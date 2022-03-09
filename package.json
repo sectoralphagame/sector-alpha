@@ -1,0 +1,68 @@
+{
+  "name": "sector-alpha",
+  "version": "1.0.0",
+  "description": "Browser-based economic sim set in space",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=development webpack serve",
+    "build": "NODE_ENV=production webpack",
+    "test": "jest",
+    "lint": "npx eslint \"src/**/*.@(tsx|ts|jsx|js)\" --fix ; npx prettier --check \"src/**/*.@(tsx|ts|jsx|js)\" --write"
+  },
+  "author": "Dominik Żegleń",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "@types/mathjs": "^9.4.2",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "esbuild": "^0.13.6",
+    "esbuild-jest": "^0.5.0",
+    "esbuild-loader": "^2.16.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb": "^19.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jest": "^25.3.0",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "fork-ts-checker-webpack-plugin": "^6.4.2",
+    "html-webpack-plugin": "^5.3.2",
+    "jest": "^27.3.0",
+    "prettier-eslint": "^8.2.2",
+    "string-replace-loader": "^3.1.0",
+    "typescript": "^4.5.2",
+    "webpack": "^5.58.2",
+    "webpack-cli": "^4.9.0",
+    "webpack-dev-server": "^4.3.1"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "resetMocks": false,
+    "transform": {
+      "^.+\\.(jsx?|tsx?)$": [
+        "esbuild-jest",
+        {
+          "sourcemap": true
+        }
+      ]
+    },
+    "testRegex": ".*\\.test\\.tsx?$",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
+  },
+  "dependencies": {
+    "@timohausmann/quadtree-js": "^1.2.5",
+    "@types/color": "^3.0.2",
+    "@types/lodash": "^4.14.177",
+    "@types/react": "^17.0.31",
+    "@types/react-dom": "^17.0.10",
+    "aphrodite": "^2.4.0",
+    "clsx": "^1.1.1",
+    "color": "^4.0.1",
+    "colormap": "^2.3.2",
+    "lodash": "^4.17.21",
+    "mathjs": "^10.0.0"
+  }
+}

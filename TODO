@@ -1,0 +1,52 @@
+Basic principles:
+    ☐ Economy
+        ☐ Factions are able to trade between themselves
+          Every marker participant should be able to adjust their buy and sell 
+          threshold using some adaptive strategy (factor-based?).
+
+        ☐ Goods are obtainable by mining or fabrication
+          Every faction has its own set of produced and consumed goods.
+
+        ☐ Storage is limited
+          Prevents throwing resources to production which has no demand yet.
+
+        ☐ Transactions are save
+          Prevents from competing in movement speed.
+
+        ☐ Assymetrical market information
+          Factions have limited knowledge about other factions, allowing them to
+          make decisions that are locally optimal, but not globally.
+
+        ☐ Transport is not instant
+          Factions have different ships, meaning they vary in terms of storage
+          and speed.
+
+        ☐ Save data regarding price/quantity over time
+          This will allow player to see how market works. It can also be used
+          during development to improve balance.
+
+    ☐ World
+        ☐ Lore
+            ☐ Factions
+              How many? Which ones?
+            ☐ Sectors
+            ☐ Travel
+              FTL? Long-haul sublight? Jump gates?
+            ☐ Goods
+                ☐ Materials obtained from mining
+                ☐ Goods produced in facilities
+                ☐ Currency
+                  It's way easier to set up Universal Trade Token (UTT)
+
+    ☐ Research and development
+        ☐ Technological advancement
+          Factions can improve their stats by constantly improving their ships
+          and facilities
+    ☐ War
+       TBD, not in mvp
+          
+
+Ideas:
+    ☐ Text and script based user input
+      Allow player to manually write scripts that are executed server-side to
+      automate all tasks.
