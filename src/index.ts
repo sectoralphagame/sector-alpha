@@ -1,6 +1,5 @@
-import { Sim } from "./sim";
+import { sim } from "./sim";
+import world from "./world";
 
-const sim = new Sim();
+sim.load(world);
 sim.start();
-
-window.sim = sim;

@@ -1,21 +1,23 @@
-import settings from "../settings";
+import { Faction } from "../economy/faction";
+import { World } from "../world";
+import { BaseSim } from "./BaseSim";
 
-export class Sim {
-  lastTick: number;
-  intervalHandle: number;
+export class Sim extends BaseSim {
+  factions: Faction[];
 
-  start = () => {
-    this.intervalHandle = setInterval(() => {
-      this.next(Date.now() - this.lastTick);
-      this.lastTick = Date.now();
-    }, 1e3 / settings.global.targetFps) as unknown as number;
-    this.lastTick = Date.now();
+  constructor() {
+    super();
+    this.factions = [];
+  }
+
+  load = (world: World) => {
+    this.factions = world.factions;
   };
 
-  next = (delta: number) => {};
-
-  pause = () => {
-    clearInterval(this.intervalHandle);
-    this.intervalHandle = null;
+  next = (delta: number) => {
+    this.factions.forEach((faction) => faction.sim(delta));
   };
 }
+
+export const sim = new Sim();
+window.sim = sim;

@@ -1,3 +1,5 @@
 interface Window {
-  sim: object;
+  sim: {
+    getTime: () => number;
+  };
 }
