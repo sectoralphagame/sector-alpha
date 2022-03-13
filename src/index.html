@@ -13,6 +13,7 @@
         background-color: black;
         color: white;
         margin: 0;
+        overscroll-behavior-y: none;
       }
 
       label {
@@ -23,10 +24,19 @@
         box-sizing: border-box;
         font-family: "Roboto", sans-serif;
       }
+
+      #root {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root" />
+    <div id="root">
+      <div id="toolbar" />
+      <div id="canvasRoot" />
+    </div>
   </body>
 </html>

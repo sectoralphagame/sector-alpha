@@ -19,9 +19,7 @@ function limitVector(vec: Point, max: number): Point {
 }
 
 export class Entity<TInput = any> implements Rect {
-  age: number;
   id: number;
-  createdAt: number;
   position: Point;
   size: Point;
   shouldDelete: boolean;
@@ -49,7 +47,6 @@ export class Entity<TInput = any> implements Rect {
   }
 
   constructor(initial: InitialEntityInput) {
-    this.age = 0;
     this.position = { ...initial.position };
     this.shouldDelete = false;
     this.size = { x: 1, y: 1 };
@@ -85,9 +82,7 @@ export class Entity<TInput = any> implements Rect {
   }
 
   // eslint-disable-next-line no-unused-vars
-  onSim(delta: number, input: TInput): Entity[] {
-    this.age += delta;
-
+  onSim(input: TInput): Entity[] {
     if (this.forces.map(len).some((force) => force > 1e4)) {
       this.die();
     }

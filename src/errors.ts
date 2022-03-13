@@ -10,3 +10,14 @@ export class InsufficientStorage extends Error {
     this.actual = actual;
   }
 }
+
+export class InsufficientMoney extends Error {
+  wanted: number;
+  actual: number;
+
+  constructor(wanted: number, actual: number) {
+    super(`Insufficient storage, wanted: ${wanted}, actual: ${actual}`);
+    this.wanted = wanted;
+    this.actual = actual;
+  }
+}

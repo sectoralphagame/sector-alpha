@@ -1,3 +1,5 @@
+import { Matrix, pow, sqrt, sum } from "mathjs";
+
 export interface Point {
   x: number;
   y: number;

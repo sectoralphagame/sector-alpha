@@ -24,7 +24,7 @@ export class BaseSim {
 
   start = () => {
     this.intervalHandle = setInterval(() => {
-      this.next(Date.now() - this.lastTick);
+      this.next((Date.now() - this.lastTick) / 1000);
       this.lastTick = Date.now();
     }, 1e3 / settings.global.targetFps) as unknown as number;
     this.firstTick = Date.now();
@@ -42,8 +42,8 @@ export class BaseSim {
   };
 
   getTime = (): number => {
-    if (this.intervalHandle) {
-      return this.timeOffset + Date.now() - this.firstTick;
+    if (this.intervalHandle && !this.outOfFocusPause) {
+      return (this.timeOffset + Date.now() - this.firstTick) / 1000;
     }
 
     return this.timeOffset;
