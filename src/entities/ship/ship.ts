@@ -1,4 +1,13 @@
-import { add, divide, matrix, Matrix, multiply, norm, subtract } from "mathjs";
+import {
+  add,
+  divide,
+  e,
+  matrix,
+  Matrix,
+  multiply,
+  norm,
+  subtract,
+} from "mathjs";
 import cloneDeep from "lodash/cloneDeep";
 import { Order } from "./orders";
 import { Facility, offerToStr } from "../../economy/factility";
@@ -85,18 +94,23 @@ export class Ship {
     const targetReached = this.moveTo(delta, order.target.position);
     if (targetReached) {
       if (order.target.isTradeAccepted(order.offer)) {
-        order.target.acceptTrade(order.offer);
-        this.storage.removeStorage(
-          order.offer.commodity,
-          order.offer.quantity -
-            order.target.storage.addStorage(
-              order.offer.commodity,
-              order.offer.quantity
-            )
-        );
-        if (this.commander) {
-          this.commander.changeMoney(order.offer.quantity * order.offer.price);
+        if (order.offer.quantity > 0) {
+          order.offer.quantity = this.storage.transfer(
+            order.offer.commodity,
+            order.offer.quantity,
+            order.target.storage,
+            false
+          );
+        } else {
+          order.offer.quantity = order.target.storage.transfer(
+            order.offer.commodity,
+            -order.offer.quantity,
+            this.storage,
+            false
+          );
         }
+
+        order.target.acceptTrade(order.offer);
 
         // console.log(
         //   `Trade accepted: ${offerToStr(order.offer.commodity, order.offer)}`
@@ -158,6 +172,7 @@ export class Ship {
                     faction: this.commander.faction,
                     price: 0,
                     quantity: this.storage.stored[commodity],
+                    budget: this.commander?.budget ?? this.owner.budget,
                   },
                   target: this.commander,
                 } as TradeOrder)

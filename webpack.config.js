@@ -27,7 +27,7 @@ const config = {
         test: /\.tsx?$/,
         loader: "esbuild-loader",
         options: {
-          loader: "ts",
+          loader: "tsx",
           target: "es2015",
         },
       },

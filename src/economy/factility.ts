@@ -1,6 +1,7 @@
 import every from "lodash/every";
 import cloneDeep from "lodash/cloneDeep";
 import sortBy from "lodash/sortBy";
+import map from "lodash/map";
 import { matrix, Matrix, min, sum } from "mathjs";
 import { sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
@@ -14,6 +15,7 @@ import {
 import { CommodityStorage } from "./storage";
 import { Faction } from "./faction";
 import { Ship } from "../entities/ship";
+import { Budget } from "./budget";
 
 let facilityIdCounter = 0;
 
@@ -36,12 +38,12 @@ export interface Transaction extends TradeOffer {
 export interface TransactionInput extends TradeOffer {
   commodity: Commodity;
   faction: Faction;
+  budget: Budget;
 }
 
 export class Facility {
   id: number;
   cooldowns: Cooldowns<"production" | "shipDispatch">;
-  money: number;
   offers: TradeOffers;
   productionAndConsumption: ProductionAndConsumption;
   transactions: Transaction[];
@@ -51,6 +53,8 @@ export class Facility {
   modules: FacilityModule[];
   lastPriceAdjust: number;
   ships: Ship[];
+  name: string;
+  budget: Budget;
 
   constructor() {
     this.id = facilityIdCounter;
@@ -64,6 +68,8 @@ export class Facility {
     this.createOffers();
     this.ships = [];
     this.transactions = [];
+    this.name = `Facility #${this.id}`;
+    this.budget = new Budget();
   }
 
   addShip = (ship: Ship) => {
@@ -85,6 +91,9 @@ export class Facility {
       })
     );
   };
+
+  getPlannedBudget = (): number =>
+    sum(map(this.offers).map((offer) => -offer.price * offer.quantity));
 
   getProductionSurplus = (commodity: Commodity) =>
     this.productionAndConsumption[commodity].produces -
@@ -119,37 +128,50 @@ export class Facility {
     if (offer.quantity > 0) {
       return (
         input.price >= offer.price &&
-        input.faction.money >= input.price * input.quantity
+        input.budget.money >= input.price * -input.quantity
       );
     }
 
     return (
-      input.price <= offer.price && this.money >= input.price * -input.quantity
+      input.price <= offer.price &&
+      this.budget.money >= input.price * -input.quantity
     );
   };
 
   acceptTrade = (input: TransactionInput) => {
-    this.changeMoney(-input.quantity * input.price);
+    if (input.quantity > 0) {
+      input.budget.transferMoney(input.quantity * input.price, this.budget);
+    } else {
+      this.budget.transferMoney(-input.quantity * input.price, input.budget);
+    }
     this.transactions.push({
       ...input,
       time: sim.getTime(),
     });
   };
 
-  changeMoney = (value: number) => {
-    this.money += value;
-  };
-
-  addStorage = (commodity: Commodity, quantity: number): number => {
+  addStorage = (
+    commodity: Commodity,
+    quantity: number,
+    recreateOffers = false
+  ): number => {
     const surplus = this.storage.addStorage(commodity, quantity);
-    this.createOffers();
+    if (recreateOffers) {
+      this.createOffers();
+    }
 
     return surplus;
   };
 
-  removeStorage = (commodity: Commodity, quantity: number) => {
+  removeStorage = (
+    commodity: Commodity,
+    quantity: number,
+    recreateOffers = false
+  ) => {
     this.storage.removeStorage(commodity, quantity);
-    this.createOffers();
+    if (recreateOffers) {
+      this.createOffers();
+    }
   };
 
   addModule = (facilityModule: FacilityModule) => {
@@ -209,31 +231,38 @@ export class Facility {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("production")) {
-      if (
+      const modulesAbleToProduce = this.modules.filter((facilityModule) =>
         every(
           perCommodity((commodity) =>
             this.storage.hasSufficientStorage(
               commodity,
-              this.productionAndConsumption[commodity].consumes
+              facilityModule.productionAndConsumption[commodity].consumes
             )
           )
         )
-      ) {
+      );
+      if (modulesAbleToProduce.length) {
         this.cooldowns.use("production", 15);
         // TODO: use allocations and postpone storing commodities until
         // finished producing
-        perCommodity((commodity) =>
-          this.removeStorage(
-            commodity,
-            this.productionAndConsumption[commodity].consumes
-          )
-        );
-        perCommodity((commodity) =>
-          this.addStorage(
-            commodity,
-            this.productionAndConsumption[commodity].produces
-          )
-        );
+
+        modulesAbleToProduce.forEach((facilityModule) => {
+          perCommodity((commodity) =>
+            this.removeStorage(
+              commodity,
+              facilityModule.productionAndConsumption[commodity].consumes,
+              false
+            )
+          );
+          perCommodity((commodity) =>
+            this.addStorage(
+              commodity,
+              facilityModule.productionAndConsumption[commodity].produces,
+              false
+            )
+          );
+        });
+        this.createOffers();
       }
     }
 
@@ -247,8 +276,8 @@ export class Facility {
 
       const needs = this.getNeededCommodities();
 
-      if (needs.length > 0) {
-        const mostNeededCommodity = needs[0];
+      while (needs.length > 0 && idleShips.length) {
+        const mostNeededCommodity = needs.shift();
 
         const factionFacility = this.faction.facilities.find(
           (facility) => facility.offers[mostNeededCommodity].quantity > 0
@@ -264,13 +293,14 @@ export class Facility {
                 -this.offers[mostNeededCommodity].quantity,
                 ship.storage.max,
                 factionFacility.offers[mostNeededCommodity].quantity,
-                this.money / this.offers[mostNeededCommodity].price
+                this.budget.money / this.offers[mostNeededCommodity].price
               ),
               commodity: mostNeededCommodity,
               faction: this.faction,
+              budget: this.budget,
             },
           });
-          return;
+          continue;
         }
 
         const friendlyFacility = sim.factions
@@ -291,10 +321,11 @@ export class Facility {
                 -this.offers[mostNeededCommodity].quantity,
                 ship.storage.max,
                 friendlyFacility.offers[mostNeededCommodity].quantity,
-                this.money / this.offers[mostNeededCommodity].price
+                this.budget.money / this.offers[mostNeededCommodity].price
               ),
               commodity: mostNeededCommodity,
               faction: this.faction,
+              budget: this.budget,
             },
           });
         }

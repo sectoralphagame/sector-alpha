@@ -2,6 +2,7 @@ import P5, { Camera } from "p5";
 import Color from "color";
 import { Sim } from "../sim";
 import { limitMin } from "../utils/limit";
+import "./components/Panel";
 import { Ship } from "../entities/ship";
 
 const zMin = 90;
@@ -59,7 +60,6 @@ class RenderCamera {
 }
 
 export function render(sim: Sim, parent: Element) {
-  let selectedShip: Ship | null = null;
   // eslint-disable-next-line no-new
   new P5((p5: P5) => {
     let camera: RenderCamera;
@@ -78,13 +78,16 @@ export function render(sim: Sim, parent: Element) {
       p5.background("black");
 
       sim.ships.forEach((ship) => {
-        const color = Color(ship.owner.color).unitArray();
+        const selected = window.selected === ship;
+        const color = selected
+          ? Color(ship.owner.color).lighten(0.2).unitArray()
+          : Color(ship.owner.color).unitArray();
         p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
         p5.noStroke();
         p5.circle(
           ship.position.get([0]) * 10,
           ship.position.get([1]) * 10,
-          sizes.ship
+          selected ? 1.3 * sizes.ship : sizes.ship
         );
       });
 
@@ -92,7 +95,10 @@ export function render(sim: Sim, parent: Element) {
         .map((faction) => faction.facilities)
         .flat()
         .forEach((facility) => {
-          const color = Color(facility.faction.color).unitArray();
+          const color =
+            window.selected === facility
+              ? Color(facility.faction.color).lighten(0.2).unitArray()
+              : Color(facility.faction.color).unitArray();
           p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
           p5.noStroke();
           p5.circle(
@@ -117,20 +123,23 @@ export function render(sim: Sim, parent: Element) {
     };
 
     p5.mouseClicked = () => {
-      const clickedShip = sim.ships.find((ship) => {
+      const clickables = [
+        ...sim.ships,
+        ...sim.factions.map((faction) => faction.facilities).flat(),
+      ];
+      const clicked = clickables.find((entity) => {
         const [x, y] = camera.translateScreenToCanvas(p5.mouseX, p5.mouseY);
         return (
-          (ship.position.get([0]) * 10 - x) ** 2 +
-            (ship.position.get([1]) * 10 - y) ** 2 <=
-          (sizes.ship * camera.scale) ** 2
+          (entity.position.get([0]) * 10 - x) ** 2 +
+            (entity.position.get([1]) * 10 - y) ** 2 <=
+          (sizes[entity instanceof Ship ? "ship" : "facility"] *
+            camera.scale) **
+            2
         );
       });
 
-      if (clickedShip) {
-        selectedShip = clickedShip;
-        console.log(selectedShip);
-      } else {
-        selectedShip = null;
+      if (clicked) {
+        window.selected = clicked;
       }
     };
 

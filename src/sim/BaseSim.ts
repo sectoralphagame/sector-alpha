@@ -7,6 +7,7 @@ export class BaseSim {
   intervalHandle: number;
   timeOffset: number;
   outOfFocusPause: boolean;
+  speed = 1;
 
   constructor() {
     this.timeOffset = 0;
@@ -22,9 +23,14 @@ export class BaseSim {
     });
   }
 
+  setSpeed = (value: number) => {
+    this.speed = value ?? 1;
+  };
+
   start = () => {
+    if (this.intervalHandle) return;
     this.intervalHandle = setInterval(() => {
-      this.next((Date.now() - this.lastTick) / 1000);
+      this.next(((Date.now() - this.lastTick) / 1000) * this.speed);
       this.lastTick = Date.now();
     }, 1e3 / settings.global.targetFps) as unknown as number;
     this.firstTick = Date.now();
@@ -38,12 +44,14 @@ export class BaseSim {
   pause = () => {
     clearInterval(this.intervalHandle);
     this.intervalHandle = null;
-    this.timeOffset += this.lastTick - this.firstTick;
+    this.timeOffset += (this.lastTick - this.firstTick) * this.speed;
   };
 
   getTime = (): number => {
     if (this.intervalHandle && !this.outOfFocusPause) {
-      return (this.timeOffset + Date.now() - this.firstTick) / 1000;
+      return (
+        (this.timeOffset + (Date.now() - this.firstTick) * this.speed) / 1000
+      );
     }
 
     return this.timeOffset;

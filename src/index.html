@@ -30,13 +30,23 @@
         height: 100vh;
         overflow: hidden;
       }
+
+      #toolbar {
+        width: 300px;
+        height: calc(100vh - 48px * 2);
+        position: absolute;
+        top: 48px;
+        left: 48px;
+        border: 1px solid white;
+        background: black;
+      }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
-      <div id="toolbar" />
-      <div id="canvasRoot" />
+      <div id="toolbar"></div>
+      <div id="canvasRoot"></div>
     </div>
   </body>
 </html>

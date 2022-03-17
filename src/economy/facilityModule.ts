@@ -55,7 +55,7 @@ export const facilityModules = {
     water: { consumes: 0, produces: 10 },
   }),
   farm: createFacilityModule("Farm", 0, {
-    food: { consumes: 1, produces: 10 },
+    food: { consumes: 0, produces: 15 },
     fuel: { consumes: 1, produces: 0 },
     water: { consumes: 3, produces: 0 },
   }),
@@ -68,7 +68,7 @@ export const facilityModules = {
   fuelFabrication: createFacilityModule("Fuel Fabrication", 0, {
     food: { consumes: 1, produces: 0 },
     fuelium: { consumes: 20, produces: 0 },
-    fuel: { consumes: 2, produces: 10 },
+    fuel: { consumes: 0, produces: 10 },
   }),
   habitat: createFacilityModule("Habitation Zone", 0, {
     food: { consumes: 5, produces: 0 },

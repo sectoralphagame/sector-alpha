@@ -1,5 +1,6 @@
 import { matrix } from "mathjs";
 import { Ship } from ".";
+import { Budget } from "../../economy/budget";
 import { Facility } from "../../economy/factility";
 import { shipClasses } from "../../world/ships";
 
@@ -52,6 +53,7 @@ describe("Ship", () => {
         faction: facility.faction,
         price: 1,
         quantity: 10,
+        budget: new Budget(),
       },
       target: facility,
     });
@@ -78,6 +80,7 @@ describe("Ship", () => {
         faction: facility.faction,
         price: 1,
         quantity: -10,
+        budget: new Budget(),
       },
       target: facility,
     });
