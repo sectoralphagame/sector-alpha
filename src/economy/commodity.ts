@@ -5,6 +5,7 @@ export const commodities = {
   fuel: "fuel",
   fuelium: "fuelium",
   gold: "gold",
+  hullPlates: "hullPlates",
   ice: "ice",
   metals: "metals",
   ore: "ore",

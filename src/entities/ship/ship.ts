@@ -1,13 +1,4 @@
-import {
-  add,
-  divide,
-  e,
-  matrix,
-  Matrix,
-  multiply,
-  norm,
-  subtract,
-} from "mathjs";
+import { add, divide, matrix, Matrix, multiply, norm, subtract } from "mathjs";
 import cloneDeep from "lodash/cloneDeep";
 import { Order } from "./orders";
 import { Facility, offerToStr } from "../../economy/factility";

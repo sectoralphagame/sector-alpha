@@ -36,6 +36,7 @@ fuelFacilityA.addModule(facilityModules.dummy_fueliumProduction);
 fuelFacilityA.addModule(facilityModules.containerSmall);
 fuelFacilityA.position = matrix([-23, -7]);
 factionA.addFacility(fuelFacilityA);
+fuelFacilityA.addShip(new Ship(shipClasses.shipA));
 
 const shipFacilityB = new Facility();
 shipFacilityB.budget.money = 100;
@@ -71,5 +72,13 @@ fuelFabricatorB.addStorage("food", 30);
 fuelFabricatorB.position = matrix([3, -14]);
 factionB.addFacility(fuelFabricatorB);
 fuelFabricatorB.addShip(new Ship(shipClasses.shipA));
+
+const hullPlatesFactoryB = new Facility();
+hullPlatesFactoryB.budget.money = 100;
+hullPlatesFactoryB.addModule(facilityModules.hullPlates);
+hullPlatesFactoryB.addModule(facilityModules.containerSmall);
+hullPlatesFactoryB.position = matrix([2, -10]);
+factionB.addFacility(hullPlatesFactoryB);
+hullPlatesFactoryB.addShip(new Ship(shipClasses.shipB));
 
 export const factions = [factionA, factionB];

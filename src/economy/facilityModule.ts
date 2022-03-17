@@ -73,10 +73,16 @@ export const facilityModules = {
   habitat: createFacilityModule("Habitation Zone", 0, {
     food: { consumes: 5, produces: 0 },
   }),
+  hullPlates: createFacilityModule("Hull Plates Production ", 0, {
+    food: { consumes: 2, produces: 0 },
+    fuel: { consumes: 7, produces: 0 },
+    metals: { consumes: 25, produces: 0 },
+    hullPlates: { consumes: 0, produces: 70 },
+  }),
   shipyard: createFacilityModule("Shipyard", 0, {
     food: { consumes: 2, produces: 0 },
     fuel: { consumes: 3, produces: 0 },
-    metals: { consumes: 10, produces: 0 },
+    hullPlates: { consumes: 10, produces: 0 },
   }),
   containerSmall: createFacilityModule("Small Container", 1000, {}),
 } as const;

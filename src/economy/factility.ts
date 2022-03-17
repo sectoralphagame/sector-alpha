@@ -227,6 +227,22 @@ export class Facility {
     ).map((offer) => offer.commodity);
   };
 
+  getCommoditiesForSell = (): Commodity[] =>
+    sortBy(
+      Object.values(commodities)
+        .map((commodity) => ({
+          commodity,
+          wantToSell: this.offers[commodity].quantity,
+          quantityStored: this.storage.stored[commodity],
+        }))
+        .filter((offer) => offer.wantToSell > 0)
+        .map((data) => ({
+          commodity: data.commodity,
+          score: data.quantityStored,
+        })),
+      "score"
+    ).map((offer) => offer.commodity);
+
   sim = (delta: number) => {
     this.cooldowns.update(delta);
 
@@ -324,6 +340,83 @@ export class Facility {
                 this.budget.money / this.offers[mostNeededCommodity].price
               ),
               commodity: mostNeededCommodity,
+              faction: this.faction,
+              budget: this.budget,
+            },
+          });
+        }
+      }
+
+      const sellable = this.getCommoditiesForSell();
+
+      while (sellable.length > 0 && idleShips.length) {
+        const commodityForSell = sellable.shift();
+
+        const factionFacility = this.faction.facilities.find(
+          (facility) => facility.offers[commodityForSell].quantity < 0
+        );
+        if (factionFacility) {
+          const ship = idleShips.pop();
+          const quantity = min(
+            this.offers[commodityForSell].quantity,
+            ship.storage.max,
+            -factionFacility.offers[commodityForSell].quantity
+          );
+          ship.addOrder({
+            type: "trade",
+            target: this,
+            offer: {
+              price: 0,
+              quantity: -quantity,
+              commodity: commodityForSell,
+              faction: this.faction,
+              budget: this.budget,
+            },
+          });
+          ship.addOrder({
+            type: "trade",
+            target: factionFacility,
+            offer: {
+              price: 0,
+              quantity,
+              commodity: commodityForSell,
+              faction: this.faction,
+              budget: this.budget,
+            },
+          });
+          continue;
+        }
+
+        const friendlyFacility = sim.factions
+          .filter((faction) => faction.slug !== this.faction.slug)
+          .map((faction) => faction.facilities)
+          .flat()
+          .find((facility) => facility.offers[commodityForSell].quantity < 0);
+        if (friendlyFacility) {
+          const ship = idleShips.pop();
+          const quantity = min(
+            this.offers[commodityForSell].quantity,
+            ship.storage.max,
+            -friendlyFacility.offers[commodityForSell].quantity
+          );
+          ship.addOrder({
+            type: "trade",
+            target: this,
+            offer: {
+              price: 0,
+              quantity: -quantity,
+              commodity: commodityForSell,
+              faction: this.faction,
+              budget: this.budget,
+            },
+          });
+          ship.addOrder({
+            type: "trade",
+            target: friendlyFacility,
+            offer: {
+              price: friendlyFacility.offers[commodityForSell].price,
+              quantity,
+              commodity: commodityForSell,
               faction: this.faction,
               budget: this.budget,
             },
