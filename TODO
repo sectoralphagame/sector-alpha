@@ -1,13 +1,13 @@
 Basic principles:
     ☐ Economy
-        ☐ Factions are able to trade between themselves
+        ✔ Factions are able to trade between themselves @done(22-03-17 13:37)
           Every marker participant should be able to adjust their buy and sell 
           threshold using some adaptive strategy (factor-based?).
 
         ☐ Goods are obtainable by mining or fabrication
           Every faction has its own set of produced and consumed goods.
 
-        ☐ Storage is limited
+        ✔ Storage is limited @done(22-03-17 13:37)
           Prevents throwing resources to production which has no demand yet.
 
         ☐ Transactions are save
@@ -17,7 +17,7 @@ Basic principles:
           Factions have limited knowledge about other factions, allowing them to
           make decisions that are locally optimal, but not globally.
 
-        ☐ Transport is not instant
+        ✔ Transport is not instant @done(22-03-17 13:38)
           Factions have different ships, meaning they vary in terms of storage
           and speed.
 
