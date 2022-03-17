@@ -1,8 +1,11 @@
 Basic principles:
     ☐ Economy
-        ✔ Factions are able to trade between themselves @done(22-03-17 13:37)
+        ☐ Factions are able to trade between themselves
           Every marker participant should be able to adjust their buy and sell 
           threshold using some adaptive strategy (factor-based?).
+
+          ☐ Add trading between facilities
+          ☐ Allow facilities to adjust their offer's prices
 
         ☐ Goods are obtainable by mining or fabrication
           Every faction has its own set of produced and consumed goods.
@@ -10,7 +13,7 @@ Basic principles:
         ✔ Storage is limited @done(22-03-17 13:37)
           Prevents throwing resources to production which has no demand yet.
 
-        ☐ Transactions are save
+        ☐ Transactions are safe
           Prevents from competing in movement speed.
 
         ☐ Assymetrical market information
@@ -24,6 +27,13 @@ Basic principles:
         ☐ Save data regarding price/quantity over time
           This will allow player to see how market works. It can also be used
           during development to improve balance.
+
+        ☐ Ships can be constructed
+          Along with facility construction it will allow world grow.
+
+        ☐ Facilities can be constructed
+          Same as ship constructing.
+
 
     ☐ World
         ☐ Lore
