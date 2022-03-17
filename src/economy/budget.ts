@@ -1,7 +1,9 @@
 import { InsufficientMoney, NegativeBudget } from "../errors";
 
 export class Budget {
-  money: number = 0;
+  private money: number = 0;
+
+  getAvailableMoney = () => this.money;
 
   changeMoney = (value: number) => {
     this.money += value;

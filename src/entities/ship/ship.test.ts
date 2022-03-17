@@ -1,7 +1,7 @@
 import { matrix } from "mathjs";
 import { Ship } from ".";
-import { Budget } from "../../economy/budget";
 import { Facility } from "../../economy/factility";
+import { Faction } from "../../economy/faction";
 import { shipClasses } from "../../world/ships";
 
 describe("Ship", () => {
@@ -41,6 +41,7 @@ describe("Ship", () => {
     facility.storage.max = 100;
     facility.offers.food = { price: 1, quantity: -20 };
     facility.position = matrix([1, 0]);
+    facility.budget.changeMoney(10);
 
     const ship = new Ship(shipClasses.shipA);
     ship.storage.addStorage("food", 10);
@@ -53,7 +54,7 @@ describe("Ship", () => {
         faction: facility.faction,
         price: 1,
         quantity: 10,
-        budget: new Budget(),
+        budget: facility.budget,
       },
       target: facility,
     });
@@ -64,13 +65,18 @@ describe("Ship", () => {
   });
 
   it("is able to buy", () => {
+    const facilityFaction = new Faction("facility-faction");
     const facility = new Facility();
+    facilityFaction.addFacility(facility);
     facility.storage.max = 100;
     facility.offers.food = { price: 1, quantity: 20 };
-    facility.storage.addStorage("food", 20);
+    facility.addStorage("food", 20);
     facility.position = matrix([1, 0]);
 
+    const shipFaction = new Faction("ship-faction");
+    shipFaction.budget.changeMoney(100);
     const ship = new Ship(shipClasses.shipA);
+    ship.setOwner(shipFaction);
     ship.position = matrix([1, 0]);
 
     const traded = ship.tradeOrder(1, {
@@ -80,7 +86,7 @@ describe("Ship", () => {
         faction: facility.faction,
         price: 1,
         quantity: -10,
-        budget: new Budget(),
+        budget: shipFaction.budget,
       },
       target: facility,
     });

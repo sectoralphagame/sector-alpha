@@ -56,7 +56,7 @@ describe("Facility", () => {
     facility.addModule(facilityModules.containerSmall);
     facility.addModule(facilityModules.farm);
 
-    expect(facility.getNeededCommodities()).toBe(["water", "fuel", "food"]);
+    expect(facility.getNeededCommodities()).toEqual(["water", "fuel"]);
   });
 
   it("properly sorts by most needed commodity 2", () => {
@@ -65,6 +65,6 @@ describe("Facility", () => {
     facility.addModule(facilityModules.farm);
     facility.addStorage("water", 10);
 
-    expect(facility.getNeededCommodities()).toBe(["fuel", "food", "water"]);
+    expect(facility.getNeededCommodities()).toEqual(["fuel", "water"]);
   });
 });

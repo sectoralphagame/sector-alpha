@@ -128,13 +128,13 @@ export class Facility {
     if (offer.quantity > 0) {
       return (
         input.price >= offer.price &&
-        input.budget.money >= input.price * -input.quantity
+        input.budget.getAvailableMoney() >= input.price * -input.quantity
       );
     }
 
     return (
       input.price <= offer.price &&
-      this.budget.money >= input.price * -input.quantity
+      this.budget.getAvailableMoney() >= input.price * -input.quantity
     );
   };
 
@@ -153,7 +153,7 @@ export class Facility {
   addStorage = (
     commodity: Commodity,
     quantity: number,
-    recreateOffers = false
+    recreateOffers = true
   ): number => {
     const surplus = this.storage.addStorage(commodity, quantity);
     if (recreateOffers) {
@@ -309,7 +309,8 @@ export class Facility {
                 -this.offers[mostNeededCommodity].quantity,
                 ship.storage.max,
                 factionFacility.offers[mostNeededCommodity].quantity,
-                this.budget.money / this.offers[mostNeededCommodity].price
+                this.budget.getAvailableMoney() /
+                  this.offers[mostNeededCommodity].price
               ),
               commodity: mostNeededCommodity,
               faction: this.faction,
@@ -337,7 +338,8 @@ export class Facility {
                 -this.offers[mostNeededCommodity].quantity,
                 ship.storage.max,
                 friendlyFacility.offers[mostNeededCommodity].quantity,
-                this.budget.money / this.offers[mostNeededCommodity].price
+                this.budget.getAvailableMoney() /
+                  this.offers[mostNeededCommodity].price
               ),
               commodity: mostNeededCommodity,
               faction: this.faction,

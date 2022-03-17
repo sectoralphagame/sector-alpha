@@ -6,7 +6,7 @@ describe("Budget", () => {
 
     budget.changeMoney(1);
 
-    expect(budget.money).toBe(1);
+    expect(budget.getAvailableMoney()).toBe(1);
   });
 
   it("cannot be negative", () => {
@@ -17,18 +17,18 @@ describe("Budget", () => {
 
   it("properly transfers money", () => {
     const budgetA = new Budget();
-    budgetA.money = 100;
+    budgetA.changeMoney(100);
     const budgetB = new Budget();
 
     budgetA.transferMoney(10, budgetB);
 
-    expect(budgetA.money).toBe(90);
-    expect(budgetB.money).toBe(10);
+    expect(budgetA.getAvailableMoney()).toBe(90);
+    expect(budgetB.getAvailableMoney()).toBe(10);
   });
 
   it("cannot transfer more money than available", () => {
     const budgetA = new Budget();
-    budgetA.money = 100;
+    budgetA.changeMoney(100);
     const budgetB = new Budget();
 
     expect(() => budgetA.transferMoney(1000, budgetB)).toThrow();

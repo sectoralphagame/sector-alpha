@@ -8,7 +8,7 @@ const FacilityPanel: React.FC = () => {
   return (
     <div>
       <div>{facility.name}</div>
-      <div>Money: {facility.budget.money.toFixed(0)}</div>
+      <div>Money: {facility.budget.getAvailableMoney().toFixed(0)}</div>
       <hr />
       {Object.values(commodities)
         .map((commodity) => ({

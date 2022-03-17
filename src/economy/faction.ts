@@ -38,16 +38,16 @@ export class Faction {
       this.cooldowns.use("budget", 60);
       this.facilities.forEach((facility) => {
         const budgetChange =
-          facility.getPlannedBudget() - facility.budget.money;
+          facility.getPlannedBudget() - facility.budget.getAvailableMoney();
 
         if (budgetChange < 0) {
           facility.budget.transferMoney(
-            limitMax(-budgetChange, facility.budget.money),
+            limitMax(-budgetChange, facility.budget.getAvailableMoney()),
             this.budget
           );
         } else {
           this.budget.transferMoney(
-            limitMax(budgetChange, this.budget.money),
+            limitMax(budgetChange, this.budget.getAvailableMoney()),
             facility.budget
           );
         }
