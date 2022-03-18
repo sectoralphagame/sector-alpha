@@ -97,8 +97,8 @@ export function render(sim: Sim, parent: Element) {
         .forEach((facility) => {
           const color =
             window.selected === facility
-              ? Color(facility.faction.color).lighten(0.2).unitArray()
-              : Color(facility.faction.color).unitArray();
+              ? Color(facility.owner.color).lighten(0.2).unitArray()
+              : Color(facility.owner.color).unitArray();
           p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
           p5.noStroke();
           p5.circle(
@@ -132,9 +132,7 @@ export function render(sim: Sim, parent: Element) {
         return (
           (entity.position.get([0]) * 10 - x) ** 2 +
             (entity.position.get([1]) * 10 - y) ** 2 <=
-          (sizes[entity instanceof Ship ? "ship" : "facility"] *
-            camera.scale) **
-            2
+          sizes[entity instanceof Ship ? "ship" : "facility"] ** 2
         );
       });
 
