@@ -160,7 +160,7 @@ export class Ship {
                   type: "trade",
                   offer: {
                     commodity,
-                    faction: this.commander.faction,
+                    faction: this.commander.owner,
                     price: 0,
                     quantity: this.storage.stored[commodity],
                     budget: this.commander?.budget ?? this.owner.budget,

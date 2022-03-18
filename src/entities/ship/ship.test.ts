@@ -51,10 +51,11 @@ describe("Ship", () => {
       type: "trade",
       offer: {
         commodity: "food",
-        faction: facility.faction,
+        faction: facility.owner,
         price: 1,
         quantity: 10,
         budget: facility.budget,
+        allocation: null,
       },
       target: facility,
     });
@@ -83,10 +84,11 @@ describe("Ship", () => {
       type: "trade",
       offer: {
         commodity: "food",
-        faction: facility.faction,
+        faction: facility.owner,
         price: 1,
         quantity: -10,
         budget: shipFaction.budget,
+        allocation: null,
       },
       target: facility,
     });

@@ -39,3 +39,12 @@ export class NegativeBudget extends Error {
     this.quantity = quantity;
   }
 }
+
+export class NotFound extends Error {
+  id: number;
+
+  constructor(id: number) {
+    super(`ID not found: ${id}`);
+    this.id = id;
+  }
+}

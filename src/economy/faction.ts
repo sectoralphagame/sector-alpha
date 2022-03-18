@@ -4,6 +4,8 @@ import { limitMax } from "../utils/limit";
 import { Budget } from "./budget";
 import { Facility } from "./factility";
 
+let factionCounter = 0;
+
 export class Faction {
   slug: string;
   name: string;
@@ -17,14 +19,15 @@ export class Faction {
     this.facilities = [];
     this.cooldowns = new Cooldowns("adjustPrices", "budget");
     this.color = Color.rgb(151, 255, 125)
-      .rotate(Math.random() * 360)
+      .rotate((Math.random() + factionCounter) * 70)
       .toString();
     this.budget = new Budget();
+    factionCounter += 1;
   }
 
   addFacility = (facility: Facility) => {
     this.facilities.push(facility);
-    facility.faction = this;
+    facility.setOwner(this);
   };
 
   sim = (delta: number) => {

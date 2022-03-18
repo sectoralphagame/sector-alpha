@@ -39,6 +39,7 @@ export interface TransactionInput extends TradeOffer {
   commodity: Commodity;
   faction: Faction;
   budget: Budget;
+  allocation: number | null;
 }
 
 export class Facility {
@@ -48,7 +49,7 @@ export class Facility {
   productionAndConsumption: ProductionAndConsumption;
   transactions: Transaction[];
   storage: CommodityStorage;
-  faction: Faction;
+  owner: Faction;
   position: Matrix;
   modules: FacilityModule[];
   lastPriceAdjust: number;
@@ -72,8 +73,17 @@ export class Facility {
     this.budget = new Budget();
   }
 
+  setOwner = (owner: Faction) => {
+    this.owner = owner;
+    this.ships.forEach((ship) => ship.setOwner(this.owner));
+  };
+  clearOwner = () => {
+    this.owner = null;
+    this.ships.forEach((ship) => ship.setOwner(this.owner));
+  };
+
   addShip = (ship: Ship) => {
-    ship.setOwner(this.faction);
+    ship.setOwner(this.owner);
     ship.setCommander(this);
     this.ships.push(ship);
   };
@@ -113,7 +123,7 @@ export class Facility {
         this.storage.stored[commodity];
 
   isTradeAccepted = (input: TransactionInput): boolean => {
-    if (input.faction === this.faction) {
+    if (input.faction === this.owner) {
       return true;
     }
 
@@ -140,7 +150,11 @@ export class Facility {
 
   acceptTrade = (input: TransactionInput) => {
     if (input.quantity > 0) {
-      input.budget.transferMoney(input.quantity * input.price, this.budget);
+      if (input.allocation) {
+        input.budget.fulfill(input.allocation, this.budget);
+      } else {
+        input.budget.transferMoney(input.quantity * input.price, this.budget);
+      }
     } else {
       this.budget.transferMoney(-input.quantity * input.price, input.budget);
     }
@@ -295,7 +309,7 @@ export class Facility {
       while (needs.length > 0 && idleShips.length) {
         const mostNeededCommodity = needs.shift();
 
-        const factionFacility = this.faction.facilities.find(
+        const factionFacility = this.owner.facilities.find(
           (facility) => facility.offers[mostNeededCommodity].quantity > 0
         );
         if (factionFacility) {
@@ -313,15 +327,16 @@ export class Facility {
                   this.offers[mostNeededCommodity].price
               ),
               commodity: mostNeededCommodity,
-              faction: this.faction,
+              faction: this.owner,
               budget: this.budget,
+              allocation: null,
             },
           });
           continue;
         }
 
         const friendlyFacility = sim.factions
-          .filter((faction) => faction.slug !== this.faction.slug)
+          .filter((faction) => faction.slug !== this.owner.slug)
           .map((faction) => faction.facilities)
           .flat()
           .find(
@@ -329,21 +344,27 @@ export class Facility {
           );
         if (friendlyFacility) {
           const ship = idleShips.pop();
+          const quantity = -min(
+            -this.offers[mostNeededCommodity].quantity,
+            ship.storage.max,
+            friendlyFacility.offers[mostNeededCommodity].quantity,
+            this.budget.getAvailableMoney() /
+              this.offers[mostNeededCommodity].price
+          );
+          const allocationId = this.budget.allocate(
+            -quantity * friendlyFacility.offers[mostNeededCommodity].price
+          );
+
           ship.addOrder({
             type: "trade",
             target: friendlyFacility,
             offer: {
               price: friendlyFacility.offers[mostNeededCommodity].price,
-              quantity: -min(
-                -this.offers[mostNeededCommodity].quantity,
-                ship.storage.max,
-                friendlyFacility.offers[mostNeededCommodity].quantity,
-                this.budget.getAvailableMoney() /
-                  this.offers[mostNeededCommodity].price
-              ),
+              quantity,
               commodity: mostNeededCommodity,
-              faction: this.faction,
+              faction: this.owner,
               budget: this.budget,
+              allocation: allocationId,
             },
           });
         }
@@ -354,7 +375,7 @@ export class Facility {
       while (sellable.length > 0 && idleShips.length) {
         const commodityForSell = sellable.shift();
 
-        const factionFacility = this.faction.facilities.find(
+        const factionFacility = this.owner.facilities.find(
           (facility) => facility.offers[commodityForSell].quantity < 0
         );
         if (factionFacility) {
@@ -371,8 +392,9 @@ export class Facility {
               price: 0,
               quantity: -quantity,
               commodity: commodityForSell,
-              faction: this.faction,
+              faction: this.owner,
               budget: this.budget,
+              allocation: null,
             },
           });
           ship.addOrder({
@@ -382,15 +404,16 @@ export class Facility {
               price: 0,
               quantity,
               commodity: commodityForSell,
-              faction: this.faction,
+              faction: this.owner,
               budget: this.budget,
+              allocation: null,
             },
           });
           continue;
         }
 
         const friendlyFacility = sim.factions
-          .filter((faction) => faction.slug !== this.faction.slug)
+          .filter((faction) => faction.slug !== this.owner.slug)
           .map((faction) => faction.facilities)
           .flat()
           .find((facility) => facility.offers[commodityForSell].quantity < 0);
@@ -408,8 +431,9 @@ export class Facility {
               price: 0,
               quantity: -quantity,
               commodity: commodityForSell,
-              faction: this.faction,
+              faction: this.owner,
               budget: this.budget,
+              allocation: null,
             },
           });
           ship.addOrder({
@@ -419,8 +443,9 @@ export class Facility {
               price: friendlyFacility.offers[commodityForSell].price,
               quantity,
               commodity: commodityForSell,
-              faction: this.faction,
+              faction: this.owner,
               budget: this.budget,
+              allocation: null,
             },
           });
         }
