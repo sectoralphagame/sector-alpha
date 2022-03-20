@@ -1,12 +1,14 @@
 import { add, divide, matrix, Matrix, multiply, norm, subtract } from "mathjs";
 import cloneDeep from "lodash/cloneDeep";
 import { Order } from "./orders";
-import { Facility, offerToStr } from "../../economy/factility";
+import { Facility } from "../../economy/factility";
 import { CommodityStorage } from "../../economy/storage";
 import { MoveOrder, TradeOrder } from ".";
 import { commodities } from "../../economy/commodity";
 import { sim } from "../../sim";
 import { Faction } from "../../economy/faction";
+import { isSellOffer } from "../../economy/utils";
+import { Cooldowns } from "../../utils/cooldowns";
 
 let shipIdCounter = 0;
 
@@ -27,6 +29,8 @@ export class Ship {
   commander: Facility | null;
   orders: Order[];
   idle: boolean;
+  cooldowns: Cooldowns<"retryOrder">;
+  retryOrderCounter: number = 0;
 
   constructor(initial: InitialShipInput) {
     this.id = shipIdCounter;
@@ -41,6 +45,8 @@ export class Ship {
     this.orders = [];
     this.idle = true;
     this.position = cloneDeep(initial.position);
+    this.cooldowns = new Cooldowns("retryOrder");
+
     sim.ships.push(this);
   }
 
@@ -81,11 +87,10 @@ export class Ship {
   };
 
   tradeOrder = (delta: number, order: TradeOrder): boolean => {
-    let done = false;
     const targetReached = this.moveTo(delta, order.target.position);
     if (targetReached) {
       if (order.target.isTradeAccepted(order.offer)) {
-        if (order.offer.quantity > 0) {
+        if (isSellOffer(order.offer)) {
           order.offer.quantity = this.storage.transfer(
             order.offer.commodity,
             order.offer.quantity,
@@ -93,7 +98,7 @@ export class Ship {
             false
           );
         } else {
-          order.offer.quantity = order.target.storage.transfer(
+          order.offer.quantity = -order.target.storage.transfer(
             order.offer.commodity,
             -order.offer.quantity,
             this.storage,
@@ -102,54 +107,46 @@ export class Ship {
         }
 
         order.target.acceptTrade(order.offer);
-
-        // console.log(
-        //   `Trade accepted: ${offerToStr(order.offer.commodity, order.offer)}`
-        // );
-      } else {
-        // console.log(
-        //   `Trade not accepted, ours: ${offerToStr(
-        //     order.offer.commodity,
-        //     order.offer
-        //   )}, theirs: ${offerToStr(
-        //     order.offer.commodity,
-        //     order.target.offers[order.offer.commodity]
-        //   )}`
-        // );
+        return true;
       }
 
-      done = true;
-      this.orders = this.orders.slice(1);
-    }
-    return done;
-  };
-
-  moveOrder = (delta: number, order: MoveOrder): boolean => {
-    const targetReached = this.moveTo(delta, order.position);
-    if (targetReached) {
-      this.orders = this.orders.slice(1);
+      if (this.retryOrderCounter < 5) {
+        this.retryOrderCounter += 1;
+        this.cooldowns.use("retryOrder", 5);
+      } else {
+        this.retryOrderCounter = 0;
+        return true;
+      }
     }
 
-    return targetReached;
+    return false;
   };
+
+  moveOrder = (delta: number, order: MoveOrder): boolean =>
+    this.moveTo(delta, order.position);
 
   sim = (delta: number) => {
     if (this.orders.length) {
-      // eslint-disable-next-line no-unused-vars, no-shadow
-      let orderFn: (delta: number, order: Order) => boolean;
+      if (this.cooldowns.canUse("retryOrder")) {
+        // eslint-disable-next-line no-unused-vars, no-shadow
+        let orderFn: (delta: number, order: Order) => boolean;
 
-      switch (this.orders[0].type) {
-        case "trade":
-          orderFn = this.tradeOrder;
-          break;
-        case "move":
-          orderFn = this.moveOrder;
-          break;
-        default:
-          orderFn = () => undefined;
+        switch (this.orders[0].type) {
+          case "trade":
+            orderFn = this.tradeOrder;
+            break;
+          case "move":
+            orderFn = this.moveOrder;
+            break;
+          default:
+            orderFn = () => undefined;
+        }
+
+        const completed = orderFn(delta, this.orders[0]);
+        if (completed) {
+          this.orders = this.orders.slice(1);
+        }
       }
-
-      orderFn(delta, this.orders[0]);
     } else if (this.commander) {
       if (!this.idle) {
         this.orders.push(

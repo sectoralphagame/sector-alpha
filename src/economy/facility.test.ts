@@ -46,6 +46,7 @@ describe("Facility", () => {
     const facility = new Facility();
     facility.addModule(facilityModules.containerSmall);
     facility.addModule(facilityModules.farm);
+    facility.budget.changeMoney(1000);
     facility.addStorage("food", 10);
 
     expect(facility.offers.water.quantity).toBeLessThan(0);

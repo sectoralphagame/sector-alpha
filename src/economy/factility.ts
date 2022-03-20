@@ -14,8 +14,9 @@ import {
 } from "./facilityModule";
 import { CommodityStorage } from "./storage";
 import { Faction } from "./faction";
-import { Ship } from "../entities/ship";
+import { Ship, tradeOrder } from "../entities/ship";
 import { Budget } from "./budget";
+import { isSellOffer } from "./utils";
 
 let facilityIdCounter = 0;
 
@@ -112,15 +113,36 @@ export class Facility {
   getSurplus = (commodity: Commodity) =>
     this.storage.stored[commodity] + this.getProductionSurplus(commodity);
 
-  getOfferedQuantity = (commodity: Commodity) =>
-    this.getRequiredStorage() === 0
-      ? this.getSurplus(commodity)
-      : this.getProductionSurplus(commodity) > 0
-      ? this.storage.stored[commodity] -
+  getOfferedQuantity = (commodity: Commodity) => {
+    if (this.getRequiredStorage() === 0) {
+      return this.getSurplus(commodity);
+    }
+
+    if (this.getProductionSurplus(commodity) > 0) {
+      return (
+        this.storage.stored[commodity] -
         this.productionAndConsumption[commodity].consumes * 2
-      : this.storage.max *
-          (this.getProductionSurplus(commodity) / this.getRequiredStorage()) +
-        this.storage.stored[commodity];
+      );
+    }
+
+    const requiredBudget = this.getPlannedBudget();
+    const availableBudget = this.budget.getAvailableMoney();
+    const requiredQuantity = Math.floor(
+      -this.storage.max *
+        (this.getProductionSurplus(commodity) / this.getRequiredStorage())
+    );
+
+    if (this.storage.stored[commodity] > requiredQuantity) {
+      return this.storage.stored[commodity] - requiredQuantity;
+    }
+
+    const multiplier =
+      requiredBudget > availableBudget ? availableBudget / requiredBudget : 1;
+
+    return Math.ceil(
+      multiplier * (this.storage.stored[commodity] - requiredQuantity)
+    );
+  };
 
   isTradeAccepted = (input: TransactionInput): boolean => {
     if (input.faction === this.owner) {
@@ -138,26 +160,30 @@ export class Facility {
     if (offer.quantity > 0) {
       return (
         input.price >= offer.price &&
-        input.budget.getAvailableMoney() >= input.price * -input.quantity
+        (input.allocation !== null ||
+          input.budget.getAvailableMoney() >= input.price * -input.quantity)
       );
     }
 
     return (
       input.price <= offer.price &&
-      this.budget.getAvailableMoney() >= input.price * -input.quantity
+      this.budget.getAvailableMoney() >= input.price * -input.quantity &&
+      this.storage.hasSufficientStorage(input.commodity, input.quantity)
     );
   };
 
   acceptTrade = (input: TransactionInput) => {
-    if (input.quantity > 0) {
-      if (input.allocation) {
+    if (input.price > 0) {
+      // They are selling us
+      if (isSellOffer(input)) {
+        this.budget.transferMoney(input.quantity * input.price, input.budget);
+      } else if (input.allocation) {
         input.budget.fulfill(input.allocation, this.budget);
       } else {
-        input.budget.transferMoney(input.quantity * input.price, this.budget);
+        input.budget.transferMoney(-input.quantity * input.price, this.budget);
       }
-    } else {
-      this.budget.transferMoney(-input.quantity * input.price, input.budget);
     }
+
     this.transactions.push({
       ...input,
       time: sim.getTime(),
@@ -314,8 +340,7 @@ export class Facility {
         );
         if (factionFacility) {
           const ship = idleShips.pop();
-          ship.addOrder({
-            type: "trade",
+          const order = tradeOrder({
             target: factionFacility,
             offer: {
               price: 0,
@@ -332,6 +357,11 @@ export class Facility {
               allocation: null,
             },
           });
+          if (order) {
+            ship.addOrder(order);
+          } else {
+            idleShips.push(ship);
+          }
           continue;
         }
 
@@ -355,8 +385,7 @@ export class Facility {
             -quantity * friendlyFacility.offers[mostNeededCommodity].price
           );
 
-          ship.addOrder({
-            type: "trade",
+          const order = tradeOrder({
             target: friendlyFacility,
             offer: {
               price: friendlyFacility.offers[mostNeededCommodity].price,
@@ -367,6 +396,13 @@ export class Facility {
               allocation: allocationId,
             },
           });
+
+          if (order) {
+            ship.addOrder(order);
+          } else {
+            idleShips.push(ship);
+          }
+          continue;
         }
       }
 

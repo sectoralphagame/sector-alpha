@@ -13,3 +13,14 @@ export interface TradeOrder {
 }
 
 export type Order = MoveOrder | TradeOrder;
+
+export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder | null {
+  if (order.offer.quantity === 0) {
+    return null;
+  }
+
+  return {
+    ...order,
+    type: "trade",
+  };
+}
