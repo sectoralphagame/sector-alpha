@@ -60,6 +60,9 @@ export class CommodityStorage {
     if (quantity < 0) {
       throw new NegativeQuantity(quantity);
     }
+    if (quantity === 0) {
+      return 0;
+    }
     const availableSpace = this.getAvailableSpace();
 
     if (availableSpace >= quantity) {
@@ -80,6 +83,9 @@ export class CommodityStorage {
   removeStorage = (commodity: Commodity, quantity: number) => {
     if (quantity < 0) {
       throw new NegativeQuantity(quantity);
+    }
+    if (quantity === 0) {
+      return;
     }
     if (!this.hasSufficientStorage(commodity, quantity)) {
       throw new InsufficientStorage(quantity, this.stored[commodity]);
