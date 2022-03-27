@@ -66,7 +66,6 @@ export const facilityModules = {
     fuel: { consumes: 2, produces: 0 },
   }),
   fuelFabrication: createFacilityModule("Fuel Fabrication", 0, {
-    food: { consumes: 1, produces: 0 },
     fuelium: { consumes: 20, produces: 0 },
     fuel: { consumes: 0, produces: 10 },
   }),

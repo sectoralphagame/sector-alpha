@@ -1,5 +1,5 @@
 import { matrix } from "mathjs";
-import { Ship } from ".";
+import { Ship, tradeOrder } from ".";
 import { Facility } from "../../economy/factility";
 import { Faction } from "../../economy/faction";
 import { shipClasses } from "../../world/ships";
@@ -41,24 +41,26 @@ describe("Ship", () => {
     facility.storage.max = 100;
     facility.offers.food = { price: 1, quantity: -20 };
     facility.position = matrix([1, 0]);
-    facility.budget.changeMoney(10);
+    facility.budget.changeMoney(20);
 
     const ship = new Ship(shipClasses.shipA);
     ship.storage.addStorage("food", 10);
     ship.position = matrix([1, 0]);
 
-    const traded = ship.tradeOrder(1, {
-      type: "trade",
-      offer: {
-        commodity: "food",
-        faction: facility.owner,
-        price: 1,
-        quantity: 10,
-        budget: facility.budget,
-        allocation: null,
-      },
-      target: facility,
-    });
+    const traded = ship.tradeOrder(
+      1,
+      tradeOrder({
+        offer: {
+          commodity: "food",
+          faction: facility.owner,
+          price: 1,
+          quantity: 10,
+          budget: facility.budget,
+          allocation: null,
+        },
+        target: facility,
+      })
+    );
 
     expect(traded).toBe(true);
     expect(facility.storage.stored.food).toBe(10);
@@ -71,7 +73,7 @@ describe("Ship", () => {
     facilityFaction.addFacility(facility);
     facility.storage.max = 100;
     facility.offers.food = { price: 1, quantity: 20 };
-    facility.addStorage("food", 20);
+    facility.addStorage("food", 20, { recreateOffers: true, exact: false });
     facility.position = matrix([1, 0]);
 
     const shipFaction = new Faction("ship-faction");
@@ -80,18 +82,53 @@ describe("Ship", () => {
     ship.setOwner(shipFaction);
     ship.position = matrix([1, 0]);
 
-    const traded = ship.tradeOrder(1, {
-      type: "trade",
-      offer: {
-        commodity: "food",
-        faction: facility.owner,
-        price: 1,
-        quantity: -10,
-        budget: shipFaction.budget,
-        allocation: null,
-      },
-      target: facility,
-    });
+    const traded = ship.tradeOrder(
+      1,
+      tradeOrder({
+        offer: {
+          commodity: "food",
+          faction: facility.owner,
+          price: 1,
+          quantity: -10,
+          budget: shipFaction.budget,
+          allocation: null,
+        },
+        target: facility,
+      })
+    );
+
+    expect(traded).toBe(true);
+    expect(facility.storage.stored.food).toBe(10);
+    expect(ship.storage.stored.food).toBe(10);
+  });
+
+  it("is able to buy from own faction", () => {
+    const faction = new Faction("faction");
+    const facility = new Facility();
+    faction.addFacility(facility);
+    facility.storage.max = 100;
+    facility.offers.food = { price: 1, quantity: 20 };
+    facility.addStorage("food", 20, { recreateOffers: true, exact: false });
+    facility.position = matrix([1, 0]);
+
+    const ship = new Ship(shipClasses.shipA);
+    ship.setOwner(faction);
+    ship.position = matrix([1, 0]);
+
+    const traded = ship.tradeOrder(
+      1,
+      tradeOrder({
+        offer: {
+          commodity: "food",
+          faction: facility.owner,
+          price: 0,
+          quantity: -10,
+          budget: faction.budget,
+          allocation: null,
+        },
+        target: facility,
+      })
+    );
 
     expect(traded).toBe(true);
     expect(facility.storage.stored.food).toBe(10);

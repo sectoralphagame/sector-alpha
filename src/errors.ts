@@ -11,6 +11,17 @@ export class InsufficientStorage extends Error {
   }
 }
 
+export class InsufficientStorageSpace extends Error {
+  wanted: number;
+  actual: number;
+
+  constructor(wanted: number, actual: number) {
+    super(`Insufficient storage space, wanted: ${wanted}, actual: ${actual}`);
+    this.wanted = wanted;
+    this.actual = actual;
+  }
+}
+
 export class InsufficientMoney extends Error {
   wanted: number;
   actual: number;
@@ -19,6 +30,15 @@ export class InsufficientMoney extends Error {
     super(`Insufficient money, wanted: ${wanted}, actual: ${actual}`);
     this.wanted = wanted;
     this.actual = actual;
+  }
+}
+
+export class NonPositiveAmount extends Error {
+  amount: number;
+
+  constructor(amount: number) {
+    super(`Expected non-negative amount, got: ${amount}`);
+    this.amount = amount;
   }
 }
 
@@ -46,5 +66,14 @@ export class NotFound extends Error {
   constructor(id: number) {
     super(`ID not found: ${id}`);
     this.id = id;
+  }
+}
+
+export class InvalidOfferType extends Error {
+  type: string;
+
+  constructor(type: string) {
+    super(`Expected opposed offer, but both got: ${type}`);
+    this.type = type;
   }
 }

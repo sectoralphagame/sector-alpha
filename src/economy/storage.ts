@@ -1,33 +1,69 @@
-import { sum } from "mathjs";
+import { min, sum } from "mathjs";
 import map from "lodash/map";
-import { InsufficientStorage, NegativeQuantity } from "../errors";
+import {
+  InsufficientStorage,
+  InsufficientStorageSpace,
+  NegativeQuantity,
+} from "../errors";
 import { perCommodity } from "../utils/perCommodity";
 import { Commodity } from "./commodity";
+
+interface CommodityStorageHistoryEntry {
+  commodity: Commodity;
+  quantity: number;
+}
 
 export class CommodityStorage {
   max: number;
   stored: Record<Commodity, number>;
+  history: CommodityStorageHistoryEntry[] = [];
 
   constructor() {
     this.max = 0;
     this.stored = perCommodity(() => 0);
   }
 
-  hasSufficientStorage = (commodity: Commodity, quantity: number): boolean =>
-    this.stored[commodity] >= quantity;
+  addHitoryEntry = (entry: CommodityStorageHistoryEntry) => {
+    this.history.unshift(entry);
+    if (this.history.length > 50) {
+      this.history.pop();
+    }
+  };
 
-  addStorage = (commodity: Commodity, quantity: number): number => {
+  getAvailableSpace = () => this.max - sum(map(this.stored));
+
+  hasSufficientStorageSpace = (quantity: number) => {
     if (quantity < 0) {
       throw new NegativeQuantity(quantity);
     }
-    const availableSpace = this.max - sum(map(this.stored));
+
+    return this.getAvailableSpace() >= quantity;
+  };
+
+  hasSufficientStorage = (commodity: Commodity, quantity: number): boolean =>
+    this.stored[commodity] >= quantity;
+
+  addStorage = (
+    commodity: Commodity,
+    quantity: number,
+    exact = true
+  ): number => {
+    if (quantity < 0) {
+      throw new NegativeQuantity(quantity);
+    }
+    const availableSpace = this.getAvailableSpace();
 
     if (availableSpace >= quantity) {
       this.stored[commodity] += quantity;
+      this.addHitoryEntry({ commodity, quantity });
       return 0;
+    }
+    if (exact) {
+      throw new InsufficientStorageSpace(quantity, availableSpace);
     }
 
     this.stored[commodity] += availableSpace;
+    this.addHitoryEntry({ commodity, quantity: availableSpace });
 
     return quantity - availableSpace;
   };
@@ -41,6 +77,7 @@ export class CommodityStorage {
     }
 
     this.stored[commodity] -= quantity;
+    this.addHitoryEntry({ commodity, quantity: -quantity });
   };
 
   transfer = (
@@ -50,14 +87,17 @@ export class CommodityStorage {
     exact: boolean
   ): number => {
     let quantityToTransfer = quantity;
-    if (exact && this.stored[commodity] < quantity) {
-      throw new InsufficientStorage(quantity, this.stored[commodity]);
+    if (this.stored[commodity] < quantity) {
+      if (exact) {
+        throw new InsufficientStorage(quantity, this.stored[commodity]);
+      }
     } else {
-      quantityToTransfer = this.stored[commodity];
+      quantityToTransfer = min(this.stored[commodity], quantity);
     }
 
     const transferred =
-      quantityToTransfer - target.addStorage(commodity, quantityToTransfer);
+      quantityToTransfer -
+      target.addStorage(commodity, quantityToTransfer, exact);
     this.removeStorage(commodity, transferred);
 
     return transferred;

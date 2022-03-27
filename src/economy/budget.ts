@@ -2,7 +2,7 @@ import { sum } from "mathjs";
 import {
   InsufficientMoney,
   NegativeBudget,
-  NegativeQuantity,
+  NonPositiveAmount,
   NotFound,
 } from "../errors";
 
@@ -20,8 +20,8 @@ export class Budget {
     this.money - sum(this.allocations.map((a) => a.amount));
 
   allocate = (amount: number): number => {
-    if (amount < 0) {
-      throw new NegativeQuantity(amount);
+    if (amount <= 0) {
+      throw new NonPositiveAmount(amount);
     }
 
     const allocation = {

@@ -9,6 +9,7 @@ import { sim } from "../../sim";
 import { Faction } from "../../economy/faction";
 import { isSellOffer } from "../../economy/utils";
 import { Cooldowns } from "../../utils/cooldowns";
+import { InsufficientStorage, InsufficientStorageSpace } from "../../errors";
 
 let shipIdCounter = 0;
 
@@ -90,24 +91,35 @@ export class Ship {
     const targetReached = this.moveTo(delta, order.target.position);
     if (targetReached) {
       if (order.target.isTradeAccepted(order.offer)) {
-        if (isSellOffer(order.offer)) {
-          order.offer.quantity = this.storage.transfer(
-            order.offer.commodity,
-            order.offer.quantity,
-            order.target.storage,
-            false
-          );
-        } else {
-          order.offer.quantity = -order.target.storage.transfer(
-            order.offer.commodity,
-            -order.offer.quantity,
-            this.storage,
-            false
-          );
-        }
+        try {
+          if (isSellOffer(order.offer)) {
+            this.storage.transfer(
+              order.offer.commodity,
+              order.offer.quantity,
+              order.target.storage,
+              true
+            );
+          } else {
+            order.target.storage.transfer(
+              order.offer.commodity,
+              -order.offer.quantity,
+              this.storage,
+              true
+            );
+          }
 
-        order.target.acceptTrade(order.offer);
-        return true;
+          order.target.acceptTrade(order.offer);
+          return true;
+        } catch (err) {
+          if (
+            !(
+              err instanceof InsufficientStorageSpace ||
+              err instanceof InsufficientStorage
+            )
+          ) {
+            throw err;
+          }
+        }
       }
 
       if (this.retryOrderCounter < 5) {
@@ -170,5 +182,6 @@ export class Ship {
         this.idle = true;
       }
     }
+    this.cooldowns.update(delta);
   };
 }

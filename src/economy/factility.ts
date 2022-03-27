@@ -43,6 +43,11 @@ export interface TransactionInput extends TradeOffer {
   allocation: number | null;
 }
 
+interface AddStorageOpts {
+  exact: boolean;
+  recreateOffers: boolean;
+}
+
 export class Facility {
   id: number;
   cooldowns: Cooldowns<"production" | "shipDispatch">;
@@ -145,30 +150,47 @@ export class Facility {
   };
 
   isTradeAccepted = (input: TransactionInput): boolean => {
-    if (input.faction === this.owner) {
-      return true;
-    }
+    let hasBudget = false;
+    let validPrice = false;
 
     const offer = this.offers[input.commodity];
 
     // Do not accept ship's buy request if facility wants to buy
     // Same goes for selling
-    if (offer.quantity * input.quantity > 0) {
+    if (offer.quantity * input.quantity >= 0) {
       return false;
     }
     // Facility wants to sell
     if (offer.quantity > 0) {
+      hasBudget =
+        input.allocation !== null ||
+        input.budget.getAvailableMoney() >= input.price * -input.quantity;
+      validPrice = input.price >= offer.price;
+
+      if (input.faction === this.owner) {
+        hasBudget = true;
+        validPrice = true;
+      }
+
       return (
-        input.price >= offer.price &&
-        (input.allocation !== null ||
-          input.budget.getAvailableMoney() >= input.price * -input.quantity)
+        validPrice &&
+        hasBudget &&
+        this.storage.hasSufficientStorage(input.commodity, input.quantity)
       );
     }
 
+    hasBudget = this.budget.getAvailableMoney() >= input.price * input.quantity;
+    validPrice = input.price <= offer.price;
+
+    if (input.faction === this.owner) {
+      hasBudget = true;
+      validPrice = true;
+    }
+
     return (
-      input.price <= offer.price &&
-      this.budget.getAvailableMoney() >= input.price * -input.quantity &&
-      this.storage.hasSufficientStorage(input.commodity, input.quantity)
+      validPrice &&
+      hasBudget &&
+      this.storage.hasSufficientStorageSpace(input.quantity)
     );
   };
 
@@ -193,9 +215,9 @@ export class Facility {
   addStorage = (
     commodity: Commodity,
     quantity: number,
-    recreateOffers = true
+    { exact, recreateOffers }: AddStorageOpts
   ): number => {
-    const surplus = this.storage.addStorage(commodity, quantity);
+    const surplus = this.storage.addStorage(commodity, quantity, exact);
     if (recreateOffers) {
       this.createOffers();
     }
@@ -314,7 +336,10 @@ export class Facility {
             this.addStorage(
               commodity,
               facilityModule.productionAndConsumption[commodity].produces,
-              false
+              {
+                exact: false,
+                recreateOffers: false,
+              }
             )
           );
         });
@@ -381,6 +406,10 @@ export class Facility {
             this.budget.getAvailableMoney() /
               this.offers[mostNeededCommodity].price
           );
+          if (quantity >= 0) {
+            idleShips.push(ship);
+            continue;
+          }
           const allocationId = this.budget.allocate(
             -quantity * friendlyFacility.offers[mostNeededCommodity].price
           );
@@ -421,6 +450,10 @@ export class Facility {
             ship.storage.max,
             -factionFacility.offers[commodityForSell].quantity
           );
+          if (quantity <= 0) {
+            idleShips.push(ship);
+            continue;
+          }
           ship.addOrder({
             type: "trade",
             target: this,
