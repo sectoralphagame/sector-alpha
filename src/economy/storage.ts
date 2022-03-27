@@ -8,7 +8,7 @@ import {
 } from "../errors";
 import { perCommodity } from "../utils/perCommodity";
 import { Commodity } from "./commodity";
-import { AllocationManager } from "./allocationManager";
+import { AllocationManager } from "./allocations";
 
 interface StorageAllocation {
   id: number;

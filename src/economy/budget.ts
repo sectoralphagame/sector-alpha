@@ -5,7 +5,7 @@ import {
   NonPositiveAmount,
   NotFound,
 } from "../errors";
-import { AllocationManager } from "./allocationManager";
+import { AllocationManager } from "./allocations";
 
 interface BudgetAllocation {
   id: number;
