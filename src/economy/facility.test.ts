@@ -44,9 +44,9 @@ describe("Facility", () => {
 
   it("creates buy offers is surplus is negative", () => {
     const facility = new Facility();
+    facility.budget.changeMoney(1000);
     facility.addModule(facilityModules.containerSmall);
     facility.addModule(facilityModules.farm);
-    facility.budget.changeMoney(1000);
     facility.addStorage("food", 10, { exact: false, recreateOffers: true });
 
     expect(facility.offers.water.quantity).toBeLessThan(0);
@@ -62,10 +62,14 @@ describe("Facility", () => {
 
   it("properly sorts by most needed commodity 2", () => {
     const facility = new Facility();
+    facility.budget.changeMoney(100);
     facility.addModule(facilityModules.containerSmall);
     facility.addModule(facilityModules.farm);
     facility.addStorage("water", 10, { exact: false, recreateOffers: true });
 
+    expect(facility.offers.food.quantity).toBe(0);
+    expect(facility.offers.fuel.quantity).toBeLessThan(0);
+    expect(facility.offers.water.quantity).toBeLessThan(0);
     expect(facility.getNeededCommodities()).toEqual(["fuel", "water"]);
   });
 });

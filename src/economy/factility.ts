@@ -17,6 +17,7 @@ import { Faction } from "./faction";
 import { Ship, tradeOrder } from "../entities/ship";
 import { Budget } from "./budget";
 import { isSellOffer } from "./utils";
+import { limitMin } from "../utils/limit";
 
 let facilityIdCounter = 0;
 
@@ -108,8 +109,17 @@ export class Facility {
     );
   };
 
+  /**
+   *
+   * @returns Minimum required money to fulfill all buy requests, not taking
+   * into account sell offers
+   */
   getPlannedBudget = (): number =>
-    sum(map(this.offers).map((offer) => -offer.price * offer.quantity));
+    sum(
+      map(this.offers).map(
+        (offer) => limitMin(-offer.quantity, 0) * offer.price
+      )
+    );
 
   getProductionSurplus = (commodity: Commodity) =>
     this.productionAndConsumption[commodity].produces -
@@ -119,7 +129,11 @@ export class Facility {
     this.storage.stored[commodity] + this.getProductionSurplus(commodity);
 
   getOfferedQuantity = (commodity: Commodity) => {
-    if (this.getRequiredStorage() === 0) {
+    if (
+      this.productionAndConsumption[commodity].consumes ===
+        this.productionAndConsumption[commodity].produces &&
+      this.productionAndConsumption[commodity].consumes === 0
+    ) {
       return this.getSurplus(commodity);
     }
 
