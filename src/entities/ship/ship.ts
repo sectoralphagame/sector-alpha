@@ -7,7 +7,6 @@ import { MoveOrder, TradeOrder } from ".";
 import { commodities } from "../../economy/commodity";
 import { sim } from "../../sim";
 import { Faction } from "../../economy/faction";
-import { isSellOffer } from "../../economy/utils";
 import { Cooldowns } from "../../utils/cooldowns";
 import { InsufficientStorage, InsufficientStorageSpace } from "../../errors";
 
@@ -92,7 +91,7 @@ export class Ship {
     if (targetReached) {
       if (order.target.isTradeAccepted(order.offer)) {
         try {
-          if (isSellOffer(order.offer)) {
+          if (order.offer.type === "sell") {
             this.storage.transfer(
               order.offer.commodity,
               order.offer.quantity,
@@ -102,7 +101,7 @@ export class Ship {
           } else {
             order.target.storage.transfer(
               order.offer.commodity,
-              -order.offer.quantity,
+              order.offer.quantity,
               this.storage,
               true
             );

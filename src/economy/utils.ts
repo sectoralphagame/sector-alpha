@@ -1,10 +1,6 @@
 import { Matrix, norm, subtract } from "mathjs";
 import sortBy from "lodash/sortBy";
-import { Facility, TradeOffer } from "./factility";
-
-export function isSellOffer(offer: TradeOffer): boolean {
-  return offer.quantity > 0;
-}
+import { Facility } from "./factility";
 
 export function getClosestFacility(
   facilities: Facility[],

@@ -16,18 +16,23 @@ import { CommodityStorage } from "./storage";
 import { Faction } from "./faction";
 import { Ship, tradeOrder } from "../entities/ship";
 import { Budget } from "./budget";
-import { getClosestFacility, isSellOffer } from "./utils";
+import { getClosestFacility } from "./utils";
 import { limitMin } from "../utils/limit";
 
 let facilityIdCounter = 0;
 
+export type TradeOfferType = "buy" | "sell";
+
 export interface TradeOffer {
   price: number;
   quantity: number;
+  type: TradeOfferType;
 }
 
 export function offerToStr(commodity: Commodity, offer: TradeOffer): string {
-  return `${offer.quantity} ${commodity} x ${offer.price} UTT`;
+  return `${offer.type === "buy" ? "Buying" : "Selling"} ${
+    offer.quantity
+  } ${commodity} x ${offer.price} UTT`;
 }
 
 export type TradeOffers = Record<Commodity, TradeOffer>;
@@ -97,10 +102,15 @@ export class Facility {
 
   createOffers = () => {
     this.offers = perCommodity(
-      (commodity): TradeOffer => ({
-        price: 1,
-        quantity: this.getOfferedQuantity(commodity),
-      })
+      (commodity): TradeOffer => {
+        const quantity = this.getOfferedQuantity(commodity);
+
+        return {
+          price: 1,
+          quantity: quantity > 0 ? quantity : -quantity,
+          type: quantity > 0 ? "sell" : "buy",
+        };
+      }
     );
   };
 
@@ -112,7 +122,7 @@ export class Facility {
   getPlannedBudget = (): number =>
     sum(
       map(this.offers).map(
-        (offer) => limitMin(-offer.quantity, 0) * offer.price
+        (offer) => (offer.type === "sell" ? 0 : offer.quantity) * offer.price
       )
     );
 
@@ -165,16 +175,13 @@ export class Facility {
 
     const offer = this.offers[input.commodity];
 
-    // Do not accept ship's buy request if facility wants to buy
-    // Same goes for selling
-    if (offer.quantity * input.quantity >= 0) {
+    if (offer.type === input.type) {
       return false;
     }
-    // Facility wants to sell
-    if (offer.quantity > 0) {
+    if (input.type === "buy") {
       hasBudget =
         input.allocation !== null ||
-        input.budget.getAvailableMoney() >= input.price * -input.quantity;
+        input.budget.getAvailableMoney() >= input.price * input.quantity;
       validPrice = input.price >= offer.price;
 
       if (input.faction === this.owner) {
@@ -207,13 +214,13 @@ export class Facility {
   acceptTrade = (input: TransactionInput) => {
     if (input.price > 0) {
       // They are selling us
-      if (isSellOffer(input)) {
+      if (input.type === "sell") {
         this.budget.transferMoney(input.quantity * input.price, input.budget);
       } else if (input.allocation) {
         const allocation = input.budget.allocations.release(input.allocation);
         input.budget.transferMoney(allocation.amount, this.budget);
       } else {
-        input.budget.transferMoney(-input.quantity * input.price, this.budget);
+        input.budget.transferMoney(input.quantity * input.price, this.budget);
       }
     }
 
@@ -260,12 +267,16 @@ export class Facility {
 
     return sortBy(
       Object.values(commodities)
+        .filter(
+          (commodity) =>
+            this.offers[commodity].type === "buy" &&
+            this.offers[commodity].quantity > 0
+        )
         .map((commodity) => ({
           commodity,
           wantToBuy: this.offers[commodity].quantity,
           quantityStored: stored[commodity],
         }))
-        .filter((offer) => offer.wantToBuy < 0)
         .map((data) => ({
           commodity: data.commodity,
           score:
@@ -349,7 +360,9 @@ export class Facility {
 
         const factionFacility = getClosestFacility(
           this.owner.facilities.filter(
-            (facility) => facility.offers[mostNeededCommodity].quantity > 0
+            (facility) =>
+              facility.offers[mostNeededCommodity].quantity > 0 &&
+              facility.offers[mostNeededCommodity].type === "sell"
           ),
           this.position
         );
@@ -359,8 +372,8 @@ export class Facility {
             target: factionFacility,
             offer: {
               price: 0,
-              quantity: -min(
-                -this.offers[mostNeededCommodity].quantity,
+              quantity: min(
+                this.offers[mostNeededCommodity].quantity,
                 ship.storage.max,
                 factionFacility.offers[mostNeededCommodity].quantity,
                 this.budget.getAvailableMoney() /
@@ -370,6 +383,7 @@ export class Facility {
               faction: this.owner,
               budget: this.budget,
               allocation: null,
+              type: "buy",
             },
           });
           if (order) {
@@ -386,26 +400,28 @@ export class Facility {
             .map((faction) => faction.facilities)
             .flat()
             .filter(
-              (facility) => facility.offers[mostNeededCommodity].quantity > 0
+              (facility) =>
+                facility.offers[mostNeededCommodity].quantity > 0 &&
+                facility.offers[mostNeededCommodity].type === "sell"
             ),
           this.position
         );
         if (friendlyFacility) {
           const ship = idleShips.pop();
-          const quantity = -min(
-            -this.offers[mostNeededCommodity].quantity,
+          const quantity = min(
+            this.offers[mostNeededCommodity].quantity,
             ship.storage.max,
             friendlyFacility.offers[mostNeededCommodity].quantity,
             this.budget.getAvailableMoney() /
               this.offers[mostNeededCommodity].price
           );
-          if (quantity >= 0) {
+          if (quantity <= 0) {
             idleShips.push(ship);
             continue;
           }
           const allocation = this.budget.allocations.new({
             amount:
-              -quantity * friendlyFacility.offers[mostNeededCommodity].price,
+              quantity * friendlyFacility.offers[mostNeededCommodity].price,
           });
 
           const order = tradeOrder({
@@ -417,6 +433,7 @@ export class Facility {
               faction: this.owner,
               budget: this.budget,
               allocation: allocation.id,
+              type: "buy",
             },
           });
 
@@ -436,7 +453,9 @@ export class Facility {
 
         const factionFacility = getClosestFacility(
           this.owner.facilities.filter(
-            (facility) => facility.offers[commodityForSell].quantity < 0
+            (facility) =>
+              facility.offers[commodityForSell].quantity > 0 &&
+              facility.offers[commodityForSell].type === "buy"
           ),
           this.position
         );
@@ -445,7 +464,7 @@ export class Facility {
           const quantity = min(
             this.offers[commodityForSell].quantity,
             ship.storage.max,
-            -factionFacility.offers[commodityForSell].quantity
+            factionFacility.offers[commodityForSell].quantity
           );
           if (quantity <= 0) {
             idleShips.push(ship);
@@ -456,11 +475,12 @@ export class Facility {
             target: this,
             offer: {
               price: 0,
-              quantity: -quantity,
+              quantity,
               commodity: commodityForSell,
               faction: this.owner,
               budget: this.budget,
               allocation: null,
+              type: "buy",
             },
           });
           ship.addOrder({
@@ -473,6 +493,7 @@ export class Facility {
               faction: this.owner,
               budget: this.budget,
               allocation: null,
+              type: "sell",
             },
           });
           continue;
@@ -484,7 +505,9 @@ export class Facility {
             .map((faction) => faction.facilities)
             .flat()
             .filter(
-              (facility) => facility.offers[commodityForSell].quantity < 0
+              (facility) =>
+                facility.offers[commodityForSell].quantity > 0 &&
+                facility.offers[commodityForSell].type === "buy"
             ),
           this.position
         );
@@ -493,18 +516,19 @@ export class Facility {
           const quantity = min(
             this.offers[commodityForSell].quantity,
             ship.storage.max,
-            -friendlyFacility.offers[commodityForSell].quantity
+            friendlyFacility.offers[commodityForSell].quantity
           );
           ship.addOrder({
             type: "trade",
             target: this,
             offer: {
               price: 0,
-              quantity: -quantity,
+              quantity,
               commodity: commodityForSell,
               faction: this.owner,
               budget: this.budget,
               allocation: null,
+              type: "buy",
             },
           });
           ship.addOrder({
@@ -517,6 +541,7 @@ export class Facility {
               faction: this.owner,
               budget: this.budget,
               allocation: null,
+              type: "sell",
             },
           });
         }

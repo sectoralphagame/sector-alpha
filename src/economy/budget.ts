@@ -2,6 +2,7 @@ import { sum } from "mathjs";
 import {
   InsufficientMoney,
   NegativeBudget,
+  NegativeQuantity,
   NonPositiveAmount,
   NotFound,
 } from "../errors";
@@ -43,6 +44,9 @@ export class Budget {
   };
 
   transferMoney = (value: number, target: Budget) => {
+    if (value < 0) {
+      throw new NegativeQuantity(value);
+    }
     if (this.money < value) {
       throw new InsufficientMoney(value, this.money);
     }

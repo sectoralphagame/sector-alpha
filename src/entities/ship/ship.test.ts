@@ -39,7 +39,7 @@ describe("Ship", () => {
   it("is able to sell", () => {
     const facility = new Facility();
     facility.storage.max = 100;
-    facility.offers.food = { price: 1, quantity: -20 };
+    facility.offers.food = { price: 1, quantity: 20, type: "buy" };
     facility.position = matrix([1, 0]);
     facility.budget.changeMoney(20);
 
@@ -57,6 +57,7 @@ describe("Ship", () => {
           quantity: 10,
           budget: facility.budget,
           allocation: null,
+          type: "sell",
         },
         target: facility,
       })
@@ -72,7 +73,7 @@ describe("Ship", () => {
     const facility = new Facility();
     facilityFaction.addFacility(facility);
     facility.storage.max = 100;
-    facility.offers.food = { price: 1, quantity: 20 };
+    facility.offers.food = { price: 1, quantity: 20, type: "sell" };
     facility.storage.addStorage("food", 20, false);
     facility.position = matrix([1, 0]);
 
@@ -89,9 +90,10 @@ describe("Ship", () => {
           commodity: "food",
           faction: facility.owner,
           price: 1,
-          quantity: -10,
+          quantity: 10,
           budget: shipFaction.budget,
           allocation: null,
+          type: "buy",
         },
         target: facility,
       })
@@ -107,7 +109,7 @@ describe("Ship", () => {
     const facility = new Facility();
     faction.addFacility(facility);
     facility.storage.max = 100;
-    facility.offers.food = { price: 1, quantity: 20 };
+    facility.offers.food = { price: 1, quantity: 20, type: "sell" };
     facility.storage.addStorage("food", 20, false);
     facility.position = matrix([1, 0]);
 
@@ -122,9 +124,10 @@ describe("Ship", () => {
           commodity: "food",
           faction: facility.owner,
           price: 0,
-          quantity: -10,
+          quantity: 10,
           budget: faction.budget,
           allocation: null,
+          type: "buy",
         },
         target: facility,
       })
