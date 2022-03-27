@@ -16,7 +16,7 @@ import { CommodityStorage } from "./storage";
 import { Faction } from "./faction";
 import { Ship, tradeOrder } from "../entities/ship";
 import { Budget } from "./budget";
-import { isSellOffer } from "./utils";
+import { getClosestFacility, isSellOffer } from "./utils";
 import { limitMin } from "../utils/limit";
 
 let facilityIdCounter = 0;
@@ -347,8 +347,11 @@ export class Facility {
       while (needs.length > 0 && idleShips.length) {
         const mostNeededCommodity = needs.shift();
 
-        const factionFacility = this.owner.facilities.find(
-          (facility) => facility.offers[mostNeededCommodity].quantity > 0
+        const factionFacility = getClosestFacility(
+          this.owner.facilities.filter(
+            (facility) => facility.offers[mostNeededCommodity].quantity > 0
+          ),
+          this.position
         );
         if (factionFacility) {
           const ship = idleShips.pop();
@@ -377,13 +380,16 @@ export class Facility {
           continue;
         }
 
-        const friendlyFacility = sim.factions
-          .filter((faction) => faction.slug !== this.owner.slug)
-          .map((faction) => faction.facilities)
-          .flat()
-          .find(
-            (facility) => facility.offers[mostNeededCommodity].quantity > 0
-          );
+        const friendlyFacility = getClosestFacility(
+          sim.factions
+            .filter((faction) => faction.slug !== this.owner.slug)
+            .map((faction) => faction.facilities)
+            .flat()
+            .filter(
+              (facility) => facility.offers[mostNeededCommodity].quantity > 0
+            ),
+          this.position
+        );
         if (friendlyFacility) {
           const ship = idleShips.pop();
           const quantity = -min(
@@ -428,8 +434,11 @@ export class Facility {
       while (sellable.length > 0 && idleShips.length) {
         const commodityForSell = sellable.shift();
 
-        const factionFacility = this.owner.facilities.find(
-          (facility) => facility.offers[commodityForSell].quantity < 0
+        const factionFacility = getClosestFacility(
+          this.owner.facilities.filter(
+            (facility) => facility.offers[commodityForSell].quantity < 0
+          ),
+          this.position
         );
         if (factionFacility) {
           const ship = idleShips.pop();
@@ -469,11 +478,16 @@ export class Facility {
           continue;
         }
 
-        const friendlyFacility = sim.factions
-          .filter((faction) => faction.slug !== this.owner.slug)
-          .map((faction) => faction.facilities)
-          .flat()
-          .find((facility) => facility.offers[commodityForSell].quantity < 0);
+        const friendlyFacility = getClosestFacility(
+          sim.factions
+            .filter((faction) => faction.slug !== this.owner.slug)
+            .map((faction) => faction.facilities)
+            .flat()
+            .filter(
+              (facility) => facility.offers[commodityForSell].quantity < 0
+            ),
+          this.position
+        );
         if (friendlyFacility) {
           const ship = idleShips.pop();
           const quantity = min(
