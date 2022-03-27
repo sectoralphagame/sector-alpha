@@ -73,7 +73,7 @@ describe("Ship", () => {
     facilityFaction.addFacility(facility);
     facility.storage.max = 100;
     facility.offers.food = { price: 1, quantity: 20 };
-    facility.addStorage("food", 20, { recreateOffers: true, exact: false });
+    facility.storage.addStorage("food", 20, false);
     facility.position = matrix([1, 0]);
 
     const shipFaction = new Faction("ship-faction");
@@ -108,7 +108,7 @@ describe("Ship", () => {
     faction.addFacility(facility);
     facility.storage.max = 100;
     facility.offers.food = { price: 1, quantity: 20 };
-    facility.addStorage("food", 20, { recreateOffers: true, exact: false });
+    facility.storage.addStorage("food", 20, false);
     facility.position = matrix([1, 0]);
 
     const ship = new Ship(shipClasses.shipA);

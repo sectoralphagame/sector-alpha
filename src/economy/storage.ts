@@ -18,10 +18,19 @@ export class CommodityStorage {
   stored: Record<Commodity, number>;
   history: CommodityStorageHistoryEntry[] = [];
 
-  constructor() {
+  // eslint-disable-next-line no-unused-vars
+  changeHandler: (entry: CommodityStorageHistoryEntry) => void;
+
+  constructor(onChange = () => undefined) {
     this.max = 0;
     this.stored = perCommodity(() => 0);
+    this.changeHandler = onChange;
   }
+
+  onChange = (entry: CommodityStorageHistoryEntry) => {
+    this.addHitoryEntry(entry);
+    this.changeHandler(entry);
+  };
 
   addHitoryEntry = (entry: CommodityStorageHistoryEntry) => {
     this.history.unshift(entry);
@@ -55,7 +64,7 @@ export class CommodityStorage {
 
     if (availableSpace >= quantity) {
       this.stored[commodity] += quantity;
-      this.addHitoryEntry({ commodity, quantity });
+      this.onChange({ commodity, quantity });
       return 0;
     }
     if (exact) {
@@ -63,7 +72,7 @@ export class CommodityStorage {
     }
 
     this.stored[commodity] += availableSpace;
-    this.addHitoryEntry({ commodity, quantity: availableSpace });
+    this.onChange({ commodity, quantity: availableSpace });
 
     return quantity - availableSpace;
   };
@@ -77,7 +86,7 @@ export class CommodityStorage {
     }
 
     this.stored[commodity] -= quantity;
-    this.addHitoryEntry({ commodity, quantity: -quantity });
+    this.onChange({ commodity, quantity: -quantity });
   };
 
   transfer = (

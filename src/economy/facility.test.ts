@@ -15,7 +15,7 @@ describe("Facility", () => {
   it("recreates offers after module change", () => {
     const facility = new Facility();
     facility.addModule(facilityModules.containerSmall);
-    facility.addStorage("food", 10, { exact: false, recreateOffers: true });
+    facility.storage.addStorage("food", 10, false);
     facility.addModule(facilityModules.farm);
 
     expect(facility.offers.food.quantity).not.toBe(0);
@@ -25,10 +25,10 @@ describe("Facility", () => {
     const facility = new Facility();
     facility.addModule(facilityModules.containerSmall);
     facility.addModule(facilityModules.farm);
-    facility.addStorage("food", 10, { exact: false, recreateOffers: true });
+    facility.storage.addStorage("food", 10, false);
     const prevOffer = facility.offers.food.quantity;
 
-    facility.addStorage("food", 10, { exact: false, recreateOffers: true });
+    facility.storage.addStorage("food", 10, false);
 
     expect(facility.offers.food.quantity).not.toBe(prevOffer);
   });
@@ -37,7 +37,7 @@ describe("Facility", () => {
     const facility = new Facility();
     facility.addModule(facilityModules.containerSmall);
     facility.addModule(facilityModules.farm);
-    facility.addStorage("food", 10, { exact: false, recreateOffers: true });
+    facility.storage.addStorage("food", 10, false);
 
     expect(facility.offers.food.quantity).toBeGreaterThan(0);
   });
@@ -47,7 +47,7 @@ describe("Facility", () => {
     facility.budget.changeMoney(1000);
     facility.addModule(facilityModules.containerSmall);
     facility.addModule(facilityModules.farm);
-    facility.addStorage("food", 10, { exact: false, recreateOffers: true });
+    facility.storage.addStorage("food", 10, false);
 
     expect(facility.offers.water.quantity).toBeLessThan(0);
   });
@@ -65,7 +65,7 @@ describe("Facility", () => {
     facility.budget.changeMoney(100);
     facility.addModule(facilityModules.containerSmall);
     facility.addModule(facilityModules.farm);
-    facility.addStorage("water", 10, { exact: false, recreateOffers: true });
+    facility.storage.addStorage("water", 10, false);
 
     expect(facility.offers.food.quantity).toBe(0);
     expect(facility.offers.fuel.quantity).toBeLessThan(0);

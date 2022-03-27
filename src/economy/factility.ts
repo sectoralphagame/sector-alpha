@@ -44,11 +44,6 @@ export interface TransactionInput extends TradeOffer {
   allocation: number | null;
 }
 
-interface AddStorageOpts {
-  exact: boolean;
-  recreateOffers: boolean;
-}
-
 export class Facility {
   id: number;
   cooldowns: Cooldowns<"production" | "shipDispatch">;
@@ -72,7 +67,7 @@ export class Facility {
     this.productionAndConsumption = cloneDeep(baseProductionAndConsumption);
     this.cooldowns = new Cooldowns("production", "shipDispatch");
     this.position = matrix([0, 0]);
-    this.storage = new CommodityStorage();
+    this.storage = new CommodityStorage(this.createOffers);
     this.createOffers();
     this.ships = [];
     this.transactions = [];
@@ -226,30 +221,6 @@ export class Facility {
     });
   };
 
-  addStorage = (
-    commodity: Commodity,
-    quantity: number,
-    { exact, recreateOffers }: AddStorageOpts
-  ): number => {
-    const surplus = this.storage.addStorage(commodity, quantity, exact);
-    if (recreateOffers) {
-      this.createOffers();
-    }
-
-    return surplus;
-  };
-
-  removeStorage = (
-    commodity: Commodity,
-    quantity: number,
-    recreateOffers = false
-  ) => {
-    this.storage.removeStorage(commodity, quantity);
-    if (recreateOffers) {
-      this.createOffers();
-    }
-  };
-
   addModule = (facilityModule: FacilityModule) => {
     this.modules.push(facilityModule);
     Object.keys(commodities).forEach((commodity: Commodity) => {
@@ -340,20 +311,16 @@ export class Facility {
 
         modulesAbleToProduce.forEach((facilityModule) => {
           perCommodity((commodity) =>
-            this.removeStorage(
+            this.storage.removeStorage(
               commodity,
-              facilityModule.productionAndConsumption[commodity].consumes,
-              false
+              facilityModule.productionAndConsumption[commodity].consumes
             )
           );
           perCommodity((commodity) =>
-            this.addStorage(
+            this.storage.addStorage(
               commodity,
               facilityModule.productionAndConsumption[commodity].produces,
-              {
-                exact: false,
-                recreateOffers: false,
-              }
+              false
             )
           );
         });
