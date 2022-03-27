@@ -121,7 +121,8 @@ export class Facility {
     this.productionAndConsumption[commodity].consumes;
 
   getSurplus = (commodity: Commodity) =>
-    this.storage.stored[commodity] + this.getProductionSurplus(commodity);
+    this.storage.getAvailableWares()[commodity] +
+    this.getProductionSurplus(commodity);
 
   getOfferedQuantity = (commodity: Commodity) => {
     if (
@@ -132,9 +133,11 @@ export class Facility {
       return this.getSurplus(commodity);
     }
 
+    const stored = this.storage.getAvailableWares();
+
     if (this.getProductionSurplus(commodity) > 0) {
       return (
-        this.storage.stored[commodity] -
+        stored[commodity] -
         this.productionAndConsumption[commodity].consumes * 2
       );
     }
@@ -146,16 +149,14 @@ export class Facility {
         (this.getProductionSurplus(commodity) / this.getRequiredStorage())
     );
 
-    if (this.storage.stored[commodity] > requiredQuantity) {
-      return this.storage.stored[commodity] - requiredQuantity;
+    if (stored[commodity] > requiredQuantity) {
+      return stored[commodity] - requiredQuantity;
     }
 
     const multiplier =
       requiredBudget > availableBudget ? availableBudget / requiredBudget : 1;
 
-    return Math.ceil(
-      multiplier * (this.storage.stored[commodity] - requiredQuantity)
-    );
+    return Math.ceil(multiplier * (stored[commodity] - requiredQuantity));
   };
 
   isTradeAccepted = (input: TransactionInput): boolean => {
@@ -209,7 +210,8 @@ export class Facility {
       if (isSellOffer(input)) {
         this.budget.transferMoney(input.quantity * input.price, input.budget);
       } else if (input.allocation) {
-        input.budget.fulfill(input.allocation, this.budget);
+        const allocation = input.budget.allocations.release(input.allocation);
+        input.budget.transferMoney(allocation.amount, this.budget);
       } else {
         input.budget.transferMoney(-input.quantity * input.price, this.budget);
       }
@@ -254,13 +256,14 @@ export class Facility {
 
   getNeededCommodities = (): Commodity[] => {
     const summedConsumption = this.getSummedConsumption();
+    const stored = this.storage.getAvailableWares();
 
     return sortBy(
       Object.values(commodities)
         .map((commodity) => ({
           commodity,
           wantToBuy: this.offers[commodity].quantity,
-          quantityStored: this.storage.stored[commodity],
+          quantityStored: stored[commodity],
         }))
         .filter((offer) => offer.wantToBuy < 0)
         .map((data) => ({
@@ -274,13 +277,15 @@ export class Facility {
     ).map((offer) => offer.commodity);
   };
 
-  getCommoditiesForSell = (): Commodity[] =>
-    sortBy(
+  getCommoditiesForSell = (): Commodity[] => {
+    const stored = this.storage.getAvailableWares();
+
+    return sortBy(
       Object.values(commodities)
         .map((commodity) => ({
           commodity,
           wantToSell: this.offers[commodity].quantity,
-          quantityStored: this.storage.stored[commodity],
+          quantityStored: stored[commodity],
         }))
         .filter((offer) => offer.wantToSell > 0)
         .map((data) => ({
@@ -289,6 +294,7 @@ export class Facility {
         })),
       "score"
     ).map((offer) => offer.commodity);
+  };
 
   sim = (delta: number) => {
     this.cooldowns.update(delta);
@@ -391,9 +397,10 @@ export class Facility {
             idleShips.push(ship);
             continue;
           }
-          const allocationId = this.budget.allocate(
-            -quantity * friendlyFacility.offers[mostNeededCommodity].price
-          );
+          const allocation = this.budget.allocations.new({
+            amount:
+              -quantity * friendlyFacility.offers[mostNeededCommodity].price,
+          });
 
           const order = tradeOrder({
             target: friendlyFacility,
@@ -403,7 +410,7 @@ export class Facility {
               commodity: mostNeededCommodity,
               faction: this.owner,
               budget: this.budget,
-              allocation: allocationId,
+              allocation: allocation.id,
             },
           });
 

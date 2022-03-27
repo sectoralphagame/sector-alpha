@@ -1,5 +1,6 @@
 import { min, sum } from "mathjs";
 import map from "lodash/map";
+import each from "lodash/each";
 import {
   InsufficientStorage,
   InsufficientStorageSpace,
@@ -7,6 +8,13 @@ import {
 } from "../errors";
 import { perCommodity } from "../utils/perCommodity";
 import { Commodity } from "./commodity";
+import { AllocationManager } from "./allocationManager";
+
+interface StorageAllocation {
+  id: number;
+  amount: Record<Commodity, number>;
+  target: CommodityStorage;
+}
 
 interface CommodityStorageHistoryEntry {
   commodity: Commodity;
@@ -14,8 +22,11 @@ interface CommodityStorageHistoryEntry {
 }
 
 export class CommodityStorage {
+  private stored: Record<Commodity, number>;
+
+  allocationManager: AllocationManager<StorageAllocation>;
+
   max: number;
-  stored: Record<Commodity, number>;
   history: CommodityStorageHistoryEntry[] = [];
 
   // eslint-disable-next-line no-unused-vars
@@ -24,6 +35,7 @@ export class CommodityStorage {
   constructor(onChange = () => undefined) {
     this.max = 0;
     this.stored = perCommodity(() => 0);
+    this.allocationManager = new AllocationManager<StorageAllocation>();
     this.changeHandler = onChange;
   }
 
@@ -40,6 +52,8 @@ export class CommodityStorage {
   };
 
   getAvailableSpace = () => this.max - sum(map(this.stored));
+
+  getAvailableWares = () => this.stored;
 
   hasSufficientStorageSpace = (quantity: number) => {
     if (quantity < 0) {

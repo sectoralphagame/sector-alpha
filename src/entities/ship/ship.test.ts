@@ -63,8 +63,8 @@ describe("Ship", () => {
     );
 
     expect(traded).toBe(true);
-    expect(facility.storage.stored.food).toBe(10);
-    expect(ship.storage.stored.food).toBe(0);
+    expect(facility.storage.getAvailableWares().food).toBe(10);
+    expect(ship.storage.getAvailableWares().food).toBe(0);
   });
 
   it("is able to buy", () => {
@@ -98,8 +98,8 @@ describe("Ship", () => {
     );
 
     expect(traded).toBe(true);
-    expect(facility.storage.stored.food).toBe(10);
-    expect(ship.storage.stored.food).toBe(10);
+    expect(facility.storage.getAvailableWares().food).toBe(10);
+    expect(ship.storage.getAvailableWares().food).toBe(10);
   });
 
   it("is able to buy from own faction", () => {
@@ -131,7 +131,7 @@ describe("Ship", () => {
     );
 
     expect(traded).toBe(true);
-    expect(facility.storage.stored.food).toBe(10);
-    expect(ship.storage.stored.food).toBe(10);
+    expect(facility.storage.getAvailableWares().food).toBe(10);
+    expect(ship.storage.getAvailableWares().food).toBe(10);
   });
 });

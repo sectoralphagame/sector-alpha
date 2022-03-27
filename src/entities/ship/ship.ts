@@ -171,7 +171,7 @@ export class Ship {
                     commodity,
                     faction: this.commander.owner,
                     price: 0,
-                    quantity: this.storage.stored[commodity],
+                    quantity: this.storage.getAvailableWares()[commodity],
                     budget: this.commander?.budget ?? this.owner.budget,
                   },
                   target: this.commander,

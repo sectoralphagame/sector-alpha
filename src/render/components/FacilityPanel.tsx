@@ -15,12 +15,14 @@ const FacilityPanel: React.FC = () => {
           commodity,
           ...facility.productionAndConsumption[commodity],
           ...facility.offers[commodity],
-          stored: facility.storage.stored[commodity],
+          stored: facility.storage.getAvailableWares()[commodity],
         }))
         .map((data) => (
-          <div key={data.commodity}>{`${data.commodity}: ${data.stored} / ${
-            data.produces || -data.consumes
-          } / ${data.quantity.toFixed(0)}`}</div>
+          <div key={data.commodity}>{`${data.commodity}: ${
+            data.stored
+          } / ${data.produces || -data.consumes} / ${data.quantity.toFixed(
+            0
+          )}`}</div>
         ))}
       <hr />
       {facility.modules.map((facilityModule, index) => (

@@ -13,7 +13,7 @@ const ShipPanel: React.FC = () => {
       {Object.values(commodities)
         .map((commodity) => ({
           commodity,
-          stored: ship.storage.stored[commodity],
+          stored: ship.storage.getAvailableWares()[commodity],
         }))
         .map((data) => (
           <div key={data.commodity}>{`${data.commodity}: ${data.stored}`}</div>
