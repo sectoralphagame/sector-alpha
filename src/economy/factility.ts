@@ -15,7 +15,8 @@ import {
 import { CommodityStorage } from "./storage";
 import { Faction } from "./faction";
 import { Ship } from "../entities/ship";
-import { Budget } from "./budget";
+import { Budget, BudgetAllocation } from "./budget";
+import { Allocation } from "./allocations";
 
 let facilityIdCounter = 0;
 
@@ -44,7 +45,13 @@ export interface TransactionInput extends TradeOffer {
   commodity: Commodity;
   faction: Faction;
   budget: Budget;
-  allocation: number | null;
+  allocations: Record<
+    "buyer" | "seller",
+    {
+      budget: number | null;
+      storage: null;
+    }
+  >;
 }
 
 export class Facility {
@@ -113,6 +120,21 @@ export class Facility {
   };
 
   /**
+   * Allocates resources necessary to finish trade before it is actually done
+   */
+  allocate = (offer: TransactionInput): Allocation | null => {
+    if (this.isTradeAccepted(offer)) {
+      if (offer.type === "sell") {
+        this.budget.allocations.new({
+          amount: offer.price * offer.quantity,
+        });
+      }
+    }
+
+    return null;
+  };
+
+  /**
    *
    * @returns Minimum required money to fulfill all buy requests, not taking
    * into account sell offers
@@ -178,7 +200,7 @@ export class Facility {
     }
     if (input.type === "buy") {
       hasBudget =
-        input.allocation !== null ||
+        input.allocations.buyer.budget !== null ||
         input.budget.getAvailableMoney() >= input.price * input.quantity;
       validPrice = input.price >= offer.price;
 
@@ -214,8 +236,10 @@ export class Facility {
       // They are selling us
       if (input.type === "sell") {
         this.budget.transferMoney(input.quantity * input.price, input.budget);
-      } else if (input.allocation) {
-        const allocation = input.budget.allocations.release(input.allocation);
+      } else if (input.allocations.buyer.budget) {
+        const allocation = input.budget.allocations.release(
+          input.allocations.buyer.budget
+        );
         input.budget.transferMoney(allocation.amount, this.budget);
       } else {
         input.budget.transferMoney(input.quantity * input.price, this.budget);

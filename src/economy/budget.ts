@@ -8,7 +8,7 @@ import {
 } from "../errors";
 import { AllocationManager } from "./allocations";
 
-interface BudgetAllocation {
+export interface BudgetAllocation {
   id: number;
   amount: number;
 }

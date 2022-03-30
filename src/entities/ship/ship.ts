@@ -10,7 +10,7 @@ import {
 } from "mathjs";
 import cloneDeep from "lodash/cloneDeep";
 import { Order } from "./orders";
-import { Facility } from "../../economy/factility";
+import { Facility, TransactionInput } from "../../economy/factility";
 import { CommodityStorage } from "../../economy/storage";
 import { MoveOrder, tradeOrder, TradeOrder } from ".";
 import { commodities, Commodity } from "../../economy/commodity";
@@ -180,7 +180,7 @@ export class Ship {
       return false;
     }
 
-    const allocation =
+    const buyerMoneyAllocation =
       this.owner === target.owner
         ? null
         : this.commander.budget.allocations.new({
@@ -196,7 +196,10 @@ export class Ship {
           commodity,
           faction: this.owner,
           budget: this.commander.budget,
-          allocation,
+          allocations: {
+            buyer: { budget: buyerMoneyAllocation, storage: null },
+            seller: { budget: null, storage: null },
+          },
           type: "buy",
         },
       })
@@ -238,17 +241,32 @@ export class Ship {
     );
     const price =
       this.owner === target.owner ? 0 : target.offers[commodity].price;
+    const offer: TransactionInput = {
+      price,
+      quantity,
+      commodity,
+      faction: this.owner,
+      budget: this.commander.budget,
+      allocations: {
+        buyer: { budget: null, storage: null },
+        seller: { budget: null, storage: null },
+      },
+      type: "sell",
+    };
+
+    const buyerMoneyAllocation = target.allocate(offer);
+    if (!buyerMoneyAllocation) return;
 
     this.addOrder({
       type: "trade",
       target: this.commander,
       offer: {
+        ...offer,
         price: 0,
-        quantity,
-        commodity,
-        faction: this.owner,
-        budget: this.commander.budget,
-        allocation: null,
+        allocations: {
+          buyer: { budget: null, storage: null },
+          seller: { budget: null, storage: null },
+        },
         type: "buy",
       },
     });
@@ -256,13 +274,11 @@ export class Ship {
       tradeOrder({
         target,
         offer: {
-          price,
-          quantity,
-          commodity,
-          faction: this.owner,
-          budget: this.commander.budget,
-          allocation: null,
-          type: "sell",
+          ...offer,
+          allocations: {
+            buyer: { budget: buyerMoneyAllocation.id, storage: null },
+            seller: { budget: null, storage: null },
+          },
         },
       })
     );
@@ -303,7 +319,10 @@ export class Ship {
                 price: 0,
                 quantity: this.storage.getAvailableWares()[commodity],
                 budget: this.commander?.budget ?? this.owner.budget,
-                allocation: null,
+                allocations: {
+                  buyer: { budget: null, storage: null },
+                  seller: { budget: null, storage: null },
+                },
                 type: "sell",
               },
               target: this.commander,
