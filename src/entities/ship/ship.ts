@@ -1,14 +1,24 @@
-import { add, divide, matrix, Matrix, multiply, norm, subtract } from "mathjs";
+import {
+  add,
+  divide,
+  matrix,
+  Matrix,
+  min,
+  multiply,
+  norm,
+  subtract,
+} from "mathjs";
 import cloneDeep from "lodash/cloneDeep";
 import { Order } from "./orders";
 import { Facility } from "../../economy/factility";
 import { CommodityStorage } from "../../economy/storage";
-import { MoveOrder, TradeOrder } from ".";
-import { commodities } from "../../economy/commodity";
+import { MoveOrder, tradeOrder, TradeOrder } from ".";
+import { commodities, Commodity } from "../../economy/commodity";
 import { sim } from "../../sim";
 import { Faction } from "../../economy/faction";
 import { Cooldowns } from "../../utils/cooldowns";
 import { InsufficientStorage, InsufficientStorageSpace } from "../../errors";
+import { getClosestFacility } from "../../economy/utils";
 
 let shipIdCounter = 0;
 
@@ -28,8 +38,7 @@ export class Ship {
   owner: Faction;
   commander: Facility | null;
   orders: Order[];
-  idle: boolean;
-  cooldowns: Cooldowns<"retryOrder">;
+  cooldowns: Cooldowns<"retryOrder" | "autoOrder">;
   retryOrderCounter: number = 0;
 
   constructor(initial: InitialShipInput) {
@@ -43,9 +52,9 @@ export class Ship {
     this.owner = null;
     this.commander = null;
     this.orders = [];
-    this.idle = true;
     this.position = cloneDeep(initial.position);
-    this.cooldowns = new Cooldowns("retryOrder");
+    this.cooldowns = new Cooldowns("retryOrder", "autoOrder");
+    this.cooldowns.use("autoOrder", 1);
 
     sim.ships.push(this);
   }
@@ -64,11 +73,7 @@ export class Ship {
     this.commander = null;
   };
 
-  addOrder = (order: Order) => {
-    this.orders.push(order);
-    this.idle = false;
-    // console.log("Dispatching ship", this, order);
-  };
+  addOrder = (order: Order) => this.orders.push(order);
 
   moveTo = (delta: number, position: Matrix): boolean => {
     const path = subtract(position, this.position) as Matrix;
@@ -133,8 +138,179 @@ export class Ship {
     return false;
   };
 
+  autoBuyMostNeededByCommander = (commodity: Commodity): boolean => {
+    let target = getClosestFacility(
+      this.owner.facilities.filter(
+        (facility) =>
+          facility.offers[commodity].quantity > 0 &&
+          facility.offers[commodity].type === "sell"
+      ),
+      this.position
+    );
+    if (!target) {
+      target = getClosestFacility(
+        sim.factions
+          .filter((faction) => faction.slug !== this.owner.slug)
+          .map((faction) => faction.facilities)
+          .flat()
+          .filter(
+            (facility) =>
+              facility.offers[commodity].quantity > 0 &&
+              facility.offers[commodity].type === "sell"
+          ),
+        this.position
+      );
+    }
+
+    if (!target) return false;
+
+    const quantity = min(
+      this.commander.offers[commodity].quantity,
+      this.storage.max,
+      target.offers[commodity].quantity,
+      this.owner === target.owner
+        ? Infinity
+        : this.commander.budget.getAvailableMoney() /
+            this.commander.offers[commodity].price
+    );
+    const price =
+      this.owner === target.owner ? 0 : target.offers[commodity].price;
+
+    if (quantity === 0) {
+      return false;
+    }
+
+    const allocation =
+      this.owner === target.owner
+        ? null
+        : this.commander.budget.allocations.new({
+            amount: quantity * target.offers[commodity].price,
+          }).id;
+
+    this.addOrder(
+      tradeOrder({
+        target,
+        offer: {
+          price,
+          quantity,
+          commodity,
+          faction: this.owner,
+          budget: this.commander.budget,
+          allocation,
+          type: "buy",
+        },
+      })
+    );
+
+    return true;
+  };
+
+  autoSellMostRedundantToCommander = (commodity: Commodity) => {
+    let target = getClosestFacility(
+      this.owner.facilities.filter(
+        (facility) =>
+          facility.offers[commodity].quantity > 0 &&
+          facility.offers[commodity].type === "buy"
+      ),
+      this.position
+    );
+    if (!target) {
+      target = getClosestFacility(
+        sim.factions
+          .filter((faction) => faction.slug !== this.owner.slug)
+          .map((faction) => faction.facilities)
+          .flat()
+          .filter(
+            (facility) =>
+              facility.offers[commodity].quantity > 0 &&
+              facility.offers[commodity].type === "buy"
+          ),
+        this.position
+      );
+    }
+
+    if (!target) return;
+
+    const quantity = min(
+      this.commander.offers[commodity].quantity,
+      this.storage.max,
+      target.offers[commodity].quantity
+    );
+    const price =
+      this.owner === target.owner ? 0 : target.offers[commodity].price;
+
+    this.addOrder({
+      type: "trade",
+      target: this.commander,
+      offer: {
+        price: 0,
+        quantity,
+        commodity,
+        faction: this.owner,
+        budget: this.commander.budget,
+        allocation: null,
+        type: "buy",
+      },
+    });
+    this.addOrder(
+      tradeOrder({
+        target,
+        offer: {
+          price,
+          quantity,
+          commodity,
+          faction: this.owner,
+          budget: this.commander.budget,
+          allocation: null,
+          type: "sell",
+        },
+      })
+    );
+  };
+
   moveOrder = (delta: number, order: MoveOrder): boolean =>
     this.moveTo(delta, order.position);
+
+  autoOrder = () => {
+    if (!(this.commander || this.orders.length !== 0)) {
+      return;
+    }
+    if (this.storage.getAvailableSpace() !== this.storage.max) {
+      this.returnToFacility();
+    } else {
+      const needs = this.commander.getNeededCommodities();
+      if (needs.length && this.autoBuyMostNeededByCommander(needs[0])) {
+        return;
+      }
+
+      const redundant = this.commander.getCommoditiesForSell();
+      if (redundant.length) {
+        this.autoSellMostRedundantToCommander(redundant[0]);
+      }
+    }
+  };
+
+  returnToFacility = () =>
+    this.orders.push(
+      ...Object.values(commodities)
+        .map(
+          (commodity) =>
+            ({
+              type: "trade",
+              offer: {
+                commodity,
+                faction: this.commander.owner,
+                price: 0,
+                quantity: this.storage.getAvailableWares()[commodity],
+                budget: this.commander?.budget ?? this.owner.budget,
+                allocation: null,
+                type: "sell",
+              },
+              target: this.commander,
+            } as TradeOrder)
+        )
+        .filter((order) => order.offer.quantity > 0)
+    );
 
   sim = (delta: number) => {
     if (this.orders.length) {
@@ -158,28 +334,9 @@ export class Ship {
           this.orders = this.orders.slice(1);
         }
       }
-    } else if (this.commander) {
-      if (!this.idle) {
-        this.orders.push(
-          ...Object.values(commodities)
-            .map(
-              (commodity) =>
-                ({
-                  type: "trade",
-                  offer: {
-                    commodity,
-                    faction: this.commander.owner,
-                    price: 0,
-                    quantity: this.storage.getAvailableWares()[commodity],
-                    budget: this.commander?.budget ?? this.owner.budget,
-                  },
-                  target: this.commander,
-                } as TradeOrder)
-            )
-            .filter((order) => order.offer.quantity > 0)
-        );
-        this.idle = true;
-      }
+    } else if (this.commander && this.cooldowns.canUse("autoOrder")) {
+      this.autoOrder();
+      this.cooldowns.use("autoOrder", 3);
     }
     this.cooldowns.update(delta);
   };
