@@ -1,11 +1,5 @@
 import { sum } from "mathjs";
-import {
-  InsufficientMoney,
-  NegativeBudget,
-  NegativeQuantity,
-  NonPositiveAmount,
-  NotFound,
-} from "../errors";
+import { InsufficientMoney, NegativeBudget, NegativeQuantity } from "../errors";
 import { AllocationManager } from "./allocations";
 
 export interface BudgetAllocation {
@@ -19,7 +13,10 @@ export class Budget {
   allocations: AllocationManager<BudgetAllocation>;
 
   constructor() {
-    this.allocations = new AllocationManager<BudgetAllocation>();
+    this.allocations = new AllocationManager<BudgetAllocation>({
+      validate: (allocation) => allocation.amount <= this.getAvailableMoney(),
+      onChange: () => undefined,
+    });
   }
 
   getAvailableMoney = () =>

@@ -1,5 +1,6 @@
 import { Matrix } from "mathjs";
 import { Facility, TransactionInput } from "../../economy/factility";
+import { NegativeQuantity } from "../../errors";
 
 export interface MoveOrder {
   type: "move";
@@ -16,7 +17,7 @@ export type Order = MoveOrder | TradeOrder;
 
 export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder | null {
   if (order.offer.quantity <= 0) {
-    return null;
+    throw new NegativeQuantity(order.offer.quantity);
   }
 
   return {

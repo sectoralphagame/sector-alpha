@@ -1,6 +1,6 @@
 import { min, sum } from "mathjs";
 import map from "lodash/map";
-import each from "lodash/each";
+import toPairs from "lodash/toPairs";
 import {
   InsufficientStorage,
   InsufficientStorageSpace,
@@ -10,10 +10,12 @@ import { perCommodity } from "../utils/perCommodity";
 import { Commodity } from "./commodity";
 import { AllocationManager } from "./allocations";
 
+export type StorageAllocationType = "incoming" | "outgoing";
+
 interface StorageAllocation {
   id: number;
   amount: Record<Commodity, number>;
-  target: CommodityStorage;
+  type: StorageAllocationType;
 }
 
 interface CommodityStorageHistoryEntry {
@@ -23,25 +25,46 @@ interface CommodityStorageHistoryEntry {
 
 export class CommodityStorage {
   private stored: Record<Commodity, number>;
+  private availableWares: Record<Commodity, number>;
 
   allocationManager: AllocationManager<StorageAllocation>;
 
   max: number;
   history: CommodityStorageHistoryEntry[] = [];
 
-  // eslint-disable-next-line no-unused-vars
-  changeHandler: (entry: CommodityStorageHistoryEntry) => void;
+  changeHandler: () => void;
 
   constructor(onChange = () => undefined) {
     this.max = 0;
     this.stored = perCommodity(() => 0);
-    this.allocationManager = new AllocationManager<StorageAllocation>();
+    this.allocationManager = new AllocationManager<StorageAllocation>({
+      validate: (allocation) => {
+        if (allocation.type === "incoming") {
+          return (
+            sum(Object.values(allocation.amount)) <= this.getAvailableSpace()
+          );
+        }
+
+        return Object.entries(allocation.amount)
+          .map(
+            ([commodity, quantity]) =>
+              this.getAvailableWares()[commodity] >= quantity
+          )
+          .every(Boolean);
+      },
+      onChange: () => {
+        this.changeHandler();
+        this.updateAvailableWares();
+      },
+    });
     this.changeHandler = onChange;
+    this.updateAvailableWares();
   }
 
   onChange = (entry: CommodityStorageHistoryEntry) => {
     this.addHitoryEntry(entry);
-    this.changeHandler(entry);
+    this.updateAvailableWares();
+    this.changeHandler();
   };
 
   addHitoryEntry = (entry: CommodityStorageHistoryEntry) => {
@@ -51,9 +74,44 @@ export class CommodityStorage {
     }
   };
 
-  getAvailableSpace = () => this.max - sum(map(this.stored));
+  getAvailableSpace = () =>
+    this.max -
+    sum(map(this.stored)) -
+    sum(
+      this.allocationManager
+        .all()
+        .filter((allocation) => allocation.type === "incoming")
+        .map((allocation) => sum(map(allocation.amount)))
+    );
 
-  getAvailableWares = () => this.stored;
+  updateAvailableWares = () => {
+    this.availableWares = [
+      ...toPairs(this.stored)
+        .map(([commodity, stored]) => ({
+          commodity,
+          stored,
+        }))
+        .flat(),
+      ...this.allocationManager
+        .all()
+        .filter((allocation) => allocation.type === "outgoing")
+        .map((allocation) =>
+          toPairs(allocation.amount).map(([commodity, stored]) => ({
+            commodity,
+            stored: -stored,
+          }))
+        )
+        .flat(),
+    ].reduce(
+      (acc, val) => ({
+        ...acc,
+        [val.commodity]: acc[val.commodity] + val.stored,
+      }),
+      perCommodity(() => 0)
+    );
+  };
+
+  getAvailableWares = () => this.availableWares;
 
   hasSufficientStorageSpace = (quantity: number) => {
     if (quantity < 0) {
@@ -64,7 +122,7 @@ export class CommodityStorage {
   };
 
   hasSufficientStorage = (commodity: Commodity, quantity: number): boolean =>
-    this.stored[commodity] >= quantity;
+    this.getAvailableWares()[commodity] >= quantity;
 
   addStorage = (
     commodity: Commodity,
@@ -77,6 +135,7 @@ export class CommodityStorage {
     if (quantity === 0) {
       return 0;
     }
+
     const availableSpace = this.getAvailableSpace();
 
     if (availableSpace >= quantity) {
@@ -102,7 +161,10 @@ export class CommodityStorage {
       return;
     }
     if (!this.hasSufficientStorage(commodity, quantity)) {
-      throw new InsufficientStorage(quantity, this.stored[commodity]);
+      throw new InsufficientStorage(
+        quantity,
+        this.getAvailableWares()[commodity]
+      );
     }
 
     this.stored[commodity] -= quantity;
@@ -116,12 +178,13 @@ export class CommodityStorage {
     exact: boolean
   ): number => {
     let quantityToTransfer = quantity;
-    if (this.stored[commodity] < quantity) {
+    const available = this.getAvailableWares();
+    if (available[commodity] < quantity) {
       if (exact) {
-        throw new InsufficientStorage(quantity, this.stored[commodity]);
+        throw new InsufficientStorage(quantity, available[commodity]);
       }
     } else {
-      quantityToTransfer = min(this.stored[commodity], quantity);
+      quantityToTransfer = min(available[commodity], quantity);
     }
 
     const transferred =

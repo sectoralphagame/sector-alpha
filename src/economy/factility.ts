@@ -15,8 +15,9 @@ import {
 import { CommodityStorage } from "./storage";
 import { Faction } from "./faction";
 import { Ship } from "../entities/ship";
-import { Budget, BudgetAllocation } from "./budget";
+import { Budget } from "./budget";
 import { Allocation } from "./allocations";
+import { InvalidOfferType } from "../errors";
 
 let facilityIdCounter = 0;
 
@@ -49,7 +50,7 @@ export interface TransactionInput extends TradeOffer {
     "buyer" | "seller",
     {
       budget: number | null;
-      storage: null;
+      storage: number | null;
     }
   >;
 }
@@ -122,13 +123,35 @@ export class Facility {
   /**
    * Allocates resources necessary to finish trade before it is actually done
    */
-  allocate = (offer: TransactionInput): Allocation | null => {
+  allocate = (
+    offer: TransactionInput
+  ): Record<"budget" | "storage", Allocation> | null => {
     if (this.isTradeAccepted(offer)) {
       if (offer.type === "sell") {
-        this.budget.allocations.new({
-          amount: offer.price * offer.quantity,
-        });
+        return {
+          budget: this.budget.allocations.new({
+            amount: offer.price * offer.quantity,
+          }),
+          storage: this.storage.allocationManager.new({
+            amount: {
+              ...perCommodity(() => 0),
+              [offer.commodity]: offer.quantity,
+            },
+            type: "incoming",
+          }),
+        };
       }
+
+      return {
+        budget: null,
+        storage: this.storage.allocationManager.new({
+          amount: {
+            ...perCommodity(() => 0),
+            [offer.commodity]: offer.quantity,
+          },
+          type: "outgoing",
+        }),
+      };
     }
 
     return null;
@@ -190,43 +213,35 @@ export class Facility {
   };
 
   isTradeAccepted = (input: TransactionInput): boolean => {
-    let hasBudget = false;
     let validPrice = false;
 
     const offer = this.offers[input.commodity];
 
     if (offer.type === input.type) {
-      return false;
+      throw new InvalidOfferType(input.type);
     }
     if (input.type === "buy") {
-      hasBudget =
-        input.allocations.buyer.budget !== null ||
-        input.budget.getAvailableMoney() >= input.price * input.quantity;
-      validPrice = input.price >= offer.price;
-
       if (input.faction === this.owner) {
-        hasBudget = true;
         validPrice = true;
+      } else {
+        validPrice = input.price >= offer.price;
       }
 
       return (
         validPrice &&
-        hasBudget &&
         this.storage.hasSufficientStorage(input.commodity, input.quantity)
       );
     }
 
-    hasBudget = this.budget.getAvailableMoney() >= input.price * input.quantity;
-    validPrice = input.price <= offer.price;
-
     if (input.faction === this.owner) {
-      hasBudget = true;
       validPrice = true;
+    } else {
+      validPrice = input.price <= offer.price;
     }
 
     return (
       validPrice &&
-      hasBudget &&
+      this.budget.getAvailableMoney() >= input.price * input.quantity &&
       this.storage.hasSufficientStorageSpace(input.quantity)
     );
   };
@@ -235,14 +250,15 @@ export class Facility {
     if (input.price > 0) {
       // They are selling us
       if (input.type === "sell") {
-        this.budget.transferMoney(input.quantity * input.price, input.budget);
-      } else if (input.allocations.buyer.budget) {
+        const allocation = this.budget.allocations.release(
+          input.allocations.buyer.budget
+        );
+        this.budget.transferMoney(allocation.amount, input.budget);
+      } else {
         const allocation = input.budget.allocations.release(
           input.allocations.buyer.budget
         );
         input.budget.transferMoney(allocation.amount, this.budget);
-      } else {
-        input.budget.transferMoney(input.quantity * input.price, this.budget);
       }
     }
 
@@ -317,7 +333,10 @@ export class Facility {
       Object.values(commodities)
         .map((commodity) => ({
           commodity,
-          wantToSell: this.offers[commodity].quantity,
+          wantToSell:
+            this.offers[commodity].type === "sell"
+              ? this.offers[commodity].quantity
+              : 0,
           quantityStored: stored[commodity],
         }))
         .filter((offer) => offer.wantToSell > 0)

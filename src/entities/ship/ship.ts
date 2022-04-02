@@ -9,6 +9,7 @@ import {
   subtract,
 } from "mathjs";
 import cloneDeep from "lodash/cloneDeep";
+import merge from "lodash/merge";
 import { Order } from "./orders";
 import { Facility, TransactionInput } from "../../economy/factility";
 import { CommodityStorage } from "../../economy/storage";
@@ -17,8 +18,8 @@ import { commodities, Commodity } from "../../economy/commodity";
 import { sim } from "../../sim";
 import { Faction } from "../../economy/faction";
 import { Cooldowns } from "../../utils/cooldowns";
-import { InsufficientStorage, InsufficientStorageSpace } from "../../errors";
 import { getClosestFacility } from "../../economy/utils";
+import { perCommodity } from "../../utils/perCommodity";
 
 let shipIdCounter = 0;
 
@@ -94,45 +95,31 @@ export class Ship {
   tradeOrder = (delta: number, order: TradeOrder): boolean => {
     const targetReached = this.moveTo(delta, order.target.position);
     if (targetReached) {
-      if (order.target.isTradeAccepted(order.offer)) {
-        try {
-          if (order.offer.type === "sell") {
-            this.storage.transfer(
-              order.offer.commodity,
-              order.offer.quantity,
-              order.target.storage,
-              true
-            );
-          } else {
-            order.target.storage.transfer(
-              order.offer.commodity,
-              order.offer.quantity,
-              this.storage,
-              true
-            );
-          }
+      if (order.offer.type === "sell") {
+        order.target.storage.allocationManager.release(
+          order.offer.allocations.buyer.storage
+        );
 
-          order.target.acceptTrade(order.offer);
-          return true;
-        } catch (err) {
-          if (
-            !(
-              err instanceof InsufficientStorageSpace ||
-              err instanceof InsufficientStorage
-            )
-          ) {
-            throw err;
-          }
-        }
-      }
-
-      if (this.retryOrderCounter < 5) {
-        this.retryOrderCounter += 1;
-        this.cooldowns.use("retryOrder", 5);
+        this.storage.transfer(
+          order.offer.commodity,
+          order.offer.quantity,
+          order.target.storage,
+          true
+        );
       } else {
-        this.retryOrderCounter = 0;
-        return true;
+        order.target.storage.allocationManager.release(
+          order.offer.allocations.seller.storage
+        );
+        order.target.storage.transfer(
+          order.offer.commodity,
+          order.offer.quantity,
+          this.storage,
+          true
+        );
       }
+
+      order.target.acceptTrade(order.offer);
+      return true;
     }
 
     return false;
@@ -180,27 +167,56 @@ export class Ship {
       return false;
     }
 
-    const buyerMoneyAllocation =
-      this.owner === target.owner
-        ? null
-        : this.commander.budget.allocations.new({
-            amount: quantity * target.offers[commodity].price,
-          }).id;
+    const offer = {
+      price,
+      quantity,
+      commodity,
+      faction: this.owner,
+      budget: this.commander.budget,
+      allocations: null,
+      type: "buy" as "buy",
+    };
+
+    const buyerAllocations = this.commander.allocate({
+      ...offer,
+      type: "sell",
+    });
+    if (!buyerAllocations) return false;
+
+    const sellerAllocations = target.allocate(offer);
+    if (!sellerAllocations) return false;
 
     this.addOrder(
       tradeOrder({
         target,
         offer: {
-          price,
-          quantity,
-          commodity,
-          faction: this.owner,
-          budget: this.commander.budget,
+          ...offer,
           allocations: {
-            buyer: { budget: buyerMoneyAllocation, storage: null },
-            seller: { budget: null, storage: null },
+            buyer: {
+              budget: buyerAllocations.budget?.id,
+              storage: null,
+            },
+            seller: { budget: null, storage: sellerAllocations.storage.id },
           },
           type: "buy",
+        },
+      })
+    );
+
+    this.addOrder(
+      tradeOrder({
+        target: this.commander,
+        offer: {
+          ...offer,
+          price: 0,
+          allocations: {
+            buyer: {
+              budget: null,
+              storage: buyerAllocations.storage.id,
+            },
+            seller: { budget: null, storage: null },
+          },
+          type: "sell",
         },
       })
     );
@@ -239,6 +255,9 @@ export class Ship {
       this.storage.max,
       target.offers[commodity].quantity
     );
+
+    if (quantity <= 0) return;
+
     const price =
       this.owner === target.owner ? 0 : target.offers[commodity].price;
     const offer: TransactionInput = {
@@ -247,36 +266,43 @@ export class Ship {
       commodity,
       faction: this.owner,
       budget: this.commander.budget,
-      allocations: {
-        buyer: { budget: null, storage: null },
-        seller: { budget: null, storage: null },
-      },
+      allocations: null,
       type: "sell",
     };
 
-    const buyerMoneyAllocation = target.allocate(offer);
-    if (!buyerMoneyAllocation) return;
+    const buyerAllocations = target.allocate(offer);
+    if (!buyerAllocations) return;
 
-    this.addOrder({
-      type: "trade",
-      target: this.commander,
-      offer: {
-        ...offer,
-        price: 0,
-        allocations: {
-          buyer: { budget: null, storage: null },
-          seller: { budget: null, storage: null },
-        },
-        type: "buy",
-      },
+    const sellerAllocations = this.commander.allocate({
+      ...offer,
+      type: "buy",
     });
+    if (!sellerAllocations) return;
+
+    this.addOrder(
+      tradeOrder({
+        target: this.commander,
+        offer: {
+          ...offer,
+          price: 0,
+          allocations: {
+            buyer: { budget: null, storage: null },
+            seller: { budget: null, storage: sellerAllocations.storage.id },
+          },
+          type: "buy",
+        },
+      })
+    );
     this.addOrder(
       tradeOrder({
         target,
         offer: {
           ...offer,
           allocations: {
-            buyer: { budget: buyerMoneyAllocation.id, storage: null },
+            buyer: {
+              budget: buyerAllocations.budget?.id,
+              storage: buyerAllocations.storage.id,
+            },
             seller: { budget: null, storage: null },
           },
         },
@@ -329,6 +355,29 @@ export class Ship {
             } as TradeOrder)
         )
         .filter((order) => order.offer.quantity > 0)
+        .map((order) => {
+          const allocation = this.commander.storage.allocationManager.new({
+            amount: {
+              ...perCommodity(() => 0),
+              [order.offer.commodity]: order.offer.quantity,
+            },
+            type: "incoming",
+          });
+          if (allocation) {
+            return merge(order, {
+              offer: {
+                allocations: {
+                  buyer: {
+                    storage: allocation.id,
+                  },
+                },
+              },
+            });
+          }
+
+          return null;
+        })
+        .filter(Boolean)
     );
 
   sim = (delta: number) => {
