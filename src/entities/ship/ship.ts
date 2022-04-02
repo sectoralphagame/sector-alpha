@@ -18,8 +18,7 @@ import { commodities, Commodity } from "../../economy/commodity";
 import { sim } from "../../sim";
 import { Faction } from "../../economy/faction";
 import { Cooldowns } from "../../utils/cooldowns";
-import { getClosestFacility } from "../../economy/utils";
-import { perCommodity } from "../../utils/perCommodity";
+import { getAnyClosestFacility } from "../../economy/utils";
 
 let shipIdCounter = 0;
 
@@ -126,28 +125,12 @@ export class Ship {
   };
 
   autoBuyMostNeededByCommander = (commodity: Commodity): boolean => {
-    let target = getClosestFacility(
-      this.owner.facilities.filter(
-        (facility) =>
-          facility.offers[commodity].quantity > 0 &&
-          facility.offers[commodity].type === "sell"
-      ),
-      this.position
+    const target = getAnyClosestFacility(
+      this.commander,
+      (facility) =>
+        facility.offers[commodity].quantity > 0 &&
+        facility.offers[commodity].type === "sell"
     );
-    if (!target) {
-      target = getClosestFacility(
-        sim.factions
-          .filter((faction) => faction.slug !== this.owner.slug)
-          .map((faction) => faction.facilities)
-          .flat()
-          .filter(
-            (facility) =>
-              facility.offers[commodity].quantity > 0 &&
-              facility.offers[commodity].type === "sell"
-          ),
-        this.position
-      );
-    }
 
     if (!target) return false;
 
@@ -225,28 +208,12 @@ export class Ship {
   };
 
   autoSellMostRedundantToCommander = (commodity: Commodity) => {
-    let target = getClosestFacility(
-      this.owner.facilities.filter(
-        (facility) =>
-          facility.offers[commodity].quantity > 0 &&
-          facility.offers[commodity].type === "buy"
-      ),
-      this.position
+    const target = getAnyClosestFacility(
+      this.commander,
+      (facility) =>
+        facility.offers[commodity].quantity > 0 &&
+        facility.offers[commodity].type === "buy"
     );
-    if (!target) {
-      target = getClosestFacility(
-        sim.factions
-          .filter((faction) => faction.slug !== this.owner.slug)
-          .map((faction) => faction.facilities)
-          .flat()
-          .filter(
-            (facility) =>
-              facility.offers[commodity].quantity > 0 &&
-              facility.offers[commodity].type === "buy"
-          ),
-        this.position
-      );
-    }
 
     if (!target) return;
 
@@ -345,10 +312,7 @@ export class Ship {
                 price: 0,
                 quantity: this.storage.getAvailableWares()[commodity],
                 budget: this.commander?.budget ?? this.owner.budget,
-                allocations: {
-                  buyer: { budget: null, storage: null },
-                  seller: { budget: null, storage: null },
-                },
+                allocations: null,
                 type: "sell",
               },
               target: this.commander,
@@ -356,19 +320,13 @@ export class Ship {
         )
         .filter((order) => order.offer.quantity > 0)
         .map((order) => {
-          const allocation = this.commander.storage.allocationManager.new({
-            amount: {
-              ...perCommodity(() => 0),
-              [order.offer.commodity]: order.offer.quantity,
-            },
-            type: "incoming",
-          });
-          if (allocation) {
+          const allocations = this.commander.allocate(order.offer);
+          if (allocations) {
             return merge(order, {
               offer: {
                 allocations: {
                   buyer: {
-                    storage: allocation.id,
+                    storage: allocations.storage.id,
                   },
                 },
               },
