@@ -137,7 +137,7 @@ export class Ship {
     return this.tradeCommodity(commodity, this.commander, target);
   };
 
-  autoSellMostRedundantToCommander = (commodity: Commodity) => {
+  autoSellMostRedundantToCommander = (commodity: Commodity): boolean => {
     const target = getAnyClosestFacility(
       this.commander,
       (facility) =>
@@ -145,9 +145,9 @@ export class Ship {
         facility.offers[commodity].type === "buy"
     );
 
-    if (!target) return;
+    if (!target) return false;
 
-    this.tradeCommodity(commodity, target, this.commander);
+    return this.tradeCommodity(commodity, target, this.commander);
   };
 
   tradeCommodity = (
