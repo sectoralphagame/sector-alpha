@@ -297,6 +297,8 @@ export class Ship {
         .filter(Boolean)
     );
 
+  holdPosition = () => false;
+
   sim = (delta: number) => {
     if (this.orders.length) {
       if (this.cooldowns.canUse("retryOrder")) {
