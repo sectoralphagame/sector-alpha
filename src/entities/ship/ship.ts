@@ -11,7 +11,11 @@ import {
 import cloneDeep from "lodash/cloneDeep";
 import merge from "lodash/merge";
 import { Order } from "./orders";
-import { Facility, TransactionInput } from "../../economy/factility";
+import {
+  Facility,
+  TradeOfferType,
+  TransactionInput,
+} from "../../economy/factility";
 import { CommodityStorage } from "../../economy/storage";
 import { MoveOrder, tradeOrder, TradeOrder } from ".";
 import { commodities, Commodity } from "../../economy/commodity";
@@ -134,21 +138,45 @@ export class Ship {
 
     if (!target) return false;
 
+    return this.tradeCommodity(commodity, this.commander, target);
+  };
+
+  autoSellMostRedundantToCommander = (commodity: Commodity) => {
+    const target = getAnyClosestFacility(
+      this.commander,
+      (facility) =>
+        facility.offers[commodity].quantity > 0 &&
+        facility.offers[commodity].type === "buy"
+    );
+
+    if (!target) return;
+
+    this.tradeCommodity(commodity, target, this.commander);
+  };
+
+  tradeCommodity = (
+    commodity: Commodity,
+    buyer: Facility,
+    seller: Facility
+  ): boolean => {
+    const sameFaction = this.owner === seller.owner;
+    const buy = this.commander === buyer;
+
     const quantity = min(
-      this.commander.offers[commodity].quantity,
+      buyer.offers[commodity].quantity,
       this.storage.max,
-      target.offers[commodity].quantity,
-      this.owner === target.owner
+      seller.offers[commodity].quantity,
+      sameFaction
         ? Infinity
         : this.commander.budget.getAvailableMoney() /
             this.commander.offers[commodity].price
     );
-    const price =
-      this.owner === target.owner ? 0 : target.offers[commodity].price;
 
     if (quantity === 0) {
       return false;
     }
+
+    const price = sameFaction ? 0 : seller.offers[commodity].price;
 
     const offer = {
       price,
@@ -160,20 +188,21 @@ export class Ship {
       type: "buy" as "buy",
     };
 
-    const buyerAllocations = this.commander.allocate({
+    const buyerAllocations = buyer.allocate({
       ...offer,
       type: "sell",
     });
     if (!buyerAllocations) return false;
 
-    const sellerAllocations = target.allocate(offer);
+    const sellerAllocations = seller.allocate(offer);
     if (!sellerAllocations) return false;
 
     this.addOrder(
       tradeOrder({
-        target,
+        target: seller,
         offer: {
           ...offer,
+          price: buy ? price : 0,
           allocations: {
             buyer: {
               budget: buyerAllocations.budget?.id,
@@ -188,13 +217,13 @@ export class Ship {
 
     this.addOrder(
       tradeOrder({
-        target: this.commander,
+        target: buyer,
         offer: {
           ...offer,
-          price: 0,
+          price: buy ? 0 : price,
           allocations: {
             buyer: {
-              budget: null,
+              budget: buyerAllocations.budget?.id,
               storage: buyerAllocations.storage.id,
             },
             seller: { budget: null, storage: null },
@@ -205,76 +234,6 @@ export class Ship {
     );
 
     return true;
-  };
-
-  autoSellMostRedundantToCommander = (commodity: Commodity) => {
-    const target = getAnyClosestFacility(
-      this.commander,
-      (facility) =>
-        facility.offers[commodity].quantity > 0 &&
-        facility.offers[commodity].type === "buy"
-    );
-
-    if (!target) return;
-
-    const quantity = min(
-      this.commander.offers[commodity].quantity,
-      this.storage.max,
-      target.offers[commodity].quantity
-    );
-
-    if (quantity <= 0) return;
-
-    const price =
-      this.owner === target.owner ? 0 : target.offers[commodity].price;
-    const offer: TransactionInput = {
-      price,
-      quantity,
-      commodity,
-      faction: this.owner,
-      budget: this.commander.budget,
-      allocations: null,
-      type: "sell",
-    };
-
-    const buyerAllocations = target.allocate(offer);
-    if (!buyerAllocations) return;
-
-    const sellerAllocations = this.commander.allocate({
-      ...offer,
-      type: "buy",
-    });
-    if (!sellerAllocations) return;
-
-    this.addOrder(
-      tradeOrder({
-        target: this.commander,
-        offer: {
-          ...offer,
-          price: 0,
-          allocations: {
-            buyer: { budget: null, storage: null },
-            seller: { budget: null, storage: sellerAllocations.storage.id },
-          },
-          type: "buy",
-        },
-      })
-    );
-    this.addOrder(
-      tradeOrder({
-        target,
-        offer: {
-          ...offer,
-          allocations: {
-            buyer: {
-              budget: buyerAllocations.budget?.id,
-              storage: buyerAllocations.storage.id,
-            },
-            seller: { budget: null, storage: null },
-          },
-        },
-      })
-    );
   };
 
   moveOrder = (delta: number, order: MoveOrder): boolean =>
