@@ -1,7 +1,6 @@
 import { Matrix, norm, subtract } from "mathjs";
 import sortBy from "lodash/sortBy";
 import { Facility } from "./factility";
-import { Faction } from "./faction";
 import { sim } from "../sim";
 
 export function getClosestFacility(

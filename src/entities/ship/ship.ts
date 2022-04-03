@@ -11,11 +11,7 @@ import {
 import cloneDeep from "lodash/cloneDeep";
 import merge from "lodash/merge";
 import { Order } from "./orders";
-import {
-  Facility,
-  TradeOfferType,
-  TransactionInput,
-} from "../../economy/factility";
+import { Facility } from "../../economy/factility";
 import { CommodityStorage } from "../../economy/storage";
 import { MoveOrder, tradeOrder, TradeOrder } from ".";
 import { commodities, Commodity } from "../../economy/commodity";
