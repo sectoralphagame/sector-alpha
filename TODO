@@ -13,7 +13,7 @@ Basic principles:
         ✔ Storage is limited @done(22-03-17 13:37)
           Prevents throwing resources to production which has no demand yet.
 
-        ☐ Transactions are safe @started(22-03-17 16:04)
+        ✔ Transactions are safe @started(22-03-17 16:04) @done(22-04-04 15:21) @lasted(2w3d22h17m32s)
           Prevents from competing in movement speed.
 
         ☐ Assymetrical market information
