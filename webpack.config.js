@@ -59,6 +59,7 @@ const config = {
       directory: path.join(__dirname, "public"),
     },
     compress: true,
+    open: true,
     port: 10000,
     historyApiFallback: true,
   },
