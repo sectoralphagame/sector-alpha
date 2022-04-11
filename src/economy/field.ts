@@ -19,11 +19,11 @@ export interface Asteroid {
   position: Matrix;
 }
 
-export class Field {
+export class AsteroidField {
   focus: FocusPoint[] = [];
   outline: Matrix[] = [];
   type: MineableCommodity;
-  rocks: Asteroid[];
+  asteroids: Asteroid[];
 
   constructor(type: MineableCommodity) {
     this.type = type;
@@ -32,8 +32,8 @@ export class Field {
 
 const getSize = () => (Math.random() < 0.1 ? random(1, 3) : random(0.25, 1));
 
-export function getRandomField(): Field {
-  const field = new Field(
+export function getRandomAsteroidField(): AsteroidField {
+  const field = new AsteroidField(
     mineableCommodities[
       Object.keys(mineableCommodities)[
         Math.floor(Object.keys(mineableCommodities).length * Math.random())
@@ -127,7 +127,7 @@ export function getRandomField(): Field {
 
   field.outline = [...sideA, ...sideB.reverse()];
 
-  field.rocks = field.focus
+  field.asteroids = field.focus
     .map((p) =>
       Array(Math.round(random(1, 3) * p.size * 3))
         .fill(0)

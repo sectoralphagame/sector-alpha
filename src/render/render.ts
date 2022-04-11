@@ -130,7 +130,7 @@ export function render(sim: Sim, parent: Element) {
 
         if (camera.scale > 5) {
           p5.fill(color[0] * 256, color[1] * 256, color[2] * 256, 128);
-          field.rocks.forEach((rock) => {
+          field.asteroids.forEach((rock) => {
             p5.circle(
               rock.position.get([0]) * 10,
               rock.position.get([1]) * 10,

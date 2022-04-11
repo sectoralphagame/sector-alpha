@@ -3,7 +3,7 @@ import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
 import { Facility } from "./factility";
 import { sim } from "../sim";
-import { Asteroid, Field } from "./field";
+import { Asteroid, AsteroidField } from "./field";
 
 export function getClosestFacility(
   facilities: Facility[],
@@ -48,11 +48,11 @@ export function getAnyClosestFacility(
 }
 
 export function getClosestMineableAsteroid(
-  field: Field,
+  field: AsteroidField,
   position: Matrix
 ): Asteroid {
   return minBy(
-    field.rocks.filter((r) => !r.mined),
+    field.asteroids.filter((r) => !r.mined),
     (r) => norm(subtract(position, r.position) as Matrix)
   );
 }

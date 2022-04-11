@@ -1,5 +1,5 @@
 import { Faction } from "../economy/faction";
-import { Field } from "../economy/field";
+import { AsteroidField } from "../economy/field";
 import { Ship } from "../entities/ship";
 import { World } from "../world";
 import { BaseSim } from "./BaseSim";
@@ -7,7 +7,7 @@ import { BaseSim } from "./BaseSim";
 export class Sim extends BaseSim {
   factions: Faction[];
   ships: Ship[];
-  fields: Field[];
+  fields: AsteroidField[];
 
   constructor() {
     super();

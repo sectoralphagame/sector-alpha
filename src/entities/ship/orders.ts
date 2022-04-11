@@ -1,6 +1,6 @@
 import { Matrix } from "mathjs";
 import { Facility, TransactionInput } from "../../economy/factility";
-import { Asteroid, Field } from "../../economy/field";
+import { Asteroid, AsteroidField } from "../../economy/field";
 import { NegativeQuantity } from "../../errors";
 
 export interface MoveOrder {
@@ -16,7 +16,7 @@ export interface TradeOrder {
 
 export interface MineOrder {
   type: "mine";
-  target: Field;
+  target: AsteroidField;
   targetRock: Asteroid;
 }
 
