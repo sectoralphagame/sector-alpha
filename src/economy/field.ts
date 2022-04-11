@@ -1,12 +1,5 @@
-import {
-  add,
-  matrix,
-  Matrix,
-  multiply,
-  random,
-  randomInt,
-  subtract,
-} from "mathjs";
+import { add, matrix, Matrix, multiply, random, subtract } from "mathjs";
+import { limitMin } from "../utils/limit";
 import { mineableCommodities, MineableCommodity } from "./commodity";
 
 export interface FocusPoint {
@@ -129,7 +122,7 @@ export function getRandomAsteroidField(): AsteroidField {
 
   field.asteroids = field.focus
     .map((p) =>
-      Array(Math.round(random(1, 3) * p.size * 3))
+      Array(Math.round(limitMin(random(1, 3) * p.size * 3, 1)))
         .fill(0)
         .map(() => {
           const asteroidAngle = Math.random() * Math.PI;
