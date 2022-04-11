@@ -9,10 +9,10 @@ const Panel: React.FC = () => {
   const interval = React.useRef<number>();
 
   React.useEffect(() => {
-    interval.current = setInterval(
+    interval.current = (setInterval(
       () => setRender((v) => !v),
       500
-    ) as unknown as number;
+    ) as unknown) as number;
 
     return () => clearInterval(interval.current);
   }, []);
@@ -49,6 +49,16 @@ const Panel: React.FC = () => {
       >
         x10
       </button>
+      {!!window.selected && (
+        <button
+          onClick={() => {
+            window.renderer.focused = window.selected;
+          }}
+          type="button"
+        >
+          focus
+        </button>
+      )}
 
       {window.selected ? (
         window.selected instanceof Ship ? (

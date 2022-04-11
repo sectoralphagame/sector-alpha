@@ -217,7 +217,7 @@ export class Facility {
 
     const offer = this.offers[input.commodity];
 
-    if (offer.type === input.type) {
+    if (offer.type === input.type && input.faction !== this.owner) {
       throw new InvalidOfferType(input.type);
     }
     if (input.type === "buy") {

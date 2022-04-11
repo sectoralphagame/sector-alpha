@@ -7,7 +7,7 @@ Basic principles:
           ☐ Add trading between facilities
           ☐ Allow facilities to adjust their offer's prices
 
-        ☐ Goods are obtainable by mining or fabrication
+        ✔ Goods are obtainable by mining or fabrication @started(22-04-04 23:20) @done(22-04-11 21:45) @lasted(6d22h25m58s)
           Every faction has its own set of produced and consumed goods.
 
         ✔ Storage is limited @done(22-03-17 13:37)

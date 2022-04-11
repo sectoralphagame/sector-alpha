@@ -1,6 +1,20 @@
 import React from "react";
 import { commodities } from "../../economy/commodity";
-import { Ship } from "../../entities/ship";
+import { Order, Ship } from "../../entities/ship";
+
+function getOrderDescription(ship: Ship, order: Order) {
+  switch (order.type) {
+    case "move":
+      return "Go to location";
+    case "trade":
+      if (order.target === ship.commander) return "Deliver wares to commander";
+      return `Deliver wares to ${order.target.name}`;
+    case "mine":
+      return `Mine ${order.target.type}`;
+    default:
+      return "Hold position";
+  }
+}
 
 const ShipPanel: React.FC = () => {
   const ship: Ship = window.selected;
@@ -8,7 +22,20 @@ const ShipPanel: React.FC = () => {
   return (
     <div>
       <div>{ship.name}</div>
-      {!!ship.commander && <div>{`Commander: ${ship.commander.name}`}</div>}
+      {!!ship.commander && (
+        <div>
+          {`Commander: ${ship.commander.name}`}
+          <button
+            onClick={() => {
+              window.selected = ship.commander;
+              window.renderer.focused = ship.commander;
+            }}
+            type="button"
+          >
+            focus
+          </button>
+        </div>
+      )}
       <hr />
       {Object.values(commodities)
         .map((commodity) => ({
@@ -18,6 +45,12 @@ const ShipPanel: React.FC = () => {
         .map((data) => (
           <div key={data.commodity}>{`${data.commodity}: ${data.stored}`}</div>
         ))}
+      <hr />
+      {ship.orders.map((order, orderIndex) => (
+        <div key={`${order.type}-${orderIndex}`}>
+          {getOrderDescription(ship, order)}
+        </div>
+      ))}
     </div>
   );
 };

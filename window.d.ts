@@ -6,5 +6,6 @@ interface Window {
     // eslint-disable-next-line no-unused-vars
     setSpeed: (value: number) => void;
   };
+  renderer: any;
   selected: any;
 }

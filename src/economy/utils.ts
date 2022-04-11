@@ -1,7 +1,9 @@
 import { Matrix, norm, subtract } from "mathjs";
 import sortBy from "lodash/sortBy";
+import minBy from "lodash/minBy";
 import { Facility } from "./factility";
 import { sim } from "../sim";
+import { Asteroid, Field } from "./field";
 
 export function getClosestFacility(
   facilities: Facility[],
@@ -43,4 +45,14 @@ export function getAnyClosestFacility(
   }
 
   return target;
+}
+
+export function getClosestMineableAsteroid(
+  field: Field,
+  position: Matrix
+): Asteroid {
+  return minBy(
+    field.rocks.filter((r) => !r.mined),
+    (r) => norm(subtract(position, r.position) as Matrix)
+  );
 }

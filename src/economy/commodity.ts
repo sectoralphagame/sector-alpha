@@ -12,3 +12,11 @@ export const commodities = {
   water: "water",
 } as const;
 export type Commodity = Values<typeof commodities>;
+
+export const mineableCommodities = {
+  fuelium: commodities.fuelium,
+  gold: commodities.gold,
+  ice: commodities.ice,
+  ore: commodities.ore,
+};
+export type MineableCommodity = Values<typeof mineableCommodities>;
