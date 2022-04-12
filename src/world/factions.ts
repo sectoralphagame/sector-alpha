@@ -32,22 +32,26 @@ factions.forEach((faction) => {
     const consumed = Object.entries(facility.productionAndConsumption)
       .filter(([, pac]) => pac.consumes > 0)
       .map(([commodity]) => commodity as MineableCommodity);
+    const hasMineables = [
+      mineableCommodities.fuelium,
+      mineableCommodities.gold,
+      mineableCommodities.ice,
+      mineableCommodities.ore,
+    ].some((commodity) => consumed.includes(commodity));
 
     do {
-      const ship = new Ship(
-        [
-          mineableCommodities.fuelium,
-          mineableCommodities.gold,
-          mineableCommodities.ice,
-          mineableCommodities.ore,
-        ].some((commodity) => consumed.includes(commodity))
-          ? shipClasses.minerA
-          : shipClasses.shipA
-      );
-      if (ship.mining > 0) {
-        ship.mainOrder = "mine";
+      if (hasMineables) {
+        const ship = new Ship(
+          Math.random() > 0.5 ? shipClasses.minerA : shipClasses.minerB
+        );
+        if (ship.mining > 0) {
+          ship.mainOrder = "mine";
+        }
+        facility.addShip(ship);
       }
-      facility.addShip(ship);
+      facility.addShip(
+        new Ship(Math.random() > 0.5 ? shipClasses.shipA : shipClasses.shipB)
+      );
     } while (Math.random() < 0.35);
     faction.addFacility(facility);
   }
