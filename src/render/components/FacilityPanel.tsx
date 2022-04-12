@@ -29,6 +29,22 @@ const FacilityPanel: React.FC = () => {
         // eslint-disable-next-line react/no-array-index-key
         <div key={`${facilityModule.name}-${index}`}>{facilityModule.name}</div>
       ))}
+      <hr />
+      {facility.ships.map((ship, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <div key={`${ship.name}-${index}`}>
+          {ship.name}{" "}
+          <button
+            onClick={() => {
+              window.selected = ship;
+              window.renderer.focused = ship;
+            }}
+            type="button"
+          >
+            focus
+          </button>
+        </div>
+      ))}
     </div>
   );
 };

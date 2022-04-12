@@ -387,7 +387,7 @@ export class Ship {
             orderFn = this.moveOrder;
             break;
           default:
-            orderFn = () => undefined;
+            orderFn = this.holdPosition;
         }
 
         const completed = orderFn(delta, this.orders[0]);
