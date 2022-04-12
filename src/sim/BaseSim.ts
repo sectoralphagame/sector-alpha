@@ -14,8 +14,10 @@ export class BaseSim {
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState !== "visible") {
-        this.pause();
-        this.outOfFocusPause = true;
+        if (this.intervalHandle) {
+          this.pause();
+          this.outOfFocusPause = true;
+        }
       } else if (this.outOfFocusPause) {
         this.start();
         this.outOfFocusPause = false;
@@ -29,12 +31,12 @@ export class BaseSim {
 
   start = () => {
     if (this.intervalHandle) return;
-    this.intervalHandle = setInterval(() => {
+    this.intervalHandle = (setInterval(() => {
       const delta = ((Date.now() - this.lastTick) / 1000) * this.speed;
       this.next(delta);
       this.timeOffset += delta;
       this.lastTick = Date.now();
-    }, 1e3 / settings.global.targetFps) as unknown as number;
+    }, 1e3 / settings.global.targetFps) as unknown) as number;
     this.lastTick = Date.now();
   };
 
