@@ -10,10 +10,16 @@ import {
 } from "mathjs";
 import cloneDeep from "lodash/cloneDeep";
 import merge from "lodash/merge";
-import { Order } from "./orders";
 import { Facility, TransactionInput } from "../../economy/factility";
 import { CommodityStorage } from "../../economy/storage";
-import { mineOrder, MineOrder, MoveOrder, tradeOrder, TradeOrder } from ".";
+import {
+  mineOrder,
+  MineOrder,
+  MoveOrder,
+  tradeOrder,
+  TradeOrder,
+  Order,
+} from "./orders";
 import {
   commodities,
   Commodity,
@@ -48,7 +54,7 @@ export class Ship {
   owner: Faction;
   commander: Facility | null;
   orders: Order[];
-  cooldowns: Cooldowns<"retryOrder" | "autoOrder">;
+  cooldowns: Cooldowns<"retryOrder" | "autoOrder" | "mine">;
   mining: number;
   retryOrderCounter: number = 0;
   mainOrder: MainOrderType;
@@ -65,7 +71,7 @@ export class Ship {
     this.commander = null;
     this.orders = [];
     this.position = cloneDeep(initial.position);
-    this.cooldowns = new Cooldowns("retryOrder", "autoOrder");
+    this.cooldowns = new Cooldowns("retryOrder", "autoOrder", "mine");
     this.cooldowns.use("autoOrder", 1);
     this.mining = initial.mining;
 
@@ -171,14 +177,16 @@ export class Ship {
     const sameFaction = this.owner === seller.owner;
     const buy = this.commander === buyer;
 
-    const quantity = min(
-      buyer.offers[commodity].quantity,
-      this.storage.max,
-      seller.offers[commodity].quantity,
-      sameFaction
-        ? Infinity
-        : this.commander.budget.getAvailableMoney() /
-            this.commander.offers[commodity].price
+    const quantity = Math.floor(
+      min(
+        buyer.offers[commodity].quantity,
+        this.storage.max,
+        seller.offers[commodity].quantity,
+        sameFaction
+          ? Infinity
+          : this.commander.budget.getAvailableMoney() /
+              this.commander.offers[commodity].price
+      )
     );
 
     if (quantity === 0) {
@@ -271,9 +279,14 @@ export class Ship {
     }
     const rockReached = this.moveTo(delta, order.targetRock.position);
 
-    if (rockReached) {
+    if (rockReached && this.cooldowns.canUse("mine")) {
+      this.cooldowns.use("mine", 1);
       order.targetRock.mined = this.id;
-      this.storage.addStorage(order.target.type, this.mining * delta, false);
+      this.storage.addStorage(
+        order.target.type,
+        Math.floor(this.mining * delta),
+        false
+      );
 
       if (this.storage.getAvailableSpace() === 0) {
         order.targetRock.mined = null;

@@ -9,7 +9,7 @@ function createFaction(index: number) {
   const char = String.fromCharCode(index + 65);
   const faction = new Faction(`f-${char}`);
   faction.name = `Faction ${char}`;
-  faction.budget.changeMoney(1e4);
+  faction.budget.changeMoney(1e6);
 
   return faction;
 }

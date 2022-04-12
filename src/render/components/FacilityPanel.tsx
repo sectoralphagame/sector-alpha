@@ -10,6 +10,7 @@ const FacilityPanel: React.FC = () => {
       <div>{facility.name}</div>
       <div>Money: {facility.budget.getAvailableMoney().toFixed(0)}</div>
       <hr />
+      Stored / Produced / Offer Qty / Price
       {Object.values(commodities)
         .map((commodity) => ({
           commodity,
@@ -22,7 +23,7 @@ const FacilityPanel: React.FC = () => {
             data.stored
           } / ${data.produces || -data.consumes} / ${data.quantity.toFixed(
             0
-          )}`}</div>
+          )} / ${data.price}`}</div>
         ))}
       <hr />
       {facility.modules.map((facilityModule, index) => (

@@ -1,7 +1,7 @@
 import cloneDeep from "lodash/cloneDeep";
 import sortBy from "lodash/sortBy";
 import map from "lodash/map";
-import { matrix, Matrix, sum } from "mathjs";
+import { matrix, Matrix, number, sum } from "mathjs";
 import { sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { perCommodity } from "../utils/perCommodity";
@@ -20,6 +20,7 @@ import { InvalidOfferType } from "../errors";
 import { createIsAbleToProduce } from "./utils";
 
 let facilityIdCounter = 0;
+const startingPrice = 100;
 
 export type TradeOfferType = "buy" | "sell";
 
@@ -57,16 +58,19 @@ export interface TransactionInput extends TradeOffer {
 
 export class Facility {
   id: number;
-  cooldowns: Cooldowns<"production">;
+  cooldowns: Cooldowns<"production" | "adjustPrices">;
   offers: TradeOffers;
   productionAndConsumption: ProductionAndConsumption;
-  transactions: Transaction[];
+  transactions: Transaction[] = [];
   storage: CommodityStorage;
   owner: Faction;
-  position: Matrix;
-  modules: FacilityModule[];
-  lastPriceAdjust: number;
-  ships: Ship[];
+  position: Matrix = matrix([0, 0]);
+  modules: FacilityModule[] = [];
+  lastPriceAdjust = {
+    time: 0,
+    commodities: perCommodity(() => 0),
+  };
+  ships: Ship[] = [];
   name: string;
   budget: Budget;
 
@@ -74,14 +78,10 @@ export class Facility {
     this.id = facilityIdCounter;
     facilityIdCounter += 1;
 
-    this.modules = [];
     this.productionAndConsumption = cloneDeep(baseProductionAndConsumption);
-    this.cooldowns = new Cooldowns("production");
-    this.position = matrix([0, 0]);
+    this.cooldowns = new Cooldowns("production", "adjustPrices");
     this.storage = new CommodityStorage(this.createOffers);
     this.createOffers();
-    this.ships = [];
-    this.transactions = [];
     this.name = `Facility #${this.id}`;
     this.budget = new Budget();
   }
@@ -112,7 +112,7 @@ export class Facility {
         const quantity = this.getOfferedQuantity(commodity);
 
         return {
-          price: 1,
+          price: (this.offers && this.offers[commodity].price) ?? startingPrice,
           quantity: quantity > 0 ? quantity : -quantity,
           type: quantity > 0 ? "sell" : "buy",
         };
@@ -209,7 +209,7 @@ export class Facility {
     const multiplier =
       requiredBudget > availableBudget ? availableBudget / requiredBudget : 1;
 
-    return Math.ceil(multiplier * (stored[commodity] - requiredQuantity));
+    return Math.floor(multiplier * (stored[commodity] - requiredQuantity));
   };
 
   isTradeAccepted = (input: TransactionInput): boolean => {
@@ -280,7 +280,38 @@ export class Facility {
     this.createOffers();
   };
 
-  adjustPrices = () => {};
+  adjustPrices = () => {
+    const quantities = perCommodity(
+      (commodity) =>
+        sum(
+          this.transactions
+            .filter(
+              (transaction) =>
+                transaction.commodity === commodity &&
+                transaction.time > this.lastPriceAdjust.time &&
+                transaction.price > 0
+            )
+            .map((h) => h.quantity)
+        ) as number
+    );
+    const change = perCommodity(
+      (commodity) =>
+        quantities[commodity] - this.lastPriceAdjust.commodities[commodity]
+    );
+
+    perCommodity((commodity) => {
+      if (this.offers[commodity].quantity > 0) {
+        this.offers[commodity].price = Math.floor(
+          this.offers[commodity].price * (change[commodity] > 0 ? 0.99 : 1.01)
+        );
+      }
+    });
+
+    this.lastPriceAdjust = {
+      commodities: quantities,
+      time: sim.getTime(),
+    };
+  };
 
   getSummedConsumption = () =>
     sum(
@@ -380,6 +411,11 @@ export class Facility {
         });
         this.createOffers();
       }
+    }
+
+    if (this.cooldowns.canUse("adjustPrices")) {
+      this.cooldowns.use("adjustPrices", 300);
+      this.adjustPrices();
     }
   };
 }
