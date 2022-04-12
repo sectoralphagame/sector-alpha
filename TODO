@@ -61,7 +61,7 @@ Basic principles:
           
 
 Bugs:
-    ☐ Simulation dies after 20 000 seconds
+    ✔ Simulation dies after 20 000 seconds @done(22-04-12 02:15)
       It happens, because traders stop delivering commodities to facilities
       which need them. Probably related to Facility.getNeededCommodities,
       Facility.getCommoditiesForSell and Ship.autoTrade
