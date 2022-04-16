@@ -113,7 +113,9 @@ export class Ship {
       this.drive.state === "cruise" ? this.drive.cruise : this.drive.maneuver;
     const distance = norm(path);
     const canCruise =
-      distance > limitMin(this.drive.ttc, 10) * this.drive.maneuver;
+      distance >
+      (this.drive.state === "cruise" ? 3 : this.drive.ttc) *
+        this.drive.maneuver;
 
     const dPos =
       norm(path) > 0
