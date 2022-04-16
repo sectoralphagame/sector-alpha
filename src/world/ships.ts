@@ -8,14 +8,22 @@ export const shipClasses: Record<
   shipA: {
     name: "Ship Type A",
     position: matrix([0, 0]),
-    speed: 1,
+    drive: {
+      cruise: 4,
+      maneuver: 0.3,
+      ttc: 3,
+    },
     storage: 10,
     mining: 0,
   },
   shipB: {
     name: "Ship Type B",
     position: matrix([0, 0]),
-    speed: 1.3,
+    drive: {
+      cruise: 4.6,
+      maneuver: 0.55,
+      ttc: 2,
+    },
     storage: 6,
     mining: 0,
   },

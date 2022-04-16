@@ -32,29 +32,45 @@ import {
   getFacilityWithMostProfit,
   getClosestMineableAsteroid,
 } from "../../economy/utils";
+import { limitMin } from "../../utils/limit";
 
 let shipIdCounter = 0;
 
 export interface InitialShipInput {
   name: string;
   position: Matrix;
-  speed: number;
+  drive: ShipDriveProps;
   storage: number;
   mining: number;
 }
 
 export type MainOrderType = "trade" | "mine";
 
+export interface ShipDriveProps {
+  maneuver: number;
+  cruise: number;
+  /**
+   * Time to initiate cruise engine
+   */
+  ttc: number;
+}
+
+export interface ShipDriveState {
+  cruiseState: "inactive" | "warming" | "active";
+}
+
+export type ShipDrive = ShipDriveProps & ShipDriveState;
+
 export class Ship {
   id: number;
   name: string;
-  speed: number;
+  drive: ShipDrive;
   position: Matrix;
   storage: CommodityStorage;
   owner: Faction;
   commander: Facility | null;
   orders: Order[];
-  cooldowns: Cooldowns<"retryOrder" | "autoOrder" | "mine">;
+  cooldowns: Cooldowns<"retryOrder" | "autoOrder" | "mine" | "cruise">;
   mining: number;
   mined: number;
   retryOrderCounter: number = 0;
@@ -65,14 +81,17 @@ export class Ship {
     shipIdCounter += 1;
 
     this.name = initial.name;
-    this.speed = initial.speed;
+    this.drive = {
+      ...initial.drive,
+      cruiseState: "inactive",
+    };
     this.storage = new CommodityStorage();
     this.storage.max = initial.storage;
     this.owner = null;
     this.commander = null;
     this.orders = [];
     this.position = cloneDeep(initial.position);
-    this.cooldowns = new Cooldowns("retryOrder", "autoOrder", "mine");
+    this.cooldowns = new Cooldowns("retryOrder", "autoOrder", "mine", "cruise");
     this.cooldowns.use("autoOrder", 1);
     this.mining = initial.mining;
     this.mined = 0;
@@ -107,14 +126,42 @@ export class Ship {
 
   moveTo = (delta: number, position: Matrix): boolean => {
     const path = subtract(position, this.position) as Matrix;
+    const speed =
+      this.drive.cruiseState === "active"
+        ? this.drive.cruise
+        : this.drive.maneuver;
+    const distance = norm(path);
+    const canCruise =
+      distance > limitMin(this.drive.ttc, 10) * this.drive.maneuver;
+
     const dPos =
       norm(path) > 0
-        ? (multiply(divide(path, norm(path)), this.speed * delta) as Matrix)
+        ? (multiply(divide(path, norm(path)), speed * delta) as Matrix)
         : matrix([0, 0]);
 
-    if (norm(dPos) >= norm(path)) {
+    if (norm(dPos) >= distance) {
       this.position = matrix(position);
       return true;
+    }
+
+    if (canCruise && this.cooldowns.canUse("cruise")) {
+      // eslint-disable-next-line default-case
+      switch (this.drive.cruiseState) {
+        case "inactive": {
+          this.cooldowns.use("cruise", this.drive.ttc);
+          this.drive.cruiseState = "warming";
+          break;
+        }
+
+        case "warming": {
+          if (this.cooldowns.canUse("cruise")) {
+            this.drive.cruiseState = "active";
+          }
+          break;
+        }
+      }
+    } else if (this.drive.cruiseState === "active") {
+      this.drive.cruiseState = "inactive";
     }
 
     this.position = add(this.position, dPos) as Matrix;
