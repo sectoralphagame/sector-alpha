@@ -33,6 +33,7 @@ import {
   getClosestMineableAsteroid,
 } from "../../economy/utils";
 import { limitMin } from "../../utils/limit";
+import { ShipDrive, ShipDriveProps } from "./drive";
 
 let shipIdCounter = 0;
 
@@ -45,21 +46,6 @@ export interface InitialShipInput {
 }
 
 export type MainOrderType = "trade" | "mine";
-
-export interface ShipDriveProps {
-  maneuver: number;
-  cruise: number;
-  /**
-   * Time to initiate cruise engine
-   */
-  ttc: number;
-}
-
-export interface ShipDriveState {
-  cruiseState: "inactive" | "warming" | "active";
-}
-
-export type ShipDrive = ShipDriveProps & ShipDriveState;
 
 export class Ship {
   id: number;
@@ -81,10 +67,7 @@ export class Ship {
     shipIdCounter += 1;
 
     this.name = initial.name;
-    this.drive = {
-      ...initial.drive,
-      cruiseState: "inactive",
-    };
+    this.drive = new ShipDrive(initial.drive);
     this.storage = new CommodityStorage();
     this.storage.max = initial.storage;
     this.owner = null;
@@ -127,9 +110,7 @@ export class Ship {
   moveTo = (delta: number, position: Matrix): boolean => {
     const path = subtract(position, this.position) as Matrix;
     const speed =
-      this.drive.cruiseState === "active"
-        ? this.drive.cruise
-        : this.drive.maneuver;
+      this.drive.state === "cruise" ? this.drive.cruise : this.drive.maneuver;
     const distance = norm(path);
     const canCruise =
       distance > limitMin(this.drive.ttc, 10) * this.drive.maneuver;
@@ -144,24 +125,12 @@ export class Ship {
       return true;
     }
 
-    if (canCruise && this.cooldowns.canUse("cruise")) {
-      // eslint-disable-next-line default-case
-      switch (this.drive.cruiseState) {
-        case "inactive": {
-          this.cooldowns.use("cruise", this.drive.ttc);
-          this.drive.cruiseState = "warming";
-          break;
-        }
+    if (canCruise && this.drive.state === "maneuver") {
+      this.drive.startCruise();
+    }
 
-        case "warming": {
-          if (this.cooldowns.canUse("cruise")) {
-            this.drive.cruiseState = "active";
-          }
-          break;
-        }
-      }
-    } else if (this.drive.cruiseState === "active") {
-      this.drive.cruiseState = "inactive";
+    if (!canCruise && this.drive.state === "cruise") {
+      this.drive.stopCruise();
     }
 
     this.position = add(this.position, dPos) as Matrix;
@@ -453,6 +422,7 @@ export class Ship {
 
   sim = (delta: number) => {
     this.cooldowns.update(delta);
+    this.drive.sim(delta);
 
     if (this.orders.length) {
       if (this.cooldowns.canUse("retryOrder")) {
