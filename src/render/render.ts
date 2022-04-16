@@ -211,7 +211,7 @@ export function render(sim: Sim, parent: Element) {
       });
 
       if (clicked) {
-        window.selected = clicked;
+        clicked.select();
       }
     };
 

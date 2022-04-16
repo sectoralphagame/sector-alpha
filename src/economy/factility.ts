@@ -16,11 +16,13 @@ import { Faction } from "./faction";
 import { Ship } from "../entities/ship";
 import { Budget } from "./budget";
 import { Allocation } from "./allocations";
-import { InvalidOfferType } from "../errors";
+import { InvalidOfferType, NonPositiveAmount } from "../errors";
 import { createIsAbleToProduce } from "./utils";
+import { limitMax, limitMin } from "../utils/limit";
 
 let facilityIdCounter = 0;
 const startingPrice = 100;
+const maxTransactions = 100;
 
 export type TradeOfferType = "buy" | "sell";
 
@@ -85,6 +87,15 @@ export class Facility {
     this.name = `Facility #${this.id}`;
     this.budget = new Budget();
   }
+
+  select = () => {
+    window.selected = this;
+  };
+
+  focus = () => {
+    this.select();
+    window.renderer.focused = this;
+  };
 
   setOwner = (owner: Faction) => {
     this.owner = owner;
@@ -177,6 +188,42 @@ export class Facility {
     this.storage.getAvailableWares()[commodity] +
     this.getProductionSurplus(commodity);
 
+  getQuota = (commodity: Commodity): number =>
+    Math.floor(
+      (this.storage.max *
+        (this.productionAndConsumption[commodity].produces +
+          this.productionAndConsumption[commodity].consumes)) /
+        this.getRequiredStorage()
+    );
+
+  /**
+   *
+   * @returns Commodity cost of production
+   */
+  getProductionCost = (commodity: Commodity): number => {
+    const productionModule = this.modules.find(
+      (m) => m.productionAndConsumption[commodity].produces > 0
+    );
+
+    if (!productionModule) {
+      return this.offers[commodity].price;
+    }
+
+    return Math.ceil(
+      sum(
+        Object.values(
+          perCommodity((c) =>
+            productionModule.productionAndConsumption[c].consumes
+              ? (this.getProductionCost(c) *
+                  productionModule.productionAndConsumption[c].consumes) /
+                productionModule.productionAndConsumption[commodity].produces
+              : 0
+          )
+        )
+      )
+    );
+  };
+
   getOfferedQuantity = (commodity: Commodity) => {
     if (
       this.productionAndConsumption[commodity].consumes ===
@@ -197,25 +244,26 @@ export class Facility {
 
     const requiredBudget = this.getPlannedBudget();
     const availableBudget = this.budget.getAvailableMoney();
-    const requiredQuantity = Math.floor(
-      -this.storage.max *
-        (this.getProductionSurplus(commodity) / this.getRequiredStorage())
-    );
+    const quota = this.getQuota(commodity);
 
-    if (stored[commodity] > requiredQuantity) {
-      return stored[commodity] - requiredQuantity;
+    if (stored[commodity] > quota) {
+      return stored[commodity] - quota;
     }
 
     const multiplier =
       requiredBudget > availableBudget ? availableBudget / requiredBudget : 1;
 
-    return Math.floor(multiplier * (stored[commodity] - requiredQuantity));
+    return Math.floor(multiplier * (stored[commodity] - quota));
   };
 
   isTradeAccepted = (input: TransactionInput): boolean => {
     let validPrice = false;
 
     const offer = this.offers[input.commodity];
+
+    if (offer.price < 0) {
+      throw new NonPositiveAmount(offer.price);
+    }
 
     if (offer.type === input.type && input.faction !== this.owner) {
       throw new InvalidOfferType(input.type);
@@ -266,6 +314,9 @@ export class Facility {
       ...input,
       time: sim.getTime(),
     });
+    if (this.transactions.length > maxTransactions) {
+      this.transactions.shift();
+    }
   };
 
   addModule = (facilityModule: FacilityModule) => {
@@ -289,7 +340,7 @@ export class Facility {
               (transaction) =>
                 transaction.commodity === commodity &&
                 transaction.time > this.lastPriceAdjust.time &&
-                transaction.price > 0
+                transaction.type !== this.offers[commodity].type
             )
             .map((h) => h.quantity)
         ) as number
@@ -300,11 +351,29 @@ export class Facility {
     );
 
     perCommodity((commodity) => {
-      if (this.offers[commodity].quantity > 0) {
-        this.offers[commodity].price = Math.floor(
-          this.offers[commodity].price * (change[commodity] > 0 ? 0.99 : 1.01)
-        );
+      const notOffered = this.offers[commodity].quantity <= 0;
+      const stockpiled =
+        this.offers[commodity].type === "buy" &&
+        this.storage.getAvailableWares()[commodity] / this.getQuota(commodity) >
+          0.8;
+
+      if (stockpiled || notOffered) {
+        return;
       }
+
+      const minPrice =
+        this.offers[commodity].type === "buy"
+          ? 1
+          : this.getProductionCost(commodity);
+      let delta = limitMin(Math.floor(this.offers[commodity].price * 0.01), 1);
+      if ((this.offers[commodity].type === "sell") === change[commodity] <= 0) {
+        delta *= -1;
+      }
+
+      this.offers[commodity].price = limitMin(
+        this.offers[commodity].price + delta,
+        minPrice
+      );
     });
 
     this.lastPriceAdjust = {
@@ -404,7 +473,11 @@ export class Facility {
           perCommodity((commodity) =>
             this.storage.addStorage(
               commodity,
-              facilityModule.productionAndConsumption[commodity].produces,
+              limitMax(
+                this.getQuota(commodity) -
+                  facilityModule.productionAndConsumption[commodity].produces,
+                facilityModule.productionAndConsumption[commodity].produces
+              ),
               false
             )
           );

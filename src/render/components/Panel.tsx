@@ -50,12 +50,7 @@ const Panel: React.FC = () => {
         x10
       </button>
       {!!window.selected && (
-        <button
-          onClick={() => {
-            window.renderer.focused = window.selected;
-          }}
-          type="button"
-        >
+        <button onClick={window.selected.focus} type="button">
           focus
         </button>
       )}

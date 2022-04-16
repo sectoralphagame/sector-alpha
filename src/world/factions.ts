@@ -52,7 +52,7 @@ factions.forEach((faction) => {
       facility.addShip(
         new Ship(Math.random() > 0.5 ? shipClasses.shipA : shipClasses.shipB)
       );
-    } while (Math.random() < 0.35);
+    } while (Math.random() < 0.15);
     faction.addFacility(facility);
   }
 });

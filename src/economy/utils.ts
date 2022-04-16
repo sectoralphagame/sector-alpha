@@ -7,47 +7,47 @@ import { sim } from "../sim";
 import { Asteroid, AsteroidField } from "./field";
 import { FacilityModule } from "./facilityModule";
 import { perCommodity } from "../utils/perCommodity";
+import { Commodity } from "./commodity";
 
-export function getClosestFacility(
-  facilities: Facility[],
-  position: Matrix
-): Facility | null {
-  const sortedByDistance = sortBy(
-    facilities.map((facility) => ({
-      facility,
-      distance: norm(subtract(position, facility.position) as Matrix),
-    })),
-    "distance"
-  );
-
-  if (sortedByDistance[0]) {
-    return sortedByDistance[0].facility;
-  }
-
-  return null;
-}
-
-export function getAnyClosestFacility(
+export function getFacilityWithMostProfit(
   facility: Facility,
-  // eslint-disable-next-line no-unused-vars
-  filter: (value: Facility, index: number, array: Facility[]) => boolean
+  commodity: Commodity
 ): Facility | null {
-  let target = getClosestFacility(
-    facility.owner.facilities.filter(filter),
-    facility.position
-  );
-  if (!target) {
-    target = getClosestFacility(
-      sim.factions
-        .filter((faction) => faction.slug !== facility.owner.slug)
-        .map((faction) => faction.facilities)
-        .flat()
-        .filter(filter),
-      facility.position
-    );
+  const distance = (f) =>
+    norm(subtract(facility.position, f.position) as Matrix) as number;
+
+  const profit = (f: Facility) =>
+    facility.owner === f.owner
+      ? 1e20
+      : (facility.offers[commodity].price - f.offers[commodity].price) *
+        (facility.offers[commodity].type === "buy" ? 1 : -1);
+
+  const sortedByProfit = sortBy(
+    sim.factions
+      .map((faction) => faction.facilities)
+      .flat()
+      .filter(
+        (f) =>
+          f.offers[commodity].type !== facility.offers[commodity].type &&
+          f.offers[commodity].quantity > 0
+      )
+      .map((f) => ({
+        facility: f,
+        profit: profit(f),
+      })),
+    "profit"
+  ).reverse();
+
+  if (!sortedByProfit[0] || sortedByProfit[0].profit <= 0) {
+    return null;
   }
 
-  return target;
+  return sortBy(
+    sortedByProfit
+      .filter((f, _, arr) => f.profit / arr[0].profit >= 0.95)
+      .map((f) => f.facility),
+    distance
+  ).reverse()[0];
 }
 
 export function getClosestMineableAsteroid(
@@ -66,11 +66,16 @@ export function createIsAbleToProduce(
 ): (facilityModule: FacilityModule) => boolean {
   return (facilityModule: FacilityModule) =>
     every(
-      perCommodity((commodity) =>
-        facility.storage.hasSufficientStorage(
-          commodity,
-          facilityModule.productionAndConsumption[commodity].consumes
-        )
+      perCommodity(
+        (commodity) =>
+          facility.storage.hasSufficientStorage(
+            commodity,
+            facilityModule.productionAndConsumption[commodity].consumes
+          ) &&
+          (facilityModule.productionAndConsumption[commodity].produces
+            ? facility.storage.getAvailableWares()[commodity] <
+              facility.getQuota(commodity)
+            : true)
       )
     );
 }

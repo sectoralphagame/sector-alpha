@@ -17,7 +17,7 @@ function getOrderDescription(ship: Ship, order: Order) {
 }
 
 const ShipPanel: React.FC = () => {
-  const ship: Ship = window.selected;
+  const ship = window.selected as Ship;
 
   return (
     <div>
@@ -25,13 +25,7 @@ const ShipPanel: React.FC = () => {
       {!!ship.commander && (
         <div>
           {`Commander: ${ship.commander.name}`}
-          <button
-            onClick={() => {
-              window.selected = ship.commander;
-              window.renderer.focused = ship.commander;
-            }}
-            type="button"
-          >
+          <button onClick={ship.commander.focus} type="button">
             focus
           </button>
         </div>

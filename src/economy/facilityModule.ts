@@ -41,14 +41,13 @@ export function createFacilityModule(
 
 export const facilityModules = {
   water: createFacilityModule("Water Production", 0, {
-    food: { consumes: 1, produces: 0 },
     ice: { consumes: 20, produces: 0 },
     water: { consumes: 0, produces: 10 },
   }),
   farm: createFacilityModule("Farm", 0, {
     food: { consumes: 0, produces: 15 },
     fuel: { consumes: 1, produces: 0 },
-    water: { consumes: 3, produces: 0 },
+    water: { consumes: 30, produces: 0 },
   }),
   refinery: createFacilityModule("Refinery", 0, {
     food: { consumes: 2, produces: 0 },

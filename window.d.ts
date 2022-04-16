@@ -7,5 +7,7 @@ interface Window {
     setSpeed: (value: number) => void;
   };
   renderer: any;
-  selected: any;
+  selected: {
+    focus: () => void;
+  };
 }
