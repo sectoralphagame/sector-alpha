@@ -20,15 +20,6 @@ export function createFarm() {
   return facility;
 }
 
-export function createFuelFacility() {
-  const facility = new Facility();
-  facility.addModule(facilityModules.dummy_fueliumProduction);
-  facility.addModule(facilityModules.containerSmall);
-  facility.storage.addStorage("fuel", 50);
-
-  return facility;
-}
-
 export function createShipyard() {
   const facility = new Facility();
   facility.addModule(facilityModules.shipyard);
@@ -64,31 +55,10 @@ export function createHullPlatesFacility() {
   return facility;
 }
 
-export function createIceMiningFacility() {
-  const facility = new Facility();
-  facility.addModule(facilityModules.dummy_iceProduction);
-  facility.addModule(facilityModules.dummy_iceProduction);
-  facility.addModule(facilityModules.containerSmall);
-  facility.storage.addStorage("ice", 50);
-
-  return facility;
-}
-
-export function createOreMiningFacility() {
-  const facility = new Facility();
-  facility.addModule(facilityModules.dummy_oreProduction);
-  facility.addModule(facilityModules.containerSmall);
-  facility.storage.addStorage("ore", 50);
-
-  return facility;
-}
-
 export const templates = [
   createFarm,
   createFuelFabricationFacility,
-  createFuelFacility,
   createHullPlatesFacility,
-  createIceMiningFacility,
   createRefineryFacility,
   createShipyard,
   createWaterFacility,

@@ -1,5 +1,6 @@
 import { Matrix } from "mathjs";
 import { Facility, TransactionInput } from "../../economy/factility";
+import { Asteroid, AsteroidField } from "../../economy/field";
 import { NegativeQuantity } from "../../errors";
 
 export interface MoveOrder {
@@ -13,7 +14,13 @@ export interface TradeOrder {
   target: Facility;
 }
 
-export type Order = MoveOrder | TradeOrder;
+export interface MineOrder {
+  type: "mine";
+  target: AsteroidField;
+  targetRock: Asteroid;
+}
+
+export type Order = MoveOrder | TradeOrder | MineOrder;
 
 export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder | null {
   if (order.offer.quantity <= 0) {
@@ -23,5 +30,12 @@ export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder | null {
   return {
     ...order,
     type: "trade",
+  };
+}
+
+export function mineOrder(order: Omit<MineOrder, "type">): MineOrder | null {
+  return {
+    ...order,
+    type: "mine",
   };
 }

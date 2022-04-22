@@ -11,14 +11,21 @@ import {
 import cloneDeep from "lodash/cloneDeep";
 import merge from "lodash/merge";
 import { Order } from "./orders";
-import { Facility } from "../../economy/factility";
+import { Facility, TransactionInput } from "../../economy/factility";
 import { CommodityStorage } from "../../economy/storage";
-import { MoveOrder, tradeOrder, TradeOrder } from ".";
-import { commodities, Commodity } from "../../economy/commodity";
+import { mineOrder, MineOrder, MoveOrder, tradeOrder, TradeOrder } from ".";
+import {
+  commodities,
+  Commodity,
+  mineableCommodities,
+} from "../../economy/commodity";
 import { sim } from "../../sim";
 import { Faction } from "../../economy/faction";
 import { Cooldowns } from "../../utils/cooldowns";
-import { getAnyClosestFacility } from "../../economy/utils";
+import {
+  getAnyClosestFacility,
+  getClosestMineableAsteroid,
+} from "../../economy/utils";
 
 let shipIdCounter = 0;
 
@@ -27,7 +34,10 @@ export interface InitialShipInput {
   position: Matrix;
   speed: number;
   storage: number;
+  mining: number;
 }
+
+export type MainOrderType = "trade" | "mine";
 
 export class Ship {
   id: number;
@@ -39,7 +49,9 @@ export class Ship {
   commander: Facility | null;
   orders: Order[];
   cooldowns: Cooldowns<"retryOrder" | "autoOrder">;
+  mining: number;
   retryOrderCounter: number = 0;
+  mainOrder: MainOrderType;
 
   constructor(initial: InitialShipInput) {
     this.id = shipIdCounter;
@@ -55,6 +67,7 @@ export class Ship {
     this.position = cloneDeep(initial.position);
     this.cooldowns = new Cooldowns("retryOrder", "autoOrder");
     this.cooldowns.use("autoOrder", 1);
+    this.mining = initial.mining;
 
     sim.ships.push(this);
   }
@@ -232,13 +245,7 @@ export class Ship {
     return true;
   };
 
-  moveOrder = (delta: number, order: MoveOrder): boolean =>
-    this.moveTo(delta, order.position);
-
-  autoOrder = () => {
-    if (!(this.commander || this.orders.length !== 0)) {
-      return;
-    }
+  autoTrade = () => {
     if (this.storage.getAvailableSpace() !== this.storage.max) {
       this.returnToFacility();
     } else {
@@ -254,30 +261,92 @@ export class Ship {
     }
   };
 
-  returnToFacility = () =>
-    this.orders.push(
-      ...Object.values(commodities)
-        .map(
-          (commodity) =>
-            ({
-              type: "trade",
-              offer: {
-                commodity,
-                faction: this.commander.owner,
-                price: 0,
-                quantity: this.storage.getAvailableWares()[commodity],
-                budget: this.commander?.budget ?? this.owner.budget,
-                allocations: null,
-                type: "sell",
-              },
+  mineOrder = (delta: number, order: MineOrder): boolean => {
+    if (order.targetRock?.mined !== this.id) {
+      order.targetRock = getClosestMineableAsteroid(
+        order.target,
+        this.position
+      );
+      if (!order.targetRock) return false;
+    }
+    const rockReached = this.moveTo(delta, order.targetRock.position);
+
+    if (rockReached) {
+      order.targetRock.mined = this.id;
+      this.storage.addStorage(order.target.type, this.mining * delta, false);
+
+      if (this.storage.getAvailableSpace() === 0) {
+        order.targetRock.mined = null;
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  autoMine = () => {
+    if (this.storage.getAvailableSpace() !== this.storage.max) {
+      this.returnToFacility();
+    } else {
+      const needed = this.commander.getNeededCommodities();
+      const mineable = needed.find((commodity) =>
+        (Object.values(mineableCommodities) as string[]).includes(commodity)
+      );
+
+      if (mineable) {
+        const field = sim.fields.find((f) => f.type === mineable);
+        const rock = getClosestMineableAsteroid(field, this.position);
+
+        if (rock) {
+          this.addOrder(
+            mineOrder({
+              target: field,
+              targetRock: rock,
+            })
+          );
+        }
+      }
+    }
+  };
+
+  moveOrder = (delta: number, order: MoveOrder): boolean =>
+    this.moveTo(delta, order.position);
+
+  autoOrder = () => {
+    if (this.orders.length !== 0) {
+      return;
+    }
+
+    switch (this.mainOrder) {
+      case "mine":
+        this.autoMine();
+        break;
+      default:
+        this.autoTrade();
+    }
+  };
+
+  sellToCommander = (commodity: Commodity) => {
+    const offer: TransactionInput = {
+      commodity,
+      quantity: this.storage.getAvailableWares()[commodity],
+      price: 0,
+      budget: null,
+      allocations: null,
+      type: "sell",
+      faction: this.owner,
+    };
+    const allocations = this.commander.allocate(offer);
+
+    if (allocations) {
+      this.addOrder(
+        tradeOrder(
+          merge(
+            {
               target: this.commander,
-            } as TradeOrder)
-        )
-        .filter((order) => order.offer.quantity > 0)
-        .map((order) => {
-          const allocations = this.commander.allocate(order.offer);
-          if (allocations) {
-            return merge(order, {
+              offer,
+            },
+            {
               offer: {
                 allocations: {
                   buyer: {
@@ -285,17 +354,23 @@ export class Ship {
                   },
                 },
               },
-            });
-          }
+            }
+          )
+        )
+      );
+    }
+  };
 
-          return null;
-        })
-        .filter(Boolean)
-    );
+  returnToFacility = () =>
+    Object.values(commodities)
+      .filter((commodity) => this.storage.getAvailableWares()[commodity] > 0)
+      .forEach(this.sellToCommander);
 
   holdPosition = () => false;
 
   sim = (delta: number) => {
+    this.cooldowns.update(delta);
+
     if (this.orders.length) {
       if (this.cooldowns.canUse("retryOrder")) {
         // eslint-disable-next-line no-unused-vars, no-shadow
@@ -305,11 +380,14 @@ export class Ship {
           case "trade":
             orderFn = this.tradeOrder;
             break;
+          case "mine":
+            orderFn = this.mineOrder;
+            break;
           case "move":
             orderFn = this.moveOrder;
             break;
           default:
-            orderFn = () => undefined;
+            orderFn = this.holdPosition;
         }
 
         const completed = orderFn(delta, this.orders[0]);
@@ -321,6 +399,5 @@ export class Ship {
       this.autoOrder();
       this.cooldowns.use("autoOrder", 3);
     }
-    this.cooldowns.update(delta);
   };
 }

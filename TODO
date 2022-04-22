@@ -7,8 +7,12 @@ Basic principles:
           ☐ Add trading between facilities
           ☐ Allow facilities to adjust their offer's prices
 
-        ☐ Goods are obtainable by mining or fabrication
+        ✔ Goods are obtainable by mining or fabrication @started(22-04-04 23:20) @done(22-04-11 21:45) @lasted(6d22h25m58s)
           Every faction has its own set of produced and consumed goods.
+
+            ☐ Rework asteroid fields so they contain multiple resources
+              It just doesn't seem realistic or balanced to have only one 
+              resource type in the whole asteroid field
 
         ✔ Storage is limited @done(22-03-17 13:37)
           Prevents throwing resources to production which has no demand yet.
@@ -55,6 +59,12 @@ Basic principles:
     ☐ War
        TBD, not in mvp
           
+
+Bugs:
+    ☐ Simulation dies after 20 000 seconds
+      It happens, because traders stop delivering commodities to facilities
+      which need them. Probably related to Facility.getNeededCommodities,
+      Facility.getCommoditiesForSell and Ship.autoTrade
 
 Ideas:
     ☐ Text and script based user input
