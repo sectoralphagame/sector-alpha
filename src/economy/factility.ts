@@ -1,7 +1,7 @@
 import cloneDeep from "lodash/cloneDeep";
 import sortBy from "lodash/sortBy";
 import map from "lodash/map";
-import { matrix, Matrix, number, sum } from "mathjs";
+import { matrix, Matrix, sum } from "mathjs";
 import { sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { perCommodity } from "../utils/perCommodity";
@@ -403,7 +403,7 @@ export class Facility {
     const summedConsumption = this.getSummedConsumption();
     const stored = this.storage.getAvailableWares();
 
-    return sortBy(
+    const scores = sortBy(
       Object.values(commodities)
         .filter(
           (commodity) =>
@@ -423,7 +423,9 @@ export class Facility {
             summedConsumption,
         })),
       "score"
-    ).map((offer) => offer.commodity);
+    );
+
+    return scores.map((offer) => offer.commodity);
   };
 
   getCommoditiesForSell = (): Commodity[] => {

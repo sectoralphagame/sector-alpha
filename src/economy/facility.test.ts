@@ -71,7 +71,7 @@ describe("Facility", () => {
     expect(facility.offers.food.quantity).not.toBeGreaterThan(0);
     expect(facility.offers.fuel.type).toBe("buy");
     expect(facility.offers.water.type).toBe("buy");
-    expect(facility.getNeededCommodities()).toEqual(["fuel", "water"]);
+    expect(facility.getNeededCommodities()).toEqual(["water", "fuel"]);
   });
 
   it("lowers prices if sales are dropping", () => {
@@ -80,6 +80,7 @@ describe("Facility", () => {
     facility.addModule(facilityModules.containerSmall);
     facility.addModule(facilityModules.farm);
     facility.storage.addStorage("food", 10, false);
+    facility.offers.food.price = 1000;
     facility.lastPriceAdjust = {
       time: 0,
       commodities: perCommodity((commodity) => (commodity === "food" ? 10 : 0)),

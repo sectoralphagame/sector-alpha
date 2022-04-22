@@ -12,7 +12,7 @@ describe("createIsAbleToProduce", () => {
 
   it("properly returns true if got everything needed for production", () => {
     facility.storage.addStorage("fuel", 20);
-    facility.storage.addStorage("water", 20);
+    facility.storage.addStorage("water", 40);
 
     const isAbleToProduce = createIsAbleToProduce(facility);
 
