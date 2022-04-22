@@ -10,7 +10,7 @@ describe("Ship", () => {
     const ship = new Ship(shipClasses.shipA);
     ship.position = matrix([1, 0]);
 
-    const reached = ship.moveTo(1, matrix([1, 0.5]));
+    const reached = ship.moveTo(1, matrix([1, 0.3]));
 
     expect(reached).toBe(true);
   });
@@ -34,7 +34,7 @@ describe("Ship", () => {
     });
 
     expect(ship.position.get([0])).toBe(1);
-    expect(ship.position.get([1])).toBe(0.5);
+    expect(ship.position.get([1])).toBe(0.3);
   });
 
   it("is able to sell", () => {
