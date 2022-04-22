@@ -1,4 +1,3 @@
-import every from "lodash/every";
 import cloneDeep from "lodash/cloneDeep";
 import sortBy from "lodash/sortBy";
 import map from "lodash/map";
@@ -18,6 +17,7 @@ import { Ship } from "../entities/ship";
 import { Budget } from "./budget";
 import { Allocation } from "./allocations";
 import { InvalidOfferType } from "../errors";
+import { createIsAbleToProduce } from "./utils";
 
 let facilityIdCounter = 0;
 
@@ -352,22 +352,18 @@ export class Facility {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("production")) {
-      const modulesAbleToProduce = this.modules.filter((facilityModule) =>
-        every(
-          perCommodity((commodity) =>
-            this.storage.hasSufficientStorage(
-              commodity,
-              facilityModule.productionAndConsumption[commodity].consumes
-            )
-          )
-        )
-      );
+      const isAbleToProduce = createIsAbleToProduce(this);
+      const modulesAbleToProduce = this.modules.filter(isAbleToProduce);
       if (modulesAbleToProduce.length) {
         this.cooldowns.use("production", 15);
         // TODO: use allocations and postpone storing commodities until
         // finished producing
 
-        modulesAbleToProduce.forEach((facilityModule) => {
+        this.modules.forEach((facilityModule) => {
+          if (!isAbleToProduce(facilityModule)) {
+            return;
+          }
+
           perCommodity((commodity) =>
             this.storage.removeStorage(
               commodity,
