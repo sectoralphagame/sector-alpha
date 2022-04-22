@@ -1,11 +1,15 @@
 Basic principles:
     ☐ Economy
-        ☐ Factions are able to trade between themselves
+        ✔ Factions are able to trade between themselves @done(22-04-16 02:53)
           Every marker participant should be able to adjust their buy and sell 
           threshold using some adaptive strategy (factor-based?).
 
-          ☐ Add trading between facilities
-          ☐ Allow facilities to adjust their offer's prices
+          ✔ Add trading between facilities @done(22-04-14 02:18)
+          ✔ Allow facilities to adjust their offer's prices @done(22-04-14 02:18)
+
+            ✔ Facilities do not take into account production cost @done(22-04-16 02:52)
+              Commodity should not be sold at the lower price than its 
+              production cost. Never.
 
         ✔ Goods are obtainable by mining or fabrication @started(22-04-04 23:20) @done(22-04-11 21:45) @lasted(6d22h25m58s)
           Every faction has its own set of produced and consumed goods.
@@ -66,7 +70,10 @@ Bugs:
       which need them. Probably related to Facility.getNeededCommodities,
       Facility.getCommoditiesForSell and Ship.autoTrade
 
+    ☐ Tesselation in asteroid field outlining hits performance really hard
+
 Ideas:
     ☐ Text and script based user input
       Allow player to manually write scripts that are executed server-side to
       automate all tasks.
+Archive:

@@ -51,6 +51,15 @@ export class NegativeQuantity extends Error {
   }
 }
 
+export class NonIntegerQuantity extends Error {
+  quantity: number;
+
+  constructor(quantity: number) {
+    super(`Non integer quantity: ${quantity}`);
+    this.quantity = quantity;
+  }
+}
+
 export class NegativeBudget extends Error {
   quantity: number;
 

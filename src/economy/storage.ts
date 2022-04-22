@@ -5,10 +5,12 @@ import {
   InsufficientStorage,
   InsufficientStorageSpace,
   NegativeQuantity,
+  NonIntegerQuantity,
 } from "../errors";
 import { perCommodity } from "../utils/perCommodity";
 import { Commodity } from "./commodity";
 import { AllocationManager } from "./allocations";
+import { sim } from "../sim";
 
 export type StorageAllocationType = "incoming" | "outgoing";
 
@@ -21,6 +23,7 @@ interface StorageAllocation {
 interface CommodityStorageHistoryEntry {
   commodity: Commodity;
   quantity: number;
+  time: number;
 }
 
 export class CommodityStorage {
@@ -61,8 +64,8 @@ export class CommodityStorage {
     this.updateAvailableWares();
   }
 
-  onChange = (entry: CommodityStorageHistoryEntry) => {
-    this.addHitoryEntry(entry);
+  onChange = (entry: Omit<CommodityStorageHistoryEntry, "time">) => {
+    this.addHitoryEntry({ ...entry, time: sim.getTime() });
     this.updateAvailableWares();
     this.changeHandler();
   };
@@ -132,6 +135,9 @@ export class CommodityStorage {
     if (quantity < 0) {
       throw new NegativeQuantity(quantity);
     }
+    if (!Number.isInteger(quantity)) {
+      throw new NonIntegerQuantity(quantity);
+    }
     if (quantity === 0) {
       return 0;
     }
@@ -156,6 +162,9 @@ export class CommodityStorage {
   removeStorage = (commodity: Commodity, quantity: number) => {
     if (quantity < 0) {
       throw new NegativeQuantity(quantity);
+    }
+    if (!Number.isInteger(quantity)) {
+      throw new NonIntegerQuantity(quantity);
     }
     if (quantity === 0) {
       return;

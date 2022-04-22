@@ -9,7 +9,7 @@ function createFaction(index: number) {
   const char = String.fromCharCode(index + 65);
   const faction = new Faction(`f-${char}`);
   faction.name = `Faction ${char}`;
-  faction.budget.changeMoney(1e4);
+  faction.budget.changeMoney(1e6);
 
   return faction;
 }
@@ -52,7 +52,7 @@ factions.forEach((faction) => {
       facility.addShip(
         new Ship(Math.random() > 0.5 ? shipClasses.shipA : shipClasses.shipB)
       );
-    } while (Math.random() < 0.35);
+    } while (Math.random() < 0.15);
     faction.addFacility(facility);
   }
 });

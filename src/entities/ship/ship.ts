@@ -10,10 +10,16 @@ import {
 } from "mathjs";
 import cloneDeep from "lodash/cloneDeep";
 import merge from "lodash/merge";
-import { Order } from "./orders";
 import { Facility, TransactionInput } from "../../economy/factility";
 import { CommodityStorage } from "../../economy/storage";
-import { mineOrder, MineOrder, MoveOrder, tradeOrder, TradeOrder } from ".";
+import {
+  mineOrder,
+  MineOrder,
+  MoveOrder,
+  tradeOrder,
+  TradeOrder,
+  Order,
+} from "./orders";
 import {
   commodities,
   Commodity,
@@ -23,7 +29,7 @@ import { sim } from "../../sim";
 import { Faction } from "../../economy/faction";
 import { Cooldowns } from "../../utils/cooldowns";
 import {
-  getAnyClosestFacility,
+  getFacilityWithMostProfit,
   getClosestMineableAsteroid,
 } from "../../economy/utils";
 
@@ -48,8 +54,9 @@ export class Ship {
   owner: Faction;
   commander: Facility | null;
   orders: Order[];
-  cooldowns: Cooldowns<"retryOrder" | "autoOrder">;
+  cooldowns: Cooldowns<"retryOrder" | "autoOrder" | "mine">;
   mining: number;
+  mined: number;
   retryOrderCounter: number = 0;
   mainOrder: MainOrderType;
 
@@ -65,12 +72,22 @@ export class Ship {
     this.commander = null;
     this.orders = [];
     this.position = cloneDeep(initial.position);
-    this.cooldowns = new Cooldowns("retryOrder", "autoOrder");
+    this.cooldowns = new Cooldowns("retryOrder", "autoOrder", "mine");
     this.cooldowns.use("autoOrder", 1);
     this.mining = initial.mining;
+    this.mined = 0;
 
     sim.ships.push(this);
   }
+
+  select = () => {
+    window.selected = this;
+  };
+
+  focus = () => {
+    this.select();
+    window.renderer.focused = this;
+  };
 
   setOwner = (owner: Faction) => {
     this.owner = owner;
@@ -96,7 +113,7 @@ export class Ship {
         : matrix([0, 0]);
 
     if (norm(dPos) >= norm(path)) {
-      this.position = cloneDeep(position);
+      this.position = matrix(position);
       return true;
     }
 
@@ -138,12 +155,7 @@ export class Ship {
   };
 
   autoBuyMostNeededByCommander = (commodity: Commodity): boolean => {
-    const target = getAnyClosestFacility(
-      this.commander,
-      (facility) =>
-        facility.offers[commodity].quantity > 0 &&
-        facility.offers[commodity].type === "sell"
-    );
+    const target = getFacilityWithMostProfit(this.commander, commodity);
 
     if (!target) return false;
 
@@ -151,12 +163,7 @@ export class Ship {
   };
 
   autoSellMostRedundantToCommander = (commodity: Commodity): boolean => {
-    const target = getAnyClosestFacility(
-      this.commander,
-      (facility) =>
-        facility.offers[commodity].quantity > 0 &&
-        facility.offers[commodity].type === "buy"
-    );
+    const target = getFacilityWithMostProfit(this.commander, commodity);
 
     if (!target) return false;
 
@@ -171,14 +178,16 @@ export class Ship {
     const sameFaction = this.owner === seller.owner;
     const buy = this.commander === buyer;
 
-    const quantity = min(
-      buyer.offers[commodity].quantity,
-      this.storage.max,
-      seller.offers[commodity].quantity,
-      sameFaction
-        ? Infinity
-        : this.commander.budget.getAvailableMoney() /
-            this.commander.offers[commodity].price
+    const quantity = Math.floor(
+      min(
+        buyer.offers[commodity].quantity,
+        this.storage.max,
+        seller.offers[commodity].quantity,
+        sameFaction
+          ? Infinity
+          : this.commander.budget.getAvailableMoney() /
+              this.commander.offers[commodity].price
+      )
     );
 
     if (quantity === 0) {
@@ -204,7 +213,11 @@ export class Ship {
     if (!buyerAllocations) return false;
 
     const sellerAllocations = seller.allocate(offer);
-    if (!sellerAllocations) return false;
+    if (!sellerAllocations) {
+      buyer.budget.allocations.release(buyerAllocations.budget.id);
+      buyer.storage.allocationManager.release(buyerAllocations.storage.id);
+      return false;
+    }
 
     this.addOrder(
       tradeOrder({
@@ -249,15 +262,27 @@ export class Ship {
     if (this.storage.getAvailableSpace() !== this.storage.max) {
       this.returnToFacility();
     } else {
-      const needs = this.commander.getNeededCommodities();
-      if (needs.length && this.autoBuyMostNeededByCommander(needs[0])) {
+      const bought = this.commander
+        .getNeededCommodities()
+        .reduce((acc, commodity) => {
+          if (acc) {
+            return true;
+          }
+
+          return this.autoBuyMostNeededByCommander(commodity);
+        }, false);
+
+      if (bought) {
         return;
       }
 
-      const redundant = this.commander.getCommoditiesForSell();
-      if (redundant.length) {
-        this.autoSellMostRedundantToCommander(redundant[0]);
-      }
+      this.commander.getCommoditiesForSell().reduce((acc, commodity) => {
+        if (acc) {
+          return true;
+        }
+
+        return this.autoSellMostRedundantToCommander(commodity);
+      }, false);
     }
   };
 
@@ -272,8 +297,17 @@ export class Ship {
     const rockReached = this.moveTo(delta, order.targetRock.position);
 
     if (rockReached) {
+      if (this.cooldowns.canUse("mine")) {
+        this.cooldowns.use("mine", 5);
+        this.storage.addStorage(
+          order.target.type,
+          Math.floor(this.mined),
+          false
+        );
+        this.mined = 0;
+      }
       order.targetRock.mined = this.id;
-      this.storage.addStorage(order.target.type, this.mining * delta, false);
+      this.mined += this.mining * delta;
 
       if (this.storage.getAvailableSpace() === 0) {
         order.targetRock.mined = null;
@@ -361,10 +395,12 @@ export class Ship {
     }
   };
 
-  returnToFacility = () =>
+  returnToFacility = () => {
+    this.addOrder({ type: "move", position: this.commander.position });
     Object.values(commodities)
       .filter((commodity) => this.storage.getAvailableWares()[commodity] > 0)
       .forEach(this.sellToCommander);
+  };
 
   holdPosition = () => false;
 

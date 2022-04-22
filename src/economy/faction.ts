@@ -32,10 +32,6 @@ export class Faction {
 
   sim = (delta: number) => {
     this.facilities.forEach((facility) => facility.sim(delta));
-    if (this.cooldowns.canUse("adjustPrices")) {
-      this.cooldowns.use("adjustPrices", 60);
-      this.facilities.forEach((facility) => facility.adjustPrices());
-    }
 
     if (this.cooldowns.canUse("budget")) {
       this.cooldowns.use("budget", 60);
