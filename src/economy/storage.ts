@@ -9,7 +9,7 @@ import {
 } from "../errors";
 import { perCommodity } from "../utils/perCommodity";
 import { Commodity } from "./commodity";
-import { AllocationManager } from "./allocations";
+import { AllocationManager } from "../components/utils/allocations";
 import { sim } from "../sim";
 
 export type StorageAllocationType = "incoming" | "outgoing";

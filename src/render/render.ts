@@ -160,8 +160,10 @@ export function render(sim: Sim, parent: Element) {
           const selected = window.selected === facility;
           const color =
             window.selected === facility
-              ? Color(facility.owner.color).lighten(0.2).unitArray()
-              : Color(facility.owner.color).unitArray();
+              ? Color(facility.components.owner.value.color)
+                  .lighten(0.2)
+                  .unitArray()
+              : Color(facility.components.owner.value.color).unitArray();
           p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
           p5.noStroke();
           p5.circle(

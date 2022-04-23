@@ -1,6 +1,5 @@
 import cloneDeep from "lodash/cloneDeep";
 import sortBy from "lodash/sortBy";
-import map from "lodash/map";
 import { matrix, Matrix, sum } from "mathjs";
 import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
@@ -14,31 +13,22 @@ import {
 import { CommodityStorage } from "./storage";
 import { Faction } from "./faction";
 import { Ship } from "../entities/ship";
-import { Budget } from "./budget";
-import { Allocation } from "./allocations";
+import { Budget } from "../components/budget";
+import { Allocation } from "../components/utils/allocations";
 import { InvalidOfferType, NonPositiveAmount } from "../errors";
-import { createIsAbleToProduce } from "./utils";
+import { createIsAbleToProduce, getPlannedBudget } from "./utils";
 import { limitMax, limitMin } from "../utils/limit";
 import { Entity } from "../components/entity";
+import { Owner } from "../components/owner";
+import { startingPrice, Trade, TradeOffer } from "../components/trade";
 
-const startingPrice = 100;
 const maxTransactions = 100;
-
-export type TradeOfferType = "buy" | "sell";
-
-export interface TradeOffer {
-  price: number;
-  quantity: number;
-  type: TradeOfferType;
-}
 
 export function offerToStr(commodity: Commodity, offer: TradeOffer): string {
   return `${offer.type === "buy" ? "Buying" : "Selling"} ${
     offer.quantity
   } ${commodity} x ${offer.price} UTT`;
 }
-
-export type TradeOffers = Record<Commodity, TradeOffer>;
 
 export interface Transaction extends TradeOffer {
   commodity: Commodity;
@@ -60,11 +50,9 @@ export interface TransactionInput extends TradeOffer {
 
 export class Facility extends Entity {
   cooldowns: Cooldowns<"production" | "adjustPrices" | "settleBudget">;
-  offers: TradeOffers;
   productionAndConsumption: ProductionAndConsumption;
   transactions: Transaction[] = [];
   storage: CommodityStorage;
-  owner: Faction;
   position: Matrix = matrix([0, 0]);
   modules: FacilityModule[] = [];
   lastPriceAdjust = {
@@ -73,7 +61,6 @@ export class Facility extends Entity {
   };
   ships: Ship[] = [];
   name: string;
-  budget: Budget;
 
   constructor(sim: Sim) {
     super(sim);
@@ -85,10 +72,14 @@ export class Facility extends Entity {
       "settleBudget"
     );
     this.storage = new CommodityStorage(this.createOffers);
-    this.createOffers();
     this.name = `Facility #${this.id}`;
-    this.budget = new Budget();
     this.sim.facilities.push(this);
+
+    this.components.budget = new Budget();
+    this.components.owner = new Owner();
+    this.components.trade = new Trade();
+
+    this.createOffers();
   }
 
   select = () => {
@@ -100,32 +91,15 @@ export class Facility extends Entity {
     window.renderer.focused = this;
   };
 
-  setOwner = (owner: Faction) => {
-    this.owner = owner;
-    this.ships.forEach((ship) => ship.setOwner(this.owner));
-  };
-  clearOwner = () => {
-    this.owner = null;
-    this.ships.forEach((ship) => ship.setOwner(this.owner));
-  };
-
-  addShip = (ship: Ship) => {
-    ship.setOwner(this.owner);
-    ship.setCommander(this);
-    this.ships.push(ship);
-  };
-
-  removeShip = (ship: Ship) => {
-    this.ships = this.ships.filter((s) => s.id !== ship.id);
-    ship.clearCommander();
-  };
-
   createOffers = () => {
-    this.offers = perCommodity((commodity): TradeOffer => {
+    this.components.trade.offers = perCommodity((commodity): TradeOffer => {
       const quantity = this.getOfferedQuantity(commodity);
 
       return {
-        price: (this.offers && this.offers[commodity].price) ?? startingPrice,
+        price:
+          (this.components.trade.offers &&
+            this.components.trade.offers[commodity].price) ??
+          startingPrice,
         quantity: quantity > 0 ? quantity : -quantity,
         type: quantity > 0 ? "sell" : "buy",
       };
@@ -141,7 +115,7 @@ export class Facility extends Entity {
     if (this.isTradeAccepted(offer)) {
       if (offer.type === "sell") {
         return {
-          budget: this.budget.allocations.new({
+          budget: this.components.budget.allocations.new({
             amount: offer.price * offer.quantity,
           }),
           storage: this.storage.allocationManager.new({
@@ -169,18 +143,6 @@ export class Facility extends Entity {
     return null;
   };
 
-  /**
-   *
-   * @returns Minimum required money to fulfill all buy requests, not taking
-   * into account sell offers
-   */
-  getPlannedBudget = (): number =>
-    sum(
-      map(this.offers).map(
-        (offer) => (offer.type === "sell" ? 0 : offer.quantity) * offer.price
-      )
-    );
-
   getProductionSurplus = (commodity: Commodity) =>
     this.productionAndConsumption[commodity].produces -
     this.productionAndConsumption[commodity].consumes;
@@ -207,7 +169,7 @@ export class Facility extends Entity {
     );
 
     if (!productionModule) {
-      return this.offers[commodity].price;
+      return this.components.trade.offers[commodity].price;
     }
 
     return Math.ceil(
@@ -243,8 +205,8 @@ export class Facility extends Entity {
       );
     }
 
-    const requiredBudget = this.getPlannedBudget();
-    const availableBudget = this.budget.getAvailableMoney();
+    const requiredBudget = getPlannedBudget(this);
+    const availableBudget = this.components.budget.getAvailableMoney();
     const quota = this.getQuota(commodity);
 
     if (stored[commodity] > quota) {
@@ -260,17 +222,20 @@ export class Facility extends Entity {
   isTradeAccepted = (input: TransactionInput): boolean => {
     let validPrice = false;
 
-    const offer = this.offers[input.commodity];
+    const offer = this.components.trade.offers[input.commodity];
 
     if (offer.price < 0) {
       throw new NonPositiveAmount(offer.price);
     }
 
-    if (offer.type === input.type && input.faction !== this.owner) {
+    if (
+      offer.type === input.type &&
+      input.faction !== this.components.owner.value
+    ) {
       throw new InvalidOfferType(input.type);
     }
     if (input.type === "buy") {
-      if (input.faction === this.owner) {
+      if (input.faction === this.components.owner.value) {
         validPrice = true;
       } else {
         validPrice = input.price >= offer.price;
@@ -282,7 +247,7 @@ export class Facility extends Entity {
       );
     }
 
-    if (input.faction === this.owner) {
+    if (input.faction === this.components.owner.value) {
       validPrice = true;
     } else {
       validPrice = input.price <= offer.price;
@@ -290,7 +255,8 @@ export class Facility extends Entity {
 
     return (
       validPrice &&
-      this.budget.getAvailableMoney() >= input.price * input.quantity &&
+      this.components.budget.getAvailableMoney() >=
+        input.price * input.quantity &&
       this.storage.hasSufficientStorageSpace(input.quantity)
     );
   };
@@ -299,15 +265,15 @@ export class Facility extends Entity {
     if (input.price > 0) {
       // They are selling us
       if (input.type === "sell") {
-        const allocation = this.budget.allocations.release(
+        const allocation = this.components.budget.allocations.release(
           input.allocations.buyer.budget
         );
-        this.budget.transferMoney(allocation.amount, input.budget);
+        this.components.budget.transferMoney(allocation.amount, input.budget);
       } else {
         const allocation = input.budget.allocations.release(
           input.allocations.buyer.budget
         );
-        input.budget.transferMoney(allocation.amount, this.budget);
+        input.budget.transferMoney(allocation.amount, this.components.budget);
       }
     }
 
@@ -341,7 +307,8 @@ export class Facility extends Entity {
               (transaction) =>
                 transaction.commodity === commodity &&
                 transaction.time > this.lastPriceAdjust.time &&
-                transaction.type !== this.offers[commodity].type
+                transaction.type !==
+                  this.components.trade.offers[commodity].type
             )
             .map((h) => h.quantity)
         ) as number
@@ -352,9 +319,9 @@ export class Facility extends Entity {
     );
 
     perCommodity((commodity) => {
-      const notOffered = this.offers[commodity].quantity <= 0;
+      const notOffered = this.components.trade.offers[commodity].quantity <= 0;
       const stockpiled =
-        this.offers[commodity].type === "buy" &&
+        this.components.trade.offers[commodity].type === "buy" &&
         this.storage.getAvailableWares()[commodity] / this.getQuota(commodity) >
           0.8;
 
@@ -363,16 +330,22 @@ export class Facility extends Entity {
       }
 
       const minPrice =
-        this.offers[commodity].type === "buy"
+        this.components.trade.offers[commodity].type === "buy"
           ? 1
           : this.getProductionCost(commodity);
-      let delta = limitMin(Math.floor(this.offers[commodity].price * 0.01), 1);
-      if ((this.offers[commodity].type === "sell") === change[commodity] <= 0) {
+      let delta = limitMin(
+        Math.floor(this.components.trade.offers[commodity].price * 0.01),
+        1
+      );
+      if (
+        (this.components.trade.offers[commodity].type === "sell") ===
+        change[commodity] <= 0
+      ) {
         delta *= -1;
       }
 
-      this.offers[commodity].price = limitMin(
-        this.offers[commodity].price + delta,
+      this.components.trade.offers[commodity].price = limitMin(
+        this.components.trade.offers[commodity].price + delta,
         minPrice
       );
     });
@@ -408,12 +381,12 @@ export class Facility extends Entity {
       Object.values(commodities)
         .filter(
           (commodity) =>
-            this.offers[commodity].type === "buy" &&
-            this.offers[commodity].quantity > 0
+            this.components.trade.offers[commodity].type === "buy" &&
+            this.components.trade.offers[commodity].quantity > 0
         )
         .map((commodity) => ({
           commodity,
-          wantToBuy: this.offers[commodity].quantity,
+          wantToBuy: this.components.trade.offers[commodity].quantity,
           quantityStored: stored[commodity],
         }))
         .map((data) => ({
@@ -437,8 +410,8 @@ export class Facility extends Entity {
         .map((commodity) => ({
           commodity,
           wantToSell:
-            this.offers[commodity].type === "sell"
-              ? this.offers[commodity].quantity
+            this.components.trade.offers[commodity].type === "sell"
+              ? this.components.trade.offers[commodity].quantity
               : 0,
           quantityStored: stored[commodity],
         }))
@@ -451,30 +424,8 @@ export class Facility extends Entity {
     ).map((offer) => offer.commodity);
   };
 
-  settleBudget = () => {
-    const budgetChange =
-      this.getPlannedBudget() - this.budget.getAvailableMoney();
-
-    if (budgetChange < 0) {
-      this.budget.transferMoney(
-        limitMax(-budgetChange, this.budget.getAvailableMoney()),
-        this.owner.budget
-      );
-    } else {
-      this.owner.budget.transferMoney(
-        limitMax(budgetChange, this.owner.budget.getAvailableMoney()),
-        this.budget
-      );
-    }
-  };
-
   simulate = (delta: number) => {
     this.cooldowns.update(delta);
-
-    if (this.cooldowns.canUse("settleBudget")) {
-      this.cooldowns.use("settleBudget", 60);
-      this.settleBudget();
-    }
 
     if (this.cooldowns.canUse("production")) {
       const isAbleToProduce = createIsAbleToProduce(this);

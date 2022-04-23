@@ -8,7 +8,9 @@ const FacilityPanel: React.FC = () => {
   return (
     <div>
       <div>{facility.name}</div>
-      <div>Money: {facility.budget.getAvailableMoney().toFixed(0)}</div>
+      <div>
+        Money: {facility.components.budget.getAvailableMoney().toFixed(0)}
+      </div>
       <hr />
       <table>
         <thead>
@@ -25,7 +27,7 @@ const FacilityPanel: React.FC = () => {
             .map((commodity) => ({
               commodity,
               ...facility.productionAndConsumption[commodity],
-              ...facility.offers[commodity],
+              ...facility.components.trade.offers[commodity],
               stored: facility.storage.getAvailableWares()[commodity],
             }))
             .map((data) => (

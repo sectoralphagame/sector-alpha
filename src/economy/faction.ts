@@ -1,6 +1,6 @@
 import Color from "color";
 import { Cooldowns } from "../utils/cooldowns";
-import { Budget } from "./budget";
+import { Budget } from "../components/budget";
 
 let factionCounter = 0;
 

@@ -5,6 +5,8 @@ import { Ship } from "../entities/ship";
 import { World } from "../world";
 import { BaseSim } from "./BaseSim";
 import { Facility } from "../economy/factility";
+import { System } from "../systems/system";
+import { BudgetPlanningSystem } from "../systems/budgetPlanning";
 
 export class Sim extends BaseSim {
   entities: Entity[] = [];
@@ -14,6 +16,14 @@ export class Sim extends BaseSim {
   fields: AsteroidField[] = [];
 
   entityIdCounter: number = 0;
+
+  systems: System[];
+
+  constructor() {
+    super();
+
+    this.systems = [new BudgetPlanningSystem(this)];
+  }
 
   registerEntity = (entity: Entity) => {
     entity.id = this.entityIdCounter;
@@ -29,6 +39,8 @@ export class Sim extends BaseSim {
   next = (delta: number) => {
     this.facilities.forEach((facility) => facility.simulate(delta));
     this.ships.forEach((ship) => ship.simulate(delta));
+
+    this.systems.forEach((s) => s.exec(delta));
   };
 }
 

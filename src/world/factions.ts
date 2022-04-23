@@ -41,24 +41,26 @@ factions.forEach((faction) => {
 
     do {
       if (hasMineables) {
-        const ship = new Ship({
+        const mineOrTrade = new Ship({
           ...(Math.random() > 0.5 ? shipClasses.minerA : shipClasses.minerB),
           position: matrix([0, 0]),
           sim,
         });
-        if (ship.mining > 0) {
-          ship.mainOrder = "mine";
+        if (mineOrTrade.mining > 0) {
+          mineOrTrade.mainOrder = "mine";
         }
-        facility.addShip(ship);
+        mineOrTrade.setCommander(facility);
+        mineOrTrade.setOwner(faction);
       }
-      facility.addShip(
-        new Ship({
-          ...(Math.random() > 0.5 ? shipClasses.shipA : shipClasses.shipB),
-          position: matrix([0, 0]),
-          sim,
-        })
-      );
+      const tradeShip = new Ship({
+        ...(Math.random() > 0.5 ? shipClasses.shipA : shipClasses.shipB),
+        position: matrix([0, 0]),
+        sim,
+      });
+      tradeShip.setCommander(facility);
+      tradeShip.setOwner(faction);
     } while (Math.random() < 0.15);
-    facility.setOwner(faction);
+
+    facility.components.owner.set(faction);
   }
 });

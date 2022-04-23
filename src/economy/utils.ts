@@ -1,13 +1,15 @@
 import every from "lodash/every";
-import { Matrix, norm, subtract } from "mathjs";
+import { Matrix, norm, subtract, sum } from "mathjs";
 import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
+import { map } from "lodash";
 import { Facility } from "./factility";
 import { sim } from "../sim";
 import { Asteroid, AsteroidField } from "./field";
 import { FacilityModule } from "./facilityModule";
 import { perCommodity } from "../utils/perCommodity";
 import { Commodity } from "./commodity";
+import { Entity } from "../components/entity";
 
 export function getFacilityWithMostProfit(
   facility: Facility,
@@ -17,17 +19,19 @@ export function getFacilityWithMostProfit(
     norm(subtract(facility.position, f.position) as Matrix) as number;
 
   const profit = (f: Facility) =>
-    facility.owner === f.owner
+    facility.components.owner.value === f.components.owner.value
       ? 1e20
-      : (facility.offers[commodity].price - f.offers[commodity].price) *
-        (facility.offers[commodity].type === "buy" ? 1 : -1);
+      : (facility.components.trade.offers[commodity].price -
+          f.components.trade.offers[commodity].price) *
+        (facility.components.trade.offers[commodity].type === "buy" ? 1 : -1);
 
   const sortedByProfit = sortBy(
     sim.facilities
       .filter(
         (f) =>
-          f.offers[commodity].type !== facility.offers[commodity].type &&
-          f.offers[commodity].quantity > 0
+          f.components.trade.offers[commodity].type !==
+            facility.components.trade.offers[commodity].type &&
+          f.components.trade.offers[commodity].quantity > 0
       )
       .map((f) => ({
         facility: f,
@@ -76,4 +80,17 @@ export function createIsAbleToProduce(
             : true)
       )
     );
+}
+
+/**
+ *
+ * @returns Minimum required money to fulfill all buy requests, not taking
+ * into account sell offers
+ */
+export function getPlannedBudget(entity: Entity): number {
+  return sum(
+    map(entity.components.trade.offers).map(
+      (offer) => (offer.type === "sell" ? 0 : offer.quantity) * offer.price
+    )
+  );
 }

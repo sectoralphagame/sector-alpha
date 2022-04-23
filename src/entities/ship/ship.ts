@@ -32,7 +32,6 @@ import {
   getFacilityWithMostProfit,
   getClosestMineableAsteroid,
 } from "../../economy/utils";
-import { limitMin } from "../../utils/limit";
 import { ShipDrive, ShipDriveProps } from "./drive";
 import { Entity } from "../../components/entity";
 
@@ -191,18 +190,18 @@ export class Ship extends Entity {
     buyer: Facility,
     seller: Facility
   ): boolean => {
-    const sameFaction = this.owner === seller.owner;
+    const sameFaction = this.owner === seller.components.owner.value;
     const buy = this.commander === buyer;
 
     const quantity = Math.floor(
       min(
-        buyer.offers[commodity].quantity,
+        buyer.components.trade.offers[commodity].quantity,
         this.storage.max,
-        seller.offers[commodity].quantity,
+        seller.components.trade.offers[commodity].quantity,
         sameFaction
           ? Infinity
-          : this.commander.budget.getAvailableMoney() /
-              this.commander.offers[commodity].price
+          : this.commander.components.budget.getAvailableMoney() /
+              this.commander.components.trade.offers[commodity].price
       )
     );
 
@@ -210,14 +209,16 @@ export class Ship extends Entity {
       return false;
     }
 
-    const price = sameFaction ? 0 : seller.offers[commodity].price;
+    const price = sameFaction
+      ? 0
+      : seller.components.trade.offers[commodity].price;
 
     const offer = {
       price,
       quantity,
       commodity,
       faction: this.owner,
-      budget: this.commander.budget,
+      budget: this.commander.components.budget,
       allocations: null,
       type: "buy" as "buy",
     };
@@ -230,7 +231,7 @@ export class Ship extends Entity {
 
     const sellerAllocations = seller.allocate(offer);
     if (!sellerAllocations) {
-      buyer.budget.allocations.release(buyerAllocations.budget.id);
+      buyer.components.budget.allocations.release(buyerAllocations.budget.id);
       buyer.storage.allocationManager.release(buyerAllocations.storage.id);
       return false;
     }

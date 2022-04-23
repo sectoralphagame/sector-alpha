@@ -1,6 +1,6 @@
 import { sum } from "mathjs";
 import { InsufficientMoney, NegativeBudget, NegativeQuantity } from "../errors";
-import { AllocationManager } from "./allocations";
+import { AllocationManager } from "./utils/allocations";
 
 export interface BudgetAllocation {
   id: number;
