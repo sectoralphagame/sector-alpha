@@ -149,8 +149,8 @@ export function render(sim: Sim, parent: Element) {
           p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
           p5.noStroke();
           p5.circle(
-            ship.position.get([0]) * 10,
-            ship.position.get([1]) * 10,
+            ship.cp.position.x * 10,
+            ship.cp.position.y * 10,
             (camera.z / zMin) * (selected ? 1.3 : 1) * sizes.ship
           );
         });
@@ -167,8 +167,8 @@ export function render(sim: Sim, parent: Element) {
           p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
           p5.noStroke();
           p5.circle(
-            facility.position.get([0]) * 10,
-            facility.position.get([1]) * 10,
+            facility.cp.position.x * 10,
+            facility.cp.position.y * 10,
             (camera.z / zMin) * (selected ? 1.3 : 1) * sizes.facility
           );
         });
@@ -194,8 +194,8 @@ export function render(sim: Sim, parent: Element) {
       const clicked = clickables.find((entity) => {
         const [x, y] = camera.translateScreenToCanvas(p5.mouseX, p5.mouseY);
         return (
-          (entity.position.get([0]) * 10 - x) ** 2 +
-            (entity.position.get([1]) * 10 - y) ** 2 <=
+          (entity.cp.position.x * 10 - x) ** 2 +
+            (entity.cp.position.y * 10 - y) ** 2 <=
           (camera.z / zMin) *
             sizes[entity instanceof Ship ? "ship" : "facility"] *
             2

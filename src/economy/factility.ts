@@ -1,6 +1,6 @@
 import cloneDeep from "lodash/cloneDeep";
 import sortBy from "lodash/sortBy";
-import { matrix, Matrix, sum } from "mathjs";
+import { sum } from "mathjs";
 import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { perCommodity } from "../utils/perCommodity";
@@ -20,6 +20,7 @@ import { Entity } from "../components/entity";
 import { Owner } from "../components/owner";
 import { startingPrice, Trade, TradeOffer } from "../components/trade";
 import { CommodityStorage } from "../components/storage";
+import { Position } from "../components/position";
 
 const maxTransactions = 100;
 
@@ -51,7 +52,6 @@ export class Facility extends Entity {
   cooldowns: Cooldowns<"production" | "adjustPrices" | "settleBudget">;
   productionAndConsumption: ProductionAndConsumption;
   transactions: Transaction[] = [];
-  position: Matrix = matrix([0, 0]);
   modules: FacilityModule[] = [];
   lastPriceAdjust = {
     time: 0,
@@ -73,8 +73,9 @@ export class Facility extends Entity {
 
     this.cp.budget = new Budget();
     this.cp.owner = new Owner();
-    this.cp.trade = new Trade();
+    this.cp.position = new Position();
     this.cp.storage = new CommodityStorage(this.createOffers);
+    this.cp.trade = new Trade();
 
     this.createOffers();
   }

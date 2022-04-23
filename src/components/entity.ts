@@ -3,10 +3,12 @@ import type { Sim } from "../sim";
 import { Owner } from "./owner";
 import { Trade } from "./trade";
 import { CommodityStorage } from "./storage";
+import { Position } from "./position";
 
 export interface CoreComponents {
   budget: Budget;
   owner: Owner;
+  position: Position;
   storage: CommodityStorage;
   trade: Trade;
 }

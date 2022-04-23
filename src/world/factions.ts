@@ -24,7 +24,7 @@ factions.forEach((faction) => {
   for (let i = 0; i < randomInt(13, 20); i++) {
     const facility =
       facilityTemplates[randomInt(0, facilityTemplates.length)]();
-    facility.position = add(
+    facility.cp.position.value = add(
       position,
       matrix([random(-12, 12), random(-12, 12)])
     ) as Matrix;

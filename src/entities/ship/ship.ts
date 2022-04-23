@@ -8,7 +8,6 @@ import {
   norm,
   subtract,
 } from "mathjs";
-import cloneDeep from "lodash/cloneDeep";
 import merge from "lodash/merge";
 import { Facility, TransactionInput } from "../../economy/factility";
 import {
@@ -34,6 +33,7 @@ import { ShipDrive, ShipDriveProps } from "./drive";
 import { Entity } from "../../components/entity";
 import { Owner } from "../../components/owner";
 import { CommodityStorage } from "../../components/storage";
+import { Position } from "../../components/position";
 
 export interface InitialShipInput {
   name: string;
@@ -49,7 +49,6 @@ export type MainOrderType = "trade" | "mine";
 export class Ship extends Entity {
   name: string;
   drive: ShipDrive;
-  position: Matrix;
   commander: Facility | null;
   orders: Order[];
   cooldowns: Cooldowns<"retryOrder" | "autoOrder" | "mine" | "cruise">;
@@ -66,13 +65,13 @@ export class Ship extends Entity {
 
     this.commander = null;
     this.orders = [];
-    this.position = cloneDeep(initial.position);
     this.cooldowns = new Cooldowns("retryOrder", "autoOrder", "mine", "cruise");
     this.cooldowns.use("autoOrder", 1);
     this.mining = initial.mining;
     this.mined = 0;
 
     this.cp.owner = new Owner();
+    this.cp.position = new Position(initial.position);
     this.cp.storage = new CommodityStorage();
     this.cp.storage.max = initial.storage;
 
@@ -98,7 +97,7 @@ export class Ship extends Entity {
   addOrder = (order: Order) => this.orders.push(order);
 
   moveTo = (delta: number, position: Matrix): boolean => {
-    const path = subtract(position, this.position) as Matrix;
+    const path = subtract(position, this.cp.position.value) as Matrix;
     const speed =
       this.drive.state === "cruise" ? this.drive.cruise : this.drive.maneuver;
     const distance = norm(path);
@@ -113,7 +112,7 @@ export class Ship extends Entity {
         : matrix([0, 0]);
 
     if (norm(dPos) >= distance) {
-      this.position = matrix(position);
+      this.cp.position.value = matrix(position);
       return true;
     }
 
@@ -125,12 +124,12 @@ export class Ship extends Entity {
       this.drive.stopCruise();
     }
 
-    this.position = add(this.position, dPos) as Matrix;
+    this.cp.position.value = add(this.cp.position.value, dPos) as Matrix;
     return false;
   };
 
   tradeOrder = (delta: number, order: TradeOrder): boolean => {
-    const targetReached = this.moveTo(delta, order.target.position);
+    const targetReached = this.moveTo(delta, order.target.cp.position.value);
     if (targetReached) {
       if (order.offer.type === "sell") {
         order.target.cp.storage.allocationManager.release(
@@ -300,7 +299,7 @@ export class Ship extends Entity {
     if (order.targetRock?.mined !== this.id) {
       order.targetRock = getClosestMineableAsteroid(
         order.target,
-        this.position
+        this.cp.position.value
       );
       if (!order.targetRock) return false;
     }
@@ -339,7 +338,7 @@ export class Ship extends Entity {
 
       if (mineable) {
         const field = this.sim.fields.find((f) => f.type === mineable);
-        const rock = getClosestMineableAsteroid(field, this.position);
+        const rock = getClosestMineableAsteroid(field, this.cp.position.value);
 
         if (rock) {
           this.addOrder(
@@ -406,7 +405,7 @@ export class Ship extends Entity {
   };
 
   returnToFacility = () => {
-    this.addOrder({ type: "move", position: this.commander.position });
+    this.addOrder({ type: "move", position: this.commander.cp.position.value });
     Object.values(commodities)
       .filter((commodity) => this.cp.storage.getAvailableWares()[commodity] > 0)
       .forEach(this.sellToCommander);

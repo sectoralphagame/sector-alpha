@@ -16,7 +16,9 @@ export function getFacilityWithMostProfit(
   commodity: Commodity
 ): Facility | null {
   const distance = (f) =>
-    norm(subtract(facility.position, f.position) as Matrix) as number;
+    norm(
+      subtract(facility.cp.position.value, f.cp.position.value) as Matrix
+    ) as number;
 
   const profit = (f: Facility) =>
     facility.components.owner.value === f.components.owner.value
