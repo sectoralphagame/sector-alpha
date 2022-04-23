@@ -8,7 +8,7 @@ import { System } from "./system";
 function settleBudget(entity: Entity) {
   const budgetChange =
     getPlannedBudget(entity) - entity.components.budget.getAvailableMoney();
-  console.log(budgetChange);
+
   if (budgetChange < 0) {
     entity.components.budget.transferMoney(
       limitMax(-budgetChange, entity.components.budget.getAvailableMoney()),
