@@ -11,7 +11,6 @@ import {
 import cloneDeep from "lodash/cloneDeep";
 import merge from "lodash/merge";
 import { Facility, TransactionInput } from "../../economy/factility";
-import { CommodityStorage } from "../../economy/storage";
 import {
   mineOrder,
   MineOrder,
@@ -26,7 +25,6 @@ import {
   mineableCommodities,
 } from "../../economy/commodity";
 import { Sim } from "../../sim";
-import { Faction } from "../../economy/faction";
 import { Cooldowns } from "../../utils/cooldowns";
 import {
   getFacilityWithMostProfit,
@@ -34,6 +32,8 @@ import {
 } from "../../economy/utils";
 import { ShipDrive, ShipDriveProps } from "./drive";
 import { Entity } from "../../components/entity";
+import { Owner } from "../../components/owner";
+import { CommodityStorage } from "../../components/storage";
 
 export interface InitialShipInput {
   name: string;
@@ -50,8 +50,6 @@ export class Ship extends Entity {
   name: string;
   drive: ShipDrive;
   position: Matrix;
-  storage: CommodityStorage;
-  owner: Faction;
   commander: Facility | null;
   orders: Order[];
   cooldowns: Cooldowns<"retryOrder" | "autoOrder" | "mine" | "cruise">;
@@ -65,9 +63,7 @@ export class Ship extends Entity {
 
     this.name = initial.name;
     this.drive = new ShipDrive(initial.drive);
-    this.storage = new CommodityStorage();
-    this.storage.max = initial.storage;
-    this.owner = null;
+
     this.commander = null;
     this.orders = [];
     this.position = cloneDeep(initial.position);
@@ -75,6 +71,10 @@ export class Ship extends Entity {
     this.cooldowns.use("autoOrder", 1);
     this.mining = initial.mining;
     this.mined = 0;
+
+    this.cp.owner = new Owner();
+    this.cp.storage = new CommodityStorage();
+    this.cp.storage.max = initial.storage;
 
     this.sim.ships.push(this);
   }
@@ -86,13 +86,6 @@ export class Ship extends Entity {
   focus = () => {
     this.select();
     window.renderer.focused = this;
-  };
-
-  setOwner = (owner: Faction) => {
-    this.owner = owner;
-  };
-  clearOwner = () => {
-    this.owner = null;
   };
 
   setCommander = (commander: Facility) => {
@@ -140,24 +133,24 @@ export class Ship extends Entity {
     const targetReached = this.moveTo(delta, order.target.position);
     if (targetReached) {
       if (order.offer.type === "sell") {
-        order.target.storage.allocationManager.release(
+        order.target.cp.storage.allocationManager.release(
           order.offer.allocations.buyer.storage
         );
 
-        this.storage.transfer(
+        this.cp.storage.transfer(
           order.offer.commodity,
           order.offer.quantity,
-          order.target.storage,
+          order.target.cp.storage,
           true
         );
       } else {
-        order.target.storage.allocationManager.release(
+        order.target.cp.storage.allocationManager.release(
           order.offer.allocations.seller.storage
         );
-        order.target.storage.transfer(
+        order.target.cp.storage.transfer(
           order.offer.commodity,
           order.offer.quantity,
-          this.storage,
+          this.cp.storage,
           true
         );
       }
@@ -190,13 +183,13 @@ export class Ship extends Entity {
     buyer: Facility,
     seller: Facility
   ): boolean => {
-    const sameFaction = this.owner === seller.components.owner.value;
+    const sameFaction = this.cp.owner.value === seller.components.owner.value;
     const buy = this.commander === buyer;
 
     const quantity = Math.floor(
       min(
         buyer.components.trade.offers[commodity].quantity,
-        this.storage.max,
+        this.cp.storage.max,
         seller.components.trade.offers[commodity].quantity,
         sameFaction
           ? Infinity
@@ -217,7 +210,7 @@ export class Ship extends Entity {
       price,
       quantity,
       commodity,
-      faction: this.owner,
+      faction: this.cp.owner.value,
       budget: this.commander.components.budget,
       allocations: null,
       type: "buy" as "buy",
@@ -232,7 +225,7 @@ export class Ship extends Entity {
     const sellerAllocations = seller.allocate(offer);
     if (!sellerAllocations) {
       buyer.components.budget.allocations.release(buyerAllocations.budget.id);
-      buyer.storage.allocationManager.release(buyerAllocations.storage.id);
+      buyer.cp.storage.allocationManager.release(buyerAllocations.storage.id);
       return false;
     }
 
@@ -276,7 +269,7 @@ export class Ship extends Entity {
   };
 
   autoTrade = () => {
-    if (this.storage.getAvailableSpace() !== this.storage.max) {
+    if (this.cp.storage.getAvailableSpace() !== this.cp.storage.max) {
       this.returnToFacility();
     } else {
       const bought = this.commander
@@ -316,7 +309,7 @@ export class Ship extends Entity {
     if (rockReached) {
       if (this.cooldowns.canUse("mine")) {
         this.cooldowns.use("mine", 5);
-        this.storage.addStorage(
+        this.cp.storage.addStorage(
           order.target.type,
           Math.floor(this.mined),
           false
@@ -326,7 +319,7 @@ export class Ship extends Entity {
       order.targetRock.mined = this.id;
       this.mined += this.mining * delta;
 
-      if (this.storage.getAvailableSpace() === 0) {
+      if (this.cp.storage.getAvailableSpace() === 0) {
         order.targetRock.mined = null;
         return true;
       }
@@ -336,7 +329,7 @@ export class Ship extends Entity {
   };
 
   autoMine = () => {
-    if (this.storage.getAvailableSpace() !== this.storage.max) {
+    if (this.cp.storage.getAvailableSpace() !== this.cp.storage.max) {
       this.returnToFacility();
     } else {
       const needed = this.commander.getNeededCommodities();
@@ -380,12 +373,12 @@ export class Ship extends Entity {
   sellToCommander = (commodity: Commodity) => {
     const offer: TransactionInput = {
       commodity,
-      quantity: this.storage.getAvailableWares()[commodity],
+      quantity: this.cp.storage.getAvailableWares()[commodity],
       price: 0,
       budget: null,
       allocations: null,
       type: "sell",
-      faction: this.owner,
+      faction: this.cp.owner.value,
     };
     const allocations = this.commander.allocate(offer);
 
@@ -415,7 +408,7 @@ export class Ship extends Entity {
   returnToFacility = () => {
     this.addOrder({ type: "move", position: this.commander.position });
     Object.values(commodities)
-      .filter((commodity) => this.storage.getAvailableWares()[commodity] > 0)
+      .filter((commodity) => this.cp.storage.getAvailableWares()[commodity] > 0)
       .forEach(this.sellToCommander);
   };
 

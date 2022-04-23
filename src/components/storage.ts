@@ -8,9 +8,9 @@ import {
   NonIntegerQuantity,
 } from "../errors";
 import { perCommodity } from "../utils/perCommodity";
-import { Commodity } from "./commodity";
 import { AllocationManager } from "../components/utils/allocations";
 import { sim } from "../sim";
+import { Commodity } from "../economy/commodity";
 
 export type StorageAllocationType = "incoming" | "outgoing";
 

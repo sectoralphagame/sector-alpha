@@ -28,7 +28,7 @@ const FacilityPanel: React.FC = () => {
               commodity,
               ...facility.productionAndConsumption[commodity],
               ...facility.components.trade.offers[commodity],
-              stored: facility.storage.getAvailableWares()[commodity],
+              stored: facility.cp.storage.getAvailableWares()[commodity],
             }))
             .map((data) => (
               <tr key={data.commodity}>
@@ -47,17 +47,19 @@ const FacilityPanel: React.FC = () => {
         <div key={`${facilityModule.name}-${index}`}>{facilityModule.name}</div>
       ))}
       <hr />
-      {facility.ships.map((ship, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <div key={`${ship.name}-${index}`}>
-          {ship.name}{" "}
-          <button onClick={ship.focus} type="button">
-            focus
-          </button>
-        </div>
-      ))}
+      {window.sim.entities
+        .filter((e) => e?.commander === facility)
+        .map((ship, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <div key={`${ship.name}-${index}`}>
+            {ship.name}{" "}
+            <button onClick={ship.focus} type="button">
+              focus
+            </button>
+          </div>
+        ))}
       <hr />
-      {facility.storage.allocationManager.all().map((allocation) => (
+      {facility.cp.storage.allocationManager.all().map((allocation) => (
         // eslint-disable-next-line react/no-array-index-key
         <div key={allocation.id}>
           Allocation #{allocation.id}: {allocation.type}

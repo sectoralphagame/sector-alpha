@@ -2,10 +2,12 @@ import { Budget } from "./budget";
 import type { Sim } from "../sim";
 import { Owner } from "./owner";
 import { Trade } from "./trade";
+import { CommodityStorage } from "./storage";
 
 export interface CoreComponents {
   budget: Budget;
   owner: Owner;
+  storage: CommodityStorage;
   trade: Trade;
 }
 
@@ -17,6 +19,10 @@ export abstract class Entity {
   constructor(sim: Sim) {
     this.sim = sim;
     sim.registerEntity(this);
+  }
+
+  get cp(): Partial<CoreComponents> {
+    return this.components;
   }
 
   hasComponents(components: Array<keyof CoreComponents>): boolean {

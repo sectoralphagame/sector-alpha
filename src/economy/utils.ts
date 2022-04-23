@@ -70,12 +70,12 @@ export function createIsAbleToProduce(
     every(
       perCommodity(
         (commodity) =>
-          facility.storage.hasSufficientStorage(
+          facility.cp.storage.hasSufficientStorage(
             commodity,
             facilityModule.productionAndConsumption[commodity].consumes
           ) &&
           (facilityModule.productionAndConsumption[commodity].produces
-            ? facility.storage.getAvailableWares()[commodity] <
+            ? facility.cp.storage.getAvailableWares()[commodity] <
               facility.getQuota(commodity)
             : true)
       )

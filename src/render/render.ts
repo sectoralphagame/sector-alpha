@@ -144,8 +144,8 @@ export function render(sim: Sim, parent: Element) {
         sim.ships.forEach((ship) => {
           const selected = window.selected === ship;
           const color = selected
-            ? Color(ship.owner.color).lighten(0.2).unitArray()
-            : Color(ship.owner.color).unitArray();
+            ? Color(ship.cp.owner.value.color).lighten(0.2).unitArray()
+            : Color(ship.cp.owner.value.color).unitArray();
           p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
           p5.noStroke();
           p5.circle(

@@ -19,14 +19,14 @@ export const factions = Array(10)
   .fill(0)
   .map((_, index) => createFaction(index));
 factions.forEach((faction) => {
-  const position = matrix([randomInt(-50, 50), randomInt(-50, 50)]);
+  const position = matrix([randomInt(-100, 100), randomInt(-100, 100)]);
 
   for (let i = 0; i < randomInt(13, 20); i++) {
     const facility =
       facilityTemplates[randomInt(0, facilityTemplates.length)]();
     facility.position = add(
       position,
-      matrix([random(-4, 4), random(-4, 4)])
+      matrix([random(-12, 12), random(-12, 12)])
     ) as Matrix;
 
     const consumed = Object.entries(facility.productionAndConsumption)
@@ -50,7 +50,7 @@ factions.forEach((faction) => {
           mineOrTrade.mainOrder = "mine";
         }
         mineOrTrade.setCommander(facility);
-        mineOrTrade.setOwner(faction);
+        mineOrTrade.components.owner.set(faction);
       }
       const tradeShip = new Ship({
         ...(Math.random() > 0.5 ? shipClasses.shipA : shipClasses.shipB),
@@ -58,7 +58,7 @@ factions.forEach((faction) => {
         sim,
       });
       tradeShip.setCommander(facility);
-      tradeShip.setOwner(faction);
+      tradeShip.components.owner.set(faction);
     } while (Math.random() < 0.15);
 
     facility.components.owner.set(faction);

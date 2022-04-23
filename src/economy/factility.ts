@@ -10,9 +10,7 @@ import {
   FacilityModule,
   ProductionAndConsumption,
 } from "./facilityModule";
-import { CommodityStorage } from "./storage";
 import { Faction } from "./faction";
-import { Ship } from "../entities/ship";
 import { Budget } from "../components/budget";
 import { Allocation } from "../components/utils/allocations";
 import { InvalidOfferType, NonPositiveAmount } from "../errors";
@@ -21,6 +19,7 @@ import { limitMax, limitMin } from "../utils/limit";
 import { Entity } from "../components/entity";
 import { Owner } from "../components/owner";
 import { startingPrice, Trade, TradeOffer } from "../components/trade";
+import { CommodityStorage } from "../components/storage";
 
 const maxTransactions = 100;
 
@@ -52,14 +51,12 @@ export class Facility extends Entity {
   cooldowns: Cooldowns<"production" | "adjustPrices" | "settleBudget">;
   productionAndConsumption: ProductionAndConsumption;
   transactions: Transaction[] = [];
-  storage: CommodityStorage;
   position: Matrix = matrix([0, 0]);
   modules: FacilityModule[] = [];
   lastPriceAdjust = {
     time: 0,
     commodities: perCommodity(() => 0),
   };
-  ships: Ship[] = [];
   name: string;
 
   constructor(sim: Sim) {
@@ -71,13 +68,13 @@ export class Facility extends Entity {
       "adjustPrices",
       "settleBudget"
     );
-    this.storage = new CommodityStorage(this.createOffers);
     this.name = `Facility #${this.id}`;
     this.sim.facilities.push(this);
 
-    this.components.budget = new Budget();
-    this.components.owner = new Owner();
-    this.components.trade = new Trade();
+    this.cp.budget = new Budget();
+    this.cp.owner = new Owner();
+    this.cp.trade = new Trade();
+    this.cp.storage = new CommodityStorage(this.createOffers);
 
     this.createOffers();
   }
@@ -92,13 +89,12 @@ export class Facility extends Entity {
   };
 
   createOffers = () => {
-    this.components.trade.offers = perCommodity((commodity): TradeOffer => {
+    this.cp.trade.offers = perCommodity((commodity): TradeOffer => {
       const quantity = this.getOfferedQuantity(commodity);
 
       return {
         price:
-          (this.components.trade.offers &&
-            this.components.trade.offers[commodity].price) ??
+          (this.cp.trade.offers && this.cp.trade.offers[commodity].price) ??
           startingPrice,
         quantity: quantity > 0 ? quantity : -quantity,
         type: quantity > 0 ? "sell" : "buy",
@@ -115,10 +111,10 @@ export class Facility extends Entity {
     if (this.isTradeAccepted(offer)) {
       if (offer.type === "sell") {
         return {
-          budget: this.components.budget.allocations.new({
+          budget: this.cp.budget.allocations.new({
             amount: offer.price * offer.quantity,
           }),
-          storage: this.storage.allocationManager.new({
+          storage: this.cp.storage.allocationManager.new({
             amount: {
               ...perCommodity(() => 0),
               [offer.commodity]: offer.quantity,
@@ -130,7 +126,7 @@ export class Facility extends Entity {
 
       return {
         budget: null,
-        storage: this.storage.allocationManager.new({
+        storage: this.cp.storage.allocationManager.new({
           amount: {
             ...perCommodity(() => 0),
             [offer.commodity]: offer.quantity,
@@ -148,12 +144,12 @@ export class Facility extends Entity {
     this.productionAndConsumption[commodity].consumes;
 
   getSurplus = (commodity: Commodity) =>
-    this.storage.getAvailableWares()[commodity] +
+    this.cp.storage.getAvailableWares()[commodity] +
     this.getProductionSurplus(commodity);
 
   getQuota = (commodity: Commodity): number =>
     Math.floor(
-      (this.storage.max *
+      (this.cp.storage.max *
         (this.productionAndConsumption[commodity].produces +
           this.productionAndConsumption[commodity].consumes)) /
         this.getRequiredStorage()
@@ -169,7 +165,7 @@ export class Facility extends Entity {
     );
 
     if (!productionModule) {
-      return this.components.trade.offers[commodity].price;
+      return this.cp.trade.offers[commodity].price;
     }
 
     return Math.ceil(
@@ -196,7 +192,7 @@ export class Facility extends Entity {
       return this.getSurplus(commodity);
     }
 
-    const stored = this.storage.getAvailableWares();
+    const stored = this.cp.storage.getAvailableWares();
 
     if (this.getProductionSurplus(commodity) > 0) {
       return (
@@ -206,7 +202,7 @@ export class Facility extends Entity {
     }
 
     const requiredBudget = getPlannedBudget(this);
-    const availableBudget = this.components.budget.getAvailableMoney();
+    const availableBudget = this.cp.budget.getAvailableMoney();
     const quota = this.getQuota(commodity);
 
     if (stored[commodity] > quota) {
@@ -222,20 +218,17 @@ export class Facility extends Entity {
   isTradeAccepted = (input: TransactionInput): boolean => {
     let validPrice = false;
 
-    const offer = this.components.trade.offers[input.commodity];
+    const offer = this.cp.trade.offers[input.commodity];
 
     if (offer.price < 0) {
       throw new NonPositiveAmount(offer.price);
     }
 
-    if (
-      offer.type === input.type &&
-      input.faction !== this.components.owner.value
-    ) {
+    if (offer.type === input.type && input.faction !== this.cp.owner.value) {
       throw new InvalidOfferType(input.type);
     }
     if (input.type === "buy") {
-      if (input.faction === this.components.owner.value) {
+      if (input.faction === this.cp.owner.value) {
         validPrice = true;
       } else {
         validPrice = input.price >= offer.price;
@@ -243,11 +236,11 @@ export class Facility extends Entity {
 
       return (
         validPrice &&
-        this.storage.hasSufficientStorage(input.commodity, input.quantity)
+        this.cp.storage.hasSufficientStorage(input.commodity, input.quantity)
       );
     }
 
-    if (input.faction === this.components.owner.value) {
+    if (input.faction === this.cp.owner.value) {
       validPrice = true;
     } else {
       validPrice = input.price <= offer.price;
@@ -255,9 +248,8 @@ export class Facility extends Entity {
 
     return (
       validPrice &&
-      this.components.budget.getAvailableMoney() >=
-        input.price * input.quantity &&
-      this.storage.hasSufficientStorageSpace(input.quantity)
+      this.cp.budget.getAvailableMoney() >= input.price * input.quantity &&
+      this.cp.storage.hasSufficientStorageSpace(input.quantity)
     );
   };
 
@@ -265,15 +257,15 @@ export class Facility extends Entity {
     if (input.price > 0) {
       // They are selling us
       if (input.type === "sell") {
-        const allocation = this.components.budget.allocations.release(
+        const allocation = this.cp.budget.allocations.release(
           input.allocations.buyer.budget
         );
-        this.components.budget.transferMoney(allocation.amount, input.budget);
+        this.cp.budget.transferMoney(allocation.amount, input.budget);
       } else {
         const allocation = input.budget.allocations.release(
           input.allocations.buyer.budget
         );
-        input.budget.transferMoney(allocation.amount, this.components.budget);
+        input.budget.transferMoney(allocation.amount, this.cp.budget);
       }
     }
 
@@ -294,7 +286,7 @@ export class Facility extends Entity {
       this.productionAndConsumption[commodity].consumes +=
         facilityModule.productionAndConsumption[commodity].consumes;
     });
-    this.storage.max += facilityModule.storage;
+    this.cp.storage.max += facilityModule.storage;
     this.createOffers();
   };
 
@@ -307,8 +299,7 @@ export class Facility extends Entity {
               (transaction) =>
                 transaction.commodity === commodity &&
                 transaction.time > this.lastPriceAdjust.time &&
-                transaction.type !==
-                  this.components.trade.offers[commodity].type
+                transaction.type !== this.cp.trade.offers[commodity].type
             )
             .map((h) => h.quantity)
         ) as number
@@ -319,10 +310,11 @@ export class Facility extends Entity {
     );
 
     perCommodity((commodity) => {
-      const notOffered = this.components.trade.offers[commodity].quantity <= 0;
+      const notOffered = this.cp.trade.offers[commodity].quantity <= 0;
       const stockpiled =
-        this.components.trade.offers[commodity].type === "buy" &&
-        this.storage.getAvailableWares()[commodity] / this.getQuota(commodity) >
+        this.cp.trade.offers[commodity].type === "buy" &&
+        this.cp.storage.getAvailableWares()[commodity] /
+          this.getQuota(commodity) >
           0.8;
 
       if (stockpiled || notOffered) {
@@ -330,22 +322,22 @@ export class Facility extends Entity {
       }
 
       const minPrice =
-        this.components.trade.offers[commodity].type === "buy"
+        this.cp.trade.offers[commodity].type === "buy"
           ? 1
           : this.getProductionCost(commodity);
       let delta = limitMin(
-        Math.floor(this.components.trade.offers[commodity].price * 0.01),
+        Math.floor(this.cp.trade.offers[commodity].price * 0.01),
         1
       );
       if (
-        (this.components.trade.offers[commodity].type === "sell") ===
+        (this.cp.trade.offers[commodity].type === "sell") ===
         change[commodity] <= 0
       ) {
         delta *= -1;
       }
 
-      this.components.trade.offers[commodity].price = limitMin(
-        this.components.trade.offers[commodity].price + delta,
+      this.cp.trade.offers[commodity].price = limitMin(
+        this.cp.trade.offers[commodity].price + delta,
         minPrice
       );
     });
@@ -375,18 +367,18 @@ export class Facility extends Entity {
 
   getNeededCommodities = (): Commodity[] => {
     const summedConsumption = this.getSummedConsumption();
-    const stored = this.storage.getAvailableWares();
+    const stored = this.cp.storage.getAvailableWares();
 
     const scores = sortBy(
       Object.values(commodities)
         .filter(
           (commodity) =>
-            this.components.trade.offers[commodity].type === "buy" &&
-            this.components.trade.offers[commodity].quantity > 0
+            this.cp.trade.offers[commodity].type === "buy" &&
+            this.cp.trade.offers[commodity].quantity > 0
         )
         .map((commodity) => ({
           commodity,
-          wantToBuy: this.components.trade.offers[commodity].quantity,
+          wantToBuy: this.cp.trade.offers[commodity].quantity,
           quantityStored: stored[commodity],
         }))
         .map((data) => ({
@@ -403,15 +395,15 @@ export class Facility extends Entity {
   };
 
   getCommoditiesForSell = (): Commodity[] => {
-    const stored = this.storage.getAvailableWares();
+    const stored = this.cp.storage.getAvailableWares();
 
     return sortBy(
       Object.values(commodities)
         .map((commodity) => ({
           commodity,
           wantToSell:
-            this.components.trade.offers[commodity].type === "sell"
-              ? this.components.trade.offers[commodity].quantity
+            this.cp.trade.offers[commodity].type === "sell"
+              ? this.cp.trade.offers[commodity].quantity
               : 0,
           quantityStored: stored[commodity],
         }))
@@ -441,13 +433,13 @@ export class Facility extends Entity {
           }
 
           perCommodity((commodity) =>
-            this.storage.removeStorage(
+            this.cp.storage.removeStorage(
               commodity,
               facilityModule.productionAndConsumption[commodity].consumes
             )
           );
           perCommodity((commodity) =>
-            this.storage.addStorage(
+            this.cp.storage.addStorage(
               commodity,
               limitMax(
                 this.getQuota(commodity) -
