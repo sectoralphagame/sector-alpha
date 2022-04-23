@@ -1,20 +1,23 @@
 import { Faction } from "../economy/faction";
 import { AsteroidField } from "../economy/field";
+import { Entity } from "../components/entity";
 import { Ship } from "../entities/ship";
 import { World } from "../world";
 import { BaseSim } from "./BaseSim";
 
 export class Sim extends BaseSim {
-  factions: Faction[];
-  ships: Ship[];
-  fields: AsteroidField[];
+  entities: Entity[] = [];
+  factions: Faction[] = [];
+  ships: Ship[] = [];
+  fields: AsteroidField[] = [];
 
-  constructor() {
-    super();
-    this.factions = [];
-    this.ships = [];
-    this.fields = [];
-  }
+  entityIdCounter: number = 0;
+
+  registerEntity = (entity: Entity) => {
+    entity.id = this.entityIdCounter;
+    this.entities.push(entity);
+    this.entityIdCounter += 1;
+  };
 
   load = (world: World) => {
     this.factions = world.factions;
@@ -23,7 +26,7 @@ export class Sim extends BaseSim {
 
   next = (delta: number) => {
     this.factions.forEach((faction) => faction.sim(delta));
-    this.ships.forEach((ship) => ship.sim(delta));
+    this.ships.forEach((ship) => ship.simulate(delta));
   };
 }
 

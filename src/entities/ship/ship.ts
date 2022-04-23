@@ -25,7 +25,7 @@ import {
   Commodity,
   mineableCommodities,
 } from "../../economy/commodity";
-import { sim } from "../../sim";
+import { Sim } from "../../sim";
 import { Faction } from "../../economy/faction";
 import { Cooldowns } from "../../utils/cooldowns";
 import {
@@ -34,21 +34,20 @@ import {
 } from "../../economy/utils";
 import { limitMin } from "../../utils/limit";
 import { ShipDrive, ShipDriveProps } from "./drive";
-
-let shipIdCounter = 0;
+import { Entity } from "../../components/entity";
 
 export interface InitialShipInput {
   name: string;
   position: Matrix;
   drive: ShipDriveProps;
+  sim: Sim;
   storage: number;
   mining: number;
 }
 
 export type MainOrderType = "trade" | "mine";
 
-export class Ship {
-  id: number;
+export class Ship extends Entity {
   name: string;
   drive: ShipDrive;
   position: Matrix;
@@ -63,8 +62,7 @@ export class Ship {
   mainOrder: MainOrderType;
 
   constructor(initial: InitialShipInput) {
-    this.id = shipIdCounter;
-    shipIdCounter += 1;
+    super(initial.sim);
 
     this.name = initial.name;
     this.drive = new ShipDrive(initial.drive);
@@ -79,7 +77,7 @@ export class Ship {
     this.mining = initial.mining;
     this.mined = 0;
 
-    sim.ships.push(this);
+    this.sim.ships.push(this);
   }
 
   select = () => {
@@ -346,7 +344,7 @@ export class Ship {
       );
 
       if (mineable) {
-        const field = sim.fields.find((f) => f.type === mineable);
+        const field = this.sim.fields.find((f) => f.type === mineable);
         const rock = getClosestMineableAsteroid(field, this.position);
 
         if (rock) {
@@ -420,9 +418,10 @@ export class Ship {
       .forEach(this.sellToCommander);
   };
 
+  // eslint-disable-next-line class-methods-use-this
   holdPosition = () => false;
 
-  sim = (delta: number) => {
+  simulate = (delta: number) => {
     this.cooldowns.update(delta);
     this.drive.sim(delta);
 

@@ -2,7 +2,7 @@ import cloneDeep from "lodash/cloneDeep";
 import sortBy from "lodash/sortBy";
 import map from "lodash/map";
 import { matrix, Matrix, sum } from "mathjs";
-import { sim } from "../sim";
+import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { perCommodity } from "../utils/perCommodity";
 import { commodities, Commodity } from "./commodity";
@@ -19,8 +19,8 @@ import { Allocation } from "./allocations";
 import { InvalidOfferType, NonPositiveAmount } from "../errors";
 import { createIsAbleToProduce } from "./utils";
 import { limitMax, limitMin } from "../utils/limit";
+import { Entity } from "../components/entity";
 
-let facilityIdCounter = 0;
 const startingPrice = 100;
 const maxTransactions = 100;
 
@@ -58,8 +58,7 @@ export interface TransactionInput extends TradeOffer {
   >;
 }
 
-export class Facility {
-  id: number;
+export class Facility extends Entity {
   cooldowns: Cooldowns<"production" | "adjustPrices">;
   offers: TradeOffers;
   productionAndConsumption: ProductionAndConsumption;
@@ -76,9 +75,8 @@ export class Facility {
   name: string;
   budget: Budget;
 
-  constructor() {
-    this.id = facilityIdCounter;
-    facilityIdCounter += 1;
+  constructor(sim: Sim) {
+    super(sim);
 
     this.productionAndConsumption = cloneDeep(baseProductionAndConsumption);
     this.cooldowns = new Cooldowns("production", "adjustPrices");
@@ -118,17 +116,15 @@ export class Facility {
   };
 
   createOffers = () => {
-    this.offers = perCommodity(
-      (commodity): TradeOffer => {
-        const quantity = this.getOfferedQuantity(commodity);
+    this.offers = perCommodity((commodity): TradeOffer => {
+      const quantity = this.getOfferedQuantity(commodity);
 
-        return {
-          price: (this.offers && this.offers[commodity].price) ?? startingPrice,
-          quantity: quantity > 0 ? quantity : -quantity,
-          type: quantity > 0 ? "sell" : "buy",
-        };
-      }
-    );
+      return {
+        price: (this.offers && this.offers[commodity].price) ?? startingPrice,
+        quantity: quantity > 0 ? quantity : -quantity,
+        type: quantity > 0 ? "sell" : "buy",
+      };
+    });
   };
 
   /**
@@ -312,7 +308,7 @@ export class Facility {
 
     this.transactions.push({
       ...input,
-      time: sim.getTime(),
+      time: this.sim.getTime(),
     });
     if (this.transactions.length > maxTransactions) {
       this.transactions.shift();
@@ -378,7 +374,7 @@ export class Facility {
 
     this.lastPriceAdjust = {
       commodities: quantities,
-      time: sim.getTime(),
+      time: this.sim.getTime(),
     };
   };
 
@@ -450,7 +446,7 @@ export class Facility {
     ).map((offer) => offer.commodity);
   };
 
-  sim = (delta: number) => {
+  simulate = (delta: number) => {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("production")) {

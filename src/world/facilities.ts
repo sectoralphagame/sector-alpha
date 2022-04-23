@@ -1,8 +1,9 @@
 import { facilityModules } from "../economy/facilityModule";
 import { Facility } from "../economy/factility";
+import { sim } from "../sim";
 
 export function createRefineryFacility() {
-  const facility = new Facility();
+  const facility = new Facility(sim);
   facility.addModule(facilityModules.refinery);
   facility.addModule(facilityModules.refinery);
   facility.addModule(facilityModules.containerSmall);
@@ -12,7 +13,7 @@ export function createRefineryFacility() {
 }
 
 export function createFarm() {
-  const facility = new Facility();
+  const facility = new Facility(sim);
   facility.addModule(facilityModules.farm);
   facility.addModule(facilityModules.containerSmall);
   facility.storage.addStorage("food", 50);
@@ -21,7 +22,7 @@ export function createFarm() {
 }
 
 export function createShipyard() {
-  const facility = new Facility();
+  const facility = new Facility(sim);
   facility.addModule(facilityModules.shipyard);
   facility.addModule(facilityModules.containerSmall);
 
@@ -29,7 +30,7 @@ export function createShipyard() {
 }
 
 export function createWaterFacility() {
-  const facility = new Facility();
+  const facility = new Facility(sim);
   facility.addModule(facilityModules.water);
   facility.addModule(facilityModules.containerSmall);
   facility.storage.addStorage("water", 50);
@@ -38,7 +39,7 @@ export function createWaterFacility() {
 }
 
 export function createFuelFabricationFacility() {
-  const facility = new Facility();
+  const facility = new Facility(sim);
   facility.addModule(facilityModules.fuelFabrication);
   facility.addModule(facilityModules.containerSmall);
   facility.storage.addStorage("fuel", 50);
@@ -47,7 +48,7 @@ export function createFuelFabricationFacility() {
 }
 
 export function createHullPlatesFacility() {
-  const facility = new Facility();
+  const facility = new Facility(sim);
   facility.addModule(facilityModules.hullPlates);
   facility.addModule(facilityModules.containerSmall);
   facility.storage.addStorage("hullPlates", 50);
