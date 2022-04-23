@@ -4,10 +4,12 @@ import { Entity } from "../components/entity";
 import { Ship } from "../entities/ship";
 import { World } from "../world";
 import { BaseSim } from "./BaseSim";
+import { Facility } from "../economy/factility";
 
 export class Sim extends BaseSim {
   entities: Entity[] = [];
   factions: Faction[] = [];
+  facilities: Facility[] = [];
   ships: Ship[] = [];
   fields: AsteroidField[] = [];
 
@@ -25,7 +27,7 @@ export class Sim extends BaseSim {
   };
 
   next = (delta: number) => {
-    this.factions.forEach((faction) => faction.sim(delta));
+    this.facilities.forEach((facility) => facility.simulate(delta));
     this.ships.forEach((ship) => ship.simulate(delta));
   };
 }

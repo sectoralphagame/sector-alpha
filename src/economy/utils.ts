@@ -23,9 +23,7 @@ export function getFacilityWithMostProfit(
         (facility.offers[commodity].type === "buy" ? 1 : -1);
 
   const sortedByProfit = sortBy(
-    sim.factions
-      .map((faction) => faction.facilities)
-      .flat()
+    sim.facilities
       .filter(
         (f) =>
           f.offers[commodity].type !== facility.offers[commodity].type &&

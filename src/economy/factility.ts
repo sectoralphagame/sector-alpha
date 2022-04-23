@@ -59,7 +59,7 @@ export interface TransactionInput extends TradeOffer {
 }
 
 export class Facility extends Entity {
-  cooldowns: Cooldowns<"production" | "adjustPrices">;
+  cooldowns: Cooldowns<"production" | "adjustPrices" | "settleBudget">;
   offers: TradeOffers;
   productionAndConsumption: ProductionAndConsumption;
   transactions: Transaction[] = [];
@@ -79,11 +79,16 @@ export class Facility extends Entity {
     super(sim);
 
     this.productionAndConsumption = cloneDeep(baseProductionAndConsumption);
-    this.cooldowns = new Cooldowns("production", "adjustPrices");
+    this.cooldowns = new Cooldowns(
+      "production",
+      "adjustPrices",
+      "settleBudget"
+    );
     this.storage = new CommodityStorage(this.createOffers);
     this.createOffers();
     this.name = `Facility #${this.id}`;
     this.budget = new Budget();
+    this.sim.facilities.push(this);
   }
 
   select = () => {
@@ -446,8 +451,30 @@ export class Facility extends Entity {
     ).map((offer) => offer.commodity);
   };
 
+  settleBudget = () => {
+    const budgetChange =
+      this.getPlannedBudget() - this.budget.getAvailableMoney();
+
+    if (budgetChange < 0) {
+      this.budget.transferMoney(
+        limitMax(-budgetChange, this.budget.getAvailableMoney()),
+        this.owner.budget
+      );
+    } else {
+      this.owner.budget.transferMoney(
+        limitMax(budgetChange, this.owner.budget.getAvailableMoney()),
+        this.budget
+      );
+    }
+  };
+
   simulate = (delta: number) => {
     this.cooldowns.update(delta);
+
+    if (this.cooldowns.canUse("settleBudget")) {
+      this.cooldowns.use("settleBudget", 60);
+      this.settleBudget();
+    }
 
     if (this.cooldowns.canUse("production")) {
       const isAbleToProduce = createIsAbleToProduce(this);

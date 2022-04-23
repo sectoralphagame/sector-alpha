@@ -59,6 +59,6 @@ factions.forEach((faction) => {
         })
       );
     } while (Math.random() < 0.15);
-    faction.addFacility(facility);
+    facility.setOwner(faction);
   }
 });
