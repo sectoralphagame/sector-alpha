@@ -43,7 +43,6 @@ export class Sim extends BaseSim {
   };
 
   next = (delta: number) => {
-    this.facilities.forEach((facility) => facility.simulate(delta));
     this.ships.forEach((ship) => ship.simulate(delta));
 
     this.systems.forEach((s) => s.exec(delta));

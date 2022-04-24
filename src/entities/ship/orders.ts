@@ -1,5 +1,6 @@
 import { Matrix } from "mathjs";
-import { Facility, TransactionInput } from "../../economy/factility";
+import { TransactionInput } from "../../components/trade";
+import { Facility } from "../../economy/factility";
 import { Asteroid, AsteroidField } from "../../economy/field";
 import { NegativeQuantity } from "../../errors";
 

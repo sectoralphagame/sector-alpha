@@ -9,7 +9,7 @@ import {
   subtract,
 } from "mathjs";
 import merge from "lodash/merge";
-import { Facility, TransactionInput } from "../../economy/factility";
+import { Facility } from "../../economy/factility";
 import {
   mineOrder,
   MineOrder,
@@ -34,6 +34,7 @@ import { Entity } from "../../components/entity";
 import { Owner } from "../../components/owner";
 import { CommodityStorage } from "../../components/storage";
 import { Position } from "../../components/position";
+import { TransactionInput } from "../../components/trade";
 
 export interface InitialShipInput {
   name: string;

@@ -1,18 +1,20 @@
 import sortBy from "lodash/sortBy";
-import { sum } from "mathjs";
 import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { perCommodity } from "../utils/perCommodity";
 import { commodities, Commodity } from "./commodity";
-import { Faction } from "./faction";
 import { Budget } from "../components/budget";
 import { Allocation } from "../components/utils/allocations";
 import { InvalidOfferType, NonPositiveAmount } from "../errors";
 import { getPlannedBudget } from "./utils";
-import { limitMin } from "../utils/limit";
 import { Entity } from "../components/entity";
 import { Owner } from "../components/owner";
-import { startingPrice, Trade, TradeOffer } from "../components/trade";
+import {
+  startingPrice,
+  Trade,
+  TradeOffer,
+  TransactionInput,
+} from "../components/trade";
 import { CommodityStorage } from "../components/storage";
 import { Position } from "../components/position";
 import { Modules } from "../components/modules";
@@ -27,31 +29,9 @@ export function offerToStr(commodity: Commodity, offer: TradeOffer): string {
   } ${commodity} x ${offer.price} UTT`;
 }
 
-export interface Transaction extends TradeOffer {
-  commodity: Commodity;
-  time: number;
-}
-
-export interface TransactionInput extends TradeOffer {
-  commodity: Commodity;
-  faction: Faction;
-  budget: Budget;
-  allocations: Record<
-    "buyer" | "seller",
-    {
-      budget: number | null;
-      storage: number | null;
-    }
-  >;
-}
-
 export class Facility extends Entity {
   cooldowns: Cooldowns<"production" | "adjustPrices" | "settleBudget">;
-  transactions: Transaction[] = [];
-  lastPriceAdjust = {
-    time: 0,
-    commodities: perCommodity(() => 0),
-  };
+
   name: string;
 
   constructor(sim: Sim) {
@@ -144,34 +124,6 @@ export class Facility extends Entity {
     this.cp.storage.getAvailableWares()[commodity] +
     this.getProductionSurplus(commodity);
 
-  /**
-   *
-   * Commodity cost of production
-   */
-  getProductionCost = (commodity: Commodity): number => {
-    const productionModule = this.cp.modules.modules.find(
-      (m) => m.cp.production?.pac[commodity].produces > 0
-    );
-
-    if (!productionModule) {
-      return this.cp.trade.offers[commodity].price;
-    }
-
-    return Math.ceil(
-      sum(
-        Object.values(
-          perCommodity((c) =>
-            productionModule.cp.production.pac[c].consumes
-              ? (this.getProductionCost(c) *
-                  productionModule.cp.production.pac[c].consumes) /
-                productionModule.cp.production.pac[commodity].produces
-              : 0
-          )
-        )
-      )
-    );
-  };
-
   getOfferedQuantity = (commodity: Commodity) => {
     if (
       this.cp.compoundProduction.pac[commodity].consumes ===
@@ -258,12 +210,12 @@ export class Facility extends Entity {
       }
     }
 
-    this.transactions.push({
+    this.cp.trade.transactions.push({
       ...input,
       time: this.sim.getTime(),
     });
-    if (this.transactions.length > maxTransactions) {
-      this.transactions.shift();
+    if (this.cp.trade.transactions.length > maxTransactions) {
+      this.cp.trade.transactions.shift();
     }
   };
 
@@ -284,64 +236,6 @@ export class Facility extends Entity {
     }
 
     this.createOffers();
-  };
-
-  adjustPrices = () => {
-    const quantities = perCommodity(
-      (commodity) =>
-        sum(
-          this.transactions
-            .filter(
-              (transaction) =>
-                transaction.commodity === commodity &&
-                transaction.time > this.lastPriceAdjust.time &&
-                transaction.type !== this.cp.trade.offers[commodity].type
-            )
-            .map((h) => h.quantity)
-        ) as number
-    );
-    const change = perCommodity(
-      (commodity) =>
-        quantities[commodity] - this.lastPriceAdjust.commodities[commodity]
-    );
-
-    perCommodity((commodity) => {
-      const notOffered = this.cp.trade.offers[commodity].quantity <= 0;
-      const stockpiled =
-        this.cp.trade.offers[commodity].type === "buy" &&
-        this.cp.storage.getAvailableWares()[commodity] /
-          this.cp.storage.quota[commodity] >
-          0.8;
-
-      if (stockpiled || notOffered) {
-        return;
-      }
-
-      const minPrice =
-        this.cp.trade.offers[commodity].type === "buy"
-          ? 1
-          : this.getProductionCost(commodity);
-      let delta = limitMin(
-        Math.floor(this.cp.trade.offers[commodity].price * 0.01),
-        1
-      );
-      if (
-        (this.cp.trade.offers[commodity].type === "sell") ===
-        change[commodity] <= 0
-      ) {
-        delta *= -1;
-      }
-
-      this.cp.trade.offers[commodity].price = limitMin(
-        this.cp.trade.offers[commodity].price + delta,
-        minPrice
-      );
-    });
-
-    this.lastPriceAdjust = {
-      commodities: quantities,
-      time: this.sim.getTime(),
-    };
   };
 
   getNeededCommodities = (): Commodity[] => {
@@ -393,14 +287,5 @@ export class Facility extends Entity {
         })),
       "score"
     ).map((offer) => offer.commodity);
-  };
-
-  simulate = (delta: number) => {
-    this.cooldowns.update(delta);
-
-    if (this.cooldowns.canUse("adjustPrices")) {
-      this.cooldowns.use("adjustPrices", 300);
-      this.adjustPrices();
-    }
   };
 }
