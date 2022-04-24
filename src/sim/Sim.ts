@@ -29,7 +29,7 @@ export class Sim extends BaseSim {
 
     const settingsEntity = new Entity(this);
     settingsEntity.cp.selectionManager = new SelectionManager();
-    this.entities.push(settingsEntity);
+    this.registerEntity(settingsEntity);
 
     this.systems = [
       new BudgetPlanningSystem(this),
