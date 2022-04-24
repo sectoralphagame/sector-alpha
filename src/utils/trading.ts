@@ -1,6 +1,8 @@
+import { sortBy } from "lodash";
 import { Entity } from "../components/entity";
 import { TransactionInput } from "../components/trade";
 import { Allocation } from "../components/utils/allocations";
+import { commodities, Commodity } from "../economy/commodity";
 import { InvalidOfferType, NonPositiveAmount } from "../errors";
 import { perCommodity } from "./perCommodity";
 
@@ -107,4 +109,55 @@ export function allocate(
   }
 
   return null;
+}
+
+export function getNeededCommodities(entity: Entity): Commodity[] {
+  const summedConsumption = entity.cp.compoundProduction.getSummedConsumption();
+  const stored = entity.cp.storage.getAvailableWares();
+
+  const scores = sortBy(
+    Object.values(commodities)
+      .filter(
+        (commodity) =>
+          entity.cp.trade.offers[commodity].type === "buy" &&
+          entity.cp.trade.offers[commodity].quantity > 0
+      )
+      .map((commodity) => ({
+        commodity,
+        wantToBuy: entity.cp.trade.offers[commodity].quantity,
+        quantityStored: stored[commodity],
+      }))
+      .map((data) => ({
+        commodity: data.commodity,
+        score:
+          (data.quantityStored -
+            entity.cp.compoundProduction.pac[data.commodity].consumes) /
+          summedConsumption,
+      })),
+    "score"
+  );
+
+  return scores.map((offer) => offer.commodity);
+}
+
+export function getCommoditiesForSell(entity: Entity): Commodity[] {
+  const stored = entity.cp.storage.getAvailableWares();
+
+  return sortBy(
+    Object.values(commodities)
+      .map((commodity) => ({
+        commodity,
+        wantToSell:
+          entity.cp.trade.offers[commodity].type === "sell"
+            ? entity.cp.trade.offers[commodity].quantity
+            : 0,
+        quantityStored: stored[commodity],
+      }))
+      .filter((offer) => offer.wantToSell > 0)
+      .map((data) => ({
+        commodity: data.commodity,
+        score: data.quantityStored,
+      })),
+    "score"
+  ).map((offer) => offer.commodity);
 }

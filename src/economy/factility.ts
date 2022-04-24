@@ -1,4 +1,3 @@
-import sortBy from "lodash/sortBy";
 import { Sim } from "../sim";
 import { commodities, Commodity } from "./commodity";
 import { Budget } from "../components/budget";
@@ -59,56 +58,5 @@ export class Facility extends Entity {
     if (facilityModule.hasComponents(["storageBonus"])) {
       this.cp.storage.max += facilityModule.cp.storageBonus.value;
     }
-  };
-
-  getNeededCommodities = (): Commodity[] => {
-    const summedConsumption = this.cp.compoundProduction.getSummedConsumption();
-    const stored = this.cp.storage.getAvailableWares();
-
-    const scores = sortBy(
-      Object.values(commodities)
-        .filter(
-          (commodity) =>
-            this.cp.trade.offers[commodity].type === "buy" &&
-            this.cp.trade.offers[commodity].quantity > 0
-        )
-        .map((commodity) => ({
-          commodity,
-          wantToBuy: this.cp.trade.offers[commodity].quantity,
-          quantityStored: stored[commodity],
-        }))
-        .map((data) => ({
-          commodity: data.commodity,
-          score:
-            (data.quantityStored -
-              this.cp.compoundProduction.pac[data.commodity].consumes) /
-            summedConsumption,
-        })),
-      "score"
-    );
-
-    return scores.map((offer) => offer.commodity);
-  };
-
-  getCommoditiesForSell = (): Commodity[] => {
-    const stored = this.cp.storage.getAvailableWares();
-
-    return sortBy(
-      Object.values(commodities)
-        .map((commodity) => ({
-          commodity,
-          wantToSell:
-            this.cp.trade.offers[commodity].type === "sell"
-              ? this.cp.trade.offers[commodity].quantity
-              : 0,
-          quantityStored: stored[commodity],
-        }))
-        .filter((offer) => offer.wantToSell > 0)
-        .map((data) => ({
-          commodity: data.commodity,
-          score: data.quantityStored,
-        })),
-      "score"
-    ).map((offer) => offer.commodity);
   };
 }

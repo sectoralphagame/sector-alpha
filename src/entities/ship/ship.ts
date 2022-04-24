@@ -35,7 +35,12 @@ import { Owner } from "../../components/owner";
 import { CommodityStorage } from "../../components/storage";
 import { Position } from "../../components/position";
 import { TransactionInput } from "../../components/trade";
-import { acceptTrade, allocate } from "../../utils/trading";
+import {
+  acceptTrade,
+  allocate,
+  getCommoditiesForSell,
+  getNeededCommodities,
+} from "../../utils/trading";
 
 export interface InitialShipInput {
   name: string;
@@ -273,21 +278,22 @@ export class Ship extends Entity {
     if (this.cp.storage.getAvailableSpace() !== this.cp.storage.max) {
       this.returnToFacility();
     } else {
-      const bought = this.commander
-        .getNeededCommodities()
-        .reduce((acc, commodity) => {
+      const bought = getNeededCommodities(this.commander).reduce(
+        (acc, commodity) => {
           if (acc) {
             return true;
           }
 
           return this.autoBuyMostNeededByCommander(commodity);
-        }, false);
+        },
+        false
+      );
 
       if (bought) {
         return;
       }
 
-      this.commander.getCommoditiesForSell().reduce((acc, commodity) => {
+      getCommoditiesForSell(this.commander).reduce((acc, commodity) => {
         if (acc) {
           return true;
         }
@@ -333,7 +339,7 @@ export class Ship extends Entity {
     if (this.cp.storage.getAvailableSpace() !== this.cp.storage.max) {
       this.returnToFacility();
     } else {
-      const needed = this.commander.getNeededCommodities();
+      const needed = getNeededCommodities(this.commander);
       const mineable = needed.find((commodity) =>
         (Object.values(mineableCommodities) as string[]).includes(commodity)
       );
