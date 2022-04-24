@@ -9,7 +9,6 @@ import {
   subtract,
 } from "mathjs";
 import merge from "lodash/merge";
-import { Facility } from "../../economy/factility";
 import {
   mineOrder,
   MineOrder,
@@ -42,6 +41,7 @@ import {
   getNeededCommodities,
 } from "../../utils/trading";
 import { Selection } from "../../components/selection/selection";
+import { Facility } from "../../archetypes/facility";
 
 export interface InitialShipInput {
   name: string;

@@ -1,13 +1,13 @@
 import React from "react";
+import { Facility } from "../../archetypes/facility";
 import { commodities } from "../../economy/commodity";
-import { Facility } from "../../economy/factility";
 
 const FacilityPanel: React.FC = () => {
   const facility = window.selected as Facility;
 
   return (
     <div>
-      <div>{facility.name}</div>
+      <div>{facility.cp.name.value}</div>
       <div>
         Money: {facility.components.budget.getAvailableMoney().toFixed(0)}
       </div>

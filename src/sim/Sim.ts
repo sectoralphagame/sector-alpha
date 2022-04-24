@@ -4,7 +4,6 @@ import { Entity } from "../components/entity";
 import { Ship } from "../entities/ship";
 import { World } from "../world";
 import { BaseSim } from "./BaseSim";
-import { Facility } from "../economy/factility";
 import { System } from "../systems/system";
 import { BudgetPlanningSystem } from "../systems/budgetPlanning";
 import { ProducingSystem } from "../systems/producing";
@@ -16,7 +15,6 @@ import { SelectionManager } from "../components/selection/selectionManager";
 export class Sim extends BaseSim {
   entities: Entity[] = [];
   factions: Faction[] = [];
-  facilities: Facility[] = [];
   ships: Ship[] = [];
   fields: AsteroidField[] = [];
 
@@ -29,7 +27,6 @@ export class Sim extends BaseSim {
 
     const settingsEntity = new Entity(this);
     settingsEntity.cp.selectionManager = new SelectionManager();
-    this.registerEntity(settingsEntity);
 
     this.systems = [
       new BudgetPlanningSystem(this),

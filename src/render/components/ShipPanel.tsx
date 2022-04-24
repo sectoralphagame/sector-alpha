@@ -8,7 +8,7 @@ function getOrderDescription(ship: Ship, order: Order) {
       return "Go to location";
     case "trade":
       if (order.target === ship.commander) return "Deliver wares to commander";
-      return `Deliver wares to ${order.target.name}`;
+      return `Deliver wares to ${order.target.cp.name.value}`;
     case "mine":
       return `Mine ${order.target.type}`;
     default:
@@ -24,7 +24,7 @@ const ShipPanel: React.FC = () => {
       <div>{ship.name}</div>
       {!!ship.commander && (
         <div>
-          {`Commander: ${ship.commander.name}`}
+          {`Commander: ${ship.commander.cp.name.value}`}
           <button
             onClick={() => {
               window.sim.entities.find((e) =>

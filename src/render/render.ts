@@ -156,22 +156,24 @@ export function render(sim: Sim, parent: Element) {
         });
       }
       if (camera.scale > 0.8) {
-        sim.facilities.forEach((facility) => {
-          const selected = window.selected === facility;
-          const color =
-            window.selected === facility
-              ? Color(facility.components.owner.value.color)
-                  .lighten(0.2)
-                  .unitArray()
-              : Color(facility.components.owner.value.color).unitArray();
-          p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
-          p5.noStroke();
-          p5.circle(
-            facility.cp.position.x * 10,
-            facility.cp.position.y * 10,
-            (camera.z / zMin) * (selected ? 1.3 : 1) * sizes.facility
-          );
-        });
+        sim.entities
+          .filter((e) => e.hasComponents(["compoundProduction"]))
+          .forEach((facility) => {
+            const selected = window.selected === facility;
+            const color =
+              window.selected === facility
+                ? Color(facility.components.owner.value.color)
+                    .lighten(0.2)
+                    .unitArray()
+                : Color(facility.components.owner.value.color).unitArray();
+            p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
+            p5.noStroke();
+            p5.circle(
+              facility.cp.position.x * 10,
+              facility.cp.position.y * 10,
+              (camera.z / zMin) * (selected ? 1.3 : 1) * sizes.facility
+            );
+          });
       }
     };
 
@@ -190,7 +192,7 @@ export function render(sim: Sim, parent: Element) {
     };
 
     p5.mouseClicked = () => {
-      const clickables = [...sim.ships, ...sim.facilities];
+      const clickables = sim.entities.filter((e) => e.cp.selection);
       const clicked = clickables.find((entity) => {
         const [x, y] = camera.translateScreenToCanvas(p5.mouseX, p5.mouseY);
         return (

@@ -2,11 +2,14 @@ import { Matrix, norm, subtract, sum } from "mathjs";
 import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
 import { map } from "lodash";
-import { Facility } from "./factility";
 import { sim } from "../sim";
 import { Asteroid, AsteroidField } from "./field";
 import { Commodity } from "./commodity";
 import { Entity } from "../components/entity";
+import { Facility } from "../archetypes/facility";
+import { RequireComponent } from "../tsHelpers";
+
+type WithTrade = RequireComponent<"trade" | "storage">;
 
 export function getFacilityWithMostProfit(
   facility: Facility,
@@ -17,7 +20,7 @@ export function getFacilityWithMostProfit(
       subtract(facility.cp.position.value, f.cp.position.value) as Matrix
     ) as number;
 
-  const profit = (f: Facility) =>
+  const profit = (f: WithTrade) =>
     facility.components.owner.value === f.components.owner.value
       ? 1e20
       : (facility.components.trade.offers[commodity].price -
@@ -25,17 +28,18 @@ export function getFacilityWithMostProfit(
         (facility.components.trade.offers[commodity].type === "buy" ? 1 : -1);
 
   const sortedByProfit = sortBy(
-    sim.facilities
-      .filter(
+    (
+      sim.entities.filter(
         (f) =>
+          f.hasComponents(["trade", "storage"]) &&
           f.components.trade.offers[commodity].type !==
             facility.components.trade.offers[commodity].type &&
           f.components.trade.offers[commodity].quantity > 0
-      )
-      .map((f) => ({
-        facility: f,
-        profit: profit(f),
-      })),
+      ) as WithTrade[]
+    ).map((f) => ({
+      facility: f,
+      profit: profit(f),
+    })),
     "profit"
   ).reverse();
 
