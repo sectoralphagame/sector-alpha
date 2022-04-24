@@ -9,6 +9,7 @@ import { System } from "../systems/system";
 import { BudgetPlanningSystem } from "../systems/budgetPlanning";
 import { ProducingSystem } from "../systems/producing";
 import { StorageQuotaPlanningSystem } from "../systems/storageQuotaPlanning";
+import { TradingSystem } from "../systems/trading";
 
 export class Sim extends BaseSim {
   entities: Entity[] = [];
@@ -28,6 +29,7 @@ export class Sim extends BaseSim {
       new BudgetPlanningSystem(this),
       new ProducingSystem(this),
       new StorageQuotaPlanningSystem(this),
+      new TradingSystem(this),
     ];
   }
 

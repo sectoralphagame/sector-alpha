@@ -1,20 +1,13 @@
 import sortBy from "lodash/sortBy";
 import { Sim } from "../sim";
-import { Cooldowns } from "../utils/cooldowns";
 import { perCommodity } from "../utils/perCommodity";
 import { commodities, Commodity } from "./commodity";
 import { Budget } from "../components/budget";
 import { Allocation } from "../components/utils/allocations";
 import { InvalidOfferType, NonPositiveAmount } from "../errors";
-import { getPlannedBudget } from "./utils";
 import { Entity } from "../components/entity";
 import { Owner } from "../components/owner";
-import {
-  startingPrice,
-  Trade,
-  TradeOffer,
-  TransactionInput,
-} from "../components/trade";
+import { Trade, TradeOffer, TransactionInput } from "../components/trade";
 import { CommodityStorage } from "../components/storage";
 import { Position } from "../components/position";
 import { Modules } from "../components/modules";
@@ -30,18 +23,11 @@ export function offerToStr(commodity: Commodity, offer: TradeOffer): string {
 }
 
 export class Facility extends Entity {
-  cooldowns: Cooldowns<"production" | "adjustPrices" | "settleBudget">;
-
   name: string;
 
   constructor(sim: Sim) {
     super(sim);
 
-    this.cooldowns = new Cooldowns(
-      "production",
-      "adjustPrices",
-      "settleBudget"
-    );
     this.name = `Facility #${this.id}`;
     this.sim.facilities.push(this);
 
@@ -50,10 +36,8 @@ export class Facility extends Entity {
     this.cp.modules = new Modules();
     this.cp.owner = new Owner();
     this.cp.position = new Position();
-    this.cp.storage = new CommodityStorage(this.createOffers);
+    this.cp.storage = new CommodityStorage();
     this.cp.trade = new Trade();
-
-    this.createOffers();
   }
 
   select = () => {
@@ -63,20 +47,6 @@ export class Facility extends Entity {
   focus = () => {
     this.select();
     window.renderer.focused = this;
-  };
-
-  createOffers = () => {
-    this.cp.trade.offers = perCommodity((commodity): TradeOffer => {
-      const quantity = this.getOfferedQuantity(commodity);
-
-      return {
-        price:
-          (this.cp.trade.offers && this.cp.trade.offers[commodity].price) ??
-          startingPrice,
-        quantity: quantity > 0 ? quantity : -quantity,
-        type: quantity > 0 ? "sell" : "buy",
-      };
-    });
   };
 
   /**
@@ -114,46 +84,6 @@ export class Facility extends Entity {
     }
 
     return null;
-  };
-
-  getProductionSurplus = (commodity: Commodity) =>
-    this.cp.compoundProduction.pac[commodity].produces -
-    this.cp.compoundProduction.pac[commodity].consumes;
-
-  getSurplus = (commodity: Commodity) =>
-    this.cp.storage.getAvailableWares()[commodity] +
-    this.getProductionSurplus(commodity);
-
-  getOfferedQuantity = (commodity: Commodity) => {
-    if (
-      this.cp.compoundProduction.pac[commodity].consumes ===
-        this.cp.compoundProduction.pac[commodity].produces &&
-      this.cp.compoundProduction.pac[commodity].consumes === 0
-    ) {
-      return this.getSurplus(commodity);
-    }
-
-    const stored = this.cp.storage.getAvailableWares();
-
-    if (this.getProductionSurplus(commodity) > 0) {
-      return (
-        stored[commodity] -
-        this.cp.compoundProduction.pac[commodity].consumes * 2
-      );
-    }
-
-    const requiredBudget = getPlannedBudget(this);
-    const availableBudget = this.cp.budget.getAvailableMoney();
-    const quota = this.cp.storage.quota[commodity];
-
-    if (stored[commodity] > quota) {
-      return stored[commodity] - quota;
-    }
-
-    const multiplier =
-      requiredBudget > availableBudget ? availableBudget / requiredBudget : 1;
-
-    return Math.floor(multiplier * (stored[commodity] - quota));
   };
 
   isTradeAccepted = (input: TransactionInput): boolean => {
@@ -234,8 +164,6 @@ export class Facility extends Entity {
     if (facilityModule.hasComponents(["storageBonus"])) {
       this.cp.storage.max += facilityModule.cp.storageBonus.value;
     }
-
-    this.createOffers();
   };
 
   getNeededCommodities = (): Commodity[] => {
