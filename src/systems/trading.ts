@@ -72,7 +72,9 @@ function adjustPrices(entity: Entity) {
     const minPrice =
       entity.cp.trade.offers[commodity].type === "buy"
         ? 1
-        : getProductionCost(entity, commodity);
+        : entity.hasComponents(["compoundProduction"])
+        ? getProductionCost(entity, commodity)
+        : 1;
     let delta = limitMin(
       Math.floor(entity.cp.trade.offers[commodity].price * 0.01),
       1
@@ -111,6 +113,10 @@ function getSurplus(entity: Entity, commodity: Commodity) {
 }
 
 function getOfferedQuantity(entity: Entity, commodity: Commodity) {
+  if (!entity.hasComponents(["compoundProduction"])) {
+    return entity.cp.storage.getAvailableWares()[commodity];
+  }
+
   if (
     entity.cp.compoundProduction.pac[commodity].consumes ===
       entity.cp.compoundProduction.pac[commodity].produces &&
@@ -164,7 +170,10 @@ export class TradingSystem extends System {
     this.cooldowns = new Cooldowns("adjustPrices", "createOffers");
   }
 
-  query = () => this.sim.entities.filter((e) => e.hasComponents(["trade"]));
+  query = () =>
+    this.sim.entities.filter((e) =>
+      e.hasComponents(["trade", "budget", "storage"])
+    );
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);
