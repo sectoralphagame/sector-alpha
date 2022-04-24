@@ -11,6 +11,7 @@ export interface ProductionModuleInput {
   pac?: Partial<PAC>;
   parent: Entity;
   storage?: number;
+  time?: number;
 }
 
 export type FacilityModule = RequireComponent<"parent">;
@@ -19,8 +20,8 @@ export function createFacilityModule(sim: Sim, input: ProductionModuleInput) {
   const entity = new Entity(sim);
   entity.cp.parent = new Parent(input.parent);
   entity.cp.name = new Name(input.name);
-  if (input.pac) {
-    entity.cp.production = new Production(input.pac);
+  if (input.pac && input.time) {
+    entity.cp.production = new Production(input.time, input.pac);
   }
 
   if (input.storage) {
@@ -44,6 +45,7 @@ export const facilityModules = {
       ice: { consumes: 20, produces: 0 },
       water: { consumes: 0, produces: 10 },
     },
+    time: 15,
   }),
   farm: createFacilityModuleTemplate({
     name: "Farm",
@@ -52,6 +54,7 @@ export const facilityModules = {
       fuel: { consumes: 1, produces: 0 },
       water: { consumes: 30, produces: 0 },
     },
+    time: 15,
   }),
   refinery: createFacilityModuleTemplate({
     name: "Refinery",
@@ -61,6 +64,7 @@ export const facilityModules = {
       metals: { consumes: 0, produces: 15 },
       fuel: { consumes: 2, produces: 0 },
     },
+    time: 15,
   }),
   fuelFabrication: createFacilityModuleTemplate({
     name: "Fuel Fabrication",
@@ -68,12 +72,14 @@ export const facilityModules = {
       fuelium: { consumes: 20, produces: 0 },
       fuel: { consumes: 0, produces: 10 },
     },
+    time: 15,
   }),
   habitat: createFacilityModuleTemplate({
     name: "Habitation Zone",
     pac: {
       food: { consumes: 5, produces: 0 },
     },
+    time: 15,
   }),
   hullPlates: createFacilityModuleTemplate({
     name: "Hull Plates Production",
@@ -83,6 +89,7 @@ export const facilityModules = {
       metals: { consumes: 25, produces: 0 },
       hullPlates: { consumes: 0, produces: 70 },
     },
+    time: 24,
   }),
   shipyard: createFacilityModuleTemplate({
     name: "Shipyard",
@@ -91,6 +98,7 @@ export const facilityModules = {
       fuel: { consumes: 15, produces: 0 },
       hullPlates: { consumes: 400, produces: 0 },
     },
+    time: 60,
   }),
   containerSmall: createFacilityModuleTemplate({
     name: "Small Container",

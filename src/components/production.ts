@@ -55,10 +55,11 @@ export class Production extends BaseProduction {
    */
   time: number;
 
-  constructor(pac: Partial<PAC> = {}) {
+  constructor(time: number, pac: Partial<PAC> = {}) {
     super();
     this.cooldowns = new Cooldowns("production");
     this.pac = merge(cloneDeep(baseProductionAndConsumption), pac);
+    this.time = time;
   }
 }
 
