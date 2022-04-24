@@ -1,4 +1,5 @@
 import React from "react";
+import { Entity } from "../../components/entity";
 import { commodities } from "../../economy/commodity";
 import { Order, Ship } from "../../entities/ship";
 
@@ -27,9 +28,12 @@ const ShipPanel: React.FC = () => {
           {`Commander: ${ship.commander.cp.name.value}`}
           <button
             onClick={() => {
-              window.sim.entities.find((e) =>
-                e.hasComponents(["selectionManager"])
-              ).cp.selectionManager.focused = true;
+              const { selectionManager } = (
+                window.sim.entities as Entity[]
+              ).find((e) => e.hasComponents(["selectionManager"])).cp;
+
+              selectionManager.set(ship.commander);
+              selectionManager.focused = true;
             }}
             type="button"
           >

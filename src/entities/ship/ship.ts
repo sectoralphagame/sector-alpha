@@ -42,6 +42,7 @@ import {
 } from "../../utils/trading";
 import { Selection } from "../../components/selection/selection";
 import { Facility } from "../../archetypes/facility";
+import { Render } from "../../components/render";
 
 export interface InitialShipInput {
   name: string;
@@ -80,6 +81,7 @@ export class Ship extends Entity {
 
     this.cp.owner = new Owner();
     this.cp.position = new Position(initial.position);
+    this.cp.render = new Render(0.5, 0.9);
     this.cp.selection = new Selection();
     this.cp.storage = new CommodityStorage();
     this.cp.storage.max = initial.storage;

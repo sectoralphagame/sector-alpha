@@ -1,5 +1,6 @@
 import React from "react";
 import { Facility } from "../../archetypes/facility";
+import { Entity } from "../../components/entity";
 import { commodities } from "../../economy/commodity";
 
 const FacilityPanel: React.FC = () => {
@@ -55,7 +56,17 @@ const FacilityPanel: React.FC = () => {
           // eslint-disable-next-line react/no-array-index-key
           <div key={`${ship.name}-${index}`}>
             {ship.name}{" "}
-            <button onClick={ship.focus} type="button">
+            <button
+              onClick={() => {
+                const { selectionManager } = (
+                  window.sim.entities as Entity[]
+                ).find((e) => e.hasComponents(["selectionManager"])).cp;
+
+                selectionManager.set(ship);
+                selectionManager.focused = true;
+              }}
+              type="button"
+            >
               focus
             </button>
           </div>

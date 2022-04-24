@@ -3,15 +3,9 @@ import Color from "color";
 import { Sim } from "../sim";
 import { limitMin } from "../utils/limit";
 import "./components/Panel";
-import { Ship } from "../entities/ship";
 import { MineableCommodity } from "../economy/commodity";
 
 const zMin = 90;
-
-const sizes = {
-  ship: 0.5,
-  facility: 2,
-};
 
 class RenderCamera {
   x = 0;
@@ -83,7 +77,9 @@ export function render(sim: Sim, parent: Element) {
   // eslint-disable-next-line no-new
   new P5((p5: P5) => {
     let camera: RenderCamera;
-    // eslint-disable-next-line no-unused-vars
+    const settingsEntity = sim.entities.find((e) =>
+      e.hasComponents(["selectionManager"])
+    );
 
     p5.setup = () => {
       const canvas = p5.createCanvas(
@@ -96,10 +92,10 @@ export function render(sim: Sim, parent: Element) {
     };
 
     p5.draw = () => {
-      if (window.renderer.focused) {
+      if (settingsEntity.cp.selectionManager.focused) {
         camera.lookAt(
-          window.renderer.focused.cp.position.x,
-          window.renderer.focused.cp.position.y
+          settingsEntity.cp.selectionManager.entity.cp.position.x,
+          settingsEntity.cp.selectionManager.entity.cp.position.y
         );
       }
       p5.background("black");
@@ -140,41 +136,25 @@ export function render(sim: Sim, parent: Element) {
         }
       });
 
-      if (camera.scale > 1) {
-        sim.ships.forEach((ship) => {
-          const selected = window.selected === ship;
-          const color = selected
-            ? Color(ship.cp.owner.value.color).lighten(0.2).unitArray()
-            : Color(ship.cp.owner.value.color).unitArray();
+      sim.entities
+        .filter((e) => e.hasComponents(["render"]))
+        .forEach((entity) => {
+          if (camera.scale < entity.cp.render.minScale) return;
+
+          const selected = settingsEntity.cp.selectionManager.entity === entity;
+          const baseColor = entity.cp.owner?.value.color ?? "#dddddd";
+          const color =
+            settingsEntity.cp.selectionManager.entity === entity
+              ? Color(baseColor).lighten(0.2).unitArray()
+              : Color(baseColor).unitArray();
           p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
           p5.noStroke();
           p5.circle(
-            ship.cp.position.x * 10,
-            ship.cp.position.y * 10,
-            (camera.z / zMin) * (selected ? 1.3 : 1) * sizes.ship
+            entity.cp.position.x * 10,
+            entity.cp.position.y * 10,
+            (camera.z / zMin) * (selected ? 1.3 : 1) * entity.cp.render.size
           );
         });
-      }
-      if (camera.scale > 0.8) {
-        sim.entities
-          .filter((e) => e.hasComponents(["compoundProduction"]))
-          .forEach((facility) => {
-            const selected = window.selected === facility;
-            const color =
-              window.selected === facility
-                ? Color(facility.components.owner.value.color)
-                    .lighten(0.2)
-                    .unitArray()
-                : Color(facility.components.owner.value.color).unitArray();
-            p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
-            p5.noStroke();
-            p5.circle(
-              facility.cp.position.x * 10,
-              facility.cp.position.y * 10,
-              (camera.z / zMin) * (selected ? 1.3 : 1) * sizes.facility
-            );
-          });
-      }
     };
 
     p5.mouseWheel = (event: { delta: number }) => {
@@ -184,7 +164,7 @@ export function render(sim: Sim, parent: Element) {
     };
 
     p5.mouseDragged = (event: MouseEvent) => {
-      window.renderer.focused = null;
+      settingsEntity.cp.selectionManager.focused = false;
       camera.move({
         x: (event.movementX * camera.z) / zMin / 10,
         y: (event.movementY * camera.z) / zMin / 10,
@@ -198,16 +178,12 @@ export function render(sim: Sim, parent: Element) {
         return (
           (entity.cp.position.x * 10 - x) ** 2 +
             (entity.cp.position.y * 10 - y) ** 2 <=
-          (camera.z / zMin) *
-            sizes[entity instanceof Ship ? "ship" : "facility"] *
-            2
+          (camera.z / zMin) * entity.cp.render.size * 2
         );
       });
 
       if (clicked) {
-        sim.entities
-          .find((e) => e.hasComponents(["selectionManager"]))
-          .cp.selectionManager.set(clicked);
+        settingsEntity.cp.selectionManager.set(clicked);
       }
     };
 

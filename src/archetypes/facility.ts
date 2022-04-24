@@ -5,6 +5,7 @@ import { Name } from "../components/name";
 import { Owner } from "../components/owner";
 import { Position } from "../components/position";
 import { CompoundProduction } from "../components/production";
+import { Render } from "../components/render";
 import { Selection } from "../components/selection/selection";
 import { CommodityStorage } from "../components/storage";
 import { Trade } from "../components/trade";
@@ -33,6 +34,7 @@ export function createFacility(sim: Sim) {
     name: new Name(`Facility #${facility.id}`),
     owner: new Owner(),
     position: new Position(),
+    render: new Render(2, 0.7),
     selection: new Selection(),
     storage: new CommodityStorage(),
     trade: new Trade(),

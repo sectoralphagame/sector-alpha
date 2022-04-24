@@ -11,6 +11,7 @@ import { Modules } from "./modules";
 import { Name } from "./name";
 import { Selection } from "./selection/selection";
 import { SelectionManager } from "./selection/selectionManager";
+import { Render } from "./render";
 
 export interface CoreComponents {
   budget: Budget;
@@ -21,6 +22,7 @@ export interface CoreComponents {
   parent: Parent;
   position: Position;
   production: Production;
+  render: Render;
   selection: Selection;
   selectionManager: SelectionManager;
   storage: CommodityStorage;
