@@ -1,26 +1,23 @@
-import cloneDeep from "lodash/cloneDeep";
 import sortBy from "lodash/sortBy";
 import { sum } from "mathjs";
 import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { perCommodity } from "../utils/perCommodity";
 import { commodities, Commodity } from "./commodity";
-import {
-  baseProductionAndConsumption,
-  FacilityModule,
-  ProductionAndConsumption,
-} from "./facilityModule";
 import { Faction } from "./faction";
 import { Budget } from "../components/budget";
 import { Allocation } from "../components/utils/allocations";
 import { InvalidOfferType, NonPositiveAmount } from "../errors";
-import { createIsAbleToProduce, getPlannedBudget } from "./utils";
-import { limitMax, limitMin } from "../utils/limit";
+import { getPlannedBudget } from "./utils";
+import { limitMin } from "../utils/limit";
 import { Entity } from "../components/entity";
 import { Owner } from "../components/owner";
 import { startingPrice, Trade, TradeOffer } from "../components/trade";
 import { CommodityStorage } from "../components/storage";
 import { Position } from "../components/position";
+import { Modules } from "../components/modules";
+import { CompoundProduction } from "../components/production";
+import { FacilityModule } from "../archetypes/facilityModule";
 
 const maxTransactions = 100;
 
@@ -50,9 +47,7 @@ export interface TransactionInput extends TradeOffer {
 
 export class Facility extends Entity {
   cooldowns: Cooldowns<"production" | "adjustPrices" | "settleBudget">;
-  productionAndConsumption: ProductionAndConsumption;
   transactions: Transaction[] = [];
-  modules: FacilityModule[] = [];
   lastPriceAdjust = {
     time: 0,
     commodities: perCommodity(() => 0),
@@ -62,7 +57,6 @@ export class Facility extends Entity {
   constructor(sim: Sim) {
     super(sim);
 
-    this.productionAndConsumption = cloneDeep(baseProductionAndConsumption);
     this.cooldowns = new Cooldowns(
       "production",
       "adjustPrices",
@@ -72,6 +66,8 @@ export class Facility extends Entity {
     this.sim.facilities.push(this);
 
     this.cp.budget = new Budget();
+    this.cp.compoundProduction = new CompoundProduction();
+    this.cp.modules = new Modules();
     this.cp.owner = new Owner();
     this.cp.position = new Position();
     this.cp.storage = new CommodityStorage(this.createOffers);
@@ -141,28 +137,20 @@ export class Facility extends Entity {
   };
 
   getProductionSurplus = (commodity: Commodity) =>
-    this.productionAndConsumption[commodity].produces -
-    this.productionAndConsumption[commodity].consumes;
+    this.cp.compoundProduction.pac[commodity].produces -
+    this.cp.compoundProduction.pac[commodity].consumes;
 
   getSurplus = (commodity: Commodity) =>
     this.cp.storage.getAvailableWares()[commodity] +
     this.getProductionSurplus(commodity);
 
-  getQuota = (commodity: Commodity): number =>
-    Math.floor(
-      (this.cp.storage.max *
-        (this.productionAndConsumption[commodity].produces +
-          this.productionAndConsumption[commodity].consumes)) /
-        this.getRequiredStorage()
-    );
-
   /**
    *
-   * @returns Commodity cost of production
+   * Commodity cost of production
    */
   getProductionCost = (commodity: Commodity): number => {
-    const productionModule = this.modules.find(
-      (m) => m.productionAndConsumption[commodity].produces > 0
+    const productionModule = this.cp.modules.modules.find(
+      (m) => m.cp.production?.pac[commodity].produces > 0
     );
 
     if (!productionModule) {
@@ -173,10 +161,10 @@ export class Facility extends Entity {
       sum(
         Object.values(
           perCommodity((c) =>
-            productionModule.productionAndConsumption[c].consumes
+            productionModule.cp.production.pac[c].consumes
               ? (this.getProductionCost(c) *
-                  productionModule.productionAndConsumption[c].consumes) /
-                productionModule.productionAndConsumption[commodity].produces
+                  productionModule.cp.production.pac[c].consumes) /
+                productionModule.cp.production.pac[commodity].produces
               : 0
           )
         )
@@ -186,9 +174,9 @@ export class Facility extends Entity {
 
   getOfferedQuantity = (commodity: Commodity) => {
     if (
-      this.productionAndConsumption[commodity].consumes ===
-        this.productionAndConsumption[commodity].produces &&
-      this.productionAndConsumption[commodity].consumes === 0
+      this.cp.compoundProduction.pac[commodity].consumes ===
+        this.cp.compoundProduction.pac[commodity].produces &&
+      this.cp.compoundProduction.pac[commodity].consumes === 0
     ) {
       return this.getSurplus(commodity);
     }
@@ -198,13 +186,13 @@ export class Facility extends Entity {
     if (this.getProductionSurplus(commodity) > 0) {
       return (
         stored[commodity] -
-        this.productionAndConsumption[commodity].consumes * 2
+        this.cp.compoundProduction.pac[commodity].consumes * 2
       );
     }
 
     const requiredBudget = getPlannedBudget(this);
     const availableBudget = this.cp.budget.getAvailableMoney();
-    const quota = this.getQuota(commodity);
+    const quota = this.cp.storage.quota[commodity];
 
     if (stored[commodity] > quota) {
       return stored[commodity] - quota;
@@ -280,14 +268,21 @@ export class Facility extends Entity {
   };
 
   addModule = (facilityModule: FacilityModule) => {
-    this.modules.push(facilityModule);
-    Object.keys(commodities).forEach((commodity: Commodity) => {
-      this.productionAndConsumption[commodity].produces +=
-        facilityModule.productionAndConsumption[commodity].produces;
-      this.productionAndConsumption[commodity].consumes +=
-        facilityModule.productionAndConsumption[commodity].consumes;
-    });
-    this.cp.storage.max += facilityModule.storage;
+    this.cp.modules.modules.push(facilityModule);
+
+    if (facilityModule.hasComponents(["production"])) {
+      Object.keys(commodities).forEach((commodity: Commodity) => {
+        this.cp.compoundProduction.pac[commodity].produces +=
+          facilityModule.cp.production.pac[commodity].produces;
+        this.cp.compoundProduction.pac[commodity].consumes +=
+          facilityModule.cp.production.pac[commodity].consumes;
+      });
+    }
+
+    if (facilityModule.hasComponents(["storageBonus"])) {
+      this.cp.storage.max += facilityModule.cp.storageBonus.value;
+    }
+
     this.createOffers();
   };
 
@@ -315,7 +310,7 @@ export class Facility extends Entity {
       const stockpiled =
         this.cp.trade.offers[commodity].type === "buy" &&
         this.cp.storage.getAvailableWares()[commodity] /
-          this.getQuota(commodity) >
+          this.cp.storage.quota[commodity] >
           0.8;
 
       if (stockpiled || notOffered) {
@@ -349,25 +344,8 @@ export class Facility extends Entity {
     };
   };
 
-  getSummedConsumption = () =>
-    sum(
-      Object.values(commodities).map(
-        (commodity) => this.productionAndConsumption[commodity].consumes
-      )
-    );
-
-  getSummedProduction = () =>
-    sum(
-      Object.values(commodities).map(
-        (commodity) => this.productionAndConsumption[commodity].produces
-      )
-    );
-
-  getRequiredStorage = () =>
-    this.getSummedConsumption() + this.getSummedProduction();
-
   getNeededCommodities = (): Commodity[] => {
-    const summedConsumption = this.getSummedConsumption();
+    const summedConsumption = this.cp.compoundProduction.getSummedConsumption();
     const stored = this.cp.storage.getAvailableWares();
 
     const scores = sortBy(
@@ -386,7 +364,7 @@ export class Facility extends Entity {
           commodity: data.commodity,
           score:
             (data.quantityStored -
-              this.productionAndConsumption[data.commodity].consumes) /
+              this.cp.compoundProduction.pac[data.commodity].consumes) /
             summedConsumption,
         })),
       "score"
@@ -419,41 +397,6 @@ export class Facility extends Entity {
 
   simulate = (delta: number) => {
     this.cooldowns.update(delta);
-
-    if (this.cooldowns.canUse("production")) {
-      const isAbleToProduce = createIsAbleToProduce(this);
-      const modulesAbleToProduce = this.modules.filter(isAbleToProduce);
-      if (modulesAbleToProduce.length) {
-        this.cooldowns.use("production", 15);
-        // TODO: use allocations and postpone storing commodities until
-        // finished producing
-
-        this.modules.forEach((facilityModule) => {
-          if (!isAbleToProduce(facilityModule)) {
-            return;
-          }
-
-          perCommodity((commodity) =>
-            this.cp.storage.removeStorage(
-              commodity,
-              facilityModule.productionAndConsumption[commodity].consumes
-            )
-          );
-          perCommodity((commodity) =>
-            this.cp.storage.addStorage(
-              commodity,
-              limitMax(
-                this.getQuota(commodity) -
-                  facilityModule.productionAndConsumption[commodity].produces,
-                facilityModule.productionAndConsumption[commodity].produces
-              ),
-              false
-            )
-          );
-        });
-        this.createOffers();
-      }
-    }
 
     if (this.cooldowns.canUse("adjustPrices")) {
       this.cooldowns.use("adjustPrices", 300);

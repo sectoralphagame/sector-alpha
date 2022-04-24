@@ -4,16 +4,27 @@ import { Owner } from "./owner";
 import { Trade } from "./trade";
 import { CommodityStorage } from "./storage";
 import { Position } from "./position";
+import { CompoundProduction, Production } from "./production";
+import { Parent } from "./parent";
+import { StorageBonus } from "./storageBonus";
+import { Modules } from "./modules";
+import { Name } from "./name";
 
 export interface CoreComponents {
   budget: Budget;
+  compoundProduction: CompoundProduction;
+  modules: Modules;
+  name: Name;
   owner: Owner;
+  parent: Parent;
   position: Position;
+  production: Production;
   storage: CommodityStorage;
+  storageBonus: StorageBonus;
   trade: Trade;
 }
 
-export abstract class Entity {
+export class Entity {
   components: Partial<CoreComponents> = {};
   id: number;
   sim: Sim;

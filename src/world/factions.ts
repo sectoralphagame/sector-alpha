@@ -29,7 +29,7 @@ factions.forEach((faction) => {
       matrix([random(-12, 12), random(-12, 12)])
     ) as Matrix;
 
-    const consumed = Object.entries(facility.productionAndConsumption)
+    const consumed = Object.entries(facility.cp.compoundProduction.pac)
       .filter(([, pac]) => pac.consumes > 0)
       .map(([commodity]) => commodity as MineableCommodity);
     const hasMineables = [

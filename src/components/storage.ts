@@ -33,6 +33,7 @@ export class CommodityStorage {
   allocationManager: AllocationManager<StorageAllocation>;
 
   max: number;
+  quota: Record<Commodity, number>;
   history: CommodityStorageHistoryEntry[] = [];
 
   changeHandler: () => void;
@@ -40,6 +41,7 @@ export class CommodityStorage {
   constructor(onChange = () => undefined) {
     this.max = 0;
     this.stored = perCommodity(() => 0);
+    this.quota = perCommodity(() => 0);
     this.allocationManager = new AllocationManager<StorageAllocation>({
       validate: (allocation) => {
         if (allocation.type === "incoming") {
@@ -112,6 +114,11 @@ export class CommodityStorage {
       }),
       perCommodity(() => 0)
     );
+  };
+
+  updateQuota = (quota: Record<Commodity, number>) => {
+    this.quota = quota;
+    this.changeHandler();
   };
 
   getAvailableWares = () => this.availableWares;

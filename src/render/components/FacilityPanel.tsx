@@ -26,7 +26,7 @@ const FacilityPanel: React.FC = () => {
           {Object.values(commodities)
             .map((commodity) => ({
               commodity,
-              ...facility.productionAndConsumption[commodity],
+              ...facility.cp.compoundProduction.pac[commodity],
               ...facility.components.trade.offers[commodity],
               stored: facility.cp.storage.getAvailableWares()[commodity],
             }))
@@ -42,9 +42,11 @@ const FacilityPanel: React.FC = () => {
         </tbody>
       </table>
       <hr />
-      {facility.modules.map((facilityModule, index) => (
+      {facility.cp.modules.modules.map((facilityModule, index) => (
         // eslint-disable-next-line react/no-array-index-key
-        <div key={`${facilityModule.name}-${index}`}>{facilityModule.name}</div>
+        <div key={`${facilityModule.cp.name.value}-${index}`}>
+          {facilityModule.cp.name.value}
+        </div>
       ))}
       <hr />
       {window.sim.entities

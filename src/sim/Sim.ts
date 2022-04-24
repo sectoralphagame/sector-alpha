@@ -7,6 +7,11 @@ import { BaseSim } from "./BaseSim";
 import { Facility } from "../economy/factility";
 import { System } from "../systems/system";
 import { BudgetPlanningSystem } from "../systems/budgetPlanning";
+import {
+  ProducingByModulesSystem,
+  ProducingSystem,
+} from "../systems/producing";
+import { StorageQuotaPlanningSystem } from "../systems/storageQuotaPlanning";
 
 export class Sim extends BaseSim {
   entities: Entity[] = [];
@@ -22,7 +27,12 @@ export class Sim extends BaseSim {
   constructor() {
     super();
 
-    this.systems = [new BudgetPlanningSystem(this)];
+    this.systems = [
+      new BudgetPlanningSystem(this),
+      new ProducingSystem(this),
+      new ProducingByModulesSystem(this),
+      new StorageQuotaPlanningSystem(this),
+    ];
   }
 
   registerEntity = (entity: Entity) => {

@@ -1,4 +1,3 @@
-import every from "lodash/every";
 import { Matrix, norm, subtract, sum } from "mathjs";
 import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
@@ -6,8 +5,6 @@ import { map } from "lodash";
 import { Facility } from "./factility";
 import { sim } from "../sim";
 import { Asteroid, AsteroidField } from "./field";
-import { FacilityModule } from "./facilityModule";
-import { perCommodity } from "../utils/perCommodity";
 import { Commodity } from "./commodity";
 import { Entity } from "../components/entity";
 
@@ -62,26 +59,6 @@ export function getClosestMineableAsteroid(
     field.asteroids.filter((r) => !r.mined),
     (r) => norm(subtract(position, r.position) as Matrix)
   );
-}
-
-export function createIsAbleToProduce(
-  facility: Facility
-  // eslint-disable-next-line no-unused-vars
-): (facilityModule: FacilityModule) => boolean {
-  return (facilityModule: FacilityModule) =>
-    every(
-      perCommodity(
-        (commodity) =>
-          facility.cp.storage.hasSufficientStorage(
-            commodity,
-            facilityModule.productionAndConsumption[commodity].consumes
-          ) &&
-          (facilityModule.productionAndConsumption[commodity].produces
-            ? facility.cp.storage.getAvailableWares()[commodity] <
-              facility.getQuota(commodity)
-            : true)
-      )
-    );
 }
 
 /**

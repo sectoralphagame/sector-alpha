@@ -1,6 +1,9 @@
 import { notImplemented } from "../errors";
 import { Sim } from "../sim";
 
+/**
+ * Base class to extend new systems. Use `-ingSystem` postfix in system names.
+ */
 export abstract class System {
   sim: Sim;
 

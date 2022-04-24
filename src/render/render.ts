@@ -98,8 +98,8 @@ export function render(sim: Sim, parent: Element) {
     p5.draw = () => {
       if (window.renderer.focused) {
         camera.lookAt(
-          window.renderer.focused.position.get([0]),
-          window.renderer.focused.position.get([1])
+          window.renderer.focused.cp.position.x,
+          window.renderer.focused.cp.position.y
         );
       }
       p5.background("black");
