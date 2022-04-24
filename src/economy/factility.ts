@@ -1,20 +1,15 @@
 import sortBy from "lodash/sortBy";
 import { Sim } from "../sim";
-import { perCommodity } from "../utils/perCommodity";
 import { commodities, Commodity } from "./commodity";
 import { Budget } from "../components/budget";
-import { Allocation } from "../components/utils/allocations";
-import { InvalidOfferType, NonPositiveAmount } from "../errors";
 import { Entity } from "../components/entity";
 import { Owner } from "../components/owner";
-import { Trade, TradeOffer, TransactionInput } from "../components/trade";
+import { Trade, TradeOffer } from "../components/trade";
 import { CommodityStorage } from "../components/storage";
 import { Position } from "../components/position";
 import { Modules } from "../components/modules";
 import { CompoundProduction } from "../components/production";
 import { FacilityModule } from "../archetypes/facilityModule";
-
-const maxTransactions = 100;
 
 export function offerToStr(commodity: Commodity, offer: TradeOffer): string {
   return `${offer.type === "buy" ? "Buying" : "Selling"} ${
@@ -47,106 +42,6 @@ export class Facility extends Entity {
   focus = () => {
     this.select();
     window.renderer.focused = this;
-  };
-
-  /**
-   * Allocates resources necessary to finish trade before it is actually done
-   */
-  allocate = (
-    offer: TransactionInput
-  ): Record<"budget" | "storage", Allocation> | null => {
-    if (this.isTradeAccepted(offer)) {
-      if (offer.type === "sell") {
-        return {
-          budget: this.cp.budget.allocations.new({
-            amount: offer.price * offer.quantity,
-          }),
-          storage: this.cp.storage.allocationManager.new({
-            amount: {
-              ...perCommodity(() => 0),
-              [offer.commodity]: offer.quantity,
-            },
-            type: "incoming",
-          }),
-        };
-      }
-
-      return {
-        budget: null,
-        storage: this.cp.storage.allocationManager.new({
-          amount: {
-            ...perCommodity(() => 0),
-            [offer.commodity]: offer.quantity,
-          },
-          type: "outgoing",
-        }),
-      };
-    }
-
-    return null;
-  };
-
-  isTradeAccepted = (input: TransactionInput): boolean => {
-    let validPrice = false;
-
-    const offer = this.cp.trade.offers[input.commodity];
-
-    if (offer.price < 0) {
-      throw new NonPositiveAmount(offer.price);
-    }
-
-    if (offer.type === input.type && input.faction !== this.cp.owner.value) {
-      throw new InvalidOfferType(input.type);
-    }
-    if (input.type === "buy") {
-      if (input.faction === this.cp.owner.value) {
-        validPrice = true;
-      } else {
-        validPrice = input.price >= offer.price;
-      }
-
-      return (
-        validPrice &&
-        this.cp.storage.hasSufficientStorage(input.commodity, input.quantity)
-      );
-    }
-
-    if (input.faction === this.cp.owner.value) {
-      validPrice = true;
-    } else {
-      validPrice = input.price <= offer.price;
-    }
-
-    return (
-      validPrice &&
-      this.cp.budget.getAvailableMoney() >= input.price * input.quantity &&
-      this.cp.storage.hasSufficientStorageSpace(input.quantity)
-    );
-  };
-
-  acceptTrade = (input: TransactionInput) => {
-    if (input.price > 0) {
-      // They are selling us
-      if (input.type === "sell") {
-        const allocation = this.cp.budget.allocations.release(
-          input.allocations.buyer.budget
-        );
-        this.cp.budget.transferMoney(allocation.amount, input.budget);
-      } else {
-        const allocation = input.budget.allocations.release(
-          input.allocations.buyer.budget
-        );
-        input.budget.transferMoney(allocation.amount, this.cp.budget);
-      }
-    }
-
-    this.cp.trade.transactions.push({
-      ...input,
-      time: this.sim.getTime(),
-    });
-    if (this.cp.trade.transactions.length > maxTransactions) {
-      this.cp.trade.transactions.shift();
-    }
   };
 
   addModule = (facilityModule: FacilityModule) => {

@@ -35,6 +35,7 @@ import { Owner } from "../../components/owner";
 import { CommodityStorage } from "../../components/storage";
 import { Position } from "../../components/position";
 import { TransactionInput } from "../../components/trade";
+import { acceptTrade, allocate } from "../../utils/trading";
 
 export interface InitialShipInput {
   name: string;
@@ -155,7 +156,7 @@ export class Ship extends Entity {
         );
       }
 
-      order.target.acceptTrade(order.offer);
+      acceptTrade(order.target, order.offer);
       return true;
     }
 
@@ -216,13 +217,13 @@ export class Ship extends Entity {
       type: "buy" as "buy",
     };
 
-    const buyerAllocations = buyer.allocate({
+    const buyerAllocations = allocate(buyer, {
       ...offer,
       type: "sell",
     });
     if (!buyerAllocations) return false;
 
-    const sellerAllocations = seller.allocate(offer);
+    const sellerAllocations = allocate(seller, offer);
     if (!sellerAllocations) {
       buyer.components.budget.allocations.release(buyerAllocations.budget.id);
       buyer.cp.storage.allocationManager.release(buyerAllocations.storage.id);
@@ -380,7 +381,7 @@ export class Ship extends Entity {
       type: "sell",
       faction: this.cp.owner.value,
     };
-    const allocations = this.commander.allocate(offer);
+    const allocations = allocate(this.commander, offer);
 
     if (allocations) {
       this.addOrder(
