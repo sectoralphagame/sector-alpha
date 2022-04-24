@@ -9,6 +9,7 @@ import { Position } from "../components/position";
 import { Modules } from "../components/modules";
 import { CompoundProduction } from "../components/production";
 import { FacilityModule } from "../archetypes/facilityModule";
+import { Selection } from "../components/selection/selection";
 
 export function offerToStr(commodity: Commodity, offer: TradeOffer): string {
   return `${offer.type === "buy" ? "Buying" : "Selling"} ${
@@ -30,18 +31,10 @@ export class Facility extends Entity {
     this.cp.modules = new Modules();
     this.cp.owner = new Owner();
     this.cp.position = new Position();
+    this.cp.selection = new Selection();
     this.cp.storage = new CommodityStorage();
     this.cp.trade = new Trade();
   }
-
-  select = () => {
-    window.selected = this;
-  };
-
-  focus = () => {
-    this.select();
-    window.renderer.focused = this;
-  };
 
   addModule = (facilityModule: FacilityModule) => {
     this.cp.modules.modules.push(facilityModule);

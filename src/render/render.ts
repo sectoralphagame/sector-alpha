@@ -203,7 +203,9 @@ export function render(sim: Sim, parent: Element) {
       });
 
       if (clicked) {
-        clicked.select();
+        sim.entities
+          .find((e) => e.hasComponents(["selectionManager"]))
+          .cp.selectionManager.set(clicked);
       }
     };
 

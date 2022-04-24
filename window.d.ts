@@ -9,6 +9,6 @@ interface Window {
   } & Record<string, any>;
   renderer: any;
   selected: {
-    focus: () => void;
-  };
+    id: number;
+  } | null;
 }

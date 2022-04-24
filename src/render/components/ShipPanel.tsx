@@ -25,7 +25,14 @@ const ShipPanel: React.FC = () => {
       {!!ship.commander && (
         <div>
           {`Commander: ${ship.commander.name}`}
-          <button onClick={ship.commander.focus} type="button">
+          <button
+            onClick={() => {
+              window.sim.entities.find((e) =>
+                e.hasComponents(["selectionManager"])
+              ).cp.selectionManager.focused = true;
+            }}
+            type="button"
+          >
             focus
           </button>
         </div>

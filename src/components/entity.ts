@@ -9,6 +9,8 @@ import { Parent } from "./parent";
 import { StorageBonus } from "./storageBonus";
 import { Modules } from "./modules";
 import { Name } from "./name";
+import { Selection } from "./selection/selection";
+import { SelectionManager } from "./selection/selectionManager";
 
 export interface CoreComponents {
   budget: Budget;
@@ -19,6 +21,8 @@ export interface CoreComponents {
   parent: Parent;
   position: Position;
   production: Production;
+  selection: Selection;
+  selectionManager: SelectionManager;
   storage: CommodityStorage;
   storageBonus: StorageBonus;
   trade: Trade;

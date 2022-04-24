@@ -10,6 +10,8 @@ import { BudgetPlanningSystem } from "../systems/budgetPlanning";
 import { ProducingSystem } from "../systems/producing";
 import { StorageQuotaPlanningSystem } from "../systems/storageQuotaPlanning";
 import { TradingSystem } from "../systems/trading";
+import { SelectingSystem } from "../systems/selecting";
+import { SelectionManager } from "../components/selection/selectionManager";
 
 export class Sim extends BaseSim {
   entities: Entity[] = [];
@@ -25,11 +27,16 @@ export class Sim extends BaseSim {
   constructor() {
     super();
 
+    const settingsEntity = new Entity(this);
+    settingsEntity.cp.selectionManager = new SelectionManager();
+    this.entities.push(settingsEntity);
+
     this.systems = [
       new BudgetPlanningSystem(this),
       new ProducingSystem(this),
       new StorageQuotaPlanningSystem(this),
       new TradingSystem(this),
+      new SelectingSystem(this),
     ];
   }
 

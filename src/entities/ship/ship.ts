@@ -41,6 +41,7 @@ import {
   getCommoditiesForSell,
   getNeededCommodities,
 } from "../../utils/trading";
+import { Selection } from "../../components/selection/selection";
 
 export interface InitialShipInput {
   name: string;
@@ -79,20 +80,12 @@ export class Ship extends Entity {
 
     this.cp.owner = new Owner();
     this.cp.position = new Position(initial.position);
+    this.cp.selection = new Selection();
     this.cp.storage = new CommodityStorage();
     this.cp.storage.max = initial.storage;
 
     this.sim.ships.push(this);
   }
-
-  select = () => {
-    window.selected = this;
-  };
-
-  focus = () => {
-    this.select();
-    window.renderer.focused = this;
-  };
 
   setCommander = (commander: Facility) => {
     this.commander = commander;

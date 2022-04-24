@@ -9,10 +9,10 @@ const Panel: React.FC = () => {
   const interval = React.useRef<number>();
 
   React.useEffect(() => {
-    interval.current = (setInterval(
+    interval.current = setInterval(
       () => setRender((v) => !v),
       500
-    ) as unknown) as number;
+    ) as unknown as number;
 
     return () => clearInterval(interval.current);
   }, []);
@@ -50,7 +50,14 @@ const Panel: React.FC = () => {
         x10
       </button>
       {!!window.selected && (
-        <button onClick={window.selected.focus} type="button">
+        <button
+          onClick={() => {
+            window.sim.entities.find((e) =>
+              e.hasComponents(["selectionManager"])
+            ).cp.selectionManager.focused = true;
+          }}
+          type="button"
+        >
           focus
         </button>
       )}
