@@ -44,7 +44,7 @@ factions.forEach((faction) => {
       if (hasMineables) {
         const mineOrTrade = new Ship({
           ...(Math.random() > 0.5 ? shipClasses.minerA : shipClasses.minerB),
-          position: matrix([0, 0]),
+          position: matrix([random(-100, 100), random(-100, 100)]),
           sim,
         });
         mineOrTrade.cp.commander = new Parent(facility);
@@ -52,7 +52,7 @@ factions.forEach((faction) => {
       }
       const tradeShip = new Ship({
         ...(Math.random() > 0.5 ? shipClasses.shipA : shipClasses.shipB),
-        position: matrix([0, 0]),
+        position: matrix([random(-100, 100), random(-100, 100)]),
         sim,
       });
       tradeShip.cp.commander = new Parent(facility);
