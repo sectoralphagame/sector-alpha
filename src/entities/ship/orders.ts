@@ -21,7 +21,11 @@ export interface MineOrder {
   targetRock: Asteroid;
 }
 
-export type Order = MoveOrder | TradeOrder | MineOrder;
+export interface HoldPositionOrder {
+  type: "hold";
+}
+
+export type Order = MoveOrder | TradeOrder | MineOrder | HoldPositionOrder;
 
 export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder | null {
   if (order.offer.quantity <= 0) {

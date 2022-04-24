@@ -8,7 +8,8 @@ function getOrderDescription(ship: Ship, order: Order) {
     case "move":
       return "Go to location";
     case "trade":
-      if (order.target === ship.commander) return "Deliver wares to commander";
+      if (order.target === ship.cp.commander.value)
+        return "Deliver wares to commander";
       return `Deliver wares to ${order.target.cp.name.value}`;
     case "mine":
       return `Mine ${order.target.type}`;
@@ -22,17 +23,17 @@ const ShipPanel: React.FC = () => {
 
   return (
     <div>
-      <div>{ship.name}</div>
-      {!!ship.commander && (
+      <div>{ship.cp.name.value}</div>
+      {!!ship.cp.commander && (
         <div>
-          {`Commander: ${ship.commander.cp.name.value}`}
+          {`Commander: ${ship.cp.commander.value.cp.name.value}`}
           <button
             onClick={() => {
               const { selectionManager } = (
                 window.sim.entities as Entity[]
               ).find((e) => e.hasComponents(["selectionManager"])).cp;
 
-              selectionManager.set(ship.commander);
+              selectionManager.set(ship.cp.commander.value);
               selectionManager.focused = true;
             }}
             type="button"

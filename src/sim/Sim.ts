@@ -11,6 +11,7 @@ import { StorageQuotaPlanningSystem } from "../systems/storageQuotaPlanning";
 import { TradingSystem } from "../systems/trading";
 import { SelectingSystem } from "../systems/selecting";
 import { SelectionManager } from "../components/selection";
+import { OrderPlanningSystem } from "../systems/orderPlanning";
 
 export class Sim extends BaseSim {
   entities: Entity[] = [];
@@ -34,6 +35,7 @@ export class Sim extends BaseSim {
       new StorageQuotaPlanningSystem(this),
       new TradingSystem(this),
       new SelectingSystem(this),
+      new OrderPlanningSystem(this),
     ];
   }
 

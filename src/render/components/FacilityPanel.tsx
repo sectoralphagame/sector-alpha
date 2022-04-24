@@ -50,12 +50,12 @@ const FacilityPanel: React.FC = () => {
         </div>
       ))}
       <hr />
-      {window.sim.entities
-        .filter((e) => e?.commander === facility)
+      {(window.sim.entities as Entity[])
+        .filter((e) => e?.cp.commander?.value === facility)
         .map((ship, index) => (
           // eslint-disable-next-line react/no-array-index-key
-          <div key={`${ship.name}-${index}`}>
-            {ship.name}{" "}
+          <div key={`${ship.cp.name.value}-${index}`}>
+            {ship.cp.name.value}{" "}
             <button
               onClick={() => {
                 const { selectionManager } = (

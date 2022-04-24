@@ -1,4 +1,5 @@
 import { add, Matrix, matrix, random, randomInt } from "mathjs";
+import { Parent } from "../components/parent";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
 import { Faction } from "../economy/faction";
 import { Ship } from "../entities/ship";
@@ -46,10 +47,7 @@ factions.forEach((faction) => {
           position: matrix([0, 0]),
           sim,
         });
-        if (mineOrTrade.mining > 0) {
-          mineOrTrade.mainOrder = "mine";
-        }
-        mineOrTrade.setCommander(facility);
+        mineOrTrade.cp.commander = new Parent(facility);
         mineOrTrade.components.owner.set(faction);
       }
       const tradeShip = new Ship({
@@ -57,7 +55,7 @@ factions.forEach((faction) => {
         position: matrix([0, 0]),
         sim,
       });
-      tradeShip.setCommander(facility);
+      tradeShip.cp.commander = new Parent(facility);
       tradeShip.components.owner.set(faction);
     } while (Math.random() < 0.15);
 

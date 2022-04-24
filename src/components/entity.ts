@@ -11,9 +11,12 @@ import { Modules } from "./modules";
 import { Name } from "./name";
 import { Selection, SelectionManager } from "./selection";
 import { Render } from "./render";
+import { AutoOrder } from "./autoOrder";
 
 export interface CoreComponents {
+  autoOrder: AutoOrder;
   budget: Budget;
+  commander: Parent; // Essentially the same
   compoundProduction: CompoundProduction;
   modules: Modules;
   name: Name;
@@ -43,7 +46,7 @@ export class Entity {
     return this.components;
   }
 
-  hasComponents(components: Array<keyof CoreComponents>): boolean {
+  hasComponents(components: Readonly<Array<keyof CoreComponents>>): boolean {
     return components.every((name) => !!this.components[name]);
   }
 }
