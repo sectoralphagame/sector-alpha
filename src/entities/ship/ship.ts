@@ -40,7 +40,7 @@ import {
   getCommoditiesForSell,
   getNeededCommodities,
 } from "../../utils/trading";
-import { Selection } from "../../components/selection/selection";
+import { Selection } from "../../components/selection";
 import { Facility } from "../../archetypes/facility";
 import { Render } from "../../components/render";
 

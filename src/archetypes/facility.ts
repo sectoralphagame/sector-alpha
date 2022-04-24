@@ -6,7 +6,7 @@ import { Owner } from "../components/owner";
 import { Position } from "../components/position";
 import { CompoundProduction } from "../components/production";
 import { Render } from "../components/render";
-import { Selection } from "../components/selection/selection";
+import { Selection } from "../components/selection";
 import { CommodityStorage } from "../components/storage";
 import { Trade } from "../components/trade";
 import { Sim } from "../sim";

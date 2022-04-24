@@ -9,8 +9,7 @@ import { Parent } from "./parent";
 import { StorageBonus } from "./storageBonus";
 import { Modules } from "./modules";
 import { Name } from "./name";
-import { Selection } from "./selection/selection";
-import { SelectionManager } from "./selection/selectionManager";
+import { Selection, SelectionManager } from "./selection";
 import { Render } from "./render";
 
 export interface CoreComponents {

@@ -1,5 +1,7 @@
-import { Sim } from "../../sim";
-import { Entity } from "../entity";
+import { Sim } from "../sim";
+import { Entity } from "./entity";
+
+export class Selection {}
 
 let entityCounter = 0;
 

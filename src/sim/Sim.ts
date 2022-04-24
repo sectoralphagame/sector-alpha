@@ -10,7 +10,7 @@ import { ProducingSystem } from "../systems/producing";
 import { StorageQuotaPlanningSystem } from "../systems/storageQuotaPlanning";
 import { TradingSystem } from "../systems/trading";
 import { SelectingSystem } from "../systems/selecting";
-import { SelectionManager } from "../components/selection/selectionManager";
+import { SelectionManager } from "../components/selection";
 
 export class Sim extends BaseSim {
   entities: Entity[] = [];
