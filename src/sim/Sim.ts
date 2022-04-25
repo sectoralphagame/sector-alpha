@@ -13,6 +13,7 @@ import { SelectingSystem } from "../systems/selecting";
 import { SelectionManager } from "../components/selection";
 import { OrderPlanningSystem } from "../systems/orderPlanning";
 import { MovingSystem } from "../systems/moving";
+import { MiningSystem } from "../systems/mining";
 
 export class Sim extends BaseSim {
   entities: Entity[] = [];
@@ -38,6 +39,7 @@ export class Sim extends BaseSim {
       new SelectingSystem(this),
       new OrderPlanningSystem(this),
       new MovingSystem(this),
+      new MiningSystem(this),
     ];
   }
 

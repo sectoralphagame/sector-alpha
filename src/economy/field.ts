@@ -8,6 +8,7 @@ export interface FocusPoint {
 }
 
 export interface Asteroid {
+  field: AsteroidField;
   mined: number | null;
   position: Matrix;
 }
@@ -129,6 +130,7 @@ export function getRandomAsteroidField(): AsteroidField {
 
           return {
             mined: null,
+            field,
             position: add(
               p.position,
               matrix([

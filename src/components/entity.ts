@@ -13,6 +13,7 @@ import { Selection, SelectionManager } from "./selection";
 import { Render } from "./render";
 import { AutoOrder } from "./autoOrder";
 import { Drive } from "./drive";
+import { Mining } from "./mining";
 
 export interface CoreComponents {
   autoOrder: AutoOrder;
@@ -20,6 +21,7 @@ export interface CoreComponents {
   commander: Parent; // Essentially the same
   compoundProduction: CompoundProduction;
   drive: Drive;
+  mining: Mining;
   modules: Modules;
   name: Name;
   owner: Owner;

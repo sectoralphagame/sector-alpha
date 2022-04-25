@@ -20,6 +20,7 @@ import { Render } from "../../components/render";
 import { AutoOrder } from "../../components/autoOrder";
 import { Name } from "../../components/name";
 import { Drive, ShipDriveProps } from "../../components/drive";
+import { Mining } from "../../components/mining";
 
 export interface InitialShipInput {
   name: string;
@@ -33,8 +34,6 @@ export interface InitialShipInput {
 export class Ship extends Entity {
   orders: Order[];
   cooldowns: Cooldowns<"retryOrder" | "autoOrder" | "mine" | "cruise">;
-  mining: number;
-  mined: number;
   retryOrderCounter: number = 0;
 
   constructor(initial: InitialShipInput) {
@@ -42,13 +41,12 @@ export class Ship extends Entity {
 
     this.orders = [];
     this.cooldowns = new Cooldowns("retryOrder", "autoOrder", "mine", "cruise");
-    this.mining = initial.mining;
-    this.mined = 0;
 
     this.cp.autoOrder = new AutoOrder(initial.mining ? "mine" : "trade");
     this.cp.drive = new Drive(initial.drive);
     this.cp.name = new Name(initial.name);
     this.cp.owner = new Owner();
+    this.cp.mining = new Mining(initial.mining);
     this.cp.position = new Position(initial.position);
     this.cp.render = new Render(0.5, 0.9);
     this.cp.selection = new Selection();
@@ -204,7 +202,7 @@ export class Ship extends Entity {
     return true;
   };
 
-  mineOrder = (delta: number, order: MineOrder): boolean => {
+  mineOrder = (_: number, order: MineOrder): boolean => {
     if (
       !order.targetRock ||
       (order.targetRock.mined !== null && order.targetRock.mined !== this.id)
@@ -219,19 +217,11 @@ export class Ship extends Entity {
     this.cp.drive.setTarget(order.targetRock.position);
 
     if (this.cp.drive.targetReached) {
-      if (this.cooldowns.canUse("mine")) {
-        this.cooldowns.use("mine", 5);
-        this.cp.storage.addStorage(
-          order.target.type,
-          Math.floor(this.mined),
-          false
-        );
-        this.mined = 0;
-      }
+      this.cp.mining.asteroid = order.targetRock;
       order.targetRock.mined = this.id;
-      this.mined += this.mining * delta;
 
       if (this.cp.storage.getAvailableSpace() === 0) {
+        this.cp.mining.asteroid = null;
         order.targetRock.mined = null;
         return true;
       }
