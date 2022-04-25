@@ -1,5 +1,4 @@
 import { Faction } from "../economy/faction";
-import { AsteroidField } from "../economy/field";
 import { Entity } from "../components/entity";
 import { Ship } from "../entities/ship";
 import { World } from "../world";
@@ -19,7 +18,6 @@ export class Sim extends BaseSim {
   entities: Entity[] = [];
   factions: Faction[] = [];
   ships: Ship[] = [];
-  fields: AsteroidField[] = [];
 
   entityIdCounter: number = 0;
 
@@ -51,7 +49,6 @@ export class Sim extends BaseSim {
 
   load = (world: World) => {
     this.factions = world.factions;
-    this.fields = world.fields;
   };
 
   next = (delta: number) => {

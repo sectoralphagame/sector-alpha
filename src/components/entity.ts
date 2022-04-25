@@ -14,13 +14,19 @@ import { Render } from "./render";
 import { AutoOrder } from "./autoOrder";
 import { Drive } from "./drive";
 import { Mining } from "./mining";
+import { Minable } from "./minable";
+import { AsteroidSpawn } from "./asteroidSpawn";
+import { Children } from "./children";
 
 export interface CoreComponents {
+  asteroidSpawn: AsteroidSpawn;
   autoOrder: AutoOrder;
   budget: Budget;
+  children: Children;
   commander: Parent; // Essentially the same
   compoundProduction: CompoundProduction;
   drive: Drive;
+  minable: Minable;
   mining: Mining;
   modules: Modules;
   name: Name;

@@ -205,7 +205,8 @@ export class Ship extends Entity {
   mineOrder = (_: number, order: MineOrder): boolean => {
     if (
       !order.targetRock ||
-      (order.targetRock.mined !== null && order.targetRock.mined !== this.id)
+      (order.targetRock.cp.minable.minedBy !== null &&
+        order.targetRock.cp.minable.minedBy !== this)
     ) {
       order.targetRock = getClosestMineableAsteroid(
         order.target,
@@ -214,15 +215,15 @@ export class Ship extends Entity {
       if (!order.targetRock) return false;
     }
 
-    this.cp.drive.setTarget(order.targetRock.position);
+    this.cp.drive.setTarget(order.targetRock);
 
     if (this.cp.drive.targetReached) {
       this.cp.mining.asteroid = order.targetRock;
-      order.targetRock.mined = this.id;
+      order.targetRock.cp.minable.setMinedBy(this);
 
       if (this.cp.storage.getAvailableSpace() === 0) {
-        this.cp.mining.asteroid = null;
-        order.targetRock.mined = null;
+        this.cp.mining.clearAsteroid();
+        order.targetRock.cp.minable.clearMinedBy();
         return true;
       }
     }

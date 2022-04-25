@@ -12,7 +12,7 @@ function getOrderDescription(ship: Ship, order: Order) {
         return "Deliver wares to commander";
       return `Deliver wares to ${order.target.cp.name.value}`;
     case "mine":
-      return `Mine ${order.target.type}`;
+      return `Mine ${order.target.cp.asteroidSpawn.type}`;
     default:
       return "Hold position";
   }

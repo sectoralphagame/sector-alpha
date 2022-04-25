@@ -1,11 +1,11 @@
 import P5, { Camera } from "p5";
 import Color from "color";
 import { Sim } from "../sim";
-import { limitMin } from "../utils/limit";
+import { limit } from "../utils/limit";
 import "./components/Panel";
-import { MineableCommodity } from "../economy/commodity";
 
 const zMin = 90;
+const zMax = 1200;
 
 class RenderCamera {
   x = 0;
@@ -39,7 +39,7 @@ class RenderCamera {
   move({ x, y, z }: Partial<RenderCamera>) {
     if (x) this.x -= x;
     if (y) this.y -= y;
-    if (z) this.z = limitMin(z / 10 + this.z, zMin);
+    if (z) this.z = limit(z / 10 + this.z, zMin, zMax);
     this.updateViewport();
   }
 
@@ -63,13 +63,6 @@ class RenderCamera {
     ];
   }
 }
-
-const fieldColors: Record<MineableCommodity, string> = {
-  fuelium: "#ffab6b",
-  gold: "#ffe46b",
-  ice: "#e8ffff",
-  ore: "#ff5c7a",
-};
 
 export function render(sim: Sim, parent: Element) {
   window.renderer = {};
@@ -100,49 +93,14 @@ export function render(sim: Sim, parent: Element) {
       }
       p5.background("black");
 
-      sim.fields.forEach((field) => {
-        const color = Color(fieldColors[field.type]).unitArray();
-        p5.fill(color[0] * 256, color[1] * 256, color[2] * 256, 64);
-        p5.noStroke();
-        p5.beginShape();
-
-        field.outline.forEach((point) => {
-          p5.curveVertex(point.get([0]) * 10, point.get([1]) * 10);
-        });
-
-        p5.curveVertex(
-          field.outline[0].get([0]) * 10,
-          field.outline[0].get([1]) * 10
-        );
-        p5.curveVertex(
-          field.outline[1].get([0]) * 10,
-          field.outline[1].get([1]) * 10
-        );
-        p5.curveVertex(
-          field.outline[2].get([0]) * 10,
-          field.outline[2].get([1]) * 10
-        );
-        p5.endShape();
-
-        if (camera.scale > 5) {
-          p5.fill(color[0] * 256, color[1] * 256, color[2] * 256, 128);
-          field.asteroids.forEach((rock) => {
-            p5.circle(
-              rock.position.get([0]) * 10,
-              rock.position.get([1]) * 10,
-              0.5
-            );
-          });
-        }
-      });
-
       sim.entities
         .filter((e) => e.hasComponents(["render"]))
         .forEach((entity) => {
-          if (camera.scale < entity.cp.render.minScale) return;
-
           const selected = settingsEntity.cp.selectionManager.entity === entity;
-          const baseColor = entity.cp.owner?.value.color ?? "#dddddd";
+          if (camera.scale < entity.cp.render.minScale && !selected) return;
+
+          const baseColor =
+            entity.cp.render.color ?? entity.cp.owner?.value.color ?? "#dddddd";
           const color =
             settingsEntity.cp.selectionManager.entity === entity
               ? Color(baseColor).lighten(0.2).unitArray()

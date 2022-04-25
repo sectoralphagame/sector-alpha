@@ -10,7 +10,7 @@ function mine(entity: WithMining, delta: number) {
     if (entity.cp.mining.cooldowns.canUse("mine")) {
       entity.cp.mining.cooldowns.use("mine", 5);
       entity.cp.storage.addStorage(
-        entity.cp.mining.asteroid.field.type,
+        entity.cp.mining.asteroid.cp.minable.commodity,
         Math.floor(entity.cp.mining.buffer),
         false
       );

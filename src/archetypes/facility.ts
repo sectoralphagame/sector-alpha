@@ -26,7 +26,7 @@ export const facilityComponents = [
   "trade",
 ] as const;
 
-// Ugly hack to transfform facilityComponents array type to string union
+// Ugly hack to transform facilityComponents array type to string union
 const widenType = [...facilityComponents][0];
 export type FacilityComponent = typeof widenType;
 export type Facility = RequireComponent<FacilityComponent>;

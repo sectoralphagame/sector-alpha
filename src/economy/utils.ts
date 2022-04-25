@@ -3,11 +3,12 @@ import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
 import { map } from "lodash";
 import { sim } from "../sim";
-import { Asteroid, AsteroidField } from "./field";
 import { Commodity } from "./commodity";
 import { Entity } from "../components/entity";
 import { Facility } from "../archetypes/facility";
 import { RequireComponent } from "../tsHelpers";
+import { AsteroidField } from "../archetypes/asteroidField";
+import { asteroid, Asteroid } from "../archetypes/asteroid";
 
 type WithTrade = RequireComponent<"trade" | "storage">;
 
@@ -60,8 +61,10 @@ export function getClosestMineableAsteroid(
   position: Matrix
 ): Asteroid {
   return minBy(
-    field.asteroids.filter((r) => !r.mined),
-    (r) => norm(subtract(position, r.position) as Matrix)
+    field.components.children.value
+      .map(asteroid)
+      .filter((a) => !a.components.minable.minedBy),
+    (r) => norm(subtract(position, asteroid(r).cp.position.value) as Matrix)
   );
 }
 

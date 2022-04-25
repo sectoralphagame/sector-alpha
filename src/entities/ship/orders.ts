@@ -1,7 +1,8 @@
 import { Matrix } from "mathjs";
+import { Asteroid } from "../../archetypes/asteroid";
+import { AsteroidField } from "../../archetypes/asteroidField";
 import { Facility } from "../../archetypes/facility";
 import { TransactionInput } from "../../components/trade";
-import { Asteroid, AsteroidField } from "../../economy/field";
 import { NegativeQuantity } from "../../errors";
 
 export interface MoveOrder {

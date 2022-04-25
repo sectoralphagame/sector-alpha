@@ -1,3 +1,4 @@
+import { asteroidField } from "../archetypes/asteroidField";
 import { facility } from "../archetypes/facility";
 import { mineableCommodities } from "../economy/commodity";
 import { getClosestMineableAsteroid } from "../economy/utils";
@@ -47,7 +48,9 @@ function autoMine(entity: Ship) {
     );
 
     if (mineable) {
-      const field = entity.sim.fields.find((f) => f.type === mineable);
+      const field = asteroidField(
+        entity.sim.entities.find((e) => e.cp.asteroidSpawn?.type === mineable)
+      );
       const rock = getClosestMineableAsteroid(field, entity.cp.position.value);
 
       if (rock) {
