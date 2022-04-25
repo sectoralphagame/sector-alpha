@@ -12,12 +12,14 @@ import { Name } from "./name";
 import { Selection, SelectionManager } from "./selection";
 import { Render } from "./render";
 import { AutoOrder } from "./autoOrder";
+import { Drive } from "./drive";
 
 export interface CoreComponents {
   autoOrder: AutoOrder;
   budget: Budget;
   commander: Parent; // Essentially the same
   compoundProduction: CompoundProduction;
+  drive: Drive;
   modules: Modules;
   name: Name;
   owner: Owner;
