@@ -14,7 +14,7 @@ import { SelectionManager } from "../components/selection";
 import { OrderPlanningSystem } from "../systems/orderPlanning";
 import { MovingSystem } from "../systems/moving";
 import { MiningSystem } from "../systems/mining";
-import { RenderingSystem } from "../systems/render";
+import { RenderingSystem } from "../systems/rendering";
 import { createQueries, Queries } from "../systems/query";
 
 export class Sim extends BaseSim {
