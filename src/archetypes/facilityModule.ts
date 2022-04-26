@@ -18,14 +18,14 @@ export type FacilityModule = RequireComponent<"parent">;
 
 export function createFacilityModule(sim: Sim, input: ProductionModuleInput) {
   const entity = new Entity(sim);
-  entity.cp.parent = new Parent(input.parent);
-  entity.cp.name = new Name(input.name);
+  entity.addComponent("parent", new Parent(input.parent));
+  entity.addComponent("name", new Name(input.name));
   if (input.pac && input.time) {
-    entity.cp.production = new Production(input.time, input.pac);
+    entity.addComponent("production", new Production(input.time, input.pac));
   }
 
   if (input.storage) {
-    entity.cp.storageBonus = new StorageBonus(input.storage);
+    entity.addComponent("storageBonus", new StorageBonus(input.storage));
   }
 
   return entity as FacilityModule;

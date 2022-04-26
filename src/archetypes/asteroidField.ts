@@ -1,7 +1,7 @@
 import { Matrix } from "mathjs";
 import { AsteroidSpawn } from "../components/asteroidSpawn";
 import { Children } from "../components/children";
-import { CoreComponents, Entity } from "../components/entity";
+import { Entity } from "../components/entity";
 import { Position } from "../components/position";
 import { MineableCommodity } from "../economy/commodity";
 import { MissingComponentError } from "../errors";
@@ -19,6 +19,14 @@ const widenType = [...asteroidFieldComponents][0];
 export type AsteroidFieldComponent = typeof widenType;
 export type AsteroidField = RequireComponent<AsteroidFieldComponent>;
 
+export function asteroidField(entity: Entity): AsteroidField {
+  if (!entity.hasComponents(asteroidFieldComponents)) {
+    throw new MissingComponentError(entity, asteroidFieldComponents);
+  }
+
+  return entity as AsteroidField;
+}
+
 export function createAsteroidField(
   sim: Sim,
   type: MineableCommodity,
@@ -27,20 +35,9 @@ export function createAsteroidField(
 ) {
   const entity = new Entity(sim);
 
-  const components: Pick<CoreComponents, AsteroidFieldComponent> = {
-    asteroidSpawn: new AsteroidSpawn(type, size),
-    children: new Children(),
-    position: new Position(position),
-  };
-  entity.components = components;
+  entity.addComponent("asteroidSpawn", new AsteroidSpawn(type, size));
+  entity.addComponent("children", new Children());
+  entity.addComponent("position", new Position(position));
 
-  return entity as AsteroidField;
-}
-
-export function asteroidField(entity: Entity): AsteroidField {
-  if (!entity.hasComponents(asteroidFieldComponents)) {
-    throw new MissingComponentError(entity, asteroidFieldComponents);
-  }
-
-  return entity as AsteroidField;
+  return asteroidField(entity);
 }

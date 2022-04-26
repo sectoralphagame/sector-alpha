@@ -47,7 +47,7 @@ factions.forEach((faction) => {
           position: matrix([random(-100, 100), random(-100, 100)]),
           sim,
         });
-        mineOrTrade.cp.commander = new Parent(facility);
+        mineOrTrade.addComponent("commander", new Parent(facility));
         mineOrTrade.components.owner.set(faction);
       }
       const tradeShip = new Ship({
@@ -55,7 +55,7 @@ factions.forEach((faction) => {
         position: matrix([random(-100, 100), random(-100, 100)]),
         sim,
       });
-      tradeShip.cp.commander = new Parent(facility);
+      tradeShip.addComponent("commander", new Parent(facility));
       tradeShip.components.owner.set(faction);
     } while (Math.random() < 0.15);
 

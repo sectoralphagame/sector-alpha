@@ -42,15 +42,19 @@ export class Ship extends Entity {
     this.orders = [];
     this.cooldowns = new Cooldowns("retryOrder", "autoOrder", "mine", "cruise");
 
-    this.cp.autoOrder = new AutoOrder(initial.mining ? "mine" : "trade");
-    this.cp.drive = new Drive(initial.drive);
-    this.cp.name = new Name(initial.name);
-    this.cp.owner = new Owner();
-    this.cp.mining = new Mining(initial.mining);
-    this.cp.position = new Position(initial.position);
-    this.cp.render = new Render(0.5, 0.9);
-    this.cp.selection = new Selection();
-    this.cp.storage = new CommodityStorage();
+    this.addComponent(
+      "autoOrder",
+      new AutoOrder(initial.mining ? "mine" : "trade")
+    );
+    this.addComponent("drive", new Drive(initial.drive));
+    this.addComponent("name", new Name(initial.name));
+    this.addComponent("owner", new Owner());
+    this.addComponent("mining", new Mining(initial.mining));
+    this.addComponent("position", new Position(initial.position));
+    this.addComponent("render", new Render(0.5, 0.9));
+    this.addComponent("selection", new Selection());
+    this.addComponent("storage", new CommodityStorage());
+
     this.cp.storage.max = initial.storage;
 
     this.sim.ships.push(this);

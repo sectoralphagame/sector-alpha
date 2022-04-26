@@ -1,5 +1,5 @@
 import { Budget } from "../components/budget";
-import { CoreComponents, Entity } from "../components/entity";
+import { Entity } from "../components/entity";
 import { Modules } from "../components/modules";
 import { Name } from "../components/name";
 import { Owner } from "../components/owner";
@@ -31,30 +31,27 @@ const widenType = [...facilityComponents][0];
 export type FacilityComponent = typeof widenType;
 export type Facility = RequireComponent<FacilityComponent>;
 
-export function createFacility(sim: Sim) {
-  const entity = new Entity(sim);
-
-  const components: Pick<CoreComponents, FacilityComponent> = {
-    budget: new Budget(),
-    compoundProduction: new CompoundProduction(),
-    modules: new Modules(),
-    name: new Name(`Facility #${entity.id}`),
-    owner: new Owner(),
-    position: new Position(),
-    render: new Render(2, 0.7),
-    selection: new Selection(),
-    storage: new CommodityStorage(),
-    trade: new Trade(),
-  };
-  entity.components = components;
-
-  return entity as Facility;
-}
-
 export function facility(entity: Entity): Facility {
   if (!entity.hasComponents(facilityComponents)) {
     throw new MissingComponentError(entity, facilityComponents);
   }
 
   return entity as Facility;
+}
+
+export function createFacility(sim: Sim) {
+  const entity = new Entity(sim);
+
+  entity.addComponent("budget", new Budget());
+  entity.addComponent("compoundProduction", new CompoundProduction());
+  entity.addComponent("modules", new Modules());
+  entity.addComponent("name", new Name(`Facility #${entity.id}`));
+  entity.addComponent("owner", new Owner());
+  entity.addComponent("position", new Position());
+  entity.addComponent("render", new Render(2, 0.7));
+  entity.addComponent("selection", new Selection());
+  entity.addComponent("storage", new CommodityStorage());
+  entity.addComponent("trade", new Trade());
+
+  return facility(entity);
 }

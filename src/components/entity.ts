@@ -59,4 +59,15 @@ export class Entity {
   hasComponents(components: Readonly<Array<keyof CoreComponents>>): boolean {
     return components.every((name) => !!this.components[name]);
   }
+
+  addComponent<T extends keyof CoreComponents>(
+    name: T,
+    component: CoreComponents[T]
+  ) {
+    this.components[name] = component;
+  }
+
+  removeComponent(name: keyof CoreComponents) {
+    delete this.components[name];
+  }
 }

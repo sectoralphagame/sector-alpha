@@ -1,5 +1,5 @@
 import { Matrix } from "mathjs";
-import { CoreComponents, Entity } from "../components/entity";
+import { Entity } from "../components/entity";
 import { Minable } from "../components/minable";
 import { Parent } from "../components/parent";
 import { Position } from "../components/position";
@@ -28,6 +28,14 @@ const fieldColors: Record<MineableCommodity, string> = {
   ore: "#ff5c7a",
 };
 
+export function asteroid(entity: Entity): Asteroid {
+  if (!entity.hasComponents(asteroidComponents)) {
+    throw new MissingComponentError(entity, asteroidComponents);
+  }
+
+  return entity as Asteroid;
+}
+
 export function createAsteroid(
   sim: Sim,
   parent: RequireComponent<"asteroidSpawn">,
@@ -36,22 +44,12 @@ export function createAsteroid(
   const entity = new Entity(sim);
   const type = parent.cp.asteroidSpawn.type;
 
-  const components: Pick<CoreComponents, AsteroidComponent> = {
-    minable: new Minable(type),
-    parent: new Parent(parent),
-    position: new Position(position),
-    render: new Render(0.2, 1.5, fieldColors[type]),
-  };
-  entity.components = components;
+  entity.addComponent("minable", new Minable(type));
+  entity.addComponent("parent", new Parent(parent));
+  entity.addComponent("position", new Position(position));
+  entity.addComponent("render", new Render(0.2, 1.5, fieldColors[type]));
+
   parent.components.children.add(entity as RequireComponent<"parent">);
 
-  return entity as Asteroid;
-}
-
-export function asteroid(entity: Entity): Asteroid {
-  if (!entity.hasComponents(asteroidComponents)) {
-    throw new MissingComponentError(entity, asteroidComponents);
-  }
-
-  return entity as Asteroid;
+  return asteroid(entity);
 }
