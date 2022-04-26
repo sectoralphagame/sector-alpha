@@ -67,6 +67,7 @@ class RenderCamera {
 
 export class RenderingSystem extends System {
   parent: Element;
+  p5: P5;
 
   constructor(sim: Sim) {
     super(sim);
@@ -76,8 +77,7 @@ export class RenderingSystem extends System {
   }
 
   init = () => {
-    // eslint-disable-next-line no-new
-    new P5((p5: P5) => {
+    this.p5 = new P5((p5: P5) => {
       let camera: RenderCamera;
       const settingsEntity = this.sim.entities.find((e) =>
         e.hasComponents(["selectionManager"])
