@@ -21,12 +21,7 @@ function mine(entity: WithMining, delta: number) {
 }
 
 export class MiningSystem extends System {
-  query = () =>
-    this.sim.entities.filter((e) =>
-      e.hasComponents(["mining", "storage"])
-    ) as WithMining[];
-
   exec = (delta: number): void => {
-    this.query().forEach((entity) => mine(entity, delta));
+    this.sim.queries.mining.get().forEach((entity) => mine(entity, delta));
   };
 }

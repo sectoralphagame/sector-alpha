@@ -1,77 +1,22 @@
-import P5, { Camera } from "p5";
+import P5 from "p5";
 import Color from "color";
 import { Sim } from "../../sim";
-import { limit } from "../../utils/limit";
 import "./components/Panel";
 import { System } from "../system";
-
-const zMin = 90;
-const zMax = 1200;
-
-class RenderCamera {
-  x = 0;
-  y = 0;
-  z = 0;
-  camera: Camera;
-  p5: P5;
-
-  w: number;
-  h: number;
-  scale: number;
-
-  constructor(p5: P5) {
-    this.p5 = p5;
-    this.camera = p5.createCamera();
-    this.move({ x: this.x, y: this.y, z: 1e4 });
-  }
-
-  updateViewport() {
-    this.camera.lookAt(this.x, this.y, 0);
-    this.camera.setPosition(this.x, this.y, this.z);
-    this.w =
-      2 *
-      (this.camera as any).aspectRatio *
-      this.z *
-      Math.tan((this.camera as any).cameraFOV / 2);
-    this.h = this.w / (this.camera as any).aspectRatio;
-    this.scale = this.p5.width / this.w;
-  }
-
-  move({ x, y, z }: Partial<RenderCamera>) {
-    if (x) this.x -= x;
-    if (y) this.y -= y;
-    if (z) this.z = limit(z / 10 + this.z, zMin, zMax);
-    this.updateViewport();
-  }
-
-  lookAt(x: number, y: number): void {
-    this.x = x * 10;
-    this.y = y * 10;
-    this.updateViewport();
-  }
-
-  translateScreenToCanvas(x: number, y: number): [number, number] {
-    return [
-      x / this.scale - this.w / 2 + this.x,
-      y / this.scale - this.h / 2 + this.y,
-    ];
-  }
-
-  translateCanvasToScreen(x: number, y: number): [number, number] {
-    return [
-      this.scale * (x + this.w / 2 - this.x),
-      this.scale * (y + this.h / 2 - this.y),
-    ];
-  }
-}
+import { RenderCamera, zMin } from "./camera";
+import { Query } from "../query";
 
 export class RenderingSystem extends System {
+  renderable: Query<"render" | "position">;
+  selectable: Query<"selection" | "position">;
   parent: Element;
   p5: P5;
 
   constructor(sim: Sim) {
     super(sim);
     this.parent = document.querySelector("#canvasRoot");
+    this.renderable = new Query(sim, ["render", "position"]);
+    this.selectable = new Query(sim, ["selection", "position"]);
 
     this.init();
   }
@@ -79,9 +24,7 @@ export class RenderingSystem extends System {
   init = () => {
     this.p5 = new P5((p5: P5) => {
       let camera: RenderCamera;
-      const settingsEntity = this.sim.entities.find((e) =>
-        e.hasComponents(["selectionManager"])
-      );
+      const settingsEntity = this.sim.queries.selectionManager.get()[0];
 
       p5.setup = () => {
         const canvas = p5.createCanvas(
@@ -102,29 +45,24 @@ export class RenderingSystem extends System {
         }
         p5.background("black");
 
-        this.sim.entities
-          .filter((e) => e.hasComponents(["render"]))
-          .forEach((entity) => {
-            const selected =
-              settingsEntity.cp.selectionManager.entity === entity;
-            if (camera.scale < entity.cp.render.minScale && !selected) return;
+        this.renderable.get().forEach((entity) => {
+          const selected = settingsEntity.cp.selectionManager.entity === entity;
+          if (camera.scale < entity.cp.render.minScale && !selected) return;
 
-            const baseColor =
-              entity.cp.render.color ??
-              entity.cp.owner?.value.color ??
-              "#dddddd";
-            const color =
-              settingsEntity.cp.selectionManager.entity === entity
-                ? Color(baseColor).lighten(0.2).unitArray()
-                : Color(baseColor).unitArray();
-            p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
-            p5.noStroke();
-            p5.circle(
-              entity.cp.position.x * 10,
-              entity.cp.position.y * 10,
-              (camera.z / zMin) * (selected ? 1.3 : 1) * entity.cp.render.size
-            );
-          });
+          const baseColor =
+            entity.cp.render.color ?? entity.cp.owner?.value.color ?? "#dddddd";
+          const color =
+            settingsEntity.cp.selectionManager.entity === entity
+              ? Color(baseColor).lighten(0.2).unitArray()
+              : Color(baseColor).unitArray();
+          p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
+          p5.noStroke();
+          p5.circle(
+            entity.cp.position.x * 10,
+            entity.cp.position.y * 10,
+            (camera.z / zMin) * (selected ? 1.3 : 1) * entity.cp.render.size
+          );
+        });
       };
 
       p5.mouseWheel = (event: { delta: number }) => {
@@ -142,7 +80,7 @@ export class RenderingSystem extends System {
       };
 
       p5.mouseClicked = () => {
-        const clickables = this.sim.entities.filter((e) => e.cp.selection);
+        const clickables = this.selectable.get().filter((e) => e.cp.selection);
         const clicked = clickables.find((entity) => {
           const [x, y] = camera.translateScreenToCanvas(p5.mouseX, p5.mouseY);
           return (

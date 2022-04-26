@@ -30,13 +30,14 @@ export function getFacilityWithMostProfit(
 
   const sortedByProfit = sortBy(
     (
-      sim.entities.filter(
-        (f) =>
-          f.hasComponents(["trade", "storage"]) &&
-          f.components.trade.offers[commodity].type !==
-            facility.components.trade.offers[commodity].type &&
-          f.components.trade.offers[commodity].quantity > 0
-      ) as WithTrade[]
+      sim.queries.trading
+        .get()
+        .filter(
+          (f) =>
+            f.components.trade.offers[commodity].type !==
+              facility.components.trade.offers[commodity].type &&
+            f.components.trade.offers[commodity].quantity > 0
+        ) as WithTrade[]
     ).map((f) => ({
       facility: f,
       profit: profit(f),

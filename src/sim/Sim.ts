@@ -15,6 +15,7 @@ import { OrderPlanningSystem } from "../systems/orderPlanning";
 import { MovingSystem } from "../systems/moving";
 import { MiningSystem } from "../systems/mining";
 import { RenderingSystem } from "../systems/render";
+import { createQueries, Queries } from "../systems/query";
 
 export class Sim extends BaseSim {
   ships: Ship[] = [];
@@ -25,6 +26,7 @@ export class Sim extends BaseSim {
   factions: Faction[] = [];
   entities: Entity[] = [];
   systems: System[];
+  queries: Queries;
 
   constructor() {
     super();
@@ -33,6 +35,8 @@ export class Sim extends BaseSim {
 
     const settingsEntity = new Entity(this);
     settingsEntity.cp.selectionManager = new SelectionManager();
+
+    this.queries = createQueries(this);
 
     this.systems = [
       new BudgetPlanningSystem(this),

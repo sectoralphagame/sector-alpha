@@ -1,5 +1,4 @@
 import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
 import { perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
@@ -12,17 +11,12 @@ export class StorageQuotaPlanningSystem extends System {
     this.cooldowns = new Cooldowns("settle");
   }
 
-  query = () =>
-    this.sim.entities.filter((e) => e.hasComponents(["storage"])) as Array<
-      RequireComponent<"storage">
-    >;
-
   exec = (delta: number): void => {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("settle")) {
       this.cooldowns.use("settle", 20);
-      this.query().forEach((entity) => {
+      this.sim.queries.storageAndTrading.get().forEach((entity) => {
         const hasProduction =
           entity.hasComponents(["production"]) ||
           entity.hasComponents(["compoundProduction"]);

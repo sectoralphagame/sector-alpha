@@ -49,7 +49,9 @@ function autoMine(entity: Ship) {
 
     if (mineable) {
       const field = asteroidField(
-        entity.sim.entities.find((e) => e.cp.asteroidSpawn?.type === mineable)
+        entity.sim.queries.asteroidFields
+          .get()
+          .find((e) => e.cp.asteroidSpawn?.type === mineable)
       );
       const rock = getClosestMineableAsteroid(field, entity.cp.position.value);
 
@@ -87,17 +89,14 @@ export class OrderPlanningSystem extends System {
     this.cooldowns = new Cooldowns("autoOrder");
   }
 
-  query = () =>
-    this.sim.entities.filter((e) =>
-      e.hasComponents(["autoOrder", "commander"])
-    ) as Ship[];
-
   exec = (delta: number): void => {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("autoOrder")) {
       this.cooldowns.use("autoOrder", 1);
-      this.query().forEach((entity) => autoOrder(entity));
+      this.sim.queries.autoOrderable
+        .get()
+        .forEach((entity) => autoOrder(entity as Ship));
     }
   };
 }

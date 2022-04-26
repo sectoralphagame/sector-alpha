@@ -170,22 +170,17 @@ export class TradingSystem extends System {
     this.cooldowns = new Cooldowns("adjustPrices", "createOffers");
   }
 
-  query = () =>
-    this.sim.entities.filter((e) =>
-      e.hasComponents(["trade", "budget", "storage"])
-    );
-
   exec = (delta: number): void => {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("adjustPrices")) {
       this.cooldowns.use("adjustPrices", 300);
-      this.query().forEach(adjustPrices);
+      this.sim.queries.trading.get().forEach(adjustPrices);
     }
 
     if (this.cooldowns.canUse("createOffers")) {
       this.cooldowns.use("createOffers", 2);
-      this.query().forEach(createOffers);
+      this.sim.queries.trading.get().forEach(createOffers);
     }
   };
 }

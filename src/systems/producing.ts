@@ -42,18 +42,8 @@ export function isAbleToProduce(
 }
 
 export class ProducingSystem extends System {
-  queryStandaloneProduction = () =>
-    this.sim.entities.filter((e) =>
-      e.hasComponents(["production", "storage"])
-    ) as Array<RequireComponent<"production" | "storage">>;
-
-  queryProductionByModules = () =>
-    this.sim.entities.filter((e) =>
-      e.hasComponents(["production", "parent"])
-    ) as Array<RequireComponent<"production" | "parent">>;
-
   exec = (delta: number): void => {
-    this.queryStandaloneProduction().forEach((entity) => {
+    this.sim.queries.standaloneProduction.get().forEach((entity) => {
       entity.cp.production.cooldowns.update(delta);
 
       if (!isAbleToProduce(entity, entity.cp.storage)) {
@@ -70,7 +60,7 @@ export class ProducingSystem extends System {
       produce(entity.cp.production.pac, storage);
     });
 
-    this.queryProductionByModules().forEach((facilityModule) => {
+    this.sim.queries.productionByModules.get().forEach((facilityModule) => {
       facilityModule.cp.production.cooldowns.update(delta);
 
       if (
