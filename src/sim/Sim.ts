@@ -14,6 +14,7 @@ import { SelectionManager } from "../components/selection";
 import { OrderPlanningSystem } from "../systems/orderPlanning";
 import { MovingSystem } from "../systems/moving";
 import { MiningSystem } from "../systems/mining";
+import { RenderingSystem } from "../systems/render";
 
 export class Sim extends BaseSim {
   ships: Ship[] = [];
@@ -42,6 +43,7 @@ export class Sim extends BaseSim {
       new OrderPlanningSystem(this),
       new MovingSystem(this),
       new MiningSystem(this),
+      new RenderingSystem(this),
     ];
   }
 

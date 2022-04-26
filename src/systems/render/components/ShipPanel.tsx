@@ -1,7 +1,7 @@
 import React from "react";
-import { Entity } from "../../components/entity";
-import { commodities } from "../../economy/commodity";
-import { Order, Ship } from "../../entities/ship";
+import { Entity } from "../../../components/entity";
+import { commodities } from "../../../economy/commodity";
+import { Order, Ship } from "../../../entities/ship";
 
 function getOrderDescription(ship: Ship, order: Order) {
   switch (order.type) {

@@ -1,7 +1,7 @@
 import React from "react";
-import { Facility } from "../../archetypes/facility";
-import { Entity } from "../../components/entity";
-import { commodities } from "../../economy/commodity";
+import { Facility } from "../../../archetypes/facility";
+import { Entity } from "../../../components/entity";
+import { commodities } from "../../../economy/commodity";
 
 const FacilityPanel: React.FC = () => {
   const facility = window.selected as Facility;

@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Ship } from "../../entities/ship";
+import { Ship } from "../../../entities/ship";
 import FacilityPanel from "./FacilityPanel";
 import ShipPanel from "./ShipPanel";
 
@@ -19,7 +19,7 @@ const Panel: React.FC = () => {
 
   return (
     <div>
-      <button onClick={window.sim.pause} type="button">
+      <button onClick={window.sim?.pause} type="button">
         pause
       </button>
       <button
