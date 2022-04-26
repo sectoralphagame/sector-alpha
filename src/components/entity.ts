@@ -65,9 +65,11 @@ export class Entity {
     component: CoreComponents[T]
   ) {
     this.components[name] = component;
+    this.sim.events.emit("add-component", this);
   }
 
   removeComponent(name: keyof CoreComponents) {
     delete this.components[name];
+    this.sim.events.emit("remove-component", { name, entity: this });
   }
 }

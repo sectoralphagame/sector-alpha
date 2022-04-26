@@ -1,5 +1,6 @@
 import { add, divide, Matrix, matrix, multiply, norm, subtract } from "mathjs";
 import { Entity } from "../components/entity";
+import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { System } from "./system";
 
@@ -48,10 +49,32 @@ function move(entity: Driveable, delta: number) {
 }
 
 export class MovingSystem extends System {
-  query = () =>
-    this.sim.entities.filter((e) =>
-      e.hasComponents(["drive", "position"])
-    ) as Driveable[];
+  entities: Driveable[];
+
+  query = () => {
+    if (!this.entities) {
+      this.entities = this.sim.entities.filter((e) =>
+        e.hasComponents(["drive", "position"])
+      ) as Driveable[];
+    }
+
+    return this.entities;
+  };
+
+  constructor(sim: Sim) {
+    super(sim);
+    sim.events.on("add-component", (entity) => {
+      if (this.entities && entity.hasComponents(["drive", "position"])) {
+        this.entities.push(entity);
+      }
+    });
+
+    sim.events.on("remove-component", (payload) => {
+      if (["drive", "position"].includes(payload.name)) {
+        this.entities = this.entities.filter((e) => e.id !== payload.entity.id);
+      }
+    });
+  }
 
   exec = (delta: number): void => {
     this.query().forEach((entity) => move(entity, delta));

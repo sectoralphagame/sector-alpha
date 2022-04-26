@@ -1,3 +1,4 @@
+import EventEmitter from "eventemitter3";
 import { Faction } from "../economy/faction";
 import { Entity } from "../components/entity";
 import { Ship } from "../entities/ship";
@@ -15,16 +16,19 @@ import { MovingSystem } from "../systems/moving";
 import { MiningSystem } from "../systems/mining";
 
 export class Sim extends BaseSim {
-  entities: Entity[] = [];
-  factions: Faction[] = [];
   ships: Ship[] = [];
 
   entityIdCounter: number = 0;
+  events: EventEmitter<"add-component" | "remove-component", Entity>;
 
+  factions: Faction[] = [];
+  entities: Entity[] = [];
   systems: System[];
 
   constructor() {
     super();
+
+    this.events = new EventEmitter();
 
     const settingsEntity = new Entity(this);
     settingsEntity.cp.selectionManager = new SelectionManager();
