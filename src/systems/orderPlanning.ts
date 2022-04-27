@@ -2,24 +2,35 @@ import { asteroidField } from "../archetypes/asteroidField";
 import { facility } from "../archetypes/facility";
 import { mineableCommodities } from "../economy/commodity";
 import { getClosestMineableAsteroid } from "../economy/utils";
-import { mineOrder, Ship } from "../entities/ship";
+import { mineOrder } from "../entities/ship";
 import { Sim } from "../sim";
+import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
-import { getCommoditiesForSell, getNeededCommodities } from "../utils/trading";
+import {
+  autoBuyMostNeededByCommander,
+  autoSellMostRedundantToCommander,
+  getCommoditiesForSell,
+  getNeededCommodities,
+  returnToFacility,
+} from "../utils/trading";
 import { System } from "./system";
 
-function autoTrade(entity: Ship) {
+function autoTrade(
+  entity: RequireComponent<
+    "drive" | "storage" | "autoOrder" | "orders" | "commander"
+  >
+) {
   const commander = facility(entity.cp.commander.value);
 
   if (entity.cp.storage.getAvailableSpace() !== entity.cp.storage.max) {
-    entity.returnToFacility();
+    returnToFacility(entity);
   } else {
     const bought = getNeededCommodities(commander).reduce((acc, commodity) => {
       if (acc) {
         return true;
       }
 
-      return entity.autoBuyMostNeededByCommander(commodity);
+      return autoBuyMostNeededByCommander(entity, commodity);
     }, false);
 
     if (bought) {
@@ -31,16 +42,20 @@ function autoTrade(entity: Ship) {
         return true;
       }
 
-      return entity.autoSellMostRedundantToCommander(commodity);
+      return autoSellMostRedundantToCommander(entity, commodity);
     }, false);
   }
 }
 
-function autoMine(entity: Ship) {
+function autoMine(
+  entity: RequireComponent<
+    "drive" | "storage" | "autoOrder" | "orders" | "commander"
+  >
+) {
   const commander = facility(entity.cp.commander.value);
 
   if (entity.cp.storage.getAvailableSpace() !== entity.cp.storage.max) {
-    entity.returnToFacility();
+    returnToFacility(entity);
   } else {
     const needed = getNeededCommodities(commander);
     const mineable = needed.find((commodity) =>
@@ -56,7 +71,7 @@ function autoMine(entity: Ship) {
       const rock = getClosestMineableAsteroid(field, entity.cp.position.value);
 
       if (rock) {
-        entity.addOrder(
+        entity.cp.orders.value.push(
           mineOrder({
             target: field,
             targetRock: rock,
@@ -67,8 +82,8 @@ function autoMine(entity: Ship) {
   }
 }
 
-function autoOrder(entity: Ship) {
-  if ((entity as Ship).orders.length !== 0) {
+function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
+  if (entity.cp.orders.value.length !== 0) {
     return;
   }
 
@@ -94,9 +109,7 @@ export class OrderPlanningSystem extends System {
 
     if (this.cooldowns.canUse("autoOrder")) {
       this.cooldowns.use("autoOrder", 1);
-      this.sim.queries.autoOrderable
-        .get()
-        .forEach((entity) => autoOrder(entity as Ship));
+      this.sim.queries.autoOrderable.get().forEach(autoOrder);
     }
   };
 }

@@ -16,6 +16,7 @@ import { MovingSystem } from "../systems/moving";
 import { MiningSystem } from "../systems/mining";
 import { RenderingSystem } from "../systems/rendering";
 import { createQueries, Queries } from "../systems/query";
+import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
 
 export class Sim extends BaseSim {
   ships: Ship[] = [];
@@ -48,6 +49,7 @@ export class Sim extends BaseSim {
       new MovingSystem(this),
       new MiningSystem(this),
       new RenderingSystem(this),
+      new OrderExecutingSystem(this),
     ];
   }
 
@@ -62,8 +64,6 @@ export class Sim extends BaseSim {
   };
 
   next = (delta: number) => {
-    this.ships.forEach((ship) => ship.simulate(delta));
-
     this.systems.forEach((s) => s.exec(delta));
   };
 }

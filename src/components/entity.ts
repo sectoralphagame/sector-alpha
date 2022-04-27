@@ -17,6 +17,7 @@ import { Mining } from "./mining";
 import { Minable } from "./minable";
 import { AsteroidSpawn } from "./asteroidSpawn";
 import { Children } from "./children";
+import { Orders } from "./orders";
 
 export interface CoreComponents {
   asteroidSpawn: AsteroidSpawn;
@@ -30,6 +31,7 @@ export interface CoreComponents {
   mining: Mining;
   modules: Modules;
   name: Name;
+  orders: Orders;
   owner: Owner;
   parent: Parent;
   position: Position;

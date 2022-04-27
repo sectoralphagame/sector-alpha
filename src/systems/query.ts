@@ -45,8 +45,9 @@ export class Query<T extends keyof CoreComponents> {
 export function createQueries(sim: Sim) {
   return {
     asteroidFields: new Query(sim, ["asteroidSpawn"]),
-    autoOrderable: new Query(sim, ["autoOrder", "commander"]),
+    autoOrderable: new Query(sim, ["autoOrder", "commander", "orders"]),
     mining: new Query(sim, ["mining", "storage"]),
+    orderable: new Query(sim, ["orders"]),
     selectionManager: new Query(sim, ["selectionManager"]),
     storageAndTrading: new Query(sim, ["storage", "trade"]),
     trading: new Query(sim, ["trade", "budget", "storage"]),
