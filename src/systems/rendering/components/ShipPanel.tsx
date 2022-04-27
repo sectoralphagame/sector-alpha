@@ -1,7 +1,8 @@
 import React from "react";
+import { Ship } from "../../../archetypes/ship";
 import { Entity } from "../../../components/entity";
+import { Order } from "../../../components/orders";
 import { commodities } from "../../../economy/commodity";
-import { Order, Ship } from "../../../entities/ship";
 
 function getOrderDescription(ship: Ship, order: Order) {
   switch (order.type) {
@@ -52,7 +53,7 @@ const ShipPanel: React.FC = () => {
           <div key={data.commodity}>{`${data.commodity}: ${data.stored}`}</div>
         ))}
       <hr />
-      {ship.orders.map((order, orderIndex) => (
+      {ship.cp.orders.value.map((order, orderIndex) => (
         <div key={`${order.type}-${orderIndex}`}>
           {getOrderDescription(ship, order)}
         </div>

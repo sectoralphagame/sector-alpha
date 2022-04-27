@@ -1,9 +1,9 @@
 import { add, Matrix, matrix, random, randomInt } from "mathjs";
+import { createShip } from "../archetypes/ship";
 import { Parent } from "../components/parent";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
 import { Faction } from "../economy/faction";
-import { Ship } from "../entities/ship";
-import { sim } from "../sim";
+import { Sim, sim } from "../sim";
 import { templates as facilityTemplates } from "./facilities";
 import { shipClasses } from "./ships";
 
@@ -42,18 +42,20 @@ factions.forEach((faction) => {
 
     do {
       if (hasMineables) {
-        const mineOrTrade = new Ship({
+        const mineOrTrade = createShip(window.sim as Sim, {
           ...(Math.random() > 0.5 ? shipClasses.minerA : shipClasses.minerB),
           position: matrix([random(-100, 100), random(-100, 100)]),
           sim,
+          owner: faction,
         });
         mineOrTrade.addComponent("commander", new Parent(facility));
         mineOrTrade.components.owner.set(faction);
       }
-      const tradeShip = new Ship({
+      const tradeShip = createShip(window.sim as Sim, {
         ...(Math.random() > 0.5 ? shipClasses.shipA : shipClasses.shipB),
         position: matrix([random(-100, 100), random(-100, 100)]),
         sim,
+        owner: faction,
       });
       tradeShip.addComponent("commander", new Parent(facility));
       tradeShip.components.owner.set(faction);

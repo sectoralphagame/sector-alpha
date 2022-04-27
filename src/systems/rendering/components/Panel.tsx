@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Ship } from "../../../entities/ship";
+import { shipComponents } from "../../../archetypes/ship";
+import { Entity } from "../../../components/entity";
 import FacilityPanel from "./FacilityPanel";
 import ShipPanel from "./ShipPanel";
 
@@ -63,7 +64,7 @@ const Panel: React.FC = () => {
       )}
 
       {window.selected ? (
-        window.selected instanceof Ship ? (
+        (window.selected as Entity).hasComponents(shipComponents) ? (
           <ShipPanel />
         ) : (
           <FacilityPanel />

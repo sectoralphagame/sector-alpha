@@ -1,8 +1,8 @@
 import { asteroidField } from "../archetypes/asteroidField";
 import { facility } from "../archetypes/facility";
+import { mineOrder } from "../components/orders";
 import { mineableCommodities } from "../economy/commodity";
 import { getClosestMineableAsteroid } from "../economy/utils";
-import { mineOrder } from "../entities/ship";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
@@ -13,13 +13,18 @@ import {
   getNeededCommodities,
   returnToFacility,
 } from "../utils/trading";
+import { holdPosition } from "./orderExecuting/misc";
 import { System } from "./system";
 
-function autoTrade(
-  entity: RequireComponent<
-    "drive" | "storage" | "autoOrder" | "orders" | "commander"
-  >
-) {
+type Trading = RequireComponent<
+  "drive" | "storage" | "autoOrder" | "orders" | "commander"
+>;
+
+type Mining = RequireComponent<
+  "drive" | "storage" | "autoOrder" | "orders" | "commander" | "mining"
+>;
+
+function autoTrade(entity: Trading) {
   const commander = facility(entity.cp.commander.value);
 
   if (entity.cp.storage.getAvailableSpace() !== entity.cp.storage.max) {
@@ -89,10 +94,23 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
 
   switch (entity.cp.autoOrder.default) {
     case "mine":
-      autoMine(entity);
+      autoMine(entity as Mining);
+      break;
+    case "trade":
+      if (
+        entity.hasComponents([
+          "drive",
+          "storage",
+          "autoOrder",
+          "orders",
+          "commander",
+        ])
+      ) {
+        autoTrade(entity as Trading);
+      }
       break;
     default:
-      autoTrade(entity);
+      holdPosition();
   }
 }
 

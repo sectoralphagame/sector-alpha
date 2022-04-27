@@ -1,4 +1,4 @@
-import { MoveOrder } from "../../entities/ship";
+import { MoveOrder } from "../../components/orders";
 import { RequireComponent } from "../../tsHelpers";
 
 export function moveOrder(

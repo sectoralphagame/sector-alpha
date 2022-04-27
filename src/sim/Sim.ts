@@ -1,7 +1,6 @@
 import EventEmitter from "eventemitter3";
 import { Faction } from "../economy/faction";
 import { Entity } from "../components/entity";
-import { Ship } from "../entities/ship";
 import { World } from "../world";
 import { BaseSim } from "./BaseSim";
 import { System } from "../systems/system";
@@ -19,8 +18,6 @@ import { createQueries, Queries } from "../systems/query";
 import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
 
 export class Sim extends BaseSim {
-  ships: Ship[] = [];
-
   entityIdCounter: number = 0;
   events: EventEmitter<"add-component" | "remove-component", Entity>;
 

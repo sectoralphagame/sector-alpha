@@ -14,6 +14,7 @@ export class SelectionManager {
     entityCounter++;
 
     if (entityCounter > 1) {
+      // eslint-disable-next-line no-console
       console.warn(
         "SelectionManager is meant to be singleton. Please make sure you know what you're doing."
       );

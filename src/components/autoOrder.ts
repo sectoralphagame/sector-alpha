@@ -1,4 +1,4 @@
-import { Order } from "../entities/ship";
+import { Order } from "./orders";
 
 export class AutoOrder {
   default: Order["type"];

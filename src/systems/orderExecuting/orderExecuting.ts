@@ -1,5 +1,5 @@
 import { Entity } from "../../components/entity";
-import { Order } from "../../entities/ship";
+import { Order } from "../../components/orders";
 import { System } from "../system";
 import { mineOrder } from "./mine";
 import { holdPosition, moveOrder } from "./misc";

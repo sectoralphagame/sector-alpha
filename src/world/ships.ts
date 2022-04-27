@@ -1,8 +1,8 @@
-import { InitialShipInput } from "../entities/ship";
+import { InitialShipInput } from "../archetypes/ship";
 
 export const shipClasses: Record<
   "shipA" | "shipB" | "minerA" | "minerB",
-  Omit<InitialShipInput, "position" | "sim">
+  Omit<InitialShipInput, "position" | "sim" | "owner">
 > = {
   shipA: {
     name: "Ship Type A",
