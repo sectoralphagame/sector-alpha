@@ -1,14 +1,28 @@
+import * as PIXI from "pixi.js";
+
 export class Render {
-  color: string | null;
-  size: number;
-  minScale: number;
+  defaultScale: number = 1;
+  initialized: boolean = false;
+  maxZ: number;
+  sprite: PIXI.Sprite;
+  texture: string;
 
-  constructor(size: number, minScale: number, color?: string) {
-    this.size = size;
-    this.minScale = minScale;
+  constructor(
+    pathToTexture: string,
+    maxZ: number,
+    color: number = null,
+    defaultScale = 1
+  ) {
+    this.defaultScale = defaultScale;
+    this.texture = pathToTexture;
+    this.maxZ = maxZ;
 
-    if (color) {
-      this.color = color;
+    if (process.env.NODE_ENV !== "test") {
+      this.sprite = new PIXI.Sprite(PIXI.Texture.from(pathToTexture));
+      this.sprite.anchor.set(0.5, 0.5);
+      if (color) {
+        this.sprite.tint = color;
+      }
     }
   }
 }

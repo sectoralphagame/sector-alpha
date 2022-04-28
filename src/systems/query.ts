@@ -48,11 +48,13 @@ export function createQueries(sim: Sim) {
     autoOrderable: new Query(sim, ["autoOrder", "commander", "orders"]),
     mining: new Query(sim, ["mining", "storage"]),
     orderable: new Query(sim, ["orders"]),
+    productionByModules: new Query(sim, ["production", "parent"]),
+    renderable: new Query(sim, ["render", "position"]),
+    selectable: new Query(sim, ["render", "position", "selection"]),
     selectionManager: new Query(sim, ["selectionManager"]),
+    standaloneProduction: new Query(sim, ["production", "storage"]),
     storageAndTrading: new Query(sim, ["storage", "trade"]),
     trading: new Query(sim, ["trade", "budget", "storage"]),
-    standaloneProduction: new Query(sim, ["production", "storage"]),
-    productionByModules: new Query(sim, ["production", "parent"]),
   } as const;
 }
 

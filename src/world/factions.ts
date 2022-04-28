@@ -23,12 +23,13 @@ factions.forEach((faction) => {
   const position = matrix([randomInt(-100, 100), randomInt(-100, 100)]);
 
   for (let i = 0; i < randomInt(13, 20); i++) {
-    const facility =
-      facilityTemplates[randomInt(0, facilityTemplates.length)]();
-    facility.cp.position.value = add(
-      position,
-      matrix([random(-12, 12), random(-12, 12)])
-    ) as Matrix;
+    const facility = facilityTemplates[randomInt(0, facilityTemplates.length)]({
+      owner: faction,
+      position: add(
+        position,
+        matrix([random(-12, 12), random(-12, 12)])
+      ) as Matrix,
+    });
 
     const consumed = Object.entries(facility.cp.compoundProduction.pac)
       .filter(([, pac]) => pac.consumes > 0)

@@ -13,7 +13,7 @@ export const asteroidComponents = [
   "minable",
   "parent",
   "position",
-  "render",
+  // "render",
 ] as const;
 
 // Ugly hack to transform asteroidComponents array type to string union
@@ -47,7 +47,7 @@ export function createAsteroid(
   entity.addComponent("minable", new Minable(type));
   entity.addComponent("parent", new Parent(parent));
   entity.addComponent("position", new Position(position));
-  entity.addComponent("render", new Render(0.2, 1.5, fieldColors[type]));
+  // entity.addComponent("render", new Render(0.2, 1.5, fieldColors[type]));
 
   parent.components.children.add(entity as RequireComponent<"parent">);
 
