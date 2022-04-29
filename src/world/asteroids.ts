@@ -20,7 +20,7 @@ export function getRandomAsteroidField() {
   );
 
   const asteroids = Math.round(
-    limitMin(random(1, 4) * field.cp.asteroidSpawn.size, 1)
+    limitMin(random(2, 6) * field.cp.asteroidSpawn.size, 1)
   );
   for (let i = 0; i < asteroids; i++) {
     const asteroidAngle = Math.random() * Math.PI;

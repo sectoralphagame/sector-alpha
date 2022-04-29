@@ -54,7 +54,7 @@ export function createAsteroid(
     new Render({
       color: Color(fieldColors[type]).rgbNumber(),
       defaultScale: 0.6,
-      maxZ: 1.5,
+      maxZ: 1.2,
       pathToTexture: asteroidTexture,
       zIndex: 0,
     })
