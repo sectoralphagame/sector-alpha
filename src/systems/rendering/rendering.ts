@@ -79,7 +79,7 @@ export class RenderingSystem extends System {
         entity.cp.position.x * 10,
         entity.cp.position.y * 10
       );
-      entityRender.sprite.angle = entity.cp.position.angle;
+      entityRender.sprite.rotation = entity.cp.position.angle;
 
       if (this.prevScale !== this.viewport.scale.x) {
         entityRender.sprite.scale.set(
