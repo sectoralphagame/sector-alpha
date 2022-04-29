@@ -15,7 +15,7 @@ import { Faction } from "../economy/faction";
 import { MissingComponentError } from "../errors";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
-import s_civ from "../../assets/s_civ.svg";
+import sCivTexture from "../../assets/s_civ.svg";
 
 export const shipComponents = [
   "drive",
@@ -63,7 +63,13 @@ export function createShip(sim: Sim, initial: InitialShipInput) {
   entity.addComponent("position", new Position(initial.position));
   entity.addComponent(
     "render",
-    new Render(s_civ, 0.9, Color(initial.owner.color).rgbNumber(), 0.25)
+    new Render({
+      color: Color(initial.owner.color).rgbNumber(),
+      defaultScale: 0.4,
+      maxZ: 0.9,
+      pathToTexture: sCivTexture,
+      zIndex: 2,
+    })
   );
   entity.addComponent("selection", new Selection());
   entity.addComponent("storage", new CommodityStorage());

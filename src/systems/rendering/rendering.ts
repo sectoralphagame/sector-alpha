@@ -1,12 +1,9 @@
 import P5 from "p5";
-import { Sim } from "../../sim";
 import "./components/Panel";
 import * as PIXI from "pixi.js";
-import { SVGScene } from "@pixi-essentials/svg";
 import { Viewport } from "pixi-viewport";
+import { Sim } from "../../sim";
 import { System } from "../system";
-import f_civ from "../../../assets/f_shipyard.svg";
-import s_civ from "../../../assets/s_civ.svg";
 import { Query } from "../query";
 
 const minScale = 0.4;
@@ -54,28 +51,11 @@ export class RenderingSystem extends System {
       settingsEntity.cp.selectionManager.focused = false;
       viewport.plugins.remove("follow");
     });
+    viewport.sortableChildren = true;
 
     this.viewport = viewport;
-
-    // spriteF.on("pointerover", () => {
-    //   selected = 1;
-    // });
-    // spriteF.on("pointerout", () => {
-    //   selected = null;
-    // });
-
-    // app.ticker.add(() => {
-    //   if (selected) {
-    //     spriteF.scale.set(
-    //       spriteF.scale.x + (spriteF.scale.x > 1.9 ? -0.02 : 0.01)
-    //     );
-    //   } else {
-    //     spriteF.scale.set(1.5);
-    //   }
-    // });
   };
 
-  // eslint-disable-next-line no-unused-vars, class-methods-use-this
   exec(): void {
     const settingsEntity = this.sim.queries.selectionManager.get()[0];
 
@@ -91,6 +71,7 @@ export class RenderingSystem extends System {
           });
           entityRender.sprite.cursor = "pointer";
         }
+
         entityRender.initialized = true;
       }
 

@@ -13,7 +13,7 @@ import { CommodityStorage } from "../components/storage";
 import { Trade } from "../components/trade";
 import { Faction } from "../economy/faction";
 import { MissingComponentError } from "../errors";
-import f_civ from "../../assets/f_civ.svg";
+import fCivTexture from "../../assets/f_civ.svg";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 
@@ -59,7 +59,13 @@ export function createFacility(sim: Sim, initial?: InitialFacilityInput) {
   entity.addComponent("position", new Position(initial?.position));
   entity.addComponent(
     "render",
-    new Render(f_civ, 0.33, Color(initial?.owner.color).rgbNumber())
+    new Render({
+      color: Color(initial?.owner.color).rgbNumber(),
+      defaultScale: 1,
+      maxZ: 0.33,
+      pathToTexture: fCivTexture,
+      zIndex: 1,
+    })
   );
   entity.addComponent("selection", new Selection());
   entity.addComponent("storage", new CommodityStorage());
