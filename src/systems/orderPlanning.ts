@@ -1,3 +1,5 @@
+import { minBy } from "lodash";
+import { Matrix, norm, subtract } from "mathjs";
 import { asteroidField } from "../archetypes/asteroidField";
 import { facility } from "../archetypes/facility";
 import { mineOrder } from "../components/orders";
@@ -21,7 +23,13 @@ type Trading = RequireComponent<
 >;
 
 type Mining = RequireComponent<
-  "drive" | "storage" | "autoOrder" | "orders" | "commander" | "mining"
+  | "drive"
+  | "storage"
+  | "autoOrder"
+  | "orders"
+  | "commander"
+  | "mining"
+  | "position"
 >;
 
 function autoTrade(entity: Trading) {
@@ -54,7 +62,7 @@ function autoTrade(entity: Trading) {
 
 function autoMine(
   entity: RequireComponent<
-    "drive" | "storage" | "autoOrder" | "orders" | "commander"
+    "drive" | "storage" | "autoOrder" | "orders" | "commander" | "position"
   >
 ) {
   const commander = facility(entity.cp.commander.value);
@@ -68,10 +76,21 @@ function autoMine(
     );
 
     if (mineable) {
-      const field = asteroidField(
+      const field = minBy(
         entity.sim.queries.asteroidFields
           .get()
-          .find((e) => e.cp.asteroidSpawn?.type === mineable)
+          .map(asteroidField)
+          .filter(
+            (e) =>
+              e.cp.asteroidSpawn.type === mineable &&
+              e.cp.children.value.some(
+                (asteroid) => !asteroid.cp.minable.minedBy
+              )
+          ),
+        (e) =>
+          norm(
+            subtract(entity.cp.position.coord, e.cp.position.coord) as Matrix
+          )
       );
       const rock = getClosestMineableAsteroid(field, entity.cp.position.coord);
 
