@@ -36,9 +36,7 @@ export class CommodityStorage {
   quota: Record<Commodity, number>;
   history: CommodityStorageHistoryEntry[] = [];
 
-  changeHandler: () => void;
-
-  constructor(onChange = () => undefined) {
+  constructor() {
     this.max = 0;
     this.stored = perCommodity(() => 0);
     this.quota = perCommodity(() => 0);
@@ -57,19 +55,14 @@ export class CommodityStorage {
           )
           .every(Boolean);
       },
-      onChange: () => {
-        this.changeHandler();
-        this.updateAvailableWares();
-      },
+      onChange: this.updateAvailableWares,
     });
-    this.changeHandler = onChange;
     this.updateAvailableWares();
   }
 
   onChange = (entry: Omit<CommodityStorageHistoryEntry, "time">) => {
     this.addHitoryEntry({ ...entry, time: sim ? sim.getTime() : 0 });
     this.updateAvailableWares();
-    this.changeHandler();
   };
 
   addHitoryEntry = (entry: CommodityStorageHistoryEntry) => {
@@ -118,7 +111,6 @@ export class CommodityStorage {
 
   updateQuota = (quota: Record<Commodity, number>) => {
     this.quota = quota;
-    this.changeHandler();
   };
 
   getAvailableWares = () => this.availableWares;
