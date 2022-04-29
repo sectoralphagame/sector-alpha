@@ -48,7 +48,7 @@ export function createAsteroid(
 
   entity.addComponent("minable", new Minable(type));
   entity.addComponent("parent", new Parent(parent));
-  entity.addComponent("position", new Position(position));
+  entity.addComponent("position", new Position(position, 0));
   entity.addComponent(
     "render",
     new Render({

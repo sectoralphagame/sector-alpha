@@ -37,7 +37,7 @@ export function createAsteroidField(
 
   entity.addComponent("asteroidSpawn", new AsteroidSpawn(type, size));
   entity.addComponent("children", new Children());
-  entity.addComponent("position", new Position(position));
+  entity.addComponent("position", new Position(position, 0));
 
   return asteroidField(entity);
 }

@@ -60,7 +60,7 @@ export function createShip(sim: Sim, initial: InitialShipInput) {
   entity.addComponent("name", new Name(initial.name));
   entity.addComponent("orders", new Orders());
   entity.addComponent("owner", new Owner(initial.owner));
-  entity.addComponent("position", new Position(initial.position));
+  entity.addComponent("position", new Position(initial.position, 0));
   entity.addComponent(
     "render",
     new Render({

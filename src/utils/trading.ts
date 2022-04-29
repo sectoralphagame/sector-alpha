@@ -1,15 +1,15 @@
 import { sortBy } from "lodash";
 import { min } from "mathjs";
 import merge from "lodash/merge";
-import { Facility, facility } from "../archetypes/facility";
+import { facility } from "../archetypes/facility";
 import { Entity } from "../components/entity";
 import { tradeOrder } from "../components/orders";
-import { TransactionInput } from "../components/trade";
+import type { TransactionInput } from "../components/trade";
 import { Allocation } from "../components/utils/allocations";
 import { commodities, Commodity } from "../economy/commodity";
-import { getFacilityWithMostProfit } from "../economy/utils";
+import { getFacilityWithMostProfit, WithTrade } from "../economy/utils";
 import { InvalidOfferType, NonPositiveAmount } from "../errors";
-import { RequireComponent } from "../tsHelpers";
+import type { RequireComponent } from "../tsHelpers";
 import { perCommodity } from "./perCommodity";
 import { createOffers } from "../systems/trading";
 
@@ -173,8 +173,8 @@ export function getCommoditiesForSell(entity: Entity): Commodity[] {
 export function tradeCommodity(
   entity: RequireComponent<"storage" | "commander">,
   commodity: Commodity,
-  buyer: Facility,
-  seller: Facility
+  buyer: WithTrade,
+  seller: WithTrade
 ): boolean {
   const sameFaction = entity.cp.owner.value === seller.components.owner.value;
   const buy = entity.cp.commander.value === buyer;
@@ -292,7 +292,7 @@ export function returnToFacility(
 ) {
   entity.cp.orders.value.push({
     type: "move",
-    position: entity.cp.commander.value.cp.position.value,
+    position: entity.cp.commander.value.cp.position.coord,
   });
   Object.values(commodities)
     .filter((commodity) => entity.cp.storage.getAvailableWares()[commodity] > 0)

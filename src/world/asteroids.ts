@@ -29,7 +29,7 @@ export function getRandomAsteroidField() {
       window.sim as any,
       field,
       add(
-        field.cp.position.value,
+        field.cp.position.coord,
         matrix([
           random(-field.cp.asteroidSpawn.size, field.cp.asteroidSpawn.size) *
             Math.cos(asteroidAngle),

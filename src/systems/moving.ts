@@ -14,9 +14,9 @@ function move(entity: Driveable, delta: number) {
 
   const position =
     entity.cp.drive.target instanceof Entity
-      ? entity.cp.drive.target.cp.position.value
+      ? entity.cp.drive.target.cp.position.coord
       : entity.cp.drive.target;
-  const path = subtract(position, entity.cp.position.value) as Matrix;
+  const path = subtract(position, entity.cp.position.coord) as Matrix;
   const speed =
     entity.cp.drive.state === "cruise"
       ? entity.cp.drive.cruise
@@ -33,7 +33,7 @@ function move(entity: Driveable, delta: number) {
       : matrix([0, 0]);
 
   if (norm(dPos) >= distance) {
-    entity.cp.position.value = matrix(position);
+    entity.cp.position.coord = matrix(position);
     entity.cp.drive.targetReached = true;
     return;
   }
@@ -46,7 +46,7 @@ function move(entity: Driveable, delta: number) {
     entity.cp.drive.stopCruise();
   }
 
-  entity.cp.position.value = add(entity.cp.position.value, dPos) as Matrix;
+  entity.cp.position.coord = add(entity.cp.position.coord, dPos) as Matrix;
 }
 
 export class MovingSystem extends System {

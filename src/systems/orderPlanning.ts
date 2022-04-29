@@ -73,7 +73,7 @@ function autoMine(
           .get()
           .find((e) => e.cp.asteroidSpawn?.type === mineable)
       );
-      const rock = getClosestMineableAsteroid(field, entity.cp.position.value);
+      const rock = getClosestMineableAsteroid(field, entity.cp.position.coord);
 
       if (rock) {
         entity.cp.orders.value.push(

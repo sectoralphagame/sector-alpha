@@ -1,17 +1,19 @@
 import { matrix, Matrix } from "mathjs";
 
 export class Position {
-  value: Matrix;
+  angle: number;
+  coord: Matrix;
 
-  constructor(value?: Matrix) {
-    this.value = matrix(value ?? [0, 0]);
+  constructor(value: Matrix, angle: number) {
+    this.coord = matrix(value);
+    this.angle = angle;
   }
 
   get x() {
-    return this.value.get([0]);
+    return this.coord.get([0]);
   }
 
   get y() {
-    return this.value.get([1]);
+    return this.coord.get([1]);
   }
 }
