@@ -2,6 +2,7 @@ import P5 from "p5";
 import "./components/Panel";
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
+import Color from "color";
 import { Sim } from "../../sim";
 import { System } from "../system";
 import { Query } from "../query";
@@ -61,6 +62,7 @@ export class RenderingSystem extends System {
 
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
+      const selected = entity === settingsEntity.cp.selectionManager.entity;
 
       if (!entityRender.initialized) {
         this.viewport.addChild(entityRender.sprite);
@@ -80,11 +82,18 @@ export class RenderingSystem extends System {
         entity.cp.position.y * 10
       );
       entityRender.sprite.rotation = entity.cp.position.angle;
+      if (selected && entityRender.sprite.tint === entityRender.color) {
+        entityRender.sprite.tint = Color(entityRender.sprite.tint)
+          .lighten(0.23)
+          .rgbNumber();
+        entityRender.sprite.zIndex = 10;
+      } else if (!selected && entityRender.sprite.tint !== entityRender.color) {
+        entityRender.sprite.tint = entityRender.color;
+        entityRender.sprite.zIndex = entityRender.zIndex;
+      }
 
       entityRender.sprite.scale.set(
-        (1 / this.prevScale) *
-          entityRender.defaultScale *
-          (entity === settingsEntity.cp.selectionManager.entity ? 1.5 : 1)
+        (1 / this.prevScale) * entityRender.defaultScale * (selected ? 1.5 : 1)
       );
 
       entityRender.sprite.visible = entityRender.maxZ <= this.prevScale;
