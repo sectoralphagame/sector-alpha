@@ -34,7 +34,7 @@ const ShipPanel: React.FC = () => {
                 .find((e) => e.hasComponents(["selectionManager"]))!
                 .requireComponents(["selectionManager"]).cp;
 
-              selectionManager.set(ship);
+              selectionManager.set(ship.cp.commander!.value);
               selectionManager.focused = true;
             }}
             type="button"

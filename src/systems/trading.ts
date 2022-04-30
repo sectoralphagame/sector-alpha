@@ -196,7 +196,7 @@ export class TradingSystem extends System {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("adjustPrices")) {
-      this.cooldowns.use("adjustPrices", 300);
+      this.cooldowns.use("adjustPrices", 150);
       this.sim.queries.trading.get().forEach(adjustPrices);
     }
 

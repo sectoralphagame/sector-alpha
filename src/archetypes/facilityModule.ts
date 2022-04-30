@@ -102,6 +102,6 @@ export const facilityModules = {
   }),
   containerSmall: createFacilityModuleTemplate({
     name: "Small Container",
-    storage: 1000,
+    storage: 4000,
   }),
 } as const;

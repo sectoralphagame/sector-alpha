@@ -81,11 +81,11 @@ export class RenderingSystem extends System {
       );
       entityRender.sprite.rotation = entity.cp.position.angle;
 
-      if (this.prevScale !== this.viewport.scale.x) {
-        entityRender.sprite.scale.set(
-          (1 / this.prevScale) * entityRender.defaultScale
-        );
-      }
+      entityRender.sprite.scale.set(
+        (1 / this.prevScale) *
+          entityRender.defaultScale *
+          (entity === settingsEntity.cp.selectionManager.entity ? 1.5 : 1)
+      );
 
       entityRender.sprite.visible = entityRender.maxZ <= this.prevScale;
     });

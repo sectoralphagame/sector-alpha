@@ -86,4 +86,8 @@ export class Entity {
     delete this.components[name];
     this.sim.events.emit("remove-component", { name, entity: this });
   }
+
+  unregister() {
+    this.sim.unregisterEntity(this);
+  }
 }

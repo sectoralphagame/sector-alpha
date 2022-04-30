@@ -18,7 +18,10 @@ import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
 
 export class Sim extends BaseSim {
   entityIdCounter: number = 0;
-  events: EventEmitter<"add-component" | "remove-component", Entity>;
+  events: EventEmitter<
+    "add-component" | "remove-component" | "remove-entity",
+    Entity
+  >;
 
   factions: Faction[] = [];
   entities: Entity[] = [];
@@ -59,6 +62,11 @@ export class Sim extends BaseSim {
     entity.id = this.entityIdCounter;
     this.entities.push(entity);
     this.entityIdCounter += 1;
+  };
+
+  unregisterEntity = (entity: Entity) => {
+    this.entities = this.entities.filter((e) => e !== entity);
+    this.events.emit("remove-entity", entity);
   };
 
   load = (world: World) => {

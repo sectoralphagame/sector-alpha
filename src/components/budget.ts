@@ -16,12 +16,14 @@ export class Budget {
   constructor() {
     this.allocations = new AllocationManager<BudgetAllocation>({
       validate: (allocation) => allocation.amount <= this.getAvailableMoney(),
-      onChange: () => {
-        this.available =
-          this.money - sum(this.allocations.all().map((a) => a.amount));
-      },
+      onChange: this.updateAvailableMoney,
     });
   }
+
+  updateAvailableMoney = () => {
+    this.available =
+      this.money - sum(this.allocations.all().map((a) => a.amount));
+  };
 
   getAvailableMoney = () => this.available;
 
@@ -33,6 +35,8 @@ export class Budget {
     if (this.money < 0) {
       throw new NegativeBudget(this.money);
     }
+
+    this.updateAvailableMoney();
   };
 
   set = (value: number) => {
@@ -41,6 +45,8 @@ export class Budget {
     }
 
     this.money = value;
+
+    this.updateAvailableMoney();
   };
 
   transferMoney = (value: number, target: Budget) => {
