@@ -14,7 +14,6 @@ import { CommodityStorage } from "../components/storage";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
-import sCivTexture from "../../assets/s_civ.svg";
 
 export const shipComponents = [
   "drive",
@@ -42,6 +41,7 @@ export interface InitialShipInput {
   owner: Faction;
   storage: number;
   mining: number;
+  texture: string;
 }
 
 export function createShip(sim: Sim, initial: InitialShipInput) {
@@ -62,7 +62,7 @@ export function createShip(sim: Sim, initial: InitialShipInput) {
       color: Color(initial.owner.color).rgbNumber(),
       defaultScale: 0.4,
       maxZ: 0.7,
-      pathToTexture: sCivTexture,
+      pathToTexture: initial.texture,
       zIndex: 2,
     })
   );

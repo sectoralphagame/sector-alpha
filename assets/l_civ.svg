@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="25" fill="none" viewBox="0 0 40 25">
-  <path fill="#000" d="M1 15.5 12 1h16l11 14.5-19-4-19 4Z"/>
-  <path fill="#000" d="m20 14.5-19 4v2l19-4 19 4v-2l-19-4Z"/>
-  <path fill="#000" d="m20 18.5-19 4v2l19-4 19 4v-2l-19-4Z"/>
-  <path stroke="#000" stroke-linejoin="round" d="M1 15.5 12 1h16l11 14.5-19-4-19 4Z"/>
-  <path stroke="#000" stroke-linejoin="round" d="m20 14.5-19 4v2l19-4 19 4v-2l-19-4Z"/>
-  <path stroke="#000" stroke-linejoin="round" d="m20 18.5-19 4v2l19-4 19 4v-2l-19-4Z"/>
+  <path fill="#fff" d="M1 15.5 12 1h16l11 14.5-19-4-19 4Z"/>
+  <path fill="#fff" d="m20 14.5-19 4v2l19-4 19 4v-2l-19-4Z"/>
+  <path fill="#fff" d="m20 18.5-19 4v2l19-4 19 4v-2l-19-4Z"/>
+  <path stroke="#fff" stroke-linejoin="round" d="M1 15.5 12 1h16l11 14.5-19-4-19 4Z"/>
+  <path stroke="#fff" stroke-linejoin="round" d="m20 14.5-19 4v2l19-4 19 4v-2l-19-4Z"/>
+  <path stroke="#fff" stroke-linejoin="round" d="m20 18.5-19 4v2l19-4 19 4v-2l-19-4Z"/>
 </svg>

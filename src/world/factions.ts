@@ -50,14 +50,18 @@ factions.forEach((faction) => {
         });
         mineOrTrade.addComponent("commander", new Parent(facility));
         mineOrTrade.components.owner.set(faction);
+      } else {
+        const tradeShip = createShip(window.sim as Sim, {
+          ...(Math.random() > 0.5
+            ? shipClasses.courierA
+            : shipClasses.courierB),
+          position: matrix([random(-100, 100), random(-100, 100)]),
+          sim,
+          owner: faction,
+        });
+        tradeShip.addComponent("commander", new Parent(facility));
+        tradeShip.components.owner.set(faction);
       }
-      const tradeShip = createShip(window.sim as Sim, {
-        ...(Math.random() > 0.5 ? shipClasses.shipA : shipClasses.shipB),
-        position: matrix([random(-100, 100), random(-100, 100)]),
-        owner: faction,
-      });
-      tradeShip.addComponent("commander", new Parent(facility));
-      tradeShip.components.owner.set(faction);
     } while (Math.random() < 0.15);
 
     facility.components.owner.set(faction);

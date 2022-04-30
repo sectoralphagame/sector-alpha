@@ -12,7 +12,7 @@ const Panel: React.FC = () => {
   React.useEffect(() => {
     interval.current = setInterval(
       () => setRender((v) => !v),
-      500
+      250
     ) as unknown as number;
 
     return () => clearInterval(interval.current);

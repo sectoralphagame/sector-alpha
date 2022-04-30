@@ -9,18 +9,21 @@ export interface BudgetAllocation {
 
 export class Budget {
   private money: number = 0;
+  private available: number = 0;
 
   allocations: AllocationManager<BudgetAllocation>;
 
   constructor() {
     this.allocations = new AllocationManager<BudgetAllocation>({
       validate: (allocation) => allocation.amount <= this.getAvailableMoney(),
-      onChange: () => undefined,
+      onChange: () => {
+        this.available =
+          this.money - sum(this.allocations.all().map((a) => a.amount));
+      },
     });
   }
 
-  getAvailableMoney = () =>
-    this.money - sum(this.allocations.all().map((a) => a.amount));
+  getAvailableMoney = () => this.available;
 
   getAllMoney = () => this.money;
 
