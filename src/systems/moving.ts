@@ -37,7 +37,9 @@ function move(entity: Driveable, delta: number) {
       ? (multiply(moveVec, speed * delta) as Matrix)
       : matrix([0, 0]);
   const dAngle =
-    drive.rotary * delta * Math.sign(targetAngle - entityPosition.angle);
+    Math.abs(targetAngle - entityPosition.angle) > drive.rotary * delta
+      ? drive.rotary * delta * Math.sign(targetAngle - entityPosition.angle)
+      : targetAngle - entityPosition.angle;
 
   if (norm(dPos) >= distance) {
     entityPosition.coord = matrix(targetPosition);
