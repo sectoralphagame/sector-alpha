@@ -1,22 +1,28 @@
 import { sum } from "mathjs";
-import { Entity } from "../components/entity";
 import { startingPrice, TradeOffer } from "../components/trade";
 import { Commodity } from "../economy/commodity";
-import { getPlannedBudget } from "../economy/utils";
+import { getPlannedBudget, WithTrade } from "../economy/utils";
 import { Sim } from "../sim";
+import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
 import { limitMin } from "../utils/limit";
 import { perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
 
+type WithTradeAndProduction = WithTrade &
+  RequireComponent<"compoundProduction">;
+
 /**
  *
  * Commodity cost of production
  */
-function getProductionCost(entity: Entity, commodity: Commodity): number {
-  const productionModule = entity.cp.modules.modules.find(
-    (m) => m.cp.production?.pac[commodity].produces > 0
-  );
+function getProductionCost(
+  entity: RequireComponent<"modules" | "trade">,
+  commodity: Commodity
+): number {
+  const productionModule = entity.cp.modules.modules
+    .find((m) => m.cp.production?.pac[commodity].produces)
+    ?.requireComponents(["production"]);
 
   if (!productionModule) {
     return entity.cp.trade.offers[commodity].price;
@@ -37,7 +43,7 @@ function getProductionCost(entity: Entity, commodity: Commodity): number {
   );
 }
 
-export function adjustPrices(entity: Entity) {
+export function adjustPrices(entity: WithTrade) {
   const quantities = perCommodity(
     (commodity) =>
       sum(
@@ -73,7 +79,14 @@ export function adjustPrices(entity: Entity) {
       entity.cp.trade.offers[commodity].type === "buy"
         ? 1
         : entity.hasComponents(["compoundProduction"])
-        ? getProductionCost(entity, commodity)
+        ? getProductionCost(
+            entity.requireComponents([
+              "compoundProduction",
+              "trade",
+              "modules",
+            ]),
+            commodity
+          )
         : 1;
     let delta = limitMin(
       Math.floor(entity.cp.trade.offers[commodity].price * 0.01),
@@ -98,45 +111,54 @@ export function adjustPrices(entity: Entity) {
   };
 }
 
-function getProductionSurplus(entity: Entity, commodity: Commodity) {
+function getProductionSurplus(
+  entity: WithTradeAndProduction,
+  commodity: Commodity
+) {
   return (
     entity.cp.compoundProduction.pac[commodity].produces -
     entity.cp.compoundProduction.pac[commodity].consumes
   );
 }
 
-function getSurplus(entity: Entity, commodity: Commodity) {
+function getSurplus(entity: WithTradeAndProduction, commodity: Commodity) {
   return (
     entity.cp.storage.getAvailableWares()[commodity] +
     getProductionSurplus(entity, commodity)
   );
 }
 
-export function getOfferedQuantity(entity: Entity, commodity: Commodity) {
+export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
   if (!entity.hasComponents(["compoundProduction"])) {
     return entity.cp.storage.getAvailableWares()[commodity];
   }
 
+  const entityWithProduction = entity.requireComponents([
+    "compoundProduction",
+    "budget",
+    "position",
+    "storage",
+    "owner",
+    "trade",
+  ]);
+  const production = entityWithProduction.cp.compoundProduction;
+
   if (
-    entity.cp.compoundProduction.pac[commodity].consumes ===
-      entity.cp.compoundProduction.pac[commodity].produces &&
-    entity.cp.compoundProduction.pac[commodity].consumes === 0
+    production.pac[commodity].consumes === production.pac[commodity].produces &&
+    production.pac[commodity].consumes === 0
   ) {
-    return getSurplus(entity, commodity);
+    return getSurplus(entityWithProduction, commodity);
   }
 
-  const stored = entity.cp.storage.getAvailableWares();
+  const stored = entityWithProduction.cp.storage.getAvailableWares();
 
-  if (getProductionSurplus(entity, commodity) > 0) {
-    return (
-      stored[commodity] -
-      entity.cp.compoundProduction.pac[commodity].consumes * 2
-    );
+  if (getProductionSurplus(entityWithProduction, commodity) > 0) {
+    return stored[commodity] - production.pac[commodity].consumes * 2;
   }
 
-  const requiredBudget = getPlannedBudget(entity);
-  const availableBudget = entity.cp.budget.getAvailableMoney();
-  const quota = entity.cp.storage.quota[commodity];
+  const requiredBudget = getPlannedBudget(entityWithProduction);
+  const availableBudget = entityWithProduction.cp.budget.getAvailableMoney();
+  const quota = entityWithProduction.cp.storage.quota[commodity];
 
   if (stored[commodity] > quota) {
     return stored[commodity] - quota;
@@ -148,7 +170,7 @@ export function getOfferedQuantity(entity: Entity, commodity: Commodity) {
   return Math.floor(multiplier * (stored[commodity] - quota));
 }
 
-export function createOffers(entity: Entity) {
+export function createOffers(entity: WithTrade) {
   entity.cp.trade.offers = perCommodity((commodity): TradeOffer => {
     const quantity = getOfferedQuantity(entity, commodity);
 

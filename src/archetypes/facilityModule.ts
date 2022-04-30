@@ -14,7 +14,7 @@ export interface ProductionModuleInput {
   time?: number;
 }
 
-export type FacilityModule = RequireComponent<"parent">;
+export type FacilityModule = RequireComponent<"parent" | "name">;
 
 export function createFacilityModule(sim: Sim, input: ProductionModuleInput) {
   const entity = new Entity(sim);

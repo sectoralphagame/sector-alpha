@@ -77,7 +77,8 @@ export class Drive {
     const targetsAreEntities =
       target instanceof Entity && this.target instanceof Entity;
     const targetsAreMatrices =
-      !!(target as Matrix)?.datatype && (this.target as Matrix)?.datatype;
+      !!(target as Matrix)?.datatype && !!(this.target as Matrix)?.datatype;
+
     const shouldUpdate = targetsAreEntities
       ? target.id !== (this.target as Entity).id
       : targetsAreMatrices

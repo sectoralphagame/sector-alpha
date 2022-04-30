@@ -12,7 +12,6 @@ import { Render } from "../components/render";
 import { Selection } from "../components/selection";
 import { CommodityStorage } from "../components/storage";
 import { Faction } from "../economy/faction";
-import { MissingComponentError } from "../errors";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import sCivTexture from "../../assets/s_civ.svg";
@@ -33,11 +32,7 @@ export type ShipComponent = typeof widenType;
 export type Ship = RequireComponent<ShipComponent>;
 
 export function ship(entity: Entity): Ship {
-  if (!entity.hasComponents(shipComponents)) {
-    throw new MissingComponentError(entity, shipComponents);
-  }
-
-  return entity as Ship;
+  return entity.requireComponents(shipComponents);
 }
 
 export interface InitialShipInput {
@@ -78,7 +73,8 @@ export function createShip(sim: Sim, initial: InitialShipInput) {
     entity.addComponent("mining", new Mining(initial.mining));
   }
 
-  entity.cp.storage.max = initial.storage;
+  const shipEntity = ship(entity);
+  shipEntity.cp.storage!.max = initial.storage;
 
-  return entity as Ship;
+  return shipEntity;
 }

@@ -108,3 +108,12 @@ export class MissingComponentError extends Error {
     this.expectedComponents = expectedComponents;
   }
 }
+
+export class MissingEntityError extends Error {
+  id: number;
+
+  constructor(id: number) {
+    super(`Missing entity: ${id}`);
+    this.id = id;
+  }
+}

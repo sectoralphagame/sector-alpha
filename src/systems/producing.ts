@@ -55,7 +55,9 @@ export class ProducingSystem extends System {
         entity.cp.production.time
       );
 
-      const storage = entity.cp.parent.value.cp.storage;
+      const storage =
+        entity.cp.storage ??
+        entity.requireComponents(["parent"]).cp.parent.value.cp.storage;
 
       produce(entity.cp.production.pac, storage);
     });
@@ -66,7 +68,8 @@ export class ProducingSystem extends System {
       if (
         !isAbleToProduce(
           facilityModule,
-          facilityModule.cp.parent.value.cp.storage
+          facilityModule.cp.parent.value.requireComponents(["storage"]).cp
+            .storage
         )
       ) {
         return;
@@ -77,7 +80,9 @@ export class ProducingSystem extends System {
         facilityModule.cp.production.time
       );
 
-      const storage = facilityModule.cp.parent.value.cp.storage;
+      const storage = facilityModule.cp.parent.value.requireComponents([
+        "storage",
+      ]).cp.storage;
 
       produce(facilityModule.cp.production.pac, storage);
     });

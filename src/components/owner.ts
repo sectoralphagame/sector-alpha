@@ -1,10 +1,12 @@
 import { Faction } from "../economy/faction";
 
 export class Owner {
-  value: Faction | null;
+  value: Faction | null = null;
 
   constructor(value: Faction | null = null) {
-    this.set(value);
+    if (value) {
+      this.set(value);
+    }
   }
 
   set = (value: Faction) => {

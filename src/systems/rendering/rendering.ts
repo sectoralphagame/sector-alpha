@@ -11,14 +11,14 @@ const minScale = 0.4;
 export class RenderingSystem extends System {
   renderable: Query<"render" | "position">;
   selectable: Query<"selection" | "position">;
-  parent: Element;
+  parent: HTMLCanvasElement;
   viewport: Viewport;
   p5: P5;
   prevScale: number = minScale;
 
   constructor(sim: Sim) {
     super(sim);
-    this.parent = document.querySelector("#canvasRoot");
+    this.parent = document.querySelector("#canvasRoot")!;
     this.renderable = new Query(sim, ["render", "position"]);
     this.selectable = new Query(sim, ["selection", "position"]);
 
@@ -34,7 +34,7 @@ export class RenderingSystem extends System {
       resolution: window.devicePixelRatio,
       width: window.innerWidth,
       height: window.innerHeight,
-      view: document.querySelector("#canvasRoot"),
+      view: this.parent,
     });
 
     const viewport = new Viewport({
@@ -92,7 +92,8 @@ export class RenderingSystem extends System {
 
     if (settingsEntity.cp.selectionManager.focused) {
       this.viewport.follow(
-        settingsEntity.cp.selectionManager.entity.cp.render.sprite
+        settingsEntity.cp.selectionManager.entity!.requireComponents(["render"])
+          .cp.render.sprite
       );
     }
 

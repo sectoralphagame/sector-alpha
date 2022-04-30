@@ -12,7 +12,7 @@ export interface CreateAllocationManagerOpts<T> {
 
 export class AllocationManager<T extends Allocation> {
   private allocations: T[] = [];
-  private allocationIdCounter: number = 0;
+  private allocationIdCounter: number = 1;
   // eslint-disable-next-line no-unused-vars
   private validate: (allocation: T) => boolean;
   private onChange: () => void;

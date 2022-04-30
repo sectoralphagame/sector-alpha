@@ -6,10 +6,10 @@ import { Parent } from "../components/parent";
 import { Position } from "../components/position";
 import { Render } from "../components/render";
 import { MineableCommodity } from "../economy/commodity";
-import { MissingComponentError } from "../errors";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import asteroidTexture from "../../assets/asteroid.svg";
+import { AsteroidField } from "./asteroidField";
 
 export const asteroidComponents = [
   "minable",
@@ -31,16 +31,12 @@ const fieldColors: Record<MineableCommodity, string> = {
 };
 
 export function asteroid(entity: Entity): Asteroid {
-  if (!entity.hasComponents(asteroidComponents)) {
-    throw new MissingComponentError(entity, asteroidComponents);
-  }
-
-  return entity as Asteroid;
+  return entity.requireComponents(asteroidComponents);
 }
 
 export function createAsteroid(
   sim: Sim,
-  parent: RequireComponent<"asteroidSpawn">,
+  parent: AsteroidField,
   position: Matrix
 ) {
   const entity = new Entity(sim);

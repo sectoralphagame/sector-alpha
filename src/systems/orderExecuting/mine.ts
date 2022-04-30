@@ -3,7 +3,7 @@ import { getClosestMineableAsteroid } from "../../economy/utils";
 import { RequireComponent } from "../../tsHelpers";
 
 export function mineOrder(
-  entity: RequireComponent<"drive" | "mining">,
+  entity: RequireComponent<"drive" | "mining" | "position" | "storage">,
   order: MineOrder
 ): boolean {
   if (
@@ -11,11 +11,12 @@ export function mineOrder(
     (order.targetRock.cp.minable.minedBy !== null &&
       order.targetRock.cp.minable.minedBy !== entity)
   ) {
-    order.targetRock = getClosestMineableAsteroid(
+    const rock = getClosestMineableAsteroid(
       order.target,
       entity.cp.position.coord
     );
-    if (!order.targetRock) return false;
+    if (!rock) return false;
+    order.targetRock = rock;
   }
 
   entity.cp.drive.setTarget(order.targetRock);

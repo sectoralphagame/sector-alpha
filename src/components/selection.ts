@@ -1,3 +1,4 @@
+import { MissingEntityError } from "../errors";
 import { Sim } from "../sim";
 import { Entity } from "./entity";
 
@@ -23,7 +24,11 @@ export class SelectionManager {
 
   load = (sim: Sim) => {
     if (this.id) {
-      this.entity = sim.entities.find((e) => e.id === this.id);
+      const entity = sim.entities.find((e) => e.id === this.id);
+      if (!entity) {
+        throw new MissingEntityError(this.id);
+      }
+      this.entity = entity;
     }
   };
 

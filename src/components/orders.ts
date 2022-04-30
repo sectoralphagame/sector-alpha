@@ -28,7 +28,7 @@ export interface HoldPositionOrder {
 
 export type Order = MoveOrder | TradeOrder | MineOrder | HoldPositionOrder;
 
-export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder | null {
+export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder {
   if (order.offer.quantity <= 0) {
     throw new NegativeQuantity(order.offer.quantity);
   }
@@ -39,7 +39,7 @@ export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder | null {
   };
 }
 
-export function mineOrder(order: Omit<MineOrder, "type">): MineOrder | null {
+export function mineOrder(order: Omit<MineOrder, "type">): MineOrder {
   return {
     ...order,
     type: "mine",
