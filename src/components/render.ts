@@ -27,7 +27,14 @@ export class Render {
     this.maxZ = maxZ;
 
     if (process.env.NODE_ENV !== "test") {
-      this.sprite = new PIXI.Sprite(PIXI.Texture.from(pathToTexture));
+      this.sprite = new PIXI.Sprite(
+        PIXI.Texture.from(pathToTexture, {
+          resolution: 2,
+          resourceOptions: {
+            scale: 2,
+          },
+        })
+      );
       this.sprite.anchor.set(0.5, 0.5);
       this.sprite.zIndex = zIndex;
       if (color) {
