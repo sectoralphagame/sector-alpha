@@ -39,10 +39,10 @@ export class Sim extends BaseSim {
     this.queries = createQueries(this);
 
     this.systems = [
-      new BudgetPlanningSystem(this),
       new ProducingSystem(this),
       new StorageQuotaPlanningSystem(this),
       new TradingSystem(this),
+      new BudgetPlanningSystem(this),
       new SelectingSystem(this),
       new OrderPlanningSystem(this),
       new MovingSystem(this),
