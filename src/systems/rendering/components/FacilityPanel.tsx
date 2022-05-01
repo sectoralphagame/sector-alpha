@@ -44,12 +44,24 @@ const FacilityPanel: React.FC = () => {
         </tbody>
       </table>
       <hr />
-      {facility.cp.modules.modules.map((facilityModule, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <div key={`${facilityModule.cp.name.value}-${index}`}>
-          {facilityModule.cp.name.value}
-        </div>
-      ))}
+      <table style={{ width: "100%" }}>
+        <tbody>
+          {facility.cp.modules.modules.map((facilityModule, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <tr key={`${facilityModule.cp.name.value}-${index}`}>
+              <td>{facilityModule.cp.name.value}</td>
+              {facilityModule.hasComponents(["production"]) && (
+                <td style={{ textAlign: "right" }}>
+                  {facilityModule.cp.production!.cooldowns.timers.production.toFixed(
+                    0
+                  )}
+                  s
+                </td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <hr />
       {(window.sim.entities as Entity[])
         .filter((e) => e?.cp.commander?.value === facility)
