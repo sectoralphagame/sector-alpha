@@ -7,6 +7,24 @@ import { Sim, sim } from "../sim";
 import { templates as facilityTemplates } from "./facilities";
 import { shipClasses } from "./ships";
 
+function getFreighterTemplate() {
+  const rnd = Math.random();
+
+  if (rnd > 0.9) {
+    return Math.random() > 0.5
+      ? shipClasses.largeFreighterA
+      : shipClasses.largeFreighterB;
+  }
+
+  if (rnd > 0.2) {
+    return Math.random() > 0.5
+      ? shipClasses.freighterA
+      : shipClasses.freighterB;
+  }
+
+  return Math.random() > 0.5 ? shipClasses.courierA : shipClasses.courierB;
+}
+
 function createFaction(index: number) {
   const char = String.fromCharCode(index + 65);
   const faction = new Faction(`f-${char}`);
@@ -64,13 +82,7 @@ factions.forEach((faction) => {
         mineOrTrade.components.owner.set(faction);
       } else {
         const tradeShip = createShip(window.sim as Sim, {
-          ...(Math.random() > 0.9
-            ? Math.random() > 0.5
-              ? shipClasses.freighterA
-              : shipClasses.freighterB
-            : Math.random() > 0.5
-            ? shipClasses.courierA
-            : shipClasses.courierB),
+          ...getFreighterTemplate(),
           position: matrix([random(-100, 100), random(-100, 100)]),
           sim,
           owner: faction,

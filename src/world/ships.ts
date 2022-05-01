@@ -52,6 +52,30 @@ export const shipClasses = {
     mining: 0,
     texture: mCivTexture,
   },
+  largeFreighterA: {
+    name: "Large Freighter A",
+    drive: {
+      cruise: 1.1,
+      maneuver: 0.1,
+      rotary: 11,
+      ttc: 13,
+    },
+    storage: 800,
+    mining: 0,
+    texture: lCivTexture,
+  },
+  largeFreighterB: {
+    name: "Large Freighter B",
+    drive: {
+      cruise: 0.9,
+      maneuver: 0.09,
+      rotary: 9,
+      ttc: 15,
+    },
+    storage: 940,
+    mining: 0,
+    texture: lCivTexture,
+  },
 
   minerA: {
     name: "Miner A",
