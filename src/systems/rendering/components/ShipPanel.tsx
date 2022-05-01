@@ -8,11 +8,14 @@ import { IconButton } from "./IconButton";
 import locationIcon from "../../../../assets/ui/location.svg";
 import { nano } from "../../../style";
 
-const styles = nano.sheet({
-  focus: {
-    marginLeft: "24px",
+const styles = nano.sheet(
+  {
+    focus: {
+      marginLeft: "24px",
+    },
   },
-});
+  "ShipPanel"
+);
 
 function getOrderDescription(ship: Ship, order: Order) {
   switch (order.type) {
