@@ -283,14 +283,11 @@ export function autoBuyMostNeededByCommander(
   >,
   commodity: Commodity
 ): boolean {
+  const minQuantity = 0.3 * entity.cp.storage.max;
   const commander = facility(entity.cp.commander.value);
-  if (
-    commander.cp.trade.offers[commodity].quantity <
-    0.4 * entity.cp.storage.max
-  )
-    return false;
+  if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
-  const target = getFacilityWithMostProfit(commander, commodity);
+  const target = getFacilityWithMostProfit(commander, commodity, minQuantity);
 
   if (!target) return false;
 
@@ -303,14 +300,11 @@ export function autoSellMostRedundantToCommander(
   >,
   commodity: Commodity
 ): boolean {
+  const minQuantity = 0.3 * entity.cp.storage.max;
   const commander = facility(entity.cp.commander.value);
-  if (
-    commander.cp.trade.offers[commodity].quantity <
-    0.4 * entity.cp.storage.max
-  )
-    return false;
+  if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
-  const target = getFacilityWithMostProfit(commander, commodity);
+  const target = getFacilityWithMostProfit(commander, commodity, minQuantity);
 
   if (!target) return false;
 

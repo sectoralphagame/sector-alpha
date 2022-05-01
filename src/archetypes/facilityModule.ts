@@ -89,16 +89,48 @@ export const facilityModules = {
       metals: { consumes: 25, produces: 0 },
       hullPlates: { consumes: 0, produces: 70 },
     },
-    time: 24,
+    time: 55,
   }),
   shipyard: createFacilityModuleTemplate({
     name: "Shipyard",
     pac: {
+      electronics: { consumes: 590, produces: 0 },
       food: { consumes: 10, produces: 0 },
       fuel: { consumes: 15, produces: 0 },
       hullPlates: { consumes: 400, produces: 0 },
     },
     time: 60,
+  }),
+  gold: createFacilityModuleTemplate({
+    name: "Gold Refinery",
+    pac: {
+      goldOre: { consumes: 300, produces: 0 },
+      food: { consumes: 35, produces: 0 },
+      fuel: { consumes: 90, produces: 0 },
+      gold: { consumes: 400, produces: 0 },
+    },
+    time: 230,
+  }),
+  silicon: createFacilityModuleTemplate({
+    name: "Silicon Purification",
+    pac: {
+      food: { consumes: 5, produces: 0 },
+      silica: { consumes: 20, produces: 0 },
+      silicon: { consumes: 0, produces: 35 },
+      fuel: { consumes: 3, produces: 0 },
+    },
+    time: 20,
+  }),
+  electronics: createFacilityModuleTemplate({
+    name: "Electronics Production",
+    pac: {
+      food: { consumes: 15, produces: 0 },
+      silicon: { consumes: 10, produces: 0 },
+      gold: { consumes: 8, produces: 0 },
+      electronics: { consumes: 0, produces: 40 },
+      fuel: { consumes: 5, produces: 0 },
+    },
+    time: 120,
   }),
   containerSmall: createFacilityModuleTemplate({
     name: "Small Container",

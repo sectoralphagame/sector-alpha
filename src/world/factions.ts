@@ -1,4 +1,4 @@
-import { add, e, Matrix, matrix, random, randomInt } from "mathjs";
+import { add, Matrix, matrix, random, randomInt } from "mathjs";
 import { createShip } from "../archetypes/ship";
 import { Parent } from "../components/parent";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
@@ -47,7 +47,8 @@ factions.forEach((faction) => {
       .map(([commodity]) => commodity as MineableCommodity);
     const hasMineables = [
       mineableCommodities.fuelium,
-      mineableCommodities.gold,
+      mineableCommodities.goldOre,
+      mineableCommodities.silica,
       mineableCommodities.ice,
       mineableCommodities.ore,
     ].some((commodity) => consumed.includes(commodity));
@@ -63,7 +64,11 @@ factions.forEach((faction) => {
         mineOrTrade.components.owner.set(faction);
       } else {
         const tradeShip = createShip(window.sim as Sim, {
-          ...(Math.random() > 0.5
+          ...(Math.random() > 0.9
+            ? Math.random() > 0.5
+              ? shipClasses.freighterA
+              : shipClasses.freighterB
+            : Math.random() > 0.5
             ? shipClasses.courierA
             : shipClasses.courierB),
           position: matrix([random(-100, 100), random(-100, 100)]),
