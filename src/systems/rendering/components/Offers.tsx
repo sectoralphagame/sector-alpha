@@ -40,9 +40,11 @@ export const Offers: React.FC<OffersProps> = ({ entity }) => {
             <tr key={data.commodity}>
               <TableCell>{data.commodity}</TableCell>
               <TableCell>{data.stored}</TableCell>
-              {!!data.produces && !!data.consumes && (
-                <TableCell>{data.produces - data.consumes}</TableCell>
-              )}
+              <TableCell>
+                {data.produces !== undefined && data.consumes !== undefined
+                  ? data.produces - data.consumes
+                  : "-"}
+              </TableCell>
               <TableCell>{data.quantity}</TableCell>
               <TableCell>{data.price}</TableCell>
             </tr>
