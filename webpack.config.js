@@ -15,15 +15,6 @@ const config = {
         },
       },
       {
-        test: /.*.ts$/,
-        loader: "string-replace-loader",
-        options: {
-          search: /aphrodite/,
-          // eslint-disable-next-line quotes
-          replace: "aphrodite/no-important",
-        },
-      },
-      {
         test: /\.tsx?$/,
         loader: "esbuild-loader",
         options: {

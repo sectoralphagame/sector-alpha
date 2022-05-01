@@ -1,8 +1,18 @@
 import React from "react";
+import SVG from "react-inlinesvg";
 import { ship as asShip, Ship } from "../../../archetypes/ship";
 import { Entity } from "../../../components/entity";
 import { Order } from "../../../components/orders";
 import { commodities } from "../../../economy/commodity";
+import { IconButton } from "./IconButton";
+import locationIcon from "../../../../assets/ui/location.svg";
+import { nano } from "../../../style";
+
+const styles = nano.sheet({
+  focus: {
+    marginLeft: "24px",
+  },
+});
 
 function getOrderDescription(ship: Ship, order: Order) {
   switch (order.type) {
@@ -21,6 +31,9 @@ function getOrderDescription(ship: Ship, order: Order) {
 
 const ShipPanel: React.FC = () => {
   const ship = asShip(window.selected as Entity);
+  const storedCommodities = Object.values(commodities).filter(
+    (commodity) => ship.cp.storage.getAvailableWares()[commodity] > 0
+  );
 
   return (
     <div>
@@ -28,7 +41,8 @@ const ShipPanel: React.FC = () => {
       {!!ship.cp.commander && (
         <div>
           {`Commander: ${ship.cp.commander.value.cp.name!.value}`}
-          <button
+          <IconButton
+            className={styles.focus}
             onClick={() => {
               const { selectionManager } = (window.sim.entities as Entity[])
                 .find((e) => e.hasComponents(["selectionManager"]))!
@@ -37,21 +51,24 @@ const ShipPanel: React.FC = () => {
               selectionManager.set(ship.cp.commander!.value);
               selectionManager.focused = true;
             }}
-            type="button"
           >
-            focus
-          </button>
+            <SVG src={locationIcon} />
+          </IconButton>
         </div>
       )}
       <hr />
-      {Object.values(commodities)
-        .map((commodity) => ({
-          commodity,
-          stored: ship.cp.storage.getAvailableWares()[commodity],
-        }))
-        .map((data) => (
-          <div key={data.commodity}>{`${data.commodity}: ${data.stored}`}</div>
-        ))}
+      {storedCommodities.length > 0
+        ? storedCommodities
+            .map((commodity) => ({
+              commodity,
+              stored: ship.cp.storage.getAvailableWares()[commodity],
+            }))
+            .map((data) => (
+              <div
+                key={data.commodity}
+              >{`${data.commodity}: ${data.stored}`}</div>
+            ))
+        : "Empty storage"}
       <hr />
       {ship.cp.orders.value.map((order, orderIndex) => (
         <div key={`${order.type}-${orderIndex}`}>

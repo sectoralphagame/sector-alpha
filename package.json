@@ -70,18 +70,19 @@
     "@types/lodash": "^4.14.177",
     "@types/react": "^17.0.40",
     "@types/react-dom": "^17.0.13",
-    "aphrodite": "^2.4.0",
     "clsx": "^1.1.1",
     "color": "^4.0.1",
     "colormap": "^2.3.2",
     "eventemitter3": "^4.0.7",
     "lodash": "^4.17.21",
     "mathjs": "^10.0.0",
+    "nano-css": "^5.3.4",
     "npm": "^8.7.0",
     "p5": "^1.4.1",
     "pixi-viewport": "^4.34.4",
     "pixi.js": "^6.3.0",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "react-inlinesvg": "^3.0.0"
   }
 }
