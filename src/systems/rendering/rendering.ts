@@ -6,6 +6,7 @@ import Color from "color";
 import { Sim } from "../../sim";
 import { System } from "../system";
 import { Query } from "../query";
+import { gridHex } from "./grid";
 
 const minScale = 0.4;
 
@@ -55,6 +56,8 @@ export class RenderingSystem extends System {
     viewport.sortableChildren = true;
 
     this.viewport = viewport;
+    gridHex(100, this.viewport, { color: 0x1d1d1d, width: 1 });
+    gridHex(1000, this.viewport, { color: 0x292929, width: 3 });
   };
 
   exec(): void {

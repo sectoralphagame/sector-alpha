@@ -65,6 +65,8 @@
   },
   "dependencies": {
     "@pixi-essentials/svg": "^1.1.5",
+    "@pixi/graphics": "^6.3.0",
+    "@pixi/graphics-extras": "^6.3.0",
     "@timohausmann/quadtree-js": "^1.2.5",
     "@types/color": "^3.0.2",
     "@types/lodash": "^4.14.177",
