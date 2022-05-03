@@ -23,7 +23,7 @@ const widenType = [...asteroidComponents][0];
 export type AsteroidComponent = typeof widenType;
 export type Asteroid = RequireComponent<AsteroidComponent>;
 
-const fieldColors: Record<MineableCommodity, string> = {
+export const fieldColors: Record<MineableCommodity, string> = {
   fuelium: "#ffab6b",
   goldOre: "#ffe46b",
   ice: "#e8ffff",

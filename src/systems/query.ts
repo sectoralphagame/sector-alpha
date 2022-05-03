@@ -59,6 +59,8 @@ export function createQueries(sim: Sim) {
     orderable: new Query(sim, ["orders"]),
     productionByModules: new Query(sim, ["production", "parent"]),
     renderable: new Query(sim, ["render", "position"]),
+    renderableGraphics: new Query(sim, ["renderGraphics", "position"]),
+    sectors: new Query(sim, ["renderGraphics", "hecsPosition"]),
     selectable: new Query(sim, ["render", "position", "selection"]),
     selectionManager: new Query(sim, ["selectionManager"]),
     standaloneProduction: new Query(sim, ["production", "storage"]),

@@ -5,14 +5,10 @@ import { Viewport } from "pixi-viewport";
 import Color from "color";
 import { Sim } from "../../sim";
 import { System } from "../system";
-import { Query } from "../query";
-import { gridHex } from "./grid";
 
 const minScale = 0.4;
 
 export class RenderingSystem extends System {
-  renderable: Query<"render" | "position">;
-  selectable: Query<"selection" | "position">;
   parent: HTMLCanvasElement;
   viewport: Viewport;
   p5: P5;
@@ -21,8 +17,6 @@ export class RenderingSystem extends System {
   constructor(sim: Sim) {
     super(sim);
     this.parent = document.querySelector("#canvasRoot")!;
-    this.renderable = new Query(sim, ["render", "position"]);
-    this.selectable = new Query(sim, ["selection", "position"]);
 
     this.init();
   }
@@ -56,12 +50,25 @@ export class RenderingSystem extends System {
     viewport.sortableChildren = true;
 
     this.viewport = viewport;
-    gridHex(100, this.viewport, { color: 0x1d1d1d, width: 1 });
-    gridHex(1000, this.viewport, { color: 0x292929, width: 3 });
   };
 
   exec(): void {
     const settingsEntity = this.sim.queries.selectionManager.get()[0];
+
+    this.sim.queries.sectors.get().forEach((sector) => {
+      if (!sector.cp.renderGraphics.initialized) {
+        sector.cp.renderGraphics.g.lineStyle({ color: 0x292929, width: 5 });
+        sector.cp.renderGraphics.draw(this.viewport);
+        sector.cp.renderGraphics.initialized = true;
+      }
+    });
+
+    this.sim.queries.renderableGraphics.get().forEach((entity) => {
+      if (!entity.cp.renderGraphics.initialized) {
+        entity.cp.renderGraphics.draw(this.viewport);
+        entity.cp.renderGraphics.initialized = true;
+      }
+    });
 
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;

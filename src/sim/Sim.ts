@@ -70,7 +70,7 @@ export class Sim extends BaseSim {
   };
 
   load = (world: World) => {
-    this.factions = world.factions;
+    world.factions(this);
   };
 
   next = (delta: number) => {

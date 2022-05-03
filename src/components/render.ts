@@ -47,3 +47,23 @@ export class Render {
     }
   }
 }
+
+export class RenderGraphics {
+  // eslint-disable-next-line no-unused-vars
+  _draw: (g: PIXI.Graphics) => void;
+  g: PIXI.Graphics;
+  initialized: boolean = false;
+
+  // eslint-disable-next-line no-unused-vars
+  constructor(draw: (g: PIXI.Graphics) => void) {
+    // eslint-disable-next-line no-underscore-dangle
+    this._draw = draw;
+    this.g = new PIXI.Graphics();
+  }
+
+  draw = (container: PIXI.Container) => {
+    container.addChild(this.g);
+    // eslint-disable-next-line no-underscore-dangle
+    this._draw(this.g);
+  };
+}
