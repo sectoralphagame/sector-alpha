@@ -9,6 +9,7 @@ import { MineableCommodity } from "../economy/commodity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { fieldColors } from "./asteroid";
+import { Sector } from "./sector";
 
 export const asteroidFieldComponents = [
   "asteroidSpawn",
@@ -30,13 +31,14 @@ export function createAsteroidField(
   sim: Sim,
   type: MineableCommodity,
   size: number,
-  position: Matrix
+  position: Matrix,
+  sector: Sector
 ) {
   const entity = new Entity(sim);
 
   entity.addComponent("asteroidSpawn", new AsteroidSpawn(type, size));
   entity.addComponent("children", new Children());
-  entity.addComponent("position", new Position(position, 0));
+  entity.addComponent("position", new Position(position, 0, sector));
   entity.addComponent(
     "renderGraphics",
     new RenderGraphics((g) => {

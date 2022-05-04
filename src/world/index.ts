@@ -1,11 +1,11 @@
 import { matrix } from "mathjs";
-import { createSector } from "../archetypes/sector";
-import { Sim } from "../sim";
+import { createSector, sector, sectorComponents } from "../archetypes/sector";
+import { sim, Sim } from "../sim";
 import { getRandomAsteroidField } from "./asteroids";
 import { factions } from "./factions";
 
 export interface World {
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars, no-shadow
   factions: (sim: Sim) => void;
 }
 
@@ -36,6 +36,14 @@ createSector(window.sim as Sim, {
 createSector(window.sim as Sim, {
   position: alpha.cp.hecsPosition.se(),
   name: "6",
+});
+createSector(window.sim as Sim, {
+  position: sector(
+    sim.entities.find(
+      (s) => s.hasComponents(sectorComponents) && s.cp.name!.value === "6"
+    )!
+  ).cp.hecsPosition.e(),
+  name: "7",
 });
 
 Array(20).fill(0).map(getRandomAsteroidField);

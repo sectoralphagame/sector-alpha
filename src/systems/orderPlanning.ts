@@ -60,7 +60,8 @@ function autoMine(
     | "commander"
     | "position"
     | "owner"
-  >
+  >,
+  sectorDistance: number
 ) {
   const commander = facility(entity.cp.commander.value);
 
@@ -79,6 +80,9 @@ function autoMine(
           .map(asteroidField)
           .filter(
             (e) =>
+              e.cp.position.sector.cp.hecsPosition.distance(
+                commander.cp.position.sector.cp.hecsPosition.value
+              ) <= sectorDistance &&
               e.cp.asteroidSpawn.type === mineable &&
               e.cp.children.value
                 .map(asteroid)
@@ -123,7 +127,8 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
           "commander",
           "orders",
           "owner",
-        ])
+        ]),
+        0
       );
       break;
     case "trade":

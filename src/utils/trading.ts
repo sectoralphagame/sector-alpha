@@ -287,7 +287,12 @@ export function autoBuyMostNeededByCommander(
   const commander = facility(entity.cp.commander.value);
   if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
-  const target = getFacilityWithMostProfit(commander, commodity, minQuantity);
+  const target = getFacilityWithMostProfit(
+    commander,
+    commodity,
+    minQuantity,
+    0
+  );
 
   if (!target) return false;
 
@@ -304,7 +309,12 @@ export function autoSellMostRedundantToCommander(
   const commander = facility(entity.cp.commander.value);
   if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
-  const target = getFacilityWithMostProfit(commander, commodity, minQuantity);
+  const target = getFacilityWithMostProfit(
+    commander,
+    commodity,
+    minQuantity,
+    0
+  );
 
   if (!target) return false;
 

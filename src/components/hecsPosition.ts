@@ -1,4 +1,4 @@
-import { matrix, Matrix, multiply } from "mathjs";
+import { matrix, Matrix, multiply, subtract, sum } from "mathjs";
 
 export class HECSPosition {
   value: Matrix;
@@ -18,6 +18,9 @@ export class HECSPosition {
       ),
       scale
     );
+
+  distance = (pos: Matrix): number =>
+    sum((subtract(this.value, pos) as Matrix).map(Math.abs)) / 2;
 
   se = (): Matrix =>
     matrix([

@@ -48,7 +48,7 @@ export const factions = (sim: Sim) =>
       );
       let hasShipyard = false;
 
-      for (let i = 0; i < randomInt(13, 20); i++) {
+      for (let i = 0; i < randomInt(10, 15); i++) {
         const facility = facilityTemplates[
           randomInt(0, facilityTemplates.length)
         ]({
@@ -57,6 +57,7 @@ export const factions = (sim: Sim) =>
             position,
             matrix([random(-30, 30), random(-30, 30)])
           ) as Matrix,
+          sector,
         });
         const hasShipyardModule = facility.cp.modules.modules.find(
           (m) => m.cp.name.value === "Shipyard"
@@ -86,16 +87,24 @@ export const factions = (sim: Sim) =>
               ...(Math.random() > 0.5
                 ? shipClasses.minerA
                 : shipClasses.minerB),
-              position: matrix([random(-100, 100), random(-100, 100)]),
+              position: add(
+                position,
+                matrix([random(-30, 30), random(-30, 30)])
+              ) as Matrix,
               owner: faction,
+              sector,
             });
             mineOrTrade.addComponent("commander", new Parent(facility));
             mineOrTrade.components.owner.set(faction);
           } else {
             const tradeShip = createShip(sim, {
               ...getFreighterTemplate(),
-              position: matrix([random(-100, 100), random(-100, 100)]),
+              position: add(
+                position,
+                matrix([random(-30, 30), random(-30, 30)])
+              ) as Matrix,
               owner: faction,
+              sector,
             });
             tradeShip.addComponent("commander", new Parent(facility));
             tradeShip.components.owner.set(faction);

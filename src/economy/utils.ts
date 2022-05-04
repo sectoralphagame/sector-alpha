@@ -15,7 +15,8 @@ export type WithTrade = RequireComponent<
 export function getFacilityWithMostProfit(
   facility: WithTrade,
   commodity: Commodity,
-  minQuantity: number
+  minQuantity: number,
+  sectorDistance: number
 ): WithTrade | null {
   const distance = (f: WithTrade) =>
     norm(
@@ -35,6 +36,9 @@ export function getFacilityWithMostProfit(
         .get()
         .filter(
           (f) =>
+            f.cp.position.sector.cp.hecsPosition.distance(
+              facility.cp.position.sector.cp.hecsPosition.value
+            ) <= sectorDistance &&
             f.components.trade.offers[commodity].type !==
               facility.components.trade.offers[commodity].type &&
             f.components.trade.offers[commodity].quantity >= minQuantity

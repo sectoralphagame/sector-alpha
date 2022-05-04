@@ -6,7 +6,7 @@ import Color from "color";
 import { Sim } from "../../sim";
 import { System } from "../system";
 
-const minScale = 0.4;
+const minScale = 0.2;
 
 export class RenderingSystem extends System {
   parent: HTMLCanvasElement;

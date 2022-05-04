@@ -6,11 +6,27 @@ import { Sim } from "../sim";
 import { createAsteroid } from "../archetypes/asteroid";
 import { sectorSize } from "../archetypes/sector";
 
-const getSize = () => (Math.random() < 0.1 ? random(6, 9) : random(2, 4));
+const getSize = () => (Math.random() < 0.1 ? random(4, 7) : random(1, 3));
 
 export function getRandomAsteroidField() {
   const sectors = (window.sim as Sim).queries.sectors.get();
   const sector = sectors[Math.floor(sectors.length * Math.random())];
+  const maxR = (sectorSize / 20) * Math.sqrt(3);
+
+  const sectorCenterPosition = sector.cp.hecsPosition.toCartesian(
+    (sectorSize / 10) * Math.sqrt(3)
+  );
+  const polarPosition = {
+    r: random(0, maxR - 7),
+    a: random(-Math.PI, Math.PI),
+  };
+  const position = add(
+    matrix([
+      polarPosition.r * Math.cos(polarPosition.a),
+      polarPosition.r * Math.sin(polarPosition.a),
+    ]),
+    sectorCenterPosition
+  ) as Matrix;
 
   const field = createAsteroidField(
     window.sim as Sim,
@@ -20,13 +36,8 @@ export function getRandomAsteroidField() {
       ]
     ],
     getSize(),
-    add(
-      sector.cp.hecsPosition.toCartesian(sectorSize / 10),
-      matrix([
-        random(-sectorSize / 20, sectorSize / 20),
-        random(-sectorSize / 20, sectorSize / 20),
-      ])
-    ) as Matrix
+    position,
+    sector
   );
 
   const asteroids = Math.round(
@@ -46,7 +57,8 @@ export function getRandomAsteroidField() {
           random(-field.cp.asteroidSpawn.size, field.cp.asteroidSpawn.size) *
             Math.sin(asteroidAngle),
         ])
-      ) as Matrix
+      ) as Matrix,
+      sector
     );
   }
 }
