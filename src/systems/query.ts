@@ -48,7 +48,7 @@ export class Query<T extends keyof CoreComponents> {
       ) as QueryEntities<T>;
     }
 
-    return this.entities;
+    return this.entities.filter((e) => !e.deleted);
   };
 }
 
@@ -66,6 +66,7 @@ export function createQueries(sim: Sim) {
     selectionManager: new Query(sim, ["selectionManager"]),
     standaloneProduction: new Query(sim, ["production", "storage"]),
     storageAndTrading: new Query(sim, ["storage", "trade"]),
+    teleports: new Query(sim, ["teleport"]),
     trading: new Query(sim, ["trade", "budget", "storage", "position"]),
   } as const;
 }

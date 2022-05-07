@@ -2,6 +2,7 @@ import { createFacility, InitialFacilityInput } from "../archetypes/facility";
 import { facilityModules } from "../archetypes/facilityModule";
 import { sim as defaultSim, Sim } from "../sim";
 import { addFacilityModule } from "../utils/entityModules";
+import fTeleport from "../../assets/f_teleport.svg";
 
 export function createRefineryFacility(
   input: InitialFacilityInput,
@@ -108,12 +109,19 @@ export function createElectronicsFacility(
   return facility;
 }
 
+export function createTeleporter(input: InitialFacilityInput) {
+  const facility = createFacility(sim, input);
+  addFacilityModule(facility, facilityModules.teleport(sim, facility));
+  facility.cp.render.setTexture(fTeleport);
+
+  return facility;
+}
+
 export const templates = [
   createFarm,
   createFuelFabricationFacility,
   createHullPlatesFacility,
   createRefineryFacility,
-  createShipyard,
   createWaterFacility,
   createGoldRefinery,
   createSiliconPurificationFacility,

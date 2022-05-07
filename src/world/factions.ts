@@ -5,7 +5,7 @@ import { Parent } from "../components/parent";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
-import { templates as facilityTemplates } from "./facilities";
+import { createTeleporter, templates as facilityTemplates } from "./facilities";
 import { shipClasses } from "./ships";
 
 function getFreighterTemplate() {
@@ -36,81 +36,92 @@ function createFaction(index: number) {
 }
 
 export const factions = (sim: Sim) =>
-  Array(10)
-    .fill(0)
-    .map((_, index) => createFaction(index))
-    .forEach((faction) => {
-      const sectors = sim.queries.sectors.get();
-      const sector = sectors[Math.floor(sectors.length * Math.random())];
+  sim.queries.sectors.get().forEach((sector, index, sectors) => {
+    const faction = createFaction(index);
 
-      const position = sector.cp.hecsPosition.toCartesian(
-        (sectorSize / 10) * Math.sqrt(3)
-      );
-      let hasShipyard = false;
+    const position = sector.cp.hecsPosition.toCartesian(
+      (sectorSize / 10) * Math.sqrt(3)
+    );
 
-      for (let i = 0; i < randomInt(10, 15); i++) {
-        const facility = facilityTemplates[
-          randomInt(0, facilityTemplates.length)
-        ]({
-          owner: faction,
-          position: add(
-            position,
-            matrix([random(-30, 30), random(-30, 30)])
-          ) as Matrix,
-          sector,
-        });
-        const hasShipyardModule = facility.cp.modules.modules.find(
-          (m) => m.cp.name.value === "Shipyard"
-        );
-        if (hasShipyard && hasShipyardModule) {
-          i--;
-          facility.unregister();
-          continue;
-        } else {
-          hasShipyard = true;
-        }
-
-        const consumed = Object.entries(facility.cp.compoundProduction.pac)
-          .filter(([, pac]) => pac.consumes > 0)
-          .map(([commodity]) => commodity as MineableCommodity);
-        const hasMineables = [
-          mineableCommodities.fuelium,
-          mineableCommodities.goldOre,
-          mineableCommodities.silica,
-          mineableCommodities.ice,
-          mineableCommodities.ore,
-        ].some((commodity) => consumed.includes(commodity));
-
-        do {
-          if (hasMineables) {
-            const mineOrTrade = createShip(sim, {
-              ...(Math.random() > 0.5
-                ? shipClasses.minerA
-                : shipClasses.minerB),
-              position: add(
-                position,
-                matrix([random(-30, 30), random(-30, 30)])
-              ) as Matrix,
-              owner: faction,
-              sector,
-            });
-            mineOrTrade.addComponent("commander", new Parent(facility));
-            mineOrTrade.components.owner.set(faction);
-          } else {
-            const tradeShip = createShip(sim, {
-              ...getFreighterTemplate(),
-              position: add(
-                position,
-                matrix([random(-30, 30), random(-30, 30)])
-              ) as Matrix,
-              owner: faction,
-              sector,
-            });
-            tradeShip.addComponent("commander", new Parent(facility));
-            tradeShip.components.owner.set(faction);
-          }
-        } while (Math.random() < 0.15);
-
-        facility.components.owner.set(faction);
+    for (
+      let i = 0;
+      i < (index === 0 || index === sectors.length - 1 ? 1 : 2);
+      i++
+    ) {
+      const teleporter = createTeleporter({
+        owner: faction,
+        position: add(
+          position,
+          matrix([
+            random(-sectorSize / 20, sectorSize / 20),
+            random(-sectorSize / 20, sectorSize / 20),
+          ])
+        ) as Matrix,
+        sector,
+      }).cp.modules.modules[0];
+      const target = sim.queries.teleports
+        .get()
+        .find((t) => !t.cp.teleport.destination && t.id !== teleporter.id);
+      if (target) {
+        const t = teleporter.requireComponents(["teleport"]);
+        t.requireComponents(["teleport"]).cp.teleport.link(t, target);
       }
-    });
+    }
+
+    for (let i = 0; i < randomInt(10, 15); i++) {
+      const facility = facilityTemplates[
+        randomInt(0, facilityTemplates.length)
+      ]({
+        owner: faction,
+        position: add(
+          position,
+          matrix([
+            random(-sectorSize / 20, sectorSize / 20),
+            random(-sectorSize / 20, sectorSize / 20),
+          ])
+        ) as Matrix,
+        sector,
+      });
+
+      const consumed = Object.entries(facility.cp.compoundProduction.pac)
+        .filter(([, pac]) => pac.consumes > 0)
+        .map(([commodity]) => commodity as MineableCommodity);
+      const hasMineables = [
+        mineableCommodities.fuelium,
+        mineableCommodities.goldOre,
+        mineableCommodities.silica,
+        mineableCommodities.ice,
+        mineableCommodities.ore,
+      ].some((commodity) => consumed.includes(commodity));
+
+      do {
+        if (hasMineables) {
+          const mineOrTrade = createShip(sim, {
+            ...(Math.random() > 0.5 ? shipClasses.minerA : shipClasses.minerB),
+            position: add(
+              position,
+              matrix([random(-30, 30), random(-30, 30)])
+            ) as Matrix,
+            owner: faction,
+            sector,
+          });
+          mineOrTrade.addComponent("commander", new Parent(facility));
+          mineOrTrade.components.owner.set(faction);
+        } else {
+          const tradeShip = createShip(sim, {
+            ...getFreighterTemplate(),
+            position: add(
+              position,
+              matrix([random(-30, 30), random(-30, 30)])
+            ) as Matrix,
+            owner: faction,
+            sector,
+          });
+          tradeShip.addComponent("commander", new Parent(facility));
+          tradeShip.components.owner.set(faction);
+        }
+      } while (Math.random() < 0.15);
+
+      facility.components.owner.set(faction);
+    }
+  });

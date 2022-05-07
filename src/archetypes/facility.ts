@@ -52,7 +52,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
   entity.addComponent("compoundProduction", new CompoundProduction());
   entity.addComponent("modules", new Modules());
   entity.addComponent("name", new Name(`Facility #${entity.id}`));
-  entity.addComponent("owner", new Owner());
+  entity.addComponent("owner", new Owner(initial.owner));
   entity.addComponent(
     "position",
     new Position(initial.position, 0, initial.sector)
@@ -60,7 +60,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
   entity.addComponent(
     "render",
     new Render({
-      color: Color(initial?.owner.color).rgbNumber(),
+      color: Color(initial.owner.color).rgbNumber(),
       defaultScale: 1,
       maxZ: 0.1,
       pathToTexture: fCivTexture,

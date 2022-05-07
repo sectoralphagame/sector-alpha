@@ -5,7 +5,10 @@ import { asteroidField } from "../archetypes/asteroidField";
 import { facility } from "../archetypes/facility";
 import { mineOrder } from "../components/orders";
 import { mineableCommodities } from "../economy/commodity";
-import { getClosestMineableAsteroid } from "../economy/utils";
+import {
+  getClosestMineableAsteroid,
+  getSectorsInTeleportRange,
+} from "../economy/utils";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
@@ -75,14 +78,20 @@ function autoMine(
 
     if (mineable) {
       const field = minBy(
-        entity.sim.queries.asteroidFields
-          .get()
+        getSectorsInTeleportRange(
+          entity.cp.position.sector,
+          sectorDistance,
+          entity.sim
+        )
+          .map((sector) =>
+            entity.sim.queries.asteroidFields
+              .get()
+              .filter((f) => f.cp.position!.sector === sector)
+          )
+          .flat()
           .map(asteroidField)
           .filter(
             (e) =>
-              e.cp.position.sector.cp.hecsPosition.distance(
-                commander.cp.position.sector.cp.hecsPosition.value
-              ) <= sectorDistance &&
               e.cp.asteroidSpawn.type === mineable &&
               e.cp.children.value
                 .map(asteroid)

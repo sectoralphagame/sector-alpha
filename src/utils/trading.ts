@@ -291,7 +291,7 @@ export function autoBuyMostNeededByCommander(
     commander,
     commodity,
     minQuantity,
-    0
+    2
   );
 
   if (!target) return false;
@@ -313,7 +313,7 @@ export function autoSellMostRedundantToCommander(
     commander,
     commodity,
     minQuantity,
-    0
+    2
   );
 
   if (!target) return false;

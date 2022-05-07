@@ -21,6 +21,7 @@ import { Orders } from "./orders";
 import { RequireComponent } from "../tsHelpers";
 import { MissingComponentError } from "../errors";
 import { HECSPosition } from "./hecsPosition";
+import { Teleport } from "./teleport";
 
 export interface CoreComponents {
   asteroidSpawn: AsteroidSpawn;
@@ -46,6 +47,7 @@ export interface CoreComponents {
   selectionManager: SelectionManager;
   storage: CommodityStorage;
   storageBonus: StorageBonus;
+  teleport: Teleport;
   trade: Trade;
 }
 
@@ -53,6 +55,7 @@ export class Entity {
   components: Partial<CoreComponents> = {};
   id: number;
   sim: Sim;
+  deleted: boolean = false;
 
   constructor(sim: Sim) {
     this.sim = sim;
@@ -91,6 +94,7 @@ export class Entity {
   }
 
   unregister() {
+    this.deleted = true;
     this.sim.unregisterEntity(this);
   }
 }

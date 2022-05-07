@@ -1,16 +1,53 @@
 import { Matrix, norm, subtract, sum } from "mathjs";
 import sortBy from "lodash/sortBy";
+import uniqBy from "lodash/uniqBy";
 import minBy from "lodash/minBy";
 import { map } from "lodash";
-import { sim } from "../sim";
+import { Sim } from "../sim";
 import { Commodity } from "./commodity";
 import { RequireComponent } from "../tsHelpers";
 import { AsteroidField } from "../archetypes/asteroidField";
 import { asteroid, Asteroid } from "../archetypes/asteroid";
+import { Sector } from "../archetypes/sector";
 
 export type WithTrade = RequireComponent<
   "trade" | "storage" | "budget" | "position" | "owner"
 >;
+
+export function getSectorsInTeleportRange(
+  origin: Sector,
+  jumps: number,
+  sim: Sim
+): Sector[] {
+  if (jumps === 0) {
+    return [origin];
+  }
+
+  return uniqBy(
+    [
+      origin,
+      ...sim.queries.teleports
+        .get()
+        .filter(
+          (teleport) =>
+            teleport.cp.parent!.value.requireComponents(["position"]).cp
+              .position.sector === origin
+        )
+        .map((teleport) =>
+          getSectorsInTeleportRange(
+            teleport.cp.teleport.destination
+              .requireComponents(["parent"])
+              .cp.parent.value.requireComponents(["position"]).cp.position
+              .sector,
+            jumps - 1,
+            sim
+          )
+        )
+        .flat(),
+    ],
+    "id"
+  );
+}
 
 export function getFacilityWithMostProfit(
   facility: WithTrade,
@@ -32,13 +69,19 @@ export function getFacilityWithMostProfit(
 
   const sortedByProfit = sortBy(
     (
-      sim.queries.trading
-        .get()
+      getSectorsInTeleportRange(
+        facility.cp.position.sector,
+        sectorDistance,
+        facility.sim
+      )
+        .map((sector) =>
+          facility.sim.queries.trading
+            .get()
+            .filter((f) => f.cp.position.sector === sector)
+        )
+        .flat()
         .filter(
           (f) =>
-            f.cp.position.sector.cp.hecsPosition.distance(
-              facility.cp.position.sector.cp.hecsPosition.value
-            ) <= sectorDistance &&
             f.components.trade.offers[commodity].type !==
               facility.components.trade.offers[commodity].type &&
             f.components.trade.offers[commodity].quantity >= minQuantity

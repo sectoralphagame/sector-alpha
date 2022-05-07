@@ -1,10 +1,14 @@
 import P5 from "p5";
-import "./components/Panel";
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
 import { Sim } from "../../sim";
 import { System } from "../system";
+
+if (process.env.NODE_ENV !== "test") {
+  // eslint-disable-next-line global-require
+  require("./components/Panel");
+}
 
 const minScale = 0.2;
 
