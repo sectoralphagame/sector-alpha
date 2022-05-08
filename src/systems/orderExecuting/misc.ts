@@ -8,7 +8,13 @@ export function moveOrder(
 ): boolean {
   entity.cp.drive.setTarget(order.position);
 
-  return entity.cp.drive.targetReached;
+  const reached = entity.cp.drive.targetReached;
+
+  if (reached) {
+    entity.cp.drive.setTarget(null);
+  }
+
+  return reached;
 }
 
 export function teleportOrder(

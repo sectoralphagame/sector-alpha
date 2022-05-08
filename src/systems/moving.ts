@@ -15,6 +15,14 @@ function move(entity: Driveable, delta: number) {
   if (drive.target === null) return;
 
   const targetPosition = drive.target.cp.position;
+  const isInSector = targetPosition.sector.id === entity.cp.position.sector.id;
+  if (!isInSector) {
+    console.error(entity);
+    console.error(drive.target);
+    drive.target = null;
+    entity.cp.orders!.value = [];
+    throw new Error("Out of bounds");
+  }
   const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
   // TODO: Investigate magic that is happening here with 90deg offsets
   const targetAngle = Math.atan2(path.get([1]), path.get([0])) + Math.PI / 2;
