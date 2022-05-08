@@ -17,6 +17,8 @@ import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Sector } from "./sector";
 
+export const commanderRange = 2;
+
 export const facilityComponents = [
   "budget",
   "compoundProduction",

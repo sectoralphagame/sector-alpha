@@ -1,4 +1,5 @@
-import { MoveOrder } from "../../components/orders";
+import { MoveOrder, TeleportOrder } from "../../components/orders";
+import { Position } from "../../components/position";
 import { RequireComponent } from "../../tsHelpers";
 
 export function moveOrder(
@@ -8,6 +9,19 @@ export function moveOrder(
   entity.cp.drive.setTarget(order.position);
 
   return entity.cp.drive.targetReached;
+}
+
+export function teleportOrder(
+  entity: RequireComponent<"position" | "orders">,
+  order: TeleportOrder
+): boolean {
+  entity.cp.position = new Position(
+    order.position.cp.position.coord,
+    entity.cp.position.angle,
+    order.position.cp.position.sector
+  );
+
+  return true;
 }
 
 export function holdPosition() {

@@ -6,6 +6,7 @@ import { Modules } from "../components/modules";
 import { Owner } from "../components/owner";
 import { Position } from "../components/position";
 import { Sim } from "../sim/Sim";
+import { regen } from "../systems/pathPlanning";
 import { addFacilityModule } from "../utils/entityModules";
 import { Faction } from "./faction";
 import { getSectorsInTeleportRange } from "./utils";
@@ -61,10 +62,11 @@ describe("getSectorsInTeleportRange", () => {
         t3.cp.modules.modules[0].requireComponents(["teleport"]),
         t4.cp.modules.modules[0].requireComponents(["teleport"])
       );
+    regen(sim);
 
     expect(getSectorsInTeleportRange(sectors[0], 0, sim)).toHaveLength(1);
-    expect(getSectorsInTeleportRange(sectors[0], 1, sim)).toHaveLength(3);
-    expect(getSectorsInTeleportRange(sectors[0], 2, sim)).toHaveLength(4);
-    expect(getSectorsInTeleportRange(sectors[1], 1, sim)).toHaveLength(4);
+    expect(getSectorsInTeleportRange(sectors[0], 1, sim)).toHaveLength(2);
+    expect(getSectorsInTeleportRange(sectors[0], 2, sim)).toHaveLength(3);
+    expect(getSectorsInTeleportRange(sectors[1], 1, sim)).toHaveLength(3);
   });
 });

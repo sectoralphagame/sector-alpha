@@ -11,6 +11,7 @@ import { InvalidOfferType, NonPositiveAmount } from "../errors";
 import type { RequireComponent } from "../tsHelpers";
 import { perCommodity } from "./perCommodity";
 import { createOffers } from "../systems/trading";
+import { moveToOrders } from "./moving";
 
 export function isTradeAccepted(
   entity: WithTrade,
@@ -176,11 +177,15 @@ export function getCommoditiesForSell(entity: WithTrade): Commodity[] {
 }
 
 export function tradeCommodity(
-  entity: RequireComponent<"storage" | "commander" | "owner" | "orders">,
+  entity: RequireComponent<
+    "storage" | "commander" | "owner" | "orders" | "position"
+  >,
   commodity: Commodity,
   buyer: WithTrade,
   seller: WithTrade
 ): boolean {
+  if (!entity.sim.paths) return false;
+
   const sameFaction = entity.cp.owner.value === seller.components.owner.value;
   const buy = entity.cp.commander.value === buyer;
   const commander = entity.cp.commander.value.requireComponents([
@@ -236,6 +241,7 @@ export function tradeCommodity(
   }
 
   entity.cp.orders.value.push(
+    ...moveToOrders(entity, seller),
     tradeOrder({
       target: seller,
       offer: {
@@ -253,10 +259,8 @@ export function tradeCommodity(
         },
         type: "buy",
       },
-    })
-  );
-
-  entity.cp.orders.value.push(
+    }),
+    ...moveToOrders(seller, buyer),
     tradeOrder({
       target: buyer,
       offer: {
@@ -279,9 +283,10 @@ export function tradeCommodity(
 
 export function autoBuyMostNeededByCommander(
   entity: RequireComponent<
-    "commander" | "storage" | "owner" | "orders" | "autoOrder"
+    "commander" | "storage" | "owner" | "orders" | "autoOrder" | "position"
   >,
-  commodity: Commodity
+  commodity: Commodity,
+  jumps: number
 ): boolean {
   const minQuantity = 0;
   const commander = facility(entity.cp.commander.value);
@@ -291,7 +296,7 @@ export function autoBuyMostNeededByCommander(
     commander,
     commodity,
     minQuantity,
-    2
+    jumps
   );
 
   if (!target) return false;
@@ -301,9 +306,10 @@ export function autoBuyMostNeededByCommander(
 
 export function autoSellMostRedundantToCommander(
   entity: RequireComponent<
-    "commander" | "storage" | "owner" | "orders" | "autoOrder"
+    "commander" | "storage" | "owner" | "orders" | "autoOrder" | "position"
   >,
-  commodity: Commodity
+  commodity: Commodity,
+  jumps: number
 ): boolean {
   const minQuantity = 0;
   const commander = facility(entity.cp.commander.value);
@@ -313,7 +319,7 @@ export function autoSellMostRedundantToCommander(
     commander,
     commodity,
     minQuantity,
-    2
+    jumps
   );
 
   if (!target) return false;
@@ -323,14 +329,11 @@ export function autoSellMostRedundantToCommander(
 
 export function returnToFacility(
   entity: RequireComponent<
-    "drive" | "commander" | "orders" | "storage" | "owner"
+    "drive" | "commander" | "orders" | "storage" | "owner" | "position"
   >
 ) {
   const commander = facility(entity.cp.commander.value);
-  entity.cp.orders.value.push({
-    type: "move",
-    position: commander.cp.position.coord,
-  });
+  entity.cp.orders.value.push(...moveToOrders(entity, commander));
   Object.values(commodities)
     .filter((commodity) => entity.cp.storage.getAvailableWares()[commodity] > 0)
     .forEach((commodity) => {

@@ -2,7 +2,7 @@ import { minBy } from "lodash";
 import { Matrix, norm, subtract } from "mathjs";
 import { asteroid } from "../archetypes/asteroid";
 import { asteroidField } from "../archetypes/asteroidField";
-import { facility } from "../archetypes/facility";
+import { commanderRange, facility } from "../archetypes/facility";
 import { mineOrder } from "../components/orders";
 import { mineableCommodities } from "../economy/commodity";
 import {
@@ -12,6 +12,7 @@ import {
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
+import { moveToOrders } from "../utils/moving";
 import {
   autoBuyMostNeededByCommander,
   autoSellMostRedundantToCommander,
@@ -23,10 +24,16 @@ import { holdPosition } from "./orderExecuting/misc";
 import { System } from "./system";
 
 type Trading = RequireComponent<
-  "drive" | "storage" | "autoOrder" | "orders" | "commander" | "owner"
+  | "drive"
+  | "storage"
+  | "autoOrder"
+  | "orders"
+  | "commander"
+  | "owner"
+  | "position"
 >;
 
-function autoTrade(entity: Trading) {
+function autoTrade(entity: Trading, sectorDistance: number) {
   const commander = facility(entity.cp.commander.value);
 
   if (entity.cp.storage.getAvailableSpace() !== entity.cp.storage.max) {
@@ -37,7 +44,7 @@ function autoTrade(entity: Trading) {
         return true;
       }
 
-      return autoBuyMostNeededByCommander(entity, commodity);
+      return autoBuyMostNeededByCommander(entity, commodity, sectorDistance);
     }, false);
 
     if (bought) {
@@ -49,7 +56,11 @@ function autoTrade(entity: Trading) {
         return true;
       }
 
-      return autoSellMostRedundantToCommander(entity, commodity);
+      return autoSellMostRedundantToCommander(
+        entity,
+        commodity,
+        sectorDistance
+      );
     }, false);
   }
 }
@@ -109,6 +120,7 @@ function autoMine(
 
       if (rock) {
         entity.cp.orders.value.push(
+          ...moveToOrders(entity, field),
           mineOrder({
             target: field,
             targetRock: rock,
@@ -137,7 +149,7 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
           "orders",
           "owner",
         ]),
-        0
+        commanderRange
       );
       break;
     case "trade":
@@ -149,7 +161,9 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
           "orders",
           "commander",
           "owner",
-        ])
+          "position",
+        ]),
+        commanderRange
       );
       break;
     default:

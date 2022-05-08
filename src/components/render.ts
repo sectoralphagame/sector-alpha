@@ -25,14 +25,12 @@ export class Render {
     zIndex,
   }: RenderInput) {
     this.defaultScale = defaultScale;
-    this.maxZ = maxZ;
     this.zIndex = zIndex;
+    this.maxZ = maxZ;
 
     if (process.env.NODE_ENV !== "test") {
       this.setTexture(pathToTexture);
 
-      this.sprite.anchor.set(0.5, 0.5);
-      this.sprite.zIndex = zIndex;
       if (color) {
         this.sprite.tint = color;
         this.color = color;
@@ -42,14 +40,18 @@ export class Render {
 
   setTexture = (pathToTexture: string) => {
     this.texture = pathToTexture;
-    this.sprite = new PIXI.Sprite(
-      PIXI.Texture.from(pathToTexture, {
-        resolution: 2,
-        resourceOptions: {
-          scale: 2,
-        },
-      })
-    );
+    if (process.env.NODE_ENV !== "test") {
+      this.sprite = new PIXI.Sprite(
+        PIXI.Texture.from(pathToTexture, {
+          resolution: 2,
+          resourceOptions: {
+            scale: 2,
+          },
+        })
+      );
+      this.sprite.anchor.set(0.5, 0.5);
+      this.sprite.zIndex = this.zIndex;
+    }
   };
 }
 

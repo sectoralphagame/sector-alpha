@@ -1,5 +1,4 @@
 import { add, Matrix, matrix, multiply, norm, subtract } from "mathjs";
-import { Entity } from "../components/entity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Query } from "./query";
@@ -10,16 +9,13 @@ type Driveable = RequireComponent<"drive" | "position">;
 function move(entity: Driveable, delta: number) {
   entity.cp.drive.sim(delta);
 
-  if (entity.cp.drive.target === null) return;
-
   const entityPosition = entity.cp.position;
   const drive = entity.cp.drive;
 
-  const targetPosition =
-    drive.target instanceof Entity
-      ? drive.target.cp.position.coord
-      : drive.target!;
-  const path = subtract(targetPosition, entityPosition.coord) as Matrix;
+  if (drive.target === null) return;
+
+  const targetPosition = drive.target.cp.position;
+  const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
   // TODO: Investigate magic that is happening here with 90deg offsets
   const targetAngle = Math.atan2(path.get([1]), path.get([0])) + Math.PI / 2;
   const speed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
@@ -42,7 +38,7 @@ function move(entity: Driveable, delta: number) {
       : targetAngle - entityPosition.angle;
 
   if (norm(dPos) >= distance) {
-    entityPosition.coord = matrix(targetPosition);
+    entityPosition.coord = matrix(targetPosition.coord);
     drive.targetReached = true;
     return;
   }

@@ -13,6 +13,7 @@ export class Position {
     this.coord = matrix(value);
     this.angle = angle;
     this.sector = sector;
+    this.sectorId = sector.id;
   }
 
   get x() {

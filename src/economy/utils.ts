@@ -1,6 +1,5 @@
 import { Matrix, norm, subtract, sum } from "mathjs";
 import sortBy from "lodash/sortBy";
-import uniqBy from "lodash/uniqBy";
 import minBy from "lodash/minBy";
 import { map } from "lodash";
 import { Sim } from "../sim";
@@ -19,34 +18,10 @@ export function getSectorsInTeleportRange(
   jumps: number,
   sim: Sim
 ): Sector[] {
-  if (jumps === 0) {
-    return [origin];
-  }
-
-  return uniqBy(
-    [
-      origin,
-      ...sim.queries.teleports
-        .get()
-        .filter(
-          (teleport) =>
-            teleport.cp.parent!.value.requireComponents(["position"]).cp
-              .position.sector === origin
-        )
-        .map((teleport) =>
-          getSectorsInTeleportRange(
-            teleport.cp.teleport.destination
-              .requireComponents(["parent"])
-              .cp.parent.value.requireComponents(["position"]).cp.position
-              .sector,
-            jumps - 1,
-            sim
-          )
-        )
-        .flat(),
-    ],
-    "id"
-  );
+  const ids = Object.entries(sim.paths[origin.id.toString()])
+    .filter(([, path]) => path.distance <= jumps)
+    .map(([id]) => parseInt(id, 10));
+  return sim.queries.sectors.get().filter((sector) => ids.includes(sector.id));
 }
 
 export function getFacilityWithMostProfit(

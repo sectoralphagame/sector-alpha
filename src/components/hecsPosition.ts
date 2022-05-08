@@ -7,6 +7,21 @@ export class HECSPosition {
     this.value = value;
   }
 
+  static round = (hex: Matrix) => {
+    const rounded = hex.map(Math.round);
+    const diff = (subtract(hex, rounded) as Matrix).map(Math.abs);
+
+    if (diff.get([0]) > diff.get([1]) && diff.get([0]) > diff.get([2])) {
+      rounded.set([0], -rounded.get([1]) - rounded.get([2]));
+    } else if (diff.get([1]) > diff.get([2])) {
+      rounded.set([1], -rounded.get([0]) - rounded.get([2]));
+    } else {
+      rounded.set([2], -rounded.get([0]) - rounded.get([1]));
+    }
+
+    return rounded;
+  };
+
   toCartesian = (scale: number): Matrix =>
     multiply(
       multiply(

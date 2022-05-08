@@ -13,6 +13,7 @@
   "author": "Dominik Żegleń",
   "license": "ISC",
   "devDependencies": {
+    "@types/graphlib": "^2.1.8",
     "@types/jest": "^27.0.2",
     "@types/mathjs": "^9.4.2",
     "@types/p5": "^1.4.1",
@@ -76,6 +77,7 @@
     "color": "^4.0.1",
     "colormap": "^2.3.2",
     "eventemitter3": "^4.0.7",
+    "graphlib": "^2.1.8",
     "lodash": "^4.17.21",
     "mathjs": "^10.0.0",
     "nano-css": "^5.3.4",
