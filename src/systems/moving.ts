@@ -17,7 +17,9 @@ function move(entity: Driveable, delta: number) {
   const targetPosition = drive.target.cp.position;
   const isInSector = targetPosition.sector.id === entity.cp.position.sector.id;
   if (!isInSector) {
+    // eslint-disable-next-line no-console
     console.error(entity);
+    // eslint-disable-next-line no-console
     console.error(drive.target);
     drive.target = null;
     entity.cp.orders!.value = [];
