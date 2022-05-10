@@ -13,7 +13,7 @@ export class SelectionManager {
   constructor() {
     entityCounter++;
 
-    if (entityCounter > 1) {
+    if (entityCounter > 1 && process.env.NODE_ENV !== "test") {
       // eslint-disable-next-line no-console
       console.warn(
         "SelectionManager is meant to be singleton. Please make sure you know what you're doing."

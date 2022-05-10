@@ -9,8 +9,8 @@ import {
 } from "../errors";
 import { perCommodity } from "../utils/perCommodity";
 import { AllocationManager } from "../components/utils/allocations";
-import { sim } from "../sim";
 import { Commodity } from "../economy/commodity";
+import { sim } from "../sim";
 
 export type StorageAllocationType = "incoming" | "outgoing";
 
@@ -67,7 +67,7 @@ export class CommodityStorage {
   }
 
   onChange = (entry: Omit<CommodityStorageHistoryEntry, "time">) => {
-    this.addHitoryEntry({ ...entry, time: sim.getTime() });
+    this.addHitoryEntry({ ...entry, time: sim ? sim.getTime() : 0 });
     this.updateAvailableWares();
     this.changeHandler();
   };

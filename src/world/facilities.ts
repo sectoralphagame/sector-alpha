@@ -1,9 +1,9 @@
 import { createFacility } from "../archetypes/facility";
 import { facilityModules } from "../archetypes/facilityModule";
-import { sim } from "../sim";
+import { sim as defaultSim, Sim } from "../sim";
 import { addFacilityModule } from "../utils/entityModules";
 
-export function createRefineryFacility() {
+export function createRefineryFacility(sim: Sim = defaultSim) {
   const facility = createFacility(sim);
   addFacilityModule(facility, facilityModules.refinery(sim, facility));
   addFacilityModule(facility, facilityModules.refinery(sim, facility));
@@ -13,7 +13,7 @@ export function createRefineryFacility() {
   return facility;
 }
 
-export function createFarm() {
+export function createFarm(sim: Sim = defaultSim) {
   const facility = createFacility(sim);
   addFacilityModule(facility, facilityModules.farm(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
@@ -22,7 +22,7 @@ export function createFarm() {
   return facility;
 }
 
-export function createShipyard() {
+export function createShipyard(sim: Sim = defaultSim) {
   const facility = createFacility(sim);
   addFacilityModule(facility, facilityModules.shipyard(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
@@ -30,7 +30,7 @@ export function createShipyard() {
   return facility;
 }
 
-export function createWaterFacility() {
+export function createWaterFacility(sim: Sim = defaultSim) {
   const facility = createFacility(sim);
   addFacilityModule(facility, facilityModules.water(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
@@ -39,7 +39,7 @@ export function createWaterFacility() {
   return facility;
 }
 
-export function createFuelFabricationFacility() {
+export function createFuelFabricationFacility(sim: Sim = defaultSim) {
   const facility = createFacility(sim);
   addFacilityModule(facility, facilityModules.fuelFabrication(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
@@ -48,7 +48,7 @@ export function createFuelFabricationFacility() {
   return facility;
 }
 
-export function createHullPlatesFacility() {
+export function createHullPlatesFacility(sim: Sim = defaultSim) {
   const facility = createFacility(sim);
   addFacilityModule(facility, facilityModules.hullPlates(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));

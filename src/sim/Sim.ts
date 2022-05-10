@@ -13,7 +13,6 @@ import { SelectionManager } from "../components/selection";
 import { OrderPlanningSystem } from "../systems/orderPlanning";
 import { MovingSystem } from "../systems/moving";
 import { MiningSystem } from "../systems/mining";
-import { RenderingSystem } from "../systems/rendering";
 import { createQueries, Queries } from "../systems/query";
 import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
 
@@ -45,9 +44,15 @@ export class Sim extends BaseSim {
       new OrderPlanningSystem(this),
       new MovingSystem(this),
       new MiningSystem(this),
-      new RenderingSystem(this),
       new OrderExecutingSystem(this),
     ];
+
+    if (process.env.NODE_ENV !== "test") {
+      // Do not try to render anything while testing
+      // eslint-disable-next-line global-require
+      const { RenderingSystem } = require("../systems/rendering");
+      this.systems.push(new RenderingSystem(this));
+    }
   }
 
   registerEntity = (entity: Entity) => {

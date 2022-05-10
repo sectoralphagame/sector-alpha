@@ -37,7 +37,7 @@ function getProductionCost(entity: Entity, commodity: Commodity): number {
   );
 }
 
-function adjustPrices(entity: Entity) {
+export function adjustPrices(entity: Entity) {
   const quantities = perCommodity(
     (commodity) =>
       sum(
@@ -112,7 +112,7 @@ function getSurplus(entity: Entity, commodity: Commodity) {
   );
 }
 
-function getOfferedQuantity(entity: Entity, commodity: Commodity) {
+export function getOfferedQuantity(entity: Entity, commodity: Commodity) {
   if (!entity.hasComponents(["compoundProduction"])) {
     return entity.cp.storage.getAvailableWares()[commodity];
   }
@@ -148,7 +148,7 @@ function getOfferedQuantity(entity: Entity, commodity: Commodity) {
   return Math.floor(multiplier * (stored[commodity] - quota));
 }
 
-function createOffers(entity: Entity) {
+export function createOffers(entity: Entity) {
   entity.cp.trade.offers = perCommodity((commodity): TradeOffer => {
     const quantity = getOfferedQuantity(entity, commodity);
 

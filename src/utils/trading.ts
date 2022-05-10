@@ -11,6 +11,7 @@ import { getFacilityWithMostProfit } from "../economy/utils";
 import { InvalidOfferType, NonPositiveAmount } from "../errors";
 import { RequireComponent } from "../tsHelpers";
 import { perCommodity } from "./perCommodity";
+import { createOffers } from "../systems/trading";
 
 export function isTradeAccepted(
   entity: Entity,
@@ -77,6 +78,7 @@ export function acceptTrade(entity: Entity, input: TransactionInput) {
   if (entity.cp.trade.transactions.length > maxTransactions) {
     entity.cp.trade.transactions.shift();
   }
+  createOffers(entity);
 }
 
 /**
