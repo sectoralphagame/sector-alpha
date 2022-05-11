@@ -42,10 +42,9 @@ factions.forEach((faction) => {
 
     do {
       if (hasMineables) {
-        const mineOrTrade = createShip(window.sim as Sim, {
+        const mineOrTrade = createShip(sim, {
           ...(Math.random() > 0.5 ? shipClasses.minerA : shipClasses.minerB),
           position: matrix([random(-100, 100), random(-100, 100)]),
-          sim,
           owner: faction,
         });
         mineOrTrade.addComponent("commander", new Parent(facility));
@@ -54,7 +53,6 @@ factions.forEach((faction) => {
       const tradeShip = createShip(window.sim as Sim, {
         ...(Math.random() > 0.5 ? shipClasses.shipA : shipClasses.shipB),
         position: matrix([random(-100, 100), random(-100, 100)]),
-        sim,
         owner: faction,
       });
       tradeShip.addComponent("commander", new Parent(facility));

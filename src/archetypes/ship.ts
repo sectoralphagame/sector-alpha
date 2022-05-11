@@ -42,7 +42,6 @@ export interface InitialShipInput {
   name: string;
   position: Matrix;
   drive: ShipDriveProps;
-  sim: Sim;
   owner: Faction;
   storage: number;
   mining: number;
