@@ -37,4 +37,10 @@ export class Cooldowns<T extends string> {
 
     return copy;
   }
+
+  reset(): void {
+    Object.keys(this.timers).forEach((key) => {
+      this.timers[key] = 0;
+    });
+  }
 }

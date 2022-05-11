@@ -1,3 +1,6 @@
+import { difference } from "lodash";
+import { CoreComponents, Entity } from "./components/entity";
+
 export const notImplemented = new Error("Not implemented");
 
 export class InsufficientStorage extends Error {
@@ -84,5 +87,24 @@ export class InvalidOfferType extends Error {
   constructor(type: string) {
     super(`Expected opposed offer, but both got: ${type}`);
     this.type = type;
+  }
+}
+
+export class MissingComponentError extends Error {
+  entity: Entity;
+  expectedComponents: Readonly<Array<keyof CoreComponents>>;
+
+  constructor(
+    entity: Entity,
+    expectedComponents: Readonly<Array<keyof CoreComponents>>
+  ) {
+    super(
+      `Missing following components: ${difference(
+        expectedComponents,
+        Object.keys(entity.cp)
+      ).join(", ")}`
+    );
+    this.entity = entity;
+    this.expectedComponents = expectedComponents;
   }
 }

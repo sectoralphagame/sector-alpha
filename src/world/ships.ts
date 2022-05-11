@@ -1,13 +1,11 @@
-import { matrix } from "mathjs";
-import { InitialShipInput } from "../entities/ship";
+import { InitialShipInput } from "../archetypes/ship";
 
 export const shipClasses: Record<
   "shipA" | "shipB" | "minerA" | "minerB",
-  InitialShipInput
+  Omit<InitialShipInput, "position" | "sim" | "owner">
 > = {
   shipA: {
     name: "Ship Type A",
-    position: matrix([0, 0]),
     drive: {
       cruise: 4,
       maneuver: 0.3,
@@ -18,7 +16,6 @@ export const shipClasses: Record<
   },
   shipB: {
     name: "Ship Type B",
-    position: matrix([0, 0]),
     drive: {
       cruise: 4.6,
       maneuver: 0.55,
@@ -30,7 +27,6 @@ export const shipClasses: Record<
 
   minerA: {
     name: "Mining Ship Type A",
-    position: matrix([0, 0]),
     drive: {
       cruise: 3,
       maneuver: 0.2,
@@ -41,7 +37,6 @@ export const shipClasses: Record<
   },
   minerB: {
     name: "Mining Ship Type B",
-    position: matrix([0, 0]),
     drive: {
       cruise: 4,
       maneuver: 0.5,

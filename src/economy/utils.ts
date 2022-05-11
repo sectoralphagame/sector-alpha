@@ -1,40 +1,47 @@
-import every from "lodash/every";
-import { Matrix, norm, subtract } from "mathjs";
+import { Matrix, norm, subtract, sum } from "mathjs";
 import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
-import { Facility } from "./factility";
+import { map } from "lodash";
 import { sim } from "../sim";
-import { Asteroid, AsteroidField } from "./field";
-import { FacilityModule } from "./facilityModule";
-import { perCommodity } from "../utils/perCommodity";
 import { Commodity } from "./commodity";
+import { Entity } from "../components/entity";
+import { Facility } from "../archetypes/facility";
+import { RequireComponent } from "../tsHelpers";
+import { AsteroidField } from "../archetypes/asteroidField";
+import { asteroid, Asteroid } from "../archetypes/asteroid";
+
+type WithTrade = RequireComponent<"trade" | "storage">;
 
 export function getFacilityWithMostProfit(
   facility: Facility,
   commodity: Commodity
 ): Facility | null {
   const distance = (f) =>
-    norm(subtract(facility.position, f.position) as Matrix) as number;
+    norm(
+      subtract(facility.cp.position.value, f.cp.position.value) as Matrix
+    ) as number;
 
-  const profit = (f: Facility) =>
-    facility.owner === f.owner
+  const profit = (f: WithTrade) =>
+    facility.components.owner.value === f.components.owner.value
       ? 1e20
-      : (facility.offers[commodity].price - f.offers[commodity].price) *
-        (facility.offers[commodity].type === "buy" ? 1 : -1);
+      : (facility.components.trade.offers[commodity].price -
+          f.components.trade.offers[commodity].price) *
+        (facility.components.trade.offers[commodity].type === "buy" ? 1 : -1);
 
   const sortedByProfit = sortBy(
-    sim.factions
-      .map((faction) => faction.facilities)
-      .flat()
-      .filter(
-        (f) =>
-          f.offers[commodity].type !== facility.offers[commodity].type &&
-          f.offers[commodity].quantity > 0
-      )
-      .map((f) => ({
-        facility: f,
-        profit: profit(f),
-      })),
+    (
+      sim.queries.trading
+        .get()
+        .filter(
+          (f) =>
+            f.components.trade.offers[commodity].type !==
+              facility.components.trade.offers[commodity].type &&
+            f.components.trade.offers[commodity].quantity > 0
+        ) as WithTrade[]
+    ).map((f) => ({
+      facility: f,
+      profit: profit(f),
+    })),
     "profit"
   ).reverse();
 
@@ -55,27 +62,22 @@ export function getClosestMineableAsteroid(
   position: Matrix
 ): Asteroid {
   return minBy(
-    field.asteroids.filter((r) => !r.mined),
-    (r) => norm(subtract(position, r.position) as Matrix)
+    field.components.children.value
+      .map(asteroid)
+      .filter((a) => !a.components.minable.minedBy),
+    (r) => norm(subtract(position, asteroid(r).cp.position.value) as Matrix)
   );
 }
 
-export function createIsAbleToProduce(
-  facility: Facility
-  // eslint-disable-next-line no-unused-vars
-): (facilityModule: FacilityModule) => boolean {
-  return (facilityModule: FacilityModule) =>
-    every(
-      perCommodity(
-        (commodity) =>
-          facility.storage.hasSufficientStorage(
-            commodity,
-            facilityModule.productionAndConsumption[commodity].consumes
-          ) &&
-          (facilityModule.productionAndConsumption[commodity].produces
-            ? facility.storage.getAvailableWares()[commodity] <
-              facility.getQuota(commodity)
-            : true)
-      )
-    );
+/**
+ *
+ * @returns Minimum required money to fulfill all buy requests, not taking
+ * into account sell offers
+ */
+export function getPlannedBudget(entity: Entity): number {
+  return sum(
+    map(entity.components.trade.offers).map(
+      (offer) => (offer.type === "sell" ? 0 : offer.quantity) * offer.price
+    )
+  );
 }

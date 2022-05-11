@@ -41,5 +41,6 @@ module.exports = {
     "prefer-destructuring": "off",
     "max-classes-per-file": "off",
     "react/no-array-index-key": "off",
+    "no-invalid-this": "error",
   },
 };

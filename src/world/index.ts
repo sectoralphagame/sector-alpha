@@ -1,17 +1,15 @@
 import { Faction } from "../economy/faction";
-import { AsteroidField, getRandomAsteroidField } from "../economy/field";
+import { getRandomAsteroidField } from "./asteroids";
 import { factions } from "./factions";
 
 export interface World {
   factions: Faction[];
-  fields: AsteroidField[];
 }
+
+Array(15).fill(0).map(getRandomAsteroidField);
 
 const world: World = {
   factions,
-  fields: Array(10)
-    .fill(0)
-    .map(getRandomAsteroidField),
 };
 
 export default world;
