@@ -1,5 +1,5 @@
 import Color from "color";
-import { Matrix } from "mathjs";
+import { matrix, Matrix } from "mathjs";
 import { Budget } from "../components/budget";
 import { Entity } from "../components/entity";
 import { Modules } from "../components/modules";
@@ -56,7 +56,10 @@ export function createFacility(sim: Sim, initial?: InitialFacilityInput) {
   entity.addComponent("modules", new Modules());
   entity.addComponent("name", new Name(`Facility #${entity.id}`));
   entity.addComponent("owner", new Owner());
-  entity.addComponent("position", new Position(initial?.position));
+  entity.addComponent(
+    "position",
+    new Position(initial?.position ?? matrix([0, 0]), 0)
+  );
   entity.addComponent(
     "render",
     new Render({

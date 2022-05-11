@@ -1,7 +1,7 @@
 import { Matrix } from "mathjs";
 import { Asteroid } from "../archetypes/asteroid";
 import { AsteroidField } from "../archetypes/asteroidField";
-import { Facility } from "../archetypes/facility";
+import { WithTrade } from "../economy/utils";
 import { NegativeQuantity } from "../errors";
 import { TransactionInput } from "./trade";
 
@@ -13,7 +13,7 @@ export interface MoveOrder {
 export interface TradeOrder {
   type: "trade";
   offer: TransactionInput;
-  target: Facility;
+  target: WithTrade;
 }
 
 export interface MineOrder {

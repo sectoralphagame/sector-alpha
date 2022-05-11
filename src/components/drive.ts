@@ -10,6 +10,10 @@ export interface ShipDriveProps {
   maneuver: number;
   cruise: number;
   /**
+   * Expressed in degrees per second
+   */
+  rotary: number;
+  /**
    * Time to initiate cruise engine
    */
   ttc: number;
@@ -18,6 +22,10 @@ export interface ShipDriveProps {
 export class Drive {
   maneuver: number;
   cruise: number;
+  /**
+   * Expressed in degrees per second
+   */
+  rotary: number;
   /**
    * Time to initiate cruise engine
    */
@@ -32,6 +40,7 @@ export class Drive {
   constructor(input: ShipDriveProps) {
     this.cruise = input.cruise;
     this.maneuver = input.maneuver;
+    this.rotary = input.rotary;
     this.ttc = input.ttc;
   }
 

@@ -60,13 +60,13 @@ export function createShip(sim: Sim, initial: InitialShipInput) {
   entity.addComponent("name", new Name(initial.name));
   entity.addComponent("orders", new Orders());
   entity.addComponent("owner", new Owner(initial.owner));
-  entity.addComponent("position", new Position(initial.position));
+  entity.addComponent("position", new Position(initial.position, 0));
   entity.addComponent(
     "render",
     new Render({
       color: Color(initial.owner.color).rgbNumber(),
       defaultScale: 0.4,
-      maxZ: 0.9,
+      maxZ: 0.7,
       pathToTexture: sCivTexture,
       zIndex: 2,
     })

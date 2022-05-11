@@ -6,7 +6,7 @@ export interface World {
   factions: Faction[];
 }
 
-Array(15).fill(0).map(getRandomAsteroidField);
+Array(20).fill(0).map(getRandomAsteroidField);
 
 const world: World = {
   factions,

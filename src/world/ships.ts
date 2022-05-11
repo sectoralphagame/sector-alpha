@@ -9,6 +9,7 @@ export const shipClasses: Record<
     drive: {
       cruise: 4,
       maneuver: 0.3,
+      rotary: 1.46,
       ttc: 3,
     },
     storage: 10,
@@ -19,6 +20,7 @@ export const shipClasses: Record<
     drive: {
       cruise: 4.6,
       maneuver: 0.55,
+      rotary: 1.98,
       ttc: 2,
     },
     storage: 6,
@@ -30,6 +32,7 @@ export const shipClasses: Record<
     drive: {
       cruise: 3,
       maneuver: 0.2,
+      rotary: 1.169,
       ttc: 6,
     },
     storage: 40,
@@ -40,6 +43,7 @@ export const shipClasses: Record<
     drive: {
       cruise: 4,
       maneuver: 0.5,
+      rotary: 1.361,
       ttc: 3.5,
     },
     storage: 24,

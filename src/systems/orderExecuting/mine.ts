@@ -13,7 +13,7 @@ export function mineOrder(
   ) {
     order.targetRock = getClosestMineableAsteroid(
       order.target,
-      entity.cp.position.value
+      entity.cp.position.coord
     );
     if (!order.targetRock) return false;
   }

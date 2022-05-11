@@ -48,13 +48,13 @@ export function createAsteroid(
 
   entity.addComponent("minable", new Minable(type));
   entity.addComponent("parent", new Parent(parent));
-  entity.addComponent("position", new Position(position));
+  entity.addComponent("position", new Position(position, 0));
   entity.addComponent(
     "render",
     new Render({
       color: Color(fieldColors[type]).rgbNumber(),
       defaultScale: 0.6,
-      maxZ: 1.5,
+      maxZ: 1.2,
       pathToTexture: asteroidTexture,
       zIndex: 0,
     })
