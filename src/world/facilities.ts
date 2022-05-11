@@ -75,7 +75,10 @@ export function createHullPlatesFacility(
   return facility;
 }
 
-export function createGoldRefinery(input?: InitialFacilityInput) {
+export function createGoldRefinery(
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.gold(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
@@ -85,7 +88,8 @@ export function createGoldRefinery(input?: InitialFacilityInput) {
 }
 
 export function createSiliconPurificationFacility(
-  input?: InitialFacilityInput
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
 ) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.silicon(sim, facility));
@@ -95,7 +99,10 @@ export function createSiliconPurificationFacility(
   return facility;
 }
 
-export function createElectronicsFacility(input?: InitialFacilityInput) {
+export function createElectronicsFacility(
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.electronics(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));

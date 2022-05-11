@@ -84,7 +84,6 @@ factions.forEach((faction) => {
         const tradeShip = createShip(window.sim as Sim, {
           ...getFreighterTemplate(),
           position: matrix([random(-100, 100), random(-100, 100)]),
-          sim,
           owner: faction,
         });
         tradeShip.addComponent("commander", new Parent(facility));
