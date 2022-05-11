@@ -1,14 +1,38 @@
+import * as PIXI from "pixi.js";
+
+export interface RenderInput {
+  color?: number;
+  defaultScale: number;
+  maxZ: number;
+  pathToTexture: string;
+  zIndex: number;
+}
+
 export class Render {
-  color: string | null;
-  size: number;
-  minScale: number;
+  defaultScale: number = 1;
+  initialized: boolean = false;
+  maxZ: number;
+  sprite: PIXI.Sprite;
+  texture: string;
 
-  constructor(size: number, minScale: number, color?: string) {
-    this.size = size;
-    this.minScale = minScale;
+  constructor({
+    color,
+    defaultScale,
+    maxZ,
+    pathToTexture,
+    zIndex,
+  }: RenderInput) {
+    this.defaultScale = defaultScale;
+    this.texture = pathToTexture;
+    this.maxZ = maxZ;
 
-    if (color) {
-      this.color = color;
+    if (process.env.NODE_ENV !== "test") {
+      this.sprite = new PIXI.Sprite(PIXI.Texture.from(pathToTexture));
+      this.sprite.anchor.set(0.5, 0.5);
+      this.sprite.zIndex = zIndex;
+      if (color) {
+        this.sprite.tint = color;
+      }
     }
   }
 }

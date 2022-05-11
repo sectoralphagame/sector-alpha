@@ -1,16 +1,20 @@
 import P5 from "p5";
-import Color from "color";
-import { Sim } from "../../sim";
 import "./components/Panel";
+import * as PIXI from "pixi.js";
+import { Viewport } from "pixi-viewport";
+import { Sim } from "../../sim";
 import { System } from "../system";
-import { RenderCamera, zMin } from "./camera";
 import { Query } from "../query";
+
+const minScale = 0.4;
 
 export class RenderingSystem extends System {
   renderable: Query<"render" | "position">;
   selectable: Query<"selection" | "position">;
   parent: Element;
+  viewport: Viewport;
   p5: P5;
+  prevScale: number = minScale;
 
   constructor(sim: Sim) {
     super(sim);
@@ -22,86 +26,75 @@ export class RenderingSystem extends System {
   }
 
   init = () => {
-    this.p5 = new P5((p5: P5) => {
-      let camera: RenderCamera;
-      const settingsEntity = this.sim.queries.selectionManager.get()[0];
+    const settingsEntity = this.sim.queries.selectionManager.get()[0];
 
-      p5.setup = () => {
-        const canvas = p5.createCanvas(
-          window.innerWidth,
-          window.innerHeight,
-          "webgl"
-        );
-        canvas.parent(this.parent);
-        camera = new RenderCamera(p5);
-      };
-
-      p5.draw = () => {
-        if (settingsEntity.cp.selectionManager.focused) {
-          camera.lookAt(
-            settingsEntity.cp.selectionManager.entity.cp.position.x,
-            settingsEntity.cp.selectionManager.entity.cp.position.y
-          );
-        }
-        p5.background("black");
-
-        this.renderable.get().forEach((entity) => {
-          const selected = settingsEntity.cp.selectionManager.entity === entity;
-          if (camera.scale < entity.cp.render.minScale && !selected) return;
-
-          const baseColor =
-            entity.cp.render.color ?? entity.cp.owner?.value.color ?? "#dddddd";
-          const color =
-            settingsEntity.cp.selectionManager.entity === entity
-              ? Color(baseColor).lighten(0.2).unitArray()
-              : Color(baseColor).unitArray();
-          p5.fill(color[0] * 256, color[1] * 256, color[2] * 256);
-          p5.noStroke();
-          p5.circle(
-            entity.cp.position.x * 10,
-            entity.cp.position.y * 10,
-            (camera.z / zMin) * (selected ? 1.3 : 1) * entity.cp.render.size
-          );
-        });
-      };
-
-      p5.mouseWheel = (event: { delta: number }) => {
-        camera.move({
-          z: event.delta,
-        });
-      };
-
-      p5.mouseDragged = (event: MouseEvent) => {
-        settingsEntity.cp.selectionManager.focused = false;
-        camera.move({
-          x: (event.movementX * camera.z) / zMin / 10,
-          y: (event.movementY * camera.z) / zMin / 10,
-        });
-      };
-
-      p5.mouseClicked = () => {
-        const clickables = this.selectable.get().filter((e) => e.cp.selection);
-        const clicked = clickables.find((entity) => {
-          const [x, y] = camera.translateScreenToCanvas(p5.mouseX, p5.mouseY);
-          return (
-            (entity.cp.position.x * 10 - x) ** 2 +
-              (entity.cp.position.y * 10 - y) ** 2 <=
-            (camera.z / zMin) * entity.cp.render.size * 2
-          );
-        });
-
-        if (clicked) {
-          settingsEntity.cp.selectionManager.set(clicked);
-        }
-      };
-
-      p5.windowResized = () => {
-        p5.resizeCanvas(this.parent.clientWidth, this.parent.clientHeight);
-        camera.updateViewport();
-      };
+    const app = new PIXI.Application({
+      antialias: true,
+      autoDensity: true,
+      resolution: window.devicePixelRatio,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      view: document.querySelector("#canvasRoot"),
     });
+
+    const viewport = new Viewport({
+      screenWidth: window.innerWidth,
+      screenHeight: window.innerHeight,
+      interaction: app.renderer.plugins.interaction,
+    });
+
+    app.stage.addChild(viewport);
+
+    viewport.drag().pinch().wheel();
+    viewport.clampZoom({ minScale });
+    viewport.on("drag-start", () => {
+      settingsEntity.cp.selectionManager.focused = false;
+      viewport.plugins.remove("follow");
+    });
+    viewport.sortableChildren = true;
+
+    this.viewport = viewport;
   };
 
-  // eslint-disable-next-line no-unused-vars, class-methods-use-this
-  exec(): void {}
+  exec(): void {
+    const settingsEntity = this.sim.queries.selectionManager.get()[0];
+
+    this.sim.queries.renderable.get().forEach((entity) => {
+      const entityRender = entity.cp.render;
+
+      if (!entityRender.initialized) {
+        this.viewport.addChild(entityRender.sprite);
+        if (entity.hasComponents(["selection"])) {
+          entityRender.sprite.interactive = true;
+          entityRender.sprite.on("mousedown", () => {
+            settingsEntity.cp.selectionManager.set(entity);
+          });
+          entityRender.sprite.cursor = "pointer";
+        }
+
+        entityRender.initialized = true;
+      }
+
+      entityRender.sprite.position.set(
+        entity.cp.position.x * 10,
+        entity.cp.position.y * 10
+      );
+
+      if (this.prevScale !== this.viewport.scale.x) {
+        entityRender.sprite.scale.set(
+          (1 / this.prevScale) * entityRender.defaultScale
+        );
+      }
+
+      entityRender.sprite.visible = entityRender.maxZ <= this.prevScale;
+    });
+
+    if (settingsEntity.cp.selectionManager.focused) {
+      this.viewport.follow(
+        settingsEntity.cp.selectionManager.entity.cp.render.sprite
+      );
+    }
+
+    this.prevScale = this.viewport.scale.x;
+  }
 }

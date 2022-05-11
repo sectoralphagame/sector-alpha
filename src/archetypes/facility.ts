@@ -1,3 +1,5 @@
+import Color from "color";
+import { Matrix } from "mathjs";
 import { Budget } from "../components/budget";
 import { Entity } from "../components/entity";
 import { Modules } from "../components/modules";
@@ -9,7 +11,9 @@ import { Render } from "../components/render";
 import { Selection } from "../components/selection";
 import { CommodityStorage } from "../components/storage";
 import { Trade } from "../components/trade";
+import { Faction } from "../economy/faction";
 import { MissingComponentError } from "../errors";
+import fCivTexture from "../../assets/f_civ.svg";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 
@@ -39,7 +43,12 @@ export function facility(entity: Entity): Facility {
   return entity as Facility;
 }
 
-export function createFacility(sim: Sim) {
+export interface InitialFacilityInput {
+  position: Matrix;
+  owner: Faction;
+}
+
+export function createFacility(sim: Sim, initial?: InitialFacilityInput) {
   const entity = new Entity(sim);
 
   entity.addComponent("budget", new Budget());
@@ -47,8 +56,17 @@ export function createFacility(sim: Sim) {
   entity.addComponent("modules", new Modules());
   entity.addComponent("name", new Name(`Facility #${entity.id}`));
   entity.addComponent("owner", new Owner());
-  entity.addComponent("position", new Position());
-  entity.addComponent("render", new Render(2, 0.7));
+  entity.addComponent("position", new Position(initial?.position));
+  entity.addComponent(
+    "render",
+    new Render({
+      color: Color(initial?.owner.color).rgbNumber(),
+      defaultScale: 1,
+      maxZ: 0.33,
+      pathToTexture: fCivTexture,
+      zIndex: 1,
+    })
+  );
   entity.addComponent("selection", new Selection());
   entity.addComponent("storage", new CommodityStorage());
   entity.addComponent("trade", new Trade());

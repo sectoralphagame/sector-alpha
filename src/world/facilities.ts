@@ -1,10 +1,13 @@
-import { createFacility } from "../archetypes/facility";
+import { createFacility, InitialFacilityInput } from "../archetypes/facility";
 import { facilityModules } from "../archetypes/facilityModule";
 import { sim as defaultSim, Sim } from "../sim";
 import { addFacilityModule } from "../utils/entityModules";
 
-export function createRefineryFacility(sim: Sim = defaultSim) {
-  const facility = createFacility(sim);
+export function createRefineryFacility(
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
+  const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.refinery(sim, facility));
   addFacilityModule(facility, facilityModules.refinery(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
@@ -13,8 +16,11 @@ export function createRefineryFacility(sim: Sim = defaultSim) {
   return facility;
 }
 
-export function createFarm(sim: Sim = defaultSim) {
-  const facility = createFacility(sim);
+export function createFarm(
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
+  const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.farm(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
   facility.cp.storage.addStorage("food", 50);
@@ -22,16 +28,22 @@ export function createFarm(sim: Sim = defaultSim) {
   return facility;
 }
 
-export function createShipyard(sim: Sim = defaultSim) {
-  const facility = createFacility(sim);
+export function createShipyard(
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
+  const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.shipyard(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
 
   return facility;
 }
 
-export function createWaterFacility(sim: Sim = defaultSim) {
-  const facility = createFacility(sim);
+export function createWaterFacility(
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
+  const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.water(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
   facility.cp.storage.addStorage("water", 50);
@@ -39,8 +51,11 @@ export function createWaterFacility(sim: Sim = defaultSim) {
   return facility;
 }
 
-export function createFuelFabricationFacility(sim: Sim = defaultSim) {
-  const facility = createFacility(sim);
+export function createFuelFabricationFacility(
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
+  const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.fuelFabrication(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
   facility.cp.storage.addStorage("fuel", 50);
@@ -48,8 +63,11 @@ export function createFuelFabricationFacility(sim: Sim = defaultSim) {
   return facility;
 }
 
-export function createHullPlatesFacility(sim: Sim = defaultSim) {
-  const facility = createFacility(sim);
+export function createHullPlatesFacility(
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
+  const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.hullPlates(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
   facility.cp.storage.addStorage("hullPlates", 50);

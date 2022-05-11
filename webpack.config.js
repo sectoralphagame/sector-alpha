@@ -41,6 +41,10 @@ const config = {
           target: "es2015",
         },
       },
+      {
+        test: /\.(svg|png|jpe?g)$/,
+        type: "asset/resource",
+      },
     ],
   },
   output: {

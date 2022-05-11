@@ -1,4 +1,5 @@
 import { Matrix } from "mathjs";
+import Color from "color";
 import { Entity } from "../components/entity";
 import { Minable } from "../components/minable";
 import { Parent } from "../components/parent";
@@ -8,6 +9,7 @@ import { MineableCommodity } from "../economy/commodity";
 import { MissingComponentError } from "../errors";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
+import asteroidTexture from "../../assets/asteroid.svg";
 
 export const asteroidComponents = [
   "minable",
@@ -47,7 +49,16 @@ export function createAsteroid(
   entity.addComponent("minable", new Minable(type));
   entity.addComponent("parent", new Parent(parent));
   entity.addComponent("position", new Position(position));
-  entity.addComponent("render", new Render(0.2, 1.5, fieldColors[type]));
+  entity.addComponent(
+    "render",
+    new Render({
+      color: Color(fieldColors[type]).rgbNumber(),
+      defaultScale: 0.6,
+      maxZ: 1.5,
+      pathToTexture: asteroidTexture,
+      zIndex: 0,
+    })
+  );
 
   parent.components.children.add(entity as RequireComponent<"parent">);
 

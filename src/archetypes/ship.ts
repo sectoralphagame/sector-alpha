@@ -1,4 +1,5 @@
 import { Matrix } from "mathjs";
+import Color from "color";
 import { AutoOrder } from "../components/autoOrder";
 import { Drive, ShipDriveProps } from "../components/drive";
 import { Entity } from "../components/entity";
@@ -14,6 +15,7 @@ import { Faction } from "../economy/faction";
 import { MissingComponentError } from "../errors";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
+import sCivTexture from "../../assets/s_civ.svg";
 
 export const shipComponents = [
   "drive",
@@ -59,7 +61,16 @@ export function createShip(sim: Sim, initial: InitialShipInput) {
   entity.addComponent("orders", new Orders());
   entity.addComponent("owner", new Owner(initial.owner));
   entity.addComponent("position", new Position(initial.position));
-  entity.addComponent("render", new Render(0.5, 0.9));
+  entity.addComponent(
+    "render",
+    new Render({
+      color: Color(initial.owner.color).rgbNumber(),
+      defaultScale: 0.4,
+      maxZ: 0.9,
+      pathToTexture: sCivTexture,
+      zIndex: 2,
+    })
+  );
   entity.addComponent("selection", new Selection());
   entity.addComponent("storage", new CommodityStorage());
 

@@ -1,3 +1,6 @@
+import { matrix } from "mathjs";
+import { Facility } from "../archetypes/facility";
+import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { settleStorageQuota } from "../systems/storageQuotaPlanning";
 import { createOffers } from "../systems/trading";
@@ -6,14 +9,18 @@ import { getNeededCommodities } from "./trading";
 
 describe("Trading module", () => {
   let sim: Sim;
+  let facility: Facility;
 
   beforeEach(() => {
     sim = new Sim();
+    facility = createFarm(
+      { position: matrix([0, 0]), owner: new Faction("0") },
+      sim
+    );
+    facility.cp.budget.changeMoney(100);
   });
 
   it("properly sorts by most needed commodity 1", () => {
-    const facility = createFarm(sim);
-    facility.cp.budget.changeMoney(100);
     settleStorageQuota(facility);
     createOffers(facility);
 
@@ -21,8 +28,6 @@ describe("Trading module", () => {
   });
 
   it("properly sorts by most needed commodity 2", () => {
-    const facility = createFarm(sim);
-    facility.cp.budget.changeMoney(100);
     facility.cp.storage.removeStorage("food", 50);
     facility.cp.storage.addStorage("water", 10);
     settleStorageQuota(facility);
