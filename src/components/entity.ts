@@ -18,6 +18,8 @@ import { Minable } from "./minable";
 import { AsteroidSpawn } from "./asteroidSpawn";
 import { Children } from "./children";
 import { Orders } from "./orders";
+import { RequireComponent } from "../tsHelpers";
+import { MissingComponentError } from "../errors";
 
 export interface CoreComponents {
   asteroidSpawn: AsteroidSpawn;
@@ -60,6 +62,16 @@ export class Entity {
 
   hasComponents(components: Readonly<Array<keyof CoreComponents>>): boolean {
     return components.every((name) => !!this.components[name]);
+  }
+
+  requireComponents<T extends keyof CoreComponents>(
+    components: Readonly<T[]>
+  ): RequireComponent<T> {
+    if (!components.every((name) => !!this.components[name])) {
+      throw new MissingComponentError(this, components);
+    }
+
+    return this as unknown as RequireComponent<T>;
   }
 
   addComponent<T extends keyof CoreComponents>(

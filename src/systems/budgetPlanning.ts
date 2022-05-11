@@ -1,25 +1,24 @@
-import { Entity } from "../components/entity";
-import { getPlannedBudget } from "../economy/utils";
+import { getPlannedBudget, WithTrade } from "../economy/utils";
 import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { limitMax } from "../utils/limit";
 import { Query } from "./query";
 import { System } from "./system";
 
-function settleBudget(entity: Entity) {
+function settleBudget(entity: WithTrade) {
   const budgetChange =
     getPlannedBudget(entity) - entity.components.budget.getAvailableMoney();
 
   if (budgetChange < 0) {
     entity.components.budget.transferMoney(
       limitMax(-budgetChange, entity.components.budget.getAvailableMoney()),
-      entity.components.owner.value.budget
+      entity.components.owner.value!.budget
     );
   } else {
-    entity.components.owner.value.budget.transferMoney(
+    entity.components.owner.value!.budget.transferMoney(
       limitMax(
         budgetChange,
-        entity.components.owner.value.budget.getAvailableMoney()
+        entity.components.owner.value!.budget.getAvailableMoney()
       ),
       entity.components.budget
     );

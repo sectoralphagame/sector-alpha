@@ -18,7 +18,7 @@ function move(entity: Driveable, delta: number) {
   const targetPosition =
     drive.target instanceof Entity
       ? drive.target.cp.position.coord
-      : drive.target;
+      : drive.target!;
   const path = subtract(targetPosition, entityPosition.coord) as Matrix;
   // TODO: Investigate magic that is happening here with 90deg offsets
   const targetAngle = Math.atan2(path.get([1]), path.get([0])) + Math.PI / 2;

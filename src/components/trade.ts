@@ -11,14 +11,14 @@ export interface Transaction extends TradeOffer {
 export interface TransactionInput extends TradeOffer {
   commodity: Commodity;
   faction: Faction;
-  budget: Budget;
+  budget: Budget | null;
   allocations: Record<
     "buyer" | "seller",
     {
       budget: number | null;
       storage: number | null;
-    }
-  >;
+    } | null
+  > | null;
 }
 
 export type TradeOfferType = "buy" | "sell";

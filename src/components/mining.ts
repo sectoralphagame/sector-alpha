@@ -1,4 +1,5 @@
 import { asteroid, Asteroid } from "../archetypes/asteroid";
+import { MissingEntityError } from "../errors";
 import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 
@@ -25,9 +26,11 @@ export class Mining {
 
   load = (sim: Sim) => {
     if (this.asteroidId) {
-      this.asteroid = asteroid(
-        sim.entities.find((e) => e.id === this.asteroidId)
-      );
+      const entity = sim.entities.find((e) => e.id === this.asteroidId);
+      if (!entity) {
+        throw new MissingEntityError(this.asteroidId);
+      }
+      this.asteroid = asteroid(entity);
     }
   };
 

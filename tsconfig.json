@@ -6,7 +6,8 @@
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "resolveJsonModule": true,
-    "jsx": "react"
+    "jsx": "react",
+    "strictNullChecks": true
   },
   "exclude": ["**/*.test.*"]
 }

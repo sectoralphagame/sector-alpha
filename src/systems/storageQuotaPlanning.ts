@@ -5,17 +5,15 @@ import { perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
 
 export function settleStorageQuota(entity: RequireComponent<"storage">) {
-  const hasProduction =
-    entity.hasComponents(["production"]) ||
-    entity.hasComponents(["compoundProduction"]);
+  const hasProduction = entity.hasComponents(["compoundProduction"]);
   entity.cp.storage.updateQuota(
     perCommodity((commodity) => {
       if (hasProduction) {
         return Math.floor(
           (entity.cp.storage.max *
-            (entity.cp.compoundProduction.pac[commodity].produces +
-              entity.cp.compoundProduction.pac[commodity].consumes)) /
-            entity.cp.compoundProduction.getRequiredStorage()
+            (entity.cp.compoundProduction!.pac[commodity].produces +
+              entity.cp.compoundProduction!.pac[commodity].consumes)) /
+            entity.cp.compoundProduction!.getRequiredStorage()
         );
       }
 

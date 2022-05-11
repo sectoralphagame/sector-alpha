@@ -10,9 +10,11 @@ export function tradeOrder(
 
   if (entity.cp.drive.targetReached) {
     if (order.offer.type === "sell") {
-      order.target.cp.storage.allocationManager.release(
-        order.offer.allocations.buyer.storage
-      );
+      if (order.offer.allocations?.buyer?.storage) {
+        order.target.cp.storage.allocationManager.release(
+          order.offer.allocations.buyer.storage
+        );
+      }
 
       entity.cp.storage.transfer(
         order.offer.commodity,
@@ -21,9 +23,11 @@ export function tradeOrder(
         true
       );
     } else {
-      order.target.cp.storage.allocationManager.release(
-        order.offer.allocations.seller.storage
-      );
+      if (order.offer.allocations?.seller?.storage) {
+        order.target.cp.storage.allocationManager.release(
+          order.offer.allocations.seller.storage
+        );
+      }
       order.target.cp.storage.transfer(
         order.offer.commodity,
         order.offer.quantity,

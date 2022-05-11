@@ -1,5 +1,5 @@
 import React from "react";
-import { Ship } from "../../../archetypes/ship";
+import { ship as asShip, Ship } from "../../../archetypes/ship";
 import { Entity } from "../../../components/entity";
 import { Order } from "../../../components/orders";
 import { commodities } from "../../../economy/commodity";
@@ -9,9 +9,9 @@ function getOrderDescription(ship: Ship, order: Order) {
     case "move":
       return "Go to location";
     case "trade":
-      if (order.target === ship.cp.commander.value)
+      if (order.target === ship.cp.commander?.value)
         return "Deliver wares to commander";
-      return `Deliver wares to ${order.target.cp.name.value}`;
+      return `Deliver wares to ${order.target.cp.name?.value}`;
     case "mine":
       return `Mine ${order.target.cp.asteroidSpawn.type}`;
     default:
@@ -20,21 +20,21 @@ function getOrderDescription(ship: Ship, order: Order) {
 }
 
 const ShipPanel: React.FC = () => {
-  const ship = window.selected as Ship;
+  const ship = asShip(window.selected as Entity);
 
   return (
     <div>
       <div>{ship.cp.name.value}</div>
       {!!ship.cp.commander && (
         <div>
-          {`Commander: ${ship.cp.commander.value.cp.name.value}`}
+          {`Commander: ${ship.cp.commander.value.cp.name!.value}`}
           <button
             onClick={() => {
-              const { selectionManager } = (
-                window.sim.entities as Entity[]
-              ).find((e) => e.hasComponents(["selectionManager"])).cp;
+              const { selectionManager } = (window.sim.entities as Entity[])
+                .find((e) => e.hasComponents(["selectionManager"]))!
+                .requireComponents(["selectionManager"]).cp;
 
-              selectionManager.set(ship.cp.commander.value);
+              selectionManager.set(ship);
               selectionManager.focused = true;
             }}
             type="button"

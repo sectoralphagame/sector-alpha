@@ -4,13 +4,12 @@ import minBy from "lodash/minBy";
 import { map } from "lodash";
 import { sim } from "../sim";
 import { Commodity } from "./commodity";
-import { Entity } from "../components/entity";
 import { RequireComponent } from "../tsHelpers";
 import { AsteroidField } from "../archetypes/asteroidField";
 import { asteroid, Asteroid } from "../archetypes/asteroid";
 
 export type WithTrade = RequireComponent<
-  "trade" | "storage" | "budget" | "position"
+  "trade" | "storage" | "budget" | "position" | "owner"
 >;
 
 export function getFacilityWithMostProfit(
@@ -61,7 +60,7 @@ export function getFacilityWithMostProfit(
 export function getClosestMineableAsteroid(
   field: AsteroidField,
   position: Matrix
-): Asteroid {
+): Asteroid | undefined {
   return minBy(
     field.components.children.value
       .map(asteroid)
@@ -75,7 +74,7 @@ export function getClosestMineableAsteroid(
  * @returns Minimum required money to fulfill all buy requests, not taking
  * into account sell offers
  */
-export function getPlannedBudget(entity: Entity): number {
+export function getPlannedBudget(entity: WithTrade): number {
   return sum(
     map(entity.components.trade.offers).map(
       (offer) => (offer.type === "sell" ? 0 : offer.quantity) * offer.price

@@ -1,5 +1,6 @@
 import React from "react";
 import { Facility } from "../../../archetypes/facility";
+import { ship as asShip } from "../../../archetypes/ship";
 import { Entity } from "../../../components/entity";
 import { commodities } from "../../../economy/commodity";
 
@@ -52,15 +53,16 @@ const FacilityPanel: React.FC = () => {
       <hr />
       {(window.sim.entities as Entity[])
         .filter((e) => e?.cp.commander?.value === facility)
+        .map(asShip)
         .map((ship, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <div key={`${ship.cp.name.value}-${index}`}>
             {ship.cp.name.value}{" "}
             <button
               onClick={() => {
-                const { selectionManager } = (
-                  window.sim.entities as Entity[]
-                ).find((e) => e.hasComponents(["selectionManager"])).cp;
+                const { selectionManager } = (window.sim.entities as Entity[])
+                  .find((e) => e.hasComponents(["selectionManager"]))!
+                  .requireComponents(["selectionManager"]).cp;
 
                 selectionManager.set(ship);
                 selectionManager.focused = true;

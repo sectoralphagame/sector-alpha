@@ -12,7 +12,6 @@ import { Selection } from "../components/selection";
 import { CommodityStorage } from "../components/storage";
 import { Trade } from "../components/trade";
 import { Faction } from "../economy/faction";
-import { MissingComponentError } from "../errors";
 import fCivTexture from "../../assets/f_civ.svg";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
@@ -36,11 +35,7 @@ export type FacilityComponent = typeof widenType;
 export type Facility = RequireComponent<FacilityComponent>;
 
 export function facility(entity: Entity): Facility {
-  if (!entity.hasComponents(facilityComponents)) {
-    throw new MissingComponentError(entity, facilityComponents);
-  }
-
-  return entity as Facility;
+  return entity.requireComponents(facilityComponents);
 }
 
 export interface InitialFacilityInput {

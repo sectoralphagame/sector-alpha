@@ -4,7 +4,6 @@ import { Children } from "../components/children";
 import { Entity } from "../components/entity";
 import { Position } from "../components/position";
 import { MineableCommodity } from "../economy/commodity";
-import { MissingComponentError } from "../errors";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 
@@ -20,11 +19,7 @@ export type AsteroidFieldComponent = typeof widenType;
 export type AsteroidField = RequireComponent<AsteroidFieldComponent>;
 
 export function asteroidField(entity: Entity): AsteroidField {
-  if (!entity.hasComponents(asteroidFieldComponents)) {
-    throw new MissingComponentError(entity, asteroidFieldComponents);
-  }
-
-  return entity as AsteroidField;
+  return entity.requireComponents(asteroidFieldComponents);
 }
 
 export function createAsteroidField(

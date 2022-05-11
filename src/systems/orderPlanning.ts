@@ -1,3 +1,6 @@
+import { minBy } from "lodash";
+import { Matrix, norm, subtract } from "mathjs";
+import { asteroid } from "../archetypes/asteroid";
 import { asteroidField } from "../archetypes/asteroidField";
 import { facility } from "../archetypes/facility";
 import { mineOrder } from "../components/orders";
@@ -17,11 +20,7 @@ import { holdPosition } from "./orderExecuting/misc";
 import { System } from "./system";
 
 type Trading = RequireComponent<
-  "drive" | "storage" | "autoOrder" | "orders" | "commander"
->;
-
-type Mining = RequireComponent<
-  "drive" | "storage" | "autoOrder" | "orders" | "commander" | "mining"
+  "drive" | "storage" | "autoOrder" | "orders" | "commander" | "owner"
 >;
 
 function autoTrade(entity: Trading) {
@@ -54,7 +53,13 @@ function autoTrade(entity: Trading) {
 
 function autoMine(
   entity: RequireComponent<
-    "drive" | "storage" | "autoOrder" | "orders" | "commander"
+    | "drive"
+    | "storage"
+    | "autoOrder"
+    | "orders"
+    | "commander"
+    | "position"
+    | "owner"
   >
 ) {
   const commander = facility(entity.cp.commander.value);
@@ -68,11 +73,25 @@ function autoMine(
     );
 
     if (mineable) {
-      const field = asteroidField(
+      const field = minBy(
         entity.sim.queries.asteroidFields
           .get()
-          .find((e) => e.cp.asteroidSpawn?.type === mineable)
+          .map(asteroidField)
+          .filter(
+            (e) =>
+              e.cp.asteroidSpawn.type === mineable &&
+              e.cp.children.value
+                .map(asteroid)
+                .some((a) => !a.cp.minable.minedBy)
+          ),
+        (e) =>
+          norm(
+            subtract(entity.cp.position.coord, e.cp.position.coord) as Matrix
+          )
       );
+
+      if (!field) return;
+
       const rock = getClosestMineableAsteroid(field, entity.cp.position.coord);
 
       if (rock) {
@@ -94,20 +113,30 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
 
   switch (entity.cp.autoOrder.default) {
     case "mine":
-      autoMine(entity as Mining);
+      autoMine(
+        entity.requireComponents([
+          "mining",
+          "drive",
+          "position",
+          "storage",
+          "autoOrder",
+          "commander",
+          "orders",
+          "owner",
+        ])
+      );
       break;
     case "trade":
-      if (
-        entity.hasComponents([
+      autoTrade(
+        entity.requireComponents([
           "drive",
           "storage",
           "autoOrder",
           "orders",
           "commander",
+          "owner",
         ])
-      ) {
-        autoTrade(entity as Trading);
-      }
+      );
       break;
     default:
       holdPosition();
