@@ -1,4 +1,4 @@
-import { add, matrix, Matrix, multiply } from "mathjs";
+import { add, matrix, Matrix } from "mathjs";
 import * as PIXI from "pixi.js";
 import { CoreComponents, Entity } from "../components/entity";
 import { HECSPosition } from "../components/hecsPosition";
