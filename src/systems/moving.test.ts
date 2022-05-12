@@ -17,13 +17,13 @@ describe("Ship", () => {
   beforeEach(() => {
     sim = new Sim();
     movingSystem = new MovingSystem(sim);
+    sector = createSector(sim, { position: matrix([0, 0, 0]), name: "" });
     ship = createShip(sim, {
       ...shipClasses.courierA,
       position: matrix([1, 0]),
       owner: new Faction(""),
-      sector: createSector(sim, { name: "", position: matrix([0, 0, 0]) }),
+      sector,
     });
-    sector = createSector(sim, { position: matrix([0, 0, 0]), name: "" });
   });
 
   it("is able to go to target position", () => {

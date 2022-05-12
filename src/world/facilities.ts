@@ -109,7 +109,10 @@ export function createElectronicsFacility(
   return facility;
 }
 
-export function createTeleporter(input: InitialFacilityInput) {
+export function createTeleporter(
+  input: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.teleport(sim, facility));
   facility.cp.render.setTexture(fTeleport);
