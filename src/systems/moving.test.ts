@@ -53,7 +53,12 @@ describe("Ship", () => {
     const m = createMarker(sim, { sector, value: matrix([1, 0.3]) });
     ship.cp.orders.value.push({
       type: "move",
-      position: m,
+      orders: [
+        {
+          type: "move",
+          position: m,
+        },
+      ],
     });
 
     orderExecutingSystem.exec();
