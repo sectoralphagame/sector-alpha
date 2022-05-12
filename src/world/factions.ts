@@ -39,9 +39,7 @@ export const factions = (sim: Sim) =>
   sim.queries.sectors.get().forEach((sector, index, sectors) => {
     const faction = createFaction(index);
 
-    const position = sector.cp.hecsPosition.toCartesian(
-      (sectorSize / 10) * Math.sqrt(3)
-    );
+    const position = sector.cp.hecsPosition.toCartesian(sectorSize / 10);
 
     for (
       let i = 0;

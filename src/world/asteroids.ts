@@ -14,7 +14,7 @@ export function getRandomAsteroidField() {
   const maxR = (sectorSize / 20) * Math.sqrt(3);
 
   const sectorCenterPosition = sector.cp.hecsPosition.toCartesian(
-    (sectorSize / 10) * Math.sqrt(3)
+    sectorSize / 10
   );
   const polarPosition = {
     r: random(0, maxR - 7),

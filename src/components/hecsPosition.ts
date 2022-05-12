@@ -1,4 +1,4 @@
-import { matrix, Matrix, multiply, subtract, sum } from "mathjs";
+import { add, matrix, Matrix, multiply, subtract, sum } from "mathjs";
 
 export class HECSPosition {
   value: Matrix;
@@ -26,10 +26,10 @@ export class HECSPosition {
     multiply(
       multiply(
         matrix([
-          [1 / 2, 0, 1],
-          [Math.sqrt(3) / 2, Math.sqrt(3), 0],
+          [3 / 2, 0],
+          [Math.sqrt(3) / 2, Math.sqrt(3)],
         ]),
-        this.value
+        this.value.resize([2])
       ),
       scale
     );
@@ -37,32 +37,10 @@ export class HECSPosition {
   distance = (pos: Matrix): number =>
     sum((subtract(this.value, pos) as Matrix).map(Math.abs)) / 2;
 
-  se = (): Matrix =>
-    matrix([
-      1 - this.value.get([0]),
-      this.value.get([0]) + this.value.get([1]),
-      this.value.get([0]) + this.value.get([2]),
-    ]);
-  e = (): Matrix =>
-    matrix([this.value.get([0]), this.value.get([1]), this.value.get([2]) + 1]);
-  ne = (): Matrix =>
-    matrix([
-      1 - this.value.get([0]),
-      this.value.get([0]) + this.value.get([1]) - 1,
-      this.value.get([0]) + this.value.get([2]),
-    ]);
-  nw = (): Matrix =>
-    matrix([
-      1 - this.value.get([0]),
-      this.value.get([0]) + this.value.get([1]) - 1,
-      this.value.get([0]) + this.value.get([2]) - 1,
-    ]);
-  w = (): Matrix =>
-    matrix([this.value.get([0]), this.value.get([1]), this.value.get([2]) - 1]);
-  sw = (): Matrix =>
-    matrix([
-      1 - this.value.get([0]),
-      this.value.get([0]) + this.value.get([1]),
-      this.value.get([0]) + this.value.get([2]) - 1,
-    ]);
+  se = (): Matrix => add(this.value, matrix([0, 1, -1])) as Matrix;
+  e = (): Matrix => add(this.value, matrix([1, 0, -1])) as Matrix;
+  ne = (): Matrix => add(this.value, matrix([1, -1, 0])) as Matrix;
+  nw = (): Matrix => add(this.value, matrix([0, -1, 1])) as Matrix;
+  w = (): Matrix => add(this.value, matrix([-1, 0, 1])) as Matrix;
+  sw = (): Matrix => add(this.value, matrix([-1, 1, 0])) as Matrix;
 }

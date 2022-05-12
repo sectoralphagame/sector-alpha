@@ -43,10 +43,11 @@ export function createSector(sim: Sim, { position, name }: InitialSectorInput) {
     renderGraphics: new RenderGraphics((g) => {
       const pos = entity.cp.hecsPosition!.toCartesian(sectorSize);
       g.drawRegularPolygon!(
-        pos.get([0]) * Math.sqrt(3),
-        pos.get([1]) * Math.sqrt(3),
+        pos.get([0]),
+        pos.get([1]),
         sectorSize,
-        6
+        6,
+        Math.PI / 6
       );
     }),
   };
