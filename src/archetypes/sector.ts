@@ -1,4 +1,5 @@
-import { Matrix } from "mathjs";
+import { add, matrix, Matrix, multiply } from "mathjs";
+import * as PIXI from "pixi.js";
 import { CoreComponents, Entity } from "../components/entity";
 import { HECSPosition } from "../components/hecsPosition";
 import { Name } from "../components/name";
@@ -42,6 +43,7 @@ export function createSector(sim: Sim, { position, name }: InitialSectorInput) {
     name: new Name(name),
     renderGraphics: new RenderGraphics((g) => {
       const pos = entity.cp.hecsPosition!.toCartesian(sectorSize);
+      g.lineStyle({ color: 0x292929, width: 5 });
       g.drawRegularPolygon!(
         pos.get([0]),
         pos.get([1]),
@@ -49,6 +51,14 @@ export function createSector(sim: Sim, { position, name }: InitialSectorInput) {
         6,
         Math.PI / 6
       );
+      const textGraphics = new PIXI.Text(name, {
+        fill: 0x404040,
+      });
+      textGraphics.resolution = 8;
+      const textPos = add(pos, matrix([0, 90 - sectorSize])) as Matrix;
+      textGraphics.anchor.set(0.5, 0.5);
+      textGraphics.position.set(textPos.get([0]), textPos.get([1]));
+      g.addChild(textGraphics);
     }),
   };
   entity.components = components;

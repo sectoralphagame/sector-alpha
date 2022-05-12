@@ -61,7 +61,6 @@ export class RenderingSystem extends System {
 
     this.sim.queries.sectors.get().forEach((sector) => {
       if (!sector.cp.renderGraphics.initialized) {
-        sector.cp.renderGraphics.g.lineStyle({ color: 0x292929, width: 5 });
         sector.cp.renderGraphics.draw(this.viewport);
         sector.cp.renderGraphics.initialized = true;
       }
