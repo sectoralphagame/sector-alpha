@@ -178,7 +178,7 @@ export function getCommoditiesForSell(entity: WithTrade): Commodity[] {
 
 export function tradeCommodity(
   entity: RequireComponent<
-    "storage" | "commander" | "owner" | "orders" | "position"
+    "storage" | "commander" | "owner" | "orders" | "position" | "dockable"
   >,
   commodity: Commodity,
   buyer: WithTrade,
@@ -244,6 +244,7 @@ export function tradeCommodity(
     type: "trade",
     orders: [
       ...moveToOrders(entity, seller),
+      { type: "dock", target: seller },
       tradeOrder({
         target: seller,
         offer: {
@@ -286,7 +287,13 @@ export function tradeCommodity(
 
 export function autoBuyMostNeededByCommander(
   entity: RequireComponent<
-    "commander" | "storage" | "owner" | "orders" | "autoOrder" | "position"
+    | "commander"
+    | "storage"
+    | "owner"
+    | "orders"
+    | "autoOrder"
+    | "position"
+    | "dockable"
   >,
   commodity: Commodity,
   jumps: number
@@ -309,7 +316,13 @@ export function autoBuyMostNeededByCommander(
 
 export function autoSellMostRedundantToCommander(
   entity: RequireComponent<
-    "commander" | "storage" | "owner" | "orders" | "autoOrder" | "position"
+    | "commander"
+    | "storage"
+    | "owner"
+    | "orders"
+    | "autoOrder"
+    | "position"
+    | "dockable"
   >,
   commodity: Commodity,
   jumps: number
@@ -336,7 +349,10 @@ export function returnToFacility(
   >
 ) {
   const commander = facility(entity.cp.commander.value);
-  const orders: Order[] = moveToOrders(entity, commander);
+  const orders: Order[] = [
+    ...moveToOrders(entity, commander),
+    { type: "dock", target: commander },
+  ];
   Object.values(commodities)
     .filter((commodity) => entity.cp.storage.getAvailableWares()[commodity] > 0)
     .forEach((commodity) => {

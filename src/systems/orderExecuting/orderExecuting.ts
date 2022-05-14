@@ -1,6 +1,7 @@
 import { Entity } from "../../components/entity";
 import { Order } from "../../components/orders";
 import { System } from "../system";
+import { dockOrder } from "./dock";
 import { mineOrder } from "./mine";
 import { holdPosition, moveOrder, teleportOrder } from "./misc";
 import { tradeOrder } from "./trade";
@@ -24,6 +25,9 @@ export class OrderExecutingSystem extends System {
             break;
           case "teleport":
             orderFn = teleportOrder;
+            break;
+          case "dock":
+            orderFn = dockOrder;
             break;
           default:
             orderFn = holdPosition;

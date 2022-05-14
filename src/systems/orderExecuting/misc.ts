@@ -8,6 +8,17 @@ export function moveOrder(
 ): boolean {
   entity.cp.drive.setTarget(order.position);
 
+  if (entity.cp.dockable?.docked) {
+    entity.cp.dockable.docked.cp.docks.docked =
+      entity.cp.dockable.docked.cp.docks.docked.filter(
+        (e) => e.id !== entity.id
+      );
+    entity.cp.dockable.docked = null;
+    if (entity.cp.render) {
+      entity.cp.render.show();
+    }
+  }
+
   const reached = entity.cp.drive.targetReached;
 
   if (reached) {
@@ -26,6 +37,14 @@ export function teleportOrder(
     entity.cp.position.angle,
     order.position.cp.position.sector
   );
+
+  entity.cp.docks?.docked.forEach((docked) => {
+    docked.cp.position = new Position(
+      order.position.cp.position.coord,
+      entity.cp.position.angle,
+      order.position.cp.position.sector
+    );
+  });
 
   return true;
 }

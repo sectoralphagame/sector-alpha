@@ -9,6 +9,20 @@ export interface OffersProps {
 
 export const Offers: React.FC<OffersProps> = ({ entity }) => {
   const { compoundProduction, trade, storage } = entity.cp;
+  const offered = Object.values(commodities)
+    .filter(
+      (commodity) =>
+        compoundProduction?.pac[commodity].consumes ||
+        compoundProduction?.pac[commodity].produces ||
+        trade.offers[commodity].quantity ||
+        storage.getAvailableWares()[commodity]
+    )
+    .map((commodity) => ({
+      commodity,
+      ...(compoundProduction?.pac[commodity] ?? {}),
+      ...trade.offers[commodity],
+      stored: storage.getAvailableWares()[commodity],
+    }));
 
   return (
     <Table>
@@ -22,21 +36,16 @@ export const Offers: React.FC<OffersProps> = ({ entity }) => {
         </tr>
       </thead>
       <tbody>
-        {Object.values(commodities)
-          .filter(
-            (commodity) =>
-              compoundProduction?.pac[commodity].consumes ||
-              compoundProduction?.pac[commodity].produces ||
-              trade.offers[commodity].quantity ||
-              storage.getAvailableWares()[commodity]
-          )
-          .map((commodity) => ({
-            commodity,
-            ...(compoundProduction?.pac[commodity] ?? {}),
-            ...trade.offers[commodity],
-            stored: storage.getAvailableWares()[commodity],
-          }))
-          .map((data) => (
+        {offered.length === 0 ? (
+          <tr>
+            <TableCell>-</TableCell>
+            <TableCell>-</TableCell>
+            <TableCell>-</TableCell>
+            <TableCell>-</TableCell>
+            <TableCell>-</TableCell>
+          </tr>
+        ) : (
+          offered.map((data) => (
             <tr key={data.commodity}>
               <TableCell>{data.commodity}</TableCell>
               <TableCell>{data.stored}</TableCell>
@@ -48,7 +57,8 @@ export const Offers: React.FC<OffersProps> = ({ entity }) => {
               <TableCell>{data.quantity}</TableCell>
               <TableCell>{data.price}</TableCell>
             </tr>
-          ))}
+          ))
+        )}
       </tbody>
     </Table>
   );

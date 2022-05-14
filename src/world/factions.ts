@@ -1,10 +1,12 @@
 import { add, Matrix, matrix, random, randomInt } from "mathjs";
 import { sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
+import { Docks } from "../components/dockable";
 import { Parent } from "../components/parent";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
+import { dockShip } from "../systems/orderExecuting/dock";
 import { createTeleporter, templates as facilityTemplates } from "./facilities";
 import { shipClasses } from "./ships";
 
@@ -117,6 +119,26 @@ export const factions = (sim: Sim) =>
           });
           tradeShip.addComponent("commander", new Parent(facility));
           tradeShip.components.owner.set(faction);
+          tradeShip.addComponent("docks", new Docks("small", 2));
+
+          const dockedShip = createShip(sim, {
+            ...getFreighterTemplate(),
+            position: tradeShip.cp.position.coord,
+            owner: faction,
+            sector,
+          });
+          dockedShip.cp.position.angle += Math.PI / 2;
+          dockedShip.addComponent("commander", new Parent(facility));
+          dockedShip.components.owner.set(faction);
+          dockShip(
+            dockedShip,
+            tradeShip.requireComponents(["position", "docks"])
+          );
+          dockedShip.cp.render.hide();
+          dockedShip.cp.orders.value.push({
+            type: "hold",
+            orders: [{ type: "hold" }],
+          });
         }
       } while (Math.random() < 0.15);
 

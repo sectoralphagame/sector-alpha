@@ -10,7 +10,7 @@ import { asteroid, Asteroid } from "../archetypes/asteroid";
 import { Sector } from "../archetypes/sector";
 
 export type WithTrade = RequireComponent<
-  "trade" | "storage" | "budget" | "position" | "owner"
+  "trade" | "storage" | "budget" | "position" | "owner" | "docks"
 >;
 
 export function getSectorsInTeleportRange(

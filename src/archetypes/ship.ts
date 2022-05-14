@@ -15,9 +15,11 @@ import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Sector } from "./sector";
+import { Dockable } from "../components/dockable";
 
 export const shipComponents = [
   "drive",
+  "dockable",
   "name",
   "orders",
   "owner",
@@ -46,7 +48,7 @@ export interface InitialShipInput {
   sector: Sector;
 }
 
-export function createShip(sim: Sim, initial: InitialShipInput) {
+export function createShip(sim: Sim, initial: InitialShipInput): Ship {
   const entity = new Entity(sim);
 
   entity.addComponent(
@@ -73,6 +75,7 @@ export function createShip(sim: Sim, initial: InitialShipInput) {
   );
   entity.addComponent("selection", new Selection());
   entity.addComponent("storage", new CommodityStorage());
+  entity.addComponent("dockable", new Dockable("small"));
 
   if (initial.mining) {
     entity.addComponent("mining", new Mining(initial.mining));

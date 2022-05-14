@@ -31,6 +31,7 @@ type Trading = RequireComponent<
   | "commander"
   | "owner"
   | "position"
+  | "dockable"
 >;
 
 function autoTrade(entity: Trading, sectorDistance: number) {
@@ -144,6 +145,7 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
       autoMine(
         entity.requireComponents([
           "mining",
+          "dockable",
           "drive",
           "position",
           "storage",
@@ -159,6 +161,7 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
       autoTrade(
         entity.requireComponents([
           "drive",
+          "dockable",
           "storage",
           "autoOrder",
           "orders",

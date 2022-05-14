@@ -1,19 +1,9 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import { Facility } from "../../../archetypes/facility";
-import { ship as asShip } from "../../../archetypes/ship";
-import { Entity } from "../../../components/entity";
-import locationIcon from "../../../../assets/ui/location.svg";
-import { nano } from "../../../style";
-import { IconButton } from "./IconButton";
 import { Production } from "./Production";
 import { Offers } from "./Offers";
-
-const styles = nano.sheet({
-  focus: {
-    marginLeft: "24px",
-  },
-});
+import { Docks } from "./Docks";
+import { Subordinates } from "./Subordinates";
 
 const FacilityPanel: React.FC = () => {
   const facility = window.selected as Facility;
@@ -29,35 +19,24 @@ const FacilityPanel: React.FC = () => {
       <hr />
       <Production entity={facility} />
       <hr />
-      {(window.sim.entities as Entity[])
-        .filter((e) => e?.cp.commander?.value === facility)
-        .map(asShip)
-        .map((ship, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <div key={`${ship.cp.name.value}-${index}`}>
-            {ship.cp.name.value}
-            <IconButton
-              className={styles.focus}
-              onClick={() => {
-                const { selectionManager } = (window.sim.entities as Entity[])
-                  .find((e) => e.hasComponents(["selectionManager"]))!
-                  .requireComponents(["selectionManager"]).cp;
-
-                selectionManager.set(ship);
-                selectionManager.focused = true;
-              }}
-            >
-              <SVG src={locationIcon} />
-            </IconButton>
-          </div>
-        ))}
+      <Subordinates entity={facility} />
       <hr />
-      {facility.cp.storage.allocationManager.all().map((allocation) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <div key={allocation.id}>
-          Allocation #{allocation.id}: {allocation.type}
-        </div>
-      ))}
+      {facility.cp.storage.allocationManager.all().length === 0 ? (
+        <div>No incoming transactions</div>
+      ) : (
+        facility.cp.storage.allocationManager.all().map((allocation) => (
+          <div key={allocation.id}>
+            Transaction #{allocation.id}:{" "}
+            {allocation.type === "incoming" ? "buying" : "selling"}{" "}
+            {Object.entries(allocation.amount)
+              .filter(([, amount]) => amount > 0)
+              .map(([commodity, amount]) => `${amount}x ${commodity}`)
+              .join(", ")}
+          </div>
+        ))
+      )}
+      <hr />
+      {!!facility.cp.docks && <Docks entity={facility} />}
     </div>
   );
 };
