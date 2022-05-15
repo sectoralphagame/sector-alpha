@@ -129,3 +129,9 @@ export class DockSizeMismatchError extends Error {
     this.actual = actual;
   }
 }
+
+export class NotDockedError extends Error {
+  constructor(entity: Entity, target: Entity) {
+    super(`Entity ${entity.id} must be docked to target ${target.id}`);
+  }
+}

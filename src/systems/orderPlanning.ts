@@ -69,6 +69,7 @@ function autoTrade(entity: Trading, sectorDistance: number) {
 function autoMine(
   entity: RequireComponent<
     | "drive"
+    | "dockable"
     | "storage"
     | "autoOrder"
     | "orders"

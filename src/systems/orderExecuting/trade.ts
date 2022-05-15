@@ -1,14 +1,13 @@
 import { TradeOrder } from "../../components/orders";
+import { NotDockedError } from "../../errors";
 import { RequireComponent } from "../../tsHelpers";
 import { acceptTrade } from "../../utils/trading";
 
 export function tradeOrder(
-  entity: RequireComponent<"drive" | "storage">,
+  entity: RequireComponent<"drive" | "storage" | "dockable">,
   order: TradeOrder
 ): boolean {
-  entity.cp.drive.setTarget(order.target);
-
-  if (entity.cp.drive.targetReached) {
+  if (entity.cp.dockable.docked === order.target) {
     if (order.offer.type === "sell") {
       if (order.offer.allocations?.buyer?.storage) {
         order.target.cp.storage.allocationManager.release(
@@ -40,5 +39,5 @@ export function tradeOrder(
     return true;
   }
 
-  return false;
+  throw new NotDockedError(entity, order.target);
 }
