@@ -13,32 +13,33 @@ if (process.env.NODE_ENV !== "test") {
 const minScale = 0.2;
 
 export class RenderingSystem extends System {
-  parent: HTMLCanvasElement;
   viewport: Viewport;
   p5: P5;
   prevScale: number = minScale;
 
   constructor(sim: Sim) {
     super(sim);
-    this.parent = document.querySelector("#canvasRoot")!;
 
     this.init();
   }
 
   init = () => {
     const settingsEntity = this.sim.queries.selectionManager.get()[0];
+    const root = document.querySelector("#root")!;
+    const toolbar = document.querySelector("#toolbar")!;
+    const canvas = document.querySelector("#canvasRoot")! as HTMLCanvasElement;
 
     const app = new PIXI.Application({
       antialias: true,
       autoDensity: true,
       resolution: window.devicePixelRatio,
-      width: window.innerWidth,
+      width: root.clientWidth - toolbar.clientWidth,
       height: window.innerHeight,
-      view: this.parent,
+      view: canvas,
     });
 
     const viewport = new Viewport({
-      screenWidth: window.innerWidth,
+      screenWidth: root.clientWidth - toolbar.clientWidth,
       screenHeight: window.innerHeight,
       interaction: app.renderer.plugins.interaction,
     });
