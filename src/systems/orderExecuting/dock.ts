@@ -21,13 +21,17 @@ export function dockOrder(
 ): boolean {
   entity.cp.drive.setTarget(order.target);
   const { docks } = order.target.cp;
+  const { size } = entity.cp.dockable;
   entity.cp.drive.target = order.target;
 
-  if (entity.cp.dockable.size !== docks.size) {
-    throw new DockSizeMismatchError(entity.cp.dockable.size, docks.size);
+  if (docks.pads[size] === 0) {
+    throw new DockSizeMismatchError(size);
   }
 
-  if (entity.cp.drive.targetReached && docks.pads > docks.docked.length) {
+  if (
+    entity.cp.drive.targetReached &&
+    docks.available(size) > docks.docked.length
+  ) {
     dockShip(entity, order.target);
 
     return true;

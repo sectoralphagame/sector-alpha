@@ -120,13 +120,11 @@ export class MissingEntityError extends Error {
 }
 
 export class DockSizeMismatchError extends Error {
-  wanted: DockSize;
-  actual: DockSize;
+  size: DockSize;
 
-  constructor(wanted: DockSize, actual: DockSize) {
-    super(`Dock size mismatched, wanted: ${wanted}, actual: ${actual}`);
-    this.wanted = wanted;
-    this.actual = actual;
+  constructor(size: DockSize) {
+    super(`Target entity does not contain dock with size: ${size}`);
+    this.size = size;
   }
 }
 

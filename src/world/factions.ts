@@ -119,26 +119,6 @@ export const factions = (sim: Sim) =>
           });
           tradeShip.addComponent("commander", new Parent(facility));
           tradeShip.components.owner.set(faction);
-          tradeShip.addComponent("docks", new Docks("small", 2));
-
-          const dockedShip = createShip(sim, {
-            ...getFreighterTemplate(),
-            position: tradeShip.cp.position.coord,
-            owner: faction,
-            sector,
-          });
-          dockedShip.cp.position.angle += Math.PI / 2;
-          dockedShip.addComponent("commander", new Parent(facility));
-          dockedShip.components.owner.set(faction);
-          dockShip(
-            dockedShip,
-            tradeShip.requireComponents(["position", "docks"])
-          );
-          dockedShip.cp.render.hide();
-          dockedShip.cp.orders.value.push({
-            type: "hold",
-            orders: [{ type: "hold" }],
-          });
         }
       } while (Math.random() < 0.15);
 

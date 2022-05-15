@@ -15,12 +15,14 @@ export class Dockable {
 }
 
 export class Docks {
-  size: DockSize;
-  pads: number;
+  pads: Record<DockSize, number>;
   docked: RequireComponent<"dockable" | "position">[] = [];
 
-  constructor(size: DockSize, pads: number) {
-    this.size = size;
+  constructor(pads: Record<DockSize, number>) {
     this.pads = pads;
   }
+
+  available = (size: DockSize) =>
+    this.pads[size] -
+    this.docked.filter((e) => e.cp.dockable.size === size).length;
 }

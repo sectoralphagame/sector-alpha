@@ -54,7 +54,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
 
   entity.addComponent("budget", new Budget());
   entity.addComponent("compoundProduction", new CompoundProduction());
-  entity.addComponent("docks", new Docks("small", 3));
+  entity.addComponent("docks", new Docks({ large: 1, medium: 3, small: 3 }));
   entity.addComponent("modules", new Modules());
   entity.addComponent("name", new Name(`Facility #${entity.id}`));
   entity.addComponent("owner", new Owner(initial.owner));
