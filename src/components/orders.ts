@@ -3,6 +3,7 @@ import { AsteroidField } from "../archetypes/asteroidField";
 import { Marker } from "../archetypes/marker";
 import { WithTrade } from "../economy/utils";
 import { NegativeQuantity } from "../errors";
+import { BaseComponent } from "./component";
 import { WithDock } from "./dockable";
 import { TransactionInput } from "./trade";
 
@@ -69,6 +70,6 @@ export function mineOrder(order: Omit<MineOrder, "type">): MineOrder {
   };
 }
 
-export class Orders {
-  value: OrderGroup[] = [];
+export interface Orders extends BaseComponent<"orders"> {
+  value: OrderGroup[];
 }

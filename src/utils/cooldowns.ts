@@ -29,18 +29,17 @@ export class Cooldowns<T extends string> {
     });
   }
 
-  copy(): Cooldowns<T> {
-    const copy = new Cooldowns(Object.keys(this.timers) as unknown as T);
-    Object.keys(this.timers).forEach((key) => {
-      copy.timers[key] = this.timers[key];
-    });
-
-    return copy;
-  }
-
   reset(): void {
     Object.keys(this.timers).forEach((key) => {
       this.timers[key] = 0;
     });
+  }
+
+  add(name: string) {
+    this.timers[name] = 0;
+  }
+
+  remove(name: string) {
+    delete this.timers[name];
   }
 }

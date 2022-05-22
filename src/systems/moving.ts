@@ -1,4 +1,5 @@
 import { add, Matrix, matrix, multiply, norm, subtract } from "mathjs";
+import { startCruise, stopCruise } from "../components/drive";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Query } from "./query";
@@ -7,12 +8,16 @@ import { System } from "./system";
 type Driveable = RequireComponent<"drive" | "position">;
 
 function move(entity: Driveable, delta: number) {
-  entity.cp.drive.sim(delta);
-
   const entityPosition = entity.cp.position;
   const drive = entity.cp.drive;
 
+  entity.cooldowns.update(delta);
+
   if (drive.target === null) return;
+
+  if (drive.state === "warming" && entity.cooldowns.canUse("cruise")) {
+    drive.state = "cruise";
+  }
 
   const targetPosition = drive.target.cp.position;
   const isInSector = targetPosition.sector.id === entity.cp.position.sector.id;
@@ -53,12 +58,17 @@ function move(entity: Driveable, delta: number) {
     return;
   }
 
-  if (canCruise && drive.state === "maneuver") {
-    drive.startCruise();
+  if (
+    canCruise &&
+    drive.state === "maneuver" &&
+    entity.cooldowns.canUse("drive")
+  ) {
+    entity.cooldowns.use("drive", drive.ttc);
+    startCruise(drive);
   }
 
   if (!canCruise && drive.state === "cruise") {
-    drive.stopCruise();
+    stopCruise(drive);
   }
 
   entityPosition.coord = add(entityPosition.coord, dPos) as Matrix;

@@ -1,18 +1,6 @@
 import { Faction } from "../economy/faction";
+import { BaseComponent } from "./component";
 
-export class Owner {
-  value: Faction | null = null;
-
-  constructor(value: Faction | null = null) {
-    if (value) {
-      this.set(value);
-    }
-  }
-
-  set = (value: Faction) => {
-    this.value = value;
-  };
-  clear = () => {
-    this.value = null;
-  };
+export interface Owner extends BaseComponent<"owner"> {
+  value: Faction | null;
 }

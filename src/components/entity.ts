@@ -23,6 +23,7 @@ import { MissingComponentError } from "../errors";
 import { HECSPosition } from "./hecsPosition";
 import { Teleport } from "./teleport";
 import { Docks, Dockable } from "./dockable";
+import { Cooldowns } from "../utils/cooldowns";
 
 export interface CoreComponents {
   asteroidSpawn: AsteroidSpawn;
@@ -56,6 +57,7 @@ export interface CoreComponents {
 
 export class Entity {
   components: Partial<CoreComponents> = {};
+  cooldowns = new Cooldowns<string>();
   id: number;
   sim: Sim;
   deleted: boolean = false;
@@ -83,11 +85,8 @@ export class Entity {
     return this as unknown as RequireComponent<T>;
   }
 
-  addComponent<T extends keyof CoreComponents>(
-    name: T,
-    component: CoreComponents[T]
-  ) {
-    this.components[name] = component;
+  addComponent<T extends keyof CoreComponents>(component: CoreComponents[T]) {
+    this.components[component.name] = component;
     this.sim.events.emit("add-component", this);
   }
 

@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import { BaseComponent } from "./component";
 
 export interface RenderInput {
   color?: number;
@@ -8,7 +9,7 @@ export interface RenderInput {
   zIndex: number;
 }
 
-export class Render {
+export class Render implements BaseComponent<"render"> {
   color: number;
   defaultScale: number = 1;
   initialized: boolean = false;
@@ -16,6 +17,7 @@ export class Render {
   sprite: PIXI.Sprite;
   texture: string;
   zIndex: number;
+  name: "render" = "render";
 
   constructor({
     color,
@@ -65,11 +67,12 @@ export class Render {
   };
 }
 
-export class RenderGraphics {
+export class RenderGraphics implements BaseComponent<"renderGraphics"> {
   // eslint-disable-next-line no-unused-vars
   _draw: (g: PIXI.Graphics) => void;
   g: PIXI.Graphics;
   initialized: boolean = false;
+  name: "renderGraphics" = "renderGraphics";
 
   // eslint-disable-next-line no-unused-vars
   constructor(draw: (g: PIXI.Graphics) => void) {

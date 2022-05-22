@@ -1,21 +1,7 @@
-import { MissingEntityError } from "../errors";
-import { Sim } from "../sim";
+import { BaseComponent } from "./component";
 import { Entity } from "./entity";
+import { EntityId } from "./utils/entityId";
 
-export class Parent<T extends Entity = Entity> {
-  id: number;
-  value: T;
-
-  constructor(parent: T) {
-    this.value = parent;
-    this.id = parent.id;
-  }
-
-  load = (sim: Sim) => {
-    const entity = sim.entities.find((e) => e.id === this.id);
-    if (!entity) {
-      throw new MissingEntityError(this.id);
-    }
-    this.value = entity as T;
-  };
-}
+export interface Parent<T extends Entity = Entity>
+  extends BaseComponent<"parent">,
+    EntityId<T> {}
