@@ -1,7 +1,6 @@
-import Color from "color";
 import { Matrix } from "mathjs";
 import { Entity } from "../components/entity";
-import { RenderGraphics } from "../components/render";
+import { createRenderGraphics } from "../components/renderGraphics";
 import { MineableCommodity } from "../economy/commodity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
@@ -48,17 +47,10 @@ export function createAsteroidField(
       entityId: sector.id,
     })
     .addComponent(
-      new RenderGraphics((g) => {
-        g.lineStyle({
-          alpha: 0.3,
-          width: 1,
-          color: Color(fieldColors[entity.cp.asteroidSpawn!.type]).rgbNumber(),
-        });
-        g.drawCircle(
-          entity.cp.position!.coord.get([0]) * 10,
-          entity.cp.position!.coord.get([1]) * 10,
-          entity.cp.asteroidSpawn!.size * 10
-        );
+      createRenderGraphics("circle", {
+        color: fieldColors[entity.cp.asteroidSpawn!.type],
+        position: entity.cp.position!.coord,
+        radius: entity.cp.asteroidSpawn!.size,
       })
     );
 

@@ -93,24 +93,3 @@ export function show(render: Render) {
   render.sprite.interactive = true;
   render.sprite.alpha = 1;
 }
-
-export class RenderGraphics implements BaseComponent<"renderGraphics"> {
-  // eslint-disable-next-line no-unused-vars
-  _draw: (g: PIXI.Graphics) => void;
-  g: PIXI.Graphics;
-  initialized: boolean = false;
-  name: "renderGraphics" = "renderGraphics";
-
-  // eslint-disable-next-line no-unused-vars
-  constructor(draw: (g: PIXI.Graphics) => void) {
-    // eslint-disable-next-line no-underscore-dangle
-    this._draw = draw;
-    this.g = new PIXI.Graphics();
-  }
-
-  draw = (container: PIXI.Container) => {
-    container.addChild(this.g);
-    // eslint-disable-next-line no-underscore-dangle
-    this._draw(this.g);
-  };
-}

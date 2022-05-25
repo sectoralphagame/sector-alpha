@@ -10,7 +10,8 @@ import { StorageBonus } from "./storageBonus";
 import { Modules } from "./modules";
 import { Name } from "./name";
 import { Selection, SelectionManager } from "./selection";
-import { Render, RenderGraphics } from "./render";
+import { Render } from "./render";
+import { RenderGraphics } from "./renderGraphics";
 import { AutoOrder } from "./autoOrder";
 import { Drive } from "./drive";
 import { Mining } from "./mining";
@@ -47,7 +48,7 @@ export interface CoreComponents {
   position: Position;
   production: Production;
   render: Render;
-  renderGraphics: RenderGraphics;
+  renderGraphics: RenderGraphics<any>;
   selection: Selection;
   selectionManager: SelectionManager;
   storage: CommodityStorage;

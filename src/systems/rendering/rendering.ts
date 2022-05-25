@@ -5,6 +5,7 @@ import Color from "color";
 import { Sim } from "../../sim";
 import { System } from "../system";
 import { setEntity } from "../../components/utils/entityId";
+import { drawGraphics } from "../../components/renderGraphics";
 
 if (process.env.NODE_ENV !== "test") {
   // eslint-disable-next-line global-require
@@ -63,14 +64,14 @@ export class RenderingSystem extends System {
 
     this.sim.queries.sectors.get().forEach((sector) => {
       if (!sector.cp.renderGraphics.initialized) {
-        sector.cp.renderGraphics.draw(this.viewport);
+        drawGraphics(sector.cp.renderGraphics, this.viewport);
         sector.cp.renderGraphics.initialized = true;
       }
     });
 
     this.sim.queries.renderableGraphics.get().forEach((entity) => {
       if (!entity.cp.renderGraphics.initialized) {
-        entity.cp.renderGraphics.draw(this.viewport);
+        drawGraphics(entity.cp.renderGraphics, this.viewport);
         entity.cp.renderGraphics.initialized = true;
       }
     });
