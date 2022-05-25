@@ -3,7 +3,7 @@ import Color from "color";
 import { createDrive, ShipDriveProps } from "../components/drive";
 import { Entity } from "../components/entity";
 import { createMining } from "../components/mining";
-import { Render } from "../components/render";
+import { createRender, Textures } from "../components/render";
 import { createCommodityStorage } from "../components/storage";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
@@ -37,7 +37,7 @@ export interface InitialShipInput {
   owner: Faction;
   storage: number;
   mining: number;
-  texture: string;
+  texture: keyof Textures;
   sector: Sector;
 }
 
@@ -64,11 +64,11 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       entityId: initial.sector.id,
     })
     .addComponent(
-      new Render({
+      createRender({
         color: Color(initial.owner.color).rgbNumber(),
         defaultScale: 0.4,
         maxZ: 0.5,
-        pathToTexture: initial.texture,
+        texture: initial.texture,
         zIndex: 2,
       })
     )

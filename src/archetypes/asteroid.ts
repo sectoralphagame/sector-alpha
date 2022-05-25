@@ -1,11 +1,10 @@
 import { Matrix } from "mathjs";
 import Color from "color";
 import { Entity } from "../components/entity";
-import { Render } from "../components/render";
+import { createRender } from "../components/render";
 import { MineableCommodity } from "../economy/commodity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
-import asteroidTexture from "../../assets/asteroid.svg";
 import { AsteroidField } from "./asteroidField";
 import { Sector } from "./sector";
 import { addEntity } from "../components/utils/entityId";
@@ -63,11 +62,11 @@ export function createAsteroid(
       entityId: sector.id,
     })
     .addComponent(
-      new Render({
+      createRender({
         color: Color(fieldColors[type]).rgbNumber(),
         defaultScale: 0.6,
         maxZ: 1.2,
-        pathToTexture: asteroidTexture,
+        texture: "asteroid",
         zIndex: 0,
       })
     );

@@ -7,6 +7,7 @@ import { linkTeleportModules } from "../components/teleport";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
+import { pickRandom } from "../utils/generators";
 import { createTeleporter, templates as facilityTemplates } from "./facilities";
 import { shipClasses } from "./ships";
 
@@ -14,18 +15,18 @@ function getFreighterTemplate() {
   const rnd = Math.random();
 
   if (rnd > 0.9) {
-    return Math.random() > 0.5
-      ? shipClasses.largeFreighterA
-      : shipClasses.largeFreighterB;
+    return pickRandom(
+      shipClasses.filter((s) => !s.mining && s.size === "large")
+    );
   }
 
   if (rnd > 0.2) {
-    return Math.random() > 0.5
-      ? shipClasses.freighterA
-      : shipClasses.freighterB;
+    return pickRandom(
+      shipClasses.filter((s) => !s.mining && s.size === "medium")
+    );
   }
 
-  return Math.random() > 0.5 ? shipClasses.courierA : shipClasses.courierB;
+  return pickRandom(shipClasses.filter((s) => !s.mining && s.size === "small"));
 }
 
 function createFaction(index: number) {
@@ -99,8 +100,8 @@ export const factions = (sim: Sim) =>
 
       do {
         if (hasMineables) {
-          const mineOrTrade = createShip(sim, {
-            ...(Math.random() > 0.5 ? shipClasses.minerA : shipClasses.minerB),
+          const minerShip = createShip(sim, {
+            ...pickRandom(shipClasses.filter((s) => s.mining)),
             position: add(
               position,
               matrix([random(-30, 30), random(-30, 30)])
@@ -108,12 +109,12 @@ export const factions = (sim: Sim) =>
             owner: faction,
             sector,
           });
-          mineOrTrade.addComponent({
+          minerShip.addComponent({
             name: "commander",
             entity: facility,
             entityId: facility.id,
           });
-          mineOrTrade.components.owner.value = faction;
+          minerShip.components.owner.value = faction;
         } else {
           const tradeShip = createShip(sim, {
             ...getFreighterTemplate(),

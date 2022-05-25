@@ -1,5 +1,6 @@
 import { clearTarget, setTarget } from "../../components/drive";
 import { MoveOrder, TeleportOrder } from "../../components/orders";
+import { show } from "../../components/render";
 import { setEntities } from "../../components/utils/entityId";
 import { RequireComponent } from "../../tsHelpers";
 
@@ -18,7 +19,7 @@ export function moveOrder(
     );
     entity.cp.dockable.entity = null;
     if (entity.cp.render) {
-      entity.cp.render.show();
+      show(entity.cp.render);
     }
   }
 

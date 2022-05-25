@@ -20,7 +20,7 @@ describe("Ship", () => {
     movingSystem = new MovingSystem(sim);
     sector = createSector(sim, { position: matrix([0, 0, 0]), name: "" });
     ship = createShip(sim, {
-      ...shipClasses.courierA,
+      ...shipClasses.find((s) => s.name === "Courier A"),
       position: matrix([1, 0]),
       owner: new Faction(""),
       sector,

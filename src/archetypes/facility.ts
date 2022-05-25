@@ -3,11 +3,10 @@ import { Matrix } from "mathjs";
 import { createBudget } from "../components/budget";
 import { Entity } from "../components/entity";
 import { createCompoundProduction } from "../components/production";
-import { Render } from "../components/render";
+import { createRender } from "../components/render";
 import { createCommodityStorage } from "../components/storage";
 import { createTrade } from "../components/trade";
 import { Faction } from "../economy/faction";
-import fCivTexture from "../../assets/f_civ.svg";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Sector } from "./sector";
@@ -72,11 +71,11 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
       entityId: initial.sector.id,
     })
     .addComponent(
-      new Render({
+      createRender({
         color: Color(initial.owner.color).rgbNumber(),
         defaultScale: 1,
         maxZ: 0.1,
-        pathToTexture: fCivTexture,
+        texture: "fCiv",
         zIndex: 1,
       })
     )

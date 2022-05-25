@@ -1,6 +1,7 @@
 import { availableDocks, WithDock } from "../../components/dockable";
 import { setTarget } from "../../components/drive";
 import { DockOrder } from "../../components/orders";
+import { hide } from "../../components/render";
 import {
   addEntity,
   clearEntity,
@@ -18,7 +19,7 @@ export function dockShip(
   clearEntity(ship.cp.drive);
 
   if (ship.cp.render) {
-    ship.cp.render.hide();
+    hide(ship.cp.render);
   }
 }
 

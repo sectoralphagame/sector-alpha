@@ -1,10 +1,16 @@
-import sCivTexture from "../../assets/s_civ.svg";
-import mCivTexture from "../../assets/m_civ.svg";
-import lCivTexture from "../../assets/l_civ.svg";
-import mMinTexture from "../../assets/m_min.svg";
+import { DockSize } from "../components/dockable";
+import { ShipDriveProps } from "../components/drive";
+import { Textures } from "../components/render";
 
-export const shipClasses = {
-  courierA: {
+export const shipClasses: Array<{
+  name: string;
+  drive: ShipDriveProps;
+  storage: number;
+  mining: number;
+  texture: keyof Textures;
+  size: DockSize;
+}> = [
+  {
     name: "Courier A",
     drive: {
       cruise: 4,
@@ -14,10 +20,10 @@ export const shipClasses = {
     },
     storage: 10,
     mining: 0,
-    texture: sCivTexture,
+    texture: "sCiv",
     size: "small",
   },
-  courierB: {
+  {
     name: "Courier B",
     drive: {
       cruise: 6,
@@ -27,10 +33,10 @@ export const shipClasses = {
     },
     storage: 6,
     mining: 0,
-    texture: sCivTexture,
+    texture: "sCiv",
     size: "small",
   },
-  freighterA: {
+  {
     name: "Freighter A",
     drive: {
       cruise: 1,
@@ -40,10 +46,10 @@ export const shipClasses = {
     },
     storage: 110,
     mining: 0,
-    texture: mCivTexture,
+    texture: "mCiv",
     size: "medium",
   },
-  freighterB: {
+  {
     name: "Freighter B",
     drive: {
       cruise: 0.7,
@@ -53,10 +59,10 @@ export const shipClasses = {
     },
     storage: 96,
     mining: 0,
-    texture: mCivTexture,
+    texture: "mCiv",
     size: "medium",
   },
-  largeFreighterA: {
+  {
     name: "Large Freighter A",
     drive: {
       cruise: 1.1,
@@ -66,10 +72,10 @@ export const shipClasses = {
     },
     storage: 800,
     mining: 0,
-    texture: lCivTexture,
+    texture: "lCiv",
     size: "large",
   },
-  largeFreighterB: {
+  {
     name: "Large Freighter B",
     drive: {
       cruise: 0.9,
@@ -79,11 +85,11 @@ export const shipClasses = {
     },
     storage: 940,
     mining: 0,
-    texture: lCivTexture,
+    texture: "lCiv",
     size: "large",
   },
 
-  minerA: {
+  {
     name: "Miner A",
     drive: {
       cruise: 2,
@@ -93,10 +99,10 @@ export const shipClasses = {
     },
     storage: 160,
     mining: 1,
-    texture: mMinTexture,
+    texture: "mMin",
     size: "medium",
   },
-  minerB: {
+  {
     name: "Miner B",
     drive: {
       cruise: 3,
@@ -106,7 +112,7 @@ export const shipClasses = {
     },
     storage: 96,
     mining: 1.4,
-    texture: mMinTexture,
+    texture: "mMin",
     size: "medium",
   },
-};
+];
