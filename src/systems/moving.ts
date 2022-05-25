@@ -13,20 +13,20 @@ function move(entity: Driveable, delta: number) {
 
   entity.cooldowns.update(delta);
 
-  if (drive.target === null) return;
+  if (drive.entity === null) return;
 
   if (drive.state === "warming" && entity.cooldowns.canUse("cruise")) {
     drive.state = "cruise";
   }
 
-  const targetPosition = drive.target.cp.position;
-  const isInSector = targetPosition.sector.id === entity.cp.position.sector.id;
+  const targetPosition = drive.entity.cp.position;
+  const isInSector = targetPosition.entity.id === entity.cp.position.entity.id;
   if (!isInSector) {
     // eslint-disable-next-line no-console
     console.error(entity);
     // eslint-disable-next-line no-console
-    console.error(drive.target);
-    drive.target = null;
+    console.error(drive.entity);
+    drive.entity = null;
     entity.cp.orders!.value = [];
     throw new Error("Out of bounds");
   }
@@ -74,7 +74,7 @@ function move(entity: Driveable, delta: number) {
   entityPosition.coord = add(entityPosition.coord, dPos) as Matrix;
   entityPosition.angle += dAngle;
 
-  entity.cp.docks?.docked.forEach((docked) => {
+  entity.cp.docks?.entities.forEach((docked) => {
     const dockedPosition = docked.cp.position;
 
     dockedPosition.coord = matrix(entityPosition.coord);

@@ -4,6 +4,7 @@ import { Viewport } from "pixi-viewport";
 import Color from "color";
 import { Sim } from "../../sim";
 import { System } from "../system";
+import { setEntity } from "../../components/utils/entityId";
 
 if (process.env.NODE_ENV !== "test") {
   // eslint-disable-next-line global-require
@@ -83,7 +84,10 @@ export class RenderingSystem extends System {
         if (entity.hasComponents(["selection"])) {
           entityRender.sprite.interactive = true;
           entityRender.sprite.on("mousedown", () => {
-            settingsEntity.cp.selectionManager.set(entity);
+            setEntity(
+              settingsEntity.cp.selectionManager,
+              entity.requireComponents(["selection"])
+            );
           });
           entityRender.sprite.cursor = "pointer";
         }
@@ -92,8 +96,8 @@ export class RenderingSystem extends System {
       }
 
       entityRender.sprite.position.set(
-        entity.cp.position.x * 10,
-        entity.cp.position.y * 10
+        entity.cp.position.coord.get([0]) * 10,
+        entity.cp.position.coord.get([1]) * 10
       );
       entityRender.sprite.rotation = entity.cp.position.angle;
       if (selected && entityRender.sprite.tint === entityRender.color) {

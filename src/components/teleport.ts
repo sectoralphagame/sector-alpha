@@ -8,7 +8,7 @@ export interface Teleport
   extends BaseComponent<"teleport">,
     EntityId<WithTeleport> {}
 
-export function linkTeleports(a: WithTeleport, b: WithTeleport) {
+export function linkTeleportModules(a: WithTeleport, b: WithTeleport) {
   setEntity(a.cp.teleport, b);
   setEntity(b.cp.teleport, a);
 }

@@ -6,6 +6,7 @@ import { Table, TableCell } from "./Table";
 import { IconButton } from "./IconButton";
 import locationIcon from "../../../../assets/ui/location.svg";
 import { Entity } from "../../../components/entity";
+import { setEntity } from "../../../components/utils/entityId";
 
 export interface ProductionProps {
   entity: RequireComponent<"modules">;
@@ -14,7 +15,7 @@ export interface ProductionProps {
 export const Production: React.FC<ProductionProps> = ({ entity }) => {
   const { modules } = entity.cp;
   const { productionModules, utilityModules } = groupBy(
-    modules.modules,
+    modules.entities,
     (facilityModule) =>
       facilityModule.hasComponents(["production"])
         ? "productionModules"
@@ -29,10 +30,7 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
           <tr key={`${facilityModule.cp.name.value}-${index}`}>
             <TableCell>{facilityModule.cp.name.value}</TableCell>
             <TableCell style={{ textAlign: "right" }}>
-              {facilityModule.cp.production!.cooldowns.timers.production.toFixed(
-                0
-              )}
-              s
+              {facilityModule.cooldowns.timers.production.toFixed(0)}s
             </TableCell>
           </tr>
         ))}
@@ -43,7 +41,7 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
           <tr key={`${facilityModule.cp.name.value}-${index}`}>
             <TableCell>{facilityModule.cp.name.value}</TableCell>
             <TableCell>
-              {facilityModule.cp.teleport?.destination && (
+              {facilityModule.cp.teleport?.entity && (
                 <IconButton
                   onClick={() => {
                     const { selectionManager } = (
@@ -52,8 +50,9 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
                       .find((e) => e.hasComponents(["selectionManager"]))!
                       .requireComponents(["selectionManager"]).cp;
 
-                    selectionManager.set(
-                      facilityModule.cp.teleport!.destination.cp.parent!.value
+                    setEntity(
+                      selectionManager,
+                      facilityModule.cp.teleport!.entity!.cp.parent!.entity
                     );
                     selectionManager.focused = true;
                   }}

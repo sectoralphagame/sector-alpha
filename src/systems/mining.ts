@@ -1,16 +1,17 @@
+import { addStorage } from "../components/storage";
 import { RequireComponent } from "../tsHelpers";
 import { System } from "./system";
 
 type WithMining = RequireComponent<"mining" | "storage">;
 
 function mine(entity: WithMining, delta: number) {
-  entity.cp.mining.cooldowns.update(delta);
-
-  if (entity.cp.mining.asteroid) {
-    if (entity.cp.mining.cooldowns.canUse("mine")) {
-      entity.cp.mining.cooldowns.use("mine", 5);
-      entity.cp.storage.addStorage(
-        entity.cp.mining.asteroid.cp.minable.commodity,
+  if (entity.cp.mining.entity) {
+    if (entity.cooldowns.canUse("mine")) {
+      entity.cooldowns.use("mine", 5);
+      addStorage(
+        entity.cp.storage,
+        entity.cp.mining.entity.requireComponents(["minable"]).cp.minable
+          .commodity,
         Math.floor(entity.cp.mining.buffer),
         false
       );

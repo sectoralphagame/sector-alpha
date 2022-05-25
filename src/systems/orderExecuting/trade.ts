@@ -1,4 +1,5 @@
 import { TradeOrder } from "../../components/orders";
+import { releaseStorageAllocation, transfer } from "../../components/storage";
 import { NotDockedError } from "../../errors";
 import { RequireComponent } from "../../tsHelpers";
 import { acceptTrade } from "../../utils/trading";
@@ -7,15 +8,17 @@ export function tradeOrder(
   entity: RequireComponent<"drive" | "storage" | "dockable">,
   order: TradeOrder
 ): boolean {
-  if (entity.cp.dockable.docked === order.target) {
+  if (entity.cp.dockable.entity === order.target) {
     if (order.offer.type === "sell") {
       if (order.offer.allocations?.buyer?.storage) {
-        order.target.cp.storage.allocationManager.release(
+        releaseStorageAllocation(
+          order.target.cp.storage,
           order.offer.allocations.buyer.storage
         );
       }
 
-      entity.cp.storage.transfer(
+      transfer(
+        entity.cp.storage,
         order.offer.commodity,
         order.offer.quantity,
         order.target.cp.storage,
@@ -23,11 +26,13 @@ export function tradeOrder(
       );
     } else {
       if (order.offer.allocations?.seller?.storage) {
-        order.target.cp.storage.allocationManager.release(
+        releaseStorageAllocation(
+          order.target.cp.storage,
           order.offer.allocations.seller.storage
         );
       }
-      order.target.cp.storage.transfer(
+      transfer(
+        order.target.cp.storage,
         order.offer.commodity,
         order.offer.quantity,
         entity.cp.storage,

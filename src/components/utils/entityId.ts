@@ -7,11 +7,6 @@ export interface EntityId<T extends Entity = Entity> {
   entityId: number | null;
 }
 
-export interface EntityIds<T extends Entity> {
-  entities: T[];
-  entityIds: number[];
-}
-
 export function setEntity<T extends Entity = Entity>(
   entityId: EntityId<T>,
   entity: T
@@ -20,7 +15,7 @@ export function setEntity<T extends Entity = Entity>(
   entityId.entityId = entity.id;
 }
 
-export function loadEntity<T extends Entity | null = Entity>(
+export function loadEntity<T extends Entity = Entity>(
   entityId: EntityId<T>,
   sim: Sim
 ) {
@@ -30,6 +25,16 @@ export function loadEntity<T extends Entity | null = Entity>(
   }
 
   entityId.entity = entity as T;
+}
+
+export function clearEntity(entityId: EntityId) {
+  entityId.entity = null;
+  entityId.entityId = null;
+}
+
+export interface EntityIds<T extends Entity = Entity> {
+  entities: T[];
+  entityIds: number[];
 }
 
 export function addEntity<T extends Entity = Entity>(
@@ -46,6 +51,14 @@ export function removeEntity<T extends Entity = Entity>(
 ) {
   entityIds.entities = entityIds.entities.filter((e) => e.id !== id);
   entityIds.entityIds = entityIds.entityIds.filter((e) => e !== id);
+}
+
+export function setEntities<T extends Entity = Entity>(
+  entityIds: EntityIds<T>,
+  entities: T[]
+) {
+  entityIds.entities = entities;
+  entityIds.entityIds = entities.map((e) => e.id);
 }
 
 export function loadEntities<T extends Entity = Entity>(

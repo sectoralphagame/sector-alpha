@@ -10,13 +10,13 @@ import { ProducingSystem } from "../systems/producing";
 import { StorageQuotaPlanningSystem } from "../systems/storageQuotaPlanning";
 import { TradingSystem } from "../systems/trading";
 import { SelectingSystem } from "../systems/selecting";
-import { SelectionManager } from "../components/selection";
 import { OrderPlanningSystem } from "../systems/orderPlanning";
 import { MovingSystem } from "../systems/moving";
 import { MiningSystem } from "../systems/mining";
 import { createQueries, Queries } from "../systems/query";
 import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
 import { PathPlanningSystem } from "../systems/pathPlanning";
+import { CooldownUpdatingSystem } from "../systems/cooldowns";
 
 export class Sim extends BaseSim {
   entityIdCounter: number = 0;
@@ -37,11 +37,17 @@ export class Sim extends BaseSim {
     this.events = new EventEmitter();
 
     const settingsEntity = new Entity(this);
-    settingsEntity.cp.selectionManager = new SelectionManager();
+    settingsEntity.addComponent({
+      entity: null,
+      entityId: null,
+      focused: false,
+      name: "selectionManager",
+    });
 
     this.queries = createQueries(this);
 
     this.systems = [
+      new CooldownUpdatingSystem(this),
       new ProducingSystem(this),
       new StorageQuotaPlanningSystem(this),
       new TradingSystem(this),

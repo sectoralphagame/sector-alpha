@@ -1,9 +1,5 @@
 import { Entity } from "../components/entity";
-import { Name } from "../components/name";
-import { Parent } from "../components/parent";
-import { PAC, Production } from "../components/production";
-import { StorageBonus } from "../components/storageBonus";
-import { Teleport } from "../components/teleport";
+import { createProduction, PAC } from "../components/production";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 
@@ -19,14 +15,25 @@ export type FacilityModule = RequireComponent<"parent" | "name">;
 
 export function createFacilityModule(sim: Sim, input: ProductionModuleInput) {
   const entity = new Entity(sim);
-  entity.addComponent("parent", new Parent(input.parent));
-  entity.addComponent("name", new Name(input.name));
+  entity
+    .addComponent({
+      name: "parent",
+      entity: input.parent,
+      entityId: input.parent.id,
+    })
+    .addComponent({
+      name: "name",
+      value: input.name,
+    });
   if (input.pac && input.time) {
-    entity.addComponent("production", new Production(input.time, input.pac));
+    entity.addComponent(createProduction(input.time, input.pac));
   }
 
   if (input.storage) {
-    entity.addComponent("storageBonus", new StorageBonus(input.storage));
+    entity.addComponent({
+      name: "storageBonus",
+      value: input.storage,
+    });
   }
 
   return entity as FacilityModule;
@@ -142,9 +149,17 @@ export const facilityModules = {
     parent: RequireComponent<"position" | "modules">
   ): FacilityModule => {
     const entity = new Entity(sim);
-    entity.addComponent("parent", new Parent(parent));
-    entity.addComponent("name", new Name("Hyperspace Generator"));
-    entity.addComponent("teleport", new Teleport());
+    entity
+      .addComponent({ name: "parent", entity: parent, entityId: parent.id })
+      .addComponent({
+        name: "name",
+        value: "Hyperspace Generator",
+      })
+      .addComponent({
+        name: "teleport",
+        entity: null,
+        entityId: null,
+      });
 
     return entity as FacilityModule;
   },

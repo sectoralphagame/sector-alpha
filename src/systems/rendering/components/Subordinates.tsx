@@ -6,6 +6,7 @@ import { IconButton } from "./IconButton";
 import { Table, TableCell } from "./Table";
 import { nano } from "../../../style";
 import { ship as asShip } from "../../../archetypes/ship";
+import { setEntity } from "../../../components/utils/entityId";
 
 export interface SubordinatesProps {
   entity: Entity;
@@ -23,7 +24,7 @@ const styles = nano.sheet({
 
 export const Subordinates: React.FC<SubordinatesProps> = ({ entity }) => {
   const subordinates = (window.sim.entities as Entity[])
-    .filter((e) => e?.cp.commander?.value === entity)
+    .filter((e) => e?.cp.commander?.entity === entity)
     .map(asShip);
 
   return subordinates.length === 0 ? (
@@ -49,7 +50,10 @@ export const Subordinates: React.FC<SubordinatesProps> = ({ entity }) => {
                     .find((e) => e.hasComponents(["selectionManager"]))!
                     .requireComponents(["selectionManager"]).cp;
 
-                  selectionManager.set(ship);
+                  setEntity(
+                    selectionManager,
+                    ship.requireComponents(["selection"])
+                  );
                   selectionManager.focused = true;
                 }}
               >

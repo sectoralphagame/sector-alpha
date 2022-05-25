@@ -1,9 +1,6 @@
 import Color from "color";
 import { Matrix } from "mathjs";
-import { AsteroidSpawn } from "../components/asteroidSpawn";
-import { Children } from "../components/children";
 import { Entity } from "../components/entity";
-import { Position } from "../components/position";
 import { RenderGraphics } from "../components/render";
 import { MineableCommodity } from "../economy/commodity";
 import { Sim } from "../sim";
@@ -36,24 +33,34 @@ export function createAsteroidField(
 ) {
   const entity = new Entity(sim);
 
-  entity.addComponent("asteroidSpawn", new AsteroidSpawn(type, size));
-  entity.addComponent("children", new Children());
-  entity.addComponent("position", new Position(position, 0, sector));
-  entity.addComponent(
-    "renderGraphics",
-    new RenderGraphics((g) => {
-      g.lineStyle({
-        alpha: 0.3,
-        width: 1,
-        color: Color(fieldColors[entity.cp.asteroidSpawn!.type]).rgbNumber(),
-      });
-      g.drawCircle(
-        entity.cp.position!.x * 10,
-        entity.cp.position!.y * 10,
-        entity.cp.asteroidSpawn!.size * 10
-      );
+  entity
+    .addComponent({
+      name: "asteroidSpawn",
+      size,
+      type,
     })
-  );
+    .addComponent({ name: "children", entities: [], entityIds: [] })
+    .addComponent({
+      name: "position",
+      coord: position,
+      angle: 0,
+      entity: sector,
+      entityId: sector.id,
+    })
+    .addComponent(
+      new RenderGraphics((g) => {
+        g.lineStyle({
+          alpha: 0.3,
+          width: 1,
+          color: Color(fieldColors[entity.cp.asteroidSpawn!.type]).rgbNumber(),
+        });
+        g.drawCircle(
+          entity.cp.position!.coord.get([0]) * 10,
+          entity.cp.position!.coord.get([1]) * 10,
+          entity.cp.asteroidSpawn!.size * 10
+        );
+      })
+    );
 
   return asteroidField(entity);
 }

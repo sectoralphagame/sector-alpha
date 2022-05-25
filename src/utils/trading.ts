@@ -12,6 +12,18 @@ import type { RequireComponent } from "../tsHelpers";
 import { perCommodity } from "./perCommodity";
 import { createOffers } from "../systems/trading";
 import { moveToOrders } from "./moving";
+import { getSummedConsumption } from "../components/production";
+import {
+  hasSufficientStorage,
+  hasSufficientStorageSpace,
+  newStorageAllocation,
+  releaseStorageAllocation,
+} from "../components/storage";
+import {
+  newBudgetAllocation,
+  releaseBudgetAllocation,
+  transferMoney,
+} from "../components/budget";
 
 export function isTradeAccepted(
   entity: WithTrade,
@@ -37,7 +49,7 @@ export function isTradeAccepted(
 
     return (
       validPrice &&
-      entity.cp.storage.hasSufficientStorage(input.commodity, input.quantity)
+      hasSufficientStorage(entity.cp.storage, input.commodity, input.quantity)
     );
   }
 
@@ -49,8 +61,8 @@ export function isTradeAccepted(
 
   return (
     validPrice &&
-    entity.cp.budget.getAvailableMoney() >= input.price * input.quantity &&
-    entity.cp.storage.hasSufficientStorageSpace(input.quantity)
+    entity.cp.budget.available >= input.price * input.quantity &&
+    hasSufficientStorageSpace(entity.cp.storage, input.quantity)
   );
 }
 
@@ -63,15 +75,17 @@ export function acceptTrade(entity: WithTrade, input: TransactionInput) {
       input.allocations?.buyer?.budget &&
       input.budget
     ) {
-      const allocation = entity.cp.budget.allocations.release(
+      const allocation = releaseBudgetAllocation(
+        entity.cp.budget,
         input.allocations.buyer.budget
       );
-      entity.cp.budget.transferMoney(allocation.amount, input.budget);
+      transferMoney(entity.cp.budget, allocation.amount, input.budget);
     } else if (input.allocations?.buyer?.budget && input.budget) {
-      const allocation = input.budget.allocations.release(
+      const allocation = releaseBudgetAllocation(
+        input.budget,
         input.allocations.buyer.budget
       );
-      input.budget.transferMoney(allocation.amount, entity.cp.budget);
+      transferMoney(input.budget, allocation.amount, entity.cp.budget);
     }
   }
 
@@ -95,10 +109,10 @@ export function allocate(
   if (isTradeAccepted(entity, offer)) {
     if (offer.type === "sell") {
       return {
-        budget: entity.cp.budget.allocations.new({
+        budget: newBudgetAllocation(entity.cp.budget, {
           amount: offer.price * offer.quantity,
         }),
-        storage: entity.cp.storage.allocationManager.new({
+        storage: newStorageAllocation(entity.cp.storage, {
           amount: {
             ...perCommodity(() => 0),
             [offer.commodity]: offer.quantity,
@@ -110,7 +124,7 @@ export function allocate(
 
     return {
       budget: null,
-      storage: entity.cp.storage.allocationManager.new({
+      storage: newStorageAllocation(entity.cp.storage, {
         amount: {
           ...perCommodity(() => 0),
           [offer.commodity]: offer.quantity,
@@ -126,8 +140,8 @@ export function allocate(
 export function getNeededCommodities(
   entity: WithTrade & RequireComponent<"compoundProduction">
 ): Commodity[] {
-  const summedConsumption = entity.cp.compoundProduction.getSummedConsumption();
-  const stored = entity.cp.storage.getAvailableWares();
+  const summedConsumption = getSummedConsumption(entity.cp.compoundProduction);
+  const stored = entity.cp.storage.availableWares;
 
   const scores = sortBy(
     Object.values(commodities)
@@ -155,7 +169,7 @@ export function getNeededCommodities(
 }
 
 export function getCommoditiesForSell(entity: WithTrade): Commodity[] {
-  const stored = entity.cp.storage.getAvailableWares();
+  const stored = entity.cp.storage.availableWares;
 
   return sortBy(
     Object.values(commodities)
@@ -187,8 +201,8 @@ export function tradeCommodity(
   if (!entity.sim.paths) return false;
 
   const sameFaction = entity.cp.owner.value === seller.components.owner.value;
-  const buy = entity.cp.commander.value === buyer;
-  const commander = entity.cp.commander.value.requireComponents([
+  const buy = entity.cp.commander.entity === buyer;
+  const commander = entity.cp.commander.entity!.requireComponents([
     "budget",
     "trade",
   ]);
@@ -200,7 +214,7 @@ export function tradeCommodity(
       seller.components.trade.offers[commodity].quantity,
       sameFaction
         ? Infinity
-        : commander.cp.budget.getAvailableMoney() /
+        : commander.cp.budget.available /
             commander.cp.trade.offers[commodity].price
     )
   );
@@ -232,17 +246,20 @@ export function tradeCommodity(
   const sellerAllocations = allocate(seller, offer);
   if (!sellerAllocations) {
     if (buyerAllocations.budget?.id) {
-      buyer.components.budget.allocations.release(buyerAllocations.budget.id);
+      releaseBudgetAllocation(
+        buyer.components.budget,
+        buyerAllocations.budget.id
+      );
     }
     if (buyerAllocations.storage?.id) {
-      buyer.cp.storage.allocationManager.release(buyerAllocations.storage.id);
+      releaseStorageAllocation(buyer.cp.storage, buyerAllocations.storage.id);
     }
     return false;
   }
 
   const orders: Order[] = [];
 
-  if (entity.cp.dockable.docked !== seller) {
+  if (entity.cp.dockable.entity !== seller) {
     orders.push(...moveToOrders(entity, seller), {
       type: "dock",
       target: seller,
@@ -309,7 +326,7 @@ export function autoBuyMostNeededByCommander(
   jumps: number
 ): boolean {
   const minQuantity = 0;
-  const commander = facility(entity.cp.commander.value);
+  const commander = facility(entity.cp.commander.entity!);
   if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
   const target = getFacilityWithMostProfit(
@@ -338,7 +355,7 @@ export function autoSellMostRedundantToCommander(
   jumps: number
 ): boolean {
   const minQuantity = 0;
-  const commander = facility(entity.cp.commander.value);
+  const commander = facility(entity.cp.commander.entity!);
   if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
   const target = getFacilityWithMostProfit(
@@ -364,20 +381,20 @@ export function returnToFacility(
     | "dockable"
   >
 ) {
-  const commander = facility(entity.cp.commander.value);
+  const commander = facility(entity.cp.commander.entity!);
   const orders: Order[] = [];
-  if (entity.cp.dockable.docked !== commander) {
+  if (entity.cp.dockable.entity !== commander) {
     orders.push(...moveToOrders(entity, commander), {
       type: "dock",
       target: commander,
     });
   }
   Object.values(commodities)
-    .filter((commodity) => entity.cp.storage.getAvailableWares()[commodity] > 0)
+    .filter((commodity) => entity.cp.storage.availableWares[commodity] > 0)
     .forEach((commodity) => {
       const offer: TransactionInput = {
         commodity,
-        quantity: entity.cp.storage.getAvailableWares()[commodity],
+        quantity: entity.cp.storage.availableWares[commodity],
         price: 0,
         budget: null,
         allocations: null,

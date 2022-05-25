@@ -13,3 +13,13 @@ export interface Mining extends BaseComponent<"mining">, EntityId {
    */
   buffer: number;
 }
+
+export function createMining(efficiency: number): Mining {
+  return {
+    name: "mining",
+    buffer: 0,
+    efficiency,
+    entity: null,
+    entityId: null,
+  };
+}

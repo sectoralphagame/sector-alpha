@@ -3,7 +3,7 @@ import { BaseComponent } from "./component";
 import { Entity } from "./entity";
 import { EntityId } from "./utils/entityId";
 
-export type Target = RequireComponent<"position"> | null;
+export type Target = RequireComponent<"position">;
 
 export interface ShipDriveProps {
   maneuver: number;
@@ -54,7 +54,7 @@ export function stopCruise(drive: Drive) {
   drive.state = "maneuver";
 }
 
-export function setTarget(drive: Drive, target: Target) {
+export function setTarget(drive: Drive, target: Target | null) {
   const targetsAreEntities =
     target instanceof Entity && drive.entity instanceof Entity;
 

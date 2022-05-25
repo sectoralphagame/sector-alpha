@@ -13,6 +13,7 @@ import {
   CollapsibleSummary,
 } from "./Collapsible";
 import { Docks } from "./Docks";
+import { setEntity } from "../../../components/utils/entityId";
 
 const styles = nano.sheet(
   {
@@ -30,13 +31,13 @@ function getOrderDescription(ship: Ship, order: Order) {
     case "teleport":
       return "Teleport to location";
     case "trade":
-      if (order.target === ship.cp.commander?.value)
+      if (order.target === ship.cp.commander?.entity)
         return "Deliver wares to commander";
       return `Deliver wares to ${order.target.cp.name?.value}`;
     case "mine":
       return `Mine ${order.target.cp.asteroidSpawn.type}`;
     case "dock":
-      if (order.target === ship.cp.commander?.value)
+      if (order.target === ship.cp.commander?.entity)
         return "Dock at commanding facility";
       return `Dock at ${order.target.cp.name?.value}`;
     default:
@@ -63,7 +64,7 @@ function getOrderGroupDescription(order: OrderGroup) {
 const ShipPanel: React.FC = () => {
   const ship = asShip(window.selected as Entity);
   const storedCommodities = Object.values(commodities).filter(
-    (commodity) => ship.cp.storage.getAvailableWares()[commodity] > 0
+    (commodity) => ship.cp.storage.availableWares[commodity] > 0
   );
 
   return (
@@ -71,7 +72,7 @@ const ShipPanel: React.FC = () => {
       <div>{ship.cp.name.value}</div>
       {!!ship.cp.commander && (
         <div>
-          {`Commander: ${ship.cp.commander.value.cp.name!.value}`}
+          {`Commander: ${ship.cp.commander.entity.cp.name!.value}`}
           <IconButton
             className={styles.focus}
             onClick={() => {
@@ -79,7 +80,7 @@ const ShipPanel: React.FC = () => {
                 .find((e) => e.hasComponents(["selectionManager"]))!
                 .requireComponents(["selectionManager"]).cp;
 
-              selectionManager.set(ship.cp.commander!.value);
+              setEntity(selectionManager, ship.cp.commander!.entity);
               selectionManager.focused = true;
             }}
           >
@@ -92,7 +93,7 @@ const ShipPanel: React.FC = () => {
         ? storedCommodities
             .map((commodity) => ({
               commodity,
-              stored: ship.cp.storage.getAvailableWares()[commodity],
+              stored: ship.cp.storage.availableWares[commodity],
             }))
             .map((data) => (
               <div

@@ -1,7 +1,12 @@
 import { sum } from "mathjs";
 import { InsufficientMoney, NegativeBudget, NegativeQuantity } from "../errors";
 import { BaseComponent } from "./component";
-import { Allocation, Allocations, newAllocation } from "./utils/allocations";
+import {
+  Allocation,
+  Allocations,
+  newAllocation,
+  releaseAllocation,
+} from "./utils/allocations";
 
 export interface BudgetAllocation {
   id: number;
@@ -34,6 +39,16 @@ export function newBudgetAllocation(
   const allocation = newAllocation(budget, input, (a) =>
     validateBudgetAllocation(budget, a)
   );
+  updateAvailableMoney(budget);
+
+  return allocation;
+}
+
+export function releaseBudgetAllocation(
+  budget: Budget,
+  id: number
+): BudgetAllocation {
+  const allocation = releaseAllocation(budget, id);
   updateAvailableMoney(budget);
 
   return allocation;

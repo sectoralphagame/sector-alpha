@@ -8,7 +8,12 @@ import {
   NonIntegerQuantity,
 } from "../errors";
 import { perCommodity } from "../utils/perCommodity";
-import { Allocations } from "../components/utils/allocations";
+import {
+  Allocation,
+  Allocations,
+  newAllocation,
+  releaseAllocation,
+} from "../components/utils/allocations";
 import { Commodity } from "../economy/commodity";
 import { sim } from "../sim";
 import { BaseComponent } from "./component";
@@ -208,6 +213,28 @@ export function transfer(
   removeStorage(storage, commodity, transferred);
 
   return transferred;
+}
+
+export function newStorageAllocation(
+  storage: CommodityStorage,
+  input: Omit<StorageAllocation, keyof Allocation>
+) {
+  const allocation = newAllocation(storage, input, (a) =>
+    validateStorageAllocation(storage, a)
+  );
+  updateAvailableWares(storage);
+
+  return allocation;
+}
+
+export function releaseStorageAllocation(
+  storage: CommodityStorage,
+  id: number
+): StorageAllocation {
+  const allocation = releaseAllocation(storage, id);
+  updateAvailableWares(storage);
+
+  return allocation;
 }
 
 export function createCommodityStorage(): CommodityStorage {

@@ -1,62 +1,88 @@
 import { perCommodity } from "../utils/perCommodity";
-import { CommodityStorage } from "./storage";
+import {
+  addStorage,
+  createCommodityStorage,
+  getAvailableSpace,
+  validateStorageAllocation,
+} from "./storage";
+import { newAllocation } from "./utils/allocations";
 
 describe("Storage", () => {
   it("properly calculates available space when allocations were made", () => {
-    const storage = new CommodityStorage();
+    const storage = createCommodityStorage();
     storage.max = 100;
-    storage.addStorage("food", 10);
-    storage.allocationManager.new({
-      amount: { ...perCommodity(() => 0), food: 5 },
-      type: "incoming",
-    });
-    storage.allocationManager.new({
-      amount: { ...perCommodity(() => 0), fuel: 5 },
-      type: "incoming",
-    });
-    storage.allocationManager.new({
-      amount: { ...perCommodity(() => 0), food: 9 },
-      type: "outgoing",
-    });
+    addStorage(storage, "food", 10);
+    newAllocation(
+      storage,
+      {
+        amount: { ...perCommodity(() => 0), food: 5 },
+        type: "incoming",
+      },
+      (a) => validateStorageAllocation(storage, a)
+    );
+    newAllocation(
+      storage,
+      {
+        amount: { ...perCommodity(() => 0), fuel: 5 },
+        type: "incoming",
+      },
+      (a) => validateStorageAllocation(storage, a)
+    );
+    newAllocation(
+      storage,
+      {
+        amount: { ...perCommodity(() => 0), food: 9 },
+        type: "outgoing",
+      },
+      (a) => validateStorageAllocation(storage, a)
+    );
 
-    const stored = storage.getAvailableWares();
+    const stored = storage.availableWares;
 
     expect(stored.food).toBe(1);
     expect(stored.fuel).toBe(0);
-    expect(storage.getAvailableSpace()).toBe(80);
+    expect(getAvailableSpace(storage)).toBe(80);
   });
 
   it("properly validates new outgoing allocations", () => {
-    const storage = new CommodityStorage();
+    const storage = createCommodityStorage();
     storage.max = 100;
-    storage.addStorage("food", 10);
+    addStorage(storage, "food", 10);
 
-    const allocation = storage.allocationManager.new({
-      amount: {
-        ...perCommodity(() => 0),
-        food: 10,
+    const allocation = newAllocation(
+      storage,
+      {
+        amount: {
+          ...perCommodity(() => 0),
+          food: 10,
+        },
+        type: "outgoing",
       },
-      type: "outgoing",
-    });
+      (a) => validateStorageAllocation(storage, a)
+    );
 
     expect(allocation).not.toBeNull();
-    expect(storage.getAvailableSpace()).toBe(90);
+    expect(getAvailableSpace(storage)).toBe(90);
   });
 
   it("properly validates new incoming allocations", () => {
-    const storage = new CommodityStorage();
+    const storage = createCommodityStorage();
     storage.max = 100;
-    storage.addStorage("food", 10);
+    addStorage(storage, "food", 10);
 
-    const allocation = storage.allocationManager.new({
-      amount: {
-        ...perCommodity(() => 0),
-        food: 10,
+    const allocation = newAllocation(
+      storage,
+      {
+        amount: {
+          ...perCommodity(() => 0),
+          food: 10,
+        },
+        type: "incoming",
       },
-      type: "incoming",
-    });
+      (a) => validateStorageAllocation(storage, a)
+    );
 
     expect(allocation).not.toBeNull();
-    expect(storage.getAvailableSpace()).toBe(80);
+    expect(getAvailableSpace(storage)).toBe(80);
   });
 });

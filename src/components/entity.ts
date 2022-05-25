@@ -24,22 +24,23 @@ import { HECSPosition } from "./hecsPosition";
 import { Teleport } from "./teleport";
 import { Docks, Dockable } from "./dockable";
 import { Cooldowns } from "../utils/cooldowns";
+import { Commander } from "./commander";
 
 export interface CoreComponents {
   asteroidSpawn: AsteroidSpawn;
   autoOrder: AutoOrder;
   budget: Budget;
   children: Children;
-  commander: Parent; // Essentially the same
+  commander: Commander;
   compoundProduction: CompoundProduction;
-  drive: Drive;
-  docks: Docks;
   dockable: Dockable;
+  docks: Docks;
+  drive: Drive;
+  name: Name;
   hecsPosition: HECSPosition;
   minable: Minable;
   mining: Mining;
   modules: Modules;
-  name: Name;
   orders: Orders;
   owner: Owner;
   parent: Parent;
@@ -85,9 +86,14 @@ export class Entity {
     return this as unknown as RequireComponent<T>;
   }
 
-  addComponent<T extends keyof CoreComponents>(component: CoreComponents[T]) {
-    this.components[component.name] = component;
+  addComponent<T extends keyof CoreComponents>(
+    component: CoreComponents[T]
+  ): Entity {
+    const componentName: CoreComponents[T]["name"] = component.name;
+    this.components[componentName] = component;
     this.sim.events.emit("add-component", this);
+
+    return this;
   }
 
   removeComponent(name: keyof CoreComponents) {

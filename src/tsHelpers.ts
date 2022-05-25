@@ -12,3 +12,7 @@ export type RequireComponent<T extends keyof CoreComponents> = Entity & {
   components: Components<T>;
   cp: Components<T>;
 };
+
+export type NonNullableFields<T extends {}> = {
+  [P in keyof T]: NonNullable<T[P]>;
+};

@@ -15,13 +15,13 @@ export const Offers: React.FC<OffersProps> = ({ entity }) => {
         compoundProduction?.pac[commodity].consumes ||
         compoundProduction?.pac[commodity].produces ||
         trade.offers[commodity].quantity ||
-        storage.getAvailableWares()[commodity]
+        storage.availableWares[commodity]
     )
     .map((commodity) => ({
       commodity,
       ...(compoundProduction?.pac[commodity] ?? {}),
       ...trade.offers[commodity],
-      stored: storage.getAvailableWares()[commodity],
+      stored: storage.availableWares[commodity],
     }));
 
   return (

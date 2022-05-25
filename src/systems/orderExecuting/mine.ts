@@ -1,4 +1,7 @@
+import { setTarget } from "../../components/drive";
 import { MineOrder } from "../../components/orders";
+import { getAvailableSpace } from "../../components/storage";
+import { clearEntity, setEntity } from "../../components/utils/entityId";
 import { getClosestMineableAsteroid } from "../../economy/utils";
 import { RequireComponent } from "../../tsHelpers";
 
@@ -8,8 +11,8 @@ export function mineOrder(
 ): boolean {
   if (
     !order.targetRock ||
-    (order.targetRock.cp.minable.minedBy !== null &&
-      order.targetRock.cp.minable.minedBy !== entity)
+    (order.targetRock.cp.minable.entity !== null &&
+      order.targetRock.cp.minable.entity !== entity)
   ) {
     const rock = getClosestMineableAsteroid(
       order.target,
@@ -19,15 +22,16 @@ export function mineOrder(
     order.targetRock = rock;
   }
 
-  entity.cp.drive.setTarget(order.targetRock);
+  setTarget(entity.cp.drive, order.targetRock);
 
   if (entity.cp.drive.targetReached) {
-    entity.cp.mining.asteroid = order.targetRock;
-    order.targetRock.cp.minable.setMinedBy(entity);
+    setEntity(entity.cp.mining, order.targetRock);
+    setEntity(order.targetRock.cp.minable, entity);
 
-    if (entity.cp.storage.getAvailableSpace() === 0) {
-      entity.cp.mining.clearAsteroid();
-      order.targetRock.cp.minable.clearMinedBy();
+    if (getAvailableSpace(entity.cp.storage) === 0) {
+      clearEntity(entity.cp.mining);
+      clearEntity(order.targetRock.cp.minable);
+
       return true;
     }
   }

@@ -1,12 +1,12 @@
 import { add, Matrix, matrix, random, randomInt } from "mathjs";
 import { sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
-import { Docks } from "../components/dockable";
-import { Parent } from "../components/parent";
+import { changeBudgetMoney } from "../components/budget";
+import { hecsToCartesian } from "../components/hecsPosition";
+import { linkTeleportModules } from "../components/teleport";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
-import { dockShip } from "../systems/orderExecuting/dock";
 import { createTeleporter, templates as facilityTemplates } from "./facilities";
 import { shipClasses } from "./ships";
 
@@ -32,7 +32,7 @@ function createFaction(index: number) {
   const char = String.fromCharCode(index + 65);
   const faction = new Faction(`f-${char}`);
   faction.name = `Faction ${char}`;
-  faction.budget.changeMoney(1e8);
+  changeBudgetMoney(faction.budget, 1e8);
 
   return faction;
 }
@@ -41,7 +41,10 @@ export const factions = (sim: Sim) =>
   sim.queries.sectors.get().forEach((sector, index, sectors) => {
     const faction = createFaction(index);
 
-    const position = sector.cp.hecsPosition.toCartesian(sectorSize / 10);
+    const position = hecsToCartesian(
+      sector.cp.hecsPosition.value,
+      sectorSize / 10
+    );
 
     for (
       let i = 0;
@@ -58,13 +61,13 @@ export const factions = (sim: Sim) =>
           ])
         ) as Matrix,
         sector,
-      }).cp.modules.modules[0];
+      }).cp.modules.entities[0];
       const target = sim.queries.teleports
         .get()
-        .find((t) => !t.cp.teleport.destination && t.id !== teleporter.id);
+        .find((t) => !t.cp.teleport.entity && t.id !== teleporter.id);
       if (target) {
         const t = teleporter.requireComponents(["teleport"]);
-        t.requireComponents(["teleport"]).cp.teleport.link(t, target);
+        linkTeleportModules(t, target);
       }
     }
 
@@ -105,8 +108,12 @@ export const factions = (sim: Sim) =>
             owner: faction,
             sector,
           });
-          mineOrTrade.addComponent("commander", new Parent(facility));
-          mineOrTrade.components.owner.set(faction);
+          mineOrTrade.addComponent({
+            name: "commander",
+            entity: facility,
+            entityId: facility.id,
+          });
+          mineOrTrade.components.owner.value = faction;
         } else {
           const tradeShip = createShip(sim, {
             ...getFreighterTemplate(),
@@ -117,11 +124,15 @@ export const factions = (sim: Sim) =>
             owner: faction,
             sector,
           });
-          tradeShip.addComponent("commander", new Parent(facility));
-          tradeShip.components.owner.set(faction);
+          tradeShip.addComponent({
+            name: "commander",
+            entity: facility,
+            entityId: facility.id,
+          });
+          tradeShip.components.owner.value = faction;
         }
       } while (Math.random() < 0.15);
 
-      facility.components.owner.set(faction);
+      facility.components.owner.value = faction;
     }
   });

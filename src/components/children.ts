@@ -1,4 +1,4 @@
 import { BaseComponent } from "./component";
-import { EntityId } from "./utils/entityId";
+import { EntityIds } from "./utils/entityId";
 
-export interface Children extends BaseComponent<"children">, EntityId {}
+export interface Children extends BaseComponent<"children">, EntityIds {}

@@ -6,6 +6,7 @@ import { RequireComponent } from "../../../tsHelpers";
 import { IconButton } from "./IconButton";
 import { Table, TableCell } from "./Table";
 import { nano } from "../../../style";
+import { setEntity } from "../../../components/utils/entityId";
 
 export interface DocksProps {
   entity: RequireComponent<"docks">;
@@ -24,7 +25,7 @@ const styles = nano.sheet({
 export const Docks: React.FC<DocksProps> = ({ entity }) => {
   const { docks } = entity.cp;
 
-  return docks.docked.length === 0 ? (
+  return docks.entities.length === 0 ? (
     <div>Empty docks</div>
   ) : (
     <Table>
@@ -35,7 +36,7 @@ export const Docks: React.FC<DocksProps> = ({ entity }) => {
         </tr>
       </thead>
       <tbody>
-        {docks.docked.map((ship) => (
+        {docks.entities.map((ship) => (
           <tr key={ship.id}>
             <TableCell className={styles.colName}>
               {ship.cp.name?.value}
@@ -47,7 +48,7 @@ export const Docks: React.FC<DocksProps> = ({ entity }) => {
                     .find((e) => e.hasComponents(["selectionManager"]))!
                     .requireComponents(["selectionManager"]).cp;
 
-                  selectionManager.set(ship.cp.commander!.value);
+                  setEntity(selectionManager, ship.cp.commander!.entity);
                   selectionManager.focused = true;
                 }}
               >
