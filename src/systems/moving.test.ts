@@ -2,6 +2,7 @@ import { matrix } from "mathjs";
 import { createMarker } from "../archetypes/marker";
 import { createSector, Sector } from "../archetypes/sector";
 import { createShip, Ship } from "../archetypes/ship";
+import { setTarget } from "../components/drive";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { shipClasses } from "../world/ships";
@@ -27,10 +28,13 @@ describe("Ship", () => {
   });
 
   it("is able to go to target position", () => {
-    ship.cp.drive.target = createMarker(sim, {
-      sector,
-      value: matrix([1, 0.3]),
-    });
+    setTarget(
+      ship.cp.drive,
+      createMarker(sim, {
+        sector,
+        value: matrix([1, 0.3]),
+      })
+    );
 
     movingSystem.exec(1);
 
@@ -38,10 +42,13 @@ describe("Ship", () => {
   });
 
   it("is not able to go to target position if travel is too short", () => {
-    ship.cp.drive.target = createMarker(sim, {
-      sector,
-      value: matrix([1, 10]),
-    });
+    setTarget(
+      ship.cp.drive,
+      createMarker(sim, {
+        sector,
+        value: matrix([1, 10]),
+      })
+    );
 
     movingSystem.exec(1);
 
