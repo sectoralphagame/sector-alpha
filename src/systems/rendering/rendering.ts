@@ -6,6 +6,8 @@ import { Sim } from "../../sim";
 import { System } from "../system";
 import { drawGraphics } from "../../components/renderGraphics";
 
+let initialized = false;
+
 if (process.env.NODE_ENV !== "test") {
   // eslint-disable-next-line global-require
   require("./components/Panel");
@@ -21,7 +23,9 @@ export class RenderingSystem extends System {
   constructor(sim: Sim) {
     super(sim);
 
-    this.init();
+    if (!initialized) {
+      this.init();
+    }
   }
 
   init = () => {
@@ -56,6 +60,7 @@ export class RenderingSystem extends System {
     viewport.sortableChildren = true;
 
     this.viewport = viewport;
+    initialized = true;
   };
 
   exec(): void {

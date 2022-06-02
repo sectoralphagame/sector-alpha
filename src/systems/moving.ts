@@ -13,7 +13,7 @@ function move(entity: Driveable, delta: number) {
 
   entity.cooldowns.update(delta);
 
-  if (drive.target === null) return;
+  if (!drive.target) return;
 
   if (drive.state === "warming" && entity.cooldowns.canUse("cruise")) {
     drive.state = "cruise";

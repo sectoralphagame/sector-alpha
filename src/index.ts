@@ -1,6 +1,11 @@
-import world from "./world";
-import { sim } from "./sim";
+import "reflect-metadata";
+
+// import world from "./world";
+import { Sim } from "./sim";
 import "./style";
 
-sim.load(world);
+const sim = Sim.load();
+
+window.sim = sim;
+// world(sim);
 sim.start();

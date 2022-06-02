@@ -1,8 +1,11 @@
+import pick from "lodash/pick";
+import { Exclude, Expose, Type, plainToInstance } from "class-transformer";
 import EventEmitter from "eventemitter3";
+// @ts-expect-error
+import { reviver, replacer, matrix } from "mathjs";
 import { Path } from "graphlib";
 import { Faction } from "../economy/faction";
 import { Entity } from "../components/entity";
-import { World } from "../world";
 import { BaseSim } from "./BaseSim";
 import { System } from "../systems/system";
 import { BudgetPlanningSystem } from "../systems/budgetPlanning";
@@ -19,14 +22,20 @@ import { PathPlanningSystem } from "../systems/pathPlanning";
 import { CooldownUpdatingSystem } from "../systems/cooldowns";
 import { MissingEntityError } from "../errors";
 
+@Exclude()
 export class Sim extends BaseSim {
+  @Expose()
   entityIdCounter: number = 0;
   events: EventEmitter<
     "add-component" | "remove-component" | "remove-entity",
     Entity
   >;
 
+  @Expose()
+  @Type(() => Faction)
   factions: Faction[] = [];
+  @Expose()
+  @Type(() => Entity)
   entities: Map<number, Entity>;
   systems: System[];
   queries: Queries;
@@ -48,6 +57,7 @@ export class Sim extends BaseSim {
     this.queries = createQueries(this);
 
     this.systems = [
+      new PathPlanningSystem(this),
       new CooldownUpdatingSystem(this),
       new ProducingSystem(this),
       new StorageQuotaPlanningSystem(this),
@@ -58,7 +68,6 @@ export class Sim extends BaseSim {
       new MovingSystem(this),
       new MiningSystem(this),
       new OrderExecutingSystem(this),
-      new PathPlanningSystem(this),
     ];
 
     if (process.env.NODE_ENV !== "test") {
@@ -78,10 +87,6 @@ export class Sim extends BaseSim {
   unregisterEntity = (entity: Entity) => {
     this.entities.delete(entity.id);
     this.events.emit("remove-entity", entity);
-  };
-
-  load = (world: World) => {
-    world.factions(this);
   };
 
   next = (delta: number) => {
@@ -106,7 +111,44 @@ export class Sim extends BaseSim {
 
     return entity;
   };
-}
 
-export const sim = new Sim();
-window.sim = sim;
+  save = () => {
+    const save = JSON.stringify(this, replacer);
+
+    localStorage.setItem("save", save);
+  };
+
+  static load() {
+    const save = JSON.parse(localStorage.getItem("save")!, reviver);
+    const sim = plainToInstance(Sim, save);
+
+    sim.entities.forEach((entity) => {
+      entity.sim = sim;
+
+      if (entity.cp.owner?.value) {
+        entity.cp.owner.value = sim.factions.find(
+          (f) => f.slug === entity.cp.owner!.value!.slug
+        )!;
+      }
+
+      if (entity.cp.position) {
+        entity.cp.position.coord = matrix(
+          // eslint-disable-next-line no-underscore-dangle
+          (entity.cp.position.coord as any)._data
+        );
+      }
+      if (entity.cp.hecsPosition) {
+        entity.cp.hecsPosition.value = matrix(
+          // eslint-disable-next-line no-underscore-dangle
+          (entity.cp.hecsPosition.value as any)._data
+        );
+      }
+    });
+
+    return sim;
+  }
+
+  toJSON() {
+    return pick(this, ["entityIdCounter", "entities", "factions"]);
+  }
+}
