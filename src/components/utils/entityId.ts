@@ -27,6 +27,17 @@ export function loadEntity<T extends Entity = Entity>(
   entityId.entity = entity as T;
 }
 
+export function getEntity<T extends Entity = Entity>(
+  entityId: EntityId<T>,
+  sim: Sim
+): T {
+  if (!entityId.entity) {
+    loadEntity(entityId, sim);
+  }
+
+  return entityId.entity!;
+}
+
 export function clearEntity(entityId: EntityId) {
   entityId.entity = null;
   entityId.entityId = null;

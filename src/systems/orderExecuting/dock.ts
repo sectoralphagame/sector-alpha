@@ -5,6 +5,7 @@ import { hide } from "../../components/render";
 import {
   addEntity,
   clearEntity,
+  getEntity,
   setEntity,
 } from "../../components/utils/entityId";
 import { DockSizeMismatchError } from "../../errors";
@@ -27,9 +28,10 @@ export function dockOrder(
   entity: RequireComponent<"drive" | "dockable" | "position">,
   order: DockOrder
 ): boolean {
-  const { docks } = order.target.cp;
+  const target = getEntity(order.target, entity.sim);
+  const { docks } = target.cp;
   const { size } = entity.cp.dockable;
-  setTarget(entity.cp.drive, order.target);
+  setTarget(entity.cp.drive, target);
 
   if (docks.pads[size] === 0) {
     throw new DockSizeMismatchError(size);
@@ -39,7 +41,7 @@ export function dockOrder(
     entity.cp.drive.targetReached &&
     availableDocks(docks, size) > docks.entities.length
   ) {
-    dockShip(entity, order.target);
+    dockShip(entity, target);
 
     return true;
   }

@@ -127,8 +127,8 @@ function autoMine(
           orders: [
             ...moveToOrders(entity, field),
             mineOrder({
-              target: field,
-              targetRock: rock,
+              target: { entity: field, entityId: field.id },
+              targetRock: { entity: rock, entityId: rock.id },
             }),
           ],
         });

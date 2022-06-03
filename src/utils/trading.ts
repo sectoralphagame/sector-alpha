@@ -262,13 +262,13 @@ export function tradeCommodity(
   if (entity.cp.dockable.entity !== seller) {
     orders.push(...moveToOrders(entity, seller), {
       type: "dock",
-      target: seller,
+      target: { entity: seller, entityId: seller.id },
     });
   }
 
   orders.push(
     tradeOrder({
-      target: seller,
+      target: { entity: seller, entityId: seller.id },
       offer: {
         ...offer,
         price: buy ? price : 0,
@@ -286,9 +286,9 @@ export function tradeCommodity(
       },
     }),
     ...moveToOrders(seller, buyer),
-    { type: "dock", target: buyer },
+    { type: "dock", target: { entity: buyer, entityId: buyer.id } },
     tradeOrder({
-      target: buyer,
+      target: { entity: buyer, entityId: buyer.id },
       offer: {
         ...offer,
         price: buy ? 0 : price,
@@ -386,7 +386,7 @@ export function returnToFacility(
   if (entity.cp.dockable.entity !== commander) {
     orders.push(...moveToOrders(entity, commander), {
       type: "dock",
-      target: commander,
+      target: { entity: commander, entityId: commander.id },
     });
   }
   Object.values(commodities)
@@ -408,7 +408,7 @@ export function returnToFacility(
           tradeOrder(
             merge(
               {
-                target: commander,
+                target: { entity: commander, entityId: commander.id },
                 offer,
               },
               {

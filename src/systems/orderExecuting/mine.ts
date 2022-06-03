@@ -1,7 +1,11 @@
 import { setTarget } from "../../components/drive";
 import { MineOrder } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
-import { clearEntity, setEntity } from "../../components/utils/entityId";
+import {
+  clearEntity,
+  getEntity,
+  setEntity,
+} from "../../components/utils/entityId";
 import { getClosestMineableAsteroid } from "../../economy/utils";
 import { RequireComponent } from "../../tsHelpers";
 
@@ -9,28 +13,29 @@ export function mineOrder(
   entity: RequireComponent<"drive" | "mining" | "position" | "storage">,
   order: MineOrder
 ): boolean {
+  const target = getEntity(order.target, entity.sim);
+  const targetRock = order.targetRock
+    ? getEntity(order.targetRock, entity.sim)
+    : null;
   if (
-    !order.targetRock ||
-    (order.targetRock.cp.minable.entity !== null &&
-      order.targetRock.cp.minable.entity !== entity)
+    !targetRock ||
+    (targetRock.cp.minable.entity !== null &&
+      targetRock.cp.minable.entity !== entity)
   ) {
-    const rock = getClosestMineableAsteroid(
-      order.target,
-      entity.cp.position.coord
-    );
+    const rock = getClosestMineableAsteroid(target, entity.cp.position.coord);
     if (!rock) return false;
-    order.targetRock = rock;
+    setEntity(order.targetRock, rock);
   }
 
-  setTarget(entity.cp.drive, order.targetRock);
+  setTarget(entity.cp.drive, order.targetRock.entity);
 
   if (entity.cp.drive.targetReached) {
-    setEntity(entity.cp.mining, order.targetRock);
-    setEntity(order.targetRock.cp.minable, entity);
+    setEntity(entity.cp.mining, order.targetRock.entity!);
+    setEntity(order.targetRock.entity!.cp.minable, entity);
 
     if (getAvailableSpace(entity.cp.storage) === 0) {
       clearEntity(entity.cp.mining);
-      clearEntity(order.targetRock.cp.minable);
+      clearEntity(order.targetRock.entity!.cp.minable);
 
       return true;
     }

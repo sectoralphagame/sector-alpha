@@ -23,20 +23,29 @@ export function moveToOrders(origin: Marker, target: Marker) {
           ).cp.position.entityId.toString() === paths[s.toString()].predecessor
       )!;
 
+    const t1 = findInAncestors(teleport, "position");
+    const t2 = findInAncestors(teleport?.cp.teleport.entity!, "position");
+
     orders.push(
       {
         type: "move",
-        position: findInAncestors(teleport, "position"),
+        position: { entity: t1, entityId: t1.id },
       },
       {
         type: "teleport",
-        position: findInAncestors(teleport?.cp.teleport.entity!, "position"),
+        position: { entity: t2, entityId: t2.id },
       }
     );
     s = paths[s.toString()].predecessor;
   }
 
-  orders.push({ type: "move", position: target });
+  orders.push({
+    type: "move",
+    position: {
+      entity: target,
+      entityId: target.id,
+    },
+  });
 
   return orders;
 }

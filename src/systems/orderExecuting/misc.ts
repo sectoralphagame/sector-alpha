@@ -1,14 +1,14 @@
 import { clearTarget, setTarget } from "../../components/drive";
 import { MoveOrder, TeleportOrder } from "../../components/orders";
 import { show } from "../../components/render";
-import { setEntities } from "../../components/utils/entityId";
+import { getEntity, setEntities } from "../../components/utils/entityId";
 import { RequireComponent } from "../../tsHelpers";
 
 export function moveOrder(
   entity: RequireComponent<"drive" | "orders">,
   order: MoveOrder
 ): boolean {
-  setTarget(entity.cp.drive, order.position);
+  setTarget(entity.cp.drive, getEntity(order.position, entity.sim));
 
   if (entity.cp.dockable?.entity) {
     setEntities(
@@ -36,21 +36,23 @@ export function teleportOrder(
   entity: RequireComponent<"position" | "orders">,
   order: TeleportOrder
 ): boolean {
+  const marker = getEntity(order.position, entity.sim);
+
   entity.cp.position = {
     name: "position",
     angle: entity.cp.position.angle,
-    coord: order.position.cp.position.coord,
-    entity: order.position.cp.position.entity,
-    entityId: order.position.cp.position.entity.id,
+    coord: marker.cp.position.coord,
+    entity: marker.cp.position.entity,
+    entityId: marker.cp.position.entity.id,
   };
 
   entity.cp.docks?.entities.forEach((docked) => {
     docked.cp.position = {
       name: "position",
       angle: entity.cp.position.angle,
-      coord: order.position.cp.position.coord,
-      entity: order.position.cp.position.entity,
-      entityId: order.position.cp.position.entity.id,
+      coord: marker.cp.position.coord,
+      entity: marker.cp.position.entity,
+      entityId: marker.cp.position.entity.id,
     };
   });
 

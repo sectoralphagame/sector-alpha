@@ -6,34 +6,35 @@ import { NegativeQuantity } from "../errors";
 import { BaseComponent } from "./component";
 import { WithDock } from "./dockable";
 import { TransactionInput } from "./trade";
+import { EntityId } from "./utils/entityId";
 
 export type OrderGroupType = "mine" | "trade" | "hold" | "move" | "dock";
 
 export interface DockOrder {
   type: "dock";
-  target: WithDock;
+  target: EntityId<WithDock>;
 }
 
 export interface TeleportOrder {
   type: "teleport";
-  position: Marker;
+  position: EntityId<Marker>;
 }
 
 export interface MoveOrder {
   type: "move";
-  position: Marker;
+  position: EntityId<Marker>;
 }
 
 export interface TradeOrder {
   type: "trade";
   offer: TransactionInput;
-  target: WithTrade;
+  target: EntityId<WithTrade>;
 }
 
 export interface MineOrder {
   type: "mine";
-  target: AsteroidField;
-  targetRock: Asteroid;
+  target: EntityId<AsteroidField>;
+  targetRock: EntityId<Asteroid>;
 }
 
 export interface HoldPositionOrder {

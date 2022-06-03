@@ -31,15 +31,15 @@ function getOrderDescription(ship: Ship, order: Order) {
     case "teleport":
       return "Teleport to location";
     case "trade":
-      if (order.target === ship.cp.commander?.entity)
+      if (order.target.entity === ship.cp.commander?.entity)
         return "Deliver wares to commander";
-      return `Deliver wares to ${order.target.cp.name?.value}`;
+      return `Deliver wares to ${order.target.entity!.cp.name?.value}`;
     case "mine":
-      return `Mine ${order.target.cp.asteroidSpawn.type}`;
+      return `Mine ${order.target.entity!.cp.asteroidSpawn.type}`;
     case "dock":
-      if (order.target === ship.cp.commander?.entity)
+      if (order.target.entity === ship.cp.commander?.entity)
         return "Dock at commanding facility";
-      return `Dock at ${order.target.cp.name?.value}`;
+      return `Dock at ${order.target.entity!.cp.name?.value}`;
     default:
       return "Hold position";
   }
@@ -53,8 +53,8 @@ function getOrderGroupDescription(order: OrderGroup) {
       return "Trade";
     case "mine":
       return `Mine ${
-        (order.orders.find((o) => o.type === "mine") as MineOrder)!.target.cp
-          .asteroidSpawn.type
+        (order.orders.find((o) => o.type === "mine") as MineOrder)!.target
+          .entity!.cp.asteroidSpawn.type
       }`;
     default:
       return "Hold position";
