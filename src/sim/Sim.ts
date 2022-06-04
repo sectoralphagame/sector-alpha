@@ -1,9 +1,12 @@
 import pick from "lodash/pick";
 import { Exclude, Expose, Type, plainToInstance } from "class-transformer";
 import EventEmitter from "eventemitter3";
+// For some reason replacer is not exported in types
 // @ts-expect-error
-import { reviver, replacer, matrix } from "mathjs";
+import { reviver, replacer } from "mathjs";
 import { Path } from "graphlib";
+import * as PIXI from "pixi.js";
+import isPlainObject from "lodash/isPlainObject";
 import { Faction } from "../economy/faction";
 import { Entity } from "../components/entity";
 import { BaseSim } from "./BaseSim";
@@ -21,6 +24,24 @@ import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
 import { PathPlanningSystem } from "../systems/pathPlanning";
 import { CooldownUpdatingSystem } from "../systems/cooldowns";
 import { MissingEntityError } from "../errors";
+import { setTexture } from "../components/render";
+
+function reviveMathjs(value: any) {
+  if (isPlainObject(value)) {
+    if (value.mathjs) {
+      // According to types, reviver expects no arguments which isn't true
+      // @ts-expect-error
+      return reviver("", value);
+    }
+
+    return Object.keys(value).reduce(
+      (acc, key) => ({ ...acc, [key]: reviveMathjs(value[key]) }),
+      {}
+    );
+  }
+
+  return value;
+}
 
 @Exclude()
 export class Sim extends BaseSim {
@@ -119,11 +140,13 @@ export class Sim extends BaseSim {
   };
 
   static load() {
-    const save = JSON.parse(localStorage.getItem("save")!, reviver);
+    const save = JSON.parse(localStorage.getItem("save")!);
     const sim = plainToInstance(Sim, save);
 
     sim.entities.forEach((entity) => {
       entity.sim = sim;
+
+      entity.components = reviveMathjs(entity.components);
 
       if (entity.cp.owner?.value) {
         entity.cp.owner.value = sim.factions.find(
@@ -131,17 +154,13 @@ export class Sim extends BaseSim {
         )!;
       }
 
-      if (entity.cp.position) {
-        entity.cp.position.coord = matrix(
-          // eslint-disable-next-line no-underscore-dangle
-          (entity.cp.position.coord as any)._data
-        );
+      if (entity.cp.render) {
+        setTexture(entity.cp.render, entity.cp.render.texture);
+        entity.cp.render.initialized = false;
       }
-      if (entity.cp.hecsPosition) {
-        entity.cp.hecsPosition.value = matrix(
-          // eslint-disable-next-line no-underscore-dangle
-          (entity.cp.hecsPosition.value as any)._data
-        );
+      if (entity.cp.renderGraphics) {
+        entity.cp.renderGraphics.g = new PIXI.Graphics();
+        entity.cp.renderGraphics.initialized = false;
       }
     });
 

@@ -1,4 +1,3 @@
-import P5 from "p5";
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
@@ -17,7 +16,6 @@ const minScale = 0.2;
 
 export class RenderingSystem extends System {
   viewport: Viewport;
-  p5: P5;
   prevScale: number = minScale;
 
   constructor(sim: Sim) {

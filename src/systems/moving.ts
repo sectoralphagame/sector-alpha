@@ -1,5 +1,6 @@
 import { add, Matrix, matrix, multiply, norm, subtract } from "mathjs";
-import { startCruise, stopCruise } from "../components/drive";
+import { clearTarget, startCruise, stopCruise } from "../components/drive";
+import { clearEntity } from "../components/utils/entityId";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Query } from "./query";
@@ -26,7 +27,7 @@ function move(entity: Driveable, delta: number) {
     console.error(entity);
     // eslint-disable-next-line no-console
     console.error(drive.target);
-    drive.target = null;
+    clearTarget(drive);
     entity.cp.orders!.value = [];
     throw new Error("Out of bounds");
   }
