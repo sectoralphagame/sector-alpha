@@ -63,7 +63,7 @@ describe("Ship", () => {
       orders: [
         {
           type: "move",
-          position: m,
+          position: { entity: m, entityId: m.id },
         },
       ],
     });
