@@ -16,12 +16,14 @@ import fCivTexture from "../../assets/f_civ.svg";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Sector } from "./sector";
+import { Docks } from "../components/dockable";
 
 export const commanderRange = 2;
 
 export const facilityComponents = [
   "budget",
   "compoundProduction",
+  "docks",
   "modules",
   "name",
   "owner",
@@ -52,6 +54,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
 
   entity.addComponent("budget", new Budget());
   entity.addComponent("compoundProduction", new CompoundProduction());
+  entity.addComponent("docks", new Docks({ large: 1, medium: 3, small: 3 }));
   entity.addComponent("modules", new Modules());
   entity.addComponent("name", new Name(`Facility #${entity.id}`));
   entity.addComponent("owner", new Owner(initial.owner));

@@ -63,6 +63,13 @@ function move(entity: Driveable, delta: number) {
 
   entityPosition.coord = add(entityPosition.coord, dPos) as Matrix;
   entityPosition.angle += dAngle;
+
+  entity.cp.docks?.docked.forEach((docked) => {
+    const dockedPosition = docked.cp.position;
+
+    dockedPosition.coord = matrix(entityPosition.coord);
+    dockedPosition.angle += dAngle;
+  });
 }
 
 export class MovingSystem extends System {

@@ -1,4 +1,5 @@
 import { difference } from "lodash";
+import { DockSize } from "./components/dockable";
 import { CoreComponents, Entity } from "./components/entity";
 
 export const notImplemented = new Error("Not implemented");
@@ -115,5 +116,20 @@ export class MissingEntityError extends Error {
   constructor(id: number) {
     super(`Missing entity: ${id}`);
     this.id = id;
+  }
+}
+
+export class DockSizeMismatchError extends Error {
+  size: DockSize;
+
+  constructor(size: DockSize) {
+    super(`Target entity does not contain dock with size: ${size}`);
+    this.size = size;
+  }
+}
+
+export class NotDockedError extends Error {
+  constructor(entity: Entity, target: Entity) {
+    super(`Entity ${entity.id} must be docked to target ${target.id}`);
   }
 }

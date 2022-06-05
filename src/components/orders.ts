@@ -3,9 +3,15 @@ import { AsteroidField } from "../archetypes/asteroidField";
 import { Marker } from "../archetypes/marker";
 import { WithTrade } from "../economy/utils";
 import { NegativeQuantity } from "../errors";
+import { WithDock } from "./dockable";
 import { TransactionInput } from "./trade";
 
-export type OrderGroupType = "mine" | "trade" | "hold" | "move";
+export type OrderGroupType = "mine" | "trade" | "hold" | "move" | "dock";
+
+export interface DockOrder {
+  type: "dock";
+  target: WithDock;
+}
 
 export interface TeleportOrder {
   type: "teleport";
@@ -38,7 +44,8 @@ export type Order =
   | TradeOrder
   | MineOrder
   | HoldPositionOrder
-  | TeleportOrder;
+  | TeleportOrder
+  | DockOrder;
 export interface OrderGroup {
   type: OrderGroupType;
   orders: Order[];

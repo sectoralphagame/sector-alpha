@@ -136,6 +136,7 @@ export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
   const entityWithProduction = entity.requireComponents([
     "compoundProduction",
     "budget",
+    "docks",
     "position",
     "storage",
     "owner",

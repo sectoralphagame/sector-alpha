@@ -1,10 +1,12 @@
 import { add, Matrix, matrix, random, randomInt } from "mathjs";
 import { sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
+import { Docks } from "../components/dockable";
 import { Parent } from "../components/parent";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
+import { dockShip } from "../systems/orderExecuting/dock";
 import { createTeleporter, templates as facilityTemplates } from "./facilities";
 import { shipClasses } from "./ships";
 

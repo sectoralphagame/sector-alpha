@@ -53,6 +53,16 @@ export class Render {
       this.sprite.zIndex = this.zIndex;
     }
   };
+
+  hide = () => {
+    this.sprite.interactive = false;
+    this.sprite.alpha = 0;
+  };
+
+  show = () => {
+    this.sprite.interactive = true;
+    this.sprite.alpha = 1;
+  };
 }
 
 export class RenderGraphics {

@@ -22,6 +22,7 @@ import { RequireComponent } from "../tsHelpers";
 import { MissingComponentError } from "../errors";
 import { HECSPosition } from "./hecsPosition";
 import { Teleport } from "./teleport";
+import { Docks, Dockable } from "./dockable";
 
 export interface CoreComponents {
   asteroidSpawn: AsteroidSpawn;
@@ -31,6 +32,8 @@ export interface CoreComponents {
   commander: Parent; // Essentially the same
   compoundProduction: CompoundProduction;
   drive: Drive;
+  docks: Docks;
+  dockable: Dockable;
   hecsPosition: HECSPosition;
   minable: Minable;
   mining: Mining;

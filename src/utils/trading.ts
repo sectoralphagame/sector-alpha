@@ -178,7 +178,7 @@ export function getCommoditiesForSell(entity: WithTrade): Commodity[] {
 
 export function tradeCommodity(
   entity: RequireComponent<
-    "storage" | "commander" | "owner" | "orders" | "position"
+    "storage" | "commander" | "owner" | "orders" | "position" | "dockable"
   >,
   commodity: Commodity,
   buyer: WithTrade,
@@ -240,45 +240,56 @@ export function tradeCommodity(
     return false;
   }
 
+  const orders: Order[] = [];
+
+  if (entity.cp.dockable.docked !== seller) {
+    orders.push(...moveToOrders(entity, seller), {
+      type: "dock",
+      target: seller,
+    });
+  }
+
+  orders.push(
+    tradeOrder({
+      target: seller,
+      offer: {
+        ...offer,
+        price: buy ? price : 0,
+        allocations: {
+          buyer: {
+            budget: buyerAllocations.budget?.id ?? null,
+            storage: null,
+          },
+          seller: {
+            budget: null,
+            storage: sellerAllocations.storage?.id ?? null,
+          },
+        },
+        type: "buy",
+      },
+    }),
+    ...moveToOrders(seller, buyer),
+    { type: "dock", target: buyer },
+    tradeOrder({
+      target: buyer,
+      offer: {
+        ...offer,
+        price: buy ? 0 : price,
+        allocations: {
+          buyer: {
+            budget: buyerAllocations.budget?.id ?? null,
+            storage: buyerAllocations.storage?.id ?? null,
+          },
+          seller: { budget: null, storage: null },
+        },
+        type: "sell",
+      },
+    })
+  );
+
   entity.cp.orders.value.push({
     type: "trade",
-    orders: [
-      ...moveToOrders(entity, seller),
-      tradeOrder({
-        target: seller,
-        offer: {
-          ...offer,
-          price: buy ? price : 0,
-          allocations: {
-            buyer: {
-              budget: buyerAllocations.budget?.id ?? null,
-              storage: null,
-            },
-            seller: {
-              budget: null,
-              storage: sellerAllocations.storage?.id ?? null,
-            },
-          },
-          type: "buy",
-        },
-      }),
-      ...moveToOrders(seller, buyer),
-      tradeOrder({
-        target: buyer,
-        offer: {
-          ...offer,
-          price: buy ? 0 : price,
-          allocations: {
-            buyer: {
-              budget: buyerAllocations.budget?.id ?? null,
-              storage: buyerAllocations.storage?.id ?? null,
-            },
-            seller: { budget: null, storage: null },
-          },
-          type: "sell",
-        },
-      }),
-    ],
+    orders,
   });
 
   return true;
@@ -286,7 +297,13 @@ export function tradeCommodity(
 
 export function autoBuyMostNeededByCommander(
   entity: RequireComponent<
-    "commander" | "storage" | "owner" | "orders" | "autoOrder" | "position"
+    | "commander"
+    | "storage"
+    | "owner"
+    | "orders"
+    | "autoOrder"
+    | "position"
+    | "dockable"
   >,
   commodity: Commodity,
   jumps: number
@@ -309,7 +326,13 @@ export function autoBuyMostNeededByCommander(
 
 export function autoSellMostRedundantToCommander(
   entity: RequireComponent<
-    "commander" | "storage" | "owner" | "orders" | "autoOrder" | "position"
+    | "commander"
+    | "storage"
+    | "owner"
+    | "orders"
+    | "autoOrder"
+    | "position"
+    | "dockable"
   >,
   commodity: Commodity,
   jumps: number
@@ -332,11 +355,23 @@ export function autoSellMostRedundantToCommander(
 
 export function returnToFacility(
   entity: RequireComponent<
-    "drive" | "commander" | "orders" | "storage" | "owner" | "position"
+    | "drive"
+    | "commander"
+    | "orders"
+    | "storage"
+    | "owner"
+    | "position"
+    | "dockable"
   >
 ) {
   const commander = facility(entity.cp.commander.value);
-  const orders: Order[] = moveToOrders(entity, commander);
+  const orders: Order[] = [];
+  if (entity.cp.dockable.docked !== commander) {
+    orders.push(...moveToOrders(entity, commander), {
+      type: "dock",
+      target: commander,
+    });
+  }
   Object.values(commodities)
     .filter((commodity) => entity.cp.storage.getAvailableWares()[commodity] > 0)
     .forEach((commodity) => {
@@ -373,8 +408,10 @@ export function returnToFacility(
         );
       }
     });
-  entity.cp.orders.value.push({
-    orders,
-    type: "trade",
-  });
+  if (orders.length) {
+    entity.cp.orders.value.push({
+      orders,
+      type: "trade",
+    });
+  }
 }

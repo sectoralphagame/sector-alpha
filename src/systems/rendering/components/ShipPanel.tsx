@@ -12,6 +12,7 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "./Collapsible";
+import { Docks } from "./Docks";
 
 const styles = nano.sheet(
   {
@@ -34,6 +35,10 @@ function getOrderDescription(ship: Ship, order: Order) {
       return `Deliver wares to ${order.target.cp.name?.value}`;
     case "mine":
       return `Mine ${order.target.cp.asteroidSpawn.type}`;
+    case "dock":
+      if (order.target === ship.cp.commander?.value)
+        return "Dock at commanding facility";
+      return `Dock at ${order.target.cp.name?.value}`;
     default:
       return "Hold position";
   }
@@ -96,18 +101,22 @@ const ShipPanel: React.FC = () => {
             ))
         : "Empty storage"}
       <hr />
-      {ship.cp.orders.value.map((order, orderIndex) => (
-        <Collapsible key={`${order.type}-${orderIndex}`}>
-          <CollapsibleSummary>
-            {getOrderGroupDescription(order)}
-          </CollapsibleSummary>
-          <CollapsibleContent>
-            {order.orders.map((o, index) => (
-              <div key={o.type + index}>{getOrderDescription(ship, o)}</div>
-            ))}
-          </CollapsibleContent>
-        </Collapsible>
-      ))}
+      {ship.cp.orders.value.length === 0
+        ? "No orders"
+        : ship.cp.orders.value.map((order, orderIndex) => (
+            <Collapsible key={`${order.type}-${orderIndex}`}>
+              <CollapsibleSummary>
+                {getOrderGroupDescription(order)}
+              </CollapsibleSummary>
+              <CollapsibleContent>
+                {order.orders.map((o, index) => (
+                  <div key={o.type + index}>{getOrderDescription(ship, o)}</div>
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
+          ))}
+      <hr />
+      {!!ship.cp.docks && <Docks entity={ship.requireComponents(["docks"])} />}
     </div>
   );
 };

@@ -15,6 +15,7 @@ export const shipClasses = {
     storage: 10,
     mining: 0,
     texture: sCivTexture,
+    size: "small",
   },
   courierB: {
     name: "Courier B",
@@ -27,6 +28,7 @@ export const shipClasses = {
     storage: 6,
     mining: 0,
     texture: sCivTexture,
+    size: "small",
   },
   freighterA: {
     name: "Freighter A",
@@ -39,6 +41,7 @@ export const shipClasses = {
     storage: 110,
     mining: 0,
     texture: mCivTexture,
+    size: "medium",
   },
   freighterB: {
     name: "Freighter B",
@@ -51,6 +54,7 @@ export const shipClasses = {
     storage: 96,
     mining: 0,
     texture: mCivTexture,
+    size: "medium",
   },
   largeFreighterA: {
     name: "Large Freighter A",
@@ -63,6 +67,7 @@ export const shipClasses = {
     storage: 800,
     mining: 0,
     texture: lCivTexture,
+    size: "large",
   },
   largeFreighterB: {
     name: "Large Freighter B",
@@ -75,6 +80,7 @@ export const shipClasses = {
     storage: 940,
     mining: 0,
     texture: lCivTexture,
+    size: "large",
   },
 
   minerA: {
@@ -88,6 +94,7 @@ export const shipClasses = {
     storage: 160,
     mining: 1,
     texture: mMinTexture,
+    size: "medium",
   },
   minerB: {
     name: "Miner B",
@@ -100,5 +107,6 @@ export const shipClasses = {
     storage: 96,
     mining: 1.4,
     texture: mMinTexture,
+    size: "medium",
   },
 };
