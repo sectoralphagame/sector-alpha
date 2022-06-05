@@ -33,7 +33,7 @@ describe("Ship", () => {
       createMarker(sim, {
         sector,
         value: matrix([1, 0.3]),
-      })
+      }).id
     );
 
     movingSystem.exec(1);
@@ -47,7 +47,7 @@ describe("Ship", () => {
       createMarker(sim, {
         sector,
         value: matrix([1, 10]),
-      })
+      }).id
     );
 
     movingSystem.exec(1);
@@ -63,7 +63,7 @@ describe("Ship", () => {
       orders: [
         {
           type: "move",
-          position: { entity: m, entityId: m.id },
+          targetId: m.id,
         },
       ],
     });

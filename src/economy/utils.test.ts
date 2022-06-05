@@ -17,10 +17,9 @@ function createTeleporter(sim: Sim, sector: Sector, owner: Faction) {
       name: "position",
       angle: 0,
       coord: hecsToCartesian(sector.cp.hecsPosition.value, 1),
-      entity: sector,
-      entityId: sector.id,
+      sector: sector.id,
     })
-    .addComponent({ name: "modules", entities: [], entityIds: [] })
+    .addComponent({ name: "modules", ids: [] })
     .addComponent({
       name: "owner",
       value: owner,
@@ -57,12 +56,12 @@ describe("getSectorsInTeleportRange", () => {
     const t4 = createTeleporter(sim, sectors[2], f);
 
     linkTeleportModules(
-      t1.cp.modules.entities[0].requireComponents(["teleport"]),
-      t2.cp.modules.entities[0].requireComponents(["teleport"])
+      sim.get(t1.cp.modules.ids[0]).requireComponents(["teleport"]),
+      sim.get(t2.cp.modules.ids[0]).requireComponents(["teleport"])
     );
     linkTeleportModules(
-      t3.cp.modules.entities[0].requireComponents(["teleport"]),
-      t4.cp.modules.entities[0].requireComponents(["teleport"])
+      sim.get(t3.cp.modules.ids[0]).requireComponents(["teleport"]),
+      sim.get(t4.cp.modules.ids[0]).requireComponents(["teleport"])
     );
 
     regen(sim);
