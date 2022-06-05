@@ -25,9 +25,10 @@ export type Asteroid = RequireComponent<AsteroidComponent>;
 
 const fieldColors: Record<MineableCommodity, string> = {
   fuelium: "#ffab6b",
-  gold: "#ffe46b",
+  goldOre: "#ffe46b",
   ice: "#e8ffff",
   ore: "#ff5c7a",
+  silica: "#8f8f8f",
 };
 
 export function asteroid(entity: Entity): Asteroid {

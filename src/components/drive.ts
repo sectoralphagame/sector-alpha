@@ -40,7 +40,7 @@ export class Drive {
   constructor(input: ShipDriveProps) {
     this.cruise = input.cruise;
     this.maneuver = input.maneuver;
-    this.rotary = input.rotary;
+    this.rotary = (input.rotary * Math.PI) / 180;
     this.ttc = input.ttc;
   }
 

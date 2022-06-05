@@ -75,6 +75,42 @@ export function createHullPlatesFacility(
   return facility;
 }
 
+export function createGoldRefinery(
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
+  const facility = createFacility(sim, input);
+  addFacilityModule(facility, facilityModules.gold(sim, facility));
+  addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
+  facility.cp.storage.addStorage("gold", 50);
+
+  return facility;
+}
+
+export function createSiliconPurificationFacility(
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
+  const facility = createFacility(sim, input);
+  addFacilityModule(facility, facilityModules.silicon(sim, facility));
+  addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
+  facility.cp.storage.addStorage("silica", 50);
+
+  return facility;
+}
+
+export function createElectronicsFacility(
+  input?: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
+  const facility = createFacility(sim, input);
+  addFacilityModule(facility, facilityModules.electronics(sim, facility));
+  addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
+  facility.cp.storage.addStorage("electronics", 50);
+
+  return facility;
+}
+
 export const templates = [
   createFarm,
   createFuelFabricationFacility,
@@ -82,4 +118,7 @@ export const templates = [
   createRefineryFacility,
   createShipyard,
   createWaterFacility,
+  createGoldRefinery,
+  createSiliconPurificationFacility,
+  createElectronicsFacility,
 ];

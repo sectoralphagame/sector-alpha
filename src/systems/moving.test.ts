@@ -15,7 +15,7 @@ describe("Ship", () => {
     sim = new Sim();
     movingSystem = new MovingSystem(sim);
     ship = createShip(sim, {
-      ...shipClasses.shipA,
+      ...shipClasses.courierA,
       position: matrix([1, 0]),
       owner: new Faction(""),
     });

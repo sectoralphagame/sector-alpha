@@ -22,13 +22,22 @@ export class Query<T extends keyof CoreComponents> {
     sim.events.on(
       "remove-component",
       (payload: { name: keyof CoreComponents; entity: Entity }) => {
-        if ((this.requiredComponents as string[]).includes(payload.name)) {
+        if (
+          this.entities &&
+          (this.requiredComponents as string[]).includes(payload.name)
+        ) {
           this.entities = this.entities.filter(
             (e) => e.id !== payload.entity.id
           );
         }
       }
     );
+
+    sim.events.on("remove-entity", (entity: Entity) => {
+      if (this.entities) {
+        this.entities = this.entities.filter((e) => e.id !== entity.id);
+      }
+    });
   }
 
   get = (): QueryEntities<T> => {
