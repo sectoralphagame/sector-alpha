@@ -2,7 +2,7 @@ import { sortBy } from "lodash";
 import { min } from "mathjs";
 import merge from "lodash/merge";
 import { facility } from "../archetypes/facility";
-import { tradeOrder } from "../components/orders";
+import { Order, tradeOrder } from "../components/orders";
 import type { TransactionInput } from "../components/trade";
 import { Allocation } from "../components/utils/allocations";
 import { commodities, Commodity } from "../economy/commodity";
@@ -240,43 +240,46 @@ export function tradeCommodity(
     return false;
   }
 
-  entity.cp.orders.value.push(
-    ...moveToOrders(entity, seller),
-    tradeOrder({
-      target: seller,
-      offer: {
-        ...offer,
-        price: buy ? price : 0,
-        allocations: {
-          buyer: {
-            budget: buyerAllocations.budget?.id ?? null,
-            storage: null,
+  entity.cp.orders.value.push({
+    type: "trade",
+    orders: [
+      ...moveToOrders(entity, seller),
+      tradeOrder({
+        target: seller,
+        offer: {
+          ...offer,
+          price: buy ? price : 0,
+          allocations: {
+            buyer: {
+              budget: buyerAllocations.budget?.id ?? null,
+              storage: null,
+            },
+            seller: {
+              budget: null,
+              storage: sellerAllocations.storage?.id ?? null,
+            },
           },
-          seller: {
-            budget: null,
-            storage: sellerAllocations.storage?.id ?? null,
-          },
+          type: "buy",
         },
-        type: "buy",
-      },
-    }),
-    ...moveToOrders(seller, buyer),
-    tradeOrder({
-      target: buyer,
-      offer: {
-        ...offer,
-        price: buy ? 0 : price,
-        allocations: {
-          buyer: {
-            budget: buyerAllocations.budget?.id ?? null,
-            storage: buyerAllocations.storage?.id ?? null,
+      }),
+      ...moveToOrders(seller, buyer),
+      tradeOrder({
+        target: buyer,
+        offer: {
+          ...offer,
+          price: buy ? 0 : price,
+          allocations: {
+            buyer: {
+              budget: buyerAllocations.budget?.id ?? null,
+              storage: buyerAllocations.storage?.id ?? null,
+            },
+            seller: { budget: null, storage: null },
           },
-          seller: { budget: null, storage: null },
+          type: "sell",
         },
-        type: "sell",
-      },
-    })
-  );
+      }),
+    ],
+  });
 
   return true;
 }
@@ -333,7 +336,7 @@ export function returnToFacility(
   >
 ) {
   const commander = facility(entity.cp.commander.value);
-  entity.cp.orders.value.push(...moveToOrders(entity, commander));
+  const orders: Order[] = moveToOrders(entity, commander);
   Object.values(commodities)
     .filter((commodity) => entity.cp.storage.getAvailableWares()[commodity] > 0)
     .forEach((commodity) => {
@@ -349,7 +352,7 @@ export function returnToFacility(
       const allocations = allocate(commander, offer);
 
       if (allocations) {
-        entity.cp.orders.value.push(
+        orders.push(
           tradeOrder(
             merge(
               {
@@ -370,4 +373,8 @@ export function returnToFacility(
         );
       }
     });
+  entity.cp.orders.value.push({
+    orders,
+    type: "trade",
+  });
 }

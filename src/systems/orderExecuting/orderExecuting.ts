@@ -12,7 +12,7 @@ export class OrderExecutingSystem extends System {
         // eslint-disable-next-line no-unused-vars, no-shadow
         let orderFn: (entity: Entity, order: Order) => boolean;
 
-        switch (entity.cp.orders.value[0].type) {
+        switch (entity.cp.orders.value[0].orders[0].type) {
           case "trade":
             orderFn = tradeOrder;
             break;
@@ -29,9 +29,12 @@ export class OrderExecutingSystem extends System {
             orderFn = holdPosition;
         }
 
-        const completed = orderFn(entity, entity.cp.orders.value[0]);
+        const completed = orderFn(entity, entity.cp.orders.value[0].orders[0]);
         if (completed) {
-          entity.cp.orders.value = entity.cp.orders.value.slice(1);
+          entity.cp.orders.value[0].orders.splice(0, 1);
+          if (entity.cp.orders.value[0].orders.length === 0) {
+            entity.cp.orders.value.splice(0, 1);
+          }
         }
       }
     });

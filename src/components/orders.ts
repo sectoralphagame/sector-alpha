@@ -5,6 +5,8 @@ import { WithTrade } from "../economy/utils";
 import { NegativeQuantity } from "../errors";
 import { TransactionInput } from "./trade";
 
+export type OrderGroupType = "mine" | "trade" | "hold" | "move";
+
 export interface TeleportOrder {
   type: "teleport";
   position: Marker;
@@ -37,6 +39,10 @@ export type Order =
   | MineOrder
   | HoldPositionOrder
   | TeleportOrder;
+export interface OrderGroup {
+  type: OrderGroupType;
+  orders: Order[];
+}
 
 export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder {
   if (order.offer.quantity <= 0) {
@@ -57,5 +63,5 @@ export function mineOrder(order: Omit<MineOrder, "type">): MineOrder {
 }
 
 export class Orders {
-  value: Order[] = [];
+  value: OrderGroup[] = [];
 }

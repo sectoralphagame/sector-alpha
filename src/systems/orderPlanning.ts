@@ -9,7 +9,7 @@ import {
   getClosestMineableAsteroid,
   getSectorsInTeleportRange,
 } from "../economy/utils";
-import { Sim } from "../sim";
+import type { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
 import { moveToOrders } from "../utils/moving";
@@ -119,13 +119,16 @@ function autoMine(
       const rock = getClosestMineableAsteroid(field, entity.cp.position.coord);
 
       if (rock) {
-        entity.cp.orders.value.push(
-          ...moveToOrders(entity, field),
-          mineOrder({
-            target: field,
-            targetRock: rock,
-          })
-        );
+        entity.cp.orders.value.push({
+          type: "mine",
+          orders: [
+            ...moveToOrders(entity, field),
+            mineOrder({
+              target: field,
+              targetRock: rock,
+            }),
+          ],
+        });
       }
     }
   }

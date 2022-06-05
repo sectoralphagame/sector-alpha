@@ -2,11 +2,16 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import { ship as asShip, Ship } from "../../../archetypes/ship";
 import { Entity } from "../../../components/entity";
-import { Order } from "../../../components/orders";
+import { MineOrder, Order, OrderGroup } from "../../../components/orders";
 import { commodities } from "../../../economy/commodity";
 import { IconButton } from "./IconButton";
 import locationIcon from "../../../../assets/ui/location.svg";
 import { nano } from "../../../style";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleSummary,
+} from "./Collapsible";
 
 const styles = nano.sheet(
   {
@@ -29,6 +34,22 @@ function getOrderDescription(ship: Ship, order: Order) {
       return `Deliver wares to ${order.target.cp.name?.value}`;
     case "mine":
       return `Mine ${order.target.cp.asteroidSpawn.type}`;
+    default:
+      return "Hold position";
+  }
+}
+
+function getOrderGroupDescription(order: OrderGroup) {
+  switch (order.type) {
+    case "move":
+      return "Go to location";
+    case "trade":
+      return "Trade";
+    case "mine":
+      return `Mine ${
+        (order.orders.find((o) => o.type === "mine") as MineOrder)!.target.cp
+          .asteroidSpawn.type
+      }`;
     default:
       return "Hold position";
   }
@@ -76,9 +97,16 @@ const ShipPanel: React.FC = () => {
         : "Empty storage"}
       <hr />
       {ship.cp.orders.value.map((order, orderIndex) => (
-        <div key={`${order.type}-${orderIndex}`}>
-          {getOrderDescription(ship, order)}
-        </div>
+        <Collapsible key={`${order.type}-${orderIndex}`}>
+          <CollapsibleSummary>
+            {getOrderGroupDescription(order)}
+          </CollapsibleSummary>
+          <CollapsibleContent>
+            {order.orders.map((o, index) => (
+              <div key={o.type + index}>{getOrderDescription(ship, o)}</div>
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
       ))}
     </div>
   );
