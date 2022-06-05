@@ -201,11 +201,10 @@ export function tradeCommodity(
   if (!entity.sim.paths) return false;
 
   const sameFaction = entity.cp.owner.value === seller.components.owner.value;
-  const buy = entity.cp.commander.entity === buyer;
-  const commander = entity.cp.commander.entity!.requireComponents([
-    "budget",
-    "trade",
-  ]);
+  const buy = entity.cp.commander.id === buyer.id;
+  const commander = entity.sim
+    .get(entity.cp.commander.id)
+    .requireComponents(["budget", "trade"]);
 
   const quantity = Math.floor(
     min(
@@ -259,16 +258,16 @@ export function tradeCommodity(
 
   const orders: Order[] = [];
 
-  if (entity.cp.dockable.entity !== seller) {
+  if (entity.cp.dockable.dockedIn !== seller.id) {
     orders.push(...moveToOrders(entity, seller), {
       type: "dock",
-      target: { entity: seller, entityId: seller.id },
+      targetId: seller.id,
     });
   }
 
   orders.push(
     tradeOrder({
-      target: { entity: seller, entityId: seller.id },
+      targetId: seller.id,
       offer: {
         ...offer,
         price: buy ? price : 0,
@@ -286,9 +285,9 @@ export function tradeCommodity(
       },
     }),
     ...moveToOrders(seller, buyer),
-    { type: "dock", target: { entity: buyer, entityId: buyer.id } },
+    { type: "dock", targetId: buyer.id },
     tradeOrder({
-      target: { entity: buyer, entityId: buyer.id },
+      targetId: buyer.id,
       offer: {
         ...offer,
         price: buy ? 0 : price,
@@ -326,7 +325,7 @@ export function autoBuyMostNeededByCommander(
   jumps: number
 ): boolean {
   const minQuantity = 0;
-  const commander = facility(entity.cp.commander.entity!);
+  const commander = facility(entity.sim.get(entity.cp.commander.id));
   if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
   const target = getFacilityWithMostProfit(
@@ -355,7 +354,7 @@ export function autoSellMostRedundantToCommander(
   jumps: number
 ): boolean {
   const minQuantity = 0;
-  const commander = facility(entity.cp.commander.entity!);
+  const commander = facility(entity.sim.get(entity.cp.commander.id));
   if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
   const target = getFacilityWithMostProfit(
@@ -381,12 +380,12 @@ export function returnToFacility(
     | "dockable"
   >
 ) {
-  const commander = facility(entity.cp.commander.entity!);
+  const commander = facility(entity.sim.get(entity.cp.commander.id));
   const orders: Order[] = [];
-  if (entity.cp.dockable.entity !== commander) {
+  if (entity.cp.dockable.dockedIn !== commander.id) {
     orders.push(...moveToOrders(entity, commander), {
       type: "dock",
-      target: { entity: commander, entityId: commander.id },
+      targetId: commander.id,
     });
   }
   Object.values(commodities)
@@ -408,7 +407,7 @@ export function returnToFacility(
           tradeOrder(
             merge(
               {
-                target: { entity: commander, entityId: commander.id },
+                targetId: commander.id,
                 offer,
               },
               {

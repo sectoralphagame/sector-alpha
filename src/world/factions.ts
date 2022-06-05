@@ -52,20 +52,22 @@ export const factions = (sim: Sim) =>
       i < (index === 0 || index === sectors.length - 1 ? 1 : 2);
       i++
     ) {
-      const teleporter = createTeleporter({
-        owner: faction,
-        position: add(
-          position,
-          matrix([
-            random(-sectorSize / 20, sectorSize / 20),
-            random(-sectorSize / 20, sectorSize / 20),
-          ])
-        ) as Matrix,
-        sector,
-      }).cp.modules.entities[0];
+      const teleporter = sim.get(
+        createTeleporter({
+          owner: faction,
+          position: add(
+            position,
+            matrix([
+              random(-sectorSize / 20, sectorSize / 20),
+              random(-sectorSize / 20, sectorSize / 20),
+            ])
+          ) as Matrix,
+          sector,
+        }).cp.modules.ids[0]
+      );
       const target = sim.queries.teleports
         .get()
-        .find((t) => !t.cp.teleport.entity && t.id !== teleporter.id);
+        .find((t) => !t.cp.teleport.destinationId && t.id !== teleporter.id);
       if (target) {
         const t = teleporter.requireComponents(["teleport"]);
         linkTeleportModules(t, target);
@@ -111,8 +113,7 @@ export const factions = (sim: Sim) =>
           });
           minerShip.addComponent({
             name: "commander",
-            entity: facility,
-            entityId: facility.id,
+            id: facility.id,
           });
           minerShip.components.owner.value = faction;
         } else {
@@ -127,8 +128,7 @@ export const factions = (sim: Sim) =>
           });
           tradeShip.addComponent({
             name: "commander",
-            entity: facility,
-            entityId: facility.id,
+            id: facility.id,
           });
           tradeShip.components.owner.value = faction;
         }

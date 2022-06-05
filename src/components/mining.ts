@@ -1,7 +1,6 @@
 import { BaseComponent } from "./component";
-import { EntityId } from "./utils/entityId";
 
-export interface Mining extends BaseComponent<"mining">, EntityId {
+export interface Mining extends BaseComponent<"mining"> {
   /**
    * Mined commodity per second
    */
@@ -12,6 +11,11 @@ export interface Mining extends BaseComponent<"mining">, EntityId {
    * move to storage every 2 seconds
    */
   buffer: number;
+
+  /**
+   * Mined entity ID
+   */
+  entityId: number | null;
 }
 
 export function createMining(efficiency: number): Mining {
@@ -19,7 +23,6 @@ export function createMining(efficiency: number): Mining {
     name: "mining",
     buffer: 0,
     efficiency,
-    entity: null,
     entityId: null,
   };
 }

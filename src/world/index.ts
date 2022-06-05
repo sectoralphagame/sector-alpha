@@ -41,7 +41,7 @@ createSector(window.sim as Sim, {
 createSector(window.sim as Sim, {
   position: hecsMove(
     sector(
-      sim.entities.find(
+      sim.find(
         (s) => s.hasComponents(sectorComponents) && s.cp.name!.value === "6"
       )!
     ).cp.hecsPosition.value,

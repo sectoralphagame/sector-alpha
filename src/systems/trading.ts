@@ -20,7 +20,8 @@ function getProductionCost(
   entity: RequireComponent<"modules" | "trade">,
   commodity: Commodity
 ): number {
-  const productionModule = entity.cp.modules.entities
+  const productionModule = entity.cp.modules.ids
+    .map(entity.sim.get)
     .find((m) => m.cp.production?.pac[commodity].produces)
     ?.requireComponents(["production"]);
 

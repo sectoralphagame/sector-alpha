@@ -4,7 +4,6 @@ import { Viewport } from "pixi-viewport";
 import Color from "color";
 import { Sim } from "../../sim";
 import { System } from "../system";
-import { setEntity } from "../../components/utils/entityId";
 import { drawGraphics } from "../../components/renderGraphics";
 
 if (process.env.NODE_ENV !== "test") {
@@ -78,17 +77,14 @@ export class RenderingSystem extends System {
 
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
-      const selected = entity === settingsEntity.cp.selectionManager.entity;
+      const selected = entity.id === settingsEntity.cp.selectionManager.id;
 
       if (!entityRender.initialized) {
         this.viewport.addChild(entityRender.sprite);
         if (entity.hasComponents(["selection"])) {
           entityRender.sprite.interactive = true;
           entityRender.sprite.on("mousedown", () => {
-            setEntity(
-              settingsEntity.cp.selectionManager,
-              entity.requireComponents(["selection"])
-            );
+            settingsEntity.cp.selectionManager.id = entity.id;
           });
           entityRender.sprite.cursor = "pointer";
         }
@@ -120,8 +116,9 @@ export class RenderingSystem extends System {
 
     if (settingsEntity.cp.selectionManager.focused) {
       this.viewport.follow(
-        settingsEntity.cp.selectionManager.entity!.requireComponents(["render"])
-          .cp.render.sprite
+        this.sim
+          .get(settingsEntity.cp.selectionManager.id!)
+          .requireComponents(["render"]).cp.render.sprite
       );
     }
 

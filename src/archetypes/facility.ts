@@ -52,8 +52,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     .addComponent(createDocks({ large: 1, medium: 3, small: 3 }))
     .addComponent({
       name: "modules",
-      entities: [],
-      entityIds: [],
+      ids: [],
     })
     .addComponent({
       name: "name",
@@ -67,8 +66,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
       name: "position",
       angle: 0,
       coord: initial.position,
-      entity: initial.sector,
-      entityId: initial.sector.id,
+      sector: initial.sector.id,
     })
     .addComponent(
       createRender({

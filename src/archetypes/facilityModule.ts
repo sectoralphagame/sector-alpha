@@ -18,8 +18,7 @@ export function createFacilityModule(sim: Sim, input: ProductionModuleInput) {
   entity
     .addComponent({
       name: "parent",
-      entity: input.parent,
-      entityId: input.parent.id,
+      id: input.parent.id,
     })
     .addComponent({
       name: "name",
@@ -150,15 +149,14 @@ export const facilityModules = {
   ): FacilityModule => {
     const entity = new Entity(sim);
     entity
-      .addComponent({ name: "parent", entity: parent, entityId: parent.id })
+      .addComponent({ name: "parent", id: parent.id })
       .addComponent({
         name: "name",
         value: "Hyperspace Generator",
       })
       .addComponent({
         name: "teleport",
-        entity: null,
-        entityId: null,
+        destinationId: null,
       });
 
     return entity as FacilityModule;

@@ -1,40 +1,34 @@
-import { Asteroid } from "../archetypes/asteroid";
-import { AsteroidField } from "../archetypes/asteroidField";
-import { Marker } from "../archetypes/marker";
-import { WithTrade } from "../economy/utils";
 import { NegativeQuantity } from "../errors";
 import { BaseComponent } from "./component";
-import { WithDock } from "./dockable";
 import { TransactionInput } from "./trade";
-import { EntityId } from "./utils/entityId";
 
 export type OrderGroupType = "mine" | "trade" | "hold" | "move" | "dock";
 
 export interface DockOrder {
   type: "dock";
-  target: EntityId<WithDock>;
+  targetId: number;
 }
 
 export interface TeleportOrder {
   type: "teleport";
-  position: EntityId<Marker>;
+  targetId: number;
 }
 
 export interface MoveOrder {
   type: "move";
-  position: EntityId<Marker>;
+  targetId: number;
 }
 
 export interface TradeOrder {
   type: "trade";
   offer: TransactionInput;
-  target: EntityId<WithTrade>;
+  targetId: number;
 }
 
 export interface MineOrder {
   type: "mine";
-  target: EntityId<AsteroidField>;
-  targetRock: EntityId<Asteroid>;
+  targetFieldId: number;
+  targetRockId: number;
 }
 
 export interface HoldPositionOrder {

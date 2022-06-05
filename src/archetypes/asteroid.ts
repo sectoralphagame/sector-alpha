@@ -7,7 +7,6 @@ import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { AsteroidField } from "./asteroidField";
 import { Sector } from "./sector";
-import { addEntity } from "../components/utils/entityId";
 
 export const asteroidComponents = [
   "minable",
@@ -46,20 +45,17 @@ export function createAsteroid(
     .addComponent({
       name: "minable",
       commodity: type,
-      entity: null,
-      entityId: null,
+      minedById: null,
     })
     .addComponent({
       name: "parent",
-      entity: parent,
-      entityId: parent.id,
+      id: parent.id,
     })
     .addComponent({
       name: "position",
       coord: position,
       angle: 0,
-      entity: sector,
-      entityId: sector.id,
+      sector: sector.id,
     })
     .addComponent(
       createRender({
@@ -71,7 +67,7 @@ export function createAsteroid(
       })
     );
 
-  addEntity(parent.components.children, entity as RequireComponent<"parent">);
+  parent.components.children.entities.push(entity.id);
 
   return asteroid(entity);
 }

@@ -38,13 +38,12 @@ export function createAsteroidField(
       size,
       type,
     })
-    .addComponent({ name: "children", entities: [], entityIds: [] })
+    .addComponent({ name: "children", entities: [] })
     .addComponent({
       name: "position",
       coord: position,
       angle: 0,
-      entity: sector,
-      entityId: sector.id,
+      sector: sector.id,
     })
     .addComponent(
       createRenderGraphics("circle", {

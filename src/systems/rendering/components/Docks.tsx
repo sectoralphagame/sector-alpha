@@ -1,12 +1,10 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { Entity } from "../../../components/entity";
 import locationIcon from "../../../../assets/ui/location.svg";
 import { RequireComponent } from "../../../tsHelpers";
 import { IconButton } from "./IconButton";
 import { Table, TableCell } from "./Table";
 import { nano } from "../../../style";
-import { setEntity } from "../../../components/utils/entityId";
 
 export interface DocksProps {
   entity: RequireComponent<"docks">;
@@ -25,7 +23,7 @@ const styles = nano.sheet({
 export const Docks: React.FC<DocksProps> = ({ entity }) => {
   const { docks } = entity.cp;
 
-  return docks.entities.length === 0 ? (
+  return docks.docked.length === 0 ? (
     <div>Empty docks</div>
   ) : (
     <Table>
@@ -36,27 +34,31 @@ export const Docks: React.FC<DocksProps> = ({ entity }) => {
         </tr>
       </thead>
       <tbody>
-        {docks.entities.map((ship) => (
-          <tr key={ship.id}>
-            <TableCell className={styles.colName}>
-              {ship.cp.name?.value}
-            </TableCell>
-            <TableCell className={styles.colAction}>
-              <IconButton
-                onClick={() => {
-                  const { selectionManager } = (window.sim.entities as Entity[])
-                    .find((e) => e.hasComponents(["selectionManager"]))!
-                    .requireComponents(["selectionManager"]).cp;
+        {docks.docked.map((shipId) => {
+          const ship = entity.sim.entities.get(shipId)!;
 
-                  setEntity(selectionManager, ship.cp.commander!.entity);
-                  selectionManager.focused = true;
-                }}
-              >
-                <SVG src={locationIcon} />
-              </IconButton>
-            </TableCell>
-          </tr>
-        ))}
+          return (
+            <tr key={ship.id}>
+              <TableCell className={styles.colName}>
+                {ship.cp.name?.value}
+              </TableCell>
+              <TableCell className={styles.colAction}>
+                <IconButton
+                  onClick={() => {
+                    const { selectionManager } = entity.sim
+                      .find((e) => e.hasComponents(["selectionManager"]))!
+                      .requireComponents(["selectionManager"]).cp;
+
+                    selectionManager.id = ship.cp.commander!.id;
+                    selectionManager.focused = true;
+                  }}
+                >
+                  <SVG src={locationIcon} />
+                </IconButton>
+              </TableCell>
+            </tr>
+          );
+        })}
       </tbody>
     </Table>
   );

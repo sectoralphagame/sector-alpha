@@ -1,6 +1,5 @@
 import { TradeOrder } from "../../components/orders";
 import { releaseStorageAllocation, transfer } from "../../components/storage";
-import { getEntity } from "../../components/utils/entityId";
 import { NotDockedError } from "../../errors";
 import { RequireComponent } from "../../tsHelpers";
 import { acceptTrade } from "../../utils/trading";
@@ -9,8 +8,17 @@ export function tradeOrder(
   entity: RequireComponent<"drive" | "storage" | "dockable">,
   order: TradeOrder
 ): boolean {
-  const target = getEntity(order.target, entity.sim);
-  if (entity.cp.dockable.entity === target) {
+  const target = entity.sim
+    .get(order.targetId)
+    .requireComponents([
+      "trade",
+      "storage",
+      "budget",
+      "owner",
+      "docks",
+      "position",
+    ]);
+  if (entity.cp.dockable.dockedIn === target.id) {
     if (order.offer.type === "sell") {
       if (order.offer.allocations?.buyer?.storage) {
         releaseStorageAllocation(

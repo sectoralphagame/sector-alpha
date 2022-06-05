@@ -1,23 +1,21 @@
+import { marker } from "../../archetypes/marker";
 import { clearTarget, setTarget } from "../../components/drive";
 import { MoveOrder, TeleportOrder } from "../../components/orders";
 import { show } from "../../components/render";
-import { getEntity, setEntities } from "../../components/utils/entityId";
 import { RequireComponent } from "../../tsHelpers";
 
 export function moveOrder(
   entity: RequireComponent<"drive" | "orders">,
   order: MoveOrder
 ): boolean {
-  setTarget(entity.cp.drive, getEntity(order.position, entity.sim));
+  setTarget(entity.cp.drive, order.targetId);
 
-  if (entity.cp.dockable?.entity) {
-    setEntities(
-      entity.cp.dockable.entity.cp.docks,
-      entity.cp.dockable.entity.cp.docks.entities.filter(
-        (e) => e.id !== entity.id
-      )
-    );
-    entity.cp.dockable.entity = null;
+  if (entity.cp.dockable?.dockedIn) {
+    const dock = entity.sim.entities
+      .get(entity.cp.dockable.dockedIn)!
+      .requireComponents(["docks"]);
+    dock.cp.docks.docked = dock.cp.docks.docked.filter((e) => e !== entity.id);
+    entity.cp.dockable.dockedIn = null;
     if (entity.cp.render) {
       show(entity.cp.render);
     }
@@ -36,23 +34,21 @@ export function teleportOrder(
   entity: RequireComponent<"position" | "orders">,
   order: TeleportOrder
 ): boolean {
-  const marker = getEntity(order.position, entity.sim);
+  const destination = marker(entity.sim.get(order.targetId));
 
   entity.cp.position = {
     name: "position",
     angle: entity.cp.position.angle,
-    coord: marker.cp.position.coord,
-    entity: marker.cp.position.entity,
-    entityId: marker.cp.position.entity.id,
+    coord: destination.cp.position.coord,
+    sector: destination.cp.position.sector,
   };
 
-  entity.cp.docks?.entities.forEach((docked) => {
-    docked.cp.position = {
+  entity.cp.docks?.docked.forEach((docked) => {
+    entity.sim.entities.get(docked)!.cp.position = {
       name: "position",
       angle: entity.cp.position.angle,
-      coord: marker.cp.position.coord,
-      entity: marker.cp.position.entity,
-      entityId: marker.cp.position.entity.id,
+      coord: destination.cp.position.coord,
+      sector: destination.cp.position.sector,
     };
   });
 

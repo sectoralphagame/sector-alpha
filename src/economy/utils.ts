@@ -7,7 +7,7 @@ import { Commodity } from "./commodity";
 import { RequireComponent } from "../tsHelpers";
 import { AsteroidField } from "../archetypes/asteroidField";
 import { asteroid, Asteroid } from "../archetypes/asteroid";
-import { Sector } from "../archetypes/sector";
+import { Sector, sector as asSector } from "../archetypes/sector";
 
 export type WithTrade = RequireComponent<
   "trade" | "storage" | "budget" | "position" | "owner" | "docks"
@@ -45,14 +45,14 @@ export function getFacilityWithMostProfit(
   const sortedByProfit = sortBy(
     (
       getSectorsInTeleportRange(
-        facility.cp.position.entity,
+        asSector(facility.sim.entities.get(facility.cp.position.sector)!),
         sectorDistance,
         facility.sim
       )
         .map((sector) =>
           facility.sim.queries.trading
             .get()
-            .filter((f) => f.cp.position.entity === sector)
+            .filter((f) => f.cp.position.sector === sector.id)
         )
         .flat()
         .filter(
@@ -86,8 +86,8 @@ export function getClosestMineableAsteroid(
 ): Asteroid | undefined {
   return minBy(
     field.components.children.entities
-      .map(asteroid)
-      .filter((a) => !a.components.minable.entity),
+      .map((e) => asteroid(field.sim.entities.get(e)!))
+      .filter((a) => !a.components.minable.minedById),
     (r) => norm(subtract(position, asteroid(r).cp.position.coord) as Matrix)
   );
 }

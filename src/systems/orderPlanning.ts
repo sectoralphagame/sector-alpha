@@ -3,6 +3,7 @@ import { Matrix, norm, subtract } from "mathjs";
 import { asteroid } from "../archetypes/asteroid";
 import { asteroidField } from "../archetypes/asteroidField";
 import { commanderRange, facility } from "../archetypes/facility";
+import { sector as asSector } from "../archetypes/sector";
 import { mineOrder } from "../components/orders";
 import { getAvailableSpace } from "../components/storage";
 import { mineableCommodities } from "../economy/commodity";
@@ -36,7 +37,7 @@ type Trading = RequireComponent<
 >;
 
 function autoTrade(entity: Trading, sectorDistance: number) {
-  const commander = facility(entity.cp.commander.entity);
+  const commander = facility(entity.sim.get(entity.cp.commander.id));
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);
@@ -80,7 +81,7 @@ function autoMine(
   >,
   sectorDistance: number
 ) {
-  const commander = facility(entity.cp.commander.entity);
+  const commander = facility(entity.sim.get(entity.cp.commander.id));
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);
@@ -93,14 +94,14 @@ function autoMine(
     if (mineable) {
       const field = minBy(
         getSectorsInTeleportRange(
-          entity.cp.position.entity,
+          asSector(entity.sim.entities.get(entity.cp.position.sector)!),
           sectorDistance,
           entity.sim
         )
           .map((sector) =>
             entity.sim.queries.asteroidFields
               .get()
-              .filter((f) => f.cp.position!.entity === sector)
+              .filter((f) => f.cp.position!.sector === sector.id)
           )
           .flat()
           .map(asteroidField)
@@ -108,8 +109,8 @@ function autoMine(
             (e) =>
               e.cp.asteroidSpawn.type === mineable &&
               e.cp.children.entities
-                .map(asteroid)
-                .some((a) => !a.cp.minable.entity)
+                .map((child) => asteroid(entity.sim.entities.get(child)!))
+                .some((a) => !a.cp.minable.minedById)
           ),
         (e) =>
           norm(
@@ -127,8 +128,8 @@ function autoMine(
           orders: [
             ...moveToOrders(entity, field),
             mineOrder({
-              target: { entity: field, entityId: field.id },
-              targetRock: { entity: rock, entityId: rock.id },
+              targetFieldId: field.id,
+              targetRockId: rock.id,
             }),
           ],
         });

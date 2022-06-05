@@ -32,8 +32,7 @@ export function createMarker(sim: Sim, { value, sector }: MarkerInput) {
     name: "position",
     coord: value,
     angle: 0,
-    entity: sector,
-    entityId: sector.id,
+    sector: sector.id,
   });
 
   return entity as Marker;

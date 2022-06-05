@@ -60,8 +60,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       name: "position",
       angle: 0,
       coord: initial.position,
-      entity: initial.sector,
-      entityId: initial.sector.id,
+      sector: initial.sector.id,
     })
     .addComponent(
       createRender({
@@ -77,8 +76,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
     .addComponent({
       name: "dockable",
       size: "small",
-      entity: null,
-      entityId: null,
+      dockedIn: null,
     });
 
   if (initial.mining) {

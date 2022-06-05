@@ -8,18 +8,16 @@ export function regen(sim: Sim) {
   const graph = new Graph({ directed: false });
 
   sim.queries.teleports.get().forEach((t) => {
-    graph.setNode(
-      findInAncestors(t, "position").cp.position.entityId!.toString()
-    );
+    graph.setNode(findInAncestors(t, "position").cp.position.sector.toString());
   });
 
   sim.queries.teleports.get().forEach((t) => {
     graph.setEdge(
-      findInAncestors(t, "position").cp.position.entityId!.toString(),
+      findInAncestors(t, "position").cp.position.sector.toString(),
       findInAncestors(
-        t.cp.teleport.entity!,
+        sim.get(t.cp.teleport.destinationId!),
         "position"
-      ).cp.position.entityId!.toString()
+      ).cp.position.sector.toString()
     );
   });
 

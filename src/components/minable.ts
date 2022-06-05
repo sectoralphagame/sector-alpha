@@ -1,7 +1,7 @@
 import { MineableCommodity } from "../economy/commodity";
 import { BaseComponent } from "./component";
-import { EntityId } from "./utils/entityId";
 
-export interface Minable extends BaseComponent<"minable">, EntityId {
+export interface Minable extends BaseComponent<"minable"> {
+  minedById: number | null;
   commodity: MineableCommodity;
 }

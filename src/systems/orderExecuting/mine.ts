@@ -1,11 +1,8 @@
+import { asteroid } from "../../archetypes/asteroid";
+import { asteroidField } from "../../archetypes/asteroidField";
 import { setTarget } from "../../components/drive";
 import { MineOrder } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
-import {
-  clearEntity,
-  getEntity,
-  setEntity,
-} from "../../components/utils/entityId";
 import { getClosestMineableAsteroid } from "../../economy/utils";
 import { RequireComponent } from "../../tsHelpers";
 
@@ -13,29 +10,33 @@ export function mineOrder(
   entity: RequireComponent<"drive" | "mining" | "position" | "storage">,
   order: MineOrder
 ): boolean {
-  const target = getEntity(order.target, entity.sim);
-  const targetRock = order.targetRock
-    ? getEntity(order.targetRock, entity.sim)
+  const targetField = asteroidField(entity.sim.get(order.targetFieldId));
+  const targetRock = order.targetRockId
+    ? asteroid(entity.sim.get(order.targetRockId))
     : null;
   if (
     !targetRock ||
-    (targetRock.cp.minable.entity !== null &&
-      targetRock.cp.minable.entity !== entity)
+    (targetRock.cp.minable.minedById !== null &&
+      targetRock.cp.minable.minedById !== entity.id)
   ) {
-    const rock = getClosestMineableAsteroid(target, entity.cp.position.coord);
+    const rock = getClosestMineableAsteroid(
+      targetField,
+      entity.cp.position.coord
+    );
     if (!rock) return false;
-    setEntity(order.targetRock, rock);
+    order.targetRockId = rock.id;
   }
 
-  setTarget(entity.cp.drive, order.targetRock.entity);
+  setTarget(entity.cp.drive, order.targetRockId);
 
   if (entity.cp.drive.targetReached) {
-    setEntity(entity.cp.mining, order.targetRock.entity!);
-    setEntity(order.targetRock.entity!.cp.minable, entity);
+    const rock = asteroid(entity.sim.get(order.targetRockId));
+    entity.cp.mining.entityId = order.targetRockId;
+    rock.cp.minable.minedById = entity.id;
 
     if (getAvailableSpace(entity.cp.storage) === 0) {
-      clearEntity(entity.cp.mining);
-      clearEntity(order.targetRock.entity!.cp.minable);
+      entity.cp.mining.entityId = null;
+      rock.cp.minable.minedById = null;
 
       return true;
     }
