@@ -1,17 +1,24 @@
 import { every } from "lodash";
 import { PAC } from "../components/production";
-import { CommodityStorage } from "../components/storage";
+import {
+  addStorage,
+  CommodityStorage,
+  hasSufficientStorage,
+  removeStorage,
+} from "../components/storage";
 import { RequireComponent } from "../tsHelpers";
+import { findInAncestors } from "../utils/findInAncestors";
 import { limitMax } from "../utils/limit";
 import { perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
 
 function produce(pac: PAC, storage: CommodityStorage) {
   perCommodity((commodity) =>
-    storage.removeStorage(commodity, pac[commodity].consumes)
+    removeStorage(storage, commodity, pac[commodity].consumes)
   );
   perCommodity((commodity) =>
-    storage.addStorage(
+    addStorage(
+      storage,
       commodity,
       limitMax(
         storage.quota[commodity] - pac[commodity].produces,
@@ -30,59 +37,40 @@ export function isAbleToProduce(
   return every(
     perCommodity(
       (commodity) =>
-        storage.hasSufficientStorage(
+        hasSufficientStorage(
+          storage,
           commodity,
           facilityModule.cp.production.pac[commodity].consumes
         ) &&
         (facilityModule.cp.production.pac[commodity].produces
-          ? storage.getAvailableWares()[commodity] < storage.quota[commodity]
+          ? storage.availableWares[commodity] < storage.quota[commodity]
           : true)
     )
   );
 }
 
 export class ProducingSystem extends System {
-  exec = (delta: number): void => {
+  exec = (): void => {
     this.sim.queries.standaloneProduction.get().forEach((entity) => {
-      entity.cp.production.cooldowns.update(delta);
-
       if (!isAbleToProduce(entity, entity.cp.storage)) {
         return;
       }
 
-      entity.cp.production.cooldowns.use(
-        "production",
-        entity.cp.production.time
-      );
+      entity.cooldowns.use("production", entity.cp.production.time);
 
-      const storage =
-        entity.cp.storage ??
-        entity.requireComponents(["parent"]).cp.parent.value.cp.storage;
-
-      produce(entity.cp.production.pac, storage);
+      produce(entity.cp.production.pac, entity.cp.storage);
     });
 
     this.sim.queries.productionByModules.get().forEach((facilityModule) => {
-      facilityModule.cp.production.cooldowns.update(delta);
-
-      if (
-        !isAbleToProduce(
-          facilityModule,
-          facilityModule.cp.parent.value.requireComponents(["storage"]).cp
-            .storage
-        )
-      ) {
+      const storage = findInAncestors(facilityModule, "storage").cp.storage;
+      if (!isAbleToProduce(facilityModule, storage)) {
         return;
       }
 
-      facilityModule.cp.production.cooldowns.use(
+      facilityModule.cooldowns.use(
         "production",
         facilityModule.cp.production.time
       );
-
-      const storage = facilityModule.cp.parent.value.requireComponents([
-        "storage",
-      ]).cp.storage;
 
       produce(facilityModule.cp.production.pac, storage);
     });

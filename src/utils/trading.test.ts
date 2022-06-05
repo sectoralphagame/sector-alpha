@@ -1,6 +1,8 @@
 import { matrix } from "mathjs";
 import { Facility } from "../archetypes/facility";
 import { createSector } from "../archetypes/sector";
+import { changeBudgetMoney } from "../components/budget";
+import { addStorage, removeStorage } from "../components/storage";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { settleStorageQuota } from "../systems/storageQuotaPlanning";
@@ -22,7 +24,7 @@ describe("Trading module", () => {
       },
       sim
     );
-    facility.cp.budget.changeMoney(100);
+    changeBudgetMoney(facility.cp.budget, 100);
   });
 
   it("properly sorts by most needed commodity 1", () => {
@@ -33,8 +35,8 @@ describe("Trading module", () => {
   });
 
   it("properly sorts by most needed commodity 2", () => {
-    facility.cp.storage.removeStorage("food", 50);
-    facility.cp.storage.addStorage("water", 10);
+    removeStorage(facility.cp.storage, "food", 50);
+    addStorage(facility.cp.storage, "water", 10);
     settleStorageQuota(facility);
     createOffers(facility);
 

@@ -1,9 +1,7 @@
-import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
-import { Cooldowns } from "../utils/cooldowns";
-import { Entity } from "./entity";
+import { BaseComponent } from "./component";
 
-export type Target = RequireComponent<"position"> | null;
+export type Target = RequireComponent<"position">;
 
 export interface ShipDriveProps {
   maneuver: number;
@@ -18,11 +16,11 @@ export interface ShipDriveProps {
   ttc: number;
 }
 
-export class Drive {
+export interface Drive extends BaseComponent<"drive"> {
   maneuver: number;
   cruise: number;
   /**
-   * Expressed in degrees per second
+   * Expressed in radians per second
    */
   rotary: number;
   /**
@@ -30,71 +28,41 @@ export class Drive {
    */
   ttc: number;
 
-  cooldowns = new Cooldowns("cruise");
-  state: "maneuver" | "warming" | "cruise" = "maneuver";
-  target: Target = null;
-  targetId: number | null;
-  targetReached: boolean = false;
+  state: "maneuver" | "warming" | "cruise";
+  target: number | null;
+  targetReached: boolean;
+}
 
-  constructor(input: ShipDriveProps) {
-    this.cruise = input.cruise;
-    this.maneuver = input.maneuver;
-    this.rotary = (input.rotary * Math.PI) / 180;
-    this.ttc = input.ttc;
+export function createDrive(input: ShipDriveProps): Drive {
+  return {
+    ...input,
+    rotary: (input.rotary * Math.PI) / 180,
+    state: "maneuver",
+    target: null,
+    targetReached: false,
+    name: "drive",
+  };
+}
+
+export function startCruise(drive: Drive) {
+  drive.state = "warming";
+}
+
+export function stopCruise(drive: Drive) {
+  drive.state = "maneuver";
+}
+
+export function setTarget(drive: Drive, target: number | null) {
+  const shouldUpdate = target === null ? true : target !== drive.target;
+
+  if (shouldUpdate) {
+    drive.state = "maneuver";
+    drive.target = target;
+    drive.targetReached = false;
   }
+}
 
-  load = (sim: Sim) => {
-    if (this.targetId) {
-      this.target = sim.entities.find(
-        (e) => e.id === this.targetId
-      ) as RequireComponent<"position">;
-    }
-  };
-
-  startCruise = () => {
-    if (this.state === "maneuver") {
-      this.cooldowns.use("cruise", this.ttc);
-      this.state = "warming";
-    }
-  };
-
-  stopCruise = () => {
-    this.state = "maneuver";
-  };
-
-  sim = (delta: number) => {
-    this.cooldowns.update(delta);
-
-    if (this.state === "warming") {
-      if (this.cooldowns.canUse("cruise")) {
-        this.state = "cruise";
-      }
-    }
-  };
-
-  setTarget = (target: Target) => {
-    const targetsAreEntities =
-      target instanceof Entity && this.target instanceof Entity;
-
-    const shouldUpdate = targetsAreEntities
-      ? target.id !== (this.target as Entity).id
-      : true;
-
-    if (shouldUpdate) {
-      this.state = "maneuver";
-      this.target = target;
-      this.targetReached = false;
-
-      if (target instanceof Entity) {
-        this.targetId = target.id;
-      } else {
-        this.targetId = null;
-      }
-    }
-  };
-
-  clearTarget = () => {
-    this.setTarget(null);
-    this.targetReached = true;
-  };
+export function clearTarget(drive: Drive) {
+  setTarget(drive, null);
+  drive.targetReached = true;
 }

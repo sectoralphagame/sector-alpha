@@ -10,7 +10,8 @@ import { StorageBonus } from "./storageBonus";
 import { Modules } from "./modules";
 import { Name } from "./name";
 import { Selection, SelectionManager } from "./selection";
-import { Render, RenderGraphics } from "./render";
+import { Render } from "./render";
+import { RenderGraphics } from "./renderGraphics";
 import { AutoOrder } from "./autoOrder";
 import { Drive } from "./drive";
 import { Mining } from "./mining";
@@ -23,29 +24,31 @@ import { MissingComponentError } from "../errors";
 import { HECSPosition } from "./hecsPosition";
 import { Teleport } from "./teleport";
 import { Docks, Dockable } from "./dockable";
+import { Cooldowns } from "../utils/cooldowns";
+import { Commander } from "./commander";
 
 export interface CoreComponents {
   asteroidSpawn: AsteroidSpawn;
   autoOrder: AutoOrder;
   budget: Budget;
   children: Children;
-  commander: Parent; // Essentially the same
+  commander: Commander;
   compoundProduction: CompoundProduction;
-  drive: Drive;
-  docks: Docks;
   dockable: Dockable;
+  docks: Docks;
+  drive: Drive;
+  name: Name;
   hecsPosition: HECSPosition;
   minable: Minable;
   mining: Mining;
   modules: Modules;
-  name: Name;
   orders: Orders;
   owner: Owner;
   parent: Parent;
   position: Position;
   production: Production;
   render: Render;
-  renderGraphics: RenderGraphics;
+  renderGraphics: RenderGraphics<any>;
   selection: Selection;
   selectionManager: SelectionManager;
   storage: CommodityStorage;
@@ -56,6 +59,7 @@ export interface CoreComponents {
 
 export class Entity {
   components: Partial<CoreComponents> = {};
+  cooldowns = new Cooldowns<string>();
   id: number;
   sim: Sim;
   deleted: boolean = false;
@@ -84,11 +88,13 @@ export class Entity {
   }
 
   addComponent<T extends keyof CoreComponents>(
-    name: T,
     component: CoreComponents[T]
-  ) {
-    this.components[name] = component;
+  ): Entity {
+    const componentName: CoreComponents[T]["name"] = component.name;
+    this.components[componentName] = component;
     this.sim.events.emit("add-component", this);
+
+    return this;
   }
 
   removeComponent(name: keyof CoreComponents) {

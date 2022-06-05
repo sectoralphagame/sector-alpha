@@ -1,23 +1,23 @@
 import { Graph, alg } from "graphlib";
 import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
+import { findInAncestors } from "../utils/findInAncestors";
 import { System } from "./system";
 
 export function regen(sim: Sim) {
   const graph = new Graph({ directed: false });
 
   sim.queries.teleports.get().forEach((t) => {
-    graph.setNode(
-      t.cp
-        .parent!.value.requireComponents(["position"])
-        .cp.position.sectorId.toString()
-    );
+    graph.setNode(findInAncestors(t, "position").cp.position.sector.toString());
   });
 
   sim.queries.teleports.get().forEach((t) => {
     graph.setEdge(
-      t.cp.parent!.value.cp.position!.sectorId.toString(),
-      t.cp.teleport.destination.cp.parent!.value.cp.position!.sectorId.toString()
+      findInAncestors(t, "position").cp.position.sector.toString(),
+      findInAncestors(
+        sim.get(t.cp.teleport.destinationId!),
+        "position"
+      ).cp.position.sector.toString()
     );
   });
 

@@ -1,63 +1,97 @@
 import { sum } from "mathjs";
 import { InsufficientMoney, NegativeBudget, NegativeQuantity } from "../errors";
-import { AllocationManager } from "./utils/allocations";
+import { BaseComponent } from "./component";
+import {
+  Allocation,
+  Allocations,
+  newAllocation,
+  releaseAllocation,
+} from "./utils/allocations";
 
 export interface BudgetAllocation {
   id: number;
   amount: number;
 }
 
-export class Budget {
-  private money: number = 0;
-  private available: number = 0;
+export interface Budget
+  extends BaseComponent<"budget">,
+    Allocations<BudgetAllocation> {
+  money: number;
+  available: number;
+}
 
-  allocations: AllocationManager<BudgetAllocation>;
+export function validateBudgetAllocation(
+  budget: Budget,
+  allocation: BudgetAllocation
+): boolean {
+  return allocation.amount <= budget.available;
+}
 
-  constructor() {
-    this.allocations = new AllocationManager<BudgetAllocation>({
-      validate: (allocation) => allocation.amount <= this.getAvailableMoney(),
-      onChange: this.updateAvailableMoney,
-    });
+export function updateAvailableMoney(budget: Budget) {
+  budget.available =
+    budget.money - sum(budget.allocations.map((a) => a.amount));
+}
+
+export function newBudgetAllocation(
+  budget: Budget,
+  input: Omit<BudgetAllocation, keyof Allocation>
+) {
+  const allocation = newAllocation(budget, input, (a) =>
+    validateBudgetAllocation(budget, a)
+  );
+  updateAvailableMoney(budget);
+
+  return allocation;
+}
+
+export function releaseBudgetAllocation(
+  budget: Budget,
+  id: number
+): BudgetAllocation {
+  const allocation = releaseAllocation(budget, id);
+  updateAvailableMoney(budget);
+
+  return allocation;
+}
+
+export function setMoney(budget: Budget, value: number) {
+  if (value < 0) {
+    throw new NegativeBudget(value);
   }
 
-  updateAvailableMoney = () => {
-    this.available =
-      this.money - sum(this.allocations.all().map((a) => a.amount));
-  };
+  budget.money = value;
 
-  getAvailableMoney = () => this.available;
+  updateAvailableMoney(budget);
+}
 
-  getAllMoney = () => this.money;
+export function changeBudgetMoney(budget: Budget, value: number) {
+  budget.money += value;
 
-  changeMoney = (value: number) => {
-    this.money += value;
+  if (budget.money < 0) {
+    throw new NegativeBudget(budget.money);
+  }
 
-    if (this.money < 0) {
-      throw new NegativeBudget(this.money);
-    }
+  updateAvailableMoney(budget);
+}
 
-    this.updateAvailableMoney();
-  };
+export function transferMoney(budget: Budget, value: number, target: Budget) {
+  if (value < 0) {
+    throw new NegativeQuantity(value);
+  }
+  if (budget.money < value) {
+    throw new InsufficientMoney(value, budget.money);
+  }
 
-  set = (value: number) => {
-    if (value < 0) {
-      throw new NegativeBudget(value);
-    }
+  changeBudgetMoney(budget, -value);
+  changeBudgetMoney(target, value);
+}
 
-    this.money = value;
-
-    this.updateAvailableMoney();
-  };
-
-  transferMoney = (value: number, target: Budget) => {
-    if (value < 0) {
-      throw new NegativeQuantity(value);
-    }
-    if (this.money < value) {
-      throw new InsufficientMoney(value, this.money);
-    }
-
-    this.changeMoney(-value);
-    target.changeMoney(value);
+export function createBudget(): Budget {
+  return {
+    allocationIdCounter: 1,
+    allocations: [],
+    available: 0,
+    money: 0,
+    name: "budget",
   };
 }

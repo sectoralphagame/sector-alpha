@@ -1,37 +1,42 @@
 import { perCommodity } from "../utils/perCommodity";
-import { CommodityStorage } from "./storage";
+import {
+  addStorage,
+  createCommodityStorage,
+  getAvailableSpace,
+  newStorageAllocation,
+} from "./storage";
 
 describe("Storage", () => {
   it("properly calculates available space when allocations were made", () => {
-    const storage = new CommodityStorage();
+    const storage = createCommodityStorage();
     storage.max = 100;
-    storage.addStorage("food", 10);
-    storage.allocationManager.new({
+    addStorage(storage, "food", 10);
+    newStorageAllocation(storage, {
       amount: { ...perCommodity(() => 0), food: 5 },
       type: "incoming",
     });
-    storage.allocationManager.new({
+    newStorageAllocation(storage, {
       amount: { ...perCommodity(() => 0), fuel: 5 },
       type: "incoming",
     });
-    storage.allocationManager.new({
+    newStorageAllocation(storage, {
       amount: { ...perCommodity(() => 0), food: 9 },
       type: "outgoing",
     });
 
-    const stored = storage.getAvailableWares();
+    const stored = storage.availableWares;
 
     expect(stored.food).toBe(1);
     expect(stored.fuel).toBe(0);
-    expect(storage.getAvailableSpace()).toBe(80);
+    expect(getAvailableSpace(storage)).toBe(80);
   });
 
   it("properly validates new outgoing allocations", () => {
-    const storage = new CommodityStorage();
+    const storage = createCommodityStorage();
     storage.max = 100;
-    storage.addStorage("food", 10);
+    addStorage(storage, "food", 10);
 
-    const allocation = storage.allocationManager.new({
+    const allocation = newStorageAllocation(storage, {
       amount: {
         ...perCommodity(() => 0),
         food: 10,
@@ -40,15 +45,15 @@ describe("Storage", () => {
     });
 
     expect(allocation).not.toBeNull();
-    expect(storage.getAvailableSpace()).toBe(90);
+    expect(getAvailableSpace(storage)).toBe(90);
   });
 
   it("properly validates new incoming allocations", () => {
-    const storage = new CommodityStorage();
+    const storage = createCommodityStorage();
     storage.max = 100;
-    storage.addStorage("food", 10);
+    addStorage(storage, "food", 10);
 
-    const allocation = storage.allocationManager.new({
+    const allocation = newStorageAllocation(storage, {
       amount: {
         ...perCommodity(() => 0),
         food: 10,
@@ -57,6 +62,6 @@ describe("Storage", () => {
     });
 
     expect(allocation).not.toBeNull();
-    expect(storage.getAvailableSpace()).toBe(80);
+    expect(getAvailableSpace(storage)).toBe(80);
   });
 });

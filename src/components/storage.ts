@@ -8,9 +8,15 @@ import {
   NonIntegerQuantity,
 } from "../errors";
 import { perCommodity } from "../utils/perCommodity";
-import { AllocationManager } from "../components/utils/allocations";
+import {
+  Allocation,
+  Allocations,
+  newAllocation,
+  releaseAllocation,
+} from "../components/utils/allocations";
 import { Commodity } from "../economy/commodity";
 import { sim } from "../sim";
+import { BaseComponent } from "./component";
 
 export type StorageAllocationType = "incoming" | "outgoing";
 
@@ -26,180 +32,223 @@ interface CommodityStorageHistoryEntry {
   time: number;
 }
 
-export class CommodityStorage {
-  private stored: Record<Commodity, number>;
-  private availableWares: Record<Commodity, number>;
-
-  allocationManager: AllocationManager<StorageAllocation>;
+export interface CommodityStorage
+  extends Allocations<StorageAllocation>,
+    BaseComponent<"storage"> {
+  stored: Record<Commodity, number>;
+  availableWares: Record<Commodity, number>;
 
   max: number;
   quota: Record<Commodity, number>;
-  history: CommodityStorageHistoryEntry[] = [];
+  history: CommodityStorageHistoryEntry[];
+}
 
-  constructor() {
-    this.max = 0;
-    this.stored = perCommodity(() => 0);
-    this.quota = perCommodity(() => 0);
-    this.allocationManager = new AllocationManager<StorageAllocation>({
-      validate: (allocation) => {
-        if (allocation.type === "incoming") {
-          return (
-            sum(Object.values(allocation.amount)) <= this.getAvailableSpace()
-          );
-        }
+export function hasSufficientStorage(
+  storage: CommodityStorage,
+  commodity: Commodity,
+  quantity: number
+): boolean {
+  return storage.availableWares[commodity] >= quantity;
+}
 
-        return Object.entries(allocation.amount)
-          .map(
-            ([commodity, quantity]) =>
-              this.getAvailableWares()[commodity] >= quantity
-          )
-          .every(Boolean);
-      },
-      onChange: this.updateAvailableWares,
-    });
-    this.updateAvailableWares();
-  }
+export function updateAvailableWares(storage: CommodityStorage) {
+  storage.availableWares = [
+    ...toPairs(storage.stored)
+      .map(([commodity, stored]) => ({
+        commodity,
+        stored,
+      }))
+      .flat(),
+    ...storage.allocations
+      .filter((allocation) => allocation.type === "outgoing")
+      .map((allocation) =>
+        toPairs(allocation.amount).map(([commodity, stored]) => ({
+          commodity,
+          stored: -stored,
+        }))
+      )
+      .flat(),
+  ].reduce(
+    (acc, val) => ({
+      ...acc,
+      [val.commodity]: acc[val.commodity] + val.stored,
+    }),
+    perCommodity(() => 0)
+  );
+}
 
-  onChange = (entry: Omit<CommodityStorageHistoryEntry, "time">) => {
-    this.addHitoryEntry({ ...entry, time: sim ? sim.getTime() : 0 });
-    this.updateAvailableWares();
-  };
-
-  addHitoryEntry = (entry: CommodityStorageHistoryEntry) => {
-    this.history.unshift(entry);
-    if (this.history.length > 50) {
-      this.history.pop();
-    }
-  };
-
-  getAvailableSpace = () =>
-    this.max -
-    sum(map(this.stored)) -
+export function getAvailableSpace(storage: CommodityStorage) {
+  return (
+    storage.max -
+    sum(map(storage.stored)) -
     sum(
-      this.allocationManager
-        .all()
+      storage.allocations
         .filter((allocation) => allocation.type === "incoming")
         .map((allocation) => sum(map(allocation.amount)))
-    );
+    )
+  );
+}
 
-  updateAvailableWares = () => {
-    this.availableWares = [
-      ...toPairs(this.stored)
-        .map(([commodity, stored]) => ({
-          commodity,
-          stored,
-        }))
-        .flat(),
-      ...this.allocationManager
-        .all()
-        .filter((allocation) => allocation.type === "outgoing")
-        .map((allocation) =>
-          toPairs(allocation.amount).map(([commodity, stored]) => ({
-            commodity,
-            stored: -stored,
-          }))
-        )
-        .flat(),
-    ].reduce(
-      (acc, val) => ({
-        ...acc,
-        [val.commodity]: acc[val.commodity] + val.stored,
-      }),
-      perCommodity(() => 0)
-    );
-  };
+export function hasSufficientStorageSpace(
+  storage: CommodityStorage,
+  quantity: number
+) {
+  if (quantity < 0) {
+    throw new NegativeQuantity(quantity);
+  }
 
-  updateQuota = (quota: Record<Commodity, number>) => {
-    this.quota = quota;
-  };
+  return getAvailableSpace(storage) >= quantity;
+}
 
-  getAvailableWares = () => this.availableWares;
+export function addStorageHitoryEntry(
+  storage: CommodityStorage,
+  entry: CommodityStorageHistoryEntry
+) {
+  storage.history.unshift(entry);
+  if (storage.history.length > 50) {
+    storage.history.pop();
+  }
+}
 
-  hasSufficientStorageSpace = (quantity: number) => {
-    if (quantity < 0) {
-      throw new NegativeQuantity(quantity);
-    }
+export function onStorageChange(
+  storage: CommodityStorage,
+  entry: Omit<CommodityStorageHistoryEntry, "time">
+) {
+  addStorageHitoryEntry(storage, { ...entry, time: sim ? sim.getTime() : 0 });
+  updateAvailableWares(storage);
+}
 
-    return this.getAvailableSpace() >= quantity;
-  };
+export function validateStorageAllocation(
+  storage: CommodityStorage,
+  allocation: StorageAllocation
+) {
+  if (allocation.type === "incoming") {
+    return sum(Object.values(allocation.amount)) <= getAvailableSpace(storage);
+  }
 
-  hasSufficientStorage = (commodity: Commodity, quantity: number): boolean =>
-    this.getAvailableWares()[commodity] >= quantity;
+  return Object.entries(allocation.amount)
+    .map(
+      ([commodity, quantity]) => storage.availableWares[commodity] >= quantity
+    )
+    .every(Boolean);
+}
 
-  addStorage = (
-    commodity: Commodity,
-    quantity: number,
-    exact = true
-  ): number => {
-    if (quantity < 0) {
-      throw new NegativeQuantity(quantity);
-    }
-    if (!Number.isInteger(quantity)) {
-      throw new NonIntegerQuantity(quantity);
-    }
-    if (quantity === 0) {
-      return 0;
-    }
+export function addStorage(
+  storage: CommodityStorage,
+  commodity: Commodity,
+  quantity: number,
+  exact = true
+): number {
+  if (quantity < 0) {
+    throw new NegativeQuantity(quantity);
+  }
+  if (!Number.isInteger(quantity)) {
+    throw new NonIntegerQuantity(quantity);
+  }
+  if (quantity === 0) {
+    return 0;
+  }
 
-    const availableSpace = this.getAvailableSpace();
+  const availableSpace = getAvailableSpace(storage);
 
-    if (availableSpace >= quantity) {
-      this.stored[commodity] += quantity;
-      this.onChange({ commodity, quantity });
-      return 0;
-    }
+  if (availableSpace >= quantity) {
+    storage.stored[commodity] += quantity;
+    onStorageChange(storage, { commodity, quantity });
+    return 0;
+  }
+  if (exact) {
+    throw new InsufficientStorageSpace(quantity, availableSpace);
+  }
+
+  storage.stored[commodity] += availableSpace;
+  onStorageChange(storage, { commodity, quantity: availableSpace });
+
+  return quantity - availableSpace;
+}
+
+export function removeStorage(
+  storage: CommodityStorage,
+  commodity: Commodity,
+  quantity: number
+) {
+  if (quantity < 0) {
+    throw new NegativeQuantity(quantity);
+  }
+  if (!Number.isInteger(quantity)) {
+    throw new NonIntegerQuantity(quantity);
+  }
+  if (quantity === 0) {
+    return;
+  }
+  if (!hasSufficientStorage(storage, commodity, quantity)) {
+    throw new InsufficientStorage(quantity, storage.availableWares[commodity]);
+  }
+
+  storage.stored[commodity] -= quantity;
+  onStorageChange(storage, { commodity, quantity: -quantity });
+}
+
+export function transfer(
+  storage: CommodityStorage,
+  commodity: Commodity,
+  quantity: number,
+  target: CommodityStorage,
+  exact: boolean
+): number {
+  let quantityToTransfer = quantity;
+  if (storage.availableWares[commodity] < quantity) {
     if (exact) {
-      throw new InsufficientStorageSpace(quantity, availableSpace);
-    }
-
-    this.stored[commodity] += availableSpace;
-    this.onChange({ commodity, quantity: availableSpace });
-
-    return quantity - availableSpace;
-  };
-
-  removeStorage = (commodity: Commodity, quantity: number) => {
-    if (quantity < 0) {
-      throw new NegativeQuantity(quantity);
-    }
-    if (!Number.isInteger(quantity)) {
-      throw new NonIntegerQuantity(quantity);
-    }
-    if (quantity === 0) {
-      return;
-    }
-    if (!this.hasSufficientStorage(commodity, quantity)) {
       throw new InsufficientStorage(
         quantity,
-        this.getAvailableWares()[commodity]
+        storage.availableWares[commodity]
       );
     }
+  } else {
+    quantityToTransfer = min(storage.availableWares[commodity], quantity);
+  }
 
-    this.stored[commodity] -= quantity;
-    this.onChange({ commodity, quantity: -quantity });
+  const transferred =
+    quantityToTransfer -
+    addStorage(target, commodity, quantityToTransfer, exact);
+  removeStorage(storage, commodity, transferred);
+
+  return transferred;
+}
+
+export function newStorageAllocation(
+  storage: CommodityStorage,
+  input: Omit<StorageAllocation, keyof Allocation>
+) {
+  const allocation = newAllocation(storage, input, (a) =>
+    validateStorageAllocation(storage, a)
+  );
+  updateAvailableWares(storage);
+
+  return allocation;
+}
+
+export function releaseStorageAllocation(
+  storage: CommodityStorage,
+  id: number
+): StorageAllocation {
+  const allocation = releaseAllocation(storage, id);
+  updateAvailableWares(storage);
+
+  return allocation;
+}
+
+export function createCommodityStorage(): CommodityStorage {
+  const storage: CommodityStorage = {
+    allocationIdCounter: 1,
+    allocations: [],
+    history: [],
+    max: 0,
+    availableWares: perCommodity(() => 0),
+    stored: perCommodity(() => 0),
+    quota: perCommodity(() => 0),
+    name: "storage",
   };
+  updateAvailableWares(storage);
 
-  transfer = (
-    commodity: Commodity,
-    quantity: number,
-    target: CommodityStorage,
-    exact: boolean
-  ): number => {
-    let quantityToTransfer = quantity;
-    const available = this.getAvailableWares();
-    if (available[commodity] < quantity) {
-      if (exact) {
-        throw new InsufficientStorage(quantity, available[commodity]);
-      }
-    } else {
-      quantityToTransfer = min(available[commodity], quantity);
-    }
-
-    const transferred =
-      quantityToTransfer -
-      target.addStorage(commodity, quantityToTransfer, exact);
-    this.removeStorage(commodity, transferred);
-
-    return transferred;
-  };
+  return storage;
 }

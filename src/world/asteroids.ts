@@ -5,6 +5,7 @@ import { createAsteroidField } from "../archetypes/asteroidField";
 import { Sim } from "../sim";
 import { createAsteroid } from "../archetypes/asteroid";
 import { sectorSize } from "../archetypes/sector";
+import { hecsToCartesian } from "../components/hecsPosition";
 
 const getSize = () => (Math.random() < 0.1 ? random(4, 7) : random(1, 3));
 
@@ -13,7 +14,8 @@ export function getRandomAsteroidField() {
   const sector = sectors[Math.floor(sectors.length * Math.random())];
   const maxR = (sectorSize / 20) * Math.sqrt(3);
 
-  const sectorCenterPosition = sector.cp.hecsPosition.toCartesian(
+  const sectorCenterPosition = hecsToCartesian(
+    sector.cp.hecsPosition.value,
     sectorSize / 10
   );
   const polarPosition = {

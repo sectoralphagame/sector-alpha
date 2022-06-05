@@ -10,13 +10,14 @@ import { ProducingSystem } from "../systems/producing";
 import { StorageQuotaPlanningSystem } from "../systems/storageQuotaPlanning";
 import { TradingSystem } from "../systems/trading";
 import { SelectingSystem } from "../systems/selecting";
-import { SelectionManager } from "../components/selection";
 import { OrderPlanningSystem } from "../systems/orderPlanning";
 import { MovingSystem } from "../systems/moving";
 import { MiningSystem } from "../systems/mining";
 import { createQueries, Queries } from "../systems/query";
 import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
 import { PathPlanningSystem } from "../systems/pathPlanning";
+import { CooldownUpdatingSystem } from "../systems/cooldowns";
+import { MissingEntityError } from "../errors";
 
 export class Sim extends BaseSim {
   entityIdCounter: number = 0;
@@ -26,7 +27,7 @@ export class Sim extends BaseSim {
   >;
 
   factions: Faction[] = [];
-  entities: Entity[] = [];
+  entities: Map<number, Entity>;
   systems: System[];
   queries: Queries;
   paths: Record<string, Record<string, Path>>;
@@ -34,14 +35,20 @@ export class Sim extends BaseSim {
   constructor() {
     super();
 
+    this.entities = new Map();
     this.events = new EventEmitter();
 
     const settingsEntity = new Entity(this);
-    settingsEntity.cp.selectionManager = new SelectionManager();
+    settingsEntity.addComponent({
+      id: null,
+      focused: false,
+      name: "selectionManager",
+    });
 
     this.queries = createQueries(this);
 
     this.systems = [
+      new CooldownUpdatingSystem(this),
       new ProducingSystem(this),
       new StorageQuotaPlanningSystem(this),
       new TradingSystem(this),
@@ -64,12 +71,12 @@ export class Sim extends BaseSim {
 
   registerEntity = (entity: Entity) => {
     entity.id = this.entityIdCounter;
-    this.entities.push(entity);
+    this.entities.set(entity.id, entity);
     this.entityIdCounter += 1;
   };
 
   unregisterEntity = (entity: Entity) => {
-    this.entities = this.entities.filter((e) => e !== entity);
+    this.entities.delete(entity.id);
     this.events.emit("remove-entity", entity);
   };
 
@@ -79,6 +86,25 @@ export class Sim extends BaseSim {
 
   next = (delta: number) => {
     this.systems.forEach((s) => s.exec(delta));
+  };
+
+  // eslint-disable-next-line no-unused-vars
+  find = (cb: (entity: Entity) => boolean): Entity | undefined => {
+    for (const [, entity] of this.entities) {
+      if (cb(entity)) return entity;
+    }
+
+    return undefined;
+  };
+
+  get = (id: number): Entity => {
+    const entity = this.entities.get(id);
+
+    if (!entity) {
+      throw new MissingEntityError(id);
+    }
+
+    return entity;
   };
 }
 

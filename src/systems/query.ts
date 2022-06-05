@@ -43,7 +43,7 @@ export class Query<T extends keyof CoreComponents> {
 
   get = (): QueryEntities<T> => {
     if (!this.entities) {
-      this.entities = this.sim.entities.filter((e) =>
+      this.entities = [...this.sim.entities.values()].filter((e) =>
         e.hasComponents(this.requiredComponents)
       ) as QueryEntities<T>;
     }
@@ -56,6 +56,7 @@ export function createQueries(sim: Sim) {
   return {
     asteroidFields: new Query(sim, ["asteroidSpawn", "children"]),
     autoOrderable: new Query(sim, ["autoOrder", "commander", "orders"]),
+    commendables: new Query(sim, ["commander"]),
     mining: new Query(sim, ["mining", "storage"]),
     orderable: new Query(sim, ["orders"]),
     productionByModules: new Query(sim, ["production", "parent"]),

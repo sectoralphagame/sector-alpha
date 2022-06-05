@@ -1,28 +1,37 @@
+import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
+import { BaseComponent } from "./component";
 
 export type WithDock = RequireComponent<"position" | "docks">;
 export type WithDocking = RequireComponent<"position" | "dockable">;
 
 export type DockSize = "small" | "medium" | "large";
 
-export class Dockable {
-  docked: WithDock | null = null;
+export interface Dockable extends BaseComponent<"dockable"> {
+  dockedIn: number | null;
   size: DockSize;
-
-  constructor(size: DockSize) {
-    this.size = size;
-  }
 }
 
-export class Docks {
+export interface Docks extends BaseComponent<"docks"> {
+  docked: number[];
   pads: Record<DockSize, number>;
-  docked: RequireComponent<"dockable" | "position">[] = [];
+}
 
-  constructor(pads: Record<DockSize, number>) {
-    this.pads = pads;
-  }
+export function availableDocks(docks: Docks, size: DockSize, sim: Sim) {
+  return (
+    docks.pads[size] -
+    docks.docked.filter(
+      (e) =>
+        sim.entities.get(e)!.requireComponents(["dockable"]).cp.dockable
+          .size === size
+    ).length
+  );
+}
 
-  available = (size: DockSize) =>
-    this.pads[size] -
-    this.docked.filter((e) => e.cp.dockable.size === size).length;
+export function createDocks(pads: Record<DockSize, number>): Docks {
+  return {
+    name: "docks",
+    docked: [],
+    pads,
+  };
 }

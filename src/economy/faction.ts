@@ -1,6 +1,6 @@
 import Color from "color";
 import { Cooldowns } from "../utils/cooldowns";
-import { Budget } from "../components/budget";
+import { Budget, createBudget } from "../components/budget";
 
 let factionCounter = 0;
 
@@ -16,7 +16,7 @@ export class Faction {
     this.color = Color.rgb(151, 255, 125)
       .rotate((factionCounter * 360) / 8)
       .toString();
-    this.budget = new Budget();
+    this.budget = createBudget();
     factionCounter += 1;
   }
 }

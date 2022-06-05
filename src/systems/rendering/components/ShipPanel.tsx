@@ -13,6 +13,8 @@ import {
   CollapsibleSummary,
 } from "./Collapsible";
 import { Docks } from "./Docks";
+import { Sim } from "../../../sim";
+import { asteroidField } from "../../../archetypes/asteroidField";
 
 const styles = nano.sheet(
   {
@@ -30,21 +32,24 @@ function getOrderDescription(ship: Ship, order: Order) {
     case "teleport":
       return "Teleport to location";
     case "trade":
-      if (order.target === ship.cp.commander?.value)
+      if (order.targetId === ship.cp.commander?.id)
         return "Deliver wares to commander";
-      return `Deliver wares to ${order.target.cp.name?.value}`;
+      return `Deliver wares to ${ship.sim.get(order.targetId).cp.name?.value}`;
     case "mine":
-      return `Mine ${order.target.cp.asteroidSpawn.type}`;
+      return `Mine ${
+        ship.sim.get(order.targetFieldId).requireComponents(["asteroidSpawn"])
+          .cp.asteroidSpawn.type
+      }`;
     case "dock":
-      if (order.target === ship.cp.commander?.value)
+      if (order.targetId === ship.cp.commander?.id)
         return "Dock at commanding facility";
-      return `Dock at ${order.target.cp.name?.value}`;
+      return `Dock at ${ship.sim.get(order.targetId).cp.name?.value}`;
     default:
       return "Hold position";
   }
 }
 
-function getOrderGroupDescription(order: OrderGroup) {
+function getOrderGroupDescription(order: OrderGroup, sim: Sim) {
   switch (order.type) {
     case "move":
       return "Go to location";
@@ -52,8 +57,12 @@ function getOrderGroupDescription(order: OrderGroup) {
       return "Trade";
     case "mine":
       return `Mine ${
-        (order.orders.find((o) => o.type === "mine") as MineOrder)!.target.cp
-          .asteroidSpawn.type
+        asteroidField(
+          sim.get(
+            (order.orders.find((o) => o.type === "mine") as MineOrder)!
+              .targetFieldId
+          )
+        ).cp.asteroidSpawn.type
       }`;
     default:
       return "Hold position";
@@ -63,23 +72,24 @@ function getOrderGroupDescription(order: OrderGroup) {
 const ShipPanel: React.FC = () => {
   const ship = asShip(window.selected as Entity);
   const storedCommodities = Object.values(commodities).filter(
-    (commodity) => ship.cp.storage.getAvailableWares()[commodity] > 0
+    (commodity) => ship.cp.storage.availableWares[commodity] > 0
   );
+  const commander = ship.sim.get(ship.cp.commander!.id);
 
   return (
     <div>
       <div>{ship.cp.name.value}</div>
-      {!!ship.cp.commander && (
+      {!!commander && (
         <div>
-          {`Commander: ${ship.cp.commander.value.cp.name!.value}`}
+          {`Commander: ${commander.cp.name!.value}`}
           <IconButton
             className={styles.focus}
             onClick={() => {
-              const { selectionManager } = (window.sim.entities as Entity[])
+              const { selectionManager } = ship.sim
                 .find((e) => e.hasComponents(["selectionManager"]))!
                 .requireComponents(["selectionManager"]).cp;
 
-              selectionManager.set(ship.cp.commander!.value);
+              selectionManager.id = commander.id;
               selectionManager.focused = true;
             }}
           >
@@ -92,7 +102,7 @@ const ShipPanel: React.FC = () => {
         ? storedCommodities
             .map((commodity) => ({
               commodity,
-              stored: ship.cp.storage.getAvailableWares()[commodity],
+              stored: ship.cp.storage.availableWares[commodity],
             }))
             .map((data) => (
               <div
@@ -106,7 +116,7 @@ const ShipPanel: React.FC = () => {
         : ship.cp.orders.value.map((order, orderIndex) => (
             <Collapsible key={`${order.type}-${orderIndex}`}>
               <CollapsibleSummary>
-                {getOrderGroupDescription(order)}
+                {getOrderGroupDescription(order, ship.sim)}
               </CollapsibleSummary>
               <CollapsibleContent>
                 {order.orders.map((o, index) => (

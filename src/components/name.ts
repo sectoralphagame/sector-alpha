@@ -1,7 +1,5 @@
-export class Name {
-  value: string;
+import { BaseComponent } from "./component";
 
-  constructor(name: string) {
-    this.value = name;
-  }
+export interface Name extends BaseComponent<"name"> {
+  value: string;
 }

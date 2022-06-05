@@ -5,7 +5,6 @@ import { RequireComponent } from "../../../tsHelpers";
 import { Table, TableCell } from "./Table";
 import { IconButton } from "./IconButton";
 import locationIcon from "../../../../assets/ui/location.svg";
-import { Entity } from "../../../components/entity";
 
 export interface ProductionProps {
   entity: RequireComponent<"modules">;
@@ -14,7 +13,9 @@ export interface ProductionProps {
 export const Production: React.FC<ProductionProps> = ({ entity }) => {
   const { modules } = entity.cp;
   const { productionModules, utilityModules } = groupBy(
-    modules.modules,
+    modules.ids
+      .map(entity.sim.get)
+      .map((e) => e.requireComponents(["parent", "name"])),
     (facilityModule) =>
       facilityModule.hasComponents(["production"])
         ? "productionModules"
@@ -24,46 +25,45 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
   return (
     <Table>
       <tbody>
-        {productionModules?.map((facilityModule, index) => (
+        {productionModules.map((facilityModule, index) => (
           // eslint-disable-next-line react/no-array-index-key
-          <tr key={`${facilityModule.cp.name.value}-${index}`}>
-            <TableCell>{facilityModule.cp.name.value}</TableCell>
+          <tr key={`${facilityModule.cp.name!.value}-${index}`}>
+            <TableCell>{facilityModule.cp.name!.value}</TableCell>
             <TableCell style={{ textAlign: "right" }}>
-              {facilityModule.cp.production!.cooldowns.timers.production.toFixed(
-                0
-              )}
-              s
+              {facilityModule.cooldowns.timers.production.toFixed(0)}s
             </TableCell>
           </tr>
         ))}
       </tbody>
       <tbody>
-        {utilityModules.map((facilityModule, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <tr key={`${facilityModule.cp.name.value}-${index}`}>
-            <TableCell>{facilityModule.cp.name.value}</TableCell>
-            <TableCell>
-              {facilityModule.cp.teleport?.destination && (
-                <IconButton
-                  onClick={() => {
-                    const { selectionManager } = (
-                      window.sim.entities as Entity[]
-                    )
-                      .find((e) => e.hasComponents(["selectionManager"]))!
-                      .requireComponents(["selectionManager"]).cp;
+        {utilityModules.map((facilityModule, index) => {
+          const teleport = facilityModule.cp.teleport?.destinationId
+            ? entity.sim.get(facilityModule.cp.teleport?.destinationId)
+            : null;
 
-                    selectionManager.set(
-                      facilityModule.cp.teleport!.destination.cp.parent!.value
-                    );
-                    selectionManager.focused = true;
-                  }}
-                >
-                  <SVG src={locationIcon} />
-                </IconButton>
-              )}
-            </TableCell>
-          </tr>
-        ))}
+          return (
+            // eslint-disable-next-line react/no-array-index-key
+            <tr key={`${facilityModule.cp.name.value}-${index}`}>
+              <TableCell>{facilityModule.cp.name.value}</TableCell>
+              <TableCell>
+                {teleport && (
+                  <IconButton
+                    onClick={() => {
+                      const { selectionManager } = entity.sim
+                        .find((e) => e.hasComponents(["selectionManager"]))!
+                        .requireComponents(["selectionManager"]).cp;
+
+                      selectionManager.id = teleport.cp.parent!.id;
+                      selectionManager.focused = true;
+                    }}
+                  >
+                    <SVG src={locationIcon} />
+                  </IconButton>
+                )}
+              </TableCell>
+            </tr>
+          );
+        })}
       </tbody>
     </Table>
   );

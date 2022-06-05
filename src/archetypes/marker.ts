@@ -1,6 +1,5 @@
 import { Matrix } from "mathjs";
-import { CoreComponents, Entity } from "../components/entity";
-import { Position } from "../components/position";
+import { Entity } from "../components/entity";
 import { MissingComponentError } from "../errors";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
@@ -29,10 +28,12 @@ export interface MarkerInput {
 export function createMarker(sim: Sim, { value, sector }: MarkerInput) {
   const entity = new Entity(sim);
 
-  const components: Pick<CoreComponents, MarkerComponent> = {
-    position: new Position(value, 0, sector),
-  };
-  entity.components = components;
+  entity.addComponent({
+    name: "position",
+    coord: value,
+    angle: 0,
+    sector: sector.id,
+  });
 
   return entity as Marker;
 }

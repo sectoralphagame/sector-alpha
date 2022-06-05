@@ -1,28 +1,30 @@
+import { marker } from "../../archetypes/marker";
+import { clearTarget, setTarget } from "../../components/drive";
 import { MoveOrder, TeleportOrder } from "../../components/orders";
-import { Position } from "../../components/position";
+import { show } from "../../components/render";
 import { RequireComponent } from "../../tsHelpers";
 
 export function moveOrder(
   entity: RequireComponent<"drive" | "orders">,
   order: MoveOrder
 ): boolean {
-  entity.cp.drive.setTarget(order.position);
+  setTarget(entity.cp.drive, order.targetId);
 
-  if (entity.cp.dockable?.docked) {
-    entity.cp.dockable.docked.cp.docks.docked =
-      entity.cp.dockable.docked.cp.docks.docked.filter(
-        (e) => e.id !== entity.id
-      );
-    entity.cp.dockable.docked = null;
+  if (entity.cp.dockable?.dockedIn) {
+    const dock = entity.sim.entities
+      .get(entity.cp.dockable.dockedIn)!
+      .requireComponents(["docks"]);
+    dock.cp.docks.docked = dock.cp.docks.docked.filter((e) => e !== entity.id);
+    entity.cp.dockable.dockedIn = null;
     if (entity.cp.render) {
-      entity.cp.render.show();
+      show(entity.cp.render);
     }
   }
 
   const reached = entity.cp.drive.targetReached;
 
   if (reached) {
-    entity.cp.drive.setTarget(null);
+    clearTarget(entity.cp.drive);
   }
 
   return reached;
@@ -32,18 +34,22 @@ export function teleportOrder(
   entity: RequireComponent<"position" | "orders">,
   order: TeleportOrder
 ): boolean {
-  entity.cp.position = new Position(
-    order.position.cp.position.coord,
-    entity.cp.position.angle,
-    order.position.cp.position.sector
-  );
+  const destination = marker(entity.sim.get(order.targetId));
+
+  entity.cp.position = {
+    name: "position",
+    angle: entity.cp.position.angle,
+    coord: destination.cp.position.coord,
+    sector: destination.cp.position.sector,
+  };
 
   entity.cp.docks?.docked.forEach((docked) => {
-    docked.cp.position = new Position(
-      order.position.cp.position.coord,
-      entity.cp.position.angle,
-      order.position.cp.position.sector
-    );
+    entity.sim.entities.get(docked)!.cp.position = {
+      name: "position",
+      angle: entity.cp.position.angle,
+      coord: destination.cp.position.coord,
+      sector: destination.cp.position.sector,
+    };
   });
 
   return true;

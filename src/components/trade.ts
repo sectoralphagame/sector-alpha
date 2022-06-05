@@ -2,6 +2,7 @@ import { Commodity } from "../economy/commodity";
 import { Faction } from "../economy/faction";
 import { perCommodity } from "../utils/perCommodity";
 import { Budget } from "./budget";
+import { BaseComponent } from "./component";
 
 export interface Transaction extends TradeOffer {
   commodity: Commodity;
@@ -33,21 +34,26 @@ export type TradeOffers = Record<Commodity, TradeOffer>;
 
 export const startingPrice = 100;
 
-export class Trade {
+export interface Trade extends BaseComponent<"trade"> {
   offers: TradeOffers;
-  lastPriceAdjust = {
-    time: 0,
-    commodities: perCommodity(() => 0),
-  };
-  transactions: Transaction[] = [];
+  lastPriceAdjust: { time: number; commodities: Record<Commodity, number> };
+  transactions: Transaction[];
+}
 
-  constructor() {
-    this.offers = perCommodity(
+export function createTrade(): Trade {
+  return {
+    name: "trade",
+    lastPriceAdjust: {
+      time: 0,
+      commodities: perCommodity(() => 0),
+    },
+    offers: perCommodity(
       (): TradeOffer => ({
         price: startingPrice,
         quantity: 0,
         type: "sell",
       })
-    );
-  }
+    ),
+    transactions: [],
+  };
 }

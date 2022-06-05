@@ -1,6 +1,8 @@
 import { matrix } from "mathjs";
 import { Facility } from "../archetypes/facility";
 import { createSector } from "../archetypes/sector";
+import { changeBudgetMoney } from "../components/budget";
+import { addStorage } from "../components/storage";
 import { commodities } from "../economy/commodity";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
@@ -43,14 +45,14 @@ describe("Trading module", () => {
   });
 
   it("creates buy offers is surplus is negative", () => {
-    facility.cp.budget.changeMoney(1000);
+    changeBudgetMoney(facility.cp.budget, 1000);
     system.exec(10);
 
     expect(facility.cp.trade.offers.water.type).toBe("buy");
   });
 
   it("lowers prices if sales are dropping", () => {
-    facility.cp.budget.changeMoney(1000);
+    changeBudgetMoney(facility.cp.budget, 1000);
     system.exec(10);
     facility.cp.trade.offers.food.price = 1000;
     facility.cp.trade.lastPriceAdjust = {
@@ -65,7 +67,7 @@ describe("Trading module", () => {
   });
 
   it("rises prices if sales are rising", () => {
-    facility.cp.budget.changeMoney(1000);
+    changeBudgetMoney(facility.cp.budget, 1000);
     system.exec(10);
     facility.cp.trade.lastPriceAdjust = {
       time: 0,
@@ -86,8 +88,8 @@ describe("Trading module", () => {
   });
 
   it("rises offer prices if supplies are dropping", () => {
-    facility.cp.budget.changeMoney(1000);
-    facility.cp.storage.addStorage("water", 10, false);
+    changeBudgetMoney(facility.cp.budget, 1000);
+    addStorage(facility.cp.storage, "water", 10, false);
     settleStorageQuota(facility);
     system.exec(10);
     facility.cp.trade.lastPriceAdjust = {
@@ -104,8 +106,8 @@ describe("Trading module", () => {
   });
 
   it("lowers offer prices if supplies are rising", () => {
-    facility.cp.budget.changeMoney(1000);
-    facility.cp.storage.addStorage("water", 10, false);
+    changeBudgetMoney(facility.cp.budget, 1000);
+    addStorage(facility.cp.storage, "water", 10, false);
     settleStorageQuota(facility);
     system.exec(10);
     facility.cp.trade.lastPriceAdjust = {

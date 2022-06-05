@@ -1,28 +1,13 @@
-import { MissingEntityError } from "../errors";
-import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
+import { BaseComponent } from "./component";
 
-type WithTeleport = RequireComponent<"teleport">;
+export type WithTeleport = RequireComponent<"teleport">;
 
-export class Teleport {
-  destination: WithTeleport;
-  destinationId: number;
+export interface Teleport extends BaseComponent<"teleport"> {
+  destinationId: number | null;
+}
 
-  link = (entity: WithTeleport, destination: WithTeleport) => {
-    this.setDestination(destination);
-    destination.cp.teleport.setDestination(entity);
-  };
-
-  load = (sim: Sim) => {
-    const entity = sim.entities.find((e) => e.id === this.destinationId);
-    if (!entity) {
-      throw new MissingEntityError(this.destinationId);
-    }
-    this.destination = entity.requireComponents(["teleport"]);
-  };
-
-  setDestination = (destination: WithTeleport) => {
-    this.destination = destination;
-    this.destinationId = destination.id;
-  };
+export function linkTeleportModules(a: WithTeleport, b: WithTeleport) {
+  a.cp.teleport.destinationId = b.id;
+  b.cp.teleport.destinationId = a.id;
 }

@@ -4,6 +4,7 @@ import { Viewport } from "pixi-viewport";
 import Color from "color";
 import { Sim } from "../../sim";
 import { System } from "../system";
+import { drawGraphics } from "../../components/renderGraphics";
 
 if (process.env.NODE_ENV !== "test") {
   // eslint-disable-next-line global-require
@@ -62,28 +63,28 @@ export class RenderingSystem extends System {
 
     this.sim.queries.sectors.get().forEach((sector) => {
       if (!sector.cp.renderGraphics.initialized) {
-        sector.cp.renderGraphics.draw(this.viewport);
+        drawGraphics(sector.cp.renderGraphics, this.viewport);
         sector.cp.renderGraphics.initialized = true;
       }
     });
 
     this.sim.queries.renderableGraphics.get().forEach((entity) => {
       if (!entity.cp.renderGraphics.initialized) {
-        entity.cp.renderGraphics.draw(this.viewport);
+        drawGraphics(entity.cp.renderGraphics, this.viewport);
         entity.cp.renderGraphics.initialized = true;
       }
     });
 
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
-      const selected = entity === settingsEntity.cp.selectionManager.entity;
+      const selected = entity.id === settingsEntity.cp.selectionManager.id;
 
       if (!entityRender.initialized) {
         this.viewport.addChild(entityRender.sprite);
         if (entity.hasComponents(["selection"])) {
           entityRender.sprite.interactive = true;
           entityRender.sprite.on("mousedown", () => {
-            settingsEntity.cp.selectionManager.set(entity);
+            settingsEntity.cp.selectionManager.id = entity.id;
           });
           entityRender.sprite.cursor = "pointer";
         }
@@ -92,8 +93,8 @@ export class RenderingSystem extends System {
       }
 
       entityRender.sprite.position.set(
-        entity.cp.position.x * 10,
-        entity.cp.position.y * 10
+        entity.cp.position.coord.get([0]) * 10,
+        entity.cp.position.coord.get([1]) * 10
       );
       entityRender.sprite.rotation = entity.cp.position.angle;
       if (selected && entityRender.sprite.tint === entityRender.color) {
@@ -115,8 +116,9 @@ export class RenderingSystem extends System {
 
     if (settingsEntity.cp.selectionManager.focused) {
       this.viewport.follow(
-        settingsEntity.cp.selectionManager.entity!.requireComponents(["render"])
-          .cp.render.sprite
+        this.sim
+          .get(settingsEntity.cp.selectionManager.id!)
+          .requireComponents(["render"]).cp.render.sprite
       );
     }
 

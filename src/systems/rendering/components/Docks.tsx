@@ -1,6 +1,5 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { Entity } from "../../../components/entity";
 import locationIcon from "../../../../assets/ui/location.svg";
 import { RequireComponent } from "../../../tsHelpers";
 import { IconButton } from "./IconButton";
@@ -35,27 +34,31 @@ export const Docks: React.FC<DocksProps> = ({ entity }) => {
         </tr>
       </thead>
       <tbody>
-        {docks.docked.map((ship) => (
-          <tr key={ship.id}>
-            <TableCell className={styles.colName}>
-              {ship.cp.name?.value}
-            </TableCell>
-            <TableCell className={styles.colAction}>
-              <IconButton
-                onClick={() => {
-                  const { selectionManager } = (window.sim.entities as Entity[])
-                    .find((e) => e.hasComponents(["selectionManager"]))!
-                    .requireComponents(["selectionManager"]).cp;
+        {docks.docked.map((shipId) => {
+          const ship = entity.sim.entities.get(shipId)!;
 
-                  selectionManager.set(ship.cp.commander!.value);
-                  selectionManager.focused = true;
-                }}
-              >
-                <SVG src={locationIcon} />
-              </IconButton>
-            </TableCell>
-          </tr>
-        ))}
+          return (
+            <tr key={ship.id}>
+              <TableCell className={styles.colName}>
+                {ship.cp.name?.value}
+              </TableCell>
+              <TableCell className={styles.colAction}>
+                <IconButton
+                  onClick={() => {
+                    const { selectionManager } = entity.sim
+                      .find((e) => e.hasComponents(["selectionManager"]))!
+                      .requireComponents(["selectionManager"]).cp;
+
+                    selectionManager.id = ship.cp.commander!.id;
+                    selectionManager.focused = true;
+                  }}
+                >
+                  <SVG src={locationIcon} />
+                </IconButton>
+              </TableCell>
+            </tr>
+          );
+        })}
       </tbody>
     </Table>
   );

@@ -1,22 +1,16 @@
 import Color from "color";
 import { Matrix } from "mathjs";
-import { Budget } from "../components/budget";
+import { createBudget } from "../components/budget";
 import { Entity } from "../components/entity";
-import { Modules } from "../components/modules";
-import { Name } from "../components/name";
-import { Owner } from "../components/owner";
-import { Position } from "../components/position";
-import { CompoundProduction } from "../components/production";
-import { Render } from "../components/render";
-import { Selection } from "../components/selection";
-import { CommodityStorage } from "../components/storage";
-import { Trade } from "../components/trade";
+import { createCompoundProduction } from "../components/production";
+import { createRender } from "../components/render";
+import { createCommodityStorage } from "../components/storage";
+import { createTrade } from "../components/trade";
 import { Faction } from "../economy/faction";
-import fCivTexture from "../../assets/f_civ.svg";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Sector } from "./sector";
-import { Docks } from "../components/dockable";
+import { createDocks } from "../components/dockable";
 
 export const commanderRange = 2;
 
@@ -52,29 +46,40 @@ export interface InitialFacilityInput {
 export function createFacility(sim: Sim, initial: InitialFacilityInput) {
   const entity = new Entity(sim);
 
-  entity.addComponent("budget", new Budget());
-  entity.addComponent("compoundProduction", new CompoundProduction());
-  entity.addComponent("docks", new Docks({ large: 1, medium: 3, small: 3 }));
-  entity.addComponent("modules", new Modules());
-  entity.addComponent("name", new Name(`Facility #${entity.id}`));
-  entity.addComponent("owner", new Owner(initial.owner));
-  entity.addComponent(
-    "position",
-    new Position(initial.position, 0, initial.sector)
-  );
-  entity.addComponent(
-    "render",
-    new Render({
-      color: Color(initial.owner.color).rgbNumber(),
-      defaultScale: 1,
-      maxZ: 0.1,
-      pathToTexture: fCivTexture,
-      zIndex: 1,
+  entity
+    .addComponent(createBudget())
+    .addComponent(createCompoundProduction())
+    .addComponent(createDocks({ large: 1, medium: 3, small: 3 }))
+    .addComponent({
+      name: "modules",
+      ids: [],
     })
-  );
-  entity.addComponent("selection", new Selection());
-  entity.addComponent("storage", new CommodityStorage());
-  entity.addComponent("trade", new Trade());
+    .addComponent({
+      name: "name",
+      value: `Facility #${entity.id}`,
+    })
+    .addComponent({
+      name: "owner",
+      value: initial.owner,
+    })
+    .addComponent({
+      name: "position",
+      angle: 0,
+      coord: initial.position,
+      sector: initial.sector.id,
+    })
+    .addComponent(
+      createRender({
+        color: Color(initial.owner.color).rgbNumber(),
+        defaultScale: 1,
+        maxZ: 0.1,
+        texture: "fCiv",
+        zIndex: 1,
+      })
+    )
+    .addComponent({ name: "selection" })
+    .addComponent(createCommodityStorage())
+    .addComponent(createTrade());
 
   return facility(entity);
 }

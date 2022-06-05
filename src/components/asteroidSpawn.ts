@@ -1,11 +1,7 @@
 import { MineableCommodity } from "../economy/commodity";
+import { BaseComponent } from "./component";
 
-export class AsteroidSpawn {
+export interface AsteroidSpawn extends BaseComponent<"asteroidSpawn"> {
   type: MineableCommodity;
   size: number;
-
-  constructor(type: MineableCommodity, size: number) {
-    this.type = type;
-    this.size = size;
-  }
 }

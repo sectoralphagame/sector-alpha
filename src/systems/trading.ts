@@ -20,7 +20,8 @@ function getProductionCost(
   entity: RequireComponent<"modules" | "trade">,
   commodity: Commodity
 ): number {
-  const productionModule = entity.cp.modules.modules
+  const productionModule = entity.cp.modules.ids
+    .map(entity.sim.get)
     .find((m) => m.cp.production?.pac[commodity].produces)
     ?.requireComponents(["production"]);
 
@@ -67,7 +68,7 @@ export function adjustPrices(entity: WithTrade) {
     const notOffered = entity.cp.trade.offers[commodity].quantity <= 0;
     const stockpiled =
       entity.cp.trade.offers[commodity].type === "buy" &&
-      entity.cp.storage.getAvailableWares()[commodity] /
+      entity.cp.storage.availableWares[commodity] /
         entity.cp.storage.quota[commodity] >
         0.8;
 
@@ -123,14 +124,14 @@ function getProductionSurplus(
 
 function getSurplus(entity: WithTradeAndProduction, commodity: Commodity) {
   return (
-    entity.cp.storage.getAvailableWares()[commodity] +
+    entity.cp.storage.availableWares[commodity] +
     getProductionSurplus(entity, commodity)
   );
 }
 
 export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
   if (!entity.hasComponents(["compoundProduction"])) {
-    return entity.cp.storage.getAvailableWares()[commodity];
+    return entity.cp.storage.availableWares[commodity];
   }
 
   const entityWithProduction = entity.requireComponents([
@@ -151,14 +152,14 @@ export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
     return getSurplus(entityWithProduction, commodity);
   }
 
-  const stored = entityWithProduction.cp.storage.getAvailableWares();
+  const stored = entityWithProduction.cp.storage.availableWares;
 
   if (getProductionSurplus(entityWithProduction, commodity) > 0) {
     return stored[commodity] - production.pac[commodity].consumes * 2;
   }
 
   const requiredBudget = getPlannedBudget(entityWithProduction);
-  const availableBudget = entityWithProduction.cp.budget.getAvailableMoney();
+  const availableBudget = entityWithProduction.cp.budget.available;
   const quota = entityWithProduction.cp.storage.quota[commodity];
 
   if (stored[commodity] > quota) {

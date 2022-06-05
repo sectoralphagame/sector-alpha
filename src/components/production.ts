@@ -1,10 +1,10 @@
 import { cloneDeep, merge } from "lodash";
 import { sum } from "mathjs";
 import { commodities, Commodity } from "../economy/commodity";
-import { Cooldowns } from "../utils/cooldowns";
 import { perCommodity } from "../utils/perCommodity";
+import { BaseComponent } from "./component";
 
-export interface CommodityProductionAndConsumption {
+export interface CommodityPAC {
   produces: number;
   consumes: number;
 }
@@ -12,59 +12,74 @@ export interface CommodityProductionAndConsumption {
 /**
  * Production and consumption of commodities
  */
-export type PAC = Record<Commodity, CommodityProductionAndConsumption>;
+export type PAC = Record<Commodity, CommodityPAC>;
 
 export const baseProductionAndConsumption = perCommodity(
-  (): CommodityProductionAndConsumption => ({
+  (): CommodityPAC => ({
     consumes: 0,
     produces: 0,
   })
 );
 
-export class BaseProduction {
+export interface BaseProduction {
   pac: PAC;
-
-  constructor() {
-    this.pac = cloneDeep(baseProductionAndConsumption);
-  }
-
-  getSummedConsumption = () =>
-    sum(
-      Object.values(commodities).map(
-        (commodity) => this.pac[commodity].consumes
-      )
-    );
-
-  getSummedProduction = () =>
-    sum(
-      Object.values(commodities).map(
-        (commodity) => this.pac[commodity].produces
-      )
-    );
-
-  getRequiredStorage = () =>
-    this.getSummedConsumption() + this.getSummedProduction();
 }
 
-export class Production extends BaseProduction {
-  cooldowns: Cooldowns<"production">;
+export function getSummedConsumption(production: BaseProduction): number {
+  return sum(
+    Object.values(commodities).map(
+      (commodity) => production.pac[commodity].consumes
+    )
+  );
+}
+
+export function getSummedProduction(production: BaseProduction): number {
+  return sum(
+    Object.values(commodities).map(
+      (commodity) => production.pac[commodity].produces
+    )
+  );
+}
+
+export function getRequiredStorage(production: BaseProduction): number {
+  return getSummedConsumption(production) + getSummedProduction(production);
+}
+
+export interface Production
+  extends BaseComponent<"production">,
+    BaseProduction {
   pac: PAC;
 
   /**
    * Duration of production cycle in seconds
    */
   time: number;
+}
 
-  constructor(time: number, pac: Partial<PAC> = {}) {
-    super();
-    this.cooldowns = new Cooldowns("production");
-    this.pac = merge(cloneDeep(baseProductionAndConsumption), pac);
-    this.time = time;
-  }
+export function createProduction(
+  time: number,
+  pac: Partial<PAC> = {}
+): Production {
+  return {
+    name: "production",
+    pac: merge(cloneDeep(baseProductionAndConsumption), pac),
+    time,
+  };
 }
 
 /**
  * Mark entity as able to produce, but delegate it to entity's modules having
  * `Production` component
  */
-export class CompoundProduction extends BaseProduction {}
+export interface CompoundProduction
+  extends BaseComponent<"compoundProduction">,
+    BaseProduction {}
+
+export function createCompoundProduction(
+  pac: Partial<PAC> = {}
+): CompoundProduction {
+  return {
+    name: "compoundProduction",
+    pac: merge(cloneDeep(baseProductionAndConsumption), pac),
+  };
+}

@@ -10,52 +10,51 @@ export interface CreateAllocationManagerOpts<T> {
   onChange: () => void;
 }
 
-export class AllocationManager<T extends Allocation> {
-  private allocations: T[] = [];
-  private allocationIdCounter: number = 1;
-  // eslint-disable-next-line no-unused-vars
-  private validate: (allocation: T) => boolean;
-  private onChange: () => void;
+export interface Allocations<T extends Allocation> {
+  allocations: T[];
+  allocationIdCounter: number;
+}
 
-  constructor({ validate, onChange }: CreateAllocationManagerOpts<T>) {
-    this.validate = validate;
-    this.onChange = onChange;
+export function newAllocation<T extends Allocation>(
+  manager: Allocations<T>,
+  input: Omit<T, keyof Allocation>,
+  // eslint-disable-next-line no-unused-vars
+  validate: (allocation: T) => boolean
+): T {
+  const allocation = {
+    ...input,
+    id: manager.allocationIdCounter,
+  } as T;
+  if (validate(allocation)) {
+    manager.allocations.push(allocation);
+    manager.allocationIdCounter += 1;
+
+    return allocation;
   }
 
-  new = (input: Omit<T, keyof Allocation>): T => {
-    const allocation = {
-      ...input,
-      id: this.allocationIdCounter,
-    } as T;
-    if (this.validate(allocation)) {
-      this.allocations.push(allocation);
-      this.allocationIdCounter += 1;
-      this.onChange();
+  throw new Error("Allocation validation failed");
+}
 
-      return allocation;
-    }
+export function getAllocation<T extends Allocation>(
+  manager: Allocations<T>,
+  id: number
+): T {
+  const allocation = manager.allocations.find((a) => a.id === id);
 
-    throw new Error("Allocation validation failed");
-  };
+  if (!allocation) {
+    throw new NotFound(id);
+  }
 
-  get = (id: number): T => {
-    const allocation = this.allocations.find((a) => a.id === id);
+  return allocation;
+}
 
-    if (!allocation) {
-      throw new NotFound(id);
-    }
+export function releaseAllocation<T extends Allocation>(
+  manager: Allocations<T>,
+  id: number
+): T {
+  const allocation = getAllocation(manager, id);
 
-    return allocation;
-  };
+  manager.allocations = manager.allocations.filter((a) => a.id !== id);
 
-  all = () => this.allocations;
-
-  release = (id: number): T => {
-    const allocation = this.get(id);
-
-    this.allocations = this.allocations.filter((a) => a.id !== id);
-    this.onChange();
-
-    return allocation;
-  };
+  return allocation;
 }

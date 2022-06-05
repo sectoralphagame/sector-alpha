@@ -11,9 +11,7 @@ const FacilityPanel: React.FC = () => {
   return (
     <div>
       <div>{facility.cp.name.value}</div>
-      <div>
-        Money: {facility.components.budget.getAvailableMoney().toFixed(0)}
-      </div>
+      <div>Money: {facility.components.budget.available.toFixed(0)}</div>
       <hr />
       <Offers entity={facility} />
       <hr />
@@ -21,10 +19,10 @@ const FacilityPanel: React.FC = () => {
       <hr />
       <Subordinates entity={facility} />
       <hr />
-      {facility.cp.storage.allocationManager.all().length === 0 ? (
+      {facility.cp.storage.allocations.length === 0 ? (
         <div>No incoming transactions</div>
       ) : (
-        facility.cp.storage.allocationManager.all().map((allocation) => (
+        facility.cp.storage.allocations.map((allocation) => (
           <div key={allocation.id}>
             Transaction #{allocation.id}:{" "}
             {allocation.type === "incoming" ? "buying" : "selling"}{" "}

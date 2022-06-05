@@ -1,9 +1,6 @@
+import { BaseComponent } from "./component";
 import { Order } from "./orders";
 
-export class AutoOrder {
+export interface AutoOrder extends BaseComponent<"autoOrder"> {
   default: Order["type"];
-
-  constructor(defaultOrder: Order["type"] = "hold") {
-    this.default = defaultOrder;
-  }
 }

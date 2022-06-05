@@ -22,8 +22,9 @@ const styles = nano.sheet({
 });
 
 export const Subordinates: React.FC<SubordinatesProps> = ({ entity }) => {
-  const subordinates = (window.sim.entities as Entity[])
-    .filter((e) => e?.cp.commander?.value === entity)
+  const subordinates = entity.sim.queries.commendables
+    .get()
+    .filter((e) => e?.cp.commander?.id === entity.id)
     .map(asShip);
 
   return subordinates.length === 0 ? (
@@ -45,11 +46,11 @@ export const Subordinates: React.FC<SubordinatesProps> = ({ entity }) => {
             <TableCell className={styles.colAction}>
               <IconButton
                 onClick={() => {
-                  const { selectionManager } = (window.sim.entities as Entity[])
+                  const { selectionManager } = entity.sim
                     .find((e) => e.hasComponents(["selectionManager"]))!
                     .requireComponents(["selectionManager"]).cp;
 
-                  selectionManager.set(ship);
+                  selectionManager.id = ship.id;
                   selectionManager.focused = true;
                 }}
               >

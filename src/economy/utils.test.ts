@@ -2,9 +2,8 @@ import { matrix } from "mathjs";
 import { facilityModules } from "../archetypes/facilityModule";
 import { createSector, Sector } from "../archetypes/sector";
 import { Entity } from "../components/entity";
-import { Modules } from "../components/modules";
-import { Owner } from "../components/owner";
-import { Position } from "../components/position";
+import { hecsToCartesian } from "../components/hecsPosition";
+import { linkTeleportModules } from "../components/teleport";
 import { Sim } from "../sim/Sim";
 import { regen } from "../systems/pathPlanning";
 import { addFacilityModule } from "../utils/entityModules";
@@ -13,11 +12,18 @@ import { getSectorsInTeleportRange } from "./utils";
 
 function createTeleporter(sim: Sim, sector: Sector, owner: Faction) {
   const facility = new Entity(sim);
-  facility.addComponent(
-    "position",
-    new Position(sector.cp.hecsPosition.toCartesian(1), 0, sector)
-  );
-  facility.addComponent("modules", new Modules());
+  facility
+    .addComponent({
+      name: "position",
+      angle: 0,
+      coord: hecsToCartesian(sector.cp.hecsPosition.value, 1),
+      sector: sector.id,
+    })
+    .addComponent({ name: "modules", ids: [] })
+    .addComponent({
+      name: "owner",
+      value: owner,
+    });
   addFacilityModule(
     facility as any,
     facilityModules.teleport(
@@ -25,7 +31,6 @@ function createTeleporter(sim: Sim, sector: Sector, owner: Faction) {
       facility.requireComponents(["position", "modules"])
     )
   );
-  facility.addComponent("owner", new Owner(owner));
 
   return facility.requireComponents(["modules"]);
 }
@@ -50,18 +55,15 @@ describe("getSectorsInTeleportRange", () => {
     const t3 = createTeleporter(sim, sectors[1], f);
     const t4 = createTeleporter(sim, sectors[2], f);
 
-    t1.cp.modules.modules[0]
-      .requireComponents(["teleport"])
-      .cp.teleport!.link(
-        t1.cp.modules.modules[0].requireComponents(["teleport"]),
-        t2.cp.modules.modules[0].requireComponents(["teleport"])
-      );
-    t3.cp.modules.modules[0]
-      .requireComponents(["teleport"])
-      .cp.teleport!.link(
-        t3.cp.modules.modules[0].requireComponents(["teleport"]),
-        t4.cp.modules.modules[0].requireComponents(["teleport"])
-      );
+    linkTeleportModules(
+      sim.get(t1.cp.modules.ids[0]).requireComponents(["teleport"]),
+      sim.get(t2.cp.modules.ids[0]).requireComponents(["teleport"])
+    );
+    linkTeleportModules(
+      sim.get(t3.cp.modules.ids[0]).requireComponents(["teleport"]),
+      sim.get(t4.cp.modules.ids[0]).requireComponents(["teleport"])
+    );
+
     regen(sim);
 
     expect(getSectorsInTeleportRange(sectors[0], 0, sim)).toHaveLength(1);

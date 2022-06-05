@@ -1,7 +1,5 @@
-export class StorageBonus {
-  value: number;
+import { BaseComponent } from "./component";
 
-  constructor(value: number) {
-    this.value = value;
-  }
+export interface StorageBonus extends BaseComponent<"storageBonus"> {
+  value: number;
 }

@@ -1,5 +1,6 @@
 import { matrix } from "mathjs";
 import { createSector, sector, sectorComponents } from "../archetypes/sector";
+import { hecsMove } from "../components/hecsPosition";
 import { sim, Sim } from "../sim";
 import { getRandomAsteroidField } from "./asteroids";
 import { factions } from "./factions";
@@ -14,35 +15,38 @@ const alpha = createSector(window.sim as Sim, {
   name: "Sector Alpha",
 });
 createSector(window.sim as Sim, {
-  position: alpha.cp.hecsPosition.e(),
+  position: hecsMove(alpha.cp.hecsPosition.value, "e"),
   name: "1",
 });
 createSector(window.sim as Sim, {
-  position: alpha.cp.hecsPosition.ne(),
+  position: hecsMove(alpha.cp.hecsPosition.value, "ne"),
   name: "2",
 });
 createSector(window.sim as Sim, {
-  position: alpha.cp.hecsPosition.nw(),
+  position: hecsMove(alpha.cp.hecsPosition.value, "nw"),
   name: "3",
 });
 createSector(window.sim as Sim, {
-  position: alpha.cp.hecsPosition.w(),
+  position: hecsMove(alpha.cp.hecsPosition.value, "w"),
   name: "4",
 });
 createSector(window.sim as Sim, {
-  position: alpha.cp.hecsPosition.sw(),
+  position: hecsMove(alpha.cp.hecsPosition.value, "sw"),
   name: "5",
 });
 createSector(window.sim as Sim, {
-  position: alpha.cp.hecsPosition.se(),
+  position: hecsMove(alpha.cp.hecsPosition.value, "se"),
   name: "6",
 });
 createSector(window.sim as Sim, {
-  position: sector(
-    sim.entities.find(
-      (s) => s.hasComponents(sectorComponents) && s.cp.name!.value === "6"
-    )!
-  ).cp.hecsPosition.e(),
+  position: hecsMove(
+    sector(
+      sim.find(
+        (s) => s.hasComponents(sectorComponents) && s.cp.name!.value === "6"
+      )!
+    ).cp.hecsPosition.value,
+    "e"
+  ),
   name: "7",
 });
 

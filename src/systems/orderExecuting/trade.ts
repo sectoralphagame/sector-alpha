@@ -1,4 +1,5 @@
 import { TradeOrder } from "../../components/orders";
+import { releaseStorageAllocation, transfer } from "../../components/storage";
 import { NotDockedError } from "../../errors";
 import { RequireComponent } from "../../tsHelpers";
 import { acceptTrade } from "../../utils/trading";
@@ -7,27 +8,41 @@ export function tradeOrder(
   entity: RequireComponent<"drive" | "storage" | "dockable">,
   order: TradeOrder
 ): boolean {
-  if (entity.cp.dockable.docked === order.target) {
+  const target = entity.sim
+    .get(order.targetId)
+    .requireComponents([
+      "trade",
+      "storage",
+      "budget",
+      "owner",
+      "docks",
+      "position",
+    ]);
+  if (entity.cp.dockable.dockedIn === target.id) {
     if (order.offer.type === "sell") {
       if (order.offer.allocations?.buyer?.storage) {
-        order.target.cp.storage.allocationManager.release(
+        releaseStorageAllocation(
+          target.cp.storage,
           order.offer.allocations.buyer.storage
         );
       }
 
-      entity.cp.storage.transfer(
+      transfer(
+        entity.cp.storage,
         order.offer.commodity,
         order.offer.quantity,
-        order.target.cp.storage,
+        target.cp.storage,
         true
       );
     } else {
       if (order.offer.allocations?.seller?.storage) {
-        order.target.cp.storage.allocationManager.release(
+        releaseStorageAllocation(
+          target.cp.storage,
           order.offer.allocations.seller.storage
         );
       }
-      order.target.cp.storage.transfer(
+      transfer(
+        target.cp.storage,
         order.offer.commodity,
         order.offer.quantity,
         entity.cp.storage,
@@ -35,9 +50,9 @@ export function tradeOrder(
       );
     }
 
-    acceptTrade(order.target, order.offer);
+    acceptTrade(target, order.offer);
     return true;
   }
 
-  throw new NotDockedError(entity, order.target);
+  throw new NotDockedError(entity, target);
 }

@@ -1,36 +1,36 @@
-import { Budget } from "./budget";
+import { changeBudgetMoney, createBudget, transferMoney } from "./budget";
 
 describe("Budget", () => {
   it("properly adds money", () => {
-    const budget = new Budget();
+    const budget = createBudget();
 
-    budget.changeMoney(1);
+    changeBudgetMoney(budget, 1);
 
-    expect(budget.getAvailableMoney()).toBe(1);
+    expect(budget.available).toBe(1);
   });
 
   it("cannot be negative", () => {
-    const budget = new Budget();
+    const budget = createBudget();
 
-    expect(() => budget.changeMoney(-1)).toThrow();
+    expect(() => changeBudgetMoney(budget, -1)).toThrow();
   });
 
   it("properly transfers money", () => {
-    const budgetA = new Budget();
-    budgetA.changeMoney(100);
-    const budgetB = new Budget();
+    const budgetA = createBudget();
+    changeBudgetMoney(budgetA, 100);
+    const budgetB = createBudget();
 
-    budgetA.transferMoney(10, budgetB);
+    transferMoney(budgetA, 10, budgetB);
 
-    expect(budgetA.getAvailableMoney()).toBe(90);
-    expect(budgetB.getAvailableMoney()).toBe(10);
+    expect(budgetA.available).toBe(90);
+    expect(budgetB.available).toBe(10);
   });
 
   it("cannot transfer more money than available", () => {
-    const budgetA = new Budget();
-    budgetA.changeMoney(100);
-    const budgetB = new Budget();
+    const budgetA = createBudget();
+    changeBudgetMoney(budgetA, 100);
+    const budgetB = createBudget();
 
-    expect(() => budgetA.transferMoney(1000, budgetB)).toThrow();
+    expect(() => transferMoney(budgetA, 1000, budgetB)).toThrow();
   });
 });

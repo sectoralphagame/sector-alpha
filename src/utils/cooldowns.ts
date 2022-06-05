@@ -14,10 +14,16 @@ export class Cooldowns<T extends string> {
   }
 
   canUse(key: T) {
+    if (this.timers[key] === undefined) {
+      this.add(key);
+    }
     return this.timers[key] === 0;
   }
 
   use(key: T, time: number) {
+    if (this.timers[key] === undefined) {
+      this.add(key);
+    }
     if (this.canUse(key)) {
       this.timers[key] = time;
     }
@@ -29,18 +35,17 @@ export class Cooldowns<T extends string> {
     });
   }
 
-  copy(): Cooldowns<T> {
-    const copy = new Cooldowns(Object.keys(this.timers) as unknown as T);
-    Object.keys(this.timers).forEach((key) => {
-      copy.timers[key] = this.timers[key];
-    });
-
-    return copy;
-  }
-
   reset(): void {
     Object.keys(this.timers).forEach((key) => {
       this.timers[key] = 0;
     });
+  }
+
+  add(name: string) {
+    this.timers[name] = 0;
+  }
+
+  remove(name: string) {
+    delete this.timers[name];
   }
 }
