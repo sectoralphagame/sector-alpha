@@ -1,5 +1,3 @@
-// import "reflect-metadata";
-
 // import world from "./world";
 // import { Sim } from "./sim";
 // import "./style";
@@ -10,8 +8,6 @@
 // window.sim = sim;
 // world(sim);
 // sim.start();
-
-import "reflect-metadata";
 
 import { Sim } from "./sim";
 import "./style";

@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import pick from "lodash/pick";
 import { Exclude, Expose, Type, plainToInstance } from "class-transformer";
 import EventEmitter from "eventemitter3";

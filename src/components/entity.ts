@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { Expose, Exclude, Type } from "class-transformer";
 import omit from "lodash/omit";
 import reduce from "lodash/reduce";
