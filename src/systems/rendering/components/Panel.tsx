@@ -7,6 +7,7 @@ import FacilityPanel from "./FacilityPanel";
 import ffIcon from "../../../../assets/ui/ff.svg";
 import pauseIcon from "../../../../assets/ui/pause.svg";
 import locationIcon from "../../../../assets/ui/location.svg";
+import configIcon from "../../../../assets/ui/config.svg";
 import playIcon from "../../../../assets/ui/play.svg";
 import { IconButton } from "./IconButton";
 import ShipPanel from "./ShipPanel";
@@ -53,6 +54,9 @@ const Panel: React.FC = () => {
   return (
     <div>
       <div className={styles.iconBar}>
+        <IconButton>
+          <SVG src={configIcon} />
+        </IconButton>
         <IconButton onClick={window.sim?.pause}>
           <SVG src={pauseIcon} />
         </IconButton>
