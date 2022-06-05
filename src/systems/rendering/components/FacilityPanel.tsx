@@ -1,8 +1,19 @@
 import React from "react";
+import SVG from "react-inlinesvg";
 import { Facility } from "../../../archetypes/facility";
 import { ship as asShip } from "../../../archetypes/ship";
 import { Entity } from "../../../components/entity";
-import { commodities } from "../../../economy/commodity";
+import locationIcon from "../../../../assets/ui/location.svg";
+import { nano } from "../../../style";
+import { IconButton } from "./IconButton";
+import { Production } from "./Production";
+import { Offers } from "./Offers";
+
+const styles = nano.sheet({
+  focus: {
+    marginLeft: "24px",
+  },
+});
 
 const FacilityPanel: React.FC = () => {
   const facility = window.selected as Facility;
@@ -14,54 +25,9 @@ const FacilityPanel: React.FC = () => {
         Money: {facility.components.budget.getAvailableMoney().toFixed(0)}
       </div>
       <hr />
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Stored</th>
-            <th>Produced</th>
-            <th>Offer</th>
-            <th>Unit Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.values(commodities)
-            .map((commodity) => ({
-              commodity,
-              ...facility.cp.compoundProduction.pac[commodity],
-              ...facility.components.trade.offers[commodity],
-              stored: facility.cp.storage.getAvailableWares()[commodity],
-            }))
-            .map((data) => (
-              <tr key={data.commodity}>
-                <td>{data.commodity}</td>
-                <td>{data.stored}</td>
-                <td>{data.produces - data.consumes}</td>
-                <td>{data.quantity}</td>
-                <td>{data.price}</td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      <Offers entity={facility} />
       <hr />
-      <table style={{ width: "100%" }}>
-        <tbody>
-          {facility.cp.modules.modules.map((facilityModule, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <tr key={`${facilityModule.cp.name.value}-${index}`}>
-              <td>{facilityModule.cp.name.value}</td>
-              {facilityModule.hasComponents(["production"]) && (
-                <td style={{ textAlign: "right" }}>
-                  {facilityModule.cp.production!.cooldowns.timers.production.toFixed(
-                    0
-                  )}
-                  s
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Production entity={facility} />
       <hr />
       {(window.sim.entities as Entity[])
         .filter((e) => e?.cp.commander?.value === facility)
@@ -69,8 +35,9 @@ const FacilityPanel: React.FC = () => {
         .map((ship, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <div key={`${ship.cp.name.value}-${index}`}>
-            {ship.cp.name.value}{" "}
-            <button
+            {ship.cp.name.value}
+            <IconButton
+              className={styles.focus}
               onClick={() => {
                 const { selectionManager } = (window.sim.entities as Entity[])
                   .find((e) => e.hasComponents(["selectionManager"]))!
@@ -79,10 +46,9 @@ const FacilityPanel: React.FC = () => {
                 selectionManager.set(ship);
                 selectionManager.focused = true;
               }}
-              type="button"
             >
-              focus
-            </button>
+              <SVG src={locationIcon} />
+            </IconButton>
           </div>
         ))}
       <hr />

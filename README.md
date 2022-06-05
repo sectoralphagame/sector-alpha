@@ -17,3 +17,7 @@ $ npm test
 ```sh
 $ npm run build
 ```
+
+## Thanks
+
+We used some icons with MIT licence which you can find [here](https://www.iconfinder.com/iconsets/ionicons).
