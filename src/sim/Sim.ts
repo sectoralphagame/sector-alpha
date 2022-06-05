@@ -68,13 +68,6 @@ export class Sim extends BaseSim {
     this.entities = new Map();
     this.events = new EventEmitter();
 
-    const settingsEntity = new Entity(this);
-    settingsEntity.addComponent({
-      id: null,
-      focused: false,
-      name: "selectionManager",
-    });
-
     this.queries = createQueries(this);
 
     this.systems = [
@@ -114,6 +107,15 @@ export class Sim extends BaseSim {
     this.systems.forEach((s) => s.exec(delta));
   };
 
+  init = () => {
+    const settingsEntity = new Entity(this);
+    settingsEntity.addComponent({
+      id: null,
+      focused: false,
+      name: "selectionManager",
+    });
+  };
+
   // eslint-disable-next-line no-unused-vars
   find = (cb: (entity: Entity) => boolean): Entity | undefined => {
     for (const [, entity] of this.entities) {
@@ -142,8 +144,11 @@ export class Sim extends BaseSim {
   static load() {
     const save = JSON.parse(localStorage.getItem("save")!);
     const sim = plainToInstance(Sim, save);
+    Object.values(sim.queries).forEach((query) => query.reset());
+    const entityMap = new Map();
 
     sim.entities.forEach((entity) => {
+      entityMap.set(entity.id, entity);
       entity.sim = sim;
 
       entity.components = reviveMathjs(entity.components);
@@ -164,10 +169,15 @@ export class Sim extends BaseSim {
       }
     });
 
+    sim.entities = entityMap;
+
     return sim;
   }
 
   toJSON() {
-    return pick(this, ["entityIdCounter", "entities", "factions"]);
+    return {
+      ...pick(this, ["entityIdCounter", "factions"]),
+      entities: [...this.entities].map(([, e]) => e),
+    };
   }
 }

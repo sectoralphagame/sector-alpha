@@ -67,7 +67,7 @@ class EntityComponents {
       Object.keys(this),
       (acc, key) => ({
         ...acc,
-        [key]: omit(this[key], ["sim", "entity", "entities", "g", "sprite"]),
+        [key]: omit(this[key], ["sim", "g", "sprite"]),
       }),
       {}
     );

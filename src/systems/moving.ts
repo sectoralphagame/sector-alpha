@@ -1,6 +1,5 @@
 import { add, Matrix, matrix, multiply, norm, subtract } from "mathjs";
 import { clearTarget, startCruise, stopCruise } from "../components/drive";
-import { clearEntity } from "../components/utils/entityId";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Query } from "./query";
@@ -20,7 +19,7 @@ function move(entity: Driveable, delta: number) {
     drive.state = "cruise";
   }
 
-  const targetPosition = entity.sim.entities.get(drive.target)!.cp.position!;
+  const targetPosition = entity.sim.get(drive.target).cp.position!;
   const isInSector = targetPosition.sector === entity.cp.position.sector;
   if (!isInSector) {
     // eslint-disable-next-line no-console

@@ -4,6 +4,7 @@ import Color from "color";
 import { Sim } from "../../sim";
 import { System } from "../system";
 import { drawGraphics } from "../../components/renderGraphics";
+import { RequireComponent } from "../../tsHelpers";
 
 let initialized = false;
 
@@ -15,6 +16,7 @@ if (process.env.NODE_ENV !== "test") {
 const minScale = 0.2;
 
 export class RenderingSystem extends System {
+  selectionManger: RequireComponent<"selectionManager">;
   viewport: Viewport;
   prevScale: number = minScale;
 
@@ -27,7 +29,7 @@ export class RenderingSystem extends System {
   }
 
   init = () => {
-    const settingsEntity = this.sim.queries.selectionManager.get()[0];
+    this.selectionManger = this.sim.queries.selectionManager.get()[0];
     const root = document.querySelector("#root")!;
     const toolbar = document.querySelector("#toolbar")!;
     const canvas = document.querySelector("#canvasRoot")! as HTMLCanvasElement;
@@ -52,7 +54,7 @@ export class RenderingSystem extends System {
     viewport.drag().pinch().wheel();
     viewport.clampZoom({ minScale });
     viewport.on("drag-start", () => {
-      settingsEntity.cp.selectionManager.focused = false;
+      this.selectionManger.cp.selectionManager.focused = false;
       viewport.plugins.remove("follow");
     });
     viewport.sortableChildren = true;
@@ -62,7 +64,7 @@ export class RenderingSystem extends System {
   };
 
   exec(): void {
-    const settingsEntity = this.sim.queries.selectionManager.get()[0];
+    this.selectionManger = this.sim.queries.selectionManager.get()[0];
 
     this.sim.queries.sectors.get().forEach((sector) => {
       if (!sector.cp.renderGraphics.initialized) {
@@ -80,14 +82,15 @@ export class RenderingSystem extends System {
 
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
-      const selected = entity.id === settingsEntity.cp.selectionManager.id;
+      const selected =
+        entity.id === this.selectionManger.cp.selectionManager.id;
 
       if (!entityRender.initialized) {
         this.viewport.addChild(entityRender.sprite);
         if (entity.hasComponents(["selection"])) {
           entityRender.sprite.interactive = true;
           entityRender.sprite.on("mousedown", () => {
-            settingsEntity.cp.selectionManager.id = entity.id;
+            this.selectionManger.cp.selectionManager.id = entity.id;
           });
           entityRender.sprite.cursor = "pointer";
         }
@@ -117,10 +120,10 @@ export class RenderingSystem extends System {
       entityRender.sprite.visible = entityRender.maxZ <= this.prevScale;
     });
 
-    if (settingsEntity.cp.selectionManager.focused) {
+    if (this.selectionManger.cp.selectionManager.focused) {
       this.viewport.follow(
         this.sim
-          .get(settingsEntity.cp.selectionManager.id!)
+          .get(this.selectionManger.cp.selectionManager.id!)
           .requireComponents(["render"]).cp.render.sprite
       );
     }
