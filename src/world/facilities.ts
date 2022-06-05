@@ -2,9 +2,10 @@ import { createFacility, InitialFacilityInput } from "../archetypes/facility";
 import { facilityModules } from "../archetypes/facilityModule";
 import { sim as defaultSim, Sim } from "../sim";
 import { addFacilityModule } from "../utils/entityModules";
+import fTeleport from "../../assets/f_teleport.svg";
 
 export function createRefineryFacility(
-  input?: InitialFacilityInput,
+  input: InitialFacilityInput,
   sim: Sim = defaultSim
 ) {
   const facility = createFacility(sim, input);
@@ -16,10 +17,7 @@ export function createRefineryFacility(
   return facility;
 }
 
-export function createFarm(
-  input?: InitialFacilityInput,
-  sim: Sim = defaultSim
-) {
+export function createFarm(input: InitialFacilityInput, sim: Sim = defaultSim) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.farm(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
@@ -29,7 +27,7 @@ export function createFarm(
 }
 
 export function createShipyard(
-  input?: InitialFacilityInput,
+  input: InitialFacilityInput,
   sim: Sim = defaultSim
 ) {
   const facility = createFacility(sim, input);
@@ -40,7 +38,7 @@ export function createShipyard(
 }
 
 export function createWaterFacility(
-  input?: InitialFacilityInput,
+  input: InitialFacilityInput,
   sim: Sim = defaultSim
 ) {
   const facility = createFacility(sim, input);
@@ -52,7 +50,7 @@ export function createWaterFacility(
 }
 
 export function createFuelFabricationFacility(
-  input?: InitialFacilityInput,
+  input: InitialFacilityInput,
   sim: Sim = defaultSim
 ) {
   const facility = createFacility(sim, input);
@@ -64,7 +62,7 @@ export function createFuelFabricationFacility(
 }
 
 export function createHullPlatesFacility(
-  input?: InitialFacilityInput,
+  input: InitialFacilityInput,
   sim: Sim = defaultSim
 ) {
   const facility = createFacility(sim, input);
@@ -76,7 +74,7 @@ export function createHullPlatesFacility(
 }
 
 export function createGoldRefinery(
-  input?: InitialFacilityInput,
+  input: InitialFacilityInput,
   sim: Sim = defaultSim
 ) {
   const facility = createFacility(sim, input);
@@ -88,7 +86,7 @@ export function createGoldRefinery(
 }
 
 export function createSiliconPurificationFacility(
-  input?: InitialFacilityInput,
+  input: InitialFacilityInput,
   sim: Sim = defaultSim
 ) {
   const facility = createFacility(sim, input);
@@ -100,7 +98,7 @@ export function createSiliconPurificationFacility(
 }
 
 export function createElectronicsFacility(
-  input?: InitialFacilityInput,
+  input: InitialFacilityInput,
   sim: Sim = defaultSim
 ) {
   const facility = createFacility(sim, input);
@@ -111,12 +109,22 @@ export function createElectronicsFacility(
   return facility;
 }
 
+export function createTeleporter(
+  input: InitialFacilityInput,
+  sim: Sim = defaultSim
+) {
+  const facility = createFacility(sim, input);
+  addFacilityModule(facility, facilityModules.teleport(sim, facility));
+  facility.cp.render.setTexture(fTeleport);
+
+  return facility;
+}
+
 export const templates = [
   createFarm,
   createFuelFabricationFacility,
   createHullPlatesFacility,
   createRefineryFacility,
-  createShipyard,
   createWaterFacility,
   createGoldRefinery,
   createSiliconPurificationFacility,

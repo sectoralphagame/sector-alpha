@@ -1,17 +1,18 @@
 import P5 from "p5";
-import "./components/Panel";
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
 import { Sim } from "../../sim";
 import { System } from "../system";
-import { Query } from "../query";
 
-const minScale = 0.4;
+if (process.env.NODE_ENV !== "test") {
+  // eslint-disable-next-line global-require
+  require("./components/Panel");
+}
+
+const minScale = 0.2;
 
 export class RenderingSystem extends System {
-  renderable: Query<"render" | "position">;
-  selectable: Query<"selection" | "position">;
   parent: HTMLCanvasElement;
   viewport: Viewport;
   p5: P5;
@@ -20,8 +21,6 @@ export class RenderingSystem extends System {
   constructor(sim: Sim) {
     super(sim);
     this.parent = document.querySelector("#canvasRoot")!;
-    this.renderable = new Query(sim, ["render", "position"]);
-    this.selectable = new Query(sim, ["selection", "position"]);
 
     this.init();
   }
@@ -59,6 +58,20 @@ export class RenderingSystem extends System {
 
   exec(): void {
     const settingsEntity = this.sim.queries.selectionManager.get()[0];
+
+    this.sim.queries.sectors.get().forEach((sector) => {
+      if (!sector.cp.renderGraphics.initialized) {
+        sector.cp.renderGraphics.draw(this.viewport);
+        sector.cp.renderGraphics.initialized = true;
+      }
+    });
+
+    this.sim.queries.renderableGraphics.get().forEach((entity) => {
+      if (!entity.cp.renderGraphics.initialized) {
+        entity.cp.renderGraphics.draw(this.viewport);
+        entity.cp.renderGraphics.initialized = true;
+      }
+    });
 
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;

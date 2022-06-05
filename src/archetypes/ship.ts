@@ -14,6 +14,7 @@ import { CommodityStorage } from "../components/storage";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
+import { Sector } from "./sector";
 
 export const shipComponents = [
   "drive",
@@ -42,6 +43,7 @@ export interface InitialShipInput {
   storage: number;
   mining: number;
   texture: string;
+  sector: Sector;
 }
 
 export function createShip(sim: Sim, initial: InitialShipInput) {
@@ -55,13 +57,16 @@ export function createShip(sim: Sim, initial: InitialShipInput) {
   entity.addComponent("name", new Name(initial.name));
   entity.addComponent("orders", new Orders());
   entity.addComponent("owner", new Owner(initial.owner));
-  entity.addComponent("position", new Position(initial.position, 0));
+  entity.addComponent(
+    "position",
+    new Position(initial.position, 0, initial.sector)
+  );
   entity.addComponent(
     "render",
     new Render({
       color: Color(initial.owner.color).rgbNumber(),
       defaultScale: 0.4,
-      maxZ: 0.7,
+      maxZ: 0.5,
       pathToTexture: initial.texture,
       zIndex: 2,
     })

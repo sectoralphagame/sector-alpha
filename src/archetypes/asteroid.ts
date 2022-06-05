@@ -10,6 +10,7 @@ import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import asteroidTexture from "../../assets/asteroid.svg";
 import { AsteroidField } from "./asteroidField";
+import { Sector } from "./sector";
 
 export const asteroidComponents = [
   "minable",
@@ -23,7 +24,7 @@ const widenType = [...asteroidComponents][0];
 export type AsteroidComponent = typeof widenType;
 export type Asteroid = RequireComponent<AsteroidComponent>;
 
-const fieldColors: Record<MineableCommodity, string> = {
+export const fieldColors: Record<MineableCommodity, string> = {
   fuelium: "#ffab6b",
   goldOre: "#ffe46b",
   ice: "#e8ffff",
@@ -38,14 +39,15 @@ export function asteroid(entity: Entity): Asteroid {
 export function createAsteroid(
   sim: Sim,
   parent: AsteroidField,
-  position: Matrix
+  position: Matrix,
+  sector: Sector
 ) {
   const entity = new Entity(sim);
   const type = parent.cp.asteroidSpawn.type;
 
   entity.addComponent("minable", new Minable(type));
   entity.addComponent("parent", new Parent(parent));
-  entity.addComponent("position", new Position(position, 0));
+  entity.addComponent("position", new Position(position, 0, sector));
   entity.addComponent(
     "render",
     new Render({

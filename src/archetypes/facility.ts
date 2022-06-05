@@ -1,5 +1,5 @@
 import Color from "color";
-import { matrix, Matrix } from "mathjs";
+import { Matrix } from "mathjs";
 import { Budget } from "../components/budget";
 import { Entity } from "../components/entity";
 import { Modules } from "../components/modules";
@@ -15,6 +15,9 @@ import { Faction } from "../economy/faction";
 import fCivTexture from "../../assets/f_civ.svg";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
+import { Sector } from "./sector";
+
+export const commanderRange = 2;
 
 export const facilityComponents = [
   "budget",
@@ -41,26 +44,27 @@ export function facility(entity: Entity): Facility {
 export interface InitialFacilityInput {
   position: Matrix;
   owner: Faction;
+  sector: Sector;
 }
 
-export function createFacility(sim: Sim, initial?: InitialFacilityInput) {
+export function createFacility(sim: Sim, initial: InitialFacilityInput) {
   const entity = new Entity(sim);
 
   entity.addComponent("budget", new Budget());
   entity.addComponent("compoundProduction", new CompoundProduction());
   entity.addComponent("modules", new Modules());
   entity.addComponent("name", new Name(`Facility #${entity.id}`));
-  entity.addComponent("owner", new Owner());
+  entity.addComponent("owner", new Owner(initial.owner));
   entity.addComponent(
     "position",
-    new Position(initial?.position ?? matrix([0, 0]), 0)
+    new Position(initial.position, 0, initial.sector)
   );
   entity.addComponent(
     "render",
     new Render({
-      color: Color(initial?.owner.color).rgbNumber(),
+      color: Color(initial.owner.color).rgbNumber(),
       defaultScale: 1,
-      maxZ: 0.33,
+      maxZ: 0.1,
       pathToTexture: fCivTexture,
       zIndex: 1,
     })

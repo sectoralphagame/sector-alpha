@@ -1,3 +1,4 @@
+import { sectorComponents } from "../archetypes/sector";
 import { CoreComponents, Entity } from "../components/entity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
@@ -6,10 +7,10 @@ type QueryEntities<T extends keyof CoreComponents> = Array<RequireComponent<T>>;
 
 export class Query<T extends keyof CoreComponents> {
   entities: QueryEntities<T>;
-  requiredComponents: T[];
+  requiredComponents: readonly T[];
   sim: Sim;
 
-  constructor(sim: Sim, requiredComponents: T[]) {
+  constructor(sim: Sim, requiredComponents: readonly T[]) {
     this.requiredComponents = requiredComponents;
     this.sim = sim;
 
@@ -24,7 +25,7 @@ export class Query<T extends keyof CoreComponents> {
       (payload: { name: keyof CoreComponents; entity: Entity }) => {
         if (
           this.entities &&
-          (this.requiredComponents as string[]).includes(payload.name)
+          (this.requiredComponents as readonly string[]).includes(payload.name)
         ) {
           this.entities = this.entities.filter(
             (e) => e.id !== payload.entity.id
@@ -47,7 +48,7 @@ export class Query<T extends keyof CoreComponents> {
       ) as QueryEntities<T>;
     }
 
-    return this.entities;
+    return this.entities.filter((e) => !e.deleted);
   };
 }
 
@@ -59,11 +60,14 @@ export function createQueries(sim: Sim) {
     orderable: new Query(sim, ["orders"]),
     productionByModules: new Query(sim, ["production", "parent"]),
     renderable: new Query(sim, ["render", "position"]),
+    renderableGraphics: new Query(sim, ["renderGraphics", "position"]),
+    sectors: new Query(sim, sectorComponents),
     selectable: new Query(sim, ["render", "position", "selection"]),
     selectionManager: new Query(sim, ["selectionManager"]),
     standaloneProduction: new Query(sim, ["production", "storage"]),
     storageAndTrading: new Query(sim, ["storage", "trade"]),
-    trading: new Query(sim, ["trade", "budget", "storage"]),
+    teleports: new Query(sim, ["teleport"]),
+    trading: new Query(sim, ["trade", "budget", "storage", "position"]),
   } as const;
 }
 

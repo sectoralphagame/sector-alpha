@@ -1,13 +1,18 @@
-import { Matrix } from "mathjs";
 import { Asteroid } from "../archetypes/asteroid";
 import { AsteroidField } from "../archetypes/asteroidField";
+import { Marker } from "../archetypes/marker";
 import { WithTrade } from "../economy/utils";
 import { NegativeQuantity } from "../errors";
 import { TransactionInput } from "./trade";
 
+export interface TeleportOrder {
+  type: "teleport";
+  position: Marker;
+}
+
 export interface MoveOrder {
   type: "move";
-  position: Matrix;
+  position: Marker;
 }
 
 export interface TradeOrder {
@@ -26,7 +31,12 @@ export interface HoldPositionOrder {
   type: "hold";
 }
 
-export type Order = MoveOrder | TradeOrder | MineOrder | HoldPositionOrder;
+export type Order =
+  | MoveOrder
+  | TradeOrder
+  | MineOrder
+  | HoldPositionOrder
+  | TeleportOrder;
 
 export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder {
   if (order.offer.quantity <= 0) {

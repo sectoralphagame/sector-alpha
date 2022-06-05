@@ -2,20 +2,33 @@ import { Matrix, norm, subtract, sum } from "mathjs";
 import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
 import { map } from "lodash";
-import { sim } from "../sim";
+import { Sim } from "../sim";
 import { Commodity } from "./commodity";
 import { RequireComponent } from "../tsHelpers";
 import { AsteroidField } from "../archetypes/asteroidField";
 import { asteroid, Asteroid } from "../archetypes/asteroid";
+import { Sector } from "../archetypes/sector";
 
 export type WithTrade = RequireComponent<
   "trade" | "storage" | "budget" | "position" | "owner"
 >;
 
+export function getSectorsInTeleportRange(
+  origin: Sector,
+  jumps: number,
+  sim: Sim
+): Sector[] {
+  const ids = Object.entries(sim.paths[origin.id.toString()])
+    .filter(([, path]) => path.distance <= jumps)
+    .map(([id]) => parseInt(id, 10));
+  return sim.queries.sectors.get().filter((sector) => ids.includes(sector.id));
+}
+
 export function getFacilityWithMostProfit(
   facility: WithTrade,
   commodity: Commodity,
-  minQuantity: number
+  minQuantity: number,
+  sectorDistance: number
 ): WithTrade | null {
   const distance = (f: WithTrade) =>
     norm(
@@ -31,8 +44,17 @@ export function getFacilityWithMostProfit(
 
   const sortedByProfit = sortBy(
     (
-      sim.queries.trading
-        .get()
+      getSectorsInTeleportRange(
+        facility.cp.position.sector,
+        sectorDistance,
+        facility.sim
+      )
+        .map((sector) =>
+          facility.sim.queries.trading
+            .get()
+            .filter((f) => f.cp.position.sector === sector)
+        )
+        .flat()
         .filter(
           (f) =>
             f.components.trade.offers[commodity].type !==

@@ -25,10 +25,21 @@ export class Render {
     zIndex,
   }: RenderInput) {
     this.defaultScale = defaultScale;
-    this.texture = pathToTexture;
-    this.maxZ = maxZ;
     this.zIndex = zIndex;
+    this.maxZ = maxZ;
 
+    if (process.env.NODE_ENV !== "test") {
+      this.setTexture(pathToTexture);
+
+      if (color) {
+        this.sprite.tint = color;
+        this.color = color;
+      }
+    }
+  }
+
+  setTexture = (pathToTexture: string) => {
+    this.texture = pathToTexture;
     if (process.env.NODE_ENV !== "test") {
       this.sprite = new PIXI.Sprite(
         PIXI.Texture.from(pathToTexture, {
@@ -39,11 +50,27 @@ export class Render {
         })
       );
       this.sprite.anchor.set(0.5, 0.5);
-      this.sprite.zIndex = zIndex;
-      if (color) {
-        this.sprite.tint = color;
-        this.color = color;
-      }
+      this.sprite.zIndex = this.zIndex;
     }
+  };
+}
+
+export class RenderGraphics {
+  // eslint-disable-next-line no-unused-vars
+  _draw: (g: PIXI.Graphics) => void;
+  g: PIXI.Graphics;
+  initialized: boolean = false;
+
+  // eslint-disable-next-line no-unused-vars
+  constructor(draw: (g: PIXI.Graphics) => void) {
+    // eslint-disable-next-line no-underscore-dangle
+    this._draw = draw;
+    this.g = new PIXI.Graphics();
   }
+
+  draw = (container: PIXI.Container) => {
+    container.addChild(this.g);
+    // eslint-disable-next-line no-underscore-dangle
+    this._draw(this.g);
+  };
 }

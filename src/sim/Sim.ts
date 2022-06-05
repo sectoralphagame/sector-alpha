@@ -1,4 +1,5 @@
 import EventEmitter from "eventemitter3";
+import { Path } from "graphlib";
 import { Faction } from "../economy/faction";
 import { Entity } from "../components/entity";
 import { World } from "../world";
@@ -15,6 +16,7 @@ import { MovingSystem } from "../systems/moving";
 import { MiningSystem } from "../systems/mining";
 import { createQueries, Queries } from "../systems/query";
 import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
+import { PathPlanningSystem } from "../systems/pathPlanning";
 
 export class Sim extends BaseSim {
   entityIdCounter: number = 0;
@@ -27,6 +29,7 @@ export class Sim extends BaseSim {
   entities: Entity[] = [];
   systems: System[];
   queries: Queries;
+  paths: Record<string, Record<string, Path>>;
 
   constructor() {
     super();
@@ -48,6 +51,7 @@ export class Sim extends BaseSim {
       new MovingSystem(this),
       new MiningSystem(this),
       new OrderExecutingSystem(this),
+      new PathPlanningSystem(this),
     ];
 
     if (process.env.NODE_ENV !== "test") {
@@ -70,7 +74,7 @@ export class Sim extends BaseSim {
   };
 
   load = (world: World) => {
-    this.factions = world.factions;
+    world.factions(this);
   };
 
   next = (delta: number) => {

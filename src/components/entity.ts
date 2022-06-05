@@ -10,7 +10,7 @@ import { StorageBonus } from "./storageBonus";
 import { Modules } from "./modules";
 import { Name } from "./name";
 import { Selection, SelectionManager } from "./selection";
-import { Render } from "./render";
+import { Render, RenderGraphics } from "./render";
 import { AutoOrder } from "./autoOrder";
 import { Drive } from "./drive";
 import { Mining } from "./mining";
@@ -20,6 +20,8 @@ import { Children } from "./children";
 import { Orders } from "./orders";
 import { RequireComponent } from "../tsHelpers";
 import { MissingComponentError } from "../errors";
+import { HECSPosition } from "./hecsPosition";
+import { Teleport } from "./teleport";
 
 export interface CoreComponents {
   asteroidSpawn: AsteroidSpawn;
@@ -29,6 +31,7 @@ export interface CoreComponents {
   commander: Parent; // Essentially the same
   compoundProduction: CompoundProduction;
   drive: Drive;
+  hecsPosition: HECSPosition;
   minable: Minable;
   mining: Mining;
   modules: Modules;
@@ -39,10 +42,12 @@ export interface CoreComponents {
   position: Position;
   production: Production;
   render: Render;
+  renderGraphics: RenderGraphics;
   selection: Selection;
   selectionManager: SelectionManager;
   storage: CommodityStorage;
   storageBonus: StorageBonus;
+  teleport: Teleport;
   trade: Trade;
 }
 
@@ -50,6 +55,7 @@ export class Entity {
   components: Partial<CoreComponents> = {};
   id: number;
   sim: Sim;
+  deleted: boolean = false;
 
   constructor(sim: Sim) {
     this.sim = sim;
@@ -88,6 +94,7 @@ export class Entity {
   }
 
   unregister() {
+    this.deleted = true;
     this.sim.unregisterEntity(this);
   }
 }

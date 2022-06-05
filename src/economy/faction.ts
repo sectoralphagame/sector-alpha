@@ -14,7 +14,7 @@ export class Faction {
   constructor(slug: string) {
     this.slug = slug;
     this.color = Color.rgb(151, 255, 125)
-      .rotate((Math.random() + factionCounter) * 70)
+      .rotate((factionCounter * 360) / 8)
       .toString();
     this.budget = new Budget();
     factionCounter += 1;

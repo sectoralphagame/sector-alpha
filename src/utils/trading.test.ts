@@ -1,5 +1,6 @@
 import { matrix } from "mathjs";
 import { Facility } from "../archetypes/facility";
+import { createSector } from "../archetypes/sector";
 import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { settleStorageQuota } from "../systems/storageQuotaPlanning";
@@ -14,7 +15,11 @@ describe("Trading module", () => {
   beforeEach(() => {
     sim = new Sim();
     facility = createFarm(
-      { position: matrix([0, 0]), owner: new Faction("0") },
+      {
+        position: matrix([0, 0]),
+        owner: new Faction("0"),
+        sector: createSector(sim, { name: "", position: matrix([0, 0, 0]) }),
+      },
       sim
     );
     facility.cp.budget.changeMoney(100);

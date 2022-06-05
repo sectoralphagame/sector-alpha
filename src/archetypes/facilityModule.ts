@@ -3,6 +3,7 @@ import { Name } from "../components/name";
 import { Parent } from "../components/parent";
 import { PAC, Production } from "../components/production";
 import { StorageBonus } from "../components/storageBonus";
+import { Teleport } from "../components/teleport";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 
@@ -136,4 +137,15 @@ export const facilityModules = {
     name: "Small Container",
     storage: 4000,
   }),
+  teleport: (
+    sim: Sim,
+    parent: RequireComponent<"position" | "modules">
+  ): FacilityModule => {
+    const entity = new Entity(sim);
+    entity.addComponent("parent", new Parent(parent));
+    entity.addComponent("name", new Name("Hyperspace Generator"));
+    entity.addComponent("teleport", new Teleport());
+
+    return entity as FacilityModule;
+  },
 } as const;

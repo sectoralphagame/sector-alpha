@@ -1,10 +1,9 @@
-import { deepEqual, Matrix } from "mathjs";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
 import { Entity } from "./entity";
 
-export type Target = RequireComponent<"position"> | Matrix | null;
+export type Target = RequireComponent<"position"> | null;
 
 export interface ShipDriveProps {
   maneuver: number;
@@ -76,13 +75,9 @@ export class Drive {
   setTarget = (target: Target) => {
     const targetsAreEntities =
       target instanceof Entity && this.target instanceof Entity;
-    const targetsAreMatrices =
-      !!(target as Matrix)?.datatype && !!(this.target as Matrix)?.datatype;
 
     const shouldUpdate = targetsAreEntities
       ? target.id !== (this.target as Entity).id
-      : targetsAreMatrices
-      ? !deepEqual(this.target as Matrix, target as Matrix)
       : true;
 
     if (shouldUpdate) {

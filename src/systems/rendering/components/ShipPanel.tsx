@@ -21,6 +21,8 @@ function getOrderDescription(ship: Ship, order: Order) {
   switch (order.type) {
     case "move":
       return "Go to location";
+    case "teleport":
+      return "Teleport to location";
     case "trade":
       if (order.target === ship.cp.commander?.value)
         return "Deliver wares to commander";
