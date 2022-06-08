@@ -37,11 +37,11 @@ export function isTradeAccepted(
     throw new NonPositiveAmount(offer.price);
   }
 
-  if (offer.type === input.type && input.faction !== entity.cp.owner.value) {
+  if (offer.type === input.type && input.factionId !== entity.cp.owner.id) {
     throw new InvalidOfferType(input.type);
   }
   if (input.type === "buy") {
-    if (input.faction === entity.cp.owner.value) {
+    if (input.factionId === entity.cp.owner.id) {
       validPrice = true;
     } else {
       validPrice = input.price >= offer.price;
@@ -53,7 +53,7 @@ export function isTradeAccepted(
     );
   }
 
-  if (input.faction === entity.cp.owner.value) {
+  if (input.factionId === entity.cp.owner.id) {
     validPrice = true;
   } else {
     validPrice = input.price <= offer.price;
@@ -200,7 +200,7 @@ export function tradeCommodity(
 ): boolean {
   if (!entity.sim.paths) return false;
 
-  const sameFaction = entity.cp.owner.value === seller.components.owner.value;
+  const sameFaction = entity.cp.owner.id === seller.components.owner.id;
   const buy = entity.cp.commander.id === buyer.id;
   const commander = entity.sim
     .get(entity.cp.commander.id)
@@ -230,7 +230,7 @@ export function tradeCommodity(
     price,
     quantity,
     commodity,
-    faction: entity.cp.owner.value!,
+    factionId: entity.cp.owner.id,
     budget: commander.cp.budget,
     allocations: null,
     type: "buy" as "buy",
@@ -398,7 +398,7 @@ export function returnToFacility(
         budget: null,
         allocations: null,
         type: "sell",
-        faction: entity.cp.owner.value!,
+        factionId: entity.cp.owner.id,
       };
       const allocations = allocate(commander, offer);
 

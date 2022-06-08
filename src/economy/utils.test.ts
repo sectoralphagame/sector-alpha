@@ -1,5 +1,6 @@
 import { matrix } from "mathjs";
 import { facilityModules } from "../archetypes/facilityModule";
+import { createFaction, Faction } from "../archetypes/faction";
 import { createSector, Sector } from "../archetypes/sector";
 import { Entity } from "../components/entity";
 import { hecsToCartesian } from "../components/hecsPosition";
@@ -7,7 +8,6 @@ import { linkTeleportModules } from "../components/teleport";
 import { Sim } from "../sim/Sim";
 import { regen } from "../systems/pathPlanning";
 import { addFacilityModule } from "../utils/entityModules";
-import { Faction } from "./faction";
 import { getSectorsInTeleportRange } from "./utils";
 
 function createTeleporter(sim: Sim, sector: Sector, owner: Faction) {
@@ -22,7 +22,7 @@ function createTeleporter(sim: Sim, sector: Sector, owner: Faction) {
     .addComponent({ name: "modules", ids: [] })
     .addComponent({
       name: "owner",
-      value: owner,
+      id: owner.id,
     });
   addFacilityModule(
     facility as any,
@@ -49,7 +49,7 @@ describe("getSectorsInTeleportRange", () => {
   });
 
   it("properly returns connected sectors", () => {
-    const f = new Faction("f");
+    const f = createFaction("F", sim);
     const t1 = createTeleporter(sim, sectors[0], f);
     const t2 = createTeleporter(sim, sectors[1], f);
     const t3 = createTeleporter(sim, sectors[1], f);

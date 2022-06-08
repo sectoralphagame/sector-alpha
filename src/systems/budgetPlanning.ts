@@ -1,3 +1,4 @@
+import { faction } from "../archetypes/faction";
 import { transferMoney } from "../components/budget";
 import { getPlannedBudget, WithTrade } from "../economy/utils";
 import { Sim } from "../sim";
@@ -9,17 +10,18 @@ import { System } from "./system";
 function settleBudget(entity: WithTrade) {
   const budgetChange =
     getPlannedBudget(entity) - entity.components.budget.available;
+  const owner = faction(entity.sim.get(entity.components.owner.id));
 
   if (budgetChange < 0) {
     transferMoney(
       entity.components.budget,
       limitMax(-budgetChange, entity.components.budget.available),
-      entity.components.owner.value!.budget
+      owner.cp.budget
     );
   } else {
     transferMoney(
-      entity.components.owner.value!.budget,
-      limitMax(budgetChange, entity.components.owner.value!.budget.available),
+      owner.cp.budget,
+      limitMax(budgetChange, owner.cp.budget.available),
       entity.components.budget
     );
   }

@@ -1,10 +1,10 @@
 import { matrix } from "mathjs";
 import { Facility } from "../archetypes/facility";
+import { createFaction } from "../archetypes/faction";
 import { createSector } from "../archetypes/sector";
 import { changeBudgetMoney } from "../components/budget";
 import { addStorage } from "../components/storage";
 import { commodities } from "../economy/commodity";
-import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { perCommodity } from "../utils/perCommodity";
 import { createFarm } from "../world/facilities";
@@ -21,7 +21,7 @@ describe("Trading module", () => {
     system = new TradingSystem(sim);
     facility = createFarm(
       {
-        owner: new Faction(""),
+        owner: createFaction("F", sim),
         position: matrix([0, 0]),
         sector: createSector(sim, { name: "", position: matrix([0, 0, 0]) }),
       },

@@ -1,9 +1,9 @@
 import { matrix } from "mathjs";
+import { createFaction } from "../archetypes/faction";
 import { createMarker } from "../archetypes/marker";
 import { createSector, Sector } from "../archetypes/sector";
 import { createShip, Ship } from "../archetypes/ship";
 import { setTarget } from "../components/drive";
-import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { shipClasses } from "../world/ships";
 import { MovingSystem } from "./moving";
@@ -22,7 +22,7 @@ describe("Ship", () => {
     ship = createShip(sim, {
       ...shipClasses.find((s) => s.name === "Courier A"),
       position: matrix([1, 0]),
-      owner: new Faction(""),
+      owner: createFaction("F", sim),
       sector,
     });
   });

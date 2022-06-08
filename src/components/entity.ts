@@ -31,22 +31,26 @@ import { Teleport } from "./teleport";
 import { Docks, Dockable } from "./dockable";
 import { Cooldowns } from "../utils/cooldowns";
 import { Commander } from "./commander";
+import { Color } from "./color";
+import { Ai } from "./ai";
 
 export interface CoreComponents {
+  ai: Ai;
   asteroidSpawn: AsteroidSpawn;
   autoOrder: AutoOrder;
   budget: Budget;
   children: Children;
+  color: Color;
   commander: Commander;
   compoundProduction: CompoundProduction;
   dockable: Dockable;
   docks: Docks;
   drive: Drive;
-  name: Name;
   hecsPosition: HECSPosition;
   minable: Minable;
   mining: Mining;
   modules: Modules;
+  name: Name;
   orders: Orders;
   owner: Owner;
   parent: Parent;
@@ -82,6 +86,8 @@ export class Entity {
   @Expose()
   @Type(() => Cooldowns)
   cooldowns = new Cooldowns<string>();
+  @Expose()
+  tags: Set<string>;
   @Expose()
   id: number;
   sim: Sim;

@@ -1,9 +1,9 @@
 import { matrix } from "mathjs";
 import { Facility } from "../archetypes/facility";
+import { createFaction } from "../archetypes/faction";
 import { createSector } from "../archetypes/sector";
 import { changeBudgetMoney } from "../components/budget";
 import { addStorage, removeStorage } from "../components/storage";
-import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { settleStorageQuota } from "../systems/storageQuotaPlanning";
 import { createOffers } from "../systems/trading";
@@ -19,7 +19,7 @@ describe("Trading module", () => {
     facility = createFarm(
       {
         position: matrix([0, 0]),
-        owner: new Faction("0"),
+        owner: createFaction("F", sim),
         sector: createSector(sim, { name: "", position: matrix([0, 0, 0]) }),
       },
       sim
