@@ -10,6 +10,10 @@ export abstract class System {
   constructor(sim: Sim) {
     this.sim = sim;
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  destroy() {}
+
   // eslint-disable-next-line class-methods-use-this, no-unused-vars
   exec(delta: number): void {
     throw notImplemented;

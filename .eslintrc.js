@@ -43,5 +43,6 @@ module.exports = {
     "react/no-array-index-key": "off",
     "react/prop-types": "off",
     "no-invalid-this": "error",
+    "react/require-default-props": "off",
   },
 };

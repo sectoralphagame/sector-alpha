@@ -42,6 +42,7 @@ export const graphics = {
     );
     const textGraphics = new PIXI.Text(opts.name, {
       fill: 0x404040,
+      fontFamily: "Space Mono",
     });
     textGraphics.resolution = 8;
     const textPos = add(pos, matrix([0, 90 - sectorSize])) as Matrix;
