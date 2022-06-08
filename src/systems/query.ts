@@ -6,7 +6,7 @@ import { RequireComponent } from "../tsHelpers";
 type QueryEntities<T extends keyof CoreComponents> = Array<RequireComponent<T>>;
 
 export class Query<T extends keyof CoreComponents> {
-  entities: QueryEntities<T>;
+  entities: QueryEntities<T> | undefined;
   requiredComponents: readonly T[];
   sim: Sim;
 
@@ -49,6 +49,10 @@ export class Query<T extends keyof CoreComponents> {
     }
 
     return this.entities.filter((e) => !e.deleted);
+  };
+
+  reset = (): void => {
+    this.entities = undefined;
   };
 }
 

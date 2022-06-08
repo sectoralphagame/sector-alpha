@@ -44,7 +44,7 @@ export function teleportOrder(
   };
 
   entity.cp.docks?.docked.forEach((docked) => {
-    entity.sim.entities.get(docked)!.cp.position = {
+    entity.sim.get(docked).cp.position = {
       name: "position",
       angle: entity.cp.position.angle,
       coord: destination.cp.position.coord,

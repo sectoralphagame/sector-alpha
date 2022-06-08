@@ -114,7 +114,7 @@ export const facilityModules = {
       goldOre: { consumes: 300, produces: 0 },
       food: { consumes: 35, produces: 0 },
       fuel: { consumes: 90, produces: 0 },
-      gold: { consumes: 400, produces: 0 },
+      gold: { consumes: 0, produces: 400 },
     },
     time: 230,
   }),

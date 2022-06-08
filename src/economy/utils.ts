@@ -45,7 +45,7 @@ export function getFacilityWithMostProfit(
   const sortedByProfit = sortBy(
     (
       getSectorsInTeleportRange(
-        asSector(facility.sim.entities.get(facility.cp.position.sector)!),
+        asSector(facility.sim.get(facility.cp.position.sector)),
         sectorDistance,
         facility.sim
       )
@@ -86,7 +86,7 @@ export function getClosestMineableAsteroid(
 ): Asteroid | undefined {
   return minBy(
     field.components.children.entities
-      .map((e) => asteroid(field.sim.entities.get(e)!))
+      .map((e) => asteroid(field.sim.get(e)))
       .filter((a) => !a.components.minable.minedById),
     (r) => norm(subtract(position, asteroid(r).cp.position.coord) as Matrix)
   );

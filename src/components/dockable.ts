@@ -22,8 +22,7 @@ export function availableDocks(docks: Docks, size: DockSize, sim: Sim) {
     docks.pads[size] -
     docks.docked.filter(
       (e) =>
-        sim.entities.get(e)!.requireComponents(["dockable"]).cp.dockable
-          .size === size
+        sim.get(e).requireComponents(["dockable"]).cp.dockable.size === size
     ).length
   );
 }

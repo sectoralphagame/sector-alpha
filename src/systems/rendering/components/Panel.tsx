@@ -75,7 +75,7 @@ const Panel: React.FC = () => {
         {!!window.selected && (
           <IconButton
             onClick={() => {
-              window.sim.entities.find((e) =>
+              window.sim.find((e) =>
                 e.hasComponents(["selectionManager"])
               ).cp.selectionManager.focused = true;
             }}

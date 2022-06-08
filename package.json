@@ -15,7 +15,6 @@
   "devDependencies": {
     "@types/graphlib": "^2.1.8",
     "@types/jest": "^27.0.2",
-    "@types/mathjs": "^9.4.2",
     "@types/p5": "^1.4.1",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
@@ -73,13 +72,14 @@
     "@types/lodash": "^4.14.177",
     "@types/react": "^17.0.40",
     "@types/react-dom": "^17.0.13",
+    "class-transformer": "^0.5.1",
     "clsx": "^1.1.1",
     "color": "^4.0.1",
     "colormap": "^2.3.2",
     "eventemitter3": "^4.0.7",
     "graphlib": "^2.1.8",
     "lodash": "^4.17.21",
-    "mathjs": "^10.0.0",
+    "mathjs": "^10.6.0",
     "nano-css": "^5.3.4",
     "npm": "^8.7.0",
     "p5": "^1.4.1",
@@ -87,6 +87,7 @@
     "pixi.js": "^6.3.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-inlinesvg": "^3.0.0"
+    "react-inlinesvg": "^3.0.0",
+    "reflect-metadata": "^0.1.13"
   }
 }

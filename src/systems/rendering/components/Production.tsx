@@ -25,7 +25,7 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
   return (
     <Table>
       <tbody>
-        {productionModules.map((facilityModule, index) => (
+        {(productionModules ?? []).map((facilityModule, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <tr key={`${facilityModule.cp.name!.value}-${index}`}>
             <TableCell>{facilityModule.cp.name!.value}</TableCell>
@@ -36,7 +36,7 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
         ))}
       </tbody>
       <tbody>
-        {utilityModules.map((facilityModule, index) => {
+        {(utilityModules ?? []).map((facilityModule, index) => {
           const teleport = facilityModule.cp.teleport?.destinationId
             ? entity.sim.get(facilityModule.cp.teleport?.destinationId)
             : null;

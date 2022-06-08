@@ -15,7 +15,6 @@ import {
   releaseAllocation,
 } from "../components/utils/allocations";
 import { Commodity } from "../economy/commodity";
-import { sim } from "../sim";
 import { BaseComponent } from "./component";
 
 export type StorageAllocationType = "incoming" | "outgoing";
@@ -114,7 +113,10 @@ export function onStorageChange(
   storage: CommodityStorage,
   entry: Omit<CommodityStorageHistoryEntry, "time">
 ) {
-  addStorageHitoryEntry(storage, { ...entry, time: sim ? sim.getTime() : 0 });
+  addStorageHitoryEntry(storage, {
+    ...entry,
+    time: window.sim ? window.sim.getTime() : 0,
+  });
   updateAvailableWares(storage);
 }
 

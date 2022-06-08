@@ -7,7 +7,18 @@ import { createAsteroid } from "../archetypes/asteroid";
 import { sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
 
-const getSize = () => (Math.random() < 0.1 ? random(4, 7) : random(1, 3));
+const getSize = () => {
+  const r = Math.random();
+
+  if (r < 0.05) {
+    return random(7, 12);
+  }
+  if (r < 0.15) {
+    return random(4, 7);
+  }
+
+  return random(1, 3);
+};
 
 export function getRandomAsteroidField() {
   const sectors = (window.sim as Sim).queries.sectors.get();
@@ -18,8 +29,9 @@ export function getRandomAsteroidField() {
     sector.cp.hecsPosition.value,
     sectorSize / 10
   );
+  const size = getSize();
   const polarPosition = {
-    r: random(0, maxR - 7),
+    r: random(0, maxR - size - 0.5),
     a: random(-Math.PI, Math.PI),
   };
   const position = add(
@@ -37,7 +49,7 @@ export function getRandomAsteroidField() {
         Math.floor(Object.keys(mineableCommodities).length * Math.random())
       ]
     ],
-    getSize(),
+    size,
     position,
     sector
   );

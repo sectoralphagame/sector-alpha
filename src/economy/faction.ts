@@ -1,5 +1,4 @@
 import Color from "color";
-import { Cooldowns } from "../utils/cooldowns";
 import { Budget, createBudget } from "../components/budget";
 
 let factionCounter = 0;
@@ -7,7 +6,6 @@ let factionCounter = 0;
 export class Faction {
   slug: string;
   name: string;
-  cooldowns: Cooldowns<"adjustPrices" | "budget">;
   color: string;
   budget: Budget;
 

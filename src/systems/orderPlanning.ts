@@ -94,7 +94,7 @@ function autoMine(
     if (mineable) {
       const field = minBy(
         getSectorsInTeleportRange(
-          asSector(entity.sim.entities.get(entity.cp.position.sector)!),
+          asSector(entity.sim.get(entity.cp.position.sector)),
           sectorDistance,
           entity.sim
         )
@@ -109,7 +109,7 @@ function autoMine(
             (e) =>
               e.cp.asteroidSpawn.type === mineable &&
               e.cp.children.entities
-                .map((child) => asteroid(entity.sim.entities.get(child)!))
+                .map((child) => asteroid(entity.sim.get(child)))
                 .some((a) => !a.cp.minable.minedById)
           ),
         (e) =>

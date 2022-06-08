@@ -35,7 +35,7 @@ export const Docks: React.FC<DocksProps> = ({ entity }) => {
       </thead>
       <tbody>
         {docks.docked.map((shipId) => {
-          const ship = entity.sim.entities.get(shipId)!;
+          const ship = entity.sim.get(shipId);
 
           return (
             <tr key={ship.id}>

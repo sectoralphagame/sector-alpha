@@ -1,5 +1,5 @@
 import { add, Matrix, matrix, multiply, norm, subtract } from "mathjs";
-import { startCruise, stopCruise } from "../components/drive";
+import { clearTarget, startCruise, stopCruise } from "../components/drive";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Query } from "./query";
@@ -13,20 +13,20 @@ function move(entity: Driveable, delta: number) {
 
   entity.cooldowns.update(delta);
 
-  if (drive.target === null) return;
+  if (!drive.target) return;
 
   if (drive.state === "warming" && entity.cooldowns.canUse("cruise")) {
     drive.state = "cruise";
   }
 
-  const targetPosition = entity.sim.entities.get(drive.target)!.cp.position!;
+  const targetPosition = entity.sim.get(drive.target).cp.position!;
   const isInSector = targetPosition.sector === entity.cp.position.sector;
   if (!isInSector) {
     // eslint-disable-next-line no-console
     console.error(entity);
     // eslint-disable-next-line no-console
     console.error(drive.target);
-    drive.target = null;
+    clearTarget(drive);
     entity.cp.orders!.value = [];
     throw new Error("Out of bounds");
   }

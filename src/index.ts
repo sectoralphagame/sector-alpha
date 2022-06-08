@@ -1,6 +1,18 @@
 import world from "./world";
-import { sim } from "./sim";
+import { Sim } from "./sim";
 import "./style";
 
-sim.load(world);
+const sim = new Sim();
+sim.init();
+
+window.sim = sim;
+world(sim);
 sim.start();
+
+// import { Sim } from "./sim";
+// import "./style";
+
+// const sim = Sim.load();
+
+// window.sim = sim;
+// sim.start();

@@ -1,3 +1,8 @@
+import "reflect-metadata";
+import { Expose, Exclude, Type } from "class-transformer";
+import omit from "lodash/omit";
+import reduce from "lodash/reduce";
+import pick from "lodash/pick";
 import { Budget } from "./budget";
 import type { Sim } from "../sim";
 import { Owner } from "./owner";
@@ -57,16 +62,36 @@ export interface CoreComponents {
   trade: Trade;
 }
 
+class EntityComponents {
+  toJSON() {
+    return reduce(
+      Object.keys(this),
+      (acc, key) => ({
+        ...acc,
+        [key]: omit(this[key], ["sim", "g", "sprite"]),
+      }),
+      {}
+    );
+  }
+}
+
+@Exclude()
 export class Entity {
-  components: Partial<CoreComponents> = {};
+  @Expose()
+  components = new EntityComponents() as Partial<CoreComponents>;
+  @Expose()
+  @Type(() => Cooldowns)
   cooldowns = new Cooldowns<string>();
+  @Expose()
   id: number;
   sim: Sim;
   deleted: boolean = false;
 
-  constructor(sim: Sim) {
-    this.sim = sim;
-    sim.registerEntity(this);
+  constructor(sim?: Sim) {
+    if (sim) {
+      this.sim = sim;
+      sim.registerEntity(this);
+    }
   }
 
   get cp(): Partial<CoreComponents> {
@@ -105,5 +130,9 @@ export class Entity {
   unregister() {
     this.deleted = true;
     this.sim.unregisterEntity(this);
+  }
+
+  toJSON() {
+    return pick(this, ["components", "cooldowns", "id"]);
   }
 }

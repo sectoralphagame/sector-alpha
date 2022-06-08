@@ -53,17 +53,20 @@ export const factions = (sim: Sim) =>
       i++
     ) {
       const teleporter = sim.get(
-        createTeleporter({
-          owner: faction,
-          position: add(
-            position,
-            matrix([
-              random(-sectorSize / 20, sectorSize / 20),
-              random(-sectorSize / 20, sectorSize / 20),
-            ])
-          ) as Matrix,
-          sector,
-        }).cp.modules.ids[0]
+        createTeleporter(
+          {
+            owner: faction,
+            position: add(
+              position,
+              matrix([
+                random(-sectorSize / 20, sectorSize / 20),
+                random(-sectorSize / 20, sectorSize / 20),
+              ])
+            ) as Matrix,
+            sector,
+          },
+          sim
+        ).cp.modules.ids[0]
       );
       const target = sim.queries.teleports
         .get()
@@ -77,17 +80,20 @@ export const factions = (sim: Sim) =>
     for (let i = 0; i < randomInt(10, 15); i++) {
       const facility = facilityTemplates[
         randomInt(0, facilityTemplates.length)
-      ]({
-        owner: faction,
-        position: add(
-          position,
-          matrix([
-            random(-sectorSize / 20, sectorSize / 20),
-            random(-sectorSize / 20, sectorSize / 20),
-          ])
-        ) as Matrix,
-        sector,
-      });
+      ](
+        {
+          owner: faction,
+          position: add(
+            position,
+            matrix([
+              random(-sectorSize / 20, sectorSize / 20),
+              random(-sectorSize / 20, sectorSize / 20),
+            ])
+          ) as Matrix,
+          sector,
+        },
+        sim
+      );
 
       const consumed = Object.entries(facility.cp.compoundProduction.pac)
         .filter(([, pac]) => pac.consumes > 0)
@@ -136,4 +142,5 @@ export const factions = (sim: Sim) =>
 
       facility.components.owner.value = faction;
     }
+    sim.factions.push(faction);
   });

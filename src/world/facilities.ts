@@ -1,14 +1,11 @@
 import { createFacility, InitialFacilityInput } from "../archetypes/facility";
 import { facilityModules } from "../archetypes/facilityModule";
-import { sim as defaultSim, Sim } from "../sim";
+import { Sim } from "../sim";
 import { addFacilityModule } from "../utils/entityModules";
 import { addStorage } from "../components/storage";
 import { setTexture } from "../components/render";
 
-export function createRefineryFacility(
-  input: InitialFacilityInput,
-  sim: Sim = defaultSim
-) {
+export function createRefineryFacility(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.refinery(sim, facility));
   addFacilityModule(facility, facilityModules.refinery(sim, facility));
@@ -18,7 +15,7 @@ export function createRefineryFacility(
   return facility;
 }
 
-export function createFarm(input: InitialFacilityInput, sim: Sim = defaultSim) {
+export function createFarm(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.farm(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
@@ -27,10 +24,7 @@ export function createFarm(input: InitialFacilityInput, sim: Sim = defaultSim) {
   return facility;
 }
 
-export function createShipyard(
-  input: InitialFacilityInput,
-  sim: Sim = defaultSim
-) {
+export function createShipyard(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.shipyard(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
@@ -38,10 +32,7 @@ export function createShipyard(
   return facility;
 }
 
-export function createWaterFacility(
-  input: InitialFacilityInput,
-  sim: Sim = defaultSim
-) {
+export function createWaterFacility(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.water(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
@@ -52,7 +43,7 @@ export function createWaterFacility(
 
 export function createFuelFabricationFacility(
   input: InitialFacilityInput,
-  sim: Sim = defaultSim
+  sim: Sim
 ) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.fuelFabrication(sim, facility));
@@ -64,7 +55,7 @@ export function createFuelFabricationFacility(
 
 export function createHullPlatesFacility(
   input: InitialFacilityInput,
-  sim: Sim = defaultSim
+  sim: Sim
 ) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.hullPlates(sim, facility));
@@ -74,10 +65,7 @@ export function createHullPlatesFacility(
   return facility;
 }
 
-export function createGoldRefinery(
-  input: InitialFacilityInput,
-  sim: Sim = defaultSim
-) {
+export function createGoldRefinery(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.gold(sim, facility));
   addFacilityModule(facility, facilityModules.containerSmall(sim, facility));
@@ -88,7 +76,7 @@ export function createGoldRefinery(
 
 export function createSiliconPurificationFacility(
   input: InitialFacilityInput,
-  sim: Sim = defaultSim
+  sim: Sim
 ) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.silicon(sim, facility));
@@ -100,7 +88,7 @@ export function createSiliconPurificationFacility(
 
 export function createElectronicsFacility(
   input: InitialFacilityInput,
-  sim: Sim = defaultSim
+  sim: Sim
 ) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.electronics(sim, facility));
@@ -110,10 +98,7 @@ export function createElectronicsFacility(
   return facility;
 }
 
-export function createTeleporter(
-  input: InitialFacilityInput,
-  sim: Sim = defaultSim
-) {
+export function createTeleporter(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.teleport(sim, facility));
   setTexture(facility.cp.render, "fTeleport");
