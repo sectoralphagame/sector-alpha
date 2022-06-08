@@ -5,10 +5,10 @@ import { Entity } from "../components/entity";
 import { createMining } from "../components/mining";
 import { createRender, Textures } from "../components/render";
 import { createCommodityStorage } from "../components/storage";
-import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Sector } from "./sector";
+import { Faction } from "./faction";
 
 export const shipComponents = [
   "drive",
@@ -55,7 +55,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       name: "orders",
       value: [],
     })
-    .addComponent({ name: "owner", value: initial.owner })
+    .addComponent({ name: "owner", id: initial.owner.id })
     .addComponent({
       name: "position",
       angle: 0,
@@ -64,7 +64,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
     })
     .addComponent(
       createRender({
-        color: Color(initial.owner.color).rgbNumber(),
+        color: Color(initial.owner.cp.color.value).rgbNumber(),
         defaultScale: 0.4,
         maxZ: 0.5,
         texture: initial.texture,

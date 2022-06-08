@@ -6,11 +6,11 @@ import { createCompoundProduction } from "../components/production";
 import { createRender } from "../components/render";
 import { createCommodityStorage } from "../components/storage";
 import { createTrade } from "../components/trade";
-import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Sector } from "./sector";
 import { createDocks } from "../components/dockable";
+import { Faction } from "./faction";
 
 export const commanderRange = 2;
 
@@ -60,7 +60,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     })
     .addComponent({
       name: "owner",
-      value: initial.owner,
+      id: initial.owner.id,
     })
     .addComponent({
       name: "position",
@@ -70,7 +70,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     })
     .addComponent(
       createRender({
-        color: Color(initial.owner.color).rgbNumber(),
+        color: Color(initial.owner.cp.color.value).rgbNumber(),
         defaultScale: 1,
         maxZ: 0.1,
         texture: "fCiv",

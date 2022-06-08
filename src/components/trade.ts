@@ -1,5 +1,4 @@
 import { Commodity } from "../economy/commodity";
-import { Faction } from "../economy/faction";
 import { perCommodity } from "../utils/perCommodity";
 import { Budget } from "./budget";
 import { BaseComponent } from "./component";
@@ -11,7 +10,7 @@ export interface Transaction extends TradeOffer {
 
 export interface TransactionInput extends TradeOffer {
   commodity: Commodity;
-  faction: Faction;
+  factionId: number;
   budget: Budget | null;
   allocations: Record<
     "buyer" | "seller",

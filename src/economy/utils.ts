@@ -36,7 +36,7 @@ export function getFacilityWithMostProfit(
     ) as number;
 
   const profit = (f: WithTrade) =>
-    facility.components.owner.value === f.components.owner.value
+    facility.components.owner.id === f.components.owner.id
       ? 1e20
       : (facility.components.trade.offers[commodity].price -
           f.components.trade.offers[commodity].price) *

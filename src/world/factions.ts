@@ -1,11 +1,11 @@
 import { add, Matrix, matrix, random, randomInt } from "mathjs";
+import { createFaction } from "../archetypes/faction";
 import { sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
 import { changeBudgetMoney } from "../components/budget";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { linkTeleportModules } from "../components/teleport";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
-import { Faction } from "../economy/faction";
 import { Sim } from "../sim";
 import { pickRandom } from "../utils/generators";
 import { createTeleporter, templates as facilityTemplates } from "./facilities";
@@ -29,18 +29,17 @@ function getFreighterTemplate() {
   return pickRandom(shipClasses.filter((s) => !s.mining && s.size === "small"));
 }
 
-function createFaction(index: number) {
+function createFactionX(index: number, sim: Sim) {
   const char = String.fromCharCode(index + 65);
-  const faction = new Faction(`f-${char}`);
-  faction.name = `Faction ${char}`;
-  changeBudgetMoney(faction.budget, 1e8);
+  const faction = createFaction(`Faction ${char}`, sim);
+  changeBudgetMoney(faction.cp.budget, 1e8);
 
   return faction;
 }
 
 export const factions = (sim: Sim) =>
   sim.queries.sectors.get().forEach((sector, index, sectors) => {
-    const faction = createFaction(index);
+    const faction = createFactionX(index, sim);
 
     const position = hecsToCartesian(
       sector.cp.hecsPosition.value,
@@ -121,7 +120,7 @@ export const factions = (sim: Sim) =>
             name: "commander",
             id: facility.id,
           });
-          minerShip.components.owner.value = faction;
+          minerShip.components.owner.id = faction.id;
         } else {
           const tradeShip = createShip(sim, {
             ...getFreighterTemplate(),
@@ -136,11 +135,10 @@ export const factions = (sim: Sim) =>
             name: "commander",
             id: facility.id,
           });
-          tradeShip.components.owner.value = faction;
+          tradeShip.components.owner.id = faction.id;
         }
       } while (Math.random() < 0.15);
 
-      facility.components.owner.value = faction;
+      facility.components.owner.id = faction.id;
     }
-    sim.factions.push(faction);
   });

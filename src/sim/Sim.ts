@@ -8,7 +8,6 @@ import { reviver, replacer } from "mathjs";
 import { Path } from "graphlib";
 import * as PIXI from "pixi.js";
 import isPlainObject from "lodash/isPlainObject";
-import { Faction } from "../economy/faction";
 import { Entity } from "../components/entity";
 import { BaseSim } from "./BaseSim";
 import { System } from "../systems/system";
@@ -54,9 +53,6 @@ export class Sim extends BaseSim {
     Entity
   >;
 
-  @Expose()
-  @Type(() => Faction)
-  factions: Faction[] = [];
   @Expose()
   @Type(() => Entity)
   entities: Map<number, Entity>;
@@ -169,12 +165,6 @@ export class Sim extends BaseSim {
       entity.sim = sim;
 
       entity.components = reviveMathjs(entity.components);
-
-      if (entity.cp.owner?.value) {
-        entity.cp.owner.value = sim.factions.find(
-          (f) => f.slug === entity.cp.owner!.value!.slug
-        )!;
-      }
 
       if (entity.cp.render) {
         setTexture(entity.cp.render, entity.cp.render.texture);
