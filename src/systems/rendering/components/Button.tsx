@@ -4,10 +4,6 @@ import { nano } from "../../../style";
 
 const styles = nano.sheet({
   root: {
-    "*": {
-      height: "100%",
-      width: "100%",
-    },
     "&:hover, &:focus": {
       background: "rgba(255, 255, 255, 0.15)",
     },
@@ -22,12 +18,18 @@ const styles = nano.sheet({
     cursor: "pointer",
     height: "32px",
     padding: "8px",
-    width: "32px",
+    textAlign: "center",
+    whiteSpace: "nowrap",
+    lineHeight: 1,
+    textTransform: "uppercase",
+    fontSize: "14px",
+    fontWeight: 600,
+    transition: "200ms",
     outline: 0,
   },
 });
 
-export const IconButton: React.FC<React.HTMLAttributes<HTMLButtonElement>> = (
+export const Button: React.FC<React.HTMLAttributes<HTMLButtonElement>> = (
   props
 ) => {
   const ref = React.useRef<HTMLButtonElement>(null);
@@ -45,4 +47,4 @@ export const IconButton: React.FC<React.HTMLAttributes<HTMLButtonElement>> = (
     />
   );
 };
-IconButton.displayName = "IconButton";
+Button.displayName = "Button";

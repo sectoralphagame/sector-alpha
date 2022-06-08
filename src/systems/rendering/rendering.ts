@@ -6,8 +6,6 @@ import { System } from "../system";
 import { drawGraphics } from "../../components/renderGraphics";
 import { RequireComponent } from "../../tsHelpers";
 
-let initialized = false;
-
 if (process.env.NODE_ENV !== "test") {
   // eslint-disable-next-line global-require
   require("./components/Panel");
@@ -19,13 +17,11 @@ export class RenderingSystem extends System {
   selectionManger: RequireComponent<"selectionManager">;
   viewport: Viewport;
   prevScale: number = minScale;
+  app: PIXI.Application;
 
   constructor(sim: Sim) {
     super(sim);
-
-    if (!initialized) {
-      this.init();
-    }
+    this.init();
   }
 
   init = () => {
@@ -34,7 +30,7 @@ export class RenderingSystem extends System {
     const toolbar = document.querySelector("#toolbar")!;
     const canvas = document.querySelector("#canvasRoot")! as HTMLCanvasElement;
 
-    const app = new PIXI.Application({
+    this.app = new PIXI.Application({
       antialias: true,
       autoDensity: true,
       resolution: window.devicePixelRatio,
@@ -46,10 +42,10 @@ export class RenderingSystem extends System {
     const viewport = new Viewport({
       screenWidth: root.clientWidth - toolbar.clientWidth,
       screenHeight: window.innerHeight,
-      interaction: app.renderer.plugins.interaction,
+      interaction: this.app.renderer.plugins.interaction,
     });
 
-    app.stage.addChild(viewport);
+    this.app.stage.addChild(viewport);
 
     viewport.drag().pinch().wheel();
     viewport.clampZoom({ minScale });
@@ -60,8 +56,11 @@ export class RenderingSystem extends System {
     viewport.sortableChildren = true;
 
     this.viewport = viewport;
-    initialized = true;
   };
+
+  destroy(): void {
+    this.app.destroy();
+  }
 
   exec(): void {
     this.selectionManger = this.sim.queries.selectionManager.get()[0];

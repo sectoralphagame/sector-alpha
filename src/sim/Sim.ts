@@ -26,6 +26,7 @@ import { PathPlanningSystem } from "../systems/pathPlanning";
 import { CooldownUpdatingSystem } from "../systems/cooldowns";
 import { MissingEntityError } from "../errors";
 import { setTexture } from "../components/render";
+import { openDb } from "../db";
 
 function reviveMathjs(value: any) {
   if (isPlainObject(value)) {
@@ -136,14 +137,29 @@ export class Sim extends BaseSim {
     return entity;
   };
 
-  save = () => {
-    const save = JSON.stringify(this, replacer);
-
-    localStorage.setItem("save", save);
+  destroy = () => {
+    this.systems.forEach((system) => system.destroy());
+    this.pause();
   };
 
-  static load() {
-    const save = JSON.parse(localStorage.getItem("save")!);
+  save = async (name: string, id?: number) => {
+    const data = JSON.stringify(this, replacer);
+    const db = await openDb();
+
+    const tx = db.transaction("saves", "readwrite");
+    const os = tx.objectStore("saves");
+    if (id) {
+      os.put({ id, name, data });
+    } else {
+      os.add({ name, data });
+    }
+    tx.commit();
+
+    return tx.done;
+  };
+
+  static async load(data: string) {
+    const save = JSON.parse(data);
     const sim = plainToInstance(Sim, save);
     Object.values(sim.queries).forEach((query) => query.reset());
     const entityMap = new Map();
@@ -175,9 +191,20 @@ export class Sim extends BaseSim {
     return sim;
   }
 
+  static async listSaves() {
+    const db = await openDb();
+
+    const tx = db.transaction("saves", "readonly");
+    const os = tx.objectStore("saves");
+    const results = os.getAll();
+    await tx.done;
+
+    return results;
+  }
+
   toJSON() {
     return {
-      ...pick(this, ["entityIdCounter", "factions"]),
+      ...pick(this, ["entityIdCounter", "factions", "timeOffset"]),
       entities: [...this.entities].map(([, e]) => e),
     };
   }
