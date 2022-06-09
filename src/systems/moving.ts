@@ -37,7 +37,7 @@ function move(entity: Driveable, delta: number) {
   const distance = norm(path);
   const canCruise =
     distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
-    targetAngle - entityPosition.angle < Math.PI / 12;
+    Math.abs(targetAngle - entityPosition.angle) < Math.PI / 12;
   const moveVec = matrix([
     Math.cos(entityPosition.angle - Math.PI / 2),
     Math.sin(entityPosition.angle - Math.PI / 2),
