@@ -49,7 +49,7 @@ export const Docks: React.FC<DocksProps> = ({ entity }) => {
                       .find((e) => e.hasComponents(["selectionManager"]))!
                       .requireComponents(["selectionManager"]).cp;
 
-                    selectionManager.id = ship.cp.commander!.id;
+                    selectionManager.id = ship.id;
                     selectionManager.focused = true;
                   }}
                 >
