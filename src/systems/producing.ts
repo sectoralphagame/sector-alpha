@@ -6,7 +6,9 @@ import {
   hasSufficientStorage,
   removeStorage,
 } from "../components/storage";
+import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
+import { Cooldowns } from "../utils/cooldowns";
 import { findInAncestors } from "../utils/findInAncestors";
 import { limitMax } from "../utils/limit";
 import { perCommodity } from "../utils/perCommodity";
@@ -50,7 +52,16 @@ export function isAbleToProduce(
 }
 
 export class ProducingSystem extends System {
+  cooldowns: Cooldowns<"exec">;
+
+  constructor(sim: Sim) {
+    super(sim);
+    this.cooldowns = new Cooldowns("exec");
+  }
+
   exec = (): void => {
+    if (!this.cooldowns.canUse("exec")) return;
+
     this.sim.queries.standaloneProduction.get().forEach((entity) => {
       if (!isAbleToProduce(entity, entity.cp.storage)) {
         return;
@@ -74,5 +85,6 @@ export class ProducingSystem extends System {
 
       produce(facilityModule.cp.production.pac, storage);
     });
+    this.cooldowns.use("exec", 2);
   };
 }

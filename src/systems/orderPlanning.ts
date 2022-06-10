@@ -192,7 +192,7 @@ export class OrderPlanningSystem extends System {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("autoOrder")) {
-      this.cooldowns.use("autoOrder", 1);
+      this.cooldowns.use("autoOrder", 10);
       this.sim.queries.autoOrderable.get().forEach(autoOrder);
     }
   };
