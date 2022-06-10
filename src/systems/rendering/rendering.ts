@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== "test") {
   require("./components/Panel");
 }
 
-const minScale = 0.2;
+const minScale = 0.13;
 
 export class RenderingSystem extends System {
   selectionManger: RequireComponent<"selectionManager">;

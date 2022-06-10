@@ -72,7 +72,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
       createRender({
         color: Color(initial.owner.cp.color.value).rgbNumber(),
         defaultScale: 1,
-        maxZ: 0.1,
+        maxZ: 0.2,
         texture: "fCiv",
         zIndex: 1,
       })
