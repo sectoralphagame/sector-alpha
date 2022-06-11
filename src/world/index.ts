@@ -12,7 +12,7 @@ function getRandomWorld(sim: Sim): void {
     name: "Sector Alpha",
   });
   createSector(sim, {
-    position: hecsMove(alpha.cp.hecsPosition.value, "e"),
+    position: hecsMove(alpha.cp.hecsPosition.value, "se"),
     name: getSectorName(),
   });
   createSector(sim, {
@@ -20,11 +20,11 @@ function getRandomWorld(sim: Sim): void {
     name: getSectorName(),
   });
   createSector(sim, {
-    position: hecsMove(alpha.cp.hecsPosition.value, "nw"),
+    position: hecsMove(alpha.cp.hecsPosition.value, "n"),
     name: getSectorName(),
   });
   createSector(sim, {
-    position: hecsMove(alpha.cp.hecsPosition.value, "w"),
+    position: hecsMove(alpha.cp.hecsPosition.value, "nw"),
     name: getSectorName(),
   });
   createSector(sim, {
@@ -32,13 +32,13 @@ function getRandomWorld(sim: Sim): void {
     name: getSectorName(),
   });
   createSector(sim, {
-    position: hecsMove(alpha.cp.hecsPosition.value, "se"),
+    position: hecsMove(alpha.cp.hecsPosition.value, "s"),
     name: getSectorName(),
   });
   createSector(sim, {
     position: hecsMove(
       sector(sim.queries.sectors.get()[6]).cp.hecsPosition.value,
-      "e"
+      "se"
     ),
     name: getSectorName(),
   });

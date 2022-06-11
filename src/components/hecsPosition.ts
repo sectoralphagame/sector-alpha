@@ -2,11 +2,11 @@ import { add, matrix, Matrix, multiply, subtract, sum } from "mathjs";
 import { BaseComponent } from "./component";
 
 const transforms = {
-  se: matrix([0, 1, -1]),
-  e: matrix([1, 0, -1]),
+  s: matrix([0, 1, -1]),
+  se: matrix([1, 0, -1]),
   ne: matrix([1, -1, 0]),
-  nw: matrix([0, -1, 1]),
-  w: matrix([-1, 0, 1]),
+  n: matrix([0, -1, 1]),
+  nw: matrix([-1, 0, 1]),
   sw: matrix([-1, 1, 0]),
 };
 
