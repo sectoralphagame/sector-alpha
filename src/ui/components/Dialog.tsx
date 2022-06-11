@@ -2,8 +2,8 @@ import React from "react";
 import Modal from "react-modal";
 import SVG from "react-inlinesvg";
 import { IconButton } from "./IconButton";
-import closeIcon from "../../../../assets/ui/close.svg";
-import { nano } from "../../../style";
+import closeIcon from "../../../assets/ui/close.svg";
+import { nano } from "../../style";
 
 Modal.setAppElement("#root");
 

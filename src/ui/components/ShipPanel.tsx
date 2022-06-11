@@ -1,20 +1,20 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { ship as asShip, Ship } from "../../../archetypes/ship";
-import { Entity } from "../../../components/entity";
-import { MineOrder, Order, OrderGroup } from "../../../components/orders";
-import { commodities } from "../../../economy/commodity";
+import { ship as asShip, Ship } from "../../archetypes/ship";
+import { Entity } from "../../components/entity";
+import { MineOrder, Order, OrderGroup } from "../../components/orders";
+import { commodities } from "../../economy/commodity";
 import { IconButton } from "./IconButton";
-import locationIcon from "../../../../assets/ui/location.svg";
-import { nano } from "../../../style";
+import locationIcon from "../../../assets/ui/location.svg";
+import { nano } from "../../style";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleSummary,
 } from "./Collapsible";
 import { Docks } from "./Docks";
-import { Sim } from "../../../sim";
-import { asteroidField } from "../../../archetypes/asteroidField";
+import { Sim } from "../../sim";
+import { asteroidField } from "../../archetypes/asteroidField";
 
 const styles = nano.sheet(
   {

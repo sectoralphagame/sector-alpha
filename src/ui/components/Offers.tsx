@@ -1,6 +1,6 @@
 import React from "react";
-import { commodities } from "../../../economy/commodity";
-import { RequireComponent } from "../../../tsHelpers";
+import { commodities } from "../../economy/commodity";
+import { RequireComponent } from "../../tsHelpers";
 import { Table, TableCell } from "./Table";
 
 export interface OffersProps {

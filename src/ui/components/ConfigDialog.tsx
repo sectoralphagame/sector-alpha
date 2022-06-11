@@ -1,13 +1,10 @@
 import React from "react";
-import ReactModal from "react-modal";
-import { nano } from "../../../style";
+import { nano } from "../../style";
 import { Dialog } from "./Dialog";
 import { Button } from "./Button";
-import { Sim } from "../../../sim";
-import { Save } from "../../../db";
+import { Sim } from "../../sim";
+import { Save } from "../../db";
 import { Input } from "./Input";
-
-ReactModal.setAppElement("#root");
 
 export interface ModalProps {
   open: boolean;
