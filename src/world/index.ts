@@ -43,7 +43,7 @@ function getRandomWorld(sim: Sim): void {
     name: getSectorName(),
   });
 
-  Array(25).fill(0).map(getRandomAsteroidField);
+  Array(45).fill(0).map(getRandomAsteroidField);
 
   factions(sim);
 }
