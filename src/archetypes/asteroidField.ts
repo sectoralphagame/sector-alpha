@@ -1,7 +1,7 @@
 import { Matrix } from "mathjs";
+import { AsteroidSpawn } from "../components/asteroidSpawn";
 import { Entity } from "../components/entity";
 import { createRenderGraphics } from "../components/renderGraphics";
-import { MineableCommodity } from "../economy/commodity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { fieldColors } from "./asteroid";
@@ -25,18 +25,16 @@ export function asteroidField(entity: Entity): AsteroidField {
 
 export function createAsteroidField(
   sim: Sim,
-  type: MineableCommodity,
-  size: number,
   position: Matrix,
-  sector: Sector
+  sector: Sector,
+  spawn: Omit<AsteroidSpawn, "name">
 ) {
   const entity = new Entity(sim);
 
   entity
     .addComponent({
       name: "asteroidSpawn",
-      size,
-      type,
+      ...spawn,
     })
     .addComponent({ name: "children", entities: [] })
     .addComponent({

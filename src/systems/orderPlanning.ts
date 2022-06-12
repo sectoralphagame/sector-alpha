@@ -120,20 +120,16 @@ function autoMine(
 
       if (!field) return;
 
-      const rock = getClosestMineableAsteroid(field, entity.cp.position.coord);
-
-      if (rock) {
-        entity.cp.orders.value.push({
-          type: "mine",
-          orders: [
-            ...moveToOrders(entity, field),
-            mineOrder({
-              targetFieldId: field.id,
-              targetRockId: rock.id,
-            }),
-          ],
-        });
-      }
+      entity.cp.orders.value.push({
+        type: "mine",
+        orders: [
+          ...moveToOrders(entity, field),
+          mineOrder({
+            targetFieldId: field.id,
+            targetRockId: null,
+          }),
+        ],
+      });
     }
   }
 }

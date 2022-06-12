@@ -36,7 +36,8 @@ export function createAsteroid(
   sim: Sim,
   parent: AsteroidField,
   position: Matrix,
-  sector: Sector
+  sectorId: number,
+  resources: number
 ) {
   const entity = new Entity(sim);
   const type = parent.cp.asteroidSpawn.type;
@@ -46,6 +47,7 @@ export function createAsteroid(
       name: "minable",
       commodity: type,
       minedById: null,
+      resources,
     })
     .addComponent({
       name: "parent",
@@ -55,7 +57,7 @@ export function createAsteroid(
       name: "position",
       coord: position,
       angle: 0,
-      sector: sector.id,
+      sector: sectorId,
     })
     .addComponent(
       createRender({

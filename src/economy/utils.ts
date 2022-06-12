@@ -87,7 +87,10 @@ export function getClosestMineableAsteroid(
   return minBy(
     field.components.children.entities
       .map((e) => asteroid(field.sim.get(e)))
-      .filter((a) => !a.components.minable.minedById),
+      .filter(
+        (a) =>
+          !a.components.minable.minedById && a.components.minable.resources > 0
+      ),
     (r) => norm(subtract(position, asteroid(r).cp.position.coord) as Matrix)
   );
 }

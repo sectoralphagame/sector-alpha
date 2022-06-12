@@ -28,7 +28,7 @@ export interface TradeOrder {
 export interface MineOrder {
   type: "mine";
   targetFieldId: number;
-  targetRockId: number;
+  targetRockId: number | null;
 }
 
 export interface HoldPositionOrder {

@@ -59,7 +59,8 @@ export class ProducingSystem extends System {
     this.cooldowns = new Cooldowns("exec");
   }
 
-  exec = (): void => {
+  exec = (delta: number): void => {
+    this.cooldowns.update(delta);
     if (!this.cooldowns.canUse("exec")) return;
 
     this.sim.queries.standaloneProduction.get().forEach((entity) => {

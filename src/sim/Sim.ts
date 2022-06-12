@@ -26,6 +26,7 @@ import { CooldownUpdatingSystem } from "../systems/cooldowns";
 import { MissingEntityError } from "../errors";
 import { setTexture } from "../components/render";
 import { openDb } from "../db";
+import { AsteroidSpawningSystem } from "../systems/asteroidSpawning";
 
 function reviveMathjs(value: any) {
   if (isPlainObject(value)) {
@@ -80,6 +81,7 @@ export class Sim extends BaseSim {
       new MovingSystem(this),
       new MiningSystem(this),
       new OrderExecutingSystem(this),
+      new AsteroidSpawningSystem(this),
     ];
 
     if (process.env.NODE_ENV !== "test") {
