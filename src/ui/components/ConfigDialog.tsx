@@ -1,4 +1,5 @@
 import React from "react";
+import SVG from "react-inlinesvg";
 import { nano } from "../../style";
 import { Dialog } from "./Dialog";
 import { Button } from "./Button";
@@ -6,6 +7,8 @@ import { Sim } from "../../sim";
 import { Save } from "../../db";
 import { Input } from "./Input";
 import { useLocation } from "../context/Location";
+import { IconButton } from "../components/IconButton";
+import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
 
 export interface ModalProps {
   open: boolean;
@@ -13,6 +16,9 @@ export interface ModalProps {
 }
 
 const styles = nano.sheet({
+  backButton: {
+    marginBottom: "8px",
+  },
   buttons: {},
   button: {
     "&:not(:last-child)": {
@@ -55,6 +61,14 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={onClose} title="Configuration">
+      {view !== "default" && (
+        <IconButton
+          className={styles.backButton}
+          onClick={() => setView("default")}
+        >
+          <SVG src={arrowLeftIcon} />
+        </IconButton>
+      )}
       {view === "default" ? (
         <div className={styles.buttons}>
           <Button onClick={() => setView("load")} className={styles.button}>

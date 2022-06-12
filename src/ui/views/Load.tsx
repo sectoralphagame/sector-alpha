@@ -1,11 +1,17 @@
 import React from "react";
+import SVG from "react-inlinesvg";
 import { nano } from "../../style";
 import { Sim } from "../../sim";
 import { Save } from "../../db";
 import { Button } from "../components/Button";
 import { useLocation } from "../context/Location";
+import { IconButton } from "../components/IconButton";
+import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
 
 const styles = nano.sheet({
+  backButton: {
+    marginBottom: "32px",
+  },
   buttons: {},
   button: {
     "&:not(:last-child)": {
@@ -40,6 +46,12 @@ export const LoadGame: React.FC = () => {
   return (
     <div className={styles.root}>
       <div className={styles.container}>
+        <IconButton
+          className={styles.backButton}
+          onClick={() => navigate("main")}
+        >
+          <SVG src={arrowLeftIcon} />{" "}
+        </IconButton>
         <div className={styles.buttons}>
           {!!saves &&
             saves.map((save) => (
