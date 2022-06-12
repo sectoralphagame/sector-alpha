@@ -12,6 +12,7 @@ export interface MainProps {
 const styles = nano.sheet({
   container: {
     padding: "32px",
+    width: "420px",
   },
   button: {
     "&:not(:last-child)": {

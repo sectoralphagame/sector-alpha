@@ -19,6 +19,7 @@ const styles = nano.sheet({
   },
   container: {
     padding: "32px",
+    width: "420px",
   },
   root: {
     alignItems: "center",
@@ -40,21 +41,20 @@ export const LoadGame: React.FC = () => {
     <div className={styles.root}>
       <div className={styles.container}>
         <div className={styles.buttons}>
-          {saves
-            ? saves.map((save) => (
-                <Button
-                  className={styles.button}
-                  key={save.id}
-                  onClick={async () => {
-                    window.sim = await Sim.load(save.data);
-                    window.sim.start();
-                    navigate("game");
-                  }}
-                >
-                  {save.name}
-                </Button>
-              ))
-            : "loading"}
+          {!!saves &&
+            saves.map((save) => (
+              <Button
+                className={styles.button}
+                key={save.id}
+                onClick={async () => {
+                  window.sim = await Sim.load(save.data);
+                  window.sim.start();
+                  navigate("game");
+                }}
+              >
+                {save.name}
+              </Button>
+            ))}
         </div>
       </div>
     </div>

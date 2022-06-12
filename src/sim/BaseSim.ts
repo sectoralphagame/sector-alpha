@@ -8,11 +8,11 @@ export class BaseSim {
   timeOffset: number;
   outOfFocusPause: boolean;
   speed = 1;
+  onVisibilityChange: () => void;
 
   constructor() {
     this.timeOffset = 0;
-
-    document.addEventListener("visibilitychange", () => {
+    this.onVisibilityChange = () => {
       if (document.visibilityState !== "visible") {
         if (this.intervalHandle) {
           this.pause();
@@ -22,7 +22,13 @@ export class BaseSim {
         this.start();
         this.outOfFocusPause = false;
       }
-    });
+    };
+
+    document.addEventListener("visibilitychange", this.onVisibilityChange);
+  }
+
+  destroy() {
+    document.removeEventListener("visibilitychange", this.onVisibilityChange);
   }
 
   setSpeed = (value: number) => {

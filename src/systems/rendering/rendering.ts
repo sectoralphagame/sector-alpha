@@ -57,7 +57,8 @@ export class RenderingSystem extends System {
   };
 
   destroy(): void {
-    this.app.destroy();
+    this.viewport.destroy();
+    this.app.destroy(true);
   }
 
   exec(): void {
