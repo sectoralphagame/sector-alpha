@@ -10,13 +10,13 @@ const getSize = () => {
   const r = Math.random();
 
   if (r < 0.05) {
-    return random(7, 12);
+    return random(10, 14);
   }
   if (r < 0.15) {
-    return random(4, 7);
+    return random(5, 9);
   }
 
-  return random(1, 3);
+  return random(2, 4);
 };
 
 const densities: Record<MineableCommodity, [number, number]> = {
