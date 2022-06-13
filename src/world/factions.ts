@@ -51,7 +51,7 @@ export const factions = (sim: Sim) =>
       i < (index === 0 || index === sectors.length - 1 ? 1 : 2);
       i++
     ) {
-      const teleporter = sim.get(
+      const teleporter = sim.getOrThrow(
         createTeleporter(
           {
             owner: faction,

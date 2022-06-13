@@ -21,7 +21,7 @@ function getProductionCost(
   commodity: Commodity
 ): number {
   const productionModule = entity.cp.modules.ids
-    .map(entity.sim.get)
+    .map(entity.sim.getOrThrow)
     .find((m) => m.cp.production?.pac[commodity].produces)
     ?.requireComponents(["production"]);
 

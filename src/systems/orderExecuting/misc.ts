@@ -34,7 +34,7 @@ export function teleportOrder(
   entity: RequireComponent<"position" | "orders">,
   order: TeleportOrder
 ): boolean {
-  const destination = marker(entity.sim.get(order.targetId));
+  const destination = marker(entity.sim.getOrThrow(order.targetId));
 
   entity.cp.position = {
     name: "position",
@@ -44,7 +44,7 @@ export function teleportOrder(
   };
 
   entity.cp.docks?.docked.forEach((docked) => {
-    entity.sim.get(docked).cp.position = {
+    entity.sim.getOrThrow(docked).cp.position = {
       name: "position",
       angle: entity.cp.position.angle,
       coord: destination.cp.position.coord,

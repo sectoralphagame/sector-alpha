@@ -34,16 +34,19 @@ function getOrderDescription(ship: Ship, order: Order) {
     case "trade":
       if (order.targetId === ship.cp.commander?.id)
         return "Deliver wares to commander";
-      return `Deliver wares to ${ship.sim.get(order.targetId).cp.name?.value}`;
+      return `Deliver wares to ${
+        ship.sim.getOrThrow(order.targetId).cp.name?.value
+      }`;
     case "mine":
       return `Mine ${
-        ship.sim.get(order.targetFieldId).requireComponents(["asteroidSpawn"])
-          .cp.asteroidSpawn.type
+        ship.sim
+          .getOrThrow(order.targetFieldId)
+          .requireComponents(["asteroidSpawn"]).cp.asteroidSpawn.type
       }`;
     case "dock":
       if (order.targetId === ship.cp.commander?.id)
         return "Dock at commanding facility";
-      return `Dock at ${ship.sim.get(order.targetId).cp.name?.value}`;
+      return `Dock at ${ship.sim.getOrThrow(order.targetId).cp.name?.value}`;
     default:
       return "Hold position";
   }
@@ -58,7 +61,7 @@ function getOrderGroupDescription(order: OrderGroup, sim: Sim) {
     case "mine":
       return `Mine ${
         asteroidField(
-          sim.get(
+          sim.getOrThrow(
             (order.orders.find((o) => o.type === "mine") as MineOrder)!
               .targetFieldId
           )
@@ -74,7 +77,7 @@ const ShipPanel: React.FC = () => {
   const storedCommodities = Object.values(commodities).filter(
     (commodity) => ship.cp.storage.availableWares[commodity] > 0
   );
-  const commander = ship.sim.get(ship.cp.commander!.id);
+  const commander = ship.sim.getOrThrow(ship.cp.commander!.id);
 
   return (
     <div>

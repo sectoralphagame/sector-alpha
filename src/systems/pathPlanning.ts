@@ -15,7 +15,7 @@ export function regen(sim: Sim) {
     graph.setEdge(
       findInAncestors(t, "position").cp.position.sector.toString(),
       findInAncestors(
-        sim.get(t.cp.teleport.destinationId!),
+        sim.getOrThrow(t.cp.teleport.destinationId!),
         "position"
       ).cp.position.sector.toString()
     );
