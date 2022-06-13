@@ -1,3 +1,4 @@
+import { asteroidField } from "../archetypes/asteroidField";
 import { addStorage } from "../components/storage";
 import { RequireComponent } from "../tsHelpers";
 import { System } from "./system";
@@ -9,7 +10,7 @@ function mine(entity: WithMining, delta: number) {
     if (entity.cooldowns.canUse("mine")) {
       entity.cooldowns.use("mine", 5);
       const mined = entity.sim
-        .get(entity.cp.mining.entityId)
+        .get(entity.cp.mining.entityId)!
         .requireComponents(["minable"]);
       addStorage(
         entity.cp.storage,
@@ -21,6 +22,10 @@ function mine(entity: WithMining, delta: number) {
       entity.cp.mining.buffer = 0;
 
       if (mined.cp.minable.resources <= 0) {
+        const field = asteroidField(entity.sim.get(mined.cp.parent!.id)!);
+        field.cp.children.entities = field.cp.children.entities.filter(
+          (e) => e !== mined.id
+        );
         mined.unregister();
         entity.cp.mining.entityId = null;
       }

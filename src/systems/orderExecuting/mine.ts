@@ -10,26 +10,29 @@ export function mineOrder(
   entity: RequireComponent<"drive" | "mining" | "position" | "storage">,
   order: MineOrder
 ): boolean {
-  const targetField = asteroidField(entity.sim.get(order.targetFieldId));
+  const targetField = asteroidField(entity.sim.getOrThrow(order.targetFieldId));
   const targetRock = order.targetRockId
-    ? asteroid(entity.sim.get(order.targetRockId))
+    ? entity.sim.get(order.targetRockId)
     : null;
+
   if (
     !targetRock ||
-    (targetRock.cp.minable.minedById !== null &&
-      targetRock.cp.minable.minedById !== entity.id)
+    (targetRock.cp.minable!.minedById !== null &&
+      targetRock.cp.minable!.minedById !== entity.id)
   ) {
     const rock = getClosestMineableAsteroid(
       targetField,
       entity.cp.position.coord
     );
-    if (!rock) return false;
+    if (!rock) {
+      return true;
+    }
     order.targetRockId = rock.id;
     entity.cp.orders!.value[0].orders.unshift(...moveToOrders(entity, rock));
   }
 
   if (entity.cp.drive.targetReached) {
-    const rock = asteroid(entity.sim.get(order.targetRockId!));
+    const rock = asteroid(entity.sim.getOrThrow(order.targetRockId!));
     entity.cp.mining.entityId = order.targetRockId;
     rock.cp.minable.minedById = entity.id;
 
