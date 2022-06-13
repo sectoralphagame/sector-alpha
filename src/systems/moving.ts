@@ -11,10 +11,16 @@ function hold(entity: Driveable) {
   console.warn("Order cannot be fulfilled");
   clearTarget(entity.cp.drive);
   if (entity.cp.orders) {
-    entity.cp.orders.value.unshift({
-      type: "hold",
-      orders: [{ type: "hold" }],
-    });
+    if (entity.cp.owner) {
+      if (entity.sim.getOrThrow(entity.cp.owner.id).cp.ai) {
+        entity.cp.orders.value = [];
+      } else {
+        entity.cp.orders.value.unshift({
+          type: "hold",
+          orders: [{ type: "hold" }],
+        });
+      }
+    }
   }
 }
 
