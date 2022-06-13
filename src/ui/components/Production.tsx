@@ -14,7 +14,7 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
   const { modules } = entity.cp;
   const { productionModules, utilityModules } = groupBy(
     modules.ids
-      .map(entity.sim.get)
+      .map(entity.sim.getOrThrow)
       .map((e) => e.requireComponents(["parent", "name"])),
     (facilityModule) =>
       facilityModule.hasComponents(["production"])

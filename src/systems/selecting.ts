@@ -7,7 +7,7 @@ export class SelectingSystem extends System {
       manager.cp.selectionManager.id &&
       manager.cp.selectionManager.id !== window.selected?.id
     ) {
-      window.selected = this.sim.get(manager.cp.selectionManager.id!);
+      window.selected = this.sim.getOrThrow(manager.cp.selectionManager.id!);
     }
   };
 }
