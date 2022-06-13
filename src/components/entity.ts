@@ -33,6 +33,7 @@ import { Cooldowns } from "../utils/cooldowns";
 import { Commander } from "./commander";
 import { Color } from "./color";
 import { Ai } from "./ai";
+import { isTest } from "../settings";
 
 export interface CoreComponents {
   ai: Ai;
@@ -135,6 +136,9 @@ export class Entity {
 
   unregister() {
     this.deleted = true;
+    if (!isTest && this.cp.render) {
+      this.cp.render.sprite.destroy();
+    }
     this.sim.unregisterEntity(this);
   }
 

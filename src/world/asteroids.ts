@@ -20,18 +20,18 @@ const getSize = () => {
 };
 
 const densities: Record<MineableCommodity, [number, number]> = {
-  fuelium: [1000, 4000],
-  goldOre: [100, 500],
-  ore: [500, 6500],
-  ice: [100, 900],
-  silica: [200, 750],
+  fuelium: [250, 1000],
+  goldOre: [25, 125],
+  ore: [125, 1100],
+  ice: [25, 300],
+  silica: [50, 300],
 };
 const resourcesPerAsteroid: Record<MineableCommodity, [number, number]> = {
   fuelium: [500, 800],
   goldOre: [50, 110],
-  ore: [400, 900],
-  ice: [90, 300],
-  silica: [200, 450],
+  ore: [300, 900],
+  ice: [55, 270],
+  silica: [70, 200],
 };
 const getDensity = (type: MineableCommodity) => random(...densities[type]);
 

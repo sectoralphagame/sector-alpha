@@ -18,28 +18,26 @@ export function shouldSpawnAsteroid(entity: AsteroidField): boolean {
 }
 
 function spawn(field: AsteroidField) {
-  while (shouldSpawnAsteroid(field)) {
-    const asteroidAngle = Math.random() * Math.PI;
+  const asteroidAngle = Math.random() * Math.PI;
 
-    createAsteroid(
-      window.sim as any,
-      field,
-      add(
-        field.cp.position.coord,
-        matrix([
-          random(-field.cp.asteroidSpawn.size, field.cp.asteroidSpawn.size) *
-            Math.cos(asteroidAngle),
-          random(-field.cp.asteroidSpawn.size, field.cp.asteroidSpawn.size) *
-            Math.sin(asteroidAngle),
-        ])
-      ) as Matrix,
-      field.cp.position.sector,
-      randomInt(
-        field.cp.asteroidSpawn.asteroidResources.min,
-        field.cp.asteroidSpawn.asteroidResources.max
-      )
-    );
-  }
+  createAsteroid(
+    window.sim as any,
+    field,
+    add(
+      field.cp.position.coord,
+      matrix([
+        random(-field.cp.asteroidSpawn.size, field.cp.asteroidSpawn.size) *
+          Math.cos(asteroidAngle),
+        random(-field.cp.asteroidSpawn.size, field.cp.asteroidSpawn.size) *
+          Math.sin(asteroidAngle),
+      ])
+    ) as Matrix,
+    field.cp.position.sector,
+    randomInt(
+      field.cp.asteroidSpawn.asteroidResources.min,
+      field.cp.asteroidSpawn.asteroidResources.max
+    )
+  );
 }
 
 export class AsteroidSpawningSystem extends System {
@@ -49,16 +47,21 @@ export class AsteroidSpawningSystem extends System {
     super(sim);
     this.cooldowns = new Cooldowns("tick");
   }
+
   exec = (delta: number): void => {
     this.cooldowns.update(delta);
     if (!this.cooldowns.canUse("tick")) return;
 
     this.sim.queries.asteroidFields.get().forEach((entity) => {
-      if (shouldSpawnAsteroid(entity)) {
+      if (this.sim.getTime() < 10) {
+        while (shouldSpawnAsteroid(entity)) {
+          spawn(entity);
+        }
+      } else if (shouldSpawnAsteroid(entity)) {
         spawn(entity);
       }
     });
 
-    this.cooldowns.use("tick", 60);
+    this.cooldowns.use("tick", 300);
   };
 }
