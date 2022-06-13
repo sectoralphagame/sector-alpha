@@ -23,6 +23,7 @@ export function faction(entity: Entity): Faction {
 export function createFaction(name: string, sim: Sim) {
   const entity = new Entity(sim);
   entity
+    .addComponent({ name: "ai" })
     .addComponent({
       name: "color",
       value: Color.rgb(151, 255, 125)
