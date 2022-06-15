@@ -77,7 +77,9 @@ const ShipPanel: React.FC = () => {
   const storedCommodities = Object.values(commodities).filter(
     (commodity) => ship.cp.storage.availableWares[commodity] > 0
   );
-  const commander = ship.sim.getOrThrow(ship.cp.commander!.id);
+  const commander = ship.cp.commander?.id
+    ? ship.sim.get(ship.cp.commander?.id)
+    : null;
 
   return (
     <div>

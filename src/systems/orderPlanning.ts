@@ -7,7 +7,10 @@ import { sector as asSector } from "../archetypes/sector";
 import { mineOrder } from "../components/orders";
 import { getAvailableSpace } from "../components/storage";
 import { mineableCommodities } from "../economy/commodity";
-import { getSectorsInTeleportRange } from "../economy/utils";
+import {
+  getSectorsInTeleportRange,
+  getTradeWithMostProfit,
+} from "../economy/utils";
 import type { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
@@ -18,22 +21,33 @@ import {
   getCommoditiesForSell,
   getNeededCommodities,
   returnToFacility,
+  tradeCommodity,
 } from "../utils/trading";
 import { holdPosition } from "./orderExecuting/misc";
 import { System } from "./system";
 
-type Trading = RequireComponent<
-  | "drive"
-  | "storage"
-  | "autoOrder"
-  | "orders"
-  | "commander"
-  | "owner"
-  | "position"
-  | "dockable"
->;
+const tradingComponents = [
+  "drive",
+  "storage",
+  "autoOrder",
+  "orders",
+  "owner",
+  "position",
+  "dockable",
+] as const;
+type Trading = RequireComponent<typeof tradingComponents[number]>;
 
 function autoTrade(entity: Trading, sectorDistance: number) {
+  const trade = getTradeWithMostProfit(entity, sectorDistance);
+  if (!trade) return;
+
+  tradeCommodity(entity, trade.commodity, trade.buyer, trade.seller);
+}
+
+function autoTradeForCommander(
+  entity: Trading & RequireComponent<"commander">,
+  sectorDistance: number
+) {
   const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
@@ -65,7 +79,7 @@ function autoTrade(entity: Trading, sectorDistance: number) {
   }
 }
 
-function autoMine(
+function autoMineForCommander(
   entity: RequireComponent<
     | "drive"
     | "dockable"
@@ -136,9 +150,20 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
     return;
   }
 
+  if (!entity.hasComponents(["commander"])) {
+    switch (entity.cp.autoOrder.default) {
+      case "trade":
+        autoTrade(entity.requireComponents(tradingComponents), 2);
+        break;
+      default:
+        holdPosition();
+    }
+    return;
+  }
+
   switch (entity.cp.autoOrder.default) {
     case "mine":
-      autoMine(
+      autoMineForCommander(
         entity.requireComponents([
           "mining",
           "dockable",
@@ -154,7 +179,7 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
       );
       break;
     case "trade":
-      autoTrade(
+      autoTradeForCommander(
         entity.requireComponents([
           "drive",
           "dockable",
