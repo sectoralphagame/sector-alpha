@@ -1,3 +1,7 @@
 import { BaseComponent } from "./component";
 
-export interface Ai extends BaseComponent<"ai"> {}
+export type AiType = "territorial" | "travelling";
+
+export interface Ai extends BaseComponent<"ai"> {
+  type: AiType;
+}

@@ -1,5 +1,4 @@
 import { sortBy } from "lodash";
-import { min } from "mathjs";
 import merge from "lodash/merge";
 import { facility } from "../archetypes/facility";
 import { Order, tradeOrder } from "../components/orders";
@@ -14,6 +13,7 @@ import { createOffers } from "../systems/trading";
 import { moveToOrders } from "./moving";
 import { getSummedConsumption } from "../components/production";
 import {
+  getAvailableSpace,
   hasSufficientStorage,
   hasSufficientStorageSpace,
   newStorageAllocation,
@@ -192,29 +192,31 @@ export function getCommoditiesForSell(entity: WithTrade): Commodity[] {
 
 export function tradeCommodity(
   entity: RequireComponent<
-    "storage" | "commander" | "owner" | "orders" | "position" | "dockable"
+    "storage" | "owner" | "orders" | "position" | "dockable"
   >,
   commodity: Commodity,
   buyer: WithTrade,
   seller: WithTrade
 ): boolean {
-  if (!entity.sim.paths) return false;
+  const sameFactionAsBuyer = entity.cp.owner.id === buyer.cp.owner.id;
+  const sameFactionAsSeller = entity.cp.owner.id === seller.cp.owner.id;
 
-  const sameFaction = entity.cp.owner.id === seller.components.owner.id;
-  const buy = entity.cp.commander.id === buyer.id;
-  const commander = entity.sim
-    .getOrThrow(entity.cp.commander.id)
-    .requireComponents(["budget", "trade"]);
+  const entityWithBudget = entity.sim
+    .getOrThrow(
+      entity.cp.commander ? entity.cp.commander.id : entity.cp.owner.id
+    )
+    .requireComponents(["budget"]);
+  const budget = entityWithBudget.cp.budget;
 
   const quantity = Math.floor(
-    min(
-      buyer.components.trade.offers[commodity].quantity,
-      entity.cp.storage.max,
-      seller.components.trade.offers[commodity].quantity,
-      sameFaction
+    Math.min(
+      buyer.cp.trade.offers[commodity].quantity,
+      getAvailableSpace(entity.cp.storage),
+      seller.cp.trade.offers[commodity].quantity,
+      sameFactionAsSeller
         ? Infinity
-        : commander.cp.budget.available /
-            commander.cp.trade.offers[commodity].price
+        : entityWithBudget.cp.budget.available /
+            seller.cp.trade.offers[commodity].price
     )
   );
 
@@ -222,33 +224,40 @@ export function tradeCommodity(
     return false;
   }
 
-  const price = sameFaction
+  const buyPrice = sameFactionAsSeller
     ? 0
-    : seller.components.trade.offers[commodity].price;
+    : seller.cp.trade.offers[commodity].price;
+  const sellPrice = sameFactionAsBuyer
+    ? 0
+    : buyer.cp.trade.offers[commodity].price;
 
   const offer = {
-    price,
     quantity,
     commodity,
     factionId: entity.cp.owner.id,
-    budget: commander.cp.budget,
+    budget,
     allocations: null,
+  };
+
+  // We buy, facility sells
+  const offerForBuyer = {
+    ...offer,
+    price: buyPrice,
+    type: "sell" as "sell",
+  };
+  const offerForSeller = {
+    ...offer,
+    price: sellPrice,
     type: "buy" as "buy",
   };
 
-  const buyerAllocations = allocate(buyer, {
-    ...offer,
-    type: "sell",
-  });
+  const buyerAllocations = allocate(buyer, offerForBuyer);
   if (!buyerAllocations) return false;
 
-  const sellerAllocations = allocate(seller, offer);
+  const sellerAllocations = allocate(seller, offerForSeller);
   if (!sellerAllocations) {
     if (buyerAllocations.budget?.id) {
-      releaseBudgetAllocation(
-        buyer.components.budget,
-        buyerAllocations.budget.id
-      );
+      releaseBudgetAllocation(buyer.cp.budget, buyerAllocations.budget.id);
     }
     if (buyerAllocations.storage?.id) {
       releaseStorageAllocation(buyer.cp.storage, buyerAllocations.storage.id);
@@ -269,8 +278,7 @@ export function tradeCommodity(
     tradeOrder({
       targetId: seller.id,
       offer: {
-        ...offer,
-        price: buy ? price : 0,
+        ...offerForSeller,
         allocations: {
           buyer: {
             budget: buyerAllocations.budget?.id ?? null,
@@ -289,8 +297,7 @@ export function tradeCommodity(
     tradeOrder({
       targetId: buyer.id,
       offer: {
-        ...offer,
-        price: buy ? 0 : price,
+        ...offerForBuyer,
         allocations: {
           buyer: {
             budget: buyerAllocations.budget?.id ?? null,

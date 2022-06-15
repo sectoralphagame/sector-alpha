@@ -1,5 +1,5 @@
 import { add, Matrix, matrix, random, randomInt } from "mathjs";
-import { createFaction } from "../archetypes/faction";
+import { createFaction, Faction } from "../archetypes/faction";
 import { sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
 import { changeBudgetMoney } from "../components/budget";
@@ -29,17 +29,32 @@ function getFreighterTemplate() {
   return pickRandom(shipClasses.filter((s) => !s.mining && s.size === "small"));
 }
 
-function createFactionX(index: number, sim: Sim) {
+function createTerritorialFaction(index: number, sim: Sim) {
   const char = String.fromCharCode(index + 65);
   const faction = createFaction(`Faction ${char}`, sim);
+  faction.addComponent({ name: "ai", type: "territorial" });
   changeBudgetMoney(faction.cp.budget, 1e8);
 
   return faction;
 }
 
-export const factions = (sim: Sim) =>
+function createTradingFaction(index: number, sim: Sim) {
+  const char = String.fromCharCode(index + 65);
+  const faction = createFaction(`Traders ${char}`, sim);
+  faction.addComponent({ name: "ai", type: "travelling" });
+  changeBudgetMoney(faction.cp.budget, 1e4);
+
+  return faction;
+}
+
+let faction: Faction;
+
+export const factions = (sim: Sim) => {
   sim.queries.sectors.get().forEach((sector, index, sectors) => {
-    const faction = createFactionX(index, sim);
+    faction =
+      !faction || Math.random() < 0.7
+        ? createTerritorialFaction(index, sim)
+        : faction;
 
     const position = hecsToCartesian(
       sector.cp.hecsPosition.value,
@@ -142,3 +157,24 @@ export const factions = (sim: Sim) =>
       facility.components.owner.id = faction.id;
     }
   });
+
+  for (let i = 0; i < 2; i++) {
+    faction = createTradingFaction(i, sim);
+    sim.queries.sectors.get().forEach((sector) => {
+      const sectorPosition = hecsToCartesian(
+        sector.cp.hecsPosition.value,
+        sectorSize / 10
+      );
+      const ship = createShip(sim, {
+        ...getFreighterTemplate(),
+        position: add(
+          sectorPosition,
+          matrix([random(-30, 30), random(-30, 30)])
+        ) as Matrix,
+        owner: faction,
+        sector,
+      });
+      ship.components.owner.id = faction.id;
+    });
+  }
+};
