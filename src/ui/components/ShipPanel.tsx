@@ -34,9 +34,13 @@ function getOrderDescription(ship: Ship, order: Order) {
     case "trade":
       if (order.targetId === ship.cp.commander?.id)
         return "Deliver wares to commander";
-      return `Deliver wares to ${
-        ship.sim.getOrThrow(order.targetId).cp.name?.value
-      }`;
+      return order.offer.type === "sell"
+        ? `Deliver wares to ${
+            ship.sim.getOrThrow(order.targetId).cp.name?.value
+          }`
+        : `Get wares from ${
+            ship.sim.getOrThrow(order.targetId).cp.name?.value
+          }`;
     case "mine":
       return `Mine ${
         ship.sim
