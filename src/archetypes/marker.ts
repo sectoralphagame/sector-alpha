@@ -22,7 +22,7 @@ export function marker(entity: Entity): Marker {
 
 export interface MarkerInput {
   value: Matrix;
-  sector: Sector;
+  sector: number;
 }
 
 export function createMarker(sim: Sim, { value, sector }: MarkerInput) {
@@ -32,7 +32,7 @@ export function createMarker(sim: Sim, { value, sector }: MarkerInput) {
     name: "position",
     coord: value,
     angle: 0,
-    sector: sector.id,
+    sector,
   });
 
   return entity as Marker;

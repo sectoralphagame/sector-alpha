@@ -8,8 +8,7 @@ import {
   releaseAllocation,
 } from "./utils/allocations";
 
-export interface BudgetAllocation {
-  id: number;
+export interface BudgetAllocation extends Allocation {
   amount: number;
 }
 
@@ -34,9 +33,10 @@ export function updateAvailableMoney(budget: Budget) {
 
 export function newBudgetAllocation(
   budget: Budget,
-  input: Omit<BudgetAllocation, keyof Allocation>
+  input: Omit<BudgetAllocation, keyof Allocation>,
+  meta: object = {}
 ) {
-  const allocation = newAllocation(budget, input, (a) =>
+  const allocation = newAllocation(budget, { ...input, meta }, (a) =>
     validateBudgetAllocation(budget, a)
   );
   updateAvailableMoney(budget);

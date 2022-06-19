@@ -19,8 +19,7 @@ import { BaseComponent } from "./component";
 
 export type StorageAllocationType = "incoming" | "outgoing";
 
-interface StorageAllocation {
-  id: number;
+interface StorageAllocation extends Allocation {
   amount: Record<Commodity, number>;
   type: StorageAllocationType;
 }
@@ -219,9 +218,10 @@ export function transfer(
 
 export function newStorageAllocation(
   storage: CommodityStorage,
-  input: Omit<StorageAllocation, keyof Allocation>
+  input: Omit<StorageAllocation, keyof Allocation>,
+  meta: object = {}
 ) {
-  const allocation = newAllocation(storage, input, (a) =>
+  const allocation = newAllocation(storage, { ...input, meta }, (a) =>
     validateStorageAllocation(storage, a)
   );
   updateAvailableWares(storage);

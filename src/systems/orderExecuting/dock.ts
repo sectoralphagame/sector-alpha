@@ -35,7 +35,7 @@ export function dockOrder(
 
   if (
     entity.cp.drive.targetReached &&
-    availableDocks(docks, size, entity.sim) > docks.docked.length
+    availableDocks(docks, size, entity.sim) > 0
   ) {
     dockShip(entity, target);
 

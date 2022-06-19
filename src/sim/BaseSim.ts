@@ -38,10 +38,15 @@ export class BaseSim {
   start = () => {
     if (this.intervalHandle) return;
     this.intervalHandle = setInterval(() => {
-      const delta = ((Date.now() - this.lastTick) / 1000) * this.speed;
-      this.next(delta);
-      this.timeOffset += delta;
-      this.lastTick = Date.now();
+      try {
+        const delta = ((Date.now() - this.lastTick) / 1000) * this.speed;
+        this.next(delta);
+        this.timeOffset += delta;
+        this.lastTick = Date.now();
+      } catch (err) {
+        console.error(err);
+        this.pause();
+      }
     }, 1e3 / settings.global.targetFps) as unknown as number;
     this.lastTick = Date.now();
   };

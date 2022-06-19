@@ -7,6 +7,7 @@ import lCivTexture from "../../assets/l_civ.svg";
 import mMinTexture from "../../assets/m_min.svg";
 import fTeleportTexture from "../../assets/f_teleport.svg";
 import fCivTexture from "../../assets/f_civ.svg";
+import { isTest } from "../settings";
 
 export const textures = {
   asteroid: asteroidTexture,
@@ -85,11 +86,15 @@ export function createRender({
 }
 
 export function hide(render: Render) {
-  render.sprite.interactive = false;
-  render.sprite.alpha = 0;
+  if (!isTest) {
+    render.sprite.interactive = false;
+    render.sprite.alpha = 0;
+  }
 }
 
 export function show(render: Render) {
-  render.sprite.interactive = true;
-  render.sprite.alpha = 1;
+  if (!isTest) {
+    render.sprite.interactive = true;
+    render.sprite.alpha = 1;
+  }
 }

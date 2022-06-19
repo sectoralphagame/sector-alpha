@@ -1,8 +1,9 @@
 import { minBy } from "lodash";
-import { Matrix, norm, subtract } from "mathjs";
+import { add, matrix, Matrix, norm, random, subtract } from "mathjs";
 import { asteroid } from "../archetypes/asteroid";
 import { asteroidField } from "../archetypes/asteroidField";
 import { commanderRange, facility } from "../archetypes/facility";
+import { createMarker } from "../archetypes/marker";
 import { sector as asSector } from "../archetypes/sector";
 import { mineOrder } from "../components/orders";
 import { getAvailableSpace } from "../components/storage";
@@ -37,11 +38,37 @@ const tradingComponents = [
 ] as const;
 type Trading = RequireComponent<typeof tradingComponents[number]>;
 
-function autoTrade(entity: Trading, sectorDistance: number) {
-  const trade = getTradeWithMostProfit(entity, sectorDistance);
-  if (!trade) return;
+function idleMovement(entity: Trading) {
+  entity.cp.orders.value = [
+    {
+      orders: moveToOrders(
+        entity,
+        createMarker(entity.sim, {
+          sector: entity.cp.position.sector,
+          value: add(
+            entity.cp.position.coord,
+            matrix([random(-0.5, 0.5), random(-0.5, 0.5)])
+          ),
+        })
+      ),
+      type: "move",
+    },
+  ];
+}
 
-  tradeCommodity(entity, trade.commodity, trade.buyer, trade.seller);
+function autoTrade(entity: Trading, sectorDistance: number) {
+  let makingTrade = false;
+  const trade = getTradeWithMostProfit(entity, sectorDistance);
+  if (trade) {
+    makingTrade = tradeCommodity(
+      entity,
+      trade.commodity,
+      trade.buyer,
+      trade.seller
+    );
+  }
+
+  if (!makingTrade) idleMovement(entity);
 }
 
 function autoTradeForCommander(
