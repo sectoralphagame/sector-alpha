@@ -11,7 +11,7 @@ import { createFarm } from "../world/facilities";
 import { settleStorageQuota } from "./storageQuotaPlanning";
 import { TradingSystem } from "./trading";
 
-describe("Trading module", () => {
+describe("Trading system", () => {
   let sim: Sim;
   let system: TradingSystem;
   let facility: Facility;
@@ -128,5 +128,22 @@ describe("Trading module", () => {
     system.exec(1000);
 
     expect(facility.cp.trade.offers.water.price).toBeLessThan(previousPrice);
+  });
+
+  it("properly sets offer quantity if has no commodity", () => {
+    settleStorageQuota(facility);
+    system.exec(10);
+
+    expect(facility.cp.storage.quota.water).toBe(2608);
+    expect(facility.cp.trade.offers.water.quantity).toBe(2608);
+  });
+
+  it("properly sets offer quantity if already has some commodity", () => {
+    addStorage(facility.cp.storage, "water", 10, false);
+    settleStorageQuota(facility);
+    system.exec(10);
+
+    expect(facility.cp.storage.quota.water).toBe(2608);
+    expect(facility.cp.trade.offers.water.quantity).toBe(2598);
   });
 });

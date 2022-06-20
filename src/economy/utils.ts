@@ -2,7 +2,6 @@ import { Matrix, norm, subtract, sum } from "mathjs";
 import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
 import maxBy from "lodash/maxBy";
-import { map } from "lodash";
 import { Sim } from "../sim";
 import { Commodity } from "./commodity";
 import { RequireComponent } from "../tsHelpers";
@@ -38,6 +37,11 @@ export interface TradeWithMostProfit {
   seller: WithTrade;
   commodity: Commodity;
 }
+
+/**
+ * Find commodity, seller and buyer in proximity that yields most
+ * profitable trade
+ */
 export function getTradeWithMostProfit(
   from: Marker,
   sectorDistance: number
@@ -183,8 +187,12 @@ export function getClosestMineableAsteroid(
  */
 export function getPlannedBudget(entity: WithTrade): number {
   return sum(
-    map(entity.components.trade.offers).map(
-      (offer) => (offer.type === "sell" ? 0 : offer.quantity) * offer.price
+    Object.entries(entity.components.trade.offers).map(
+      ([commodity, offer]) =>
+        (offer.type === "sell"
+          ? 0
+          : entity.cp.storage.quota[commodity] -
+            entity.cp.storage.stored[commodity]) * offer.price
     )
   );
 }

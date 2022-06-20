@@ -122,13 +122,6 @@ function getProductionSurplus(
   );
 }
 
-function getSurplus(entity: WithTradeAndProduction, commodity: Commodity) {
-  return (
-    entity.cp.storage.availableWares[commodity] +
-    getProductionSurplus(entity, commodity)
-  );
-}
-
 export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
   if (!entity.hasComponents(["compoundProduction"])) {
     return entity.cp.storage.availableWares[commodity];
@@ -149,7 +142,7 @@ export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
     production.pac[commodity].consumes === production.pac[commodity].produces &&
     production.pac[commodity].consumes === 0
   ) {
-    return getSurplus(entityWithProduction, commodity);
+    return entity.cp.storage.availableWares[commodity];
   }
 
   const stored = entityWithProduction.cp.storage.availableWares;
@@ -203,7 +196,7 @@ export class TradingSystem extends System {
     }
 
     if (this.cooldowns.canUse("createOffers")) {
-      this.cooldowns.use("createOffers", 2);
+      this.cooldowns.use("createOffers", 1);
       this.sim.queries.trading.get().forEach(createOffers);
     }
   };
