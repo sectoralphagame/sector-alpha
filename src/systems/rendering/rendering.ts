@@ -13,6 +13,7 @@ export class RenderingSystem extends System {
   prevScale: number = minScale;
   app: PIXI.Application;
   initialized = false;
+  resizeObserver: ResizeObserver;
 
   init = () => {
     this.selectionManger = this.sim.queries.selectionManager.get()[0];
@@ -35,6 +36,11 @@ export class RenderingSystem extends System {
       height: window.innerHeight,
       view: canvas,
     });
+
+    this.resizeObserver = new ResizeObserver(() => {
+      this.app.resizeTo = canvasRoot;
+    });
+    this.resizeObserver.observe(toolbar);
 
     const viewport = new Viewport({
       screenWidth: root.clientWidth - toolbar.clientWidth,
