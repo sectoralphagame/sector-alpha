@@ -34,6 +34,7 @@ import { Commander } from "./commander";
 import { Color } from "./color";
 import { Ai } from "./ai";
 import { isTest } from "../settings";
+import { DestroyAfterUsage } from "./destroyAfterUsage";
 
 export interface CoreComponents {
   ai: Ai;
@@ -44,6 +45,7 @@ export interface CoreComponents {
   color: Color;
   commander: Commander;
   compoundProduction: CompoundProduction;
+  destroyAfterUsage: DestroyAfterUsage;
   dockable: Dockable;
   docks: Docks;
   drive: Drive;

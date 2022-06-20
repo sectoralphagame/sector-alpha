@@ -70,13 +70,6 @@ function autoTrade(entity: Trading, sectorDistance: number) {
 
   if (!makingTrade) {
     idleMovement(entity);
-  } else {
-    console.log(
-      "trading",
-      trade!.commodity,
-      trade!.buyer.cp.trade!.offers[trade!.commodity].price /
-        trade!.seller.cp.trade!.offers[trade!.commodity].price
-    );
   }
 }
 
@@ -101,7 +94,7 @@ function autoTradeForCommander(
       return;
     }
 
-    getCommoditiesForSell(commander).reduce((acc, commodity) => {
+    const result = getCommoditiesForSell(commander).reduce((acc, commodity) => {
       if (acc) {
         return true;
       }
@@ -112,6 +105,10 @@ function autoTradeForCommander(
         sectorDistance
       );
     }, false);
+
+    if (!result) {
+      idleMovement(entity);
+    }
   }
 }
 
@@ -246,7 +243,7 @@ export class OrderPlanningSystem extends System {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("autoOrder")) {
-      this.cooldowns.use("autoOrder", 10);
+      this.cooldowns.use("autoOrder", 5);
       this.sim.queries.autoOrderable.get().forEach(autoOrder);
     }
   };

@@ -59,11 +59,12 @@ export function isTradeAccepted(
     validPrice = input.price <= offer.price;
   }
 
-  return (
+  const result =
     validPrice &&
     entity.cp.budget.available >= input.price * input.quantity &&
-    hasSufficientStorageSpace(entity.cp.storage, input.quantity)
-  );
+    hasSufficientStorageSpace(entity.cp.storage, input.quantity);
+
+  return result;
 }
 
 const maxTransactions = 100;
@@ -112,14 +113,17 @@ export function allocate(
     }:${entity.sim.getTime()}`;
     if (offer.type === "sell") {
       return {
-        budget: newBudgetAllocation(
-          entity.cp.budget,
-          {
-            amount: offer.price * offer.quantity,
-            issued: entity.sim.getTime(),
-          },
-          { tradeId }
-        ),
+        budget:
+          offer.price === 0
+            ? null
+            : newBudgetAllocation(
+                entity.cp.budget,
+                {
+                  amount: offer.price * offer.quantity,
+                  issued: entity.sim.getTime(),
+                },
+                { tradeId }
+              ),
         storage: newStorageAllocation(
           entity.cp.storage,
           {
@@ -136,15 +140,18 @@ export function allocate(
     }
 
     return {
-      budget: newBudgetAllocation(
-        entity.sim.getOrThrow(offer.budget!).requireComponents(["budget"]).cp
-          .budget,
-        {
-          amount: offer.price * offer.quantity,
-          issued: entity.sim.getTime(),
-        },
-        { tradeId }
-      ),
+      budget:
+        offer.price === 0
+          ? null
+          : newBudgetAllocation(
+              entity.sim.getOrThrow(offer.budget!).requireComponents(["budget"])
+                .cp.budget,
+              {
+                amount: offer.price * offer.quantity,
+                issued: entity.sim.getTime(),
+              },
+              { tradeId }
+            ),
       storage: newStorageAllocation(
         entity.cp.storage,
         {
@@ -287,11 +294,14 @@ export function tradeCommodity(
   if (
     offerForSeller.price * offer.quantity >
     entityWithBudget.cp.budget.available
-  )
+  ) {
     return false;
+  }
 
   const buyerAllocations = allocate(buyer, offerForBuyer);
-  if (!buyerAllocations) return false;
+  if (!buyerAllocations) {
+    return false;
+  }
 
   const sellerAllocations = allocate(seller, offerForSeller);
   if (!sellerAllocations) {

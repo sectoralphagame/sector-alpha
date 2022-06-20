@@ -28,12 +28,14 @@ export interface MarkerInput {
 export function createMarker(sim: Sim, { value, sector }: MarkerInput) {
   const entity = new Entity(sim);
 
-  entity.addComponent({
-    name: "position",
-    coord: value,
-    angle: 0,
-    sector,
-  });
+  entity
+    .addComponent({
+      name: "position",
+      coord: value,
+      angle: 0,
+      sector,
+    })
+    .addComponent({ name: "destroyAfterUsage" });
 
   return entity as Marker;
 }
