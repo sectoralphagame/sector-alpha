@@ -8,6 +8,11 @@ import {
   releaseAllocation,
 } from "./utils/allocations";
 
+export interface BudgetTransaction {
+  amount: number;
+  time: number;
+}
+
 export interface BudgetAllocation extends Allocation {
   amount: number;
 }
@@ -17,6 +22,7 @@ export interface Budget
     Allocations<BudgetAllocation> {
   money: number;
   available: number;
+  transactions: BudgetTransaction[];
 }
 
 export function validateBudgetAllocation(
@@ -33,7 +39,7 @@ export function updateAvailableMoney(budget: Budget) {
 
 export function newBudgetAllocation(
   budget: Budget,
-  input: Omit<BudgetAllocation, keyof Allocation>,
+  input: Omit<BudgetAllocation, "id" | "meta">,
   meta: object = {}
 ) {
   const allocation = newAllocation(budget, { ...input, meta }, (a) =>
@@ -64,6 +70,11 @@ export function setMoney(budget: Budget, value: number) {
   updateAvailableMoney(budget);
 }
 
+/**
+ * Changes budget money by value and adds transaction entry
+ * @param value Amount that budget should be increased or decreased, eg. -100
+ * would decrease budget's money by 100
+ */
 export function changeBudgetMoney(budget: Budget, value: number) {
   budget.money += value;
 
@@ -71,6 +82,13 @@ export function changeBudgetMoney(budget: Budget, value: number) {
     throw new NegativeBudget(budget.money);
   }
 
+  budget.transactions.unshift({
+    amount: value,
+    time: window.sim ? window.sim.getTime() : 0,
+  });
+  if (budget.transactions.length > 50) {
+    budget.transactions.pop();
+  }
   updateAvailableMoney(budget);
 }
 
@@ -93,5 +111,6 @@ export function createBudget(): Budget {
     available: 0,
     money: 0,
     name: "budget",
+    transactions: [],
   };
 }

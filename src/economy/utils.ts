@@ -72,28 +72,26 @@ export function getTradeWithMostProfit(
     ),
   }));
 
-  const profits = perCommodity((commodity) =>
-    bestOffers[commodity].sell && bestOffers[commodity].buy
-      ? bestOffers[commodity].sell!.cp.trade.offers[commodity].price /
-        bestOffers[commodity].buy!.cp.trade.offers[commodity].price
-      : 0
-  );
-  const commodityWithMostProfit = maxBy(
-    Object.entries(profits).map(([commodity, profit]) => ({
+  const profits = Object.entries(
+    perCommodity((commodity) =>
+      bestOffers[commodity].sell && bestOffers[commodity].buy
+        ? bestOffers[commodity].sell!.cp.trade.offers[commodity].price /
+          bestOffers[commodity].buy!.cp.trade.offers[commodity].price
+        : 0
+    )
+  )
+    .map(([commodity, profit]) => ({
       commodity,
       profit,
-    })),
-    "profit"
-  )!.commodity as Commodity;
+    }))
+    .filter(({ profit }) => profit > 1);
 
-  if (
-    !(
-      bestOffers[commodityWithMostProfit].sell &&
-      bestOffers[commodityWithMostProfit].buy
-    )
-  ) {
+  if (profits.length === 0) {
     return null;
   }
+
+  const commodityWithMostProfit = maxBy(profits, "profit")!
+    .commodity as Commodity;
 
   return {
     buyer:

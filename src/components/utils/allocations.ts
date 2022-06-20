@@ -2,6 +2,7 @@ import { NotFound } from "../../errors";
 
 export interface Allocation {
   id: number;
+  issued: number;
   meta: object;
 }
 
