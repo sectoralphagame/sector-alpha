@@ -1,6 +1,6 @@
 import { matrix } from "mathjs";
 import { Facility } from "../archetypes/facility";
-import { createFaction, faction } from "../archetypes/faction";
+import { createFaction } from "../archetypes/faction";
 import { createSector, Sector } from "../archetypes/sector";
 import { changeBudgetMoney } from "../components/budget";
 import { addStorage, removeStorage } from "../components/storage";
@@ -149,6 +149,8 @@ function trade(
 
   expect(result).toBe(true);
 
+  const shipFactionBudget = ship.sim.getOrThrow(ship.cp.owner.id).cp.budget;
+  let prevShipFactionBudget = shipFactionBudget.available;
   dockShip(ship, seller);
   const buyOrderIndex = ship.cp.orders.value[0].orders.findIndex(
     (o) => o.type === "trade"
@@ -159,14 +161,21 @@ function trade(
   )[0] as TradeOrder;
   const buyResult = tradeOrder(ship, buyOrder);
 
+  expect(shipFactionBudget.available).toBeLessThanOrEqual(
+    prevShipFactionBudget
+  );
   expect(buyResult).toBe(true);
 
+  prevShipFactionBudget = shipFactionBudget.available;
   dockShip(ship, buyer);
   const sellOrder = ship.cp.orders.value[0].orders.find(
     (o) => o.type === "trade"
   ) as TradeOrder;
   const sellResult = tradeOrder(ship, sellOrder);
 
+  expect(shipFactionBudget.available).toBeGreaterThanOrEqual(
+    prevShipFactionBudget
+  );
   expect(sellResult).toBe(true);
 }
 
@@ -189,9 +198,10 @@ describe("Trade flow", () => {
       },
       sim
     );
-    changeBudgetMoney(farm.cp.budget, 1000);
+    changeBudgetMoney(farm.cp.budget, 10000);
     settleStorageQuota(farm);
     createOffers(farm);
+    farm.cp.trade.offers.water.price = 110;
 
     const waterFacility = createWaterFacility(
       { owner: createFaction("F2", sim), position: matrix([0, 0]), sector },
@@ -199,9 +209,11 @@ describe("Trade flow", () => {
     );
     settleStorageQuota(waterFacility);
     createOffers(waterFacility);
+    waterFacility.cp.trade.offers.water.price = 90;
 
     const shipFaction = createFaction("Ship faction", sim);
     changeBudgetMoney(shipFaction.cp.budget, 1000000);
+    const prevShipFactionBudget = shipFaction.cp.budget.available;
     const ship = createShip(sim, {
       ...shipClasses[0],
       owner: shipFaction,
@@ -210,6 +222,9 @@ describe("Trade flow", () => {
     });
 
     trade(ship, "water", farm, waterFacility);
+    expect(shipFaction.cp.budget.available).toBeGreaterThan(
+      prevShipFactionBudget
+    );
   });
 
   it("within the same faction", () => {

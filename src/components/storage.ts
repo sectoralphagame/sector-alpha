@@ -98,7 +98,7 @@ export function hasSufficientStorageSpace(
   return getAvailableSpace(storage) >= quantity;
 }
 
-export function addStorageHitoryEntry(
+export function addStorageHistoryEntry(
   storage: CommodityStorage,
   entry: CommodityStorageHistoryEntry
 ) {
@@ -112,7 +112,7 @@ export function onStorageChange(
   storage: CommodityStorage,
   entry: Omit<CommodityStorageHistoryEntry, "time">
 ) {
-  addStorageHitoryEntry(storage, {
+  addStorageHistoryEntry(storage, {
     ...entry,
     time: window.sim ? window.sim.getTime() : 0,
   });
@@ -218,7 +218,7 @@ export function transfer(
 
 export function newStorageAllocation(
   storage: CommodityStorage,
-  input: Omit<StorageAllocation, keyof Allocation>,
+  input: Omit<StorageAllocation, "id" | "meta">,
   meta: object = {}
 ) {
   const allocation = newAllocation(storage, { ...input, meta }, (a) =>

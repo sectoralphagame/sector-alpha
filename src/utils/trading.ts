@@ -116,6 +116,7 @@ export function allocate(
           entity.cp.budget,
           {
             amount: offer.price * offer.quantity,
+            issued: entity.sim.getTime(),
           },
           { tradeId }
         ),
@@ -126,6 +127,7 @@ export function allocate(
               ...perCommodity(() => 0),
               [offer.commodity]: offer.quantity,
             },
+            issued: entity.sim.getTime(),
             type: "incoming",
           },
           { tradeId }
@@ -139,6 +141,7 @@ export function allocate(
           .budget,
         {
           amount: offer.price * offer.quantity,
+          issued: entity.sim.getTime(),
         },
         { tradeId }
       ),
@@ -149,6 +152,7 @@ export function allocate(
             ...perCommodity(() => 0),
             [offer.commodity]: offer.quantity,
           },
+          issued: entity.sim.getTime(),
           type: "outgoing",
         },
         { tradeId }
@@ -271,12 +275,12 @@ export function tradeCommodity(
   // We sell, facility buys
   const offerForBuyer = {
     ...offer,
-    price: buyPrice,
+    price: sellPrice,
     type: "sell" as "sell",
   };
   const offerForSeller = {
     ...offer,
-    price: sellPrice,
+    price: buyPrice,
     type: "buy" as "buy",
   };
 

@@ -2,7 +2,7 @@ import { add, Matrix, matrix, random, randomInt } from "mathjs";
 import { createFaction, Faction } from "../archetypes/faction";
 import { sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
-import { changeBudgetMoney } from "../components/budget";
+import { setMoney } from "../components/budget";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { linkTeleportModules } from "../components/teleport";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
@@ -33,7 +33,7 @@ function createTerritorialFaction(index: number, sim: Sim) {
   const char = String.fromCharCode(index + 65);
   const faction = createFaction(`Faction ${char}`, sim);
   faction.addComponent({ name: "ai", type: "territorial" });
-  changeBudgetMoney(faction.cp.budget, 1e8);
+  setMoney(faction.cp.budget, 1e8);
 
   return faction;
 }
@@ -42,7 +42,7 @@ function createTradingFaction(index: number, sim: Sim) {
   const char = String.fromCharCode(index + 65);
   const faction = createFaction(`Traders ${char}`, sim);
   faction.addComponent({ name: "ai", type: "travelling" });
-  changeBudgetMoney(faction.cp.budget, 1e4);
+  setMoney(faction.cp.budget, 1e4);
 
   return faction;
 }
@@ -136,21 +136,6 @@ export const factions = (sim: Sim) => {
             id: facility.id,
           });
           minerShip.components.owner.id = faction.id;
-        } else {
-          const tradeShip = createShip(sim, {
-            ...getFreighterTemplate(),
-            position: add(
-              position,
-              matrix([random(-30, 30), random(-30, 30)])
-            ) as Matrix,
-            owner: faction,
-            sector,
-          });
-          tradeShip.addComponent({
-            name: "commander",
-            id: facility.id,
-          });
-          tradeShip.components.owner.id = faction.id;
         }
       } while (Math.random() < 0.15);
 

@@ -68,7 +68,16 @@ function autoTrade(entity: Trading, sectorDistance: number) {
     );
   }
 
-  if (!makingTrade) idleMovement(entity);
+  if (!makingTrade) {
+    idleMovement(entity);
+  } else {
+    console.log(
+      "trading",
+      trade!.commodity,
+      trade!.buyer.cp.trade!.offers[trade!.commodity].price /
+        trade!.seller.cp.trade!.offers[trade!.commodity].price
+    );
+  }
 }
 
 function autoTradeForCommander(

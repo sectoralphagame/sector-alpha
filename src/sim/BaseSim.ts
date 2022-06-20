@@ -44,6 +44,7 @@ export class BaseSim {
         this.timeOffset += delta;
         this.lastTick = Date.now();
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error(err);
         this.pause();
       }
