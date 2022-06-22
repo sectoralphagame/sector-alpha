@@ -54,6 +54,11 @@ export class RenderingSystem extends System {
       this.selectionManger.cp.selectionManager.focused = false;
       this.viewport.plugins.remove("follow");
     });
+    this.viewport.on("mousedown", (event) => {
+      if (event.target === event.currentTarget) {
+        this.selectionManger.cp.selectionManager.id = null;
+      }
+    });
     this.viewport.sortableChildren = true;
 
     this.resizeObserver = new ResizeObserver(() => {
