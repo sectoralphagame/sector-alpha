@@ -10,7 +10,6 @@ const FacilityPanel: React.FC = () => {
 
   return (
     <div>
-      <div>{facility.cp.name.value}</div>
       <div>Money: {facility.components.budget.available.toFixed(0)}</div>
       <hr />
       <Offers entity={facility} />

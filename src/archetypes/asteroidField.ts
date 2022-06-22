@@ -4,7 +4,6 @@ import { Entity } from "../components/entity";
 import { createRenderGraphics } from "../components/renderGraphics";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
-import { fieldColors } from "./asteroid";
 import { Sector } from "./sector";
 
 export const asteroidFieldComponents = [
@@ -43,13 +42,7 @@ export function createAsteroidField(
       angle: 0,
       sector: sector.id,
     })
-    .addComponent(
-      createRenderGraphics("circle", {
-        color: fieldColors[entity.cp.asteroidSpawn!.type],
-        position: entity.cp.position!.coord,
-        radius: entity.cp.asteroidSpawn!.size,
-      })
-    );
+    .addComponent(createRenderGraphics("circle"));
 
   return asteroidField(entity);
 }
