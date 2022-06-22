@@ -43,12 +43,8 @@ export function createSector(sim: Sim, { position, name }: InitialSectorInput) {
       name: "name",
       value: name,
     })
-    .addComponent(
-      createRenderGraphics("sector", {
-        position,
-        name,
-      })
-    );
+    .addComponent(createRenderGraphics("sector"))
+    .addComponent({ name: "selection" });
 
   return entity as Sector;
 }
