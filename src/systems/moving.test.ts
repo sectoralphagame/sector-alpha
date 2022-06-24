@@ -29,7 +29,7 @@ describe("Ship", () => {
   });
 
   it("is able to go to target position", () => {
-    ship.cp.position.angle = -Math.PI / 2;
+    ship.cp.position.angle = Math.PI;
     setTarget(
       ship.cp.drive,
       createMarker(sim, {
@@ -38,10 +38,9 @@ describe("Ship", () => {
       }).id
     );
 
-    for (let index = 0; index < 10; index++) {
-      movingSystem.exec(0.1);
+    for (let index = 0; index < 3; index++) {
+      movingSystem.exec(1);
     }
-    console.log(ship.cp.position);
 
     expect(ship.cp.drive.targetReached).toBe(true);
   });
@@ -74,7 +73,9 @@ describe("Ship", () => {
     });
 
     orderExecutingSystem.exec();
-    movingSystem.exec(1);
+    for (let index = 0; index < 5; index++) {
+      movingSystem.exec(1);
+    }
 
     expect(ship.cp.drive.targetReached).toBe(true);
   });
