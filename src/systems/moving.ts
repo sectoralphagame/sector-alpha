@@ -24,6 +24,31 @@ function hold(entity: Driveable) {
   }
 }
 
+// eslint-disable-next-line no-underscore-dangle
+function _normalizeAngle(value: number, start: number, end: number): number {
+  const width = end - start;
+  const offsetValue = value - start;
+
+  return offsetValue - Math.floor(offsetValue / width) * width + start;
+}
+function normalizeAngle(value: number): number {
+  return _normalizeAngle(value, -Math.PI, Math.PI);
+}
+
+export function getDeltaAngle(
+  targetAngle: number,
+  entityAngle: number,
+  rotary: number,
+  delta: number
+): number {
+  const angleDiff = normalizeAngle(targetAngle - entityAngle);
+  const angleOffset = Math.abs(angleDiff);
+
+  return angleOffset > rotary * delta
+    ? rotary * delta * Math.sign(angleDiff)
+    : angleDiff;
+}
+
 function move(entity: Driveable, delta: number) {
   const entityPosition = entity.cp.position;
   const drive = entity.cp.drive;
@@ -56,28 +81,28 @@ function move(entity: Driveable, delta: number) {
     return;
   }
 
+  const entityAngle = normalizeAngle(
+    // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
+    entityPosition.angle - Math.PI / 2
+  );
   const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
-  // TODO: Investigate magic that is happening here with 90deg offsets
-  const targetAngle = Math.atan2(path.get([1]), path.get([0])) + Math.PI / 2;
+  const targetAngle = Math.atan2(path.get([1]), path.get([0]));
   const speed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
   const distance = norm(path);
-  const angleOffset = Math.abs(targetAngle - entityPosition.angle);
+  const angleOffset = Math.abs(targetAngle - entityAngle);
   const canCruise =
     distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
     angleOffset < Math.PI / 12;
-  const moveVec = matrix([
-    Math.cos(entityPosition.angle - Math.PI / 2),
-    Math.sin(entityPosition.angle - Math.PI / 2),
-  ]);
+  const moveVec = matrix([Math.cos(entityAngle), Math.sin(entityAngle)]);
 
   const dPos =
     norm(path) > 0
-      ? (multiply(moveVec, speed * delta) as Matrix)
+      ? (multiply(
+          moveVec,
+          angleOffset < Math.PI / 8 ? speed * delta : 0
+        ) as Matrix)
       : matrix([0, 0]);
-  const dAngle =
-    angleOffset > drive.rotary * delta
-      ? drive.rotary * delta * Math.sign(targetAngle - entityPosition.angle)
-      : targetAngle - entityPosition.angle;
+  const dAngle = getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
 
   if (norm(dPos) >= distance) {
     entityPosition.coord = matrix(targetPosition.coord);

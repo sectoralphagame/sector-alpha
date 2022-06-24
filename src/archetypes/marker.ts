@@ -3,7 +3,6 @@ import { Entity } from "../components/entity";
 import { MissingComponentError } from "../errors";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
-import { Sector } from "./sector";
 
 export const markerComponents = ["position"] as const;
 

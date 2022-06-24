@@ -25,18 +25,23 @@ describe("Ship", () => {
       owner: createFaction("F", sim),
       sector,
     });
+    ship.cp.drive.maneuver = 1;
   });
 
   it("is able to go to target position", () => {
+    ship.cp.position.angle = -Math.PI / 2;
     setTarget(
       ship.cp.drive,
       createMarker(sim, {
         sector: sector.id,
-        value: matrix([1, 0.3]),
+        value: matrix([0, 0]),
       }).id
     );
 
-    movingSystem.exec(1);
+    for (let index = 0; index < 10; index++) {
+      movingSystem.exec(0.1);
+    }
+    console.log(ship.cp.position);
 
     expect(ship.cp.drive.targetReached).toBe(true);
   });
@@ -57,7 +62,7 @@ describe("Ship", () => {
 
   it("is able to make move order", () => {
     const orderExecutingSystem = new OrderExecutingSystem(sim);
-    const m = createMarker(sim, { sector: sector.id, value: matrix([1, 0.3]) });
+    const m = createMarker(sim, { sector: sector.id, value: matrix([1, 1]) });
     ship.cp.orders.value.push({
       type: "move",
       orders: [
