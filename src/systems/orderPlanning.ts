@@ -4,7 +4,8 @@ import { asteroid } from "../archetypes/asteroid";
 import { asteroidField } from "../archetypes/asteroidField";
 import { commanderRange, facility } from "../archetypes/facility";
 import { createMarker } from "../archetypes/marker";
-import { sector as asSector } from "../archetypes/sector";
+import { sector as asSector, sectorSize } from "../archetypes/sector";
+import { hecsToCartesian } from "../components/hecsPosition";
 import { mineOrder } from "../components/orders";
 import { getAvailableSpace } from "../components/storage";
 import { mineableCommodities } from "../economy/commodity";
@@ -46,8 +47,12 @@ function idleMovement(entity: Trading) {
         createMarker(entity.sim, {
           sector: entity.cp.position.sector,
           value: add(
-            entity.cp.position.coord,
-            matrix([random(-0.5, 0.5), random(-0.5, 0.5)])
+            hecsToCartesian(
+              entity.sim.getOrThrow(entity.cp.position.sector).cp.hecsPosition!
+                .value,
+              sectorSize / 10
+            ),
+            matrix([random(-25, 25), random(-25, 25)])
           ),
         })
       ),
