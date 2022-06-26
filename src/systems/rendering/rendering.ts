@@ -16,6 +16,7 @@ export class RenderingSystem extends System {
   initialized = false;
   resizeObserver: ResizeObserver;
   cooldowns: Cooldowns<"graphics">;
+  dragging: boolean = false;
 
   init = () => {
     this.cooldowns = new Cooldowns("graphics");
@@ -53,9 +54,14 @@ export class RenderingSystem extends System {
     this.viewport.on("drag-start", () => {
       this.selectionManger.cp.selectionManager.focused = false;
       this.viewport.plugins.remove("follow");
+      this.dragging = true;
     });
-    this.viewport.on("mousedown", (event) => {
-      if (event.target === event.currentTarget) {
+    this.viewport.on("drag-end", () => {
+      this.dragging = false;
+    });
+
+    this.viewport.on("mouseup", (event) => {
+      if (event.target === event.currentTarget && !this.dragging) {
         this.selectionManger.cp.selectionManager.id = null;
       }
     });

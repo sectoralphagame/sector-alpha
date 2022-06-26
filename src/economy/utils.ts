@@ -2,8 +2,9 @@ import { Matrix, norm, subtract, sum } from "mathjs";
 import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
 import maxBy from "lodash/maxBy";
+import groupBy from "lodash/groupBy";
 import { Sim } from "../sim";
-import { Commodity } from "./commodity";
+import { Commodity, MineableCommodity } from "./commodity";
 import { RequireComponent } from "../tsHelpers";
 import { AsteroidField } from "../archetypes/asteroidField";
 import { asteroid, Asteroid } from "../archetypes/asteroid";
@@ -194,5 +195,27 @@ export function getPlannedBudget(entity: WithTrade): number {
           : entity.cp.storage.quota[commodity] -
             entity.cp.storage.stored[commodity]) * offer.price
     )
+  );
+}
+
+export function getSectorResources(
+  sector: Sector
+): Record<MineableCommodity, number> {
+  const fields = sector.sim.queries.asteroidFields
+    .get()
+    .filter((field) => field.cp.position.sector === sector.id);
+  const fieldsByType = groupBy(fields, (field) => field.cp.asteroidSpawn.type);
+
+  return perCommodity((commodity) =>
+    fieldsByType[commodity]
+      ?.map((field) => field.cp.children.entities)
+      .flat()
+      .reduce(
+        (acc, a) =>
+          acc +
+          sector.sim.getOrThrow(a).requireComponents(["minable"]).cp.minable
+            .resources,
+        0
+      )
   );
 }

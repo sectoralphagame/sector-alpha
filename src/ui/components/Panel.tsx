@@ -18,6 +18,8 @@ import { Button } from "./Button";
 import { useLayout } from "../context/Layout";
 import { facilityComponents } from "../../archetypes/facility";
 import EntityName from "./EntityName";
+import Resources from "./Resources";
+import { sector, sectorComponents } from "../../archetypes/sector";
 
 const styles = nano.sheet({
   iconBar: {
@@ -138,6 +140,9 @@ export const Panel: React.FC = () => {
           ) : entity.current.hasComponents(facilityComponents) ? (
             <FacilityPanel />
           ) : null}
+          {entity.current.hasComponents(sectorComponents) && (
+            <Resources entity={sector(entity.current)} />
+          )}
         </>
       )}
       <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)}>
