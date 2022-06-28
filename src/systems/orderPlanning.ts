@@ -12,6 +12,7 @@ import { mineableCommodities } from "../economy/commodity";
 import {
   getSectorsInTeleportRange,
   getTradeWithMostProfit,
+  tradeComponents,
 } from "../economy/utils";
 import type { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
@@ -83,11 +84,14 @@ function autoTradeForCommander(
   sectorDistance: number
 ) {
   const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
+  if (!commander.cp.compoundProduction) return;
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);
   } else {
-    const bought = getNeededCommodities(commander).reduce((acc, commodity) => {
+    const bought = getNeededCommodities(
+      commander.requireComponents([...tradeComponents, "compoundProduction"])
+    ).reduce((acc, commodity) => {
       if (acc) {
         return true;
       }
@@ -131,11 +135,14 @@ function autoMineForCommander(
   sectorDistance: number
 ) {
   const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
+  if (!commander.cp.compoundProduction) return;
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);
   } else {
-    const needed = getNeededCommodities(commander);
+    const needed = getNeededCommodities(
+      commander.requireComponents([...tradeComponents, "compoundProduction"])
+    );
     const mineable = needed.find((commodity) =>
       (Object.values(mineableCommodities) as string[]).includes(commodity)
     );

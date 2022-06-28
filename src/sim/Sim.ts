@@ -28,6 +28,7 @@ import { setTexture } from "../components/render";
 import { openDb } from "../db";
 import { AsteroidSpawningSystem } from "../systems/asteroidSpawning";
 import { isTest } from "../settings";
+import { FacilityPlanningSystem } from "../systems/facilityPlanning";
 
 function reviveMathjs(value: any) {
   if (isPlainObject(value)) {
@@ -83,6 +84,7 @@ export class Sim extends BaseSim {
       new MiningSystem(this),
       new OrderExecutingSystem(this),
       new AsteroidSpawningSystem(this),
+      new FacilityPlanningSystem(this),
     ];
 
     if (!isTest) {

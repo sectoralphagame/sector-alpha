@@ -13,7 +13,7 @@ export function shouldSpawnAsteroid(entity: AsteroidField): boolean {
         .map(asteroid)
         .map((e) => e.cp.minable.resources)
     ) <
-    entity.cp.asteroidSpawn.size * entity.cp.asteroidSpawn.density
+    entity.cp.asteroidSpawn.size ** 2 * entity.cp.asteroidSpawn.density
   );
 }
 

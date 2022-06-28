@@ -2,7 +2,7 @@ import { asteroid } from "../../archetypes/asteroid";
 import { asteroidField } from "../../archetypes/asteroidField";
 import { MineOrder } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
-import { getClosestMineableAsteroid } from "../../economy/utils";
+import { getMineableAsteroid } from "../../economy/utils";
 import { RequireComponent } from "../../tsHelpers";
 import { moveToOrders } from "../../utils/moving";
 
@@ -20,10 +20,7 @@ export function mineOrder(
     (targetRock.cp.minable!.minedById !== null &&
       targetRock.cp.minable!.minedById !== entity.id)
   ) {
-    const rock = getClosestMineableAsteroid(
-      targetField,
-      entity.cp.position.coord
-    );
+    const rock = getMineableAsteroid(targetField);
     if (!rock) {
       return true;
     }

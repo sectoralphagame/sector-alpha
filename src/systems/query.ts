@@ -1,4 +1,5 @@
 import { asteroidFieldComponents } from "../archetypes/asteroidField";
+import { factionComponents } from "../archetypes/faction";
 import { sectorComponents } from "../archetypes/sector";
 import { CoreComponents, Entity } from "../components/entity";
 import { Sim } from "../sim";
@@ -63,9 +64,15 @@ export class Query<T extends keyof CoreComponents> {
 
 export function createQueries(sim: Sim) {
   return {
+    ai: new Query(sim, [...factionComponents, "ai"]),
     asteroidFields: new Query(sim, asteroidFieldComponents),
     autoOrderable: new Query(sim, ["autoOrder", "orders"]),
     commendables: new Query(sim, ["commander"]),
+    facilityWithProduction: new Query(sim, [
+      "compoundProduction",
+      "modules",
+      "position",
+    ]),
     mining: new Query(sim, ["mining", "storage"]),
     orderable: new Query(sim, ["orders"]),
     productionByModules: new Query(sim, ["production", "parent"]),

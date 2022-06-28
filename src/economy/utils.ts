@@ -2,17 +2,17 @@ import { Matrix, norm, subtract, sum } from "mathjs";
 import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
 import maxBy from "lodash/maxBy";
-import groupBy from "lodash/groupBy";
 import { Sim } from "../sim";
-import { Commodity, MineableCommodity } from "./commodity";
+import { Commodity } from "./commodity";
 import { RequireComponent } from "../tsHelpers";
 import { AsteroidField } from "../archetypes/asteroidField";
 import { asteroid, Asteroid } from "../archetypes/asteroid";
 import { Sector, sector as asSector } from "../archetypes/sector";
 import { Marker } from "../archetypes/marker";
 import { perCommodity } from "../utils/perCommodity";
+import { pickRandom } from "../utils/generators";
 
-const tradeComponents = [
+export const tradeComponents = [
   "trade",
   "storage",
   "budget",
@@ -166,24 +166,22 @@ export function getFacilityWithMostProfit(
   ).reverse()[0];
 }
 
-export function getClosestMineableAsteroid(
-  field: AsteroidField,
-  position: Matrix
+export function getMineableAsteroid(
+  field: AsteroidField
 ): Asteroid | undefined {
-  return minBy(
+  return pickRandom(
     field.components.children.entities
       .map((e) => asteroid(field.sim.getOrThrow(e)!))
       .filter(
         (a) =>
           !a.components.minable.minedById && a.components.minable.resources > 0
-      ),
-    (r) => norm(subtract(position, asteroid(r).cp.position.coord) as Matrix)
+      )
   );
 }
 
 /**
  *
- * @returns Minimum required money to fulfill all buy requests, not taking
+ * Minimum required money to fulfill all buy requests, not taking
  * into account sell offers
  */
 export function getPlannedBudget(entity: WithTrade): number {
@@ -195,27 +193,5 @@ export function getPlannedBudget(entity: WithTrade): number {
           : entity.cp.storage.quota[commodity] -
             entity.cp.storage.stored[commodity]) * offer.price
     )
-  );
-}
-
-export function getSectorResources(
-  sector: Sector
-): Record<MineableCommodity, number> {
-  const fields = sector.sim.queries.asteroidFields
-    .get()
-    .filter((field) => field.cp.position.sector === sector.id);
-  const fieldsByType = groupBy(fields, (field) => field.cp.asteroidSpawn.type);
-
-  return perCommodity((commodity) =>
-    fieldsByType[commodity]
-      ?.map((field) => field.cp.children.entities)
-      .flat()
-      .reduce(
-        (acc, a) =>
-          acc +
-          sector.sim.getOrThrow(a).requireComponents(["minable"]).cp.minable
-            .resources,
-        0
-      )
   );
 }
