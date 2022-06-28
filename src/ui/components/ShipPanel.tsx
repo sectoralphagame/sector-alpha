@@ -87,7 +87,6 @@ const ShipPanel: React.FC = () => {
 
   return (
     <div>
-      <div>{ship.cp.name.value}</div>
       {!!commander && (
         <div>
           {`Commander: ${commander.cp.name!.value}`}

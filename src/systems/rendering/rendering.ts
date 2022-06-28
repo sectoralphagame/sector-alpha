@@ -4,6 +4,7 @@ import Color from "color";
 import { System } from "../system";
 import { drawGraphics } from "../../components/renderGraphics";
 import { RequireComponent } from "../../tsHelpers";
+import { Cooldowns } from "../../utils/cooldowns";
 
 const minScale = 0.13;
 
@@ -13,8 +14,11 @@ export class RenderingSystem extends System {
   prevScale: number = minScale;
   app: PIXI.Application;
   initialized = false;
+  resizeObserver: ResizeObserver;
+  cooldowns: Cooldowns<"graphics">;
 
   init = () => {
+    this.cooldowns = new Cooldowns("graphics");
     this.selectionManger = this.sim.queries.selectionManager.get()[0];
     const root = document.querySelector("#root")!;
     const toolbar = document.querySelector("#toolbar")!;
@@ -36,23 +40,36 @@ export class RenderingSystem extends System {
       view: canvas,
     });
 
-    const viewport = new Viewport({
+    this.viewport = new Viewport({
       screenWidth: root.clientWidth - toolbar.clientWidth,
       screenHeight: window.innerHeight,
       interaction: this.app.renderer.plugins.interaction,
     });
 
-    this.app.stage.addChild(viewport);
+    this.app.stage.addChild(this.viewport);
 
-    viewport.drag().pinch().wheel();
-    viewport.clampZoom({ minScale });
-    viewport.on("drag-start", () => {
+    this.viewport.drag().pinch().wheel();
+    this.viewport.clampZoom({ minScale });
+    this.viewport.on("drag-start", () => {
       this.selectionManger.cp.selectionManager.focused = false;
-      viewport.plugins.remove("follow");
+      this.viewport.plugins.remove("follow");
     });
-    viewport.sortableChildren = true;
+    this.viewport.on("mousedown", (event) => {
+      if (event.target === event.currentTarget) {
+        this.selectionManger.cp.selectionManager.id = null;
+      }
+    });
+    this.viewport.sortableChildren = true;
 
-    this.viewport = viewport;
+    this.resizeObserver = new ResizeObserver(() => {
+      this.app.resizeTo = canvasRoot;
+      this.viewport.resize(
+        root.clientWidth - toolbar.clientWidth,
+        window.innerHeight
+      );
+    });
+    this.resizeObserver.observe(toolbar);
+
     this.initialized = true;
   };
 
@@ -61,27 +78,16 @@ export class RenderingSystem extends System {
     this.app.destroy(true);
   }
 
-  exec(): void {
-    if (!this.initialized) {
-      this.init();
-      return;
+  updateGraphics() {
+    if (this.cooldowns.canUse("graphics")) {
+      this.cooldowns.use("graphics", this.sim.speed);
+      this.sim.queries.renderableGraphics.get().forEach((entity) => {
+        drawGraphics(entity, this.viewport);
+      });
     }
-    this.selectionManger = this.sim.queries.selectionManager.get()[0];
+  }
 
-    this.sim.queries.sectors.get().forEach((sector) => {
-      if (!sector.cp.renderGraphics.initialized) {
-        drawGraphics(sector.cp.renderGraphics, this.viewport);
-        sector.cp.renderGraphics.initialized = true;
-      }
-    });
-
-    this.sim.queries.renderableGraphics.get().forEach((entity) => {
-      if (!entity.cp.renderGraphics.initialized) {
-        drawGraphics(entity.cp.renderGraphics, this.viewport);
-        entity.cp.renderGraphics.initialized = true;
-      }
-    });
-
+  updateRenderables() {
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
       const selected =
@@ -121,6 +127,18 @@ export class RenderingSystem extends System {
 
       entityRender.sprite.visible = entityRender.maxZ <= this.prevScale;
     });
+  }
+
+  exec(delta: number): void {
+    if (!this.initialized) {
+      this.init();
+      return;
+    }
+    this.cooldowns.update(delta);
+    this.selectionManger = this.sim.queries.selectionManager.get()[0];
+
+    this.updateGraphics();
+    this.updateRenderables();
 
     if (this.selectionManger.cp.selectionManager.focused) {
       this.viewport.follow(
