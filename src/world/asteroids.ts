@@ -1,28 +1,43 @@
 import { add, matrix, Matrix, random } from "mathjs";
-import { limitMin } from "../utils/limit";
-import { mineableCommodities } from "../economy/commodity";
+import { mineableCommodities, MineableCommodity } from "../economy/commodity";
 import { createAsteroidField } from "../archetypes/asteroidField";
 import { Sim } from "../sim";
-import { createAsteroid } from "../archetypes/asteroid";
 import { sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
+import { pickRandom } from "../utils/generators";
 
 const getSize = () => {
   const r = Math.random();
 
   if (r < 0.05) {
-    return random(7, 12);
+    return random(10, 14);
   }
   if (r < 0.15) {
-    return random(4, 7);
+    return random(5, 9);
   }
 
-  return random(1, 3);
+  return random(2, 4);
 };
+
+const densities: Record<MineableCommodity, [number, number]> = {
+  fuelium: [250, 1000],
+  goldOre: [25, 125],
+  ore: [125, 1100],
+  ice: [25, 300],
+  silica: [50, 300],
+};
+const resourcesPerAsteroid: Record<MineableCommodity, [number, number]> = {
+  fuelium: [500, 800],
+  goldOre: [50, 110],
+  ore: [300, 900],
+  ice: [55, 270],
+  silica: [70, 200],
+};
+const getDensity = (type: MineableCommodity) => random(...densities[type]);
 
 export function getRandomAsteroidField() {
   const sectors = (window.sim as Sim).queries.sectors.get();
-  const sector = sectors[Math.floor(sectors.length * Math.random())];
+  const sector = pickRandom(sectors);
   const maxR = (sectorSize / 20) * Math.sqrt(3);
 
   const sectorCenterPosition = hecsToCartesian(
@@ -41,38 +56,20 @@ export function getRandomAsteroidField() {
     ]),
     sectorCenterPosition
   ) as Matrix;
-
-  const field = createAsteroidField(
-    window.sim as Sim,
+  const mineable =
     mineableCommodities[
       Object.keys(mineableCommodities)[
         Math.floor(Object.keys(mineableCommodities).length * Math.random())
       ]
-    ],
-    size,
-    position,
-    sector
-  );
+    ];
 
-  const asteroids = Math.round(
-    limitMin(random(2, 6) * field.cp.asteroidSpawn.size, 1)
-  );
-  for (let i = 0; i < asteroids; i++) {
-    const asteroidAngle = Math.random() * Math.PI;
-
-    createAsteroid(
-      window.sim as any,
-      field,
-      add(
-        field.cp.position.coord,
-        matrix([
-          random(-field.cp.asteroidSpawn.size, field.cp.asteroidSpawn.size) *
-            Math.cos(asteroidAngle),
-          random(-field.cp.asteroidSpawn.size, field.cp.asteroidSpawn.size) *
-            Math.sin(asteroidAngle),
-        ])
-      ) as Matrix,
-      sector
-    );
-  }
+  createAsteroidField(window.sim as Sim, position, sector, {
+    asteroidResources: {
+      max: resourcesPerAsteroid[mineable][1],
+      min: resourcesPerAsteroid[mineable][0],
+    },
+    density: getDensity(mineable),
+    size: getSize(),
+    type: mineable,
+  });
 }

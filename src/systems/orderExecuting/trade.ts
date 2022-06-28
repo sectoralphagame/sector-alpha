@@ -9,7 +9,7 @@ export function tradeOrder(
   order: TradeOrder
 ): boolean {
   const target = entity.sim
-    .get(order.targetId)
+    .getOrThrow(order.targetId)
     .requireComponents([
       "trade",
       "storage",

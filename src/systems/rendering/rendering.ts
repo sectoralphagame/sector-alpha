@@ -125,7 +125,7 @@ export class RenderingSystem extends System {
     if (this.selectionManger.cp.selectionManager.focused) {
       this.viewport.follow(
         this.sim
-          .get(this.selectionManger.cp.selectionManager.id!)
+          .getOrThrow(this.selectionManger.cp.selectionManager.id!)
           .requireComponents(["render"]).cp.render.sprite
       );
     }

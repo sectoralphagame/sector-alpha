@@ -7,6 +7,23 @@ import { System } from "./system";
 
 type Driveable = RequireComponent<"drive" | "position">;
 
+function hold(entity: Driveable) {
+  console.warn("Order cannot be fulfilled");
+  clearTarget(entity.cp.drive);
+  if (entity.cp.orders) {
+    if (entity.cp.owner) {
+      if (entity.sim.getOrThrow(entity.cp.owner.id).cp.ai) {
+        entity.cp.orders.value = [];
+      } else {
+        entity.cp.orders.value.unshift({
+          type: "hold",
+          orders: [{ type: "hold" }],
+        });
+      }
+    }
+  }
+}
+
 function move(entity: Driveable, delta: number) {
   const entityPosition = entity.cp.position;
   const drive = entity.cp.drive;
@@ -19,25 +36,26 @@ function move(entity: Driveable, delta: number) {
     drive.state = "cruise";
   }
 
-  const targetPosition = entity.sim.get(drive.target).cp.position!;
+  const targetEntity = entity.sim.get(drive.target);
+  if (!targetEntity) {
+    hold(entity);
+    return;
+  }
+  const targetPosition = targetEntity.cp.position!;
   const isInSector = targetPosition.sector === entity.cp.position.sector;
   if (!isInSector) {
-    // eslint-disable-next-line no-console
-    console.error(entity);
-    // eslint-disable-next-line no-console
-    console.error(drive.target);
-    clearTarget(drive);
-    entity.cp.orders!.value = [];
-    throw new Error("Out of bounds");
+    hold(entity);
+    return;
   }
   const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
   // TODO: Investigate magic that is happening here with 90deg offsets
   const targetAngle = Math.atan2(path.get([1]), path.get([0])) + Math.PI / 2;
   const speed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
   const distance = norm(path);
+  const angleOffset = Math.abs(targetAngle - entityPosition.angle);
   const canCruise =
     distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
-    Math.abs(targetAngle - entityPosition.angle) < Math.PI / 12;
+    angleOffset < Math.PI / 12;
   const moveVec = matrix([
     Math.cos(entityPosition.angle - Math.PI / 2),
     Math.sin(entityPosition.angle - Math.PI / 2),
@@ -48,7 +66,7 @@ function move(entity: Driveable, delta: number) {
       ? (multiply(moveVec, speed * delta) as Matrix)
       : matrix([0, 0]);
   const dAngle =
-    Math.abs(targetAngle - entityPosition.angle) > drive.rotary * delta
+    angleOffset > drive.rotary * delta
       ? drive.rotary * delta * Math.sign(targetAngle - entityPosition.angle)
       : targetAngle - entityPosition.angle;
 

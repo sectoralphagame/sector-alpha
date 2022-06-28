@@ -10,7 +10,7 @@ import { System } from "./system";
 function settleBudget(entity: WithTrade) {
   const budgetChange =
     getPlannedBudget(entity) - entity.components.budget.available;
-  const owner = faction(entity.sim.get(entity.components.owner.id));
+  const owner = faction(entity.sim.getOrThrow(entity.components.owner.id));
 
   if (budgetChange < 0) {
     transferMoney(

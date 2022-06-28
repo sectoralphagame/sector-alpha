@@ -16,7 +16,7 @@ export function findInAncestors<T extends keyof CoreComponents>(
 
   if (entity.hasComponents(["parent"])) {
     return findInAncestors(
-      entity.sim.get(entity.requireComponents(["parent"]).cp.parent.id),
+      entity.sim.getOrThrow(entity.requireComponents(["parent"]).cp.parent.id),
       component,
       [...visited, entity.id]
     );

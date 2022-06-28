@@ -26,6 +26,8 @@ import { CooldownUpdatingSystem } from "../systems/cooldowns";
 import { MissingEntityError } from "../errors";
 import { setTexture } from "../components/render";
 import { openDb } from "../db";
+import { AsteroidSpawningSystem } from "../systems/asteroidSpawning";
+import { isTest } from "../settings";
 
 function reviveMathjs(value: any) {
   if (isPlainObject(value)) {
@@ -80,9 +82,10 @@ export class Sim extends BaseSim {
       new MovingSystem(this),
       new MiningSystem(this),
       new OrderExecutingSystem(this),
+      new AsteroidSpawningSystem(this),
     ];
 
-    if (process.env.NODE_ENV !== "test") {
+    if (!isTest) {
       // Do not try to render anything while testing
       // eslint-disable-next-line global-require
       const { RenderingSystem } = require("../systems/rendering");
@@ -123,7 +126,18 @@ export class Sim extends BaseSim {
     return undefined;
   };
 
-  get = (id: number): Entity => {
+  /**
+   * Get entity or `undefined`, depending on entity's existence
+   * @param id Entity ID
+   */
+  get = (id: number): Entity | undefined => this.entities.get(id);
+
+  /**
+   * Use it when it should not be possible in any situation to get not existing
+   * entity
+   * @param id Entity ID
+   */
+  getOrThrow = (id: number): Entity => {
     const entity = this.entities.get(id);
 
     if (!entity) {

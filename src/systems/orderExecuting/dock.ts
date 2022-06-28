@@ -23,7 +23,7 @@ export function dockOrder(
   order: DockOrder
 ): boolean {
   const target = entity.sim
-    .get(order.targetId)
+    .getOrThrow(order.targetId)
     .requireComponents(["position", "docks"]);
   const { docks } = target.cp;
   const { size } = entity.cp.dockable;

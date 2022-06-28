@@ -7,10 +7,7 @@ import { sector as asSector } from "../archetypes/sector";
 import { mineOrder } from "../components/orders";
 import { getAvailableSpace } from "../components/storage";
 import { mineableCommodities } from "../economy/commodity";
-import {
-  getClosestMineableAsteroid,
-  getSectorsInTeleportRange,
-} from "../economy/utils";
+import { getSectorsInTeleportRange } from "../economy/utils";
 import type { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
@@ -37,7 +34,7 @@ type Trading = RequireComponent<
 >;
 
 function autoTrade(entity: Trading, sectorDistance: number) {
-  const commander = facility(entity.sim.get(entity.cp.commander.id));
+  const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);
@@ -81,7 +78,7 @@ function autoMine(
   >,
   sectorDistance: number
 ) {
-  const commander = facility(entity.sim.get(entity.cp.commander.id));
+  const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);
@@ -94,7 +91,7 @@ function autoMine(
     if (mineable) {
       const field = minBy(
         getSectorsInTeleportRange(
-          asSector(entity.sim.get(entity.cp.position.sector)),
+          asSector(entity.sim.getOrThrow(entity.cp.position.sector)),
           sectorDistance,
           entity.sim
         )
@@ -109,7 +106,7 @@ function autoMine(
             (e) =>
               e.cp.asteroidSpawn.type === mineable &&
               e.cp.children.entities
-                .map((child) => asteroid(entity.sim.get(child)))
+                .map((child) => asteroid(entity.sim.getOrThrow(child)))
                 .some((a) => !a.cp.minable.minedById)
           ),
         (e) =>
@@ -120,20 +117,16 @@ function autoMine(
 
       if (!field) return;
 
-      const rock = getClosestMineableAsteroid(field, entity.cp.position.coord);
-
-      if (rock) {
-        entity.cp.orders.value.push({
-          type: "mine",
-          orders: [
-            ...moveToOrders(entity, field),
-            mineOrder({
-              targetFieldId: field.id,
-              targetRockId: rock.id,
-            }),
-          ],
-        });
-      }
+      entity.cp.orders.value.push({
+        type: "mine",
+        orders: [
+          ...moveToOrders(entity, field),
+          mineOrder({
+            targetFieldId: field.id,
+            targetRockId: null,
+          }),
+        ],
+      });
     }
   }
 }
