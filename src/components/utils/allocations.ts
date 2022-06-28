@@ -2,6 +2,8 @@ import { NotFound } from "../../errors";
 
 export interface Allocation {
   id: number;
+  issued: number;
+  meta: object;
 }
 
 export interface CreateAllocationManagerOpts<T> {
@@ -17,7 +19,7 @@ export interface Allocations<T extends Allocation> {
 
 export function newAllocation<T extends Allocation>(
   manager: Allocations<T>,
-  input: Omit<T, keyof Allocation>,
+  input: Omit<T, "id">,
   // eslint-disable-next-line no-unused-vars
   validate: (allocation: T) => boolean
 ): T {
@@ -54,7 +56,8 @@ export function releaseAllocation<T extends Allocation>(
 ): T {
   const allocation = getAllocation(manager, id);
 
-  manager.allocations = manager.allocations.filter((a) => a.id !== id);
+  const index = manager.allocations.findIndex((a) => a.id === id);
+  manager.allocations.splice(index, 1);
 
   return allocation;
 }

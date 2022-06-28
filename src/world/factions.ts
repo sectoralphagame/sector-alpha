@@ -1,8 +1,8 @@
 import { add, Matrix, matrix, random, randomInt } from "mathjs";
-import { createFaction } from "../archetypes/faction";
+import { createFaction, Faction } from "../archetypes/faction";
 import { sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
-import { changeBudgetMoney } from "../components/budget";
+import { setMoney } from "../components/budget";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { linkTeleportModules } from "../components/teleport";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
@@ -29,17 +29,32 @@ function getFreighterTemplate() {
   return pickRandom(shipClasses.filter((s) => !s.mining && s.size === "small"));
 }
 
-function createFactionX(index: number, sim: Sim) {
+function createTerritorialFaction(index: number, sim: Sim) {
   const char = String.fromCharCode(index + 65);
   const faction = createFaction(`Faction ${char}`, sim);
-  changeBudgetMoney(faction.cp.budget, 1e8);
+  faction.addComponent({ name: "ai", type: "territorial" });
+  setMoney(faction.cp.budget, 1e8);
 
   return faction;
 }
 
-export const factions = (sim: Sim) =>
+function createTradingFaction(index: number, sim: Sim) {
+  const char = String.fromCharCode(index + 65);
+  const faction = createFaction(`Traders ${char}`, sim);
+  faction.addComponent({ name: "ai", type: "travelling" });
+  setMoney(faction.cp.budget, 1e4);
+
+  return faction;
+}
+
+let faction: Faction;
+
+export const factions = (sim: Sim) => {
   sim.queries.sectors.get().forEach((sector, index, sectors) => {
-    const faction = createFactionX(index, sim);
+    faction =
+      !faction || Math.random() < 0.7
+        ? createTerritorialFaction(index, sim)
+        : faction;
 
     const position = hecsToCartesian(
       sector.cp.hecsPosition.value,
@@ -107,7 +122,7 @@ export const factions = (sim: Sim) =>
 
       do {
         if (hasMineables) {
-          const minerShip = createShip(sim, {
+          createShip(sim, {
             ...pickRandom(shipClasses.filter((s) => s.mining)),
             position: add(
               position,
@@ -115,14 +130,12 @@ export const factions = (sim: Sim) =>
             ) as Matrix,
             owner: faction,
             sector,
-          });
-          minerShip.addComponent({
+          }).addComponent({
             name: "commander",
             id: facility.id,
           });
-          minerShip.components.owner.id = faction.id;
         } else {
-          const tradeShip = createShip(sim, {
+          createShip(sim, {
             ...getFreighterTemplate(),
             position: add(
               position,
@@ -130,15 +143,33 @@ export const factions = (sim: Sim) =>
             ) as Matrix,
             owner: faction,
             sector,
-          });
-          tradeShip.addComponent({
+          }).addComponent({
             name: "commander",
             id: facility.id,
           });
-          tradeShip.components.owner.id = faction.id;
         }
       } while (Math.random() < 0.15);
 
       facility.components.owner.id = faction.id;
     }
   });
+
+  for (let i = 0; i < 2; i++) {
+    faction = createTradingFaction(i, sim);
+    sim.queries.sectors.get().forEach((sector) => {
+      const sectorPosition = hecsToCartesian(
+        sector.cp.hecsPosition.value,
+        sectorSize / 10
+      );
+      createShip(sim, {
+        ...getFreighterTemplate(),
+        position: add(
+          sectorPosition,
+          matrix([random(-30, 30), random(-30, 30)])
+        ) as Matrix,
+        owner: faction,
+        sector,
+      });
+    });
+  }
+};

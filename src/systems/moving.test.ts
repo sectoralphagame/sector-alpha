@@ -31,7 +31,7 @@ describe("Ship", () => {
     setTarget(
       ship.cp.drive,
       createMarker(sim, {
-        sector,
+        sector: sector.id,
         value: matrix([1, 0.3]),
       }).id
     );
@@ -45,7 +45,7 @@ describe("Ship", () => {
     setTarget(
       ship.cp.drive,
       createMarker(sim, {
-        sector,
+        sector: sector.id,
         value: matrix([1, 10]),
       }).id
     );
@@ -57,7 +57,7 @@ describe("Ship", () => {
 
   it("is able to make move order", () => {
     const orderExecutingSystem = new OrderExecutingSystem(sim);
-    const m = createMarker(sim, { sector, value: matrix([1, 0.3]) });
+    const m = createMarker(sim, { sector: sector.id, value: matrix([1, 0.3]) });
     ship.cp.orders.value.push({
       type: "move",
       orders: [

@@ -47,6 +47,15 @@ function move(entity: Driveable, delta: number) {
     hold(entity);
     return;
   }
+
+  if (norm(subtract(entity.cp.position.coord, targetPosition.coord)) < 0.1) {
+    drive.targetReached = true;
+    if (targetEntity.cp.destroyAfterUsage) {
+      targetEntity.unregister();
+    }
+    return;
+  }
+
   const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
   // TODO: Investigate magic that is happening here with 90deg offsets
   const targetAngle = Math.atan2(path.get([1]), path.get([0])) + Math.PI / 2;
@@ -73,6 +82,9 @@ function move(entity: Driveable, delta: number) {
   if (norm(dPos) >= distance) {
     entityPosition.coord = matrix(targetPosition.coord);
     drive.targetReached = true;
+    if (targetEntity.cp.destroyAfterUsage) {
+      targetEntity.unregister();
+    }
     return;
   }
 

@@ -1,13 +1,17 @@
 import { minBy } from "lodash";
-import { Matrix, norm, subtract } from "mathjs";
+import { add, matrix, Matrix, norm, random, subtract } from "mathjs";
 import { asteroid } from "../archetypes/asteroid";
 import { asteroidField } from "../archetypes/asteroidField";
 import { commanderRange, facility } from "../archetypes/facility";
+import { createMarker } from "../archetypes/marker";
 import { sector as asSector } from "../archetypes/sector";
 import { mineOrder } from "../components/orders";
 import { getAvailableSpace } from "../components/storage";
 import { mineableCommodities } from "../economy/commodity";
-import { getSectorsInTeleportRange } from "../economy/utils";
+import {
+  getSectorsInTeleportRange,
+  getTradeWithMostProfit,
+} from "../economy/utils";
 import type { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
@@ -18,22 +22,61 @@ import {
   getCommoditiesForSell,
   getNeededCommodities,
   returnToFacility,
+  tradeCommodity,
 } from "../utils/trading";
 import { holdPosition } from "./orderExecuting/misc";
 import { System } from "./system";
 
-type Trading = RequireComponent<
-  | "drive"
-  | "storage"
-  | "autoOrder"
-  | "orders"
-  | "commander"
-  | "owner"
-  | "position"
-  | "dockable"
->;
+const tradingComponents = [
+  "drive",
+  "storage",
+  "autoOrder",
+  "orders",
+  "owner",
+  "position",
+  "dockable",
+] as const;
+type Trading = RequireComponent<typeof tradingComponents[number]>;
+
+function idleMovement(entity: Trading) {
+  entity.cp.orders.value = [
+    {
+      orders: moveToOrders(
+        entity,
+        createMarker(entity.sim, {
+          sector: entity.cp.position.sector,
+          value: add(
+            entity.cp.position.coord,
+            matrix([random(-0.5, 0.5), random(-0.5, 0.5)])
+          ),
+        })
+      ),
+      type: "move",
+    },
+  ];
+}
 
 function autoTrade(entity: Trading, sectorDistance: number) {
+  let makingTrade = false;
+  const trade = getTradeWithMostProfit(entity, sectorDistance);
+  if (trade) {
+    makingTrade = tradeCommodity(
+      entity,
+      trade.commodity,
+      trade.buyer,
+      trade.seller
+    );
+  }
+
+  if (!makingTrade) {
+    idleMovement(entity);
+  }
+}
+
+function autoTradeForCommander(
+  entity: Trading & RequireComponent<"commander">,
+  sectorDistance: number
+) {
   const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
@@ -51,7 +94,7 @@ function autoTrade(entity: Trading, sectorDistance: number) {
       return;
     }
 
-    getCommoditiesForSell(commander).reduce((acc, commodity) => {
+    const result = getCommoditiesForSell(commander).reduce((acc, commodity) => {
       if (acc) {
         return true;
       }
@@ -62,10 +105,14 @@ function autoTrade(entity: Trading, sectorDistance: number) {
         sectorDistance
       );
     }, false);
+
+    if (!result) {
+      idleMovement(entity);
+    }
   }
 }
 
-function autoMine(
+function autoMineForCommander(
   entity: RequireComponent<
     | "drive"
     | "dockable"
@@ -136,9 +183,20 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
     return;
   }
 
+  if (!entity.hasComponents(["commander"])) {
+    switch (entity.cp.autoOrder.default) {
+      case "trade":
+        autoTrade(entity.requireComponents(tradingComponents), 2);
+        break;
+      default:
+        holdPosition();
+    }
+    return;
+  }
+
   switch (entity.cp.autoOrder.default) {
     case "mine":
-      autoMine(
+      autoMineForCommander(
         entity.requireComponents([
           "mining",
           "dockable",
@@ -154,7 +212,7 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
       );
       break;
     case "trade":
-      autoTrade(
+      autoTradeForCommander(
         entity.requireComponents([
           "drive",
           "dockable",
@@ -185,7 +243,7 @@ export class OrderPlanningSystem extends System {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("autoOrder")) {
-      this.cooldowns.use("autoOrder", 10);
+      this.cooldowns.use("autoOrder", 5);
       this.sim.queries.autoOrderable.get().forEach(autoOrder);
     }
   };
