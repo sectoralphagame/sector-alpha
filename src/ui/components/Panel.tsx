@@ -1,44 +1,35 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import SVG from "react-inlinesvg";
-import { shipComponents } from "../../../archetypes/ship";
-import { Entity } from "../../../components/entity";
+import { shipComponents } from "../../archetypes/ship";
+import { Entity } from "../../components/entity";
 import FacilityPanel from "./FacilityPanel";
-import ffIcon from "../../../../assets/ui/ff.svg";
-import pauseIcon from "../../../../assets/ui/pause.svg";
-import locationIcon from "../../../../assets/ui/location.svg";
-import configIcon from "../../../../assets/ui/config.svg";
-import playIcon from "../../../../assets/ui/play.svg";
+import ffIcon from "../../../assets/ui/ff.svg";
+import pauseIcon from "../../../assets/ui/pause.svg";
+import locationIcon from "../../../assets/ui/location.svg";
+import configIcon from "../../../assets/ui/config.svg";
+import playIcon from "../../../assets/ui/play.svg";
 import { IconButton } from "./IconButton";
 import ShipPanel from "./ShipPanel";
-import { nano } from "../../../style";
+import { nano } from "../../style";
 import { ConfigDialog } from "./ConfigDialog";
 import { Button } from "./Button";
 
 const styles = nano.sheet({
-  root: {
-    display: "grid",
-    gridTemplateColumns: "450px 1fr",
-  },
   iconBar: {
     display: "flex",
     gap: "8px",
     marginBottom: "24px",
   },
-  toolbar: {
+  root: {
     borderRight: "1px solid #fff",
     padding: "24px",
   },
 });
 
-const Panel: React.FC = () => {
+export const Panel: React.FC = () => {
   const [openConfig, setOpenConfig] = React.useState(false);
   const [, setRender] = React.useState(false);
   const interval = React.useRef<number>();
-  const root = React.useRef(document.querySelector<HTMLDivElement>("#root")!);
-  const toolbar = React.useRef(
-    document.querySelector<HTMLDivElement>("#toolbar")!
-  );
 
   React.useEffect(() => {
     if (!window.sim) return;
@@ -50,11 +41,6 @@ const Panel: React.FC = () => {
   }, [openConfig]);
 
   React.useEffect(() => {
-    root.current.className = styles.root;
-    toolbar.current.className = styles.toolbar;
-  }, []);
-
-  React.useEffect(() => {
     interval.current = setInterval(
       () => setRender((v) => !v),
       250
@@ -64,7 +50,7 @@ const Panel: React.FC = () => {
   }, []);
 
   return (
-    <div>
+    <div className={styles.root} id="toolbar">
       <div className={styles.iconBar}>
         <IconButton onClick={() => setOpenConfig(true)}>
           <SVG src={configIcon} />
@@ -116,5 +102,3 @@ const Panel: React.FC = () => {
     </div>
   );
 };
-
-ReactDOM.render(<Panel />, document.querySelector("#toolbar"));

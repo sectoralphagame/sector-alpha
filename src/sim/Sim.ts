@@ -134,8 +134,10 @@ export class Sim extends BaseSim {
   };
 
   destroy = () => {
+    super.destroy();
     this.systems.forEach((system) => system.destroy());
     this.pause();
+    window.selected = undefined!;
   };
 
   save = async (name: string, id?: number) => {

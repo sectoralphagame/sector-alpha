@@ -1,15 +1,9 @@
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
-import { Sim } from "../../sim";
 import { System } from "../system";
 import { drawGraphics } from "../../components/renderGraphics";
 import { RequireComponent } from "../../tsHelpers";
-
-if (process.env.NODE_ENV !== "test") {
-  // eslint-disable-next-line global-require
-  require("./components/Panel");
-}
 
 const minScale = 0.13;
 
@@ -18,17 +12,20 @@ export class RenderingSystem extends System {
   viewport: Viewport;
   prevScale: number = minScale;
   app: PIXI.Application;
-
-  constructor(sim: Sim) {
-    super(sim);
-    this.init();
-  }
+  initialized = false;
 
   init = () => {
     this.selectionManger = this.sim.queries.selectionManager.get()[0];
     const root = document.querySelector("#root")!;
     const toolbar = document.querySelector("#toolbar")!;
-    const canvas = document.querySelector("#canvasRoot")! as HTMLCanvasElement;
+    const canvasRoot = document.querySelector(
+      "#canvasRoot"
+    )! as HTMLCanvasElement;
+
+    if (!(root || toolbar || canvasRoot)) return;
+
+    const canvas = document.createElement("canvas");
+    canvasRoot.appendChild(canvas);
 
     this.app = new PIXI.Application({
       antialias: true,
@@ -56,13 +53,19 @@ export class RenderingSystem extends System {
     viewport.sortableChildren = true;
 
     this.viewport = viewport;
+    this.initialized = true;
   };
 
   destroy(): void {
-    this.app.destroy();
+    this.viewport.destroy();
+    this.app.destroy(true);
   }
 
   exec(): void {
+    if (!this.initialized) {
+      this.init();
+      return;
+    }
     this.selectionManger = this.sim.queries.selectionManager.get()[0];
 
     this.sim.queries.sectors.get().forEach((sector) => {

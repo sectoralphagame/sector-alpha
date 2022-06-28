@@ -1,4 +1,4 @@
-import { nano } from "../../../style";
+import { nano } from "../../style";
 
 export const Collapsible = nano.jsx("details", {
   marginBottom: "8px",

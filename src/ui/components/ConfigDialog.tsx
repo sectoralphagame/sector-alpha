@@ -1,13 +1,14 @@
 import React from "react";
-import ReactModal from "react-modal";
-import { nano } from "../../../style";
+import SVG from "react-inlinesvg";
+import { nano } from "../../style";
 import { Dialog } from "./Dialog";
 import { Button } from "./Button";
-import { Sim } from "../../../sim";
-import { Save } from "../../../db";
+import { Sim } from "../../sim";
+import { Save } from "../../db";
 import { Input } from "./Input";
-
-ReactModal.setAppElement("#root");
+import { useLocation } from "../context/Location";
+import { IconButton } from "../components/IconButton";
+import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
 
 export interface ModalProps {
   open: boolean;
@@ -15,6 +16,9 @@ export interface ModalProps {
 }
 
 const styles = nano.sheet({
+  backButton: {
+    marginBottom: "8px",
+  },
   buttons: {},
   button: {
     "&:not(:last-child)": {
@@ -35,6 +39,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const [view, setView] = React.useState<Views>("default");
   const [saves, setSaves] = React.useState<Save[]>();
   const input = React.useRef<HTMLInputElement>(null);
+  const navigate = useLocation();
 
   React.useEffect(() => {
     if (["load", "save"].includes(view)) {
@@ -56,6 +61,14 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={onClose} title="Configuration">
+      {view !== "default" && (
+        <IconButton
+          className={styles.backButton}
+          onClick={() => setView("default")}
+        >
+          <SVG src={arrowLeftIcon} />
+        </IconButton>
+      )}
       {view === "default" ? (
         <div className={styles.buttons}>
           <Button onClick={() => setView("load")} className={styles.button}>
@@ -64,25 +77,34 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
           <Button onClick={() => setView("save")} className={styles.button}>
             save
           </Button>
+          <Button
+            onClick={() => {
+              window.sim.destroy();
+              window.sim = undefined!;
+              navigate("main");
+            }}
+            className={styles.button}
+          >
+            quit to main menu
+          </Button>
         </div>
       ) : view === "load" ? (
         <div className={styles.buttons}>
-          {saves
-            ? saves.map((save) => (
-                <Button
-                  className={styles.button}
-                  key={save.id}
-                  onClick={async () => {
-                    window.sim.destroy();
-                    window.sim = await Sim.load(save.data);
-                    window.sim.start();
-                    onClose();
-                  }}
-                >
-                  {save.name}
-                </Button>
-              ))
-            : "loading"}
+          {!!saves &&
+            saves.map((save) => (
+              <Button
+                className={styles.button}
+                key={save.id}
+                onClick={async () => {
+                  window.sim.destroy();
+                  window.sim = await Sim.load(save.data);
+                  window.sim.start();
+                  onClose();
+                }}
+              >
+                {save.name}
+              </Button>
+            ))}
         </div>
       ) : (
         <div className={styles.buttons}>
@@ -94,20 +116,19 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             />
             <input type="submit" hidden />
           </form>
-          {saves
-            ? saves.map((save) => (
-                <Button
-                  className={styles.button}
-                  key={save.id}
-                  onClick={() => {
-                    window.sim.save(save.name, save.id);
-                    onClose();
-                  }}
-                >
-                  {save.name}
-                </Button>
-              ))
-            : "loading"}
+          {!!saves &&
+            saves.map((save) => (
+              <Button
+                className={styles.button}
+                key={save.id}
+                onClick={() => {
+                  window.sim.save(save.name, save.id);
+                  onClose();
+                }}
+              >
+                {save.name}
+              </Button>
+            ))}
         </div>
       )}
     </Dialog>

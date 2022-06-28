@@ -1,10 +1,10 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import locationIcon from "../../../../assets/ui/location.svg";
-import { RequireComponent } from "../../../tsHelpers";
+import locationIcon from "../../../assets/ui/location.svg";
+import { RequireComponent } from "../../tsHelpers";
 import { IconButton } from "./IconButton";
 import { Table, TableCell } from "./Table";
-import { nano } from "../../../style";
+import { nano } from "../../style";
 
 export interface DocksProps {
   entity: RequireComponent<"docks">;

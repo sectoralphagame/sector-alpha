@@ -1,4 +1,4 @@
-import { nano } from "../../../style";
+import { nano } from "../../style";
 
 export const Table = nano.jsx("table", {
   width: "100%",

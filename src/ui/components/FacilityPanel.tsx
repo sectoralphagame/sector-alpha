@@ -1,5 +1,5 @@
 import React from "react";
-import { Facility } from "../../../archetypes/facility";
+import { Facility } from "../../archetypes/facility";
 import { Production } from "./Production";
 import { Offers } from "./Offers";
 import { Docks } from "./Docks";

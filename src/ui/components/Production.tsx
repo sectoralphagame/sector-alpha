@@ -1,10 +1,10 @@
 import React from "react";
 import groupBy from "lodash/groupBy";
 import SVG from "react-inlinesvg";
-import { RequireComponent } from "../../../tsHelpers";
+import { RequireComponent } from "../../tsHelpers";
 import { Table, TableCell } from "./Table";
 import { IconButton } from "./IconButton";
-import locationIcon from "../../../../assets/ui/location.svg";
+import locationIcon from "../../../assets/ui/location.svg";
 
 export interface ProductionProps {
   entity: RequireComponent<"modules">;
