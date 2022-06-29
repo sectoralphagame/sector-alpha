@@ -80,7 +80,7 @@ export function createQueries(sim: Sim) {
     renderableGraphics: new Query(sim, ["renderGraphics"]),
     sectors: new Query(sim, sectorComponents),
     selectable: new Query(sim, ["render", "position", "selection"]),
-    selectionManager: new Query(sim, ["selectionManager"]),
+    settings: new Query(sim, ["selectionManager", "systemManager"]),
     standaloneProduction: new Query(sim, ["production", "storage"]),
     storageAndTrading: new Query(sim, ["storage", "trade"]),
     teleports: new Query(sim, ["teleport"]),

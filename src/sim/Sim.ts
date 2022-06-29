@@ -29,6 +29,7 @@ import { openDb } from "../db";
 import { AsteroidSpawningSystem } from "../systems/asteroidSpawning";
 import { isTest } from "../settings";
 import { FacilityPlanningSystem } from "../systems/facilityPlanning";
+import { SectorStatisticGatheringSystem } from "../systems/sectorStatisticGathering";
 
 function reviveMathjs(value: any) {
   if (isPlainObject(value)) {
@@ -85,6 +86,7 @@ export class Sim extends BaseSim {
       new OrderExecutingSystem(this),
       new AsteroidSpawningSystem(this),
       new FacilityPlanningSystem(this),
+      new SectorStatisticGatheringSystem(this),
     ];
 
     if (!isTest) {
@@ -112,11 +114,16 @@ export class Sim extends BaseSim {
 
   init = () => {
     const settingsEntity = new Entity(this);
-    settingsEntity.addComponent({
-      id: null,
-      focused: false,
-      name: "selectionManager",
-    });
+    settingsEntity
+      .addComponent({
+        id: null,
+        focused: false,
+        name: "selectionManager",
+      })
+      .addComponent({
+        name: "systemManager",
+        lastStatUpdate: 0,
+      });
   };
 
   // eslint-disable-next-line no-unused-vars

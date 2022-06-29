@@ -67,8 +67,7 @@ export const graphics: Graphics = {
     textGraphics.position.set(textPos.get([0]), textPos.get([1]));
     textGraphics.interactive = true;
     textGraphics.on("mousedown", () => {
-      entity.sim.queries.selectionManager.get()[0].cp.selectionManager.id =
-        entity.id;
+      entity.sim.queries.settings.get()[0].cp.selectionManager.id = entity.id;
     });
     textGraphics.cursor = "pointer";
     g.addChild(textGraphics);

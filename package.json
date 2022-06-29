@@ -80,6 +80,7 @@
     "eventemitter3": "^4.0.7",
     "graphlib": "^2.1.8",
     "idb": "^7.0.1",
+    "lightweight-charts": "^3.8.0",
     "lodash": "^4.17.21",
     "mathjs": "^10.6.0",
     "nano-css": "^5.3.4",

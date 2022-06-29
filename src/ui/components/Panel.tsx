@@ -20,6 +20,7 @@ import { facilityComponents } from "../../archetypes/facility";
 import EntityName from "./EntityName";
 import Resources from "./Resources";
 import { sector, sectorComponents } from "../../archetypes/sector";
+import SectorStats from "./SectorStats";
 
 const styles = nano.sheet({
   iconBar: {
@@ -141,7 +142,10 @@ export const Panel: React.FC = () => {
             <FacilityPanel />
           ) : null}
           {entity.current.hasComponents(sectorComponents) && (
-            <Resources entity={sector(entity.current)} />
+            <>
+              <Resources entity={sector(entity.current)} />
+              <SectorStats entity={sector(entity.current)} />
+            </>
           )}
         </>
       )}

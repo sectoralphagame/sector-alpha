@@ -20,7 +20,7 @@ export class RenderingSystem extends System {
 
   init = () => {
     this.cooldowns = new Cooldowns("graphics");
-    this.selectionManger = this.sim.queries.selectionManager.get()[0];
+    this.selectionManger = this.sim.queries.settings.get()[0];
     const root = document.querySelector("#root")!;
     const toolbar = document.querySelector("#toolbar")!;
     const canvasRoot = document.querySelector(
@@ -141,7 +141,7 @@ export class RenderingSystem extends System {
       return;
     }
     this.cooldowns.update(delta);
-    this.selectionManger = this.sim.queries.selectionManager.get()[0];
+    this.selectionManger = this.sim.queries.settings.get()[0];
 
     this.updateGraphics();
     this.updateRenderables();
