@@ -4,7 +4,23 @@ import { nano } from "../../style";
 
 const styles = nano.sheet({
   root: {
+    "&:checked:before": {
+      position: "relative",
+      content: "''",
+      width: "6px",
+      height: "6px",
+      top: "2px",
+      left: "2px",
+      display: "block",
+      background: "#fff",
+    },
     cursor: "pointer",
+    appearance: "none",
+    width: "12px",
+    height: "12px",
+    border: "1px solid #fff",
+    borderRadius: "2px",
+    margin: "2px",
   },
 });
 
