@@ -3,7 +3,7 @@ import Modal from "react-modal";
 import SVG from "react-inlinesvg";
 import { IconButton } from "./IconButton";
 import closeIcon from "../../../assets/ui/close.svg";
-import { nano } from "../../style";
+import { nano, theme } from "../../style";
 
 Modal.setAppElement("#root");
 
@@ -18,7 +18,7 @@ const styles = nano.sheet({
   title: {
     display: "flex",
     justifyContent: "space-between",
-    marginBottom: "24px",
+    marginBottom: theme.spacing(3),
   },
   titleText: {
     fontSize: "27px",

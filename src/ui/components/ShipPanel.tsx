@@ -6,7 +6,7 @@ import { MineOrder, Order, OrderGroup } from "../../components/orders";
 import { commodities } from "../../economy/commodity";
 import { IconButton } from "./IconButton";
 import locationIcon from "../../../assets/ui/location.svg";
-import { nano } from "../../style";
+import { nano, theme } from "../../style";
 import {
   Collapsible,
   CollapsibleContent,
@@ -19,7 +19,7 @@ import { asteroidField } from "../../archetypes/asteroidField";
 const styles = nano.sheet(
   {
     focus: {
-      marginLeft: "24px",
+      marginLeft: theme.spacing(3),
     },
   },
   "ShipPanel"

@@ -7,8 +7,7 @@ import {
 } from "lightweight-charts";
 import { Sector } from "../../archetypes/sector";
 import { getSectorResources } from "../../utils/resources";
-import { fieldColors } from "../../archetypes/asteroid";
-import { nano } from "../../style";
+import { nano, theme } from "../../style";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 import { Checkbox } from "./Checkbox";
@@ -60,10 +59,10 @@ const SectorStats: React.FC<{ entity: Sector }> = ({ entity }) => {
         },
         grid: {
           horzLines: {
-            color: "#333",
+            color: theme.palette.text(5),
           },
           vertLines: {
-            color: "#333",
+            color: theme.palette.text(5),
           },
         },
         layout: {
@@ -71,7 +70,7 @@ const SectorStats: React.FC<{ entity: Sector }> = ({ entity }) => {
             color: "black",
             type: ColorType.Solid,
           },
-          textColor: "#999",
+          textColor: theme.palette.text(3),
           fontFamily: "Space Mono",
         },
         timeScale: {
@@ -86,7 +85,7 @@ const SectorStats: React.FC<{ entity: Sector }> = ({ entity }) => {
         .filter(([commodity]) => displayedResources.includes(commodity))
         .forEach(([commodity, values]) => {
           const lineSeries = chart.current!.addLineSeries({
-            color: fieldColors[commodity],
+            color: theme.palette.asteroids[commodity],
             title: commodity,
             priceFormat: {
               type: "custom",

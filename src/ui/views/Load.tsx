@@ -1,6 +1,6 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { nano } from "../../style";
+import { nano, theme } from "../../style";
 import { Sim } from "../../sim";
 import { Save } from "../../db";
 import { Button } from "../components/Button";
@@ -10,21 +10,21 @@ import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
 
 const styles = nano.sheet({
   backButton: {
-    marginBottom: "32px",
+    marginBottom: theme.spacing(4),
   },
   buttons: {},
   button: {
     "&:not(:last-child)": {
-      marginBottom: "8px",
+      marginBottom: theme.spacing(1),
     },
     width: "100%",
   },
   input: {
-    marginBottom: "8px",
+    marginBottom: theme.spacing(1),
     width: "100%",
   },
   container: {
-    padding: "32px",
+    padding: theme.spacing(4),
     width: "420px",
   },
   root: {
