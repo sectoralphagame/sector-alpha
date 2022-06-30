@@ -6,29 +6,10 @@ export class BaseSim {
   lastTick: number;
   intervalHandle: number | null;
   timeOffset: number;
-  outOfFocusPause: boolean;
   speed = 1;
-  onVisibilityChange: () => void;
 
   constructor() {
     this.timeOffset = 0;
-    this.onVisibilityChange = () => {
-      if (document.visibilityState !== "visible") {
-        if (this.intervalHandle) {
-          this.pause();
-          this.outOfFocusPause = true;
-        }
-      } else if (this.outOfFocusPause) {
-        this.start();
-        this.outOfFocusPause = false;
-      }
-    };
-
-    document.addEventListener("visibilitychange", this.onVisibilityChange);
-  }
-
-  destroy() {
-    document.removeEventListener("visibilitychange", this.onVisibilityChange);
   }
 
   setSpeed = (value: number) => {
