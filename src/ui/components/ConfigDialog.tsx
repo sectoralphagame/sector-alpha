@@ -109,7 +109,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             saves={saves}
             onClick={async (id) => {
               window.sim.destroy();
-              window.sim = await Sim.load(saves[id].data);
+              window.sim = await Sim.load(saves.find((s) => s.id === id)!.data);
               window.sim.start();
               onClose();
             }}

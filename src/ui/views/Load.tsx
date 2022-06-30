@@ -50,14 +50,16 @@ export const LoadGame: React.FC = () => {
           className={styles.backButton}
           onClick={() => navigate("main")}
         >
-          <SVG src={arrowLeftIcon} />{" "}
+          <SVG src={arrowLeftIcon} />
         </IconButton>
         <div className={styles.buttons}>
           {!!saves && (
             <Saves
               saves={saves}
               onClick={async (id) => {
-                window.sim = await Sim.load(saves[id].data);
+                window.sim = await Sim.load(
+                  saves.find((s) => s.id === id)!.data
+                );
                 window.sim.start();
                 navigate("game");
               }}
