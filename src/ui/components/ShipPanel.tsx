@@ -1,7 +1,6 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { ship as asShip, Ship } from "../../archetypes/ship";
-import { Entity } from "../../components/entity";
+import { Ship } from "../../archetypes/ship";
 import { MineOrder, Order, OrderGroup } from "../../components/orders";
 import { commodities } from "../../economy/commodity";
 import { IconButton } from "./IconButton";
@@ -76,8 +75,7 @@ function getOrderGroupDescription(order: OrderGroup, sim: Sim) {
   }
 }
 
-const ShipPanel: React.FC = () => {
-  const ship = asShip(window.selected as Entity);
+const ShipPanel: React.FC<{ entity: Ship }> = ({ entity: ship }) => {
   const storedCommodities = Object.values(commodities).filter(
     (commodity) => ship.cp.storage.availableWares[commodity] > 0
   );

@@ -10,7 +10,7 @@ import { Saves } from "../components/Saves";
 
 const styles = nano.sheet({
   backButton: {
-    marginBottom: theme.spacing(4),
+    marginBottom: theme.spacing(1),
   },
   buttons: {},
   button: {
