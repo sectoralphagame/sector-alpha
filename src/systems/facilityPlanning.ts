@@ -2,8 +2,7 @@ import { add, matrix, random, Matrix } from "mathjs";
 import { createFacility, Facility } from "../archetypes/facility";
 import { facilityModules } from "../archetypes/facilityModule";
 import { Faction } from "../archetypes/faction";
-import { sector as asSector, Sector, sectorSize } from "../archetypes/sector";
-import { createShip } from "../archetypes/ship";
+import { Sector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { mineableCommodities } from "../economy/commodity";
 import { Sim } from "../sim";
@@ -16,28 +15,9 @@ import {
   getResourceUsage,
   getSectorResources,
 } from "../utils/resources";
-import { shipClasses } from "../world/ships";
 import { System } from "./system";
 
 const usageThreshold = 1.2;
-
-function getFreighterTemplate() {
-  const rnd = Math.random();
-
-  if (rnd > 0.9) {
-    return pickRandom(
-      shipClasses.filter((s) => !s.mining && s.size === "large")
-    );
-  }
-
-  if (rnd > 0.2) {
-    return pickRandom(
-      shipClasses.filter((s) => !s.mining && s.size === "medium")
-    );
-  }
-
-  return pickRandom(shipClasses.filter((s) => !s.mining && s.size === "small"));
-}
 
 export class FacilityPlanningSystem extends System {
   cooldowns: Cooldowns<"plan">;
@@ -56,14 +36,6 @@ export class FacilityPlanningSystem extends System {
           facility.cp.owner?.id === faction.id &&
           facility.cp.position.sector === sector.id
       );
-    // const minersInSector = this.sim.queries.commendables
-    //   .get()
-    //   .filter(
-    //     (ship) =>
-    //       ship.cp.position?.sector === sector.id &&
-    //       ship.cp.owner?.id === faction.id &&
-    //       ship.cp.mining
-    //   );
     const resourceUsageInFacilities = getResourceUsage(facilities);
     const sectorPosition = hecsToCartesian(
       sector.cp.hecsPosition.value,
@@ -104,41 +76,16 @@ export class FacilityPlanningSystem extends System {
           )!
           .create(this.sim, facility)
       );
-
-      createShip(this.sim, {
-        ...pickRandom(shipClasses.filter((s) => s.mining)),
-        position: add(
-          facility.cp.position.coord,
-          matrix([random(-3, 3), random(-3, 3)])
-        ) as Matrix,
-        owner: faction,
-        sector,
-      }).addComponent({
-        name: "commander",
-        id: facility.id,
-      });
-
-      if (Math.random() > 0.6) {
-        createShip(this.sim, {
-          ...getFreighterTemplate(),
-          position: add(
-            facility.cp.position.coord,
-            matrix([random(-3, 3), random(-3, 3)])
-          ) as Matrix,
-          owner: faction,
-          sector: asSector(this.sim.getOrThrow(facility.cp.position.sector)),
-        }).addComponent({
-          name: "commander",
-          id: facility.id,
-        });
-      }
     });
   };
 
   planFactories = (faction: Faction): void => {
     const modulesToBuild: Array<
       typeof facilityModules[keyof typeof facilityModules]
-    > = [];
+    > = this.sim.queries.sectors
+      .get()
+      .filter((sector) => sector.cp.owner?.id === faction.id)
+      .map(() => facilityModules.habitat);
     this.sim.queries.facilityWithProduction.reset();
     const facilities = this.sim.queries.facilityWithProduction
       .get()
@@ -215,19 +162,6 @@ export class FacilityPlanningSystem extends System {
         facilityModules.containerSmall.create(this.sim, facility)
       );
       addFacilityModule(facility, facilityModule.create(this.sim, facility));
-
-      createShip(this.sim, {
-        ...getFreighterTemplate(),
-        position: add(
-          facility.cp.position.coord,
-          matrix([random(-3, 3), random(-3, 3)])
-        ) as Matrix,
-        owner: faction,
-        sector: asSector(this.sim.getOrThrow(facility.cp.position.sector)),
-      }).addComponent({
-        name: "commander",
-        id: facility.id,
-      });
     }
   };
 

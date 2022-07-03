@@ -49,11 +49,18 @@ export const graphics: Graphics = {
       "hecsPosition",
     ]).cp;
     const pos = hecsToCartesian(hecsPosition.value, sectorSize);
-    g.lineStyle({ color: 0x292929, width: 5 });
+    g.lineStyle({
+      color: entity.cp.owner?.id
+        ? Color(
+            entity.sim.getOrThrow(entity.cp.owner.id).cp.color?.value
+          ).rgbNumber()
+        : 0x292929,
+      width: 5,
+    });
     g.drawRegularPolygon!(
       pos.get([0]),
       pos.get([1]),
-      sectorSize,
+      sectorSize - 3,
       6,
       Math.PI / 6
     );

@@ -40,5 +40,6 @@ export const theme = {
     } as Record<MineableCommodity, string>,
     default: "#FFFFFF",
     text: (v: 1 | 2 | 3 | 4 | 5) => Color.hsl(0, 0, 100 - (v - 1) * 20).hex(),
+    disabled: Color.hsl(0, 0, 70).hex(),
   },
 };

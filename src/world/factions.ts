@@ -1,32 +1,17 @@
 import { add, Matrix, matrix, random } from "mathjs";
-import { createFaction, Faction } from "../archetypes/faction";
-import { sectorSize } from "../archetypes/sector";
+import {
+  createFaction,
+  Faction,
+  faction as asFaction,
+} from "../archetypes/faction";
+import { Sector, sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
 import { setMoney } from "../components/budget";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { linkTeleportModules } from "../components/teleport";
 import { Sim } from "../sim";
-import { pickRandom } from "../utils/generators";
+import { getFreighterTemplate } from "../systems/shipPlanning";
 import { createTeleporter } from "./facilities";
-import { shipClasses } from "./ships";
-
-function getFreighterTemplate() {
-  const rnd = Math.random();
-
-  if (rnd > 0.9) {
-    return pickRandom(
-      shipClasses.filter((s) => !s.mining && s.size === "large")
-    );
-  }
-
-  if (rnd > 0.2) {
-    return pickRandom(
-      shipClasses.filter((s) => !s.mining && s.size === "medium")
-    );
-  }
-
-  return pickRandom(shipClasses.filter((s) => !s.mining && s.size === "small"));
-}
 
 function createTerritorialFaction(index: number, sim: Sim) {
   const char = String.fromCharCode(index + 65);
@@ -46,30 +31,20 @@ function createTradingFaction(index: number, sim: Sim) {
   return faction;
 }
 
-let faction: Faction;
-
-export const factions = (sim: Sim) => {
-  sim.queries.sectors.get().forEach((sector, index, sectors) => {
-    faction =
-      !faction || Math.random() < 0.7
-        ? createTerritorialFaction(index, sim)
-        : faction;
-    sector.addComponent({ name: "owner", id: faction.id });
-
+function createLink(sim: Sim, sectors: Sector[]) {
+  const [telA, telB] = sectors.map((sector) => {
     const position = hecsToCartesian(
       sector.cp.hecsPosition.value,
       sectorSize / 10
     );
 
-    for (
-      let i = 0;
-      i < (index === 0 || index === sectors.length - 1 ? 1 : 2);
-      i++
-    ) {
-      const teleporter = sim.getOrThrow(
+    const teleporter = sim
+      .getOrThrow(
         createTeleporter(
           {
-            owner: faction,
+            owner: sector.cp.owner
+              ? asFaction(sim.getOrThrow(sector.cp.owner.id))
+              : undefined!,
             position: add(
               position,
               matrix([
@@ -81,16 +56,32 @@ export const factions = (sim: Sim) => {
           },
           sim
         ).cp.modules.ids[0]
-      );
-      const target = sim.queries.teleports
-        .get()
-        .find((t) => !t.cp.teleport.destinationId && t.id !== teleporter.id);
-      if (target) {
-        const t = teleporter.requireComponents(["teleport"]);
-        linkTeleportModules(t, target);
-      }
-    }
+      )
+      .requireComponents(["teleport"]);
+
+    return teleporter;
   });
+
+  linkTeleportModules(telA, telB);
+}
+
+let faction: Faction;
+
+export const factions = (sim: Sim) => {
+  const sectors = sim.queries.sectors.get();
+  sectors.forEach((sector, index) => {
+    faction =
+      !faction || Math.random() < 0.7
+        ? createTerritorialFaction(index, sim)
+        : faction;
+    sector.addComponent({ name: "owner", id: faction.id });
+  });
+
+  for (let i = 1; i < sectors.length; i++) {
+    createLink(sim, [sectors[i - 1], sectors[i]]);
+  }
+
+  createLink(sim, [sectors[0], sectors[5]]);
 
   for (let i = 0; i < 2; i++) {
     faction = createTradingFaction(i, sim);
