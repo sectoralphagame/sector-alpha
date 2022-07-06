@@ -10,6 +10,7 @@ import { useLocation } from "../context/Location";
 import { IconButton } from "../components/IconButton";
 import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
 import { Saves } from "./Saves";
+import useFullscreen from "../hooks/useFullscreen";
 
 export interface ModalProps {
   open: boolean;
@@ -49,6 +50,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const [saves, setSaves] = React.useState<Save[]>();
   const input = React.useRef<HTMLInputElement>(null);
   const navigate = useLocation();
+  const { fullscreenEnabled, toggle: toggleFullscreen } = useFullscreen();
 
   React.useEffect(() => {
     if (["load", "save"].includes(view)) {
@@ -151,13 +153,8 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
         </div>
       ) : (
         <div className={styles.buttons}>
-          <Button
-            className={styles.buttonContainer}
-            onClick={() => {
-              document.querySelector("#root")?.requestFullscreen();
-            }}
-          >
-            Fullscreen
+          <Button className={styles.buttonContainer} onClick={toggleFullscreen}>
+            {fullscreenEnabled ? "Disable Fullscreen" : "Enable Fullscreen"}
           </Button>
         </div>
       )}

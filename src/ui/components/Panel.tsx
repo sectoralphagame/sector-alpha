@@ -37,6 +37,14 @@ const styles = nano.sheet({
     borderRight: `1px solid ${theme.palette.default}`,
     padding: theme.spacing(3),
   },
+  scrollArea: {
+    "&::-webkit-scrollbar": {
+      display: "none",
+    },
+    overflowY: "scroll",
+    height: `calc(100vh - 32px - ${theme.spacing(9)})`,
+    paddingBottom: theme.spacing(3),
+  },
   rotate: {
     transform: "rotate(180deg)",
   },
@@ -145,7 +153,7 @@ export const Panel: React.FC = () => {
         )}
       </div>
       {!isCollapsed && !!entity && (
-        <>
+        <div className={styles.scrollArea}>
           {entity.hasComponents(["name"]) && (
             <EntityName entity={entity.requireComponents(["name"])} />
           )}
@@ -160,7 +168,7 @@ export const Panel: React.FC = () => {
               <SectorStats entity={sector(entity)} />
             </>
           )}
-        </>
+        </div>
       )}
       <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)} />
     </div>

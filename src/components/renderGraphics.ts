@@ -115,7 +115,7 @@ export const graphics: Graphics = {
     textGraphics.anchor.set(0.5, 0.5);
     textGraphics.position.set(textPos.get([0]), textPos.get([1]));
     textGraphics.interactive = true;
-    textGraphics.on("mousedown", () => {
+    textGraphics.on("pointerdown", () => {
       entity.sim.queries.settings.get()[0].cp.selectionManager.id = entity.id;
     });
     textGraphics.cursor = "pointer";

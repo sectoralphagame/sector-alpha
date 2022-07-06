@@ -5,6 +5,7 @@ import { useLocation } from "../context/Location";
 import { IconButton } from "../components/IconButton";
 import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
 import { Button } from "../components/Button";
+import useFullscreen from "../hooks/useFullscreen";
 
 const styles = nano.sheet({
   backButton: {
@@ -31,24 +32,7 @@ const styles = nano.sheet({
 
 export const Settings: React.FC = () => {
   const navigate = useLocation();
-  const [fullscreen, setFullscreen] = React.useState(
-    !!document.fullscreenElement
-  );
-
-  React.useEffect(() => {
-    const handler = () => setFullscreen(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", handler);
-
-    return () => document.removeEventListener("fullscreenchange", handler);
-  }, []);
-
-  const toggleFullscreen = () => {
-    if (fullscreen) {
-      document.exitFullscreen();
-    } else {
-      document.querySelector("#root")?.requestFullscreen();
-    }
-  };
+  const { fullscreenEnabled, toggle } = useFullscreen();
 
   return (
     <div className={styles.root}>
@@ -60,8 +44,8 @@ export const Settings: React.FC = () => {
           <SVG src={arrowLeftIcon} />
         </IconButton>
         <div className={styles.buttons}>
-          <Button className={styles.button} onClick={toggleFullscreen}>
-            {fullscreen ? "Disable Fullscreen" : "Enable Fullscreen"}
+          <Button className={styles.button} onClick={toggle}>
+            {fullscreenEnabled ? "Disable Fullscreen" : "Enable Fullscreen"}
           </Button>
         </div>
       </div>
