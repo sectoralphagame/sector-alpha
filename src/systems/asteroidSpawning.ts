@@ -4,23 +4,29 @@ import { System } from "./system";
 import { AsteroidField } from "../archetypes/asteroidField";
 import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
+import { limitMax } from "../utils/limit";
+
+export function getFieldMax(entity: AsteroidField): number {
+  return entity.cp.asteroidSpawn.size ** 2 * entity.cp.asteroidSpawn.density;
+}
+
+export function getFieldCurrent(entity: AsteroidField): number {
+  return sum(
+    entity.cp.children.entities
+      .map(entity.sim.get)
+      .map(asteroid)
+      .map((e) => e.cp.minable.resources)
+  );
+}
 
 export function shouldSpawnAsteroid(entity: AsteroidField): boolean {
-  return (
-    sum(
-      entity.cp.children.entities
-        .map(entity.sim.get)
-        .map(asteroid)
-        .map((e) => e.cp.minable.resources)
-    ) <
-    entity.cp.asteroidSpawn.size ** 2 * entity.cp.asteroidSpawn.density
-  );
+  return getFieldCurrent(entity) < getFieldMax(entity);
 }
 
 function spawn(field: AsteroidField) {
   const asteroidAngle = Math.random() * Math.PI;
 
-  createAsteroid(
+  return createAsteroid(
     window.sim as any,
     field,
     add(
@@ -58,10 +64,14 @@ export class AsteroidSpawningSystem extends System {
           spawn(entity);
         }
       } else if (shouldSpawnAsteroid(entity)) {
-        spawn(entity);
+        let toSpawn = limitMax(getFieldMax(entity) * 0.05, getFieldMax(entity));
+
+        while (toSpawn > 0) {
+          toSpawn -= spawn(entity).cp.minable.resources;
+        }
       }
     });
 
-    this.cooldowns.use("tick", 300);
+    this.cooldowns.use("tick", 600);
   };
 }
