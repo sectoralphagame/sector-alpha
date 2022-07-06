@@ -26,7 +26,7 @@ function createTeleporter(sim: Sim, sector: Sector, owner: Faction) {
     });
   addFacilityModule(
     facility as any,
-    facilityModules.teleport(
+    facilityModules.teleport.create(
       sim,
       facility.requireComponents(["position", "modules"])
     )

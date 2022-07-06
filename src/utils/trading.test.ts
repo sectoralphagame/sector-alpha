@@ -1,5 +1,5 @@
 import { matrix } from "mathjs";
-import { Facility } from "../archetypes/facility";
+import { Facility, facilityComponents } from "../archetypes/facility";
 import { createFaction } from "../archetypes/faction";
 import { createSector, Sector } from "../archetypes/sector";
 import { changeBudgetMoney } from "../components/budget";
@@ -15,10 +15,11 @@ import { dockShip } from "../systems/orderExecuting/dock";
 import { tradeOrder } from "../systems/orderExecuting/trade";
 import { TradeOrder } from "../components/orders";
 import { Commodity } from "../economy/commodity";
+import { RequireComponent } from "../tsHelpers";
 
 describe("Trading module", () => {
   let sim: Sim;
-  let facility: Facility;
+  let facility: Facility & RequireComponent<"compoundProduction">;
   let sector: Sector;
 
   beforeEach(() => {
@@ -34,7 +35,7 @@ describe("Trading module", () => {
         sector,
       },
       sim
-    );
+    ).requireComponents([...facilityComponents, "compoundProduction"]);
     facility.cp.budget.allocationIdCounter = 10;
     changeBudgetMoney(facility.cp.budget, 100);
   });
@@ -55,7 +56,7 @@ describe("Trading module", () => {
     expect(facility.cp.trade.offers.food.quantity).not.toBeGreaterThan(0);
     expect(facility.cp.trade.offers.fuel.type).toBe("buy");
     expect(facility.cp.trade.offers.water.type).toBe("buy");
-    expect(getNeededCommodities(facility)).toEqual(["water", "fuel"]);
+    expect(getNeededCommodities(facility)).toEqual(["fuel", "water"]);
   });
 
   it("properly allocates budget and storage for buy offers", () => {

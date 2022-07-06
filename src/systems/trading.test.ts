@@ -134,8 +134,8 @@ describe("Trading system", () => {
     settleStorageQuota(facility);
     system.exec(10);
 
-    expect(facility.cp.storage.quota.water).toBe(2608);
-    expect(facility.cp.trade.offers.water.quantity).toBe(2608);
+    expect(facility.cp.storage.quota.water).toBe(1333);
+    expect(facility.cp.trade.offers.water.quantity).toBe(1333);
   });
 
   it("properly sets offer quantity if already has some commodity", () => {
@@ -143,7 +143,7 @@ describe("Trading system", () => {
     settleStorageQuota(facility);
     system.exec(10);
 
-    expect(facility.cp.storage.quota.water).toBe(2608);
-    expect(facility.cp.trade.offers.water.quantity).toBe(2598);
+    expect(facility.cp.storage.quota.water).toBe(1333);
+    expect(facility.cp.trade.offers.water.quantity).toBe(1323);
   });
 });

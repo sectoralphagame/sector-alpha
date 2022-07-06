@@ -10,8 +10,9 @@ import { asteroid, Asteroid } from "../archetypes/asteroid";
 import { Sector, sector as asSector } from "../archetypes/sector";
 import { Marker } from "../archetypes/marker";
 import { perCommodity } from "../utils/perCommodity";
+import { pickRandom } from "../utils/generators";
 
-const tradeComponents = [
+export const tradeComponents = [
   "trade",
   "storage",
   "budget",
@@ -165,24 +166,22 @@ export function getFacilityWithMostProfit(
   ).reverse()[0];
 }
 
-export function getClosestMineableAsteroid(
-  field: AsteroidField,
-  position: Matrix
+export function getMineableAsteroid(
+  field: AsteroidField
 ): Asteroid | undefined {
-  return minBy(
+  return pickRandom(
     field.components.children.entities
       .map((e) => asteroid(field.sim.getOrThrow(e)!))
       .filter(
         (a) =>
           !a.components.minable.minedById && a.components.minable.resources > 0
-      ),
-    (r) => norm(subtract(position, asteroid(r).cp.position.coord) as Matrix)
+      )
   );
 }
 
 /**
  *
- * @returns Minimum required money to fulfill all buy requests, not taking
+ * Minimum required money to fulfill all buy requests, not taking
  * into account sell offers
  */
 export function getPlannedBudget(entity: WithTrade): number {

@@ -1,14 +1,13 @@
-import { add, Matrix, matrix, random, randomInt } from "mathjs";
+import { add, Matrix, matrix, random } from "mathjs";
 import { createFaction, Faction } from "../archetypes/faction";
 import { sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
 import { setMoney } from "../components/budget";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { linkTeleportModules } from "../components/teleport";
-import { mineableCommodities, MineableCommodity } from "../economy/commodity";
 import { Sim } from "../sim";
 import { pickRandom } from "../utils/generators";
-import { createTeleporter, templates as facilityTemplates } from "./facilities";
+import { createTeleporter } from "./facilities";
 import { shipClasses } from "./ships";
 
 function getFreighterTemplate() {
@@ -55,6 +54,7 @@ export const factions = (sim: Sim) => {
       !faction || Math.random() < 0.7
         ? createTerritorialFaction(index, sim)
         : faction;
+    sector.addComponent({ name: "owner", id: faction.id });
 
     const position = hecsToCartesian(
       sector.cp.hecsPosition.value,
@@ -89,68 +89,6 @@ export const factions = (sim: Sim) => {
         const t = teleporter.requireComponents(["teleport"]);
         linkTeleportModules(t, target);
       }
-    }
-
-    for (let i = 0; i < randomInt(10, 15); i++) {
-      const facility = facilityTemplates[
-        randomInt(0, facilityTemplates.length)
-      ](
-        {
-          owner: faction,
-          position: add(
-            position,
-            matrix([
-              random(-sectorSize / 20, sectorSize / 20),
-              random(-sectorSize / 20, sectorSize / 20),
-            ])
-          ) as Matrix,
-          sector,
-        },
-        sim
-      );
-
-      const consumed = Object.entries(facility.cp.compoundProduction.pac)
-        .filter(([, pac]) => pac.consumes > 0)
-        .map(([commodity]) => commodity as MineableCommodity);
-      const hasMineables = [
-        mineableCommodities.fuelium,
-        mineableCommodities.goldOre,
-        mineableCommodities.silica,
-        mineableCommodities.ice,
-        mineableCommodities.ore,
-      ].some((commodity) => consumed.includes(commodity));
-
-      do {
-        if (hasMineables) {
-          createShip(sim, {
-            ...pickRandom(shipClasses.filter((s) => s.mining)),
-            position: add(
-              position,
-              matrix([random(-30, 30), random(-30, 30)])
-            ) as Matrix,
-            owner: faction,
-            sector,
-          }).addComponent({
-            name: "commander",
-            id: facility.id,
-          });
-        } else {
-          createShip(sim, {
-            ...getFreighterTemplate(),
-            position: add(
-              position,
-              matrix([random(-30, 30), random(-30, 30)])
-            ) as Matrix,
-            owner: faction,
-            sector,
-          }).addComponent({
-            name: "commander",
-            id: facility.id,
-          });
-        }
-      } while (Math.random() < 0.15);
-
-      facility.components.owner.id = faction.id;
     }
   });
 

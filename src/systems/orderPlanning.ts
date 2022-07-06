@@ -4,13 +4,15 @@ import { asteroid } from "../archetypes/asteroid";
 import { asteroidField } from "../archetypes/asteroidField";
 import { commanderRange, facility } from "../archetypes/facility";
 import { createMarker } from "../archetypes/marker";
-import { sector as asSector } from "../archetypes/sector";
+import { sector as asSector, sectorSize } from "../archetypes/sector";
+import { hecsToCartesian } from "../components/hecsPosition";
 import { mineOrder } from "../components/orders";
 import { getAvailableSpace } from "../components/storage";
 import { mineableCommodities } from "../economy/commodity";
 import {
   getSectorsInTeleportRange,
   getTradeWithMostProfit,
+  tradeComponents,
 } from "../economy/utils";
 import type { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
@@ -46,8 +48,12 @@ function idleMovement(entity: Trading) {
         createMarker(entity.sim, {
           sector: entity.cp.position.sector,
           value: add(
-            entity.cp.position.coord,
-            matrix([random(-0.5, 0.5), random(-0.5, 0.5)])
+            hecsToCartesian(
+              entity.sim.getOrThrow(entity.cp.position.sector).cp.hecsPosition!
+                .value,
+              sectorSize / 10
+            ),
+            matrix([random(-25, 25), random(-25, 25)])
           ),
         })
       ),
@@ -78,11 +84,14 @@ function autoTradeForCommander(
   sectorDistance: number
 ) {
   const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
+  if (!commander.cp.compoundProduction) return;
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);
   } else {
-    const bought = getNeededCommodities(commander).reduce((acc, commodity) => {
+    const bought = getNeededCommodities(
+      commander.requireComponents([...tradeComponents, "compoundProduction"])
+    ).reduce((acc, commodity) => {
       if (acc) {
         return true;
       }
@@ -126,11 +135,14 @@ function autoMineForCommander(
   sectorDistance: number
 ) {
   const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
+  if (!commander.cp.compoundProduction) return;
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);
   } else {
-    const needed = getNeededCommodities(commander);
+    const needed = getNeededCommodities(
+      commander.requireComponents([...tradeComponents, "compoundProduction"])
+    );
     const mineable = needed.find((commodity) =>
       (Object.values(mineableCommodities) as string[]).includes(commodity)
     );

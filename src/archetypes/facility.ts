@@ -16,7 +16,6 @@ export const commanderRange = 2;
 
 export const facilityComponents = [
   "budget",
-  "compoundProduction",
   "docks",
   "modules",
   "name",

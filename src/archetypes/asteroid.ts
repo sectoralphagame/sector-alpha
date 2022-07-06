@@ -6,7 +6,6 @@ import { MineableCommodity } from "../economy/commodity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { AsteroidField } from "./asteroidField";
-import { Sector } from "./sector";
 
 export const asteroidComponents = [
   "minable",
@@ -63,7 +62,7 @@ export function createAsteroid(
       createRender({
         color: Color(fieldColors[type]).rgbNumber(),
         defaultScale: 0.6,
-        maxZ: 1.2,
+        maxZ: 3,
         texture: "asteroid",
         zIndex: 0,
       })

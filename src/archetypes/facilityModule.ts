@@ -41,8 +41,13 @@ export function createFacilityModule(sim: Sim, input: ProductionModuleInput) {
 export function createFacilityModuleTemplate(
   input: Omit<ProductionModuleInput, "parent">
 ) {
-  return (sim: Sim, parent: Entity) =>
-    createFacilityModule(sim, { ...input, parent });
+  return {
+    create: (sim: Sim, parent: Entity) =>
+      createFacilityModule(sim, { ...input, parent }),
+    pac: input.pac,
+    storage: input.storage,
+    time: input.time,
+  };
 }
 
 export const facilityModules = {
@@ -59,9 +64,9 @@ export const facilityModules = {
     pac: {
       food: { consumes: 0, produces: 15 },
       fuel: { consumes: 1, produces: 0 },
-      water: { consumes: 30, produces: 0 },
+      water: { consumes: 8, produces: 0 },
     },
-    time: 15,
+    time: 20,
   }),
   refinery: createFacilityModuleTemplate({
     name: "Refinery",
@@ -77,16 +82,16 @@ export const facilityModules = {
     name: "Fuel Fabrication",
     pac: {
       fuelium: { consumes: 20, produces: 0 },
-      fuel: { consumes: 0, produces: 10 },
+      fuel: { consumes: 0, produces: 15 },
     },
     time: 15,
   }),
   habitat: createFacilityModuleTemplate({
     name: "Habitation Zone",
     pac: {
-      food: { consumes: 5, produces: 0 },
+      food: { consumes: 120, produces: 0 },
     },
-    time: 15,
+    time: 100,
   }),
   hullPlates: createFacilityModuleTemplate({
     name: "Hull Plates Production",
@@ -131,11 +136,11 @@ export const facilityModules = {
   electronics: createFacilityModuleTemplate({
     name: "Electronics Production",
     pac: {
-      food: { consumes: 15, produces: 0 },
-      silicon: { consumes: 10, produces: 0 },
-      gold: { consumes: 8, produces: 0 },
+      food: { consumes: 90, produces: 0 },
+      silicon: { consumes: 420, produces: 0 },
+      gold: { consumes: 80, produces: 0 },
       electronics: { consumes: 0, produces: 40 },
-      fuel: { consumes: 5, produces: 0 },
+      fuel: { consumes: 70, produces: 0 },
     },
     time: 120,
   }),
@@ -143,22 +148,26 @@ export const facilityModules = {
     name: "Small Container",
     storage: 4000,
   }),
-  teleport: (
-    sim: Sim,
-    parent: RequireComponent<"position" | "modules">
-  ): FacilityModule => {
-    const entity = new Entity(sim);
-    entity
-      .addComponent({ name: "parent", id: parent.id })
-      .addComponent({
-        name: "name",
-        value: "Hyperspace Generator",
-      })
-      .addComponent({
-        name: "teleport",
-        destinationId: null,
-      });
+  teleport: {
+    create: (
+      sim: Sim,
+      parent: RequireComponent<"position" | "modules">
+    ): FacilityModule => {
+      const entity = new Entity(sim);
+      entity
+        .addComponent({ name: "parent", id: parent.id })
+        .addComponent({
+          name: "name",
+          value: "Hyperspace Generator",
+        })
+        .addComponent({
+          name: "teleport",
+          destinationId: null,
+        });
 
-    return entity as FacilityModule;
+      return entity as FacilityModule;
+    },
+    pac: undefined,
+    storage: undefined,
   },
 } as const;

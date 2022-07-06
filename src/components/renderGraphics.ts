@@ -9,7 +9,7 @@ import { Entity } from "./entity";
 import { hecsToCartesian } from "./hecsPosition";
 
 export type Graphics = Record<
-  "circle" | "sector",
+  "circle" | "marker" | "sector",
   // eslint-disable-next-line no-unused-vars
   (opts: { g: PIXI.Graphics; entity: Entity }) => void
 >;
@@ -28,6 +28,19 @@ export const graphics: Graphics = {
       position!.coord.get([0]) * 10,
       position!.coord.get([1]) * 10,
       asteroidSpawn!.size * 10
+    );
+  },
+  marker: ({ g, entity }) => {
+    const { position } = entity.requireComponents(["position"]).cp;
+    g.lineStyle({
+      alpha: 0.3,
+      width: 1,
+      color: 0xffffff,
+    });
+    g.drawCircle(
+      position!.coord.get([0]) * 10,
+      position!.coord.get([1]) * 10,
+      1
     );
   },
   sector: ({ g, entity }) => {
