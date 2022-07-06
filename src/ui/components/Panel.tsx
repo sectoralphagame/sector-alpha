@@ -12,7 +12,7 @@ import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
 import playIcon from "../../../assets/ui/play.svg";
 import { IconButton } from "./IconButton";
 import ShipPanel from "./ShipPanel";
-import { nano } from "../../style";
+import { nano, theme } from "../../style";
 import { ConfigDialog } from "./ConfigDialog";
 import { Button } from "./Button";
 import { useLayout } from "../context/Layout";
@@ -25,15 +25,15 @@ import SectorStats from "./SectorStats";
 const styles = nano.sheet({
   iconBar: {
     display: "flex",
-    gap: "8px",
-    marginBottom: "24px",
+    gap: theme.spacing(1),
+    marginBottom: theme.spacing(3),
   },
   iconBarCollapsed: {
     flexDirection: "column",
   },
   root: {
-    borderRight: "1px solid #fff",
-    padding: "24px",
+    borderRight: `1px solid ${theme.palette.default}`,
+    padding: theme.spacing(3),
   },
   rotate: {
     transform: "rotate(180deg)",

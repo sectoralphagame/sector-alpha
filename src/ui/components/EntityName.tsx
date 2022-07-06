@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { nano } from "../../style";
+import { nano, theme } from "../../style";
 import { RequireComponent } from "../../tsHelpers";
 
 const styles = nano.sheet({
@@ -14,9 +14,9 @@ const styles = nano.sheet({
     borderBottom: "1px solid white",
     color: "inherit",
     fontSize: "inherit",
-    marginBottom: "8px",
+    marginBottom: theme.spacing(1),
     outline: 0,
-    paddingBottom: "8px",
+    paddingBottom: theme.spacing(1),
     width: "100%",
   },
 });

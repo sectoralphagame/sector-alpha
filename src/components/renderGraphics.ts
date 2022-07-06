@@ -1,8 +1,8 @@
 import Color from "color";
 import { add, matrix, Matrix } from "mathjs";
 import * as PIXI from "pixi.js";
-import { fieldColors } from "../archetypes/asteroid";
 import { sectorSize } from "../archetypes/sector";
+import { theme } from "../style";
 import { RequireComponent } from "../tsHelpers";
 import { BaseComponent } from "./component";
 import { Entity } from "./entity";
@@ -22,7 +22,7 @@ export const graphics: Graphics = {
     g.lineStyle({
       alpha: 0.3,
       width: 1,
-      color: Color(fieldColors[asteroidSpawn!.type]).rgbNumber(),
+      color: Color(theme.palette.asteroids[asteroidSpawn!.type]).rgbNumber(),
     });
     g.drawCircle(
       position!.coord.get([0]) * 10,

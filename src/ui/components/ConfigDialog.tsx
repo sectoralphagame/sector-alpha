@@ -1,6 +1,6 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { nano } from "../../style";
+import { nano, theme } from "../../style";
 import { Dialog } from "./Dialog";
 import { Button } from "./Button";
 import { Sim } from "../../sim";
@@ -17,17 +17,17 @@ export interface ModalProps {
 
 const styles = nano.sheet({
   backButton: {
-    marginBottom: "8px",
+    marginBottom: theme.spacing(1),
   },
   buttons: {},
   button: {
     "&:not(:last-child)": {
-      marginBottom: "8px",
+      marginBottom: theme.spacing(1),
     },
     width: "100%",
   },
   input: {
-    marginBottom: "8px",
+    marginBottom: theme.spacing(1),
     width: "100%",
   },
 });

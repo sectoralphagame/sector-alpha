@@ -2,10 +2,10 @@ import { Matrix } from "mathjs";
 import Color from "color";
 import { Entity } from "../components/entity";
 import { createRender } from "../components/render";
-import { MineableCommodity } from "../economy/commodity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { AsteroidField } from "./asteroidField";
+import { theme } from "../style";
 
 export const asteroidComponents = [
   "minable",
@@ -18,14 +18,6 @@ export const asteroidComponents = [
 const widenType = [...asteroidComponents][0];
 export type AsteroidComponent = typeof widenType;
 export type Asteroid = RequireComponent<AsteroidComponent>;
-
-export const fieldColors: Record<MineableCommodity, string> = {
-  fuelium: "#ffab6b",
-  goldOre: "#ffe46b",
-  ice: "#e8ffff",
-  ore: "#ff5c7a",
-  silica: "#8f8f8f",
-};
 
 export function asteroid(entity: Entity): Asteroid {
   return entity.requireComponents(asteroidComponents);
@@ -60,7 +52,7 @@ export function createAsteroid(
     })
     .addComponent(
       createRender({
-        color: Color(fieldColors[type]).rgbNumber(),
+        color: Color(theme.palette.asteroids[type]).rgbNumber(),
         defaultScale: 0.6,
         maxZ: 3,
         texture: "asteroid",

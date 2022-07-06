@@ -1,7 +1,7 @@
-import { nano } from "../../style";
+import { nano, theme } from "../../style";
 
 export const Collapsible = nano.jsx("details", {
-  marginBottom: "8px",
+  marginBottom: theme.spacing(1),
   cursor: "pointer",
 });
 
@@ -10,5 +10,5 @@ export const CollapsibleSummary = nano.jsx("summary", {
 });
 
 export const CollapsibleContent = nano.jsx("div", {
-  marginLeft: "8px",
+  marginLeft: theme.spacing(1),
 });
