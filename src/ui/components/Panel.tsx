@@ -140,12 +140,9 @@ export const Panel: React.FC = () => {
             </IconButton>
           </>
         ) : (
-          <>
-            <div className={styles.spacer} />
-            <IconButton onClick={() => setOpenConfig(true)}>
-              <SVG src={configIcon} />
-            </IconButton>
-          </>
+          <IconButton onClick={() => setOpenConfig(true)}>
+            <SVG src={configIcon} />
+          </IconButton>
         )}
       </div>
       {!isCollapsed && !!entity && (
@@ -166,10 +163,7 @@ export const Panel: React.FC = () => {
           )}
         </>
       )}
-      <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)}>
-        <Button>load</Button>
-        <Button>save</Button>
-      </ConfigDialog>
+      <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)} />
     </div>
   );
 };

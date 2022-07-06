@@ -41,7 +41,7 @@ const styles = nano.sheet({
   },
 });
 
-const views = ["default", "load", "save"] as const;
+const views = ["default", "load", "save", "settings"] as const;
 type Views = typeof views[number];
 
 export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
@@ -93,6 +93,12 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             save
           </Button>
           <Button
+            onClick={() => setView("settings")}
+            className={styles.buttonContainer}
+          >
+            settings
+          </Button>
+          <Button
             onClick={() => {
               window.sim.destroy();
               window.sim = undefined!;
@@ -119,7 +125,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             }}
           />
         )
-      ) : (
+      ) : view === "save" ? (
         <div className={styles.buttons}>
           <form onSubmit={saveNew}>
             <Input
@@ -142,6 +148,17 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
                 {save.name}
               </Button>
             ))}
+        </div>
+      ) : (
+        <div className={styles.buttons}>
+          <Button
+            className={styles.buttonContainer}
+            onClick={() => {
+              document.querySelector("#root")?.requestFullscreen();
+            }}
+          >
+            Fullscreen
+          </Button>
         </div>
       )}
     </Dialog>

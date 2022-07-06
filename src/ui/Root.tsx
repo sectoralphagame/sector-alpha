@@ -3,11 +3,12 @@ import { LocationContext, View } from "./context/Location";
 import { Game } from "./views/Game";
 import { LoadGame } from "./views/Load";
 import { Main } from "./views/Main";
+import { Settings } from "./views/Settings";
 
 const viewComponents: Record<View, React.FC> = {
   game: Game,
   main: Main,
-  settings: Main,
+  settings: Settings,
   load: LoadGame,
 };
 
