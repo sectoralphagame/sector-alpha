@@ -17,7 +17,7 @@ import {
 } from "../utils/resources";
 import { System } from "./system";
 
-const usageThreshold = 1.2;
+const usageThreshold = { min: 0.8, max: 1.2 };
 
 export class FacilityPlanningSystem extends System {
   cooldowns: Cooldowns<"plan">;
@@ -63,19 +63,23 @@ export class FacilityPlanningSystem extends System {
         sector,
       });
 
-      addFacilityModule(
-        facility,
-        facilityModules.containerSmall.create(this.sim, facility)
-      );
-      addFacilityModule(
-        facility,
-        Object.values(facilityModules)
-          .find(
-            (facilityModule) =>
-              facilityModule.pac && facilityModule.pac[commodity]?.consumes
-          )!
-          .create(this.sim, facility)
-      );
+      const facilityModule = Object.values(facilityModules).find(
+        (fm) => fm.pac && fm.pac[commodity]?.consumes
+      )!;
+      for (
+        let i = 0;
+        i <
+        resources[commodity].max /
+          ((10000 * facilityModule.pac![commodity]!.consumes) /
+            facilityModule.time!);
+        i++
+      ) {
+        addFacilityModule(
+          facility,
+          facilityModules.containerSmall.create(this.sim, facility)
+        );
+        addFacilityModule(facility, facilityModule.create(this.sim, facility));
+      }
     });
   };
 
@@ -108,7 +112,7 @@ export class FacilityPlanningSystem extends System {
                   : (consumes / facilityModule.time! +
                       resourceUsageInFacilities[commodity]) /
                       resourcesProducedByFacilities[commodity] <
-                    usageThreshold)) ||
+                    random(usageThreshold.min, usageThreshold.max))) ||
               Math.random() > 0.97,
             true
           )

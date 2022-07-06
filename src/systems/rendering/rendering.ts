@@ -103,7 +103,7 @@ export class RenderingSystem extends System {
         this.viewport.addChild(entityRender.sprite);
         if (entity.hasComponents(["selection"])) {
           entityRender.sprite.interactive = true;
-          entityRender.sprite.on("mousedown", () => {
+          entityRender.sprite.on("pointerdown", () => {
             this.selectionManger.cp.selectionManager.id = entity.id;
           });
           entityRender.sprite.cursor = "pointer";

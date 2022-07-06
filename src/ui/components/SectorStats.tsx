@@ -22,6 +22,7 @@ const styles = nano.sheet({
   },
   label: {
     cursor: "pointer",
+    marginLeft: theme.spacing(0.5),
   },
   labelContainer: {
     display: "inline-flex",

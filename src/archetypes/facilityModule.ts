@@ -71,10 +71,8 @@ export const facilityModules = {
   refinery: createFacilityModuleTemplate({
     name: "Refinery",
     pac: {
-      food: { consumes: 2, produces: 0 },
       ore: { consumes: 20, produces: 0 },
       metals: { consumes: 0, produces: 15 },
-      fuel: { consumes: 2, produces: 0 },
     },
     time: 15,
   }),
@@ -117,8 +115,6 @@ export const facilityModules = {
     name: "Gold Refinery",
     pac: {
       goldOre: { consumes: 300, produces: 0 },
-      food: { consumes: 35, produces: 0 },
-      fuel: { consumes: 90, produces: 0 },
       gold: { consumes: 0, produces: 400 },
     },
     time: 230,
@@ -126,10 +122,8 @@ export const facilityModules = {
   silicon: createFacilityModuleTemplate({
     name: "Silicon Purification",
     pac: {
-      food: { consumes: 5, produces: 0 },
       silica: { consumes: 20, produces: 0 },
       silicon: { consumes: 0, produces: 35 },
-      fuel: { consumes: 3, produces: 0 },
     },
     time: 20,
   }),
@@ -147,6 +141,7 @@ export const facilityModules = {
   containerSmall: createFacilityModuleTemplate({
     name: "Small Container",
     storage: 4000,
+    time: undefined,
   }),
   teleport: {
     create: (
@@ -169,5 +164,6 @@ export const facilityModules = {
     },
     pac: undefined,
     storage: undefined,
+    time: undefined,
   },
 } as const;

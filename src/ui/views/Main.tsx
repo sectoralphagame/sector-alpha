@@ -51,7 +51,9 @@ export const Main: React.FC<MainProps> = () => {
         <Button className={styles.button} onClick={() => navigate("load")}>
           Load Game
         </Button>
-        <Button className={styles.button}>Settings</Button>
+        <Button className={styles.button} onClick={() => navigate("settings")}>
+          Settings
+        </Button>
       </div>
     </div>
   );

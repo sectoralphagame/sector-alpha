@@ -22,7 +22,7 @@ const styles = nano.sheet({
     whiteSpace: "nowrap",
     lineHeight: 1,
     textTransform: "uppercase",
-    fontSize: "14px",
+    fontSize: theme.typography.button,
     fontWeight: 600,
     transition: "200ms",
     outline: 0,

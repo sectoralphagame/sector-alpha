@@ -21,7 +21,7 @@ const styles = nano.sheet({
     marginBottom: theme.spacing(3),
   },
   titleText: {
-    fontSize: "27px",
+    fontSize: theme.typography.header,
     margin: 0,
   },
 });
