@@ -178,6 +178,19 @@ export class Sim extends BaseSim {
     return tx.done;
   };
 
+  static async deleteSave(id: number) {
+    const db = await openDb();
+
+    const tx = db.transaction("saves", "readwrite");
+    const os = tx.objectStore("saves");
+
+    os.delete(id);
+
+    tx.commit();
+
+    return tx.done;
+  }
+
   static async load(data: string) {
     const save = JSON.parse(data);
     const sim = plainToInstance(Sim, save);

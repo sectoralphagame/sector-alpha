@@ -3,14 +3,14 @@ import SVG from "react-inlinesvg";
 import { nano, theme } from "../../style";
 import { Sim } from "../../sim";
 import { Save } from "../../db";
-import { Button } from "../components/Button";
 import { useLocation } from "../context/Location";
 import { IconButton } from "../components/IconButton";
 import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
+import { Saves } from "../components/Saves";
 
 const styles = nano.sheet({
   backButton: {
-    marginBottom: theme.spacing(4),
+    marginBottom: theme.spacing(1),
   },
   buttons: {},
   button: {
@@ -50,23 +50,25 @@ export const LoadGame: React.FC = () => {
           className={styles.backButton}
           onClick={() => navigate("main")}
         >
-          <SVG src={arrowLeftIcon} />{" "}
+          <SVG src={arrowLeftIcon} />
         </IconButton>
         <div className={styles.buttons}>
-          {!!saves &&
-            saves.map((save) => (
-              <Button
-                className={styles.button}
-                key={save.id}
-                onClick={async () => {
-                  window.sim = await Sim.load(save.data);
-                  window.sim.start();
-                  navigate("game");
-                }}
-              >
-                {save.name}
-              </Button>
-            ))}
+          {!!saves && (
+            <Saves
+              saves={saves}
+              onClick={async (id) => {
+                window.sim = await Sim.load(
+                  saves.find((s) => s.id === id)!.data
+                );
+                window.sim.start();
+                navigate("game");
+              }}
+              onDelete={async (id) => {
+                await Sim.deleteSave(id);
+                Sim.listSaves().then(setSaves);
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

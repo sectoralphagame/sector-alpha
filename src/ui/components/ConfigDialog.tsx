@@ -9,6 +9,7 @@ import { Input } from "./Input";
 import { useLocation } from "../context/Location";
 import { IconButton } from "../components/IconButton";
 import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
+import { Saves } from "./Saves";
 
 export interface ModalProps {
   open: boolean;
@@ -20,7 +21,7 @@ const styles = nano.sheet({
     marginBottom: theme.spacing(1),
   },
   buttons: {},
-  button: {
+  buttonContainer: {
     "&:not(:last-child)": {
       marginBottom: theme.spacing(1),
     },
@@ -29,6 +30,14 @@ const styles = nano.sheet({
   input: {
     marginBottom: theme.spacing(1),
     width: "100%",
+  },
+  saveContainer: {
+    "& > button:first-child": {
+      flex: 1,
+    },
+    display: "flex",
+    alignItems: "center",
+    gap: theme.spacing(1),
   },
 });
 
@@ -71,10 +80,16 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
       )}
       {view === "default" ? (
         <div className={styles.buttons}>
-          <Button onClick={() => setView("load")} className={styles.button}>
+          <Button
+            onClick={() => setView("load")}
+            className={styles.buttonContainer}
+          >
             load
           </Button>
-          <Button onClick={() => setView("save")} className={styles.button}>
+          <Button
+            onClick={() => setView("save")}
+            className={styles.buttonContainer}
+          >
             save
           </Button>
           <Button
@@ -83,29 +98,27 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
               window.sim = undefined!;
               navigate("main");
             }}
-            className={styles.button}
+            className={styles.buttonContainer}
           >
             quit to main menu
           </Button>
         </div>
       ) : view === "load" ? (
-        <div className={styles.buttons}>
-          {!!saves &&
-            saves.map((save) => (
-              <Button
-                className={styles.button}
-                key={save.id}
-                onClick={async () => {
-                  window.sim.destroy();
-                  window.sim = await Sim.load(save.data);
-                  window.sim.start();
-                  onClose();
-                }}
-              >
-                {save.name}
-              </Button>
-            ))}
-        </div>
+        saves && (
+          <Saves
+            saves={saves}
+            onClick={async (id) => {
+              window.sim.destroy();
+              window.sim = await Sim.load(saves.find((s) => s.id === id)!.data);
+              window.sim.start();
+              onClose();
+            }}
+            onDelete={async (id) => {
+              await Sim.deleteSave(id);
+              Sim.listSaves().then(setSaves);
+            }}
+          />
+        )
       ) : (
         <div className={styles.buttons}>
           <form onSubmit={saveNew}>
@@ -119,7 +132,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
           {!!saves &&
             saves.map((save) => (
               <Button
-                className={styles.button}
+                className={styles.buttonContainer}
                 key={save.id}
                 onClick={() => {
                   window.sim.save(save.name, save.id);
