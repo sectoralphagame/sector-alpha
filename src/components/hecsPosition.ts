@@ -11,6 +11,10 @@ const transforms = {
 };
 
 export interface HECSPosition extends BaseComponent<"hecsPosition"> {
+  /**
+   * Cube coordinates as [q, r, s]
+   * https://www.redblobgames.com/grids/hexagons/#coordinates-cube
+   */
   value: Matrix;
 }
 

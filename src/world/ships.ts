@@ -1,6 +1,7 @@
 import { DockSize } from "../components/dockable";
 import { ShipDriveProps } from "../components/drive";
 import { Textures } from "../components/render";
+import { Commodity } from "../economy/commodity";
 
 export const shipClasses: Array<{
   name: string;

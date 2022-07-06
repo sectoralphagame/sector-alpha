@@ -9,9 +9,6 @@ import { limitMin } from "../utils/limit";
 import { perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
 
-type WithTradeAndProduction = WithTrade &
-  RequireComponent<"compoundProduction">;
-
 /**
  *
  * Commodity cost of production
@@ -112,8 +109,8 @@ export function adjustPrices(entity: WithTrade) {
   };
 }
 
-function getProductionSurplus(
-  entity: WithTradeAndProduction,
+export function getProductionSurplus(
+  entity: RequireComponent<"compoundProduction">,
   commodity: Commodity
 ) {
   return (

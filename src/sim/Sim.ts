@@ -30,6 +30,7 @@ import { AsteroidSpawningSystem } from "../systems/asteroidSpawning";
 import { isTest } from "../settings";
 import { FacilityPlanningSystem } from "../systems/facilityPlanning";
 import { SectorStatisticGatheringSystem } from "../systems/sectorStatisticGathering";
+import { ShipPlanningSystem } from "../systems/shipPlanning";
 
 function reviveMathjs(value: any) {
   if (isPlainObject(value)) {
@@ -86,6 +87,7 @@ export class Sim extends BaseSim {
       new OrderExecutingSystem(this),
       new AsteroidSpawningSystem(this),
       new FacilityPlanningSystem(this),
+      new ShipPlanningSystem(this),
       new SectorStatisticGatheringSystem(this),
     ];
 

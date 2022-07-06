@@ -1,45 +1,45 @@
 import { matrix } from "mathjs";
-import { createSector, sector } from "../archetypes/sector";
-import { hecsMove } from "../components/hecsPosition";
+import { createSector } from "../archetypes/sector";
 import { Sim } from "../sim";
 import { getRandomAsteroidField } from "./asteroids";
 import { factions } from "./factions";
 import { getSectorName } from "./sectorNames";
 
 function getRandomWorld(sim: Sim): void {
-  const alpha = createSector(sim, {
+  createSector(sim, {
     position: matrix([0, 0, 0]),
     name: "Sector Alpha",
   });
   createSector(sim, {
-    position: hecsMove(alpha.cp.hecsPosition.value, "se"),
+    position: matrix([2, 0, -2]),
     name: getSectorName(),
   });
   createSector(sim, {
-    position: hecsMove(alpha.cp.hecsPosition.value, "ne"),
+    position: matrix([2, -1, -1]),
     name: getSectorName(),
   });
   createSector(sim, {
-    position: hecsMove(alpha.cp.hecsPosition.value, "n"),
+    position: matrix([2, -3, 1]),
     name: getSectorName(),
   });
   createSector(sim, {
-    position: hecsMove(alpha.cp.hecsPosition.value, "nw"),
+    position: matrix([1, -2, 1]),
     name: getSectorName(),
   });
   createSector(sim, {
-    position: hecsMove(alpha.cp.hecsPosition.value, "sw"),
+    position: matrix([-2, 1, 1]),
     name: getSectorName(),
   });
   createSector(sim, {
-    position: hecsMove(alpha.cp.hecsPosition.value, "s"),
+    position: matrix([-2, 2, 0]),
     name: getSectorName(),
   });
   createSector(sim, {
-    position: hecsMove(
-      sector(sim.queries.sectors.get()[6]).cp.hecsPosition.value,
-      "se"
-    ),
+    position: matrix([-1, 2, -1]),
+    name: getSectorName(),
+  });
+  createSector(sim, {
+    position: matrix([0, 2, -2]),
     name: getSectorName(),
   });
 
