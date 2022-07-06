@@ -14,7 +14,6 @@ import { IconButton } from "./IconButton";
 import ShipPanel from "./ShipPanel";
 import { nano, theme } from "../../style";
 import { ConfigDialog } from "./ConfigDialog";
-import { Button } from "./Button";
 import { useLayout } from "../context/Layout";
 import {
   facilityComponents,
