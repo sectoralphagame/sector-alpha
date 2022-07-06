@@ -1,20 +1,21 @@
 import { Matrix } from "mathjs";
+import mapValues from "lodash/mapValues";
 import { Entity } from "../components/entity";
 import { createRenderGraphics } from "../components/renderGraphics";
 import { MissingComponentError } from "../errors";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import "@pixi/graphics-extras";
+import { mineableCommodities } from "../economy/commodity";
 
 export const sectorComponents = [
   "hecsPosition",
   "name",
   "renderGraphics",
+  "sectorStats",
 ] as const;
 
-// Ugly hack to transform sectorComponents array type to string union
-const widenType = [...sectorComponents][0];
-export type SectorComponent = typeof widenType;
+export type SectorComponent = typeof sectorComponents[number];
 export type Sector = RequireComponent<SectorComponent>;
 
 export const sectorSize = 500;
@@ -42,6 +43,10 @@ export function createSector(sim: Sim, { position, name }: InitialSectorInput) {
     .addComponent({
       name: "name",
       value: name,
+    })
+    .addComponent({
+      name: "sectorStats",
+      availableResources: mapValues(mineableCommodities, () => [] as number[]),
     })
     .addComponent(createRenderGraphics("sector"))
     .addComponent({ name: "selection" });

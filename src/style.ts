@@ -11,7 +11,7 @@ import { addon as addonCache } from "nano-css/addon/cache";
 export const nano = create({
   h: createElement,
 }) as NanoRenderer &
-  Required<Pick<NanoRenderer, "sheet">> & {
+  Required<Pick<NanoRenderer, "sheet" | "rule">> & {
     jsx: <T extends keyof HTMLElementTagNameMap>(
       el: T,
       styles: CssLikeObject

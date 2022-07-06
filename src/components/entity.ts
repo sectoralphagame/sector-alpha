@@ -35,6 +35,8 @@ import { Color } from "./color";
 import { Ai } from "./ai";
 import { isTest } from "../settings";
 import { DestroyAfterUsage } from "./destroyAfterUsage";
+import { SectorStats } from "./sectorStats";
+import { SystemManager } from "./systemManager";
 
 export interface CoreComponents {
   ai: Ai;
@@ -61,10 +63,12 @@ export interface CoreComponents {
   production: Production;
   render: Render;
   renderGraphics: RenderGraphics<any>;
+  sectorStats: SectorStats;
   selection: Selection;
   selectionManager: SelectionManager;
   storage: CommodityStorage;
   storageBonus: StorageBonus;
+  systemManager: SystemManager;
   teleport: Teleport;
   trade: Trade;
 }

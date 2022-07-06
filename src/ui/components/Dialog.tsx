@@ -10,6 +10,7 @@ Modal.setAppElement("#root");
 export interface DialogProps {
   open: boolean;
   title?: string;
+  width?: string;
   onClose: () => void;
 }
 
@@ -29,6 +30,7 @@ export const Dialog: React.FC<DialogProps> = ({
   children,
   title,
   open,
+  width,
   onClose,
 }) => (
   <Modal
@@ -41,7 +43,7 @@ export const Dialog: React.FC<DialogProps> = ({
         left: "50%",
         right: "auto",
         bottom: "auto",
-        width: "300px",
+        width: width ?? "300px",
         marginRight: "-50%",
         transform: "translate(-50%, -50%)",
       },

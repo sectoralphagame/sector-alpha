@@ -3,7 +3,7 @@ import { System } from "./system";
 
 export class SelectingSystem extends System {
   exec = (): void => {
-    const manager = this.sim.queries.selectionManager.get()[0];
+    const manager = this.sim.queries.settings.get()[0];
     if (
       manager.cp.selectionManager.id &&
       manager.cp.selectionManager.id !== window.selected?.id
