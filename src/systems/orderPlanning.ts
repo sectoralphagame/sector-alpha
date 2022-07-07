@@ -2,7 +2,11 @@ import { minBy } from "lodash";
 import { add, matrix, Matrix, norm, random, subtract } from "mathjs";
 import { asteroid } from "../archetypes/asteroid";
 import { asteroidField } from "../archetypes/asteroidField";
-import { commanderRange, facility } from "../archetypes/facility";
+import {
+  commanderRange,
+  facility,
+  facilityComponents,
+} from "../archetypes/facility";
 import { createMarker } from "../archetypes/marker";
 import { sector as asSector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
@@ -81,7 +85,9 @@ function autoTradeForCommander(
   entity: Trading & RequireComponent<"commander">,
   sectorDistance: number
 ) {
-  const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
+  const commander = entity.sim
+    .getOrThrow(entity.cp.commander.id)
+    .requireComponents([...facilityComponents, "owner"]);
   if (!commander.cp.compoundProduction) return;
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
