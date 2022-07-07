@@ -1,6 +1,6 @@
 import { sortBy } from "lodash";
 import merge from "lodash/merge";
-import { facility } from "../archetypes/facility";
+import { facilityComponents } from "../archetypes/facility";
 import { Order, tradeOrder } from "../components/orders";
 import type { TransactionInput } from "../components/trade";
 import { Allocation } from "../components/utils/allocations";
@@ -381,7 +381,9 @@ export function autoBuyMostNeededByCommander(
   jumps: number
 ): boolean {
   const minQuantity = 0;
-  const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
+  const commander = entity.sim
+    .getOrThrow(entity.cp.commander.id)
+    .requireComponents([...facilityComponents, "owner"]);
   if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
   const target = getFacilityWithMostProfit(
@@ -410,7 +412,9 @@ export function autoSellMostRedundantToCommander(
   jumps: number
 ): boolean {
   const minQuantity = 0;
-  const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
+  const commander = entity.sim
+    .getOrThrow(entity.cp.commander.id)
+    .requireComponents([...facilityComponents, "owner"]);
   if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
   const target = getFacilityWithMostProfit(
@@ -436,7 +440,9 @@ export function returnToFacility(
     | "dockable"
   >
 ) {
-  const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
+  const commander = entity.sim
+    .getOrThrow(entity.cp.commander.id)
+    .requireComponents([...facilityComponents, "owner"]);
   const orders: Order[] = [];
   if (entity.cp.dockable.dockedIn !== commander.id) {
     orders.push(...moveToOrders(entity, commander), {
