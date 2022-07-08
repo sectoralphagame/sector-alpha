@@ -87,7 +87,7 @@ export class Sim extends BaseSim {
       new OrderExecutingSystem(this),
       new AsteroidSpawningSystem(this),
       new FacilityPlanningSystem(this),
-      // new ShipPlanningSystem(this),
+      new ShipPlanningSystem(this),
       new SectorStatisticGatheringSystem(this),
     ];
 
