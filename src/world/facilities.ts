@@ -135,7 +135,6 @@ export function createTeleporter(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.teleport.create(sim, facility));
   setTexture(facility.cp.render, "fTeleport");
-  facility.cp.render.maxZ = 0;
 
   return facility;
 }
