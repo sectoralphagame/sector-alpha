@@ -63,7 +63,7 @@ export const facilityModules = {
     name: "Farm",
     pac: {
       food: { consumes: 0, produces: 15 },
-      fuel: { consumes: 1, produces: 0 },
+      fuel: { consumes: 4, produces: 0 },
       water: { consumes: 8, produces: 0 },
     },
     time: 20,
@@ -95,7 +95,7 @@ export const facilityModules = {
     name: "Hull Plates Production",
     pac: {
       food: { consumes: 2, produces: 0 },
-      fuel: { consumes: 7, produces: 0 },
+      fuel: { consumes: 20, produces: 0 },
       metals: { consumes: 25, produces: 0 },
       hullPlates: { consumes: 0, produces: 70 },
     },
