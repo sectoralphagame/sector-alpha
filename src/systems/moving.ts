@@ -8,7 +8,6 @@ import { System } from "./system";
 type Driveable = RequireComponent<"drive" | "position">;
 
 function hold(entity: Driveable) {
-  console.warn("Order cannot be fulfilled");
   clearTarget(entity.cp.drive);
   if (entity.cp.orders) {
     if (entity.cp.owner) {
