@@ -42,7 +42,7 @@ export function createAsteroidField(
       angle: 0,
       sector: sector.id,
     })
-    .addComponent(createRenderGraphics("circle"));
+    .addComponent(createRenderGraphics("asteroidField"));
 
   return asteroidField(entity);
 }

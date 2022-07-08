@@ -10,12 +10,12 @@ import { Entity } from "./entity";
 import { hecsToCartesian } from "./hecsPosition";
 
 export type Graphics = Record<
-  "circle" | "link" | "marker" | "sector",
+  "asteroidField" | "link" | "marker" | "sector",
   // eslint-disable-next-line no-unused-vars
   (opts: { g: PIXI.Graphics; entity: Entity }) => void
 >;
 export const graphics: Graphics = {
-  circle: ({ g, entity }) => {
+  asteroidField: ({ g, entity }) => {
     const { position, asteroidSpawn } = entity.requireComponents([
       "asteroidSpawn",
       "position",
@@ -24,12 +24,32 @@ export const graphics: Graphics = {
       alpha: 0.3,
       width: 1,
       color: Color(theme.palette.asteroids[asteroidSpawn!.type]).rgbNumber(),
-    });
-    g.drawCircle(
-      position!.coord.get([0]) * 10,
-      position!.coord.get([1]) * 10,
-      asteroidSpawn!.size * 10
-    );
+    })
+      .drawCircle(
+        position!.coord.get([0]) * 10,
+        position!.coord.get([1]) * 10,
+        asteroidSpawn!.size * 10
+      )
+      .lineStyle({
+        alpha: 0.2,
+        width: 0.8,
+        color: Color(theme.palette.asteroids[asteroidSpawn!.type]).rgbNumber(),
+      })
+      .drawCircle(
+        position!.coord.get([0]) * 10,
+        position!.coord.get([1]) * 10,
+        asteroidSpawn!.size * 10 - 2
+      )
+      .lineStyle({
+        alpha: 0.1,
+        width: 0.6,
+        color: Color(theme.palette.asteroids[asteroidSpawn!.type]).rgbNumber(),
+      })
+      .drawCircle(
+        position!.coord.get([0]) * 10,
+        position!.coord.get([1]) * 10,
+        asteroidSpawn!.size * 10 - 4
+      );
   },
   link: ({ g, entity }) => {
     const { teleport } = entity.requireComponents(["teleport"]).cp;
