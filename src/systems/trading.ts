@@ -68,8 +68,14 @@ export function adjustPrices(entity: WithTrade) {
       entity.cp.storage.availableWares[commodity] /
         entity.cp.storage.quota[commodity] >
         0.8;
+    const changedWithinAcceptableMargin =
+      entity.cp.trade.lastPriceAdjust.commodities[commodity] > 0 &&
+      Math.abs(
+        change[commodity] /
+          entity.cp.trade.lastPriceAdjust.commodities[commodity]
+      ) < 0.2;
 
-    if (stockpiled || notOffered) {
+    if (stockpiled || notOffered || changedWithinAcceptableMargin) {
       return;
     }
 
