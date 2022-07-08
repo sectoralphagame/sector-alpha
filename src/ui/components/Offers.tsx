@@ -10,16 +10,16 @@ export interface OffersProps {
 export const Offers: React.FC<OffersProps> = ({ entity }) => {
   const { compoundProduction, trade, storage } = entity.cp;
   const offered = Object.values(commodities)
-    .filter(
-      (commodity) =>
-        trade.offers[commodity].quantity || storage.availableWares[commodity]
-    )
+
     .map((commodity) => ({
       commodity,
       ...(compoundProduction?.pac[commodity] ?? {}),
       ...trade.offers[commodity],
       stored: storage.availableWares[commodity],
-    }));
+    }))
+    .filter(
+      (data) => data.quantity || data.stored || data.produces || data.consumes
+    );
 
   return (
     <Table>
