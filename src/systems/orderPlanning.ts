@@ -209,7 +209,7 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
   if (!entity.hasComponents(["commander"])) {
     switch (entity.cp.autoOrder.default) {
       case "trade":
-        autoTrade(entity.requireComponents(tradingComponents), 2);
+        autoTrade(entity.requireComponents(tradingComponents), 4);
         break;
       default:
         holdPosition();
