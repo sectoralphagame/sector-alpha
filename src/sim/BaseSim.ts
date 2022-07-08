@@ -1,10 +1,13 @@
+import { Exclude, Expose } from "class-transformer";
 import { notImplemented } from "../errors";
 import settings from "../settings";
 
+@Exclude()
 export class BaseSim {
   firstTick: number;
   lastTick: number;
   intervalHandle: number | null;
+  @Expose()
   timeOffset: number;
   speed = 1;
 
@@ -27,6 +30,8 @@ export class BaseSim {
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(err);
+        // eslint-disable-next-line no-console
+        console.error(`This error occured at ${this.getTime()}`);
         this.pause();
       }
     }, 1e3 / settings.global.targetFps) as unknown as number;
