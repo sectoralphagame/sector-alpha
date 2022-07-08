@@ -66,7 +66,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       createRender({
         color: Color(initial.owner.cp.color.value).rgbNumber(),
         defaultScale: 0.4,
-        maxZ: 0.5,
+        maxZ: 0.2,
         texture: initial.texture,
         zIndex: 2,
       })

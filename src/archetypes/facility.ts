@@ -70,7 +70,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
           initial.owner?.cp.color.value || theme.palette.disabled
         ).rgbNumber(),
         defaultScale: 1,
-        maxZ: 0.2,
+        maxZ: 0.1,
         texture: "fCiv",
         zIndex: 1,
       })
