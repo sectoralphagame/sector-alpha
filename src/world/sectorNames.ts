@@ -1,5 +1,4 @@
 import { randomInt } from "mathjs";
-import { pickRandom } from "../utils/generators";
 
 export function getSectorName(): string {
   return String.fromCharCode(
