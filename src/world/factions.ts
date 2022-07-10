@@ -1,11 +1,12 @@
 import { add, Matrix, matrix, random } from "mathjs";
-import { createFaction, Faction } from "../archetypes/faction";
-import { sectorSize } from "../archetypes/sector";
+import { createFaction } from "../archetypes/faction";
+import { Sector, sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
 import { setMoney } from "../components/budget";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { Sim } from "../sim";
 import { getFreighterTemplate } from "../systems/shipPlanning";
+import { pickRandomWithIndex } from "../utils/generators";
 
 function createTerritorialFaction(index: number, sim: Sim) {
   const char = String.fromCharCode(index + 65);
@@ -25,20 +26,23 @@ function createTradingFaction(index: number, sim: Sim) {
   return faction;
 }
 
-let faction: Faction;
-
-export const factions = (sim: Sim) => {
-  const sectors = sim.queries.sectors.get();
-  sectors.forEach((sector, index) => {
-    faction =
-      !faction || Math.random() < 0.7
-        ? createTerritorialFaction(index, sim)
-        : faction;
-    sector.addComponent({ name: "owner", id: faction.id });
-  });
+export const createFactions = (
+  sim: Sim,
+  islands: Sector[][],
+  factions: number
+) => {
+  let freeIslands = islands;
+  for (let i = 0; i < factions; i++) {
+    const faction = createTerritorialFaction(i, sim);
+    const [island, islandIndex] = pickRandomWithIndex(freeIslands);
+    freeIslands = freeIslands.filter((_, index) => index !== islandIndex);
+    island.forEach((sector) =>
+      sector.addComponent({ name: "owner", id: faction.id })
+    );
+  }
 
   for (let i = 0; i < 2; i++) {
-    faction = createTradingFaction(i, sim);
+    const faction = createTradingFaction(i, sim);
     sim.queries.sectors.get().forEach((sector) => {
       const sectorPosition = hecsToCartesian(
         sector.cp.hecsPosition.value,

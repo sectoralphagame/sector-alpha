@@ -1,4 +1,4 @@
-import { pickRandom } from "../utils/random";
+import { pickRandom } from "../utils/generators";
 
 const adjectives = ["Great", "Large", "Minor", "Black", "Golden", "Haunted"];
 const nouns = ["Sun", "Rift", "Void", "Nebula", "Cloud"];

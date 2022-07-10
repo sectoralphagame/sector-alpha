@@ -88,7 +88,12 @@ export class RenderingSystem extends System {
     if (this.cooldowns.canUse("graphics")) {
       this.cooldowns.use("graphics", this.sim.speed);
       this.sim.queries.renderableGraphics.get().forEach((entity) => {
-        drawGraphics(entity, this.viewport);
+        if (
+          entity.cp.renderGraphics.redraw ||
+          !entity.cp.renderGraphics.initialized
+        ) {
+          drawGraphics(entity, this.viewport);
+        }
       });
     }
   }
