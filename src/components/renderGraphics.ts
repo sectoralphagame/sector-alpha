@@ -146,6 +146,7 @@ export const graphics: Graphics = {
 export interface RenderGraphics<T extends keyof Graphics>
   extends BaseComponent<"renderGraphics"> {
   draw: T;
+  redraw: boolean;
   g: PIXI.Graphics;
   initialized: boolean;
 }
@@ -155,6 +156,7 @@ export function createRenderGraphics<T extends keyof Graphics>(
 ): RenderGraphics<T> {
   return {
     draw,
+    redraw: draw === "sector",
     initialized: false,
     g: new PIXI.Graphics(),
     name: "renderGraphics",

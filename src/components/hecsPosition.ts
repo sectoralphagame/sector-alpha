@@ -1,7 +1,7 @@
 import { add, matrix, Matrix, multiply, subtract, sum } from "mathjs";
 import { BaseComponent } from "./component";
 
-const transforms = {
+export const transforms = {
   s: matrix([0, 1, -1]),
   se: matrix([1, 0, -1]),
   ne: matrix([1, -1, 0]),
@@ -51,7 +51,7 @@ export function hecsToCartesian(position: Matrix, scale: number): Matrix {
         [3 / 2, 0],
         [Math.sqrt(3) / 2, Math.sqrt(3)],
       ]),
-      position.resize([2])
+      position.clone().resize([2])
     ),
     scale
   );

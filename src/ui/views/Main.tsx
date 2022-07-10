@@ -1,13 +1,7 @@
 import React from "react";
-import { Sim } from "../../sim";
 import { nano, theme } from "../../style";
 import { Button } from "../components/Button";
 import { useLocation } from "../context/Location";
-import world from "../../world";
-
-export interface MainProps {
-  sim: Sim;
-}
 
 const styles = nano.sheet({
   container: {
@@ -28,24 +22,13 @@ const styles = nano.sheet({
   },
 });
 
-export const Main: React.FC<MainProps> = () => {
+export const Main: React.FC = () => {
   const navigate = useLocation();
 
   return (
     <div className={styles.root}>
       <div className={styles.container}>
-        <Button
-          className={styles.button}
-          onClick={() => {
-            const sim = new Sim();
-            sim.init();
-
-            window.sim = sim;
-            world(sim);
-            sim.start();
-            navigate("game");
-          }}
-        >
+        <Button className={styles.button} onClick={() => navigate("new")}>
           New Game
         </Button>
         <Button className={styles.button} onClick={() => navigate("load")}>
