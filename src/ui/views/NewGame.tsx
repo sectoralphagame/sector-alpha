@@ -52,7 +52,7 @@ interface NewGameForm {
 
 export const NewGame: React.FC = () => {
   const { register, handleSubmit, getValues, control } = useForm<NewGameForm>({
-    defaultValues: { islands: 6, factions: 4 },
+    defaultValues: { islands: 8, factions: 4 },
   });
   const navigate = useLocation();
   const [loading, setLoading] = React.useState(false);
@@ -93,7 +93,7 @@ export const NewGame: React.FC = () => {
                     <Slider
                       {...register("islands")}
                       className={styles.slider}
-                      min={6}
+                      min={8}
                       max={16}
                       step={1}
                     />

@@ -9,13 +9,13 @@ import { createFactions } from "./factions";
 import { getSectorName } from "./sectorNames";
 import { createLink } from "./teleporters";
 
-const size = 2 ** 8;
-
 function getRandomWorld(
   sim: Sim,
   numberOfIslands: number,
   numberOfFactions: number
 ): Promise<void> {
+  const size = 2 ** Math.ceil(numberOfIslands / 2);
+
   return new Promise((resolve) => {
     setTimeout(() => {
       const islands: Sector[][] = [
@@ -27,8 +27,9 @@ function getRandomWorld(
         ],
       ];
 
-      for (let i = 1; i < numberOfIslands; i++) {
+      for (let i = 1; i <= numberOfIslands; i++) {
         islands.push([]);
+        const islandName = getSectorName();
         const numSectorsInIsland = randomInt(1, 6);
 
         let position: Matrix | null = null;
@@ -99,7 +100,7 @@ function getRandomWorld(
             islands[i].push(
               createSector(sim, {
                 position,
-                name: getSectorName(),
+                name: `${islandName}-${s + 1}`,
               })
             );
 
@@ -112,33 +113,37 @@ function getRandomWorld(
 
       const connections: Record<number, number[]> = {};
       islands.forEach((island, islandIndex) => {
-        const pairs = island
-          .map((sectorOnIsland) =>
-            islands
-              .filter((_, i) => i !== islandIndex)
-              .map((is) =>
-                is
-                  .filter(
-                    (sector) =>
-                      !(
-                        connections[sectorOnIsland.id]?.includes(sector.id) ||
-                        connections[sector.id]?.includes(sectorOnIsland.id)
-                      )
-                  )
-                  .map((sector) => [sectorOnIsland, sector])
-              )
-          )
-          .flat(2);
+        do {
+          const pairs = island
+            .map((sectorOnIsland) =>
+              islands
+                .filter((_, i) => i !== islandIndex)
+                .map((is) =>
+                  is
+                    .filter(
+                      (sector) =>
+                        !(
+                          connections[sectorOnIsland.id]?.includes(sector.id) ||
+                          connections[sector.id]?.includes(sectorOnIsland.id)
+                        )
+                    )
+                    .map((sector) => [sectorOnIsland, sector])
+                )
+            )
+            .flat(2);
 
-        const pair = minBy(pairs, ([a, b]) =>
-          hecsDistance(a.cp.hecsPosition.value, b.cp.hecsPosition.value)
-        )!;
+          const pair = minBy(pairs, ([a, b]) =>
+            hecsDistance(a.cp.hecsPosition.value, b.cp.hecsPosition.value)
+          )!;
 
-        createLink(sim, pair);
-        if (!connections[pair[0].id]) {
-          connections[pair[0].id] = [];
-        }
-        connections[pair[0].id].push(pair[1].id);
+          if (!pair) break;
+
+          createLink(sim, pair);
+          if (!connections[pair[0].id]) {
+            connections[pair[0].id] = [];
+          }
+          connections[pair[0].id].push(pair[1].id);
+        } while (Math.random() > 0.85);
       });
 
       const sectors = sim.queries.sectors.get();

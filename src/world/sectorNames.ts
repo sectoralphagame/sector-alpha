@@ -1,8 +1,10 @@
+import { randomInt } from "mathjs";
 import { pickRandom } from "../utils/generators";
 
-const adjectives = ["Great", "Large", "Minor", "Black", "Golden", "Haunted"];
-const nouns = ["Sun", "Rift", "Void", "Nebula", "Cloud"];
-
 export function getSectorName(): string {
-  return `${pickRandom(adjectives)} ${pickRandom(nouns)}`;
+  return String.fromCharCode(
+    ...Array(3)
+      .fill(0)
+      .map(() => randomInt("A".charCodeAt(0), "Z".charCodeAt(0) + 1))
+  );
 }
