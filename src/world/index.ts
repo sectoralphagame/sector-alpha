@@ -1,51 +1,28 @@
-import { matrix } from "mathjs";
-import { createSector } from "../archetypes/sector";
 import { Sim } from "../sim";
 import { getRandomAsteroidField } from "./asteroids";
-import { factions } from "./factions";
-import { getSectorName } from "./sectorNames";
+import { createConnections } from "./connections";
+import { createFactions } from "./factions";
+import { createIslands } from "./islands";
 
-function getRandomWorld(sim: Sim): void {
-  createSector(sim, {
-    position: matrix([0, 0, 0]),
-    name: "Sector Alpha",
-  });
-  createSector(sim, {
-    position: matrix([2, 0, -2]),
-    name: getSectorName(),
-  });
-  createSector(sim, {
-    position: matrix([2, -1, -1]),
-    name: getSectorName(),
-  });
-  createSector(sim, {
-    position: matrix([2, -3, 1]),
-    name: getSectorName(),
-  });
-  createSector(sim, {
-    position: matrix([1, -2, 1]),
-    name: getSectorName(),
-  });
-  createSector(sim, {
-    position: matrix([-2, 1, 1]),
-    name: getSectorName(),
-  });
-  createSector(sim, {
-    position: matrix([-2, 2, 0]),
-    name: getSectorName(),
-  });
-  createSector(sim, {
-    position: matrix([-1, 2, -1]),
-    name: getSectorName(),
-  });
-  createSector(sim, {
-    position: matrix([0, 2, -2]),
-    name: getSectorName(),
-  });
+function getRandomWorld(
+  sim: Sim,
+  numberOfIslands: number,
+  numberOfFactions: number
+): Promise<void> {
+  return new Promise((resolve) => {
+    requestIdleCallback(() => {
+      const islands = createIslands(sim, numberOfIslands);
+      createConnections(sim, islands);
 
-  Array(45).fill(0).map(getRandomAsteroidField);
+      const sectors = sim.queries.sectors.get();
+      Array(sectors.length * 4)
+        .fill(0)
+        .map(getRandomAsteroidField);
 
-  factions(sim);
+      createFactions(sim, islands.slice(1), numberOfFactions);
+      resolve();
+    });
+  });
 }
 
 export default getRandomWorld;

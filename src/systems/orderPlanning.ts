@@ -2,7 +2,11 @@ import { minBy } from "lodash";
 import { add, matrix, Matrix, norm, random, subtract } from "mathjs";
 import { asteroid } from "../archetypes/asteroid";
 import { asteroidField } from "../archetypes/asteroidField";
-import { commanderRange, facility } from "../archetypes/facility";
+import {
+  commanderRange,
+  facility,
+  facilityComponents,
+} from "../archetypes/facility";
 import { createMarker } from "../archetypes/marker";
 import { sector as asSector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
@@ -41,25 +45,23 @@ const tradingComponents = [
 type Trading = RequireComponent<typeof tradingComponents[number]>;
 
 function idleMovement(entity: Trading) {
-  entity.cp.orders.value = [
-    {
-      orders: moveToOrders(
-        entity,
-        createMarker(entity.sim, {
-          sector: entity.cp.position.sector,
-          value: add(
-            hecsToCartesian(
-              entity.sim.getOrThrow(entity.cp.position.sector).cp.hecsPosition!
-                .value,
-              sectorSize / 10
-            ),
-            matrix([random(-25, 25), random(-25, 25)])
+  entity.cp.orders.value.push({
+    orders: moveToOrders(
+      entity,
+      createMarker(entity.sim, {
+        sector: entity.cp.position.sector,
+        value: add(
+          hecsToCartesian(
+            entity.sim.getOrThrow(entity.cp.position.sector).cp.hecsPosition!
+              .value,
+            sectorSize / 10
           ),
-        })
-      ),
-      type: "move",
-    },
-  ];
+          matrix([random(-25, 25), random(-25, 25)])
+        ),
+      })
+    ),
+    type: "move",
+  });
 }
 
 function autoTrade(entity: Trading, sectorDistance: number) {
@@ -83,11 +85,14 @@ function autoTradeForCommander(
   entity: Trading & RequireComponent<"commander">,
   sectorDistance: number
 ) {
-  const commander = facility(entity.sim.getOrThrow(entity.cp.commander.id));
+  const commander = entity.sim
+    .getOrThrow(entity.cp.commander.id)
+    .requireComponents([...facilityComponents, "owner"]);
   if (!commander.cp.compoundProduction) return;
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);
+    idleMovement(entity);
   } else {
     const bought = getNeededCommodities(
       commander.requireComponents([...tradeComponents, "compoundProduction"])
@@ -139,6 +144,7 @@ function autoMineForCommander(
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);
+    idleMovement(entity);
   } else {
     const needed = getNeededCommodities(
       commander.requireComponents([...tradeComponents, "compoundProduction"])
@@ -174,7 +180,10 @@ function autoMineForCommander(
           )
       );
 
-      if (!field) return;
+      if (!field) {
+        idleMovement(entity);
+        return;
+      }
 
       entity.cp.orders.value.push({
         type: "mine",
@@ -186,6 +195,8 @@ function autoMineForCommander(
           }),
         ],
       });
+    } else {
+      idleMovement(entity);
     }
   }
 }
@@ -198,7 +209,7 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
   if (!entity.hasComponents(["commander"])) {
     switch (entity.cp.autoOrder.default) {
       case "trade":
-        autoTrade(entity.requireComponents(tradingComponents), 2);
+        autoTrade(entity.requireComponents(tradingComponents), 4);
         break;
       default:
         holdPosition();

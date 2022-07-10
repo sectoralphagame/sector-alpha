@@ -10,6 +10,7 @@ import { useLocation } from "../context/Location";
 import { IconButton } from "../components/IconButton";
 import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
 import { Saves } from "./Saves";
+import useFullscreen from "../hooks/useFullscreen";
 
 export interface ModalProps {
   open: boolean;
@@ -41,7 +42,7 @@ const styles = nano.sheet({
   },
 });
 
-const views = ["default", "load", "save"] as const;
+const views = ["default", "load", "save", "settings"] as const;
 type Views = typeof views[number];
 
 export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
@@ -49,6 +50,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const [saves, setSaves] = React.useState<Save[]>();
   const input = React.useRef<HTMLInputElement>(null);
   const navigate = useLocation();
+  const { fullscreenEnabled, toggle: toggleFullscreen } = useFullscreen();
 
   React.useEffect(() => {
     if (["load", "save"].includes(view)) {
@@ -93,6 +95,12 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             save
           </Button>
           <Button
+            onClick={() => setView("settings")}
+            className={styles.buttonContainer}
+          >
+            settings
+          </Button>
+          <Button
             onClick={() => {
               window.sim.destroy();
               window.sim = undefined!;
@@ -119,7 +127,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             }}
           />
         )
-      ) : (
+      ) : view === "save" ? (
         <div className={styles.buttons}>
           <form onSubmit={saveNew}>
             <Input
@@ -142,6 +150,12 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
                 {save.name}
               </Button>
             ))}
+        </div>
+      ) : (
+        <div className={styles.buttons}>
+          <Button className={styles.buttonContainer} onClick={toggleFullscreen}>
+            {fullscreenEnabled ? "Disable Fullscreen" : "Enable Fullscreen"}
+          </Button>
         </div>
       )}
     </Dialog>

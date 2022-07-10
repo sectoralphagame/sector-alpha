@@ -10,19 +10,16 @@ export interface OffersProps {
 export const Offers: React.FC<OffersProps> = ({ entity }) => {
   const { compoundProduction, trade, storage } = entity.cp;
   const offered = Object.values(commodities)
-    .filter(
-      (commodity) =>
-        compoundProduction?.pac[commodity].consumes ||
-        compoundProduction?.pac[commodity].produces ||
-        trade.offers[commodity].quantity ||
-        storage.availableWares[commodity]
-    )
+
     .map((commodity) => ({
       commodity,
       ...(compoundProduction?.pac[commodity] ?? {}),
       ...trade.offers[commodity],
       stored: storage.availableWares[commodity],
-    }));
+    }))
+    .filter(
+      (data) => data.quantity || data.stored || data.produces || data.consumes
+    );
 
   return (
     <Table>
@@ -30,7 +27,6 @@ export const Offers: React.FC<OffersProps> = ({ entity }) => {
         <tr>
           <th>Name</th>
           <th>Stored</th>
-          <th>Produced</th>
           <th>Offer</th>
           <th>Unit Price</th>
         </tr>
@@ -42,18 +38,12 @@ export const Offers: React.FC<OffersProps> = ({ entity }) => {
             <TableCell>-</TableCell>
             <TableCell>-</TableCell>
             <TableCell>-</TableCell>
-            <TableCell>-</TableCell>
           </tr>
         ) : (
           offered.map((data) => (
             <tr key={data.commodity}>
               <TableCell>{data.commodity}</TableCell>
               <TableCell>{data.stored}</TableCell>
-              <TableCell>
-                {data.produces !== undefined && data.consumes !== undefined
-                  ? data.produces - data.consumes
-                  : "-"}
-              </TableCell>
               <TableCell>{data.quantity}</TableCell>
               <TableCell>{data.price}</TableCell>
             </tr>

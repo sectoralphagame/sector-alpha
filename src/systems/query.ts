@@ -84,7 +84,13 @@ export function createQueries(sim: Sim) {
     standaloneProduction: new Query(sim, ["production", "storage"]),
     storageAndTrading: new Query(sim, ["storage", "trade"]),
     teleports: new Query(sim, ["teleport"]),
-    trading: new Query(sim, ["trade", "budget", "storage", "position"]),
+    trading: new Query(sim, [
+      "trade",
+      "budget",
+      "storage",
+      "position",
+      "owner",
+    ]),
   } as const;
 }
 

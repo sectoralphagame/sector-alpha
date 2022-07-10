@@ -18,7 +18,7 @@ const styles = nano.sheet({
     height: "32px",
     padding: theme.spacing(1),
     lineHeight: 1,
-    fontSize: "14px",
+    fontSize: theme.typography.button,
     fontWeight: 600,
     transition: "200ms",
     outline: 0,

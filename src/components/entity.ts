@@ -73,7 +73,7 @@ export interface CoreComponents {
   trade: Trade;
 }
 
-class EntityComponents {
+export class EntityComponents {
   toJSON() {
     return reduce(
       Object.keys(this),

@@ -4,17 +4,18 @@ import * as PIXI from "pixi.js";
 import { sectorSize } from "../archetypes/sector";
 import { theme } from "../style";
 import { RequireComponent } from "../tsHelpers";
+import { findInAncestors } from "../utils/findInAncestors";
 import { BaseComponent } from "./component";
 import { Entity } from "./entity";
 import { hecsToCartesian } from "./hecsPosition";
 
 export type Graphics = Record<
-  "circle" | "marker" | "sector",
+  "asteroidField" | "link" | "marker" | "sector",
   // eslint-disable-next-line no-unused-vars
   (opts: { g: PIXI.Graphics; entity: Entity }) => void
 >;
 export const graphics: Graphics = {
-  circle: ({ g, entity }) => {
+  asteroidField: ({ g, entity }) => {
     const { position, asteroidSpawn } = entity.requireComponents([
       "asteroidSpawn",
       "position",
@@ -23,12 +24,73 @@ export const graphics: Graphics = {
       alpha: 0.3,
       width: 1,
       color: Color(theme.palette.asteroids[asteroidSpawn!.type]).rgbNumber(),
+    })
+      .drawCircle(
+        position!.coord.get([0]) * 10,
+        position!.coord.get([1]) * 10,
+        asteroidSpawn!.size * 10
+      )
+      .lineStyle({
+        alpha: 0.2,
+        width: 0.8,
+        color: Color(theme.palette.asteroids[asteroidSpawn!.type]).rgbNumber(),
+      })
+      .drawCircle(
+        position!.coord.get([0]) * 10,
+        position!.coord.get([1]) * 10,
+        asteroidSpawn!.size * 10 - 2
+      )
+      .lineStyle({
+        alpha: 0.1,
+        width: 0.6,
+        color: Color(theme.palette.asteroids[asteroidSpawn!.type]).rgbNumber(),
+      })
+      .drawCircle(
+        position!.coord.get([0]) * 10,
+        position!.coord.get([1]) * 10,
+        asteroidSpawn!.size * 10 - 4
+      );
+  },
+  link: ({ g, entity }) => {
+    const { teleport } = entity.requireComponents(["teleport"]).cp;
+    const originPosition = findInAncestors(entity, "position").cp.position;
+    const targetPosition = findInAncestors(
+      entity.sim.getOrThrow(teleport.destinationId!),
+      "position"
+    ).cp.position;
+    g.lineStyle({
+      alpha: 0.3,
+      width: 5,
+      color: Color(theme.palette.disabled).rgbNumber(),
     });
-    g.drawCircle(
-      position!.coord.get([0]) * 10,
-      position!.coord.get([1]) * 10,
-      asteroidSpawn!.size * 10
+    g.moveTo(
+      originPosition!.coord.get([0]) * 10,
+      originPosition!.coord.get([1]) * 10
     );
+    if (
+      Math.abs(
+        targetPosition!.coord.get([0]) - originPosition!.coord.get([0])
+      ) >
+      Math.abs(targetPosition!.coord.get([1]) - originPosition!.coord.get([1]))
+    ) {
+      g.bezierCurveTo(
+        (originPosition!.coord.get([0]) + targetPosition!.coord.get([0])) * 5,
+        originPosition!.coord.get([1]) * 10,
+        (originPosition!.coord.get([0]) + targetPosition!.coord.get([0])) * 5,
+        targetPosition!.coord.get([1]) * 10,
+        targetPosition!.coord.get([0]) * 10,
+        targetPosition!.coord.get([1]) * 10
+      );
+    } else {
+      g.bezierCurveTo(
+        originPosition!.coord.get([0]) * 10,
+        (targetPosition!.coord.get([1]) + originPosition!.coord.get([1])) * 5,
+        targetPosition!.coord.get([0]) * 10,
+        (targetPosition!.coord.get([1]) + originPosition!.coord.get([1])) * 5,
+        targetPosition!.coord.get([0]) * 10,
+        targetPosition!.coord.get([1]) * 10
+      );
+    }
   },
   marker: ({ g, entity }) => {
     const { position } = entity.requireComponents(["position"]).cp;
@@ -73,7 +135,7 @@ export const graphics: Graphics = {
     textGraphics.anchor.set(0.5, 0.5);
     textGraphics.position.set(textPos.get([0]), textPos.get([1]));
     textGraphics.interactive = true;
-    textGraphics.on("mousedown", () => {
+    textGraphics.on("pointerdown", () => {
       entity.sim.queries.settings.get()[0].cp.selectionManager.id = entity.id;
     });
     textGraphics.cursor = "pointer";
@@ -84,6 +146,7 @@ export const graphics: Graphics = {
 export interface RenderGraphics<T extends keyof Graphics>
   extends BaseComponent<"renderGraphics"> {
   draw: T;
+  redraw: boolean;
   g: PIXI.Graphics;
   initialized: boolean;
 }
@@ -93,6 +156,7 @@ export function createRenderGraphics<T extends keyof Graphics>(
 ): RenderGraphics<T> {
   return {
     draw,
+    redraw: draw === "sector",
     initialized: false,
     g: new PIXI.Graphics(),
     name: "renderGraphics",

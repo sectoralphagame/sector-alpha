@@ -11,6 +11,7 @@ import { RequireComponent } from "../tsHelpers";
 import { Sector } from "./sector";
 import { createDocks } from "../components/dockable";
 import { Faction } from "./faction";
+import { theme } from "../style";
 
 export const commanderRange = 2;
 
@@ -20,7 +21,6 @@ export const facilityComponents = [
   "docks",
   "modules",
   "name",
-  "owner",
   "position",
   "render",
   "selection",
@@ -59,10 +59,6 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
       value: `Facility #${entity.id}`,
     })
     .addComponent({
-      name: "owner",
-      id: initial.owner.id,
-    })
-    .addComponent({
       name: "position",
       angle: 0,
       coord: initial.position,
@@ -70,9 +66,11 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     })
     .addComponent(
       createRender({
-        color: Color(initial.owner.cp.color.value).rgbNumber(),
+        color: Color(
+          initial.owner?.cp.color.value || theme.palette.disabled
+        ).rgbNumber(),
         defaultScale: 1,
-        maxZ: 0.2,
+        maxZ: 0.1,
         texture: "fCiv",
         zIndex: 1,
       })
@@ -80,6 +78,13 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     .addComponent({ name: "selection" })
     .addComponent(createCommodityStorage())
     .addComponent(createTrade());
+
+  if (initial.owner) {
+    entity.addComponent({
+      name: "owner",
+      id: initial.owner.id,
+    });
+  }
 
   return facility(entity);
 }
