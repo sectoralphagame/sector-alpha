@@ -26,7 +26,7 @@ export function createFaction(name: string, sim: Sim) {
     .addComponent({
       name: "color",
       value: Color.rgb(151, 255, 125)
-        .rotate((factionCounter * 360) / 8)
+        .rotate((factionCounter * 360) / 10)
         .toString(),
     })
     .addComponent(createBudget())
