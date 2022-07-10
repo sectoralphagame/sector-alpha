@@ -10,7 +10,7 @@ function getRandomWorld(
   numberOfFactions: number
 ): Promise<void> {
   return new Promise((resolve) => {
-    setTimeout(() => {
+    requestIdleCallback(() => {
       const islands = createIslands(sim, numberOfIslands);
       createConnections(sim, islands);
 
@@ -21,7 +21,7 @@ function getRandomWorld(
 
       createFactions(sim, islands.slice(1), numberOfFactions);
       resolve();
-    }, 0);
+    });
   });
 }
 
