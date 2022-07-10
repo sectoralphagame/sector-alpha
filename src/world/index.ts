@@ -136,7 +136,14 @@ function getRandomWorld(
             hecsDistance(a.cp.hecsPosition.value, b.cp.hecsPosition.value)
           )!;
 
-          if (!pair) break;
+          if (
+            !pair ||
+            hecsDistance(
+              pair[0].cp.hecsPosition.value,
+              pair[1].cp.hecsPosition.value
+            ) > 2
+          )
+            break;
 
           createLink(sim, pair);
           if (!connections[pair[0].id]) {
