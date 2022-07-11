@@ -1,6 +1,7 @@
 import React from "react";
 import { nano, theme } from "../../style";
 import { Button } from "../components/Button";
+import { View } from "../components/View";
 import { useLocation } from "../context/Location";
 
 const styles = nano.sheet({
@@ -26,18 +27,16 @@ export const Main: React.FC = () => {
   const navigate = useLocation();
 
   return (
-    <div className={styles.root}>
-      <div className={styles.container}>
-        <Button className={styles.button} onClick={() => navigate("new")}>
-          New Game
-        </Button>
-        <Button className={styles.button} onClick={() => navigate("load")}>
-          Load Game
-        </Button>
-        <Button className={styles.button} onClick={() => navigate("settings")}>
-          Settings
-        </Button>
-      </div>
-    </div>
+    <View showBack={false}>
+      <Button className={styles.button} onClick={() => navigate("new")}>
+        New Game
+      </Button>
+      <Button className={styles.button} onClick={() => navigate("load")}>
+        Load Game
+      </Button>
+      <Button className={styles.button} onClick={() => navigate("settings")}>
+        Settings
+      </Button>
+    </View>
   );
 };
