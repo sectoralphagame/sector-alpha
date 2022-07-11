@@ -9,6 +9,7 @@ import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
 import { Slider } from "../components/Slider";
 import { Button } from "../components/Button";
 import world from "../../world";
+import Text from "../components/Text";
 
 const styles = nano.sheet({
   backButton: {
@@ -20,11 +21,6 @@ const styles = nano.sheet({
   },
   button: {
     width: "100%",
-  },
-  header: {
-    fontSize: theme.typography.header,
-    marginTop: "0",
-    marginBottom: theme.spacing(2),
   },
   slider: {
     width: "100%",
@@ -81,8 +77,8 @@ export const NewGame: React.FC = () => {
             <SVG src={arrowLeftIcon} />
           </IconButton>
           <div className={styles.content}>
-            <h1 className={styles.header}>Start New Game</h1>
-            <p>Adjust world settings</p>
+            <Text variant="h1">Start New Game</Text>
+            <Text>Adjust world settings</Text>
             <div className={styles.labelContainer}>
               <Controller
                 name="islands"
