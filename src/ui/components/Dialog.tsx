@@ -4,6 +4,7 @@ import SVG from "react-inlinesvg";
 import { IconButton } from "./IconButton";
 import closeIcon from "../../../assets/ui/close.svg";
 import { nano, theme } from "../../style";
+import Text from "./Text";
 
 Modal.setAppElement("#root");
 
@@ -21,7 +22,6 @@ const styles = nano.sheet({
     marginBottom: theme.spacing(3),
   },
   titleText: {
-    fontSize: theme.typography.header,
     margin: 0,
   },
 });
@@ -53,7 +53,9 @@ export const Dialog: React.FC<DialogProps> = ({
     }}
   >
     <div className={styles.title}>
-      <h3 className={styles.titleText}>{title}</h3>
+      <Text className={styles.titleText} variant="h1">
+        {title}
+      </Text>
       <IconButton onClick={onClose}>
         <SVG src={closeIcon} />
       </IconButton>
