@@ -10,7 +10,6 @@ import { Saves } from "../components/Saves";
 import Text from "./Text";
 
 const styles = nano.sheet({
-  backButton: {},
   backButtonBar: {
     display: "flex",
     alignItems: "center",
@@ -52,10 +51,7 @@ export const View: React.FC<ViewProps> = ({
       <div className={styles.container}>
         <div className={styles.backButtonBar}>
           {showBack && (
-            <IconButton
-              className={styles.backButton}
-              onClick={() => navigate("main")}
-            >
+            <IconButton onClick={() => navigate("main")}>
               <SVG src={arrowLeftIcon} />
             </IconButton>
           )}
