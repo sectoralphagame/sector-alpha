@@ -27,7 +27,7 @@ export const Main: React.FC = () => {
   const navigate = useLocation();
 
   return (
-    <View showBack={false}>
+    <View showBack={false} title="Sector Alpha">
       <Button className={styles.button} onClick={() => navigate("new")}>
         New Game
       </Button>

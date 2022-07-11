@@ -17,7 +17,7 @@ export const Settings: React.FC = () => {
   const { fullscreenEnabled, toggle } = useFullscreen();
 
   return (
-    <View>
+    <View title="Settings">
       <Button className={styles.button} onClick={toggle}>
         {fullscreenEnabled ? "Disable Fullscreen" : "Enable Fullscreen"}
       </Button>

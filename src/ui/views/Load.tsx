@@ -28,7 +28,7 @@ export const LoadGame: React.FC = () => {
   }, []);
 
   return (
-    <View>
+    <View title="Load Game">
       <div className={styles.buttons}>
         {!!saves && (
           <Saves

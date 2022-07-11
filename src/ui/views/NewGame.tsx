@@ -45,12 +45,11 @@ export const NewGame: React.FC = () => {
   });
 
   return (
-    <View showBack={!loading}>
+    <View showBack={!loading} title={loading ? "" : "Start New Game"}>
       {loading ? (
         "Loading"
       ) : (
         <>
-          <Text variant="h1">Start New Game</Text>
           <Text>Adjust world settings</Text>
           <div className={styles.labelContainer}>
             <Controller
