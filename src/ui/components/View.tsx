@@ -1,12 +1,9 @@
 import React from "react";
 import SVG from "react-inlinesvg";
 import { nano, theme } from "../../style";
-import { Sim } from "../../sim";
-import { Save } from "../../db";
 import { useLocation } from "../context/Location";
 import { IconButton } from "../components/IconButton";
 import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
-import { Saves } from "../components/Saves";
 import Text from "./Text";
 
 const styles = nano.sheet({
