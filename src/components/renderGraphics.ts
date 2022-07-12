@@ -122,7 +122,7 @@ export const graphics: Graphics = {
     g.drawRegularPolygon!(
       pos.get([0]),
       pos.get([1]),
-      sectorSize - 3,
+      sectorSize - 2.5,
       6,
       Math.PI / 6
     );
