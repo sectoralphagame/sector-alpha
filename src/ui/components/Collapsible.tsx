@@ -10,5 +10,5 @@ export const CollapsibleSummary = nano.jsx("summary", {
 });
 
 export const CollapsibleContent = nano.jsx("div", {
-  marginLeft: theme.spacing(1),
+  marginLeft: theme.spacing(3),
 });
