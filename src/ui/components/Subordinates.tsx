@@ -6,6 +6,11 @@ import { IconButton } from "./IconButton";
 import { Table, TableCell } from "./Table";
 import { nano } from "../../style";
 import { ship as asShip } from "../../archetypes/ship";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleSummary,
+} from "./Collapsible";
 
 export interface SubordinatesProps {
   entity: Entity;
@@ -27,39 +32,40 @@ export const Subordinates: React.FC<SubordinatesProps> = ({ entity }) => {
     .filter((e) => e?.cp.commander?.id === entity.id)
     .map(asShip);
 
-  return subordinates.length === 0 ? (
-    <div>No Subordinates</div>
-  ) : (
-    <Table>
-      <thead>
-        <tr>
-          <th className={styles.colName}>Name</th>
-          <th>&nbsp;</th>
-        </tr>
-      </thead>
-      <tbody>
-        {subordinates.map((ship) => (
-          <tr key={ship.id}>
-            <TableCell className={styles.colName}>
-              {ship.cp.name?.value}
-            </TableCell>
-            <TableCell className={styles.colAction}>
-              <IconButton
-                onClick={() => {
-                  const { selectionManager } = entity.sim
-                    .find((e) => e.hasComponents(["selectionManager"]))!
-                    .requireComponents(["selectionManager"]).cp;
+  return (
+    <Collapsible>
+      <CollapsibleSummary>Subordinates</CollapsibleSummary>
+      <CollapsibleContent>
+        {subordinates.length === 0 ? (
+          <div>No Subordinates</div>
+        ) : (
+          <Table>
+            <tbody>
+              {subordinates.map((ship) => (
+                <tr key={ship.id}>
+                  <TableCell className={styles.colName}>
+                    {ship.cp.name?.value}
+                  </TableCell>
+                  <TableCell className={styles.colAction}>
+                    <IconButton
+                      onClick={() => {
+                        const { selectionManager } = entity.sim
+                          .find((e) => e.hasComponents(["selectionManager"]))!
+                          .requireComponents(["selectionManager"]).cp;
 
-                  selectionManager.id = ship.id;
-                  selectionManager.focused = true;
-                }}
-              >
-                <SVG src={locationIcon} />
-              </IconButton>
-            </TableCell>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+                        selectionManager.id = ship.id;
+                        selectionManager.focused = true;
+                      }}
+                    >
+                      <SVG src={locationIcon} />
+                    </IconButton>
+                  </TableCell>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        )}
+      </CollapsibleContent>
+    </Collapsible>
   );
 };

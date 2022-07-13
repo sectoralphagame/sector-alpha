@@ -4,6 +4,7 @@ import { Offers } from "./Offers";
 import { Docks } from "./Docks";
 import { Subordinates } from "./Subordinates";
 import { Facility } from "../../archetypes/facility";
+import { Allocations } from "./Allocations";
 
 const FacilityPanel: React.FC<{ entity: Facility }> = ({
   entity: facility,
@@ -17,22 +18,9 @@ const FacilityPanel: React.FC<{ entity: Facility }> = ({
     <hr />
     <Subordinates entity={facility} />
     <hr />
-    {facility.cp.storage.allocations.length === 0 ? (
-      <div>No incoming transactions</div>
-    ) : (
-      facility.cp.storage.allocations.map((allocation) => (
-        <div key={allocation.id}>
-          Transaction #{allocation.id}:{" "}
-          {allocation.type === "incoming" ? "buying" : "selling"}{" "}
-          {Object.entries(allocation.amount)
-            .filter(([, amount]) => amount > 0)
-            .map(([commodity, amount]) => `${amount}x ${commodity}`)
-            .join(", ")}
-        </div>
-      ))
-    )}
+    <Allocations entity={facility} />
     <hr />
-    {!!facility.cp.docks && <Docks entity={facility} />}
+    <Docks entity={facility} />
   </div>
 );
 

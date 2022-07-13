@@ -5,6 +5,11 @@ import { RequireComponent } from "../../tsHelpers";
 import { IconButton } from "./IconButton";
 import { Table, TableCell } from "./Table";
 import { nano } from "../../style";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleSummary,
+} from "./Collapsible";
 
 export interface DocksProps {
   entity: RequireComponent<"docks">;
@@ -23,43 +28,50 @@ const styles = nano.sheet({
 export const Docks: React.FC<DocksProps> = ({ entity }) => {
   const { docks } = entity.cp;
 
-  return docks.docked.length === 0 ? (
-    <div>Empty docks</div>
-  ) : (
-    <Table>
-      <thead>
-        <tr>
-          <th className={styles.colName}>Name</th>
-          <th>&nbsp;</th>
-        </tr>
-      </thead>
-      <tbody>
-        {docks.docked.map((shipId) => {
-          const ship = entity.sim.getOrThrow(shipId);
+  return (
+    <Collapsible>
+      <CollapsibleSummary>Docked Ships</CollapsibleSummary>
+      <CollapsibleContent>
+        {docks.docked.length === 0 ? (
+          <div>No docked ships</div>
+        ) : (
+          <Table>
+            <thead>
+              <tr>
+                <th className={styles.colName}>Name</th>
+                <th>&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody>
+              {docks.docked.map((shipId) => {
+                const ship = entity.sim.getOrThrow(shipId);
 
-          return (
-            <tr key={ship.id}>
-              <TableCell className={styles.colName}>
-                {ship.cp.name?.value}
-              </TableCell>
-              <TableCell className={styles.colAction}>
-                <IconButton
-                  onClick={() => {
-                    const { selectionManager } = entity.sim
-                      .find((e) => e.hasComponents(["selectionManager"]))!
-                      .requireComponents(["selectionManager"]).cp;
+                return (
+                  <tr key={ship.id}>
+                    <TableCell className={styles.colName}>
+                      {ship.cp.name?.value}
+                    </TableCell>
+                    <TableCell className={styles.colAction}>
+                      <IconButton
+                        onClick={() => {
+                          const { selectionManager } = entity.sim
+                            .find((e) => e.hasComponents(["selectionManager"]))!
+                            .requireComponents(["selectionManager"]).cp;
 
-                    selectionManager.id = ship.id;
-                    selectionManager.focused = true;
-                  }}
-                >
-                  <SVG src={locationIcon} />
-                </IconButton>
-              </TableCell>
-            </tr>
-          );
-        })}
-      </tbody>
-    </Table>
+                          selectionManager.id = ship.id;
+                          selectionManager.focused = true;
+                        }}
+                      >
+                        <SVG src={locationIcon} />
+                      </IconButton>
+                    </TableCell>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        )}
+      </CollapsibleContent>
+    </Collapsible>
   );
 };
