@@ -1,11 +1,4 @@
 import React from "react";
-import SVG from "react-inlinesvg";
-import { Entity } from "../../components/entity";
-import locationIcon from "../../../assets/ui/location.svg";
-import { IconButton } from "./IconButton";
-import { Table, TableCell } from "./Table";
-import { nano } from "../../style";
-import { ship as asShip } from "../../archetypes/ship";
 import {
   Collapsible,
   CollapsibleContent,
