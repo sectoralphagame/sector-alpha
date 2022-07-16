@@ -62,11 +62,11 @@ export const facilityModules = {
   farm: createFacilityModuleTemplate({
     name: "Farm",
     pac: {
-      food: { consumes: 0, produces: 15 },
-      fuel: { consumes: 4, produces: 0 },
-      water: { consumes: 8, produces: 0 },
+      food: { consumes: 0, produces: 60 },
+      fuel: { consumes: 16, produces: 0 },
+      water: { consumes: 32, produces: 0 },
     },
-    time: 20,
+    time: 80,
   }),
   refinery: createFacilityModuleTemplate({
     name: "Refinery",
@@ -87,7 +87,8 @@ export const facilityModules = {
   habitat: createFacilityModuleTemplate({
     name: "Habitation Zone",
     pac: {
-      food: { consumes: 120, produces: 0 },
+      food: { consumes: 35, produces: 0 },
+      fuel: { consumes: 60, produces: 0 },
     },
     time: 100,
   }),

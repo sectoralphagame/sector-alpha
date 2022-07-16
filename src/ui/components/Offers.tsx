@@ -28,7 +28,8 @@ export const Offers: React.FC<OffersProps> = ({ entity }) => {
           <th>Name</th>
           <th>Stored</th>
           <th>Offer</th>
-          <th>Unit Price</th>
+          <th>Buy</th>
+          <th>Sell</th>
         </tr>
       </thead>
       <tbody>
@@ -45,7 +46,8 @@ export const Offers: React.FC<OffersProps> = ({ entity }) => {
               <TableCell>{data.commodity}</TableCell>
               <TableCell>{data.stored}</TableCell>
               <TableCell>{data.quantity}</TableCell>
-              <TableCell>{data.price}</TableCell>
+              <TableCell>{data.type === "buy" ? data.price : "-"}</TableCell>
+              <TableCell>{data.type === "sell" ? data.price : "-"}</TableCell>
             </tr>
           ))
         )}

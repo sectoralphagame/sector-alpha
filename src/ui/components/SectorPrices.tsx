@@ -5,8 +5,8 @@ import {
   IChartApi,
   UTCTimestamp,
 } from "lightweight-charts";
+import Color from "color";
 import { Sector } from "../../archetypes/sector";
-import { getSectorResources } from "../../utils/resources";
 import { nano, theme } from "../../style";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
@@ -30,20 +30,22 @@ const styles = nano.sheet({
   },
 });
 
-const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {
+const baseColor = Color.rgb(151, 255, 125);
+
+const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
   const [open, setOpen] = React.useState(false);
   const chart = React.useRef<IChartApi | null>(null);
   const [chartContainer, setChartContainer] =
     React.useState<HTMLElement | null>(null);
-  const availableMineables = React.useMemo(
+  const availableCommodities = React.useMemo(
     () =>
-      Object.entries(getSectorResources(entity)).filter(
-        ([, { max }]) => max > 0
-      ),
-    [entity]
+      Object.entries(entity.cp.sectorStats.prices)
+        .filter(([, offers]) => offers.buy || offers.sell)
+        .map(([commodity]) => commodity),
+    [entity.cp.sectorStats.prices.fuelium.buy.length]
   );
   const [displayedResources, setDisplayedResources] = React.useState(
-    availableMineables.map(([commodity]) => commodity)
+    availableCommodities.slice(0, 2)
   );
 
   React.useEffect(() => {
@@ -82,19 +84,40 @@ const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {
         },
       });
 
-      Object.entries(entity.cp.sectorStats.availableResources)
+      Object.entries(entity.cp.sectorStats.prices)
         .filter(([commodity]) => displayedResources.includes(commodity))
-        .forEach(([commodity, values]) => {
-          const lineSeries = chart.current!.addLineSeries({
-            color: theme.palette.asteroids[commodity],
-            title: commodity,
+        .forEach(([commodity, values], index, arr) => {
+          const buyLineSeries = chart.current!.addLineSeries({
+            color: baseColor.rotate((index * 360) / arr.length).hex(),
+            title: `${commodity} - buy`,
             priceFormat: {
               type: "custom",
               formatter: (v: number) => v.toFixed(0),
             },
           });
-          lineSeries.setData(
-            values.map((value, time) => ({ time: time as UTCTimestamp, value }))
+          buyLineSeries.setData(
+            values.buy.map((value, time) => ({
+              time: time as UTCTimestamp,
+              value,
+            }))
+          );
+
+          const sellLineSeries = chart.current!.addLineSeries({
+            color: baseColor
+              .rotate((index * 360) / arr.length)
+              .lighten(0.25)
+              .hex(),
+            title: `${commodity} - sell`,
+            priceFormat: {
+              type: "custom",
+              formatter: (v: number) => v.toFixed(0),
+            },
+          });
+          sellLineSeries.setData(
+            values.sell.map((value, time) => ({
+              time: time as UTCTimestamp,
+              value,
+            }))
           );
         });
     }
@@ -102,7 +125,7 @@ const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {
     chartContainer,
     displayedResources,
     entity,
-    entity.cp.sectorStats.availableResources.fuelium.length,
+    entity.cp.sectorStats.prices.fuelium.buy.length,
   ]);
 
   return (
@@ -111,7 +134,7 @@ const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {
       <Dialog open={open} onClose={() => setOpen(false)} width="80vw">
         <div className={styles.container} ref={setChartContainer as any} />
         <div className={styles.commodities}>
-          {availableMineables.map(([commodity]) => (
+          {availableCommodities.map((commodity) => (
             <div key={commodity} className={styles.labelContainer}>
               <Checkbox
                 id={`display-${commodity}-toggle`}
@@ -138,4 +161,4 @@ const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {
   );
 };
 
-export default SectorResources;
+export default SectorPrices;

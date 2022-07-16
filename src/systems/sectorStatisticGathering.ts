@@ -1,5 +1,6 @@
 import mapValues from "lodash/mapValues";
 import { getSectorResources } from "../utils/resources";
+import { getSectorPrices } from "../utils/trading";
 import { System } from "./system";
 
 export class SectorStatisticGatheringSystem extends System {
@@ -18,6 +19,13 @@ export class SectorStatisticGatheringSystem extends System {
         mapValues(sector.cp.sectorStats.availableResources, (v, commodity) =>
           v.push(resources[commodity].available)
         );
+
+        const prices = getSectorPrices(sector);
+
+        mapValues(sector.cp.sectorStats.prices, (v, commodity) => {
+          v.buy.push(prices[commodity].buy);
+          v.sell.push(prices[commodity].sell);
+        });
       });
     }
   };

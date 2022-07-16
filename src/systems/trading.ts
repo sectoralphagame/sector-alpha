@@ -1,4 +1,5 @@
 import { sum } from "mathjs";
+import { faction } from "../archetypes/faction";
 import { startingPrice, TradeOffer } from "../components/trade";
 import { Commodity } from "../economy/commodity";
 import { getPlannedBudget, WithTrade } from "../economy/utils";
@@ -41,6 +42,75 @@ function getProductionCost(
   );
 }
 
+function adjustSellPrice(
+  entity: WithTrade,
+  commodity: Commodity,
+  change: number
+): number {
+  const notOffered = entity.cp.trade.offers[commodity].quantity <= 0;
+  const stockpiled =
+    entity.cp.storage.availableWares[commodity] /
+      entity.cp.storage.quota[commodity] >
+    0.75;
+  const changedWithinAcceptableMargin =
+    entity.cp.trade.lastPriceAdjust.commodities[commodity] > 0 &&
+    Math.abs(change / entity.cp.trade.lastPriceAdjust.commodities[commodity]) <
+      0.2;
+
+  if (notOffered || (changedWithinAcceptableMargin && !stockpiled)) {
+    return entity.cp.trade.offers[commodity].price;
+  }
+
+  const minPrice = entity.hasComponents(["compoundProduction"])
+    ? getProductionCost(
+        entity.requireComponents(["compoundProduction", "trade", "modules"]),
+        commodity
+      )
+    : 1;
+  let delta = limitMin(
+    Math.floor(
+      entity.cp.trade.offers[commodity].price *
+        faction(entity.sim.getOrThrow(entity.cp.owner.id)).cp.ai!.priceModifier
+    ),
+    1
+  );
+  if ((stockpiled && delta > 0) || change <= 0) {
+    delta *= -1;
+  }
+
+  return limitMin(entity.cp.trade.offers[commodity].price + delta, minPrice);
+}
+
+function adjustBuyPrice(
+  entity: WithTrade,
+  commodity: Commodity,
+  change: number
+): number {
+  const notOffered = entity.cp.trade.offers[commodity].quantity <= 0;
+  const urgentNeed =
+    entity.cp.storage.availableWares[commodity] /
+      entity.cp.storage.quota[commodity] <
+    0.35;
+
+  if (notOffered && !urgentNeed) {
+    return entity.cp.trade.offers[commodity].price;
+  }
+
+  let delta = limitMin(
+    Math.floor(
+      entity.cp.trade.offers[commodity].price *
+        faction(entity.sim.getOrThrow(entity.cp.owner.id)).cp.ai!.priceModifier
+    ),
+    1
+  );
+
+  if (change > 0 || !urgentNeed) {
+    delta *= -1;
+  }
+
+  return limitMin(entity.cp.trade.offers[commodity].price + delta, 1);
+}
+
 export function adjustPrices(entity: WithTrade) {
   const quantities = perCommodity(
     (commodity) =>
@@ -62,51 +132,10 @@ export function adjustPrices(entity: WithTrade) {
   );
 
   perCommodity((commodity) => {
-    const notOffered = entity.cp.trade.offers[commodity].quantity <= 0;
-    const stockpiled =
-      entity.cp.trade.offers[commodity].type === "buy" &&
-      entity.cp.storage.availableWares[commodity] /
-        entity.cp.storage.quota[commodity] >
-        0.8;
-    const changedWithinAcceptableMargin =
-      entity.cp.trade.lastPriceAdjust.commodities[commodity] > 0 &&
-      Math.abs(
-        change[commodity] /
-          entity.cp.trade.lastPriceAdjust.commodities[commodity]
-      ) < 0.2;
-
-    if (stockpiled || notOffered || changedWithinAcceptableMargin) {
-      return;
-    }
-
-    const minPrice =
-      entity.cp.trade.offers[commodity].type === "buy"
-        ? 1
-        : entity.hasComponents(["compoundProduction"])
-        ? getProductionCost(
-            entity.requireComponents([
-              "compoundProduction",
-              "trade",
-              "modules",
-            ]),
-            commodity
-          )
-        : 1;
-    let delta = limitMin(
-      Math.floor(entity.cp.trade.offers[commodity].price * 0.01),
-      1
-    );
-    if (
-      (entity.cp.trade.offers[commodity].type === "sell") ===
-      change[commodity] <= 0
-    ) {
-      delta *= -1;
-    }
-
-    entity.cp.trade.offers[commodity].price = limitMin(
-      entity.cp.trade.offers[commodity].price + delta,
-      minPrice
-    );
+    entity.cp.trade.offers[commodity].price =
+      entity.cp.trade.offers[commodity].type === "sell"
+        ? adjustSellPrice(entity, commodity, change[commodity])
+        : adjustBuyPrice(entity, commodity, change[commodity]);
   });
 
   entity.cp.trade.lastPriceAdjust = {

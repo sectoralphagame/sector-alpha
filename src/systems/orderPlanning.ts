@@ -94,35 +94,31 @@ function autoTradeForCommander(
     returnToFacility(entity);
     idleMovement(entity);
   } else {
-    const bought = getNeededCommodities(
+    for (const commodity of getNeededCommodities(
       commander.requireComponents([...tradeComponents, "compoundProduction"])
-    ).reduce((acc, commodity) => {
-      if (acc) {
-        return true;
-      }
-
-      return autoBuyMostNeededByCommander(entity, commodity, sectorDistance);
-    }, false);
-
-    if (bought) {
-      return;
-    }
-
-    const result = getCommoditiesForSell(commander).reduce((acc, commodity) => {
-      if (acc) {
-        return true;
-      }
-
-      return autoSellMostRedundantToCommander(
+    )) {
+      const result = autoBuyMostNeededByCommander(
         entity,
         commodity,
         sectorDistance
       );
-    }, false);
-
-    if (!result) {
-      idleMovement(entity);
+      if (result) {
+        return;
+      }
     }
+
+    for (const commodity of getCommoditiesForSell(commander)) {
+      const result = autoSellMostRedundantToCommander(
+        entity,
+        commodity,
+        sectorDistance
+      );
+      if (result) {
+        return;
+      }
+    }
+
+    idleMovement(entity);
   }
 }
 
@@ -209,7 +205,7 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
   if (!entity.hasComponents(["commander"])) {
     switch (entity.cp.autoOrder.default) {
       case "trade":
-        autoTrade(entity.requireComponents(tradingComponents), 4);
+        autoTrade(entity.requireComponents(tradingComponents), 6);
         break;
       default:
         holdPosition();

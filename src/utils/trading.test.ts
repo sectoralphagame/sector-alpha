@@ -44,7 +44,7 @@ describe("Trading module", () => {
     settleStorageQuota(facility);
     createOffers(facility);
 
-    expect(getNeededCommodities(facility)).toEqual(["water", "fuel"]);
+    expect(getNeededCommodities(facility)).toEqual(["fuel", "water"]);
   });
 
   it("properly sorts by most needed commodity 2", () => {

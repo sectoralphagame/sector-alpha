@@ -155,11 +155,16 @@ export class RenderingSystem extends System {
     this.updateRenderables();
 
     if (this.selectionManger.cp.selectionManager.focused) {
-      this.viewport.follow(
-        this.sim
-          .getOrThrow(this.selectionManger.cp.selectionManager.id!)
-          .requireComponents(["render"]).cp.render.sprite
+      const entity = this.sim.getOrThrow(
+        this.selectionManger.cp.selectionManager.id!
       );
+      if (entity.hasComponents(["render"])) {
+        this.viewport.follow(
+          entity.requireComponents(["render"]).cp.render.sprite
+        );
+      } else {
+        this.selectionManger.cp.selectionManager.focused = false;
+      }
     }
 
     this.prevScale = this.viewport.scale.x;

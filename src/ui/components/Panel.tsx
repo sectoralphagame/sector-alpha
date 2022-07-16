@@ -22,7 +22,8 @@ import {
 import EntityName from "./EntityName";
 import Resources from "./Resources";
 import { sector, sectorComponents } from "../../archetypes/sector";
-import SectorStats from "./SectorStats";
+import SectorResources from "./SectorStats";
+import SectorPrices from "./SectorPrices";
 
 const styles = nano.sheet({
   iconBar: {
@@ -165,7 +166,8 @@ export const Panel: React.FC = () => {
           {entity.hasComponents(sectorComponents) && (
             <>
               <Resources entity={sector(entity)} />
-              <SectorStats entity={sector(entity)} />
+              <SectorResources entity={sector(entity)} />
+              <SectorPrices entity={sector(entity)} />
             </>
           )}
         </div>

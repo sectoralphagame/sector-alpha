@@ -20,7 +20,7 @@ export function getFreighterTemplate() {
     );
   }
 
-  if (rnd > 0.2) {
+  if (rnd > 0.1) {
     return pickRandom(
       shipClasses.filter((s) => !s.mining && s.size === "medium")
     );
@@ -104,7 +104,7 @@ export class ShipPlanningSystem extends System {
                       !(
                         Object.values(mineableCommodities) as string[]
                       ).includes(commodity) && production[commodity] !== 0
-                  ).length / 2
+                  ).length
                 ) || 1
               ) + traders.length;
 
