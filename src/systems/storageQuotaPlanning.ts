@@ -1,23 +1,24 @@
 import { getRequiredStorage } from "../components/production";
+import { commoditiesArray } from "../economy/commodity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
-import { perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
 
 export function settleStorageQuota(entity: RequireComponent<"storage">) {
   const hasProduction = entity.hasComponents(["compoundProduction"]);
-  entity.cp.storage.quota = perCommodity((commodity) => {
+
+  commoditiesArray.forEach((commodity) => {
     if (hasProduction) {
-      return Math.floor(
+      entity.cp.storage.quota[commodity] = Math.floor(
         (entity.cp.storage.max *
           (entity.cp.compoundProduction!.pac[commodity].produces +
             entity.cp.compoundProduction!.pac[commodity].consumes)) /
           getRequiredStorage(entity.cp.compoundProduction!)
       );
+    } else {
+      entity.cp.storage.quota[commodity] = entity.cp.storage.max;
     }
-
-    return entity.cp.storage.max;
   });
 }
 
