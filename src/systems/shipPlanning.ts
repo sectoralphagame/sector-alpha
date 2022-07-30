@@ -79,7 +79,7 @@ export class ShipPlanningSystem extends System {
                     b +
                     (fm.cp.production!.pac[commodity].produces -
                       fm.cp.production!.pac[commodity].consumes) /
-                      fm.cp.production!.time,
+                      3600,
                   0
                 )
             );
@@ -104,7 +104,7 @@ export class ShipPlanningSystem extends System {
                       !(
                         Object.values(mineableCommodities) as string[]
                       ).includes(commodity) && production[commodity] !== 0
-                  ).length
+                  ).length / 2
                 ) || 1
               ) + traders.length;
 

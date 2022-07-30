@@ -57,8 +57,7 @@ export function getResourceUsage(
                 .map(facility.sim.get)
                 .map((facilityModule) =>
                   facilityModule?.cp.production
-                    ? facilityModule.cp.production.pac[commodity].consumes /
-                      facilityModule.cp.production.time
+                    ? facilityModule.cp.production.pac[commodity].consumes
                     : 0
                 )
             : []
@@ -82,8 +81,7 @@ export function getResourceProduction(
                 .map(facility.sim.get)
                 .map((facilityModule) =>
                   facilityModule?.cp.production
-                    ? facilityModule.cp.production.pac[commodity].produces /
-                      facilityModule.cp.production.time
+                    ? facilityModule.cp.production.pac[commodity].produces
                     : 0
                 )
             : []

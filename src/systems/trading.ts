@@ -199,14 +199,25 @@ export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
 
 export function createOffers(entity: WithTrade) {
   entity.cp.trade.offers = perCommodity((commodity): TradeOffer => {
-    const quantity = getOfferedQuantity(entity, commodity);
+    const offeredQuantity = getOfferedQuantity(entity, commodity);
+    const producedNet = entity.hasComponents(["compoundProduction"])
+      ? getProductionSurplus(
+          entity.requireComponents(["compoundProduction"]),
+          commodity
+        )
+      : 0;
 
     return {
       price:
         (entity.cp.trade.offers && entity.cp.trade.offers[commodity].price) ??
         startingPrice,
-      quantity: quantity > 0 ? quantity : -quantity,
-      type: quantity > 0 ? "sell" : "buy",
+      quantity: offeredQuantity > 0 ? offeredQuantity : -offeredQuantity,
+      type:
+        offeredQuantity > 0
+          ? "sell"
+          : offeredQuantity === 0 && producedNet > 0
+          ? "sell"
+          : "buy",
     };
   });
 }
@@ -223,7 +234,7 @@ export class TradingSystem extends System {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("adjustPrices")) {
-      this.cooldowns.use("adjustPrices", 150);
+      this.cooldowns.use("adjustPrices", 300);
       this.sim.queries.trading.get().forEach(adjustPrices);
     }
 

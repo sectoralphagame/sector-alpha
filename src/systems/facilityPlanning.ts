@@ -5,7 +5,8 @@ import { facilityModules } from "../archetypes/facilityModule";
 import { Faction } from "../archetypes/faction";
 import { Sector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
-import { mineableCommodities } from "../economy/commodity";
+import { PAC } from "../components/production";
+import { Commodity, mineableCommodities } from "../economy/commodity";
 import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { addFacilityModule } from "../utils/entityModules";
@@ -17,6 +18,21 @@ import {
   getSectorResources,
 } from "../utils/resources";
 import { System } from "./system";
+
+function isAbleToBuild(
+  pac: Partial<PAC>,
+  resourcesProducedByFacilities: Record<Commodity, number>,
+  resourceUsageInFacilities: Record<Commodity, number>,
+  stockpiling: number
+) {
+  return Object.entries(pac).every(([commodity, { consumes, produces }]) =>
+    produces
+      ? !Object.values<string>(mineableCommodities).includes(commodity)
+      : resourcesProducedByFacilities[commodity] /
+          (consumes + resourceUsageInFacilities[commodity]) >
+        stockpiling
+  );
+}
 
 export class FacilityPlanningSystem extends System {
   cooldowns: Cooldowns<"plan">;
@@ -69,8 +85,7 @@ export class FacilityPlanningSystem extends System {
         let i = 0;
         i <
         resources[commodity].max /
-          ((10000 * facilityModule.pac![commodity]!.consumes) /
-            facilityModule.time!);
+          ((10000 * facilityModule.pac![commodity]!.consumes) / 3600);
         i++
       ) {
         addFacilityModule(
@@ -134,16 +149,11 @@ export class FacilityPlanningSystem extends System {
       const productionModule = factoryModules.find(
         (facilityModule) =>
           facilityModule.pac &&
-          Object.entries(facilityModule.pac).every(
-            ([commodity, { consumes, produces }]) =>
-              produces
-                ? !Object.values<string>(mineableCommodities).includes(
-                    commodity
-                  )
-                : (consumes / facilityModule.time! +
-                    resourceUsageInFacilities[commodity]) /
-                    resourcesProducedByFacilities[commodity] <
-                  faction.cp.ai!.stockpiling
+          isAbleToBuild(
+            facilityModule.pac,
+            resourcesProducedByFacilities,
+            resourceUsageInFacilities,
+            faction.cp.ai!.stockpiling
           )
       );
       if (!productionModule) break;
@@ -151,12 +161,12 @@ export class FacilityPlanningSystem extends System {
       perCommodity((commodity) => {
         if (productionModule.pac && productionModule.pac[commodity]?.consumes) {
           resourceUsageInFacilities[commodity] +=
-            productionModule.pac![commodity]!.consumes / productionModule.time!;
+            productionModule.pac![commodity]!.consumes;
         }
 
         if (productionModule.pac && productionModule.pac[commodity]?.produces) {
           resourcesProducedByFacilities[commodity] +=
-            productionModule.pac![commodity]!.produces / productionModule.time!;
+            productionModule.pac![commodity]!.produces;
         }
       });
     }

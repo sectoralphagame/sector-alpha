@@ -25,17 +25,20 @@ function getRandomWorld(
         .get()
         .filter((faction) => faction.cp.ai.type === "territorial")
         .forEach((faction) =>
-          ["ice", "fuelium"].map((commodity: MineableCommodity) =>
+          ["ice", "fuelium"].forEach((commodity: MineableCommodity) => {
+            const ownedSectors = sectors.filter(
+              (sector) => sector.cp.owner?.id === faction.id
+            );
+
             spawnAsteroidField(
               commodity,
-              random(7, 9),
-              pickRandom(
-                sim.queries.sectors
-                  .get()
-                  .filter((sector) => sector.cp.owner?.id === faction.id)
-              )
-            )
-          )
+              random(
+                7 + Math.sqrt(ownedSectors.length),
+                9 + Math.sqrt(ownedSectors.length)
+              ),
+              pickRandom(ownedSectors)
+            );
+          })
         );
 
       resolve();

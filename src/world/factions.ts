@@ -14,7 +14,7 @@ function createTerritorialFaction(index: number, sim: Sim) {
   faction.addComponent({
     name: "ai",
     type: "territorial",
-    stockpiling: random(0.65, 1.15),
+    stockpiling: random(0.85, 1.35),
     priceModifier: random(0.002, 0.02),
   });
   setMoney(faction.cp.budget, 1e8);

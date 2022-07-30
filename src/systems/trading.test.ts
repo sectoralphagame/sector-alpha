@@ -1,6 +1,6 @@
 import { matrix } from "mathjs";
 import { Facility } from "../archetypes/facility";
-import { createFaction } from "../archetypes/faction";
+import { createFaction, factionComponents } from "../archetypes/faction";
 import { createSector } from "../archetypes/sector";
 import { changeBudgetMoney } from "../components/budget";
 import { addStorage } from "../components/storage";
@@ -21,12 +21,20 @@ describe("Trading system", () => {
     system = new TradingSystem(sim);
     facility = createFarm(
       {
-        owner: createFaction("F", sim),
+        owner: createFaction("F", sim)
+          .addComponent({
+            name: "ai",
+            priceModifier: 0.01,
+            stockpiling: 1,
+            type: "territorial",
+          })
+          .requireComponents(factionComponents),
         position: matrix([0, 0]),
         sector: createSector(sim, { name: "", position: matrix([0, 0, 0]) }),
       },
       sim
     );
+    facility.cp.storage.quota.food = 1000;
   });
 
   it("creates offers", () => {
@@ -134,8 +142,8 @@ describe("Trading system", () => {
     settleStorageQuota(facility);
     system.exec(10);
 
-    expect(facility.cp.storage.quota.water).toBe(1185);
-    expect(facility.cp.trade.offers.water.quantity).toBe(1185);
+    expect(facility.cp.storage.quota.water).toBe(1166);
+    expect(facility.cp.trade.offers.water.quantity).toBe(1166);
   });
 
   it("properly sets offer quantity if already has some commodity", () => {
@@ -143,7 +151,7 @@ describe("Trading system", () => {
     settleStorageQuota(facility);
     system.exec(10);
 
-    expect(facility.cp.storage.quota.water).toBe(1185);
-    expect(facility.cp.trade.offers.water.quantity).toBe(1175);
+    expect(facility.cp.storage.quota.water).toBe(1166);
+    expect(facility.cp.trade.offers.water.quantity).toBe(1156);
   });
 });

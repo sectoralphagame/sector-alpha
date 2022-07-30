@@ -56,12 +56,12 @@ describe("getSectorsInTeleportRange", () => {
     const t4 = createTeleporter(sim, sectors[2], f);
 
     linkTeleportModules(
-      sim.get(t1.cp.modules.ids[0]).requireComponents(["teleport"]),
-      sim.get(t2.cp.modules.ids[0]).requireComponents(["teleport"])
+      sim.getOrThrow(t1.cp.modules.ids[0]).requireComponents(["teleport"]),
+      sim.getOrThrow(t2.cp.modules.ids[0]).requireComponents(["teleport"])
     );
     linkTeleportModules(
-      sim.get(t3.cp.modules.ids[0]).requireComponents(["teleport"]),
-      sim.get(t4.cp.modules.ids[0]).requireComponents(["teleport"])
+      sim.getOrThrow(t3.cp.modules.ids[0]).requireComponents(["teleport"]),
+      sim.getOrThrow(t4.cp.modules.ids[0]).requireComponents(["teleport"])
     );
 
     regen(sim);
