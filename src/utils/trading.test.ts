@@ -1,6 +1,6 @@
 import { matrix } from "mathjs";
 import { Facility, facilityComponents } from "../archetypes/facility";
-import { createFaction } from "../archetypes/faction";
+import { createFaction, Faction } from "../archetypes/faction";
 import { createSector, Sector } from "../archetypes/sector";
 import { changeBudgetMoney } from "../components/budget";
 import { addStorage, removeStorage } from "../components/storage";
@@ -77,7 +77,7 @@ describe("Trading module", () => {
     });
 
     expect(allocations).toBeTruthy();
-    expect(allocations.storage.id).toBe(1);
+    expect(allocations!.storage?.id).toBe(1);
     expect(shipFaction.cp.budget.allocations).toHaveLength(1);
     expect(shipFaction.cp.budget.allocations[0].id).toBe(1);
     expect(facility.cp.storage.allocations).toHaveLength(1);
@@ -151,7 +151,8 @@ function trade(
 
   expect(result).toBe(true);
 
-  const shipFactionBudget = ship.sim.getOrThrow(ship.cp.owner.id).cp.budget;
+  const shipFactionBudget = ship.sim.getOrThrow<Faction>(ship.cp.owner.id).cp
+    .budget;
   let prevShipFactionBudget = shipFactionBudget.available;
   dockShip(ship, seller);
   const buyOrderIndex = ship.cp.orders.value[0].orders.findIndex(

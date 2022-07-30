@@ -148,14 +148,14 @@ export class Sim extends BaseSim {
    * entity
    * @param id Entity ID
    */
-  getOrThrow = (id: number): Entity => {
+  getOrThrow = <T extends Entity = Entity>(id: number): T => {
     const entity = this.entities.get(id);
 
     if (!entity) {
       throw new MissingEntityError(id);
     }
 
-    return entity;
+    return entity as T;
   };
 
   destroy = () => {
