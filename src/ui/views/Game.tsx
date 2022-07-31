@@ -1,16 +1,16 @@
 import clsx from "clsx";
 import React from "react";
-import { nano } from "../../style";
+import { nano, theme } from "../../style";
 import { Panel } from "../components/Panel";
 import { LayoutProvider, useLayout } from "../context/Layout";
 
 const styles = nano.sheet({
   root: {
     display: "grid",
-    gridTemplateColumns: "450px 1fr",
+    gridTemplateColumns: `${theme.isMobile ? 380 : 450}px 1fr`,
   },
   collapsed: {
-    gridTemplateColumns: "80px 1fr",
+    gridTemplateColumns: `calc(32px + ${theme.spacing(6)}) 1fr`,
   },
 });
 

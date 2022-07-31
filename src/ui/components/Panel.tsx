@@ -14,7 +14,6 @@ import { IconButton } from "./IconButton";
 import ShipPanel from "./ShipPanel";
 import { nano, theme } from "../../style";
 import { ConfigDialog } from "./ConfigDialog";
-import { Button } from "./Button";
 import { useLayout } from "../context/Layout";
 import {
   facilityComponents,
@@ -37,6 +36,14 @@ const styles = nano.sheet({
   root: {
     borderRight: `1px solid ${theme.palette.default}`,
     padding: theme.spacing(3),
+  },
+  scrollArea: {
+    "&::-webkit-scrollbar": {
+      display: "none",
+    },
+    overflowY: "scroll",
+    height: `calc(100vh - 32px - ${theme.spacing(9)})`,
+    paddingBottom: theme.spacing(3),
   },
   rotate: {
     transform: "rotate(180deg)",
@@ -140,16 +147,13 @@ export const Panel: React.FC = () => {
             </IconButton>
           </>
         ) : (
-          <>
-            <div className={styles.spacer} />
-            <IconButton onClick={() => setOpenConfig(true)}>
-              <SVG src={configIcon} />
-            </IconButton>
-          </>
+          <IconButton onClick={() => setOpenConfig(true)}>
+            <SVG src={configIcon} />
+          </IconButton>
         )}
       </div>
       {!isCollapsed && !!entity && (
-        <>
+        <div className={styles.scrollArea}>
           {entity.hasComponents(["name"]) && (
             <EntityName entity={entity.requireComponents(["name"])} />
           )}
@@ -164,12 +168,9 @@ export const Panel: React.FC = () => {
               <SectorStats entity={sector(entity)} />
             </>
           )}
-        </>
+        </div>
       )}
-      <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)}>
-        <Button>load</Button>
-        <Button>save</Button>
-      </ConfigDialog>
+      <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)} />
     </div>
   );
 };

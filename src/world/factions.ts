@@ -8,6 +8,7 @@ import { Sector, sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
 import { setMoney } from "../components/budget";
 import { hecsToCartesian } from "../components/hecsPosition";
+import { createRenderGraphics } from "../components/renderGraphics";
 import { linkTeleportModules } from "../components/teleport";
 import { Sim } from "../sim";
 import { getFreighterTemplate } from "../systems/shipPlanning";
@@ -61,6 +62,7 @@ function createLink(sim: Sim, sectors: Sector[]) {
 
     return teleporter;
   });
+  telA.addComponent(createRenderGraphics("link"));
 
   linkTeleportModules(telA, telB);
 }
@@ -77,11 +79,12 @@ export const factions = (sim: Sim) => {
     sector.addComponent({ name: "owner", id: faction.id });
   });
 
-  for (let i = 1; i < sectors.length; i++) {
+  for (let i = 2; i < sectors.length; i++) {
     createLink(sim, [sectors[i - 1], sectors[i]]);
   }
 
-  createLink(sim, [sectors[0], sectors[5]]);
+  createLink(sim, [sectors[0], sectors[2]]);
+  createLink(sim, [sectors[0], sectors[7]]);
 
   for (let i = 0; i < 2; i++) {
     faction = createTradingFaction(i, sim);
