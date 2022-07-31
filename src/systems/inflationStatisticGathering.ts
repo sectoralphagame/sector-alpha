@@ -48,15 +48,17 @@ export class InflationStatisticGatheringSystem extends System {
           }
         });
       });
-      this.sim.queries.settings
-        .get()[0]
-        .cp.inflationStats.basketPrices.push(
-          basketCommodities.reduce(
-            (acc, commodity) =>
-              acc + sum(basket[commodity]) * basketWeights[commodity],
-            0
-          )
-        );
+
+      const basketPrice = basketCommodities.reduce(
+        (acc, commodity) =>
+          acc + sum(basket[commodity]) * basketWeights[commodity],
+        0
+      );
+      if (basketPrice > 0) {
+        this.sim.queries.settings
+          .get()[0]
+          .cp.inflationStats.basketPrices.push(basketPrice);
+      }
     }
   };
 }
