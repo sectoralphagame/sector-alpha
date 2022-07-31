@@ -6,7 +6,7 @@ import { drawGraphics } from "../../components/renderGraphics";
 import { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
 
-const minScale = 0.13;
+const minScale = 0.05;
 
 export class RenderingSystem extends System {
   selectionManger: RequireComponent<"selectionManager">;
@@ -88,7 +88,12 @@ export class RenderingSystem extends System {
     if (this.cooldowns.canUse("graphics")) {
       this.cooldowns.use("graphics", this.sim.speed);
       this.sim.queries.renderableGraphics.get().forEach((entity) => {
-        drawGraphics(entity, this.viewport);
+        if (
+          entity.cp.renderGraphics.redraw ||
+          !entity.cp.renderGraphics.initialized
+        ) {
+          drawGraphics(entity, this.viewport);
+        }
       });
     }
   }
@@ -128,7 +133,10 @@ export class RenderingSystem extends System {
       }
 
       entityRender.sprite.scale.set(
-        (1 / this.prevScale) * entityRender.defaultScale * (selected ? 1.5 : 1)
+        (1 /
+          (this.prevScale * (this.prevScale < entityRender.maxZ * 2 ? 2 : 1))) *
+          entityRender.defaultScale *
+          (selected ? 1.5 : 1)
       );
 
       entityRender.sprite.visible = entityRender.maxZ <= this.prevScale;

@@ -44,5 +44,12 @@ module.exports = {
     "react/prop-types": "off",
     "no-invalid-this": "error",
     "react/require-default-props": "off",
+    "jsx-a11y/label-has-associated-control": [
+      2,
+      {
+        labelAttributes: ["label"],
+        controlComponents: ["Slider"],
+      },
+    ],
   },
 };

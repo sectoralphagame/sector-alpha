@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-export type View = "main" | "settings" | "game" | "load";
+export type View = "main" | "settings" | "game" | "load" | "new";
 
 export const LocationContext = createContext<
   // eslint-disable-next-line no-unused-vars

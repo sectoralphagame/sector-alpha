@@ -8,7 +8,7 @@ import { reviver, replacer } from "mathjs";
 import { Path } from "graphlib";
 import * as PIXI from "pixi.js";
 import isPlainObject from "lodash/isPlainObject";
-import { Entity } from "../components/entity";
+import { Entity, EntityComponents } from "../components/entity";
 import { BaseSim } from "./BaseSim";
 import { System } from "../systems/system";
 import { BudgetPlanningSystem } from "../systems/budgetPlanning";
@@ -204,6 +204,10 @@ export class Sim extends BaseSim {
       entity.sim = sim;
 
       entity.components = reviveMathjs(entity.components);
+      entity.components = Object.assign(
+        new EntityComponents(),
+        entity.components
+      );
 
       if (entity.cp.render) {
         setTexture(entity.cp.render, entity.cp.render.texture);
@@ -233,7 +237,7 @@ export class Sim extends BaseSim {
 
   toJSON() {
     return {
-      ...pick(this, ["entityIdCounter", "factions", "timeOffset"]),
+      ...pick(this, ["entityIdCounter", "timeOffset"]),
       entities: [...this.entities].map(([, e]) => e),
     };
   }

@@ -1,3 +1,4 @@
+import type { Component } from "react";
 import type { CoreComponents, Entity } from "./components/entity";
 
 export type KeyOf<T> = keyof T;
@@ -16,3 +17,5 @@ export type RequireComponent<T extends keyof CoreComponents> = Entity & {
 export type NonNullableFields<T extends {}> = {
   [P in keyof T]: NonNullable<T[P]>;
 };
+
+export type PropsOf<T> = T extends Component<infer P> ? P : never;
