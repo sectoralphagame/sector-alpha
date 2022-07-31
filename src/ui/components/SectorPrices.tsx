@@ -20,6 +20,10 @@ const styles = nano.sheet({
   container: {
     width: "100%",
   },
+  header: {
+    marginBottom: theme.spacing(1),
+    marginTop: theme.spacing(1),
+  },
   label: {
     cursor: "pointer",
     marginLeft: theme.spacing(0.5),
@@ -130,6 +134,7 @@ const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
 
   return (
     <div>
+      <div className={styles.header}>Pricing history</div>
       <Button onClick={() => setOpen(true)}>See chart</Button>
       <Dialog open={open} onClose={() => setOpen(false)} width="80vw">
         <div className={styles.container} ref={setChartContainer as any} />
