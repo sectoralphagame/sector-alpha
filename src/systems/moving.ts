@@ -66,13 +66,14 @@ function move(entity: Driveable, delta: number) {
     return;
   }
   const targetPosition = targetEntity.cp.position!;
-  const isInSector = targetPosition.sector === entity.cp.position.sector;
+  const isInSector = targetPosition.sector === entityPosition.sector;
   if (!isInSector) {
     hold(entity);
     return;
   }
 
-  if (norm(subtract(entity.cp.position.coord, targetPosition.coord)) < 0.1) {
+  const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
+  if (norm(path) < 0.1) {
     drive.targetReached = true;
     if (targetEntity.cp.destroyAfterUsage) {
       targetEntity.unregister();
@@ -84,7 +85,6 @@ function move(entity: Driveable, delta: number) {
     // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
     entityPosition.angle - Math.PI / 2
   );
-  const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
   const targetAngle = Math.atan2(path.get([1]), path.get([0]));
   const speed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
   const distance = norm(path);

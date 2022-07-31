@@ -72,12 +72,12 @@ export function getTradeWithMostProfit(
       ),
       (f) => f.cp.trade.offers[commodity].price
     ),
-    sell: minBy(
+    sell: maxBy(
       pipe(
         facilitiesInRange,
         filter(
           (f) =>
-            f.cp.trade.offers[commodity].type === "sell" &&
+            f.cp.trade.offers[commodity].type === "buy" &&
             f.cp.trade.offers[commodity].quantity > 0
         ),
         toArray
