@@ -31,7 +31,7 @@ export const createFactions = (
   islands: Sector[][],
   factions: number
 ) => {
-  let freeIslands = islands;
+  let freeIslands = islands.filter((island) => island.length > 2);
   for (let i = 0; i < factions; i++) {
     const faction = createTerritorialFaction(i, sim);
     const [island, islandIndex] = pickRandomWithIndex(freeIslands);
@@ -43,20 +43,23 @@ export const createFactions = (
 
   for (let i = 0; i < 2; i++) {
     const faction = createTradingFaction(i, sim);
-    sim.queries.sectors.get().forEach((sector) => {
-      const sectorPosition = hecsToCartesian(
-        sector.cp.hecsPosition.value,
-        sectorSize / 10
-      );
-      createShip(sim, {
-        ...getFreighterTemplate(),
-        position: add(
-          sectorPosition,
-          matrix([random(-30, 30), random(-30, 30)])
-        ) as Matrix,
-        owner: faction,
-        sector,
+    sim.queries.sectors
+      .get()
+      .filter((sector) => sector.cp.owner)
+      .forEach((sector) => {
+        const sectorPosition = hecsToCartesian(
+          sector.cp.hecsPosition.value,
+          sectorSize / 10
+        );
+        createShip(sim, {
+          ...getFreighterTemplate(),
+          position: add(
+            sectorPosition,
+            matrix([random(-30, 30), random(-30, 30)])
+          ) as Matrix,
+          owner: faction,
+          sector,
+        });
       });
-    });
   }
 };
