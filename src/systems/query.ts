@@ -1,7 +1,8 @@
 import { asteroidFieldComponents } from "../archetypes/asteroidField";
 import { factionComponents } from "../archetypes/faction";
 import { sectorComponents } from "../archetypes/sector";
-import { CoreComponents, Entity } from "../components/entity";
+import { CoreComponents } from "../components/component";
+import { Entity } from "../components/entity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 

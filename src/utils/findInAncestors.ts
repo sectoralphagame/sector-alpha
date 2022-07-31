@@ -1,4 +1,5 @@
-import { CoreComponents, Entity } from "../components/entity";
+import { CoreComponents } from "../components/component";
+import { Entity } from "../components/entity";
 import { MissingComponentError } from "../errors";
 import { RequireComponent } from "../tsHelpers";
 
