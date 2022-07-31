@@ -163,7 +163,7 @@ export function getFacilityWithMostProfit(
       .filter((f, _, arr) => f.profit / arr[0].profit >= 0.95)
       .map((f) => f.facility),
     distance
-  ).reverse()[0];
+  )[0];
 }
 
 export function getMineableAsteroid(

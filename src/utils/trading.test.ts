@@ -1,6 +1,6 @@
 import { matrix } from "mathjs";
 import { Facility, facilityComponents } from "../archetypes/facility";
-import { createFaction } from "../archetypes/faction";
+import { createFaction, Faction } from "../archetypes/faction";
 import { createSector, Sector } from "../archetypes/sector";
 import { changeBudgetMoney } from "../components/budget";
 import { addStorage, removeStorage } from "../components/storage";
@@ -16,10 +16,11 @@ import { tradeOrder } from "../systems/orderExecuting/trade";
 import { TradeOrder } from "../components/orders";
 import { Commodity } from "../economy/commodity";
 import { RequireComponent } from "../tsHelpers";
+import { WithTrade } from "../economy/utils";
 
 describe("Trading module", () => {
   let sim: Sim;
-  let facility: Facility & RequireComponent<"compoundProduction">;
+  let facility: Facility & RequireComponent<"compoundProduction" | "owner">;
   let sector: Sector;
 
   beforeEach(() => {
@@ -35,7 +36,7 @@ describe("Trading module", () => {
         sector,
       },
       sim
-    ).requireComponents([...facilityComponents, "compoundProduction"]);
+    ).requireComponents([...facilityComponents, "compoundProduction", "owner"]);
     facility.cp.budget.allocationIdCounter = 10;
     changeBudgetMoney(facility.cp.budget, 100);
   });
@@ -44,7 +45,7 @@ describe("Trading module", () => {
     settleStorageQuota(facility);
     createOffers(facility);
 
-    expect(getNeededCommodities(facility)).toEqual(["water", "fuel"]);
+    expect(getNeededCommodities(facility)).toEqual(["fuel", "water"]);
   });
 
   it("properly sorts by most needed commodity 2", () => {
@@ -76,7 +77,7 @@ describe("Trading module", () => {
     });
 
     expect(allocations).toBeTruthy();
-    expect(allocations.storage.id).toBe(1);
+    expect(allocations!.storage?.id).toBe(1);
     expect(shipFaction.cp.budget.allocations).toHaveLength(1);
     expect(shipFaction.cp.budget.allocations[0].id).toBe(1);
     expect(facility.cp.storage.allocations).toHaveLength(1);
@@ -114,7 +115,7 @@ describe("Trading module", () => {
     const waterFacility = createWaterFacility(
       { owner: createFaction("F2", sim), position: matrix([0, 0]), sector },
       sim
-    );
+    ).requireComponents([...facilityComponents, "compoundProduction", "owner"]);
     settleStorageQuota(waterFacility);
     createOffers(waterFacility);
 
@@ -143,14 +144,15 @@ describe("Trading module", () => {
 function trade(
   ship: Ship,
   commodity: Commodity,
-  buyer: Facility,
-  seller: Facility
+  buyer: WithTrade,
+  seller: WithTrade
 ) {
   const result = tradeCommodity(ship, commodity, buyer, seller);
 
   expect(result).toBe(true);
 
-  const shipFactionBudget = ship.sim.getOrThrow(ship.cp.owner.id).cp.budget;
+  const shipFactionBudget = ship.sim.getOrThrow<Faction>(ship.cp.owner.id).cp
+    .budget;
   let prevShipFactionBudget = shipFactionBudget.available;
   dockShip(ship, seller);
   const buyOrderIndex = ship.cp.orders.value[0].orders.findIndex(
@@ -198,7 +200,7 @@ describe("Trade flow", () => {
         sector,
       },
       sim
-    );
+    ).requireComponents([...facilityComponents, "compoundProduction", "owner"]);
     changeBudgetMoney(farm.cp.budget, 10000);
     settleStorageQuota(farm);
     createOffers(farm);
@@ -207,7 +209,7 @@ describe("Trade flow", () => {
     const waterFacility = createWaterFacility(
       { owner: createFaction("F2", sim), position: matrix([0, 0]), sector },
       sim
-    );
+    ).requireComponents([...facilityComponents, "compoundProduction", "owner"]);
     settleStorageQuota(waterFacility);
     createOffers(waterFacility);
     waterFacility.cp.trade.offers.water.price = 90;
@@ -238,7 +240,7 @@ describe("Trade flow", () => {
         sector,
       },
       sim
-    );
+    ).requireComponents([...facilityComponents, "compoundProduction", "owner"]);
     changeBudgetMoney(farm.cp.budget, 100);
     settleStorageQuota(farm);
     createOffers(farm);
@@ -250,7 +252,7 @@ describe("Trade flow", () => {
         sector,
       },
       sim
-    );
+    ).requireComponents([...facilityComponents, "compoundProduction", "owner"]);
     settleStorageQuota(waterFacility);
     createOffers(waterFacility);
 

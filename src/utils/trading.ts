@@ -1,5 +1,6 @@
 import { sortBy } from "lodash";
 import merge from "lodash/merge";
+import { mean } from "mathjs";
 import { facilityComponents } from "../archetypes/facility";
 import { Order, tradeOrder } from "../components/orders";
 import type { TransactionInput } from "../components/trade";
@@ -11,7 +12,6 @@ import type { RequireComponent } from "../tsHelpers";
 import { perCommodity } from "./perCommodity";
 import { createOffers } from "../systems/trading";
 import { moveToOrders } from "./moving";
-import { getSummedConsumption } from "../components/production";
 import {
   getAvailableSpace,
   hasSufficientStorage,
@@ -24,6 +24,8 @@ import {
   releaseBudgetAllocation,
   transferMoney,
 } from "../components/budget";
+import { Sector } from "../archetypes/sector";
+import { SectorPriceStats } from "../components/sectorStats";
 
 export function isTradeAccepted(
   entity: WithTrade,
@@ -173,7 +175,6 @@ export function allocate(
 export function getNeededCommodities(
   entity: WithTrade & RequireComponent<"compoundProduction">
 ): Commodity[] {
-  const summedConsumption = getSummedConsumption(entity.cp.compoundProduction);
   const stored = entity.cp.storage.availableWares;
 
   const scores = sortBy(
@@ -190,10 +191,7 @@ export function getNeededCommodities(
       }))
       .map((data) => ({
         commodity: data.commodity,
-        score:
-          (data.quantityStored -
-            entity.cp.compoundProduction.pac[data.commodity].consumes) /
-          summedConsumption,
+        score: data.quantityStored,
       })),
     "score"
   );
@@ -492,4 +490,25 @@ export function returnToFacility(
       type: "trade",
     });
   }
+}
+
+export function getSectorPrices(sector: Sector): SectorPriceStats {
+  const facilities = sector.sim.queries.trading
+    .get()
+    .filter((facility) => facility.cp.position.sector === sector.id);
+
+  return perCommodity((commodity) => {
+    const buyOffers = facilities
+      .filter((facility) => facility.cp.trade.offers[commodity].type === "buy")
+      .map((facility) => facility.cp.trade.offers[commodity].price);
+
+    const sellOffers = facilities
+      .filter((facility) => facility.cp.trade.offers[commodity].type === "sell")
+      .map((facility) => facility.cp.trade.offers[commodity].price);
+
+    return {
+      buy: buyOffers.length ? mean(buyOffers) : 0,
+      sell: sellOffers.length ? mean(sellOffers) : 0,
+    };
+  });
 }

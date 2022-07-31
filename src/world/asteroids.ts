@@ -2,7 +2,7 @@ import { add, matrix, Matrix, random } from "mathjs";
 import { mineableCommodities, MineableCommodity } from "../economy/commodity";
 import { createAsteroidField } from "../archetypes/asteroidField";
 import { Sim } from "../sim";
-import { sectorSize } from "../archetypes/sector";
+import { Sector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { pickRandom } from "../utils/generators";
 
@@ -13,10 +13,10 @@ const getSize = () => {
     return random(10, 14);
   }
   if (r < 0.25) {
-    return random(5, 9);
+    return random(1, 4);
   }
 
-  return random(1, 4);
+  return random(5, 9);
 };
 
 const densities: Record<MineableCommodity, [number, number]> = {
@@ -35,16 +35,17 @@ const resourcesPerAsteroid: Record<MineableCommodity, [number, number]> = {
 };
 const getDensity = (type: MineableCommodity) => random(...densities[type]);
 
-export function getRandomAsteroidField() {
-  const sectors = (window.sim as Sim).queries.sectors.get();
-  const sector = pickRandom(sectors);
+export function spawnAsteroidField(
+  commodity: MineableCommodity,
+  size: number,
+  sector: Sector
+) {
   const maxR = (sectorSize / 20) * Math.sqrt(3);
 
   const sectorCenterPosition = hecsToCartesian(
     sector.cp.hecsPosition.value,
     sectorSize / 10
   );
-  const size = getSize();
   const polarPosition = {
     r: random(0, maxR - size - 0.5),
     a: random(-Math.PI, Math.PI),
@@ -56,6 +57,20 @@ export function getRandomAsteroidField() {
     ]),
     sectorCenterPosition
   ) as Matrix;
+
+  createAsteroidField(window.sim as Sim, position, sector, {
+    asteroidResources: {
+      max: resourcesPerAsteroid[commodity][1],
+      min: resourcesPerAsteroid[commodity][0],
+    },
+    density: getDensity(commodity),
+    size,
+    type: commodity,
+  });
+}
+
+export function getRandomAsteroidField() {
+  const sectors = (window.sim as Sim).queries.sectors.get();
   const mineable =
     mineableCommodities[
       Object.keys(mineableCommodities)[
@@ -63,13 +78,5 @@ export function getRandomAsteroidField() {
       ]
     ];
 
-  createAsteroidField(window.sim as Sim, position, sector, {
-    asteroidResources: {
-      max: resourcesPerAsteroid[mineable][1],
-      min: resourcesPerAsteroid[mineable][0],
-    },
-    density: getDensity(mineable),
-    size: getSize(),
-    type: mineable,
-  });
+  spawnAsteroidField(mineable, getSize(), pickRandom(sectors));
 }

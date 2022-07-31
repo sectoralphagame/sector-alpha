@@ -22,7 +22,10 @@ import {
 import EntityName from "./EntityName";
 import Resources from "./Resources";
 import { sector, sectorComponents } from "../../archetypes/sector";
-import SectorStats from "./SectorStats";
+import SectorResources from "./SectorStats";
+import SectorPrices from "./SectorPrices";
+import Inflation from "./InflationStats";
+import type { Sim } from "../../sim";
 
 const styles = nano.sheet({
   iconBar: {
@@ -152,24 +155,28 @@ export const Panel: React.FC = () => {
           </IconButton>
         )}
       </div>
-      {!isCollapsed && !!entity && (
-        <div className={styles.scrollArea}>
-          {entity.hasComponents(["name"]) && (
-            <EntityName entity={entity.requireComponents(["name"])} />
-          )}
-          {entity.hasComponents(shipComponents) ? (
-            <ShipPanel entity={asShip(entity)} />
-          ) : entity.hasComponents(facilityComponents) ? (
-            <FacilityPanel entity={asFacility(entity)} />
-          ) : null}
-          {entity.hasComponents(sectorComponents) && (
-            <>
-              <Resources entity={sector(entity)} />
-              <SectorStats entity={sector(entity)} />
-            </>
-          )}
-        </div>
-      )}
+      {!isCollapsed &&
+        (entity ? (
+          <div className={styles.scrollArea}>
+            {entity.hasComponents(["name"]) && (
+              <EntityName entity={entity.requireComponents(["name"])} />
+            )}
+            {entity.hasComponents(shipComponents) ? (
+              <ShipPanel entity={asShip(entity)} />
+            ) : entity.hasComponents(facilityComponents) ? (
+              <FacilityPanel entity={asFacility(entity)} />
+            ) : null}
+            {entity.hasComponents(sectorComponents) && (
+              <>
+                <Resources entity={sector(entity)} />
+                <SectorResources entity={sector(entity)} />
+                <SectorPrices entity={sector(entity)} />
+              </>
+            )}
+          </div>
+        ) : (
+          <Inflation sim={window.sim as Sim} />
+        ))}
       <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)} />
     </div>
   );

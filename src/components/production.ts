@@ -5,12 +5,18 @@ import { perCommodity } from "../utils/perCommodity";
 import { BaseComponent } from "./component";
 
 export interface CommodityPAC {
+  /**
+   * Hourly production
+   */
   produces: number;
+  /**
+   * Hourly consumption
+   */
   consumes: number;
 }
 
 /**
- * Production and consumption of commodities
+ * Hourly production and consumption of commodities
  */
 export type PAC = Record<Commodity, CommodityPAC>;
 

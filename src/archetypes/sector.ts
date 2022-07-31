@@ -6,7 +6,7 @@ import { MissingComponentError } from "../errors";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import "@pixi/graphics-extras";
-import { mineableCommodities } from "../economy/commodity";
+import { commodities, mineableCommodities } from "../economy/commodity";
 
 export const sectorComponents = [
   "hecsPosition",
@@ -47,6 +47,7 @@ export function createSector(sim: Sim, { position, name }: InitialSectorInput) {
     .addComponent({
       name: "sectorStats",
       availableResources: mapValues(mineableCommodities, () => [] as number[]),
+      prices: mapValues(commodities, () => ({ buy: [], sell: [] })),
     })
     .addComponent(createRenderGraphics("sector"))
     .addComponent({ name: "selection" });

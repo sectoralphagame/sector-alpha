@@ -1,7 +1,8 @@
 import { asteroidFieldComponents } from "../archetypes/asteroidField";
 import { factionComponents } from "../archetypes/faction";
 import { sectorComponents } from "../archetypes/sector";
-import { CoreComponents, Entity } from "../components/entity";
+import { CoreComponents } from "../components/component";
+import { Entity } from "../components/entity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 
@@ -80,7 +81,11 @@ export function createQueries(sim: Sim) {
     renderableGraphics: new Query(sim, ["renderGraphics"]),
     sectors: new Query(sim, sectorComponents),
     selectable: new Query(sim, ["render", "position", "selection"]),
-    settings: new Query(sim, ["selectionManager", "systemManager"]),
+    settings: new Query(sim, [
+      "selectionManager",
+      "systemManager",
+      "inflationStats",
+    ]),
     standaloneProduction: new Query(sim, ["production", "storage"]),
     storageAndTrading: new Query(sim, ["storage", "trade"]),
     teleports: new Query(sim, ["teleport"]),
