@@ -212,12 +212,7 @@ export function createOffers(entity: WithTrade) {
         (entity.cp.trade.offers && entity.cp.trade.offers[commodity].price) ??
         startingPrice,
       quantity: offeredQuantity > 0 ? offeredQuantity : -offeredQuantity,
-      type:
-        offeredQuantity > 0
-          ? "sell"
-          : offeredQuantity === 0 && producedNet > 0
-          ? "sell"
-          : "buy",
+      type: producedNet > 0 ? "sell" : "buy",
     };
   });
 }
