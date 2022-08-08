@@ -41,8 +41,8 @@ export class InflationStatisticGatheringSystem extends System {
       this.sim.queries.trading.get().forEach((trader) => {
         basketCommodities.forEach((commodity) => {
           if (
-            trader.cp.trade.offers[commodity].type === "sell" &&
-            trader.cp.trade.offers[commodity].quantity > 0
+            trader.cp.trade.offers[commodity].active &&
+            trader.cp.trade.offers[commodity].type === "sell"
           ) {
             basket[commodity].push(trader.cp.trade.offers[commodity].price);
           }

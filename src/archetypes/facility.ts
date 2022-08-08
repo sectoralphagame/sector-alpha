@@ -13,7 +13,7 @@ import { createDocks } from "../components/dockable";
 import { Faction } from "./faction";
 import { theme } from "../style";
 
-export const commanderRange = 3;
+export const commanderRange = 4;
 
 export const facilityComponents = [
   "budget",

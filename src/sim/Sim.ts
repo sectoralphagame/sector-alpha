@@ -8,6 +8,7 @@ import { reviver, replacer } from "mathjs";
 import { Path } from "graphlib";
 import * as PIXI from "pixi.js";
 import isPlainObject from "lodash/isPlainObject";
+import { filter, map, pipe, toArray } from "@fxts/core";
 import { Entity, EntityComponents } from "../components/entity";
 import { BaseSim } from "./BaseSim";
 import { System } from "../systems/system";
@@ -143,6 +144,15 @@ export class Sim extends BaseSim {
 
     return undefined;
   };
+
+  // eslint-disable-next-line no-unused-vars
+  filter = (cb: (entity: Entity) => boolean): Entity[] =>
+    pipe(
+      this.entities,
+      filter(([, entity]) => cb(entity)),
+      map(([, e]) => e),
+      toArray
+    );
 
   /**
    * Get entity or `undefined`, depending on entity's existence

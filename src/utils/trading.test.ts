@@ -110,6 +110,7 @@ describe("Trading module", () => {
   it("properly arranges trade between facilities", () => {
     addStorage(facility.cp.storage, "food", 100, true);
     settleStorageQuota(facility);
+    changeBudgetMoney(facility.cp.budget, 1000);
     createOffers(facility);
 
     const waterFacility = createWaterFacility(
@@ -120,7 +121,7 @@ describe("Trading module", () => {
     createOffers(waterFacility);
 
     const shipFaction = createFaction("Ship faction", sim);
-    changeBudgetMoney(shipFaction.cp.budget, 100);
+    changeBudgetMoney(shipFaction.cp.budget, 1000);
     const ship = createShip(sim, {
       ...shipClasses[0],
       owner: shipFaction,

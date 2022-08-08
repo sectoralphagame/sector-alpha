@@ -92,6 +92,17 @@ export class InvalidOfferType extends Error {
   }
 }
 
+export class ExceededOfferQuantity extends Error {
+  quantity: number;
+  limit: number;
+
+  constructor(quantity: number, limit: number) {
+    super(`Offered ${quantity}, but the limit is ${limit}`);
+    this.quantity = quantity;
+    this.limit = limit;
+  }
+}
+
 export class MissingComponentError extends Error {
   entity: Entity;
   expectedComponents: Readonly<Array<keyof CoreComponents>>;

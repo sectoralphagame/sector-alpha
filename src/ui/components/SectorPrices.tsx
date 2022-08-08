@@ -11,6 +11,7 @@ import { nano, theme } from "../../style";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 import { Checkbox } from "./Checkbox";
+import { commodities } from "../../economy/commodity";
 
 const styles = nano.sheet({
   commodities: {
@@ -48,9 +49,10 @@ const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
         .map(([commodity]) => commodity),
     [entity.cp.sectorStats.prices.fuelium.buy.length]
   );
-  const [displayedResources, setDisplayedResources] = React.useState(
-    availableCommodities.slice(0, 2)
-  );
+  const [displayedResources, setDisplayedResources] = React.useState([
+    commodities.food,
+    commodities.fuel,
+  ] as string[]);
 
   React.useEffect(() => {
     if (chart.current) {

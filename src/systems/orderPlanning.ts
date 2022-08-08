@@ -7,7 +7,7 @@ import {
   facility,
   facilityComponents,
 } from "../archetypes/facility";
-import { createMarker } from "../archetypes/marker";
+import { createMarker, Marker } from "../archetypes/marker";
 import { sector as asSector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { mineOrder } from "../components/orders";
@@ -45,20 +45,35 @@ const tradingComponents = [
 type Trading = RequireComponent<typeof tradingComponents[number]>;
 
 function idleMovement(entity: Trading) {
+  const commander =
+    entity.cp.commander &&
+    entity.sim.getOrThrow<Marker>(entity.cp.commander.id);
+
   entity.cp.orders.value.push({
     orders: moveToOrders(
       entity,
-      createMarker(entity.sim, {
-        sector: entity.cp.position.sector,
-        value: add(
-          hecsToCartesian(
-            entity.sim.getOrThrow(entity.cp.position.sector).cp.hecsPosition!
-              .value,
-            sectorSize / 10
-          ),
-          matrix([random(-25, 25), random(-25, 25)])
-        ),
-      })
+      createMarker(
+        entity.sim,
+        commander
+          ? {
+              sector: commander.cp.position.sector,
+              value: add(
+                commander.cp.position.coord,
+                matrix([random(-4, 4), random(-4, 4)])
+              ),
+            }
+          : {
+              sector: entity.cp.position.sector,
+              value: add(
+                hecsToCartesian(
+                  entity.sim.getOrThrow(entity.cp.position.sector).cp
+                    .hecsPosition!.value,
+                  sectorSize / 10
+                ),
+                matrix([random(-25, 25), random(-25, 25)])
+              ),
+            }
+      )
     ),
     type: "move",
   });

@@ -1,13 +1,16 @@
+import { random, randomInt } from "mathjs";
 import { Commodity } from "../economy/commodity";
 import { perCommodity } from "../utils/perCommodity";
 import { BaseComponent } from "./component";
 
-export interface Transaction extends TradeOffer {
+export interface Transaction extends Omit<TradeOffer, "active"> {
   commodity: Commodity;
   time: number;
 }
 
-export interface TransactionInput extends TradeOffer {
+export type PriceBelief = [number, number];
+
+export interface TransactionInput extends Omit<TradeOffer, "active"> {
   commodity: Commodity;
   /**
    * ID of entity that initiates trade (usually ship)
@@ -30,6 +33,7 @@ export interface TransactionInput extends TradeOffer {
 export type TradeOfferType = "buy" | "sell";
 
 export interface TradeOffer {
+  active: boolean;
   price: number;
   quantity: number;
   type: TradeOfferType;
@@ -37,24 +41,32 @@ export interface TradeOffer {
 
 export type TradeOffers = Record<Commodity, TradeOffer>;
 
-export const startingPrice = 100;
-
 export interface Trade extends BaseComponent<"trade"> {
+  pricing: Record<Commodity, PriceBelief>;
   offers: TradeOffers;
   lastPriceAdjust: { time: number; commodities: Record<Commodity, number> };
   transactions: Transaction[];
 }
 
 export function createTrade(): Trade {
+  const pricing = perCommodity(() => {
+    const lower = random(50, 150);
+    const upper = lower + random(5, 20);
+
+    return [lower, upper] as PriceBelief;
+  });
+
   return {
     name: "trade",
+    pricing,
     lastPriceAdjust: {
       time: 0,
       commodities: perCommodity(() => 0),
     },
     offers: perCommodity(
-      (): TradeOffer => ({
-        price: startingPrice,
+      (commodity): TradeOffer => ({
+        active: false,
+        price: randomInt(...pricing[commodity]),
         quantity: 0,
         type: "sell",
       })

@@ -72,7 +72,7 @@ const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
         title: "Inflation (10 minute period)",
         priceFormat: {
           type: "custom",
-          formatter: (v: number) => `${(v * 100).toFixed(1)}%`,
+          formatter: (v: number) => `${((v - 1) * 100).toFixed(1)}%`,
         },
       });
       lineSeries.setData(

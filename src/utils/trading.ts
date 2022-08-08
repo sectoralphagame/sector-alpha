@@ -7,10 +7,13 @@ import type { TransactionInput } from "../components/trade";
 import { Allocation } from "../components/utils/allocations";
 import { commodities, commoditiesArray, Commodity } from "../economy/commodity";
 import { getFacilityWithMostProfit, WithTrade } from "../economy/utils";
-import { InvalidOfferType, NonPositiveAmount } from "../errors";
+import {
+  ExceededOfferQuantity,
+  InvalidOfferType,
+  NonPositiveAmount,
+} from "../errors";
 import type { RequireComponent } from "../tsHelpers";
 import { perCommodity } from "./perCommodity";
-import { createOffers } from "../systems/trading";
 import { moveToOrders } from "./moving";
 import {
   getAvailableSpace,
@@ -26,6 +29,7 @@ import {
 } from "../components/budget";
 import { Sector } from "../archetypes/sector";
 import { SectorPriceStats } from "../components/sectorStats";
+import { limitMax } from "./limit";
 
 export function isTradeAccepted(
   entity: WithTrade,
@@ -42,6 +46,11 @@ export function isTradeAccepted(
   if (offer.type === input.type && input.factionId !== entity.cp.owner.id) {
     throw new InvalidOfferType(input.type);
   }
+
+  if (offer.quantity < input.quantity) {
+    throw new ExceededOfferQuantity(input.quantity, offer.quantity);
+  }
+
   if (input.type === "buy") {
     if (input.factionId === entity.cp.owner.id) {
       validPrice = true;
@@ -99,7 +108,6 @@ export function acceptTrade(entity: WithTrade, input: TransactionInput) {
   if (entity.cp.trade.transactions.length > maxTransactions) {
     entity.cp.trade.transactions.shift();
   }
-  createOffers(entity);
 }
 
 /**
@@ -110,9 +118,12 @@ export function allocate(
   offer: Omit<TransactionInput, "allocations">
 ): Record<"budget" | "storage", Allocation | null> | null {
   if (isTradeAccepted(entity, offer)) {
+    entity.cp.trade.offers[offer.commodity].quantity -= offer.quantity;
+
     const tradeId = `${entity.id}:${offer.initiator}:${
       offer.type
     }:${entity.sim.getTime()}`;
+
     if (offer.type === "sell") {
       return {
         budget:
@@ -235,9 +246,7 @@ export function tradeCommodity(
   buyer: WithTrade,
   seller: WithTrade
 ): boolean {
-  const sameFactionAsBuyer = entity.cp.owner.id === buyer.cp.owner.id;
-  const sameFactionAsSeller = entity.cp.owner.id === seller.cp.owner.id;
-
+  // if (window.selected?.id === entity.cp.commander?.id) debugger;
   const entityWithBudget = entity.sim
     .getOrThrow(
       entity.cp.commander ? entity.cp.commander.id : entity.cp.owner.id
@@ -249,10 +258,8 @@ export function tradeCommodity(
       buyer.cp.trade.offers[commodity].quantity,
       getAvailableSpace(entity.cp.storage),
       seller.cp.trade.offers[commodity].quantity,
-      sameFactionAsSeller
-        ? Infinity
-        : entityWithBudget.cp.budget.available /
-            seller.cp.trade.offers[commodity].price
+      entityWithBudget.cp.budget.available /
+        seller.cp.trade.offers[commodity].price
     )
   );
 
@@ -260,15 +267,14 @@ export function tradeCommodity(
     return false;
   }
 
-  const buyPrice = sameFactionAsSeller
-    ? 0
-    : seller.cp.trade.offers[commodity].price;
-  const sellPrice = sameFactionAsBuyer
-    ? 0
-    : buyer.cp.trade.offers[commodity].price;
-
-  if (!sameFactionAsSeller && buyPrice > entityWithBudget.cp.budget.available)
-    return false;
+  const buyPrice =
+    seller.id === entity.cp.commander?.id
+      ? 0
+      : seller.cp.trade.offers[commodity].price;
+  const sellPrice =
+    buyer.id === entity.cp.commander?.id
+      ? 0
+      : buyer.cp.trade.offers[commodity].price;
 
   const offer = {
     initiator: entity.id,
@@ -380,7 +386,7 @@ export function autoBuyMostNeededByCommander(
   commodity: Commodity,
   jumps: number
 ): boolean {
-  const minQuantity = 0;
+  const minQuantity = entity.cp.storage.max / 10;
   const commander = entity.sim
     .getOrThrow(entity.cp.commander.id)
     .requireComponents([...facilityComponents, "owner"]);
@@ -411,7 +417,7 @@ export function autoSellMostRedundantToCommander(
   commodity: Commodity,
   jumps: number
 ): boolean {
-  const minQuantity = 0;
+  const minQuantity = entity.cp.storage.max / 10;
   const commander = entity.sim
     .getOrThrow(entity.cp.commander.id)
     .requireComponents([...facilityComponents, "owner"]);
@@ -451,18 +457,26 @@ export function returnToFacility(
     });
   }
   Object.values(commodities)
-    .filter((commodity) => entity.cp.storage.availableWares[commodity] > 0)
+    .filter(
+      (commodity) =>
+        entity.cp.storage.availableWares[commodity] > 0 &&
+        commander.cp.trade.offers[commodity].quantity > 0
+    )
     .forEach((commodity) => {
       const offer: TransactionInput = {
         commodity,
         initiator: entity.id,
-        quantity: entity.cp.storage.availableWares[commodity],
+        quantity: limitMax(
+          entity.cp.storage.availableWares[commodity],
+          commander.cp.trade.offers[commodity].quantity
+        ),
         price: 0,
         budget: null,
         allocations: null,
         type: "sell",
         factionId: entity.cp.owner.id,
       };
+
       const allocations = allocate(commander, offer);
       if (allocations) {
         orders.push(
@@ -501,11 +515,19 @@ export function getSectorPrices(sector: Sector): SectorPriceStats {
 
   return perCommodity((commodity) => {
     const buyOffers = facilities
-      .filter((facility) => facility.cp.trade.offers[commodity].type === "buy")
+      .filter(
+        (facility) =>
+          facility.cp.trade.offers[commodity].active &&
+          facility.cp.trade.offers[commodity].type === "buy"
+      )
       .map((facility) => facility.cp.trade.offers[commodity].price);
 
     const sellOffers = facilities
-      .filter((facility) => facility.cp.trade.offers[commodity].type === "sell")
+      .filter(
+        (facility) =>
+          facility.cp.trade.offers[commodity].active &&
+          facility.cp.trade.offers[commodity].type === "sell"
+      )
       .map((facility) => facility.cp.trade.offers[commodity].price);
 
     return {
