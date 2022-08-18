@@ -16,6 +16,7 @@ export const commodities = {
   water: "water",
 } as const;
 export type Commodity = Values<typeof commodities>;
+export const commoditiesArray = Object.values(commodities) as Commodity[];
 
 export const mineableCommodities = {
   fuelium: commodities.fuelium,

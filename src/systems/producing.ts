@@ -1,4 +1,4 @@
-import { every } from "lodash";
+import { every } from "@fxts/core";
 import { Production } from "../components/production";
 import {
   addStorage,
@@ -6,6 +6,7 @@ import {
   hasSufficientStorage,
   removeStorage,
 } from "../components/storage";
+import { commodities, Commodity } from "../economy/commodity";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
@@ -47,17 +48,16 @@ export function isAbleToProduce(
 ): boolean {
   const multiplier = facilityModule.cp.production.time / 3600;
   return every(
-    perCommodity(
-      (commodity) =>
-        hasSufficientStorage(
-          storage,
-          commodity,
-          facilityModule.cp.production.pac[commodity].consumes * multiplier
-        ) &&
-        (facilityModule.cp.production.pac[commodity].produces * multiplier
-          ? storage.availableWares[commodity] < storage.quota[commodity]
-          : true)
-    )
+    (commodity) =>
+      hasSufficientStorage(
+        storage,
+        commodity,
+        facilityModule.cp.production.pac[commodity].consumes * multiplier
+      ) &&
+      (facilityModule.cp.production.pac[commodity].produces * multiplier
+        ? storage.availableWares[commodity] < storage.quota[commodity]
+        : true),
+    Object.values(commodities) as Commodity[]
   );
 }
 

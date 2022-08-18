@@ -40,7 +40,7 @@ export class PathPlanningSystem extends System {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("regen")) {
-      this.cooldowns.use("regen", 5);
+      this.cooldowns.use("regen", 30 * 60);
       regen(this.sim);
     }
   };

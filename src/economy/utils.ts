@@ -2,8 +2,9 @@ import { Matrix, norm, subtract, sum } from "mathjs";
 import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
 import maxBy from "lodash/maxBy";
+import { filter, map, pipe, toArray } from "@fxts/core";
 import { Sim } from "../sim";
-import { Commodity } from "./commodity";
+import { commoditiesArray, Commodity } from "./commodity";
 import { RequireComponent } from "../tsHelpers";
 import { AsteroidField } from "../archetypes/asteroidField";
 import { asteroid, Asteroid } from "../archetypes/asteroid";
@@ -60,36 +61,44 @@ export function getTradeWithMostProfit(
   const bestOffers = perCommodity((commodity) => ({
     // We buy, facility sells
     buy: minBy(
-      facilitiesInRange.filter(
-        (f) =>
-          f.cp.trade.offers[commodity].type === "sell" &&
-          f.cp.trade.offers[commodity].quantity > 0
+      pipe(
+        facilitiesInRange,
+        filter(
+          (f) =>
+            f.cp.trade.offers[commodity].type === "sell" &&
+            f.cp.trade.offers[commodity].quantity > 0
+        ),
+        toArray
       ),
       (f) => f.cp.trade.offers[commodity].price
     ),
     sell: maxBy(
-      facilitiesInRange.filter(
-        (f) =>
-          f.cp.trade.offers[commodity].type === "buy" &&
-          f.cp.trade.offers[commodity].quantity > 0
+      pipe(
+        facilitiesInRange,
+        filter(
+          (f) =>
+            f.cp.trade.offers[commodity].type === "buy" &&
+            f.cp.trade.offers[commodity].quantity > 0
+        ),
+        toArray
       ),
       (f) => f.cp.trade.offers[commodity].price
     ),
   }));
 
-  const profits = Object.entries(
-    perCommodity((commodity) =>
-      bestOffers[commodity].sell && bestOffers[commodity].buy
-        ? bestOffers[commodity].sell!.cp.trade.offers[commodity].price /
-          bestOffers[commodity].buy!.cp.trade.offers[commodity].price
-        : 0
-    )
-  )
-    .map(([commodity, profit]) => ({
+  const profits = pipe(
+    commoditiesArray,
+    map((commodity) => ({
       commodity,
-      profit,
-    }))
-    .filter(({ profit }) => profit > 1);
+      profit:
+        bestOffers[commodity].sell && bestOffers[commodity].buy
+          ? bestOffers[commodity].sell!.cp.trade.offers[commodity].price /
+            bestOffers[commodity].buy!.cp.trade.offers[commodity].price
+          : 0,
+    })),
+    filter(({ profit }) => profit > 1),
+    toArray
+  );
 
   if (profits.length === 0) {
     return null;

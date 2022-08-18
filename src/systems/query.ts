@@ -1,3 +1,4 @@
+import { filter, map, pipe, toArray } from "@fxts/core";
 import { asteroidFieldComponents } from "../archetypes/asteroidField";
 import { factionComponents } from "../archetypes/faction";
 import { sectorComponents } from "../archetypes/sector";
@@ -50,8 +51,11 @@ export class Query<T extends keyof CoreComponents> {
 
   get = (): QueryEntities<T> => {
     if (!this.entities) {
-      this.entities = [...this.sim.entities.values()].filter((e) =>
-        e.hasComponents(this.requiredComponents)
+      this.entities = pipe(
+        this.sim.entities,
+        map(([, e]) => e),
+        filter((e) => e.hasComponents(this.requiredComponents)),
+        toArray
       ) as QueryEntities<T>;
     }
 

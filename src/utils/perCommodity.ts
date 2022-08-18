@@ -1,10 +1,10 @@
-import { commodities, Commodity } from "../economy/commodity";
+import { commoditiesArray, Commodity } from "../economy/commodity";
 
 export function perCommodity<T>(
   // eslint-disable-next-line no-unused-vars
   cb: (commodity: Commodity) => T
 ): Record<Commodity, T> {
-  return Object.values(commodities)
+  return commoditiesArray
     .map((commodity) => ({
       commodity,
       data: cb(commodity),

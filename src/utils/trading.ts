@@ -1,11 +1,11 @@
-import { sortBy } from "lodash";
 import merge from "lodash/merge";
 import { mean } from "mathjs";
+import { filter, map, pipe, sortBy } from "@fxts/core";
 import { facilityComponents } from "../archetypes/facility";
 import { Order, tradeOrder } from "../components/orders";
 import type { TransactionInput } from "../components/trade";
 import { Allocation } from "../components/utils/allocations";
-import { commodities, Commodity } from "../economy/commodity";
+import { commodities, commoditiesArray, Commodity } from "../economy/commodity";
 import { getFacilityWithMostProfit, WithTrade } from "../economy/utils";
 import { InvalidOfferType, NonPositiveAmount } from "../errors";
 import type { RequireComponent } from "../tsHelpers";
@@ -177,47 +177,49 @@ export function getNeededCommodities(
 ): Commodity[] {
   const stored = entity.cp.storage.availableWares;
 
-  const scores = sortBy(
-    Object.values(commodities)
-      .filter(
+  return sortBy(
+    (c) => c.score,
+    pipe(
+      commoditiesArray,
+      filter(
         (commodity) =>
           entity.cp.trade.offers[commodity].type === "buy" &&
           entity.cp.trade.offers[commodity].quantity > 0
-      )
-      .map((commodity) => ({
+      ),
+      map((commodity) => ({
         commodity,
         wantToBuy: entity.cp.trade.offers[commodity].quantity,
         quantityStored: stored[commodity],
-      }))
-      .map((data) => ({
+      })),
+      map((data) => ({
         commodity: data.commodity,
         score: data.quantityStored,
-      })),
-    "score"
-  );
-
-  return scores.map((offer) => offer.commodity);
+      }))
+    )
+  ).map((offer) => offer.commodity);
 }
 
 export function getCommoditiesForSell(entity: WithTrade): Commodity[] {
   const stored = entity.cp.storage.availableWares;
 
   return sortBy(
-    Object.values(commodities)
-      .map((commodity) => ({
+    (c) => c.score,
+    pipe(
+      commoditiesArray,
+      filter(
+        (commodity) =>
+          entity.cp.trade.offers[commodity].type === "sell" &&
+          entity.cp.trade.offers[commodity].quantity > 0
+      ),
+      map((commodity) => ({
         commodity,
-        wantToSell:
-          entity.cp.trade.offers[commodity].type === "sell"
-            ? entity.cp.trade.offers[commodity].quantity
-            : 0,
         quantityStored: stored[commodity],
-      }))
-      .filter((offer) => offer.wantToSell > 0)
-      .map((data) => ({
+      })),
+      map((data) => ({
         commodity: data.commodity,
         score: data.quantityStored,
-      })),
-    "score"
+      }))
+    )
   ).map((offer) => offer.commodity);
 }
 

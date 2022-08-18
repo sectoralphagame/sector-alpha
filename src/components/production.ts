@@ -1,6 +1,5 @@
 import { cloneDeep, merge } from "lodash";
-import { sum } from "mathjs";
-import { commodities, Commodity } from "../economy/commodity";
+import { commoditiesArray, Commodity } from "../economy/commodity";
 import { perCommodity } from "../utils/perCommodity";
 import { BaseComponent } from "./component";
 
@@ -32,18 +31,16 @@ export interface BaseProduction {
 }
 
 export function getSummedConsumption(production: BaseProduction): number {
-  return sum(
-    Object.values(commodities).map(
-      (commodity) => production.pac[commodity].consumes
-    )
+  return commoditiesArray.reduce(
+    (acc, commodity) => acc + production.pac[commodity].consumes,
+    0
   );
 }
 
 export function getSummedProduction(production: BaseProduction): number {
-  return sum(
-    Object.values(commodities).map(
-      (commodity) => production.pac[commodity].produces
-    )
+  return commoditiesArray.reduce(
+    (acc, commodity) => acc + production.pac[commodity].produces,
+    0
   );
 }
 
