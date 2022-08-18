@@ -246,17 +246,17 @@ export function tradeCommodity(
   buyer: WithTrade,
   seller: WithTrade
 ): boolean {
-  // if (window.selected?.id === entity.cp.commander?.id) debugger;
   const entityWithBudget = entity.sim
     .getOrThrow(
       entity.cp.commander ? entity.cp.commander.id : entity.cp.owner.id
     )
     .requireComponents(["budget"]);
 
+  const availableSpace = getAvailableSpace(entity.cp.storage);
   const quantity = Math.floor(
     Math.min(
       buyer.cp.trade.offers[commodity].quantity,
-      getAvailableSpace(entity.cp.storage),
+      availableSpace,
       seller.cp.trade.offers[commodity].quantity,
       entityWithBudget.cp.budget.available /
         seller.cp.trade.offers[commodity].price
