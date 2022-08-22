@@ -1,17 +1,16 @@
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
-import { System } from "../system";
 import { drawGraphics } from "../../components/renderGraphics";
 import { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
+import { SystemWithHooks } from "../hooks";
 
 const minScale = 0.05;
 
-export class RenderingSystem extends System {
+export class RenderingSystem extends SystemWithHooks {
   selectionManger: RequireComponent<"selectionManager">;
   viewport: Viewport;
-  prevScale: number = minScale;
   app: PIXI.Application;
   initialized = false;
   resizeObserver: ResizeObserver;
@@ -84,7 +83,7 @@ export class RenderingSystem extends System {
     this.app.destroy(true);
   }
 
-  updateGraphics() {
+  updateGraphics = () => {
     if (this.cooldowns.canUse("graphics")) {
       this.cooldowns.use("graphics", this.sim.speed);
       this.sim.queries.renderableGraphics.get().forEach((entity) => {
@@ -96,13 +95,12 @@ export class RenderingSystem extends System {
         }
       });
     }
-  }
+  };
 
-  updateRenderables() {
+  updateRenderables = () => {
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
-      const selected =
-        entity.id === this.selectionManger.cp.selectionManager.id;
+      const scale = this.viewport.scale.x;
 
       if (!entityRender.initialized) {
         this.viewport.addChild(entityRender.sprite);
@@ -112,6 +110,13 @@ export class RenderingSystem extends System {
             this.selectionManger.cp.selectionManager.id = entity.id;
           });
           entityRender.sprite.cursor = "pointer";
+          entityRender.sprite.tint = entityRender.color;
+          entityRender.sprite.zIndex = entityRender.zIndex;
+          entityRender.sprite.scale.set(
+            (1 / (scale * (scale < entityRender.maxZ * 2 ? 2 : 1))) *
+              entityRender.defaultScale
+          );
+          entityRender.sprite.visible = entityRender.maxZ <= scale;
         }
 
         entityRender.initialized = true;
@@ -127,6 +132,15 @@ export class RenderingSystem extends System {
         );
         entityRender.sprite.rotation = entity.cp.position.angle;
       }
+    });
+  };
+
+  updateSelection = () => {
+    this.sim.queries.renderable.get().forEach((entity) => {
+      const entityRender = entity.cp.render;
+      const selected =
+        entity.id === this.selectionManger.cp.selectionManager.id;
+
       if (selected && entityRender.sprite.tint === entityRender.color) {
         entityRender.sprite.tint = Color(entityRender.sprite.tint)
           .lighten(0.23)
@@ -136,19 +150,28 @@ export class RenderingSystem extends System {
         entityRender.sprite.tint = entityRender.color;
         entityRender.sprite.zIndex = entityRender.zIndex;
       }
+    });
+  };
+
+  updateScaling = () => {
+    this.sim.queries.renderable.get().forEach((entity) => {
+      const entityRender = entity.cp.render;
+      const selected =
+        entity.id === this.selectionManger.cp.selectionManager.id;
+      const scale = this.viewport.scale.x;
 
       entityRender.sprite.scale.set(
-        (1 /
-          (this.prevScale * (this.prevScale < entityRender.maxZ * 2 ? 2 : 1))) *
+        (1 / (scale * (scale < entityRender.maxZ * 2 ? 2 : 1))) *
           entityRender.defaultScale *
           (selected ? 1.5 : 1)
       );
 
-      entityRender.sprite.visible = entityRender.maxZ <= this.prevScale;
+      entityRender.sprite.visible = entityRender.maxZ <= scale;
     });
-  }
+  };
 
-  exec(delta: number): void {
+  exec = (delta: number): void => {
+    super.exec(delta);
     if (!this.initialized) {
       this.init();
       return;
@@ -158,6 +181,12 @@ export class RenderingSystem extends System {
 
     this.updateGraphics();
     this.updateRenderables();
+
+    this.hook(
+      this.selectionManger.cp.selectionManager.id,
+      this.updateSelection
+    );
+    this.hook(this.viewport.scale.x, this.updateScaling);
 
     if (this.selectionManger.cp.selectionManager.focused) {
       const entity = this.sim.getOrThrow(
@@ -171,7 +200,5 @@ export class RenderingSystem extends System {
         this.selectionManger.cp.selectionManager.focused = false;
       }
     }
-
-    this.prevScale = this.viewport.scale.x;
-  }
+  };
 }
