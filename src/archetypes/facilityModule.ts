@@ -62,9 +62,9 @@ export const facilityModules = {
   farm: createFacilityModuleTemplate({
     name: "Farm",
     pac: {
-      food: { consumes: 0, produces: 2700 },
-      fuel: { consumes: 700, produces: 0 },
-      water: { consumes: 1400, produces: 0 },
+      food: { consumes: 0, produces: 1300 },
+      fuel: { consumes: 350, produces: 0 },
+      water: { consumes: 700, produces: 0 },
     },
     time: 3 * 60,
   }),

@@ -6,7 +6,12 @@ import { Faction } from "../archetypes/faction";
 import { Sector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { PAC } from "../components/production";
-import { Commodity, mineableCommodities } from "../economy/commodity";
+import { addStorage } from "../components/storage";
+import {
+  commoditiesArray,
+  Commodity,
+  mineableCommodities,
+} from "../economy/commodity";
 import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { addFacilityModule } from "../utils/entityModules";
@@ -158,7 +163,7 @@ export class FacilityPlanningSystem extends System {
       );
       if (!productionModule) break;
       modulesToBuild.push(productionModule);
-      perCommodity((commodity) => {
+      commoditiesArray.forEach((commodity) => {
         if (productionModule.pac && productionModule.pac[commodity]?.consumes) {
           resourceUsageInFacilities[commodity] +=
             productionModule.pac![commodity]!.consumes;
@@ -176,6 +181,14 @@ export class FacilityPlanningSystem extends System {
     const buildQueue = shuffle(modulesToBuild);
     while (buildQueue.length > 0) {
       if (!facility || Math.random() > 0.6) {
+        if (facility && this.sim.getTime() === 0) {
+          commoditiesArray.forEach((commodity) => {
+            if (facility!.cp.compoundProduction.pac[commodity].consumes) {
+              addStorage(facility!.cp.storage, commodity, 500);
+            }
+          });
+        }
+
         const sector = pickRandom(
           this.sim.queries.sectors
             .get()
@@ -207,6 +220,14 @@ export class FacilityPlanningSystem extends System {
       );
       addFacilityModule(facility, facilityModule.create(this.sim, facility));
     }
+
+    console.table(
+      perCommodity(
+        (commodity) =>
+          resourcesProducedByFacilities[commodity] -
+          resourceUsageInFacilities[commodity]
+      )
+    );
   };
 
   exec = (): void => {

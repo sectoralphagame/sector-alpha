@@ -104,7 +104,7 @@ export class ShipPlanningSystem extends System {
                       !(
                         Object.values(mineableCommodities) as string[]
                       ).includes(commodity) && production[commodity] !== 0
-                  ).length / 2
+                  ).length / 1.5
                 ) || 1
               ) + traders.length;
 

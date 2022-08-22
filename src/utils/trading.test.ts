@@ -62,7 +62,12 @@ describe("Trading module", () => {
 
   it("properly allocates budget and storage for buy offers", () => {
     addStorage(facility.cp.storage, "food", 100, true);
-    facility.cp.trade.offers.food = { price: 20, quantity: 100, type: "sell" };
+    facility.cp.trade.offers.food = {
+      price: 20,
+      quantity: 100,
+      type: "sell",
+      active: true,
+    };
     const shipFaction = createFaction("Ship faction", sim);
     changeBudgetMoney(shipFaction.cp.budget, 100);
 
@@ -86,7 +91,12 @@ describe("Trading module", () => {
 
   it("properly allocates budget and storage for sell offers", () => {
     addStorage(facility.cp.storage, "food", 100, true);
-    facility.cp.trade.offers.water = { price: 20, quantity: 100, type: "buy" };
+    facility.cp.trade.offers.water = {
+      price: 20,
+      quantity: 100,
+      type: "buy",
+      active: true,
+    };
     const shipFaction = createFaction("Ship faction", sim);
     changeBudgetMoney(shipFaction.cp.budget, 0);
 
@@ -110,6 +120,7 @@ describe("Trading module", () => {
   it("properly arranges trade between facilities", () => {
     addStorage(facility.cp.storage, "food", 100, true);
     settleStorageQuota(facility);
+    changeBudgetMoney(facility.cp.budget, 10000);
     createOffers(facility);
 
     const waterFacility = createWaterFacility(
@@ -120,7 +131,7 @@ describe("Trading module", () => {
     createOffers(waterFacility);
 
     const shipFaction = createFaction("Ship faction", sim);
-    changeBudgetMoney(shipFaction.cp.budget, 100);
+    changeBudgetMoney(shipFaction.cp.budget, 1000);
     const ship = createShip(sim, {
       ...shipClasses[0],
       owner: shipFaction,
@@ -233,6 +244,8 @@ describe("Trade flow", () => {
   it("within the same faction", () => {
     const sector = createSector(sim, { name: "", position: matrix([0, 0, 0]) });
     const f = createFaction("F", sim);
+    changeBudgetMoney(f.cp.budget, 10000);
+
     const farm = createFarm(
       {
         position: matrix([0, 0]),
@@ -241,7 +254,7 @@ describe("Trade flow", () => {
       },
       sim
     ).requireComponents([...facilityComponents, "compoundProduction", "owner"]);
-    changeBudgetMoney(farm.cp.budget, 100);
+    changeBudgetMoney(farm.cp.budget, 10000);
     settleStorageQuota(farm);
     createOffers(farm);
 

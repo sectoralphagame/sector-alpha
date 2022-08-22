@@ -65,6 +65,7 @@ export function getTradeWithMostProfit(
         facilitiesInRange,
         filter(
           (f) =>
+            f.cp.trade.offers[commodity].active &&
             f.cp.trade.offers[commodity].type === "sell" &&
             f.cp.trade.offers[commodity].quantity > 0
         ),
@@ -77,6 +78,7 @@ export function getTradeWithMostProfit(
         facilitiesInRange,
         filter(
           (f) =>
+            f.cp.trade.offers[commodity].active &&
             f.cp.trade.offers[commodity].type === "buy" &&
             f.cp.trade.offers[commodity].quantity > 0
         ),
@@ -132,11 +134,9 @@ export function getFacilityWithMostProfit(
     ) as number;
 
   const profit = (f: WithTrade) =>
-    facility.components.owner.id === f.components.owner.id
-      ? 1e20
-      : (facility.components.trade.offers[commodity].price -
-          f.components.trade.offers[commodity].price) *
-        (facility.components.trade.offers[commodity].type === "buy" ? 1 : -1);
+    (facility.components.trade.offers[commodity].price -
+      f.components.trade.offers[commodity].price) *
+    (facility.components.trade.offers[commodity].type === "buy" ? 1 : -1);
 
   const sortedByProfit = sortBy(
     (
@@ -152,6 +152,7 @@ export function getFacilityWithMostProfit(
         )
         .filter(
           (f) =>
+            f.components.trade.offers[commodity].active &&
             f.components.trade.offers[commodity].type !==
               facility.components.trade.offers[commodity].type &&
             f.components.trade.offers[commodity].quantity >= minQuantity
@@ -167,12 +168,12 @@ export function getFacilityWithMostProfit(
     return null;
   }
 
-  return sortBy(
+  return minBy(
     sortedByProfit
       .filter((f, _, arr) => f.profit / arr[0].profit >= 0.95)
       .map((f) => f.facility),
     distance
-  )[0];
+  )!;
 }
 
 export function getMineableAsteroid(
@@ -191,13 +192,13 @@ export function getMineableAsteroid(
 /**
  *
  * Minimum required money to fulfill all buy requests, not taking
- * into account sell offers
+ * into account sell and inactive offers
  */
 export function getPlannedBudget(entity: WithTrade): number {
   return sum(
     Object.entries(entity.components.trade.offers).map(
       ([commodity, offer]) =>
-        (offer.type === "sell"
+        (offer.type === "sell" || !offer.active
           ? 0
           : entity.cp.storage.quota[commodity] -
             entity.cp.storage.stored[commodity]) * offer.price

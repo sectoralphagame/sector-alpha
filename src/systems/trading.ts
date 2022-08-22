@@ -1,12 +1,26 @@
-import { sum } from "mathjs";
-import { faction } from "../archetypes/faction";
-import { startingPrice, TradeOffer } from "../components/trade";
-import { Commodity } from "../economy/commodity";
-import { getPlannedBudget, WithTrade } from "../economy/utils";
+import {
+  average,
+  filter,
+  flatMap,
+  map,
+  pipe,
+  size,
+  sum as fxSum,
+} from "@fxts/core";
+import { randomInt, sum } from "mathjs";
+import { Sector } from "../archetypes/sector";
+import { PriceBelief, TradeOffer } from "../components/trade";
+import { commoditiesArray, Commodity } from "../economy/commodity";
+import {
+  getPlannedBudget,
+  getSectorsInTeleportRange,
+  WithTrade,
+} from "../economy/utils";
+import settings from "../settings";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
-import { limitMin } from "../utils/limit";
+import { limit } from "../utils/limit";
 import { perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
 
@@ -28,87 +42,181 @@ function getProductionCost(
   }
 
   return Math.ceil(
-    sum(
-      Object.values(
-        perCommodity((c) =>
-          productionModule.cp.production.pac[c].consumes
-            ? (getProductionCost(entity, c) *
-                productionModule.cp.production.pac[c].consumes) /
-              productionModule.cp.production.pac[commodity].produces
-            : 0
+    pipe(
+      commoditiesArray,
+      map((c) =>
+        productionModule.cp.production.pac[c].consumes
+          ? (getProductionCost(entity, c) *
+              productionModule.cp.production.pac[c].consumes) /
+            productionModule.cp.production.pac[commodity].produces
+          : 0
+      ),
+      fxSum
+    )
+  );
+}
+
+/**
+ *
+ * Gets average price on the market in n jumps proximity
+ */
+function getAveragePrice(
+  sectorId: number,
+  commodity: Commodity,
+  sim: Sim
+): number {
+  return average(
+    pipe(
+      getSectorsInTeleportRange(sim.getOrThrow<Sector>(sectorId), 4, sim),
+      flatMap((sector) =>
+        pipe(
+          sim.queries.trading.get(),
+          filter(
+            (e) =>
+              e.cp.position?.sector === sector.id &&
+              e.cp.trade?.offers[commodity].active
+          ),
+          map((e) => e.cp.trade!.offers[commodity].price)
         )
       )
     )
   );
 }
 
-function adjustSellPrice(
-  entity: WithTrade,
-  commodity: Commodity,
-  change: number
-): number {
-  const notOffered = entity.cp.trade.offers[commodity].quantity <= 0;
-  const stockpiled =
-    entity.cp.storage.availableWares[commodity] /
-      entity.cp.storage.quota[commodity] >
-    0.75;
-  const changedWithinAcceptableMargin =
-    entity.cp.trade.lastPriceAdjust.commodities[commodity] > 0 &&
-    Math.abs(change / entity.cp.trade.lastPriceAdjust.commodities[commodity]) <
-      0.2;
+function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
+  const currentPrice = entity.cp.trade.offers[commodity].price;
+  if (!entity.cp.trade.offers[commodity].active) return currentPrice;
 
-  if (notOffered || (changedWithinAcceptableMargin && !stockpiled)) {
-    return entity.cp.trade.offers[commodity].price;
-  }
+  const filled =
+    entity.cp.storage.stored[commodity] /
+    (entity.cp.storage.quota[commodity] -
+      (entity.cp.compoundProduction
+        ? entity.cp.compoundProduction.pac[commodity].consumes * 2
+        : 0));
+  const hadAnySale = size(
+    filter(
+      (transaction) =>
+        transaction.commodity === commodity &&
+        transaction.time > entity.cp.trade.lastPriceAdjust.time &&
+        transaction.type !== entity.cp.trade.offers[commodity].type,
+      entity.cp.trade.transactions
+    )
+  );
+  const mean =
+    (entity.cp.trade.pricing[commodity][0] +
+      entity.cp.trade.pricing[commodity][1]) /
+    2;
 
   const minPrice = entity.hasComponents(["compoundProduction"])
     ? getProductionCost(
         entity.requireComponents(["compoundProduction", "trade", "modules"]),
         commodity
       )
-    : 1;
-  let delta = limitMin(
-    Math.floor(
-      entity.cp.trade.offers[commodity].price *
-        faction(entity.sim.getOrThrow(entity.cp.owner.id)).cp.ai!.priceModifier
-    ),
-    1
-  );
-  if ((stockpiled && delta > 0) || change <= 0) {
-    delta *= -1;
+    : settings.global.minPrice;
+
+  if (!hadAnySale) {
+    const diff = filled * mean;
+    entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[commodity].map(
+      (v) => v - diff / 6
+    ) as PriceBelief;
+  } else {
+    const averagePrice = getAveragePrice(
+      entity.cp.position.sector,
+      commodity,
+      entity.sim
+    );
+
+    if (currentPrice < averagePrice) {
+      const overbid = averagePrice - currentPrice;
+
+      entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[
+        commodity
+      ].map((v) => v + overbid * filled) as PriceBelief;
+    } else {
+      entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[
+        commodity
+      ].map((v) => v - mean / 5) as PriceBelief;
+    }
   }
 
-  return limitMin(entity.cp.trade.offers[commodity].price + delta, minPrice);
+  entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[commodity].map(
+    (v) => limit(v, minPrice, settings.global.maxPrice)
+  ) as PriceBelief;
+  if (
+    entity.cp.trade.pricing[commodity][0] ===
+    entity.cp.trade.pricing[commodity][1]
+  ) {
+    entity.cp.trade.pricing[commodity][1] += 2;
+  }
+
+  return randomInt(...entity.cp.trade.pricing[commodity]);
 }
 
-function adjustBuyPrice(
-  entity: WithTrade,
-  commodity: Commodity,
-  change: number
-): number {
-  const notOffered = entity.cp.trade.offers[commodity].quantity <= 0;
-  const urgentNeed =
-    entity.cp.storage.availableWares[commodity] /
-      entity.cp.storage.quota[commodity] <
-    0.35;
+function adjustBuyPrice(entity: WithTrade, commodity: Commodity): number {
+  const currentPrice = entity.cp.trade.offers[commodity].price;
+  if (!entity.cp.trade.offers[commodity].active) return currentPrice;
 
-  if (notOffered && !urgentNeed) {
-    return entity.cp.trade.offers[commodity].price;
-  }
-
-  let delta = limitMin(
-    Math.floor(
-      entity.cp.trade.offers[commodity].price *
-        faction(entity.sim.getOrThrow(entity.cp.owner.id)).cp.ai!.priceModifier
-    ),
-    1
+  const filled =
+    entity.cp.storage.stored[commodity] / entity.cp.storage.quota[commodity];
+  const hadAnySale = size(
+    filter(
+      (transaction) =>
+        transaction.commodity === commodity &&
+        transaction.time > entity.cp.trade.lastPriceAdjust.time &&
+        transaction.type !== entity.cp.trade.offers[commodity].type,
+      entity.cp.trade.transactions
+    )
   );
+  const mean =
+    (entity.cp.trade.pricing[commodity][0] +
+      entity.cp.trade.pricing[commodity][1]) /
+    2;
 
-  if (change > 0 || !urgentNeed) {
-    delta *= -1;
+  if (hadAnySale) {
+    if (entity.cp.trade.pricing[commodity][1] / mean > 1.1) {
+      if (filled > 0.5) {
+        const diff = mean / 10;
+        entity.cp.trade.pricing[commodity][0] += diff;
+        entity.cp.trade.pricing[commodity][1] -= diff;
+      } else {
+        entity.cp.trade.pricing[commodity][1] *= 1.1;
+      }
+    }
+  } else if (filled < 0.25) {
+    const diff = (currentPrice - mean) / 2;
+    entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[commodity].map(
+      (v) => v + Math.abs(diff)
+    ) as PriceBelief;
+  } else {
+    const averagePrice = getAveragePrice(
+      entity.cp.position.sector,
+      commodity,
+      entity.sim
+    );
+
+    if (currentPrice > averagePrice) {
+      const overbid = currentPrice - averagePrice;
+      entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[
+        commodity
+      ].map((v) => v - overbid * 1.1) as PriceBelief;
+    } else {
+      entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[
+        commodity
+      ].map((v) => v - mean / 5) as PriceBelief;
+    }
   }
 
-  return limitMin(entity.cp.trade.offers[commodity].price + delta, 1);
+  entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[commodity].map(
+    (v) => limit(v, settings.global.minPrice, settings.global.maxPrice)
+  ) as PriceBelief;
+  if (
+    entity.cp.trade.pricing[commodity][0] ===
+    entity.cp.trade.pricing[commodity][1]
+  ) {
+    entity.cp.trade.pricing[commodity][1] += 2;
+  }
+
+  return randomInt(...entity.cp.trade.pricing[commodity]);
 }
 
 export function adjustPrices(entity: WithTrade) {
@@ -125,17 +233,12 @@ export function adjustPrices(entity: WithTrade) {
           .map((h) => h.quantity)
       ) as number
   );
-  const change = perCommodity(
-    (commodity) =>
-      quantities[commodity] -
-      entity.cp.trade.lastPriceAdjust.commodities[commodity]
-  );
 
-  perCommodity((commodity) => {
+  commoditiesArray.forEach((commodity) => {
     entity.cp.trade.offers[commodity].price =
       entity.cp.trade.offers[commodity].type === "sell"
-        ? adjustSellPrice(entity, commodity, change[commodity])
-        : adjustBuyPrice(entity, commodity, change[commodity]);
+        ? adjustSellPrice(entity, commodity)
+        : adjustBuyPrice(entity, commodity);
   });
 
   entity.cp.trade.lastPriceAdjust = {
@@ -188,7 +291,7 @@ export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
   const quota = entityWithProduction.cp.storage.quota[commodity];
 
   if (stored[commodity] > quota) {
-    return stored[commodity] - quota;
+    return 0;
   }
 
   const multiplier =
@@ -208,20 +311,22 @@ export function createOffers(entity: WithTrade) {
       : 0;
 
     return {
+      active: !(offeredQuantity === 0 && producedNet === 0),
       price:
         (entity.cp.trade.offers && entity.cp.trade.offers[commodity].price) ??
-        startingPrice,
+        0,
       quantity: offeredQuantity > 0 ? offeredQuantity : -offeredQuantity,
-      type:
-        offeredQuantity > 0
-          ? "sell"
-          : offeredQuantity === 0 && producedNet > 0
-          ? "sell"
-          : "buy",
+      type: producedNet > 0 ? "sell" : "buy",
     };
   });
 }
 
+/**
+ * Using slightly modified version of algorithm published in
+ * Emergent Economies for Role Playing Games by Doran and Parberry, 2012
+ *
+ * @link https://ianparberry.com/pubs/econ.pdf
+ */
 export class TradingSystem extends System {
   cooldowns: Cooldowns<"adjustPrices" | "createOffers">;
 

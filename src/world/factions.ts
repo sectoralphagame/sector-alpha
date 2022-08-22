@@ -14,7 +14,7 @@ function createTerritorialFaction(index: number, sim: Sim) {
   faction.addComponent({
     name: "ai",
     type: "territorial",
-    stockpiling: random(0.85, 1.1),
+    stockpiling: random(0.6, 1.2),
     priceModifier: random(0.002, 0.02),
   });
   setMoney(faction.cp.budget, 1e8);
@@ -57,6 +57,7 @@ export const createFactions = (
       .get()
       .filter((sector) => sector.cp.owner)
       .forEach((sector) => {
+        if (Math.random() > 0.4) return;
         const sectorPosition = hecsToCartesian(
           sector.cp.hecsPosition.value,
           sectorSize / 10
