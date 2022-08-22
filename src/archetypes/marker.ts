@@ -6,9 +6,7 @@ import { RequireComponent } from "../tsHelpers";
 
 export const markerComponents = ["position"] as const;
 
-// Ugly hack to transform markerComponents array type to string union
-const widenType = [...markerComponents][0];
-export type MarkerComponent = typeof widenType;
+export type MarkerComponent = typeof markerComponents[number];
 export type Marker = RequireComponent<MarkerComponent>;
 
 export function marker(entity: Entity): Marker {

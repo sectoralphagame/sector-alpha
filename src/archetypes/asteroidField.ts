@@ -13,9 +13,7 @@ export const asteroidFieldComponents = [
   "renderGraphics",
 ] as const;
 
-// Ugly hack to transform asteroidFieldComponents array type to string union
-const widenType = [...asteroidFieldComponents][0];
-export type AsteroidFieldComponent = typeof widenType;
+export type AsteroidFieldComponent = typeof asteroidFieldComponents[number];
 export type AsteroidField = RequireComponent<AsteroidFieldComponent>;
 
 export function asteroidField(entity: Entity): AsteroidField {

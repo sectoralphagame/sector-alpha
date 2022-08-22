@@ -21,9 +21,7 @@ export const shipComponents = [
   "storage",
 ] as const;
 
-// Ugly hack to transform shipComponents array type to string union
-const widenType = [...shipComponents][0];
-export type ShipComponent = typeof widenType;
+export type ShipComponent = typeof shipComponents[number];
 export type Ship = RequireComponent<ShipComponent>;
 
 export function ship(entity: Entity): Ship {

@@ -28,9 +28,7 @@ export const facilityComponents = [
   "trade",
 ] as const;
 
-// Ugly hack to transform facilityComponents array type to string union
-const widenType = [...facilityComponents][0];
-export type FacilityComponent = typeof widenType;
+export type FacilityComponent = typeof facilityComponents[number];
 export type Facility = RequireComponent<FacilityComponent>;
 
 export function facility(entity: Entity): Facility {
