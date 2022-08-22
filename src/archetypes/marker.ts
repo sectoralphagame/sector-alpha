@@ -31,6 +31,7 @@ export function createMarker(sim: Sim, { value, sector }: MarkerInput) {
       coord: value,
       angle: 0,
       sector,
+      moved: false,
     })
     .addComponent({ name: "destroyAfterUsage" });
 

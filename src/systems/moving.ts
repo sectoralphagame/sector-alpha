@@ -127,6 +127,7 @@ function move(entity: Driveable, delta: number) {
 
   entityPosition.coord = add(entityPosition.coord, dPos) as Matrix;
   entityPosition.angle += dAngle;
+  entityPosition.moved = true;
 
   entity.cp.docks?.docked.forEach((docked) => {
     const dockedPosition = entity.sim.entities

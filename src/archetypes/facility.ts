@@ -61,6 +61,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
       angle: 0,
       coord: initial.position,
       sector: initial.sector.id,
+      moved: false,
     })
     .addComponent(
       createRender({

@@ -115,13 +115,18 @@ export class RenderingSystem extends System {
         }
 
         entityRender.initialized = true;
+        entity.cp.position.moved = true;
       }
 
-      entityRender.sprite.position.set(
-        entity.cp.position.coord.get([0]) * 10,
-        entity.cp.position.coord.get([1]) * 10
-      );
-      entityRender.sprite.rotation = entity.cp.position.angle;
+      if (entity.cp.position.moved) {
+        entity.cp.position.moved = false;
+
+        entityRender.sprite.position.set(
+          entity.cp.position.coord.get([0]) * 10,
+          entity.cp.position.coord.get([1]) * 10
+        );
+        entityRender.sprite.rotation = entity.cp.position.angle;
+      }
       if (selected && entityRender.sprite.tint === entityRender.color) {
         entityRender.sprite.tint = Color(entityRender.sprite.tint)
           .lighten(0.23)

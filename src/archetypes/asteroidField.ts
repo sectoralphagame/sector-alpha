@@ -39,6 +39,7 @@ export function createAsteroidField(
       coord: position,
       angle: 0,
       sector: sector.id,
+      moved: false,
     })
     .addComponent(createRenderGraphics("asteroidField"));
 

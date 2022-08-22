@@ -41,6 +41,7 @@ export function teleportOrder(
     angle: entity.cp.position.angle,
     coord: destination.cp.position.coord,
     sector: destination.cp.position.sector,
+    moved: true,
   };
 
   entity.cp.docks?.docked.forEach((docked) => {
@@ -49,6 +50,7 @@ export function teleportOrder(
       angle: entity.cp.position.angle,
       coord: destination.cp.position.coord,
       sector: destination.cp.position.sector,
+      moved: true,
     };
   });
 

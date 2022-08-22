@@ -59,6 +59,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       angle: 0,
       coord: initial.position,
       sector: initial.sector.id,
+      moved: false,
     })
     .addComponent(
       createRender({

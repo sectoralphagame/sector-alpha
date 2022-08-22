@@ -47,6 +47,7 @@ export function createAsteroid(
       coord: position,
       angle: 0,
       sector: sectorId,
+      moved: false,
     })
     .addComponent(
       createRender({
