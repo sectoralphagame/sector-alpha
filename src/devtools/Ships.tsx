@@ -33,6 +33,7 @@ function useThrottledFormState<T>(name?: string): T {
 
 const styles = nano.sheet({
   editorContainer: {
+    overflowY: "scroll",
     padding: theme.spacing(1),
   },
   editor: {
@@ -46,11 +47,12 @@ const styles = nano.sheet({
   root: {
     display: "grid",
     gridTemplateColumns: "1fr 300px",
-    minHeight: "100vh",
+    height: "100vh",
   },
   viewer: {
     borderLeft: `1px solid ${theme.palette.default}`,
     padding: theme.spacing(1),
+    overflowY: "scroll",
     fontFamily: "monospace",
     lineBreak: "anywhere",
   },
