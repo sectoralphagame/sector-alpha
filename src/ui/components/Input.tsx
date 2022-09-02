@@ -23,11 +23,19 @@ const styles = nano.sheet({
     transition: "200ms",
     outline: 0,
   },
+  label: {
+    cursor: "pointer",
+    fontSize: theme.typography.label,
+    marginLeft: theme.spacing(0.5),
+  },
 });
 
 export const Input = React.forwardRef<
   HTMLInputElement,
-  React.HTMLAttributes<HTMLInputElement>
+  React.DetailedHTMLProps<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+  >
 >((props, ref) => (
   <input
     {...props}
@@ -37,3 +45,19 @@ export const Input = React.forwardRef<
   />
 ));
 Input.displayName = "Input";
+
+export const LabeledInput = React.forwardRef<
+  HTMLInputElement,
+  React.DetailedHTMLProps<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+  > & { label: string }
+>(({ id, label, ...props }, ref) => (
+  <div>
+    <label className={styles.label} htmlFor={id}>
+      {label}
+    </label>
+    <Input {...props} ref={ref} />
+  </div>
+));
+LabeledInput.displayName = "LabeledInput";

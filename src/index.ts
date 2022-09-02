@@ -1,2 +1,2 @@
 import "./style";
-import "./ui";
+import "./gateway";
