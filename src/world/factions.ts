@@ -5,7 +5,7 @@ import { createShip } from "../archetypes/ship";
 import { setMoney } from "../components/budget";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { Sim } from "../sim";
-import { getFreighterTemplate } from "../systems/shipPlanning";
+import { requestShip } from "../systems/shipPlanning";
 import { pickRandomWithIndex } from "../utils/generators";
 
 function createTerritorialFaction(index: number, sim: Sim) {
@@ -63,7 +63,7 @@ export const createFactions = (
           sectorSize / 10
         );
         createShip(sim, {
-          ...getFreighterTemplate(),
+          ...requestShip("trading"),
           position: add(
             sectorPosition,
             matrix([random(-30, 30), random(-30, 30)])

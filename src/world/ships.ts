@@ -3,9 +3,8 @@ import { ShipDriveProps } from "../components/drive";
 import { Textures } from "../components/render";
 import shipClassesData from "./data/ships.json";
 
-export interface ShipInput {
+export interface ShipInput extends ShipDriveProps {
   name: string;
-  drive: ShipDriveProps;
   storage: number;
   mining: number;
   texture: keyof Textures;

@@ -70,7 +70,7 @@ const styles = nano.sheet({
 });
 
 function getShipTravelTime(ship: ShipInput, distance: number): number {
-  return ship.drive.ttc + distance / ship.drive.cruise;
+  return ship.ttc + distance / ship.cruise;
 }
 
 function getShipTravelSpeed(ship: ShipInput, distance: number): number {
@@ -125,33 +125,33 @@ const ShipEditor: React.FC<{ index: number }> = ({ index }) => {
       <CollapsibleContent className={styles.editor}>
         <div className={styles.column}>
           <LabeledInput
-            {...register(`ships.${index}.drive.cruise`, {
+            {...register(`ships.${index}.cruise`, {
               valueAsNumber: true,
             })}
             label="Cruise"
-            defaultValue={getValues().ships[index].drive.cruise}
+            defaultValue={getValues().ships[index].cruise}
             type="number"
           />
           <LabeledInput
-            {...register(`ships.${index}.drive.maneuver`, {
+            {...register(`ships.${index}.maneuver`, {
               valueAsNumber: true,
             })}
             label="Maneuver"
-            defaultValue={getValues().ships[index].drive.maneuver}
+            defaultValue={getValues().ships[index].maneuver}
             type="number"
           />
           <LabeledInput
-            {...register(`ships.${index}.drive.rotary`, {
+            {...register(`ships.${index}.rotary`, {
               valueAsNumber: true,
             })}
             label="Rotary"
-            defaultValue={getValues().ships[index].drive.rotary}
+            defaultValue={getValues().ships[index].rotary}
             type="number"
           />
           <LabeledInput
-            {...register(`ships.${index}.drive.ttc`, { valueAsNumber: true })}
+            {...register(`ships.${index}.ttc`, { valueAsNumber: true })}
             label="Time to cruise"
-            defaultValue={getValues().ships[index].drive.ttc}
+            defaultValue={getValues().ships[index].ttc}
             type="number"
           />
         </div>
@@ -204,7 +204,10 @@ const Editor: React.FC<{}> = () => {
       <Button
         onClick={() => {
           append({
-            drive: { cruise: 0, maneuver: 0, rotary: 0, ttc: 0 },
+            cruise: 0,
+            maneuver: 0,
+            rotary: 0,
+            ttc: 0,
             name: "New Ship",
             size: "medium",
             storage: 0,

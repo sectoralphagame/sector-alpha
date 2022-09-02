@@ -1,14 +1,16 @@
 import { Matrix } from "mathjs";
 import Color from "color";
-import { createDrive, ShipDriveProps } from "../components/drive";
+import pick from "lodash/pick";
+import { createDrive } from "../components/drive";
 import { Entity } from "../components/entity";
 import { createMining } from "../components/mining";
-import { createRender, Textures } from "../components/render";
+import { createRender } from "../components/render";
 import { createCommodityStorage } from "../components/storage";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Sector } from "./sector";
 import { Faction } from "./faction";
+import { ShipInput } from "../world/ships";
 
 export const shipComponents = [
   "drive",
@@ -28,14 +30,9 @@ export function ship(entity: Entity): Ship {
   return entity.requireComponents(shipComponents);
 }
 
-export interface InitialShipInput {
-  name: string;
+export interface InitialShipInput extends ShipInput {
   position: Matrix;
-  drive: ShipDriveProps;
   owner: Faction;
-  storage: number;
-  mining: number;
-  texture: keyof Textures;
   sector: Sector;
 }
 
@@ -47,7 +44,9 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       name: "autoOrder",
       default: initial.mining ? "mine" : "trade",
     })
-    .addComponent(createDrive(initial.drive))
+    .addComponent(
+      createDrive(pick(initial, ["rotary", "cruise", "ttc", "maneuver"]))
+    )
     .addComponent({ name: "name", value: initial.name })
     .addComponent({
       name: "orders",
