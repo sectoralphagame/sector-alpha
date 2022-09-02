@@ -1,14 +1,14 @@
 [
   {
     "name": "Courier A",
-    "storage": 10,
+    "storage": 11,
     "mining": 0,
     "texture": "sCiv",
     "size": "small",
     "cruise": 4,
     "maneuver": 0.3,
     "rotary": 86,
-    "ttc": 3
+    "ttc": 7
   },
   {
     "name": "Courier B",
@@ -19,7 +19,7 @@
     "cruise": 6,
     "maneuver": 0.55,
     "rotary": 117,
-    "ttc": 2
+    "ttc": 1
   },
   {
     "name": "Freighter A",
@@ -41,7 +41,7 @@
     "cruise": 0.7,
     "maneuver": 0.05,
     "rotary": 31,
-    "ttc": 6.5
+    "ttc": 22
   },
   {
     "name": "Large Freighter A",

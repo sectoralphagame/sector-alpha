@@ -17,7 +17,7 @@ import {
 } from "../ui/components/Collapsible";
 import { Button } from "../ui/components/Button";
 
-type FormData = { ships: ShipInput[]; distance: number };
+type FormData = { ships: ShipInput[] };
 
 function useThrottledFormState<T>(name?: string): T {
   const data = useWatch(name ? { name } : undefined!);
@@ -41,8 +41,9 @@ const styles = nano.sheet({
       width: "100%",
     },
     display: "grid",
-    gridTemplateColumns: "200px 150px 100px 100px 100px 50px",
+    gridTemplateColumns: "200px 200px 100px 100px 100px 50px",
     gap: theme.spacing(2),
+    marginLeft: 0,
   },
   root: {
     display: "grid",
@@ -83,6 +84,11 @@ function getShipStorageEfficiency(ship: ShipInput, distance: number): number {
   return ship.storage * getShipTravelSpeed(ship, distance);
 }
 
+// eslint-disable-next-line no-unused-vars
+function withDistance(cb: (distance: number) => any): string {
+  return [10, 100, 1000, 10000].map(cb).join("/");
+}
+
 const JSONOutput: React.FC = () => {
   const data = useThrottledFormState<FormData>();
   const display = React.useMemo(
@@ -108,9 +114,8 @@ const JSONOutput: React.FC = () => {
 const ShipEditor: React.FC<{ index: number }> = ({ index }) => {
   const { register, getValues } = useFormContext<FormData>();
   const ship = useThrottledFormState<ShipInput>(`ships.${index.toString()}`);
-  const distance = useThrottledFormState<number>("distance");
 
-  if (!ship || !distance) {
+  if (!ship) {
     return null;
   }
 
@@ -121,10 +126,16 @@ const ShipEditor: React.FC<{ index: number }> = ({ index }) => {
           {...register(`ships.${index}.name`)}
           defaultValue={getValues().ships[index].name}
         />
-        <div>Drive {getShipTravelSpeed(ship, distance).toFixed(2)}</div>
-        <div>Storage {getShipStorageEfficiency(ship, distance).toFixed(0)}</div>
+        <div>
+          Drive {withDistance((d) => getShipTravelSpeed(ship, d).toFixed(2))}
+        </div>
+        <div>
+          Storage{" "}
+          {withDistance((d) => getShipStorageEfficiency(ship, d).toFixed(0))}
+        </div>
       </CollapsibleSummary>
       <CollapsibleContent className={styles.editor}>
+        <div />
         <div className={styles.column}>
           <LabeledInput
             {...register(`ships.${index}.cruise`, {
@@ -197,7 +208,7 @@ const ShipEditor: React.FC<{ index: number }> = ({ index }) => {
 };
 
 const Editor: React.FC<{}> = () => {
-  const { getValues, control, register } = useFormContext<FormData>();
+  const { getValues, control } = useFormContext<FormData>();
   const { append } = useFieldArray({ control, name: "ships" });
   const [ships, setShips] = React.useState(getValues().ships);
 
@@ -221,11 +232,6 @@ const Editor: React.FC<{}> = () => {
       >
         + Add new
       </Button>
-      <LabeledInput
-        {...register("distance", { valueAsNumber: true, value: 100 })}
-        label="Distance"
-        type="number"
-      />
       {Object.values(ships).map((_, shipIndex) => (
         <ShipEditor index={shipIndex} key={shipIndex} />
       ))}
@@ -235,7 +241,7 @@ const Editor: React.FC<{}> = () => {
 
 export const Ships: React.FC = () => {
   const form = useForm<FormData>({
-    defaultValues: { ships: shipClasses, distance: 100 },
+    defaultValues: { ships: shipClasses },
   });
 
   return (

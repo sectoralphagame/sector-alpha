@@ -48,6 +48,8 @@ export function getDeltaAngle(
     : angleDiff;
 }
 
+const cruiseTimer = "cruise";
+
 function move(entity: Driveable, delta: number) {
   const entityPosition = entity.cp.position;
   const drive = entity.cp.drive;
@@ -56,7 +58,7 @@ function move(entity: Driveable, delta: number) {
 
   if (!drive.target) return;
 
-  if (drive.state === "warming" && entity.cooldowns.canUse("cruise")) {
+  if (drive.state === "warming" && entity.cooldowns.canUse(cruiseTimer)) {
     drive.state = "cruise";
   }
 
@@ -115,9 +117,9 @@ function move(entity: Driveable, delta: number) {
   if (
     canCruise &&
     drive.state === "maneuver" &&
-    entity.cooldowns.canUse("drive")
+    entity.cooldowns.canUse(cruiseTimer)
   ) {
-    entity.cooldowns.use("drive", drive.ttc);
+    entity.cooldowns.use(cruiseTimer, drive.ttc);
     startCruise(drive);
   }
 
