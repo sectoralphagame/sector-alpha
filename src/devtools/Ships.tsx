@@ -16,6 +16,7 @@ import {
   CollapsibleSummary,
 } from "../ui/components/Collapsible";
 import { Button } from "../ui/components/Button";
+import { limitMax } from "../utils/limit";
 
 type FormData = { ships: ShipInput[] };
 
@@ -51,6 +52,9 @@ const styles = nano.sheet({
     height: "100vh",
   },
   viewer: {
+    "json-viewer": {
+      "--background-color": "transparent",
+    },
     borderLeft: `1px solid ${theme.palette.default}`,
     padding: theme.spacing(1),
     overflowY: "scroll",
@@ -73,7 +77,33 @@ const styles = nano.sheet({
 });
 
 function getShipTravelTime(ship: ShipInput, distance: number): number {
-  return ship.ttc + distance / ship.cruise;
+  if (ship.acceleration <= 0) {
+    return NaN;
+  }
+
+  const resolution = distance / 100;
+  let moved = 0;
+  let speed = 0;
+  let cycles = 0;
+
+  // Inspired by Verlet integration
+  for (; moved < distance && cycles * resolution < ship.ttc; cycles++) {
+    moved += speed * resolution;
+    speed = limitMax(
+      speed + ship.maneuver * ship.acceleration * resolution,
+      ship.maneuver
+    );
+  }
+
+  for (; moved < distance; cycles++) {
+    moved += speed * resolution;
+    speed = limitMax(
+      speed + ship.cruise * ship.acceleration * resolution,
+      ship.cruise
+    );
+  }
+
+  return cycles * resolution;
 }
 
 function getShipTravelSpeed(ship: ShipInput, distance: number): number {
@@ -106,7 +136,8 @@ const JSONOutput: React.FC = () => {
       >
         Copy
       </Button>
-      {display}
+      {/* @ts-expect-error */}
+      <json-viewer data={display} />
     </div>
   );
 };
@@ -137,6 +168,17 @@ const ShipEditor: React.FC<{ index: number }> = ({ index }) => {
       <CollapsibleContent className={styles.editor}>
         <div />
         <div className={styles.column}>
+          <LabeledInput
+            {...register(`ships.${index}.acceleration`, {
+              valueAsNumber: true,
+            })}
+            label="Acceleration"
+            defaultValue={getValues().ships[index].acceleration}
+            type="number"
+            max={1}
+            min={0.01}
+            step={0.01}
+          />
           <LabeledInput
             {...register(`ships.${index}.cruise`, {
               valueAsNumber: true,
