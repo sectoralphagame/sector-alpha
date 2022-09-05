@@ -95,7 +95,7 @@ export class FacilityPlanningSystem extends System {
       ) {
         addFacilityModule(
           facility,
-          facilityModules.containerSmall.create(this.sim, facility)
+          facilityModules.containerMedium.create(this.sim, facility)
         );
         addFacilityModule(facility, facilityModule.create(this.sim, facility));
       }

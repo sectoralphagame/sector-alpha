@@ -41,7 +41,7 @@ export class BudgetPlanningSystem extends System {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("settle")) {
-      this.cooldowns.use("settle", 30 * 60);
+      this.cooldowns.use("settle", 5 * 60);
       this.query.get().forEach(settleBudget);
     }
   };

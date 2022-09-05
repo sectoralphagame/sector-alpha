@@ -28,7 +28,6 @@ import { MissingEntityError } from "../errors";
 import { setTexture } from "../components/render";
 import { openDb } from "../db";
 import { AsteroidSpawningSystem } from "../systems/asteroidSpawning";
-import { isTest } from "../settings";
 import { FacilityPlanningSystem } from "../systems/facilityPlanning";
 import { SectorStatisticGatheringSystem } from "../systems/sectorStatisticGathering";
 import { ShipPlanningSystem } from "../systems/shipPlanning";
@@ -93,14 +92,13 @@ export class Sim extends BaseSim {
       new SectorStatisticGatheringSystem(this),
       new InflationStatisticGatheringSystem(this),
     ];
-
-    if (!isTest) {
-      // Do not try to render anything while testing
-      // eslint-disable-next-line global-require
-      const { RenderingSystem } = require("../systems/rendering");
-      this.systems.push(new RenderingSystem(this));
-    }
   }
+
+  initRendering = () => {
+    // eslint-disable-next-line global-require
+    const { RenderingSystem } = require("../systems/rendering");
+    this.systems.push(new RenderingSystem(this));
+  };
 
   registerEntity = (entity: Entity) => {
     entity.id = this.entityIdCounter;

@@ -12,7 +12,7 @@ function getRandomWorld(
   numberOfIslands: number,
   numberOfFactions: number
 ): Promise<void> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     requestIdleCallback(() => {
       const islands = createIslands(sim, numberOfIslands);
       createConnections(sim, islands);
@@ -20,7 +20,11 @@ function getRandomWorld(
       const sectors = sim.queries.sectors.get();
       Array(sectors.length).fill(0).map(getRandomAsteroidField);
 
-      createFactions(sim, islands.slice(1), numberOfFactions);
+      try {
+        createFactions(sim, islands.slice(1), numberOfFactions);
+      } catch {
+        reject();
+      }
       sim.queries.ai
         .get()
         .filter((faction) => faction.cp.ai.type === "territorial")
@@ -40,6 +44,12 @@ function getRandomWorld(
             );
           })
         );
+
+      for (let i = 0; i < 3600; i++) {
+        sim.next(1);
+      }
+
+      sim.initRendering();
 
       resolve();
     });

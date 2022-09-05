@@ -42,7 +42,7 @@ const styles = nano.sheet({
       width: "100%",
     },
     display: "grid",
-    gridTemplateColumns: "200px 200px 100px 100px 100px 50px",
+    gridTemplateColumns: "200px 200px 240px 160px 100px 50px",
     gap: theme.spacing(2),
     marginLeft: 0,
   },
@@ -76,8 +76,15 @@ const styles = nano.sheet({
   },
 });
 
+/**
+ * Expressed in seconds
+ */
 function getShipTravelTime(ship: ShipInput, distance: number): number {
-  if (ship.acceleration <= 0) {
+  if (
+    [ship.acceleration, ship.cruise, ship.maneuver].some(
+      (v) => Number.isNaN(v) || v <= 0
+    )
+  ) {
     return NaN;
   }
 
@@ -106,12 +113,33 @@ function getShipTravelTime(ship: ShipInput, distance: number): number {
   return cycles * resolution;
 }
 
+/**
+ * Expressed in units per second
+ */
 function getShipTravelSpeed(ship: ShipInput, distance: number): number {
   return distance / getShipTravelTime(ship, distance);
 }
 
+/**
+ * Expressed in storage kilounits per hour
+ */
 function getShipStorageEfficiency(ship: ShipInput, distance: number): number {
-  return ship.storage * getShipTravelSpeed(ship, distance);
+  return (ship.storage / getShipTravelTime(ship, distance)) * 3.6;
+}
+
+/**
+ * Expressed in storage kilounits per hour
+ */
+function getShipMiningEfficiency(ship: ShipInput, distance: number): number {
+  if (ship.mining === 0) {
+    return 0;
+  }
+
+  return (
+    (ship.storage /
+      (getShipTravelTime(ship, distance) * 2 + ship.storage / ship.mining)) *
+    3.6
+  );
 }
 
 // eslint-disable-next-line no-unused-vars
@@ -158,11 +186,19 @@ const ShipEditor: React.FC<{ index: number }> = ({ index }) => {
           defaultValue={getValues().ships[index].name}
         />
         <div>
-          Drive {withDistance((d) => getShipTravelSpeed(ship, d).toFixed(2))}
+          Speed [su/s]
+          <br />
+          {withDistance((d) => getShipTravelSpeed(ship, d).toFixed(2))}
         </div>
         <div>
-          Storage{" "}
-          {withDistance((d) => getShipStorageEfficiency(ship, d).toFixed(0))}
+          Storage [Ksu/h]
+          <br />
+          {withDistance((d) => getShipStorageEfficiency(ship, d).toFixed(2))}
+        </div>
+        <div>
+          Mining [Ksu/h]
+          <br />
+          {withDistance((d) => getShipMiningEfficiency(ship, d).toFixed(2))}
         </div>
       </CollapsibleSummary>
       <CollapsibleContent className={styles.editor}>

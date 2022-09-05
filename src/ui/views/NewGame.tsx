@@ -34,13 +34,20 @@ export const NewGame: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
 
   const onSubmit = handleSubmit(async () => {
-    const sim = new Sim();
-    sim.init();
-
-    window.sim = sim;
-    setLoading(true);
-    await world(sim, getValues().islands, getValues().factions);
-    sim.start();
+    let sim: Sim;
+    let success = false;
+    while (!success) {
+      sim = new Sim();
+      sim.init();
+      window.sim = sim;
+      setLoading(true);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await world(sim, getValues().islands, getValues().factions);
+        success = true;
+      } catch {}
+    }
+    sim!.start();
     navigate("game");
   });
 
