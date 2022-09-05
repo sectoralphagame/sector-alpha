@@ -7,6 +7,7 @@ import {
   useFormContext,
   useFieldArray,
 } from "react-hook-form";
+import { Tab as HeadlessTab } from "@headlessui/react";
 import { nano, theme } from "../style";
 import { shipClasses, ShipInput } from "../world/ships";
 import { Input, LabeledInput } from "../ui/components/Input";
@@ -17,6 +18,7 @@ import {
 } from "../ui/components/Collapsible";
 import { Button } from "../ui/components/Button";
 import { limitMax } from "../utils/limit";
+import { Tab, TabList } from "../ui/components/Tabs";
 
 type FormData = { ships: ShipInput[] };
 
@@ -71,7 +73,10 @@ const styles = nano.sheet({
     width: "100%",
     marginBottom: theme.spacing(2),
   },
-  add: {
+  tabs: {
+    marginBottom: theme.spacing(2),
+  },
+  hr: {
     marginBottom: theme.spacing(2),
   },
 });
@@ -170,7 +175,7 @@ const JSONOutput: React.FC = () => {
   );
 };
 
-const ShipEditor: React.FC<{ index: number }> = ({ index }) => {
+const ShipFreightEditor: React.FC<{ index: number }> = ({ index }) => {
   const { register, getValues } = useFormContext<FormData>();
   const ship = useThrottledFormState<ShipInput>(`ships.${index.toString()}`);
 
@@ -292,27 +297,38 @@ const Editor: React.FC<{}> = () => {
 
   return (
     <div className={styles.editorContainer}>
-      <Button
-        onClick={() => {
-          append({
-            cruise: 0,
-            maneuver: 0,
-            rotary: 0,
-            ttc: 0,
-            name: "New Ship",
-            size: "medium",
-            storage: 0,
-            texture: "mCiv",
-          });
-          setShips(getValues().ships);
-        }}
-        className={styles.add}
-      >
-        + Add new
-      </Button>
-      {Object.values(ships).map((_, shipIndex) => (
-        <ShipEditor index={shipIndex} key={shipIndex} />
-      ))}
+      <HeadlessTab.Group>
+        <TabList className={styles.tabs}>
+          <Button
+            onClick={() => {
+              append({
+                cruise: 0,
+                maneuver: 0,
+                rotary: 0,
+                ttc: 0,
+                name: "New Ship",
+                size: "medium",
+                storage: 0,
+                texture: "mCiv",
+              });
+              setShips(getValues().ships);
+            }}
+          >
+            + Add new ship
+          </Button>
+          <Tab>Freight</Tab>
+        </TabList>
+
+        <hr className={styles.hr} />
+
+        <HeadlessTab.Panels>
+          <HeadlessTab.Panel>
+            {Object.values(ships).map((_, shipIndex) => (
+              <ShipFreightEditor index={shipIndex} key={shipIndex} />
+            ))}
+          </HeadlessTab.Panel>
+        </HeadlessTab.Panels>
+      </HeadlessTab.Group>
     </div>
   );
 };
