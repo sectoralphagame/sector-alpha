@@ -45,6 +45,7 @@ export const NewGame: React.FC = () => {
         // eslint-disable-next-line no-await-in-loop
         await world(sim, getValues().islands, getValues().factions);
         success = true;
+        // eslint-disable-next-line no-empty
       } catch {}
     }
     sim!.start();
