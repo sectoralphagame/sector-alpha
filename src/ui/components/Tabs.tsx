@@ -5,8 +5,9 @@ import { nano, theme } from "../../style";
 
 const styles = nano.sheet({
   list: {
-    display: "flex",
-    gap: theme.spacing(1),
+    borderRadius: "4px",
+    border: `1px solid ${theme.palette.default}`,
+    background: theme.palette.background,
   },
   tab: {
     "&:hover, &:focus": {
@@ -16,12 +17,11 @@ const styles = nano.sheet({
       background: "rgba(255, 255, 255, 0.3)",
     },
     appearance: "none",
-    background: "#000",
-    borderRadius: "4px",
-    border: `1px solid ${theme.palette.default}`,
+    background: "transparent",
+    border: "none",
     color: theme.palette.default,
     cursor: "pointer",
-    height: "32px",
+    height: "30px",
     padding: theme.spacing(1),
     textAlign: "center",
     whiteSpace: "nowrap",

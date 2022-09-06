@@ -1,4 +1,5 @@
 import React from "react";
+import SVG from "react-inlinesvg";
 import throttle from "lodash/throttle";
 import {
   useForm,
@@ -8,6 +9,7 @@ import {
   useFieldArray,
 } from "react-hook-form";
 import { Tab as HeadlessTab } from "@headlessui/react";
+import clsx from "clsx";
 import { nano, theme } from "../style";
 import { shipClasses, ShipInput } from "../world/ships";
 import { Input, LabeledInput } from "../ui/components/Input";
@@ -19,6 +21,8 @@ import {
 import { Button } from "../ui/components/Button";
 import { limitMax } from "../utils/limit";
 import { Tab, TabList } from "../ui/components/Tabs";
+import arrowLeftIcon from "../../assets/ui/arrow_left.svg";
+import { IconButton } from "../ui/components/IconButton";
 
 type FormData = { ships: ShipInput[] };
 
@@ -50,8 +54,11 @@ const styles = nano.sheet({
   },
   root: {
     display: "grid",
-    gridTemplateColumns: "1fr 300px",
+    gridTemplateColumns: "1fr 120px",
     height: "100vh",
+  },
+  rootExpanded: {
+    gridTemplateColumns: "1fr 350px",
   },
   viewer: {
     "json-viewer": {
@@ -69,15 +76,16 @@ const styles = nano.sheet({
     gap: theme.spacing(1),
     padding: `${theme.spacing(1)} 0`,
   },
-  copy: {
-    width: "100%",
-    marginBottom: theme.spacing(2),
-  },
-  tabs: {
-    marginBottom: theme.spacing(2),
+  toolbar: {
+    display: "flex",
+    gap: theme.spacing(1),
+    marginBottom: theme.spacing(1),
   },
   hr: {
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+  },
+  rotate: {
+    transform: "rotate(180deg)",
   },
 });
 
@@ -152,7 +160,10 @@ function withDistance(cb: (distance: number) => any): string {
   return [10, 100, 1000, 10000].map(cb).join("/");
 }
 
-const JSONOutput: React.FC = () => {
+const JSONOutput: React.FC<{ expanded: boolean; onExpand: () => void }> = ({
+  expanded,
+  onExpand,
+}) => {
   const data = useThrottledFormState<FormData>();
   const display = React.useMemo(
     () => (data ? JSON.stringify(Object.values(data!)[0]) : null),
@@ -161,16 +172,53 @@ const JSONOutput: React.FC = () => {
 
   return (
     <div className={styles.viewer}>
-      <Button
-        className={styles.copy}
-        onClick={() => {
-          navigator.clipboard.writeText(display!);
-        }}
-      >
-        Copy
-      </Button>
+      <div className={styles.toolbar}>
+        <IconButton onClick={onExpand}>
+          <SVG
+            src={arrowLeftIcon}
+            className={clsx({
+              [styles.rotate]: expanded,
+            })}
+          />
+        </IconButton>
+        <Button
+          onClick={() => {
+            navigator.clipboard.writeText(display!);
+          }}
+        >
+          Copy
+        </Button>
+      </div>
       {/* @ts-expect-error */}
-      <json-viewer data={display} />
+      {expanded && <json-viewer data={display} />}
+    </div>
+  );
+};
+
+const ShipGeneralEditor: React.FC<{ index: number }> = ({ index }) => {
+  const { register, getValues } = useFormContext<FormData>();
+  const ship = useThrottledFormState<ShipInput>(`ships.${index.toString()}`);
+
+  if (!ship) {
+    return null;
+  }
+
+  return (
+    <div className={styles.editor}>
+      <Input
+        {...register(`ships.${index}.name`)}
+        defaultValue={getValues().ships[index].name}
+      />
+      <LabeledInput
+        {...register(`ships.${index}.texture`)}
+        label="Texture"
+        defaultValue={getValues().ships[index].texture}
+      />
+      <LabeledInput
+        {...register(`ships.${index}.size`)}
+        label="Size"
+        defaultValue={getValues().ships[index].size}
+      />
     </div>
   );
 };
@@ -190,19 +238,11 @@ const ShipFreightEditor: React.FC<{ index: number }> = ({ index }) => {
           {...register(`ships.${index}.name`)}
           defaultValue={getValues().ships[index].name}
         />
+        <div>{withDistance((d) => getShipTravelSpeed(ship, d).toFixed(2))}</div>
         <div>
-          Speed [su/s]
-          <br />
-          {withDistance((d) => getShipTravelSpeed(ship, d).toFixed(2))}
-        </div>
-        <div>
-          Storage [Ksu/h]
-          <br />
           {withDistance((d) => getShipStorageEfficiency(ship, d).toFixed(2))}
         </div>
         <div>
-          Mining [Ksu/h]
-          <br />
           {withDistance((d) => getShipMiningEfficiency(ship, d).toFixed(2))}
         </div>
       </CollapsibleSummary>
@@ -271,20 +311,6 @@ const ShipFreightEditor: React.FC<{ index: number }> = ({ index }) => {
             type="number"
           />
         </div>
-        <div className={styles.column}>
-          <LabeledInput
-            {...register(`ships.${index}.texture`)}
-            label="Texture"
-            defaultValue={getValues().ships[index].texture}
-          />
-        </div>
-        <div className={styles.column}>
-          <LabeledInput
-            {...register(`ships.${index}.size`)}
-            label="Size"
-            defaultValue={getValues().ships[index].size}
-          />
-        </div>
       </CollapsibleContent>
     </Collapsible>
   );
@@ -298,7 +324,7 @@ const Editor: React.FC<{}> = () => {
   return (
     <div className={styles.editorContainer}>
       <HeadlessTab.Group>
-        <TabList className={styles.tabs}>
+        <div className={styles.toolbar}>
           <Button
             onClick={() => {
               append({
@@ -316,13 +342,27 @@ const Editor: React.FC<{}> = () => {
           >
             + Add new ship
           </Button>
-          <Tab>Freight</Tab>
-        </TabList>
+          <TabList>
+            <Tab>General</Tab>
+            <Tab>Freight</Tab>
+          </TabList>
+        </div>
 
         <hr className={styles.hr} />
 
         <HeadlessTab.Panels>
           <HeadlessTab.Panel>
+            {Object.values(ships).map((_, shipIndex) => (
+              <ShipGeneralEditor index={shipIndex} key={shipIndex} />
+            ))}
+          </HeadlessTab.Panel>
+          <HeadlessTab.Panel>
+            <div className={styles.editor}>
+              <div />
+              <div>Speed [su/s]</div>
+              <div>Storage [Ksu/h]</div>
+              <div>Mining [Ksu/h]</div>
+            </div>
             {Object.values(ships).map((_, shipIndex) => (
               <ShipFreightEditor index={shipIndex} key={shipIndex} />
             ))}
@@ -337,12 +377,20 @@ export const Ships: React.FC = () => {
   const form = useForm<FormData>({
     defaultValues: { ships: shipClasses },
   });
+  const [expanded, setExpanded] = React.useState(false);
 
   return (
     <FormProvider {...form}>
-      <div className={styles.root}>
+      <div
+        className={clsx(styles.root, {
+          [styles.rootExpanded]: expanded,
+        })}
+      >
         <Editor />
-        <JSONOutput />
+        <JSONOutput
+          expanded={expanded}
+          onExpand={() => setExpanded(!expanded)}
+        />
       </div>
     </FormProvider>
   );
