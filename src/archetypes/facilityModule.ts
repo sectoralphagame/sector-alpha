@@ -144,6 +144,11 @@ export const facilityModules = {
     storage: 4000,
     time: undefined,
   }),
+  containerMedium: createFacilityModuleTemplate({
+    name: "Medium Container",
+    storage: 15000,
+    time: undefined,
+  }),
   teleport: {
     create: (
       sim: Sim,

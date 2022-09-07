@@ -43,6 +43,7 @@ export const theme = {
       ore: "#ff5c7a",
       silica: "#8f8f8f",
     } as Record<MineableCommodity, string>,
+    background: "#000000",
     default: "#FFFFFF",
     text: (v: 1 | 2 | 3 | 4 | 5) => Color.hsl(0, 0, 100 - (v - 1) * 20).hex(),
     disabled: Color.hsl(0, 0, 70).hex(),
@@ -85,5 +86,12 @@ nano.global({
   "#canvasRoot": {
     width: "100%",
     height: "100vh",
+  },
+  "input::-webkit-outer-spin-button, input::-webkit-inner-spin-button": {
+    appearance: "none",
+    margin: 0,
+  },
+  "input[type=number]": {
+    appearance: "textfield",
   },
 });
