@@ -2,6 +2,7 @@ import { add, Matrix, matrix, multiply, norm, subtract } from "mathjs";
 import { clearTarget, startCruise, stopCruise } from "../components/drive";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
+import { limitMax } from "../utils/limit";
 import { Query } from "./query";
 import { System } from "./system";
 
@@ -87,8 +88,13 @@ function move(entity: Driveable, delta: number) {
     // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
     entityPosition.angle - Math.PI / 2
   );
+  const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
+  drive.currentSpeed = limitMax(
+    drive.currentSpeed + maxSpeed * drive.acceleration * delta,
+    maxSpeed
+  );
+
   const targetAngle = Math.atan2(path.get([1]), path.get([0]));
-  const speed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
   const distance = norm(path);
   const angleOffset = Math.abs(targetAngle - entityAngle);
   const canCruise =
@@ -100,7 +106,7 @@ function move(entity: Driveable, delta: number) {
     norm(path) > 0
       ? (multiply(
           moveVec,
-          angleOffset < Math.PI / 8 ? speed * delta : 0
+          angleOffset < Math.PI / 8 ? drive.currentSpeed * delta : 0
         ) as Matrix)
       : matrix([0, 0]);
   const dAngle = getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);

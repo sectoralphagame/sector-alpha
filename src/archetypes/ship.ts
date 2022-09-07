@@ -45,7 +45,9 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       default: initial.mining ? "mine" : "trade",
     })
     .addComponent(
-      createDrive(pick(initial, ["rotary", "cruise", "ttc", "maneuver"]))
+      createDrive(
+        pick(initial, ["acceleration", "rotary", "cruise", "ttc", "maneuver"])
+      )
     )
     .addComponent({ name: "name", value: initial.name })
     .addComponent({

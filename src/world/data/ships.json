@@ -8,7 +8,8 @@
     "cruise": 4,
     "maneuver": 0.3,
     "rotary": 86,
-    "ttc": 7
+    "ttc": 7,
+    "acceleration": 0.1
   },
   {
     "name": "Courier B",
@@ -19,7 +20,8 @@
     "cruise": 6,
     "maneuver": 0.55,
     "rotary": 117,
-    "ttc": 1
+    "ttc": 1,
+    "acceleration": 0.1
   },
   {
     "name": "Freighter A",
@@ -30,7 +32,8 @@
     "cruise": 1,
     "maneuver": 0.13,
     "rotary": 54,
-    "ttc": 3.3
+    "ttc": 3.3,
+    "acceleration": 0.1
   },
   {
     "name": "Freighter B",
@@ -41,7 +44,8 @@
     "cruise": 0.7,
     "maneuver": 0.05,
     "rotary": 31,
-    "ttc": 22
+    "ttc": 22,
+    "acceleration": 0.1
   },
   {
     "name": "Large Freighter A",
@@ -52,7 +56,8 @@
     "cruise": 1.1,
     "maneuver": 0.1,
     "rotary": 11,
-    "ttc": 13
+    "ttc": 13,
+    "acceleration": 0.1
   },
   {
     "name": "Large Freighter B",
@@ -63,7 +68,8 @@
     "cruise": 0.9,
     "maneuver": 0.09,
     "rotary": 9,
-    "ttc": 15
+    "ttc": 15,
+    "acceleration": 0.1
   },
   {
     "name": "Miner A",
@@ -74,7 +80,8 @@
     "cruise": 2,
     "maneuver": 0.15,
     "rotary": 54,
-    "ttc": 6
+    "ttc": 6,
+    "acceleration": 0.1
   },
   {
     "name": "Miner B",
@@ -85,6 +92,7 @@
     "cruise": 3,
     "maneuver": 0.3,
     "rotary": 68,
-    "ttc": 3.5
+    "ttc": 3.5,
+    "acceleration": 0.1
   }
 ]

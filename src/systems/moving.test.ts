@@ -38,7 +38,7 @@ describe("Ship", () => {
       }).id
     );
 
-    for (let index = 0; index < 3; index++) {
+    for (let index = 0; index < 5; index++) {
       movingSystem.exec(1);
     }
 

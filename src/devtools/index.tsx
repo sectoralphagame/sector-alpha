@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { Ships } from "./Ships";
+import "@alenaksu/json-viewer";
 
 export const DevTools: React.FC = () => (
   <Routes>

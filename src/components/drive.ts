@@ -4,6 +4,10 @@ import { BaseComponent } from "./component";
 export type Target = RequireComponent<"position">;
 
 export interface ShipDriveProps {
+  /**
+   * Expressed in percent of max speed per second
+   */
+  acceleration: number;
   maneuver: number;
   cruise: number;
   /**
@@ -17,6 +21,11 @@ export interface ShipDriveProps {
 }
 
 export interface Drive extends BaseComponent<"drive"> {
+  /**
+   * Expressed in percent of max speed per second
+   */
+  acceleration: number;
+  currentSpeed: number;
   maneuver: number;
   cruise: number;
   /**
@@ -36,6 +45,7 @@ export interface Drive extends BaseComponent<"drive"> {
 export function createDrive(input: ShipDriveProps): Drive {
   return {
     ...input,
+    currentSpeed: 0,
     rotary: (input.rotary * Math.PI) / 180,
     state: "maneuver",
     target: null,
@@ -49,6 +59,7 @@ export function startCruise(drive: Drive) {
 }
 
 export function stopCruise(drive: Drive) {
+  drive.currentSpeed = drive.maneuver;
   drive.state = "maneuver";
 }
 

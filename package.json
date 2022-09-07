@@ -67,6 +67,7 @@
     ]
   },
   "dependencies": {
+    "@alenaksu/json-viewer": "^1.0.1",
     "@fxts/core": "^0.9.0",
     "@pixi-essentials/svg": "^1.1.5",
     "@pixi/graphics": "^6.3.0",
