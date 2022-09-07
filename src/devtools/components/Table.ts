@@ -31,6 +31,7 @@ export const Table = nano.jsx("table", {
   },
   borderCollapse: "collapse",
   tableLayout: "fixed",
+  width: "100%",
 });
 
 export const TableCell: React.FC<

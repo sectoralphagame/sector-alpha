@@ -12,7 +12,7 @@ import { Button } from "../../ui/components/Button";
 import { Tab, TabList } from "../../ui/components/Tabs";
 import { FormData } from "./utils";
 import { styles } from "./styles";
-import { ShipGeneralEditor } from "./General";
+import { GeneralEditor } from "./General";
 import { FreightEditor } from "./Freight";
 import { JSONOutput } from "./JSONOutput";
 
@@ -52,9 +52,7 @@ const Editor: React.FC<{}> = () => {
 
         <HeadlessTab.Panels>
           <HeadlessTab.Panel>
-            {Object.values(ships).map((_, shipIndex) => (
-              <ShipGeneralEditor index={shipIndex} key={shipIndex} />
-            ))}
+            <GeneralEditor ships={ships} />
           </HeadlessTab.Panel>
           <HeadlessTab.Panel>
             <FreightEditor ships={ships} />

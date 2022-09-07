@@ -137,7 +137,7 @@ const ShipFreightEditor: React.FC<{ index: number }> = ({ index }) => {
 };
 
 export const FreightEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
-  <Table className={styles.table}>
+  <Table>
     <colgroup>
       <col style={{ width: "48px" }} />
       <col style={{ width: "200px" }} />
