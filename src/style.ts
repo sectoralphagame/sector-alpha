@@ -49,6 +49,7 @@ export const theme = {
   },
   typography: {
     button: `${baseFontSize - 2}px`,
+    label: `${baseFontSize - 2}px`,
     default: `${baseFontSize}px`,
     header: `${Math.ceil(baseFontSize * 1.3 ** 2)}px`,
     header2: `${Math.ceil(baseFontSize * 1.3)}px`,

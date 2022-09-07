@@ -1,6 +1,6 @@
 import { sum } from "mathjs";
 import sortBy from "lodash/sortBy";
-import { createShip } from "../archetypes/ship";
+import { createShip, InitialShipInput } from "../archetypes/ship";
 import { mineableCommodities } from "../economy/commodity";
 import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
@@ -29,7 +29,9 @@ export function getFreighterTemplate() {
   return pickRandom(shipClasses.filter((s) => !s.mining && s.size === "small"));
 }
 
-function requestShip(type: "mining" | "trading") {
+export function requestShip(
+  type: "mining" | "trading"
+): Omit<InitialShipInput, "position" | "owner" | "sector"> {
   switch (type) {
     case "mining":
       return shipClasses.filter((s) => s.mining)[Math.random() > 0.5 ? 1 : 0];

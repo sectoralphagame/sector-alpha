@@ -17,6 +17,7 @@ const styles = nano.sheet({
     marginBottom: theme.spacing(1),
     outline: 0,
     paddingBottom: theme.spacing(1),
+    paddingTop: theme.spacing(1),
     width: "100%",
   },
 });
