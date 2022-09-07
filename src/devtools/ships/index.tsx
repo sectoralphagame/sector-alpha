@@ -13,7 +13,7 @@ import { Tab, TabList } from "../../ui/components/Tabs";
 import { FormData } from "./utils";
 import { styles } from "./styles";
 import { ShipGeneralEditor } from "./General";
-import { ShipFreightEditor } from "./Freight";
+import { FreightEditor } from "./Freight";
 import { JSONOutput } from "./JSONOutput";
 
 const Editor: React.FC<{}> = () => {
@@ -57,15 +57,7 @@ const Editor: React.FC<{}> = () => {
             ))}
           </HeadlessTab.Panel>
           <HeadlessTab.Panel>
-            <div className={styles.editor}>
-              <div />
-              <div>Speed [su/s]</div>
-              <div>Storage [Ksu/h]</div>
-              <div>Mining [Ksu/h]</div>
-            </div>
-            {Object.values(ships).map((_, shipIndex) => (
-              <ShipFreightEditor index={shipIndex} key={shipIndex} />
-            ))}
+            <FreightEditor ships={ships} />
           </HeadlessTab.Panel>
         </HeadlessTab.Panels>
       </HeadlessTab.Group>

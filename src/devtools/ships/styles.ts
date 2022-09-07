@@ -5,14 +5,16 @@ export const styles = nano.sheet({
     overflowY: "scroll",
     padding: theme.spacing(1),
   },
-  editor: {
-    "& input": {
-      width: "100%",
-    },
+  freightExpanded: {
     display: "grid",
-    gridTemplateColumns: "200px 200px 240px 160px 100px 50px",
+    gridTemplateColumns: "1fr 1fr",
+    gap: theme.spacing(3),
+    padding: `${theme.spacing(3)} 0`,
+  },
+  freightExpandedForm: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
     gap: theme.spacing(2),
-    marginLeft: 0,
   },
   root: {
     display: "grid",
@@ -48,5 +50,11 @@ export const styles = nano.sheet({
   },
   rotate: {
     transform: "rotate(180deg)",
+  },
+  rowExpander: {
+    transform: "rotate(-90deg)",
+  },
+  rowExpanderToggled: {
+    transform: "rotate(90deg)",
   },
 });

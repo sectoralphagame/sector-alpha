@@ -1,11 +1,10 @@
 import React from "react";
+import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleSummary,
-} from "../../ui/components/Collapsible";
-import { Input, LabeledInput } from "../../ui/components/Input";
+import clsx from "clsx";
+import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
+import { LabeledInput } from "../../ui/components/Input";
+import { Table, TableCell, TableHeader } from "../components/Table";
 import { ShipInput } from "../../world/ships";
 import { styles } from "./styles";
 import {
@@ -16,96 +15,150 @@ import {
   useThrottledFormState,
   withDistance,
 } from "./utils";
+import { IconButton } from "../../ui/components/IconButton";
+import { Card, CardHeader } from "../../ui/components/Card";
 
-export const ShipFreightEditor: React.FC<{ index: number }> = ({ index }) => {
+const ShipFreightEditor: React.FC<{ index: number }> = ({ index }) => {
   const { register, getValues } = useFormContext<FormData>();
   const ship = useThrottledFormState<ShipInput>(`ships.${index.toString()}`);
+  const [expanded, setExpanded] = React.useState(false);
 
   if (!ship) {
     return null;
   }
 
   return (
-    <Collapsible>
-      <CollapsibleSummary className={styles.editor}>
-        <Input
-          {...register(`ships.${index}.name`)}
-          defaultValue={getValues().ships[index].name}
-        />
-        <div>{withDistance((d) => getShipTravelSpeed(ship, d).toFixed(2))}</div>
-        <div>
+    <>
+      <tr>
+        <TableCell>
+          <IconButton onClick={() => setExpanded(!expanded)}>
+            <SVG
+              src={arrowLeftIcon}
+              className={clsx(styles.rowExpander, {
+                [styles.rowExpanderToggled]: expanded,
+              })}
+            />
+          </IconButton>
+        </TableCell>
+        <TableCell>
+          <input
+            {...register(`ships.${index}.name`)}
+            defaultValue={getValues().ships[index].name}
+          />
+        </TableCell>
+        <TableCell>
+          {withDistance((d) => getShipTravelSpeed(ship, d).toFixed(2))}
+        </TableCell>
+        <TableCell>
           {withDistance((d) => getShipStorageEfficiency(ship, d).toFixed(2))}
-        </div>
-        <div>
+        </TableCell>
+        <TableCell>
           {withDistance((d) => getShipMiningEfficiency(ship, d).toFixed(2))}
-        </div>
-      </CollapsibleSummary>
-      <CollapsibleContent className={styles.editor}>
-        <div />
-        <div className={styles.column}>
-          <LabeledInput
-            {...register(`ships.${index}.acceleration`, {
-              valueAsNumber: true,
-            })}
-            label="Acceleration"
-            defaultValue={getValues().ships[index].acceleration}
-            type="number"
-            max={1}
-            min={0.01}
-            step={0.01}
-          />
-          <LabeledInput
-            {...register(`ships.${index}.cruise`, {
-              valueAsNumber: true,
-            })}
-            label="Cruise"
-            defaultValue={getValues().ships[index].cruise}
-            type="number"
-          />
-          <LabeledInput
-            {...register(`ships.${index}.maneuver`, {
-              valueAsNumber: true,
-            })}
-            label="Maneuver"
-            defaultValue={getValues().ships[index].maneuver}
-            type="number"
-          />
-          <LabeledInput
-            {...register(`ships.${index}.rotary`, {
-              valueAsNumber: true,
-            })}
-            label="Rotary"
-            defaultValue={getValues().ships[index].rotary}
-            type="number"
-          />
-          <LabeledInput
-            {...register(`ships.${index}.ttc`, { valueAsNumber: true })}
-            label="Time to cruise"
-            defaultValue={getValues().ships[index].ttc}
-            type="number"
-          />
-        </div>
-        <div className={styles.column}>
-          <LabeledInput
-            {...register(`ships.${index}.storage`, {
-              valueAsNumber: true,
-            })}
-            label="Storage"
-            defaultValue={getValues().ships[index].storage}
-            type="number"
-          />
-        </div>
-        <div className={styles.column}>
-          <LabeledInput
-            {...register(`ships.${index}.mining`, {
-              valueAsNumber: true,
-            })}
-            label="Mining"
-            defaultValue={getValues().ships[index].mining}
-            type="number"
-          />
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
+        </TableCell>
+      </tr>
+      {expanded && (
+        <tr>
+          <TableCell />
+          <TableCell colSpan={4}>
+            <div className={styles.freightExpanded}>
+              <Card>
+                <CardHeader>Drive</CardHeader>
+                <div className={styles.freightExpandedForm}>
+                  <LabeledInput
+                    {...register(`ships.${index}.acceleration`, {
+                      valueAsNumber: true,
+                    })}
+                    label="Acceleration"
+                    defaultValue={getValues().ships[index].acceleration}
+                    type="number"
+                    max={1}
+                    min={0.01}
+                    step={0.01}
+                  />
+                  <LabeledInput
+                    {...register(`ships.${index}.cruise`, {
+                      valueAsNumber: true,
+                    })}
+                    label="Cruise"
+                    defaultValue={getValues().ships[index].cruise}
+                    type="number"
+                  />
+                  <LabeledInput
+                    {...register(`ships.${index}.maneuver`, {
+                      valueAsNumber: true,
+                    })}
+                    label="Maneuver"
+                    defaultValue={getValues().ships[index].maneuver}
+                    type="number"
+                  />
+                  <LabeledInput
+                    {...register(`ships.${index}.rotary`, {
+                      valueAsNumber: true,
+                    })}
+                    label="Rotary"
+                    defaultValue={getValues().ships[index].rotary}
+                    type="number"
+                  />
+                  <LabeledInput
+                    {...register(`ships.${index}.ttc`, { valueAsNumber: true })}
+                    label="Time to cruise"
+                    defaultValue={getValues().ships[index].ttc}
+                    type="number"
+                  />
+                </div>
+              </Card>
+              <Card>
+                <CardHeader>Miscellaneous</CardHeader>
+                <div className={styles.freightExpandedForm}>
+                  <LabeledInput
+                    {...register(`ships.${index}.storage`, {
+                      valueAsNumber: true,
+                    })}
+                    label="Storage"
+                    defaultValue={getValues().ships[index].storage}
+                    type="number"
+                  />
+                  <LabeledInput
+                    {...register(`ships.${index}.mining`, {
+                      valueAsNumber: true,
+                    })}
+                    label="Mining"
+                    defaultValue={getValues().ships[index].mining}
+                    type="number"
+                  />
+                </div>
+              </Card>
+            </div>
+          </TableCell>
+        </tr>
+      )}
+    </>
   );
 };
+
+export const FreightEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
+  <Table className={styles.table}>
+    <colgroup>
+      <col style={{ width: "48px" }} />
+      <col style={{ width: "200px" }} />
+      <col style={{ width: "250px" }} />
+      <col style={{ width: "250px" }} />
+      <col style={{ width: "250px" }} />
+      <col />
+    </colgroup>
+    <thead>
+      <tr>
+        {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+        <th colSpan={2} />
+        <TableHeader>Speed [su/s]</TableHeader>
+        <TableHeader>Storage [Ksu/h]</TableHeader>
+        <TableHeader>Mining [Ksu/h]</TableHeader>
+      </tr>
+    </thead>
+    <tbody>
+      {Object.values(ships).map((_, shipIndex) => (
+        <ShipFreightEditor index={shipIndex} key={shipIndex} />
+      ))}
+    </tbody>
+  </Table>
+);

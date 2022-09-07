@@ -87,4 +87,11 @@ nano.global({
     width: "100%",
     height: "100vh",
   },
+  "input::-webkit-outer-spin-button, input::-webkit-inner-spin-button": {
+    appearance: "none",
+    margin: 0,
+  },
+  "input[type=number]": {
+    appearance: "textfield",
+  },
 });
