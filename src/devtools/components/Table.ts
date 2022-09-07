@@ -6,13 +6,11 @@ export const Table = nano.jsx("table", {
     borderBottom: `1px ${theme.palette.disabled} solid`,
   },
   "tbody td, thead th": {
-    padding: `${theme.spacing(0.5)} ${theme.spacing(1)}`,
+    padding: `${theme.spacing(0.75)} ${theme.spacing(1)}`,
+    position: "relative",
   },
   "tbody tr:not(.no-border):last-child": {
     borderBottom: "none",
-  },
-  "tbody td": {
-    padding: `${theme.spacing(0.75)} ${theme.spacing(1)}`,
   },
   "tbody input": {
     "&:focus": {

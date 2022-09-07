@@ -140,7 +140,7 @@ export const FreightEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
   <Table>
     <colgroup>
       <col style={{ width: "48px" }} />
-      <col style={{ width: "200px" }} />
+      <col style={{ width: "250px" }} />
       <col style={{ width: "250px" }} />
       <col style={{ width: "250px" }} />
       <col style={{ width: "250px" }} />

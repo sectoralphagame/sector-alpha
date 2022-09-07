@@ -57,4 +57,12 @@ export const styles = nano.sheet({
   rowExpanderToggled: {
     transform: "rotate(90deg)",
   },
+  textureLabel: {
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  texturePreview: {
+    height: "16px",
+    width: "16px",
+  },
 });
