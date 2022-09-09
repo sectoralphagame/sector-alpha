@@ -15,6 +15,7 @@ import { styles } from "./styles";
 import { GeneralEditor } from "./General";
 import { FreightEditor } from "./Freight";
 import { JSONOutput } from "./JSONOutput";
+import { BuildEditor } from "./Build";
 
 const Editor: React.FC<{}> = () => {
   const { getValues, control } = useFormContext<FormData>();
@@ -45,6 +46,7 @@ const Editor: React.FC<{}> = () => {
           <TabList>
             <Tab>General</Tab>
             <Tab>Freight</Tab>
+            <Tab>Build</Tab>
           </TabList>
         </div>
 
@@ -56,6 +58,9 @@ const Editor: React.FC<{}> = () => {
           </HeadlessTab.Panel>
           <HeadlessTab.Panel>
             <FreightEditor ships={ships} />
+          </HeadlessTab.Panel>
+          <HeadlessTab.Panel>
+            <BuildEditor ships={ships} />
           </HeadlessTab.Panel>
         </HeadlessTab.Panels>
       </HeadlessTab.Group>

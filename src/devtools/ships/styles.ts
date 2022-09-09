@@ -65,4 +65,10 @@ export const styles = nano.sheet({
     height: "16px",
     width: "16px",
   },
+  buildExpanded: {
+    display: "grid",
+    gridTemplateColumns: "200px 80px 32px",
+    gap: theme.spacing(1),
+    padding: `${theme.spacing(3)} 0`,
+  },
 });
