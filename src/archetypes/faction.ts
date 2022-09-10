@@ -7,7 +7,12 @@ import { createBudget } from "../components/budget";
 
 let factionCounter = 0;
 
-export const factionComponents = ["color", "budget", "name"] as const;
+export const factionComponents = [
+  "color",
+  "blueprints",
+  "budget",
+  "name",
+] as const;
 
 export type FactionComponent = typeof factionComponents[number];
 export type Faction = RequireComponent<FactionComponent>;
@@ -30,7 +35,8 @@ export function createFaction(name: string, sim: Sim) {
         .toString(),
     })
     .addComponent(createBudget())
-    .addComponent({ name: "name", value: name });
+    .addComponent({ name: "name", value: name })
+    .addComponent({ name: "blueprints", ships: [] });
   factionCounter++;
 
   return entity as Faction;

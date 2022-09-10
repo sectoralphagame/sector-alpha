@@ -6,38 +6,18 @@ import { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { pickRandom } from "../utils/generators";
 import { perCommodity } from "../utils/perCommodity";
-import { shipClasses } from "../world/ships";
+import { ShipRole } from "../world/ships";
 import { System } from "./system";
-import { faction as asFaction } from "../archetypes/faction";
+import { faction as asFaction, Faction } from "../archetypes/faction";
 import { sector as asSector } from "../archetypes/sector";
 
-export function getFreighterTemplate() {
-  const rnd = Math.random();
-
-  if (rnd > 0.9) {
-    return pickRandom(
-      shipClasses.filter((s) => !s.mining && s.size === "large")
-    );
-  }
-
-  if (rnd > 0.1) {
-    return pickRandom(
-      shipClasses.filter((s) => !s.mining && s.size === "medium")
-    );
-  }
-
-  return pickRandom(shipClasses.filter((s) => !s.mining && s.size === "small"));
-}
-
 export function requestShip(
-  type: "mining" | "trading"
+  faction: Faction,
+  role: ShipRole
 ): Omit<InitialShipInput, "position" | "owner" | "sector"> {
-  switch (type) {
-    case "mining":
-      return shipClasses.filter((s) => s.mining)[Math.random() > 0.5 ? 1 : 0];
-    default:
-      return getFreighterTemplate();
-  }
+  return pickRandom(
+    faction.cp.blueprints.ships.filter((ship) => ship.role === role)
+  );
 }
 
 export class ShipPlanningSystem extends System {
@@ -136,7 +116,7 @@ export class ShipPlanningSystem extends System {
                   spareTraders.length > 0
                     ? spareTraders.pop()!
                     : createShip(this.sim, {
-                        ...requestShip("trading"),
+                        ...requestShip(faction, "transport"),
                         position: facility.cp.position.coord.clone(),
                         owner: asFaction(
                           this.sim.getOrThrow(facility.cp.owner!.id)
@@ -193,7 +173,7 @@ export class ShipPlanningSystem extends System {
                 spareMiners.length > 0
                   ? spareMiners.pop()!
                   : createShip(this.sim, {
-                      ...requestShip("mining"),
+                      ...requestShip(faction, "mining"),
                       position: facility.cp.position.coord.clone(),
                       owner: asFaction(
                         this.sim.getOrThrow(facility.cp.owner!.id)

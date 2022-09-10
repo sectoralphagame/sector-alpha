@@ -29,11 +29,13 @@ import { SectorStats } from "./sectorStats";
 import { SystemManager } from "./systemManager";
 import { InflationStats } from "./inflationStats";
 import { Shipyard } from "./shipyard";
+import { Blueprints } from "./blueprints";
 
 export interface CoreComponents {
   ai: Ai;
   asteroidSpawn: AsteroidSpawn;
   autoOrder: AutoOrder;
+  blueprints: Blueprints;
   budget: Budget;
   children: Children;
   color: Color;

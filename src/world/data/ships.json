@@ -13,7 +13,8 @@
     "build": {
       "cost": { "electronics": 15, "hullPlates": 400, "fuel": 200 },
       "time": 60
-    }
+    },
+    "role": "transport"
   },
   {
     "name": "Courier B",
@@ -29,7 +30,8 @@
     "build": {
       "cost": { "hullPlates": 430, "electronics": 17, "fuel": 220 },
       "time": 60
-    }
+    },
+    "role": "transport"
   },
   {
     "name": "Freighter A",
@@ -45,7 +47,8 @@
     "build": {
       "cost": { "hullPlates": 3400, "electronics": 85, "fuel": 1200 },
       "time": 60
-    }
+    },
+    "role": "transport"
   },
   {
     "name": "Freighter B",
@@ -61,7 +64,8 @@
     "build": {
       "cost": { "fuel": 3500, "hullPlates": 95, "electronics": 1100 },
       "time": 60
-    }
+    },
+    "role": "transport"
   },
   {
     "name": "Large Freighter A",
@@ -77,7 +81,8 @@
     "build": {
       "cost": { "hullPlates": 14000, "electronics": 590, "fuel": 7600 },
       "time": 60
-    }
+    },
+    "role": "transport"
   },
   {
     "name": "Large Freighter B",
@@ -93,7 +98,8 @@
     "build": {
       "cost": { "hullPlates": 16500, "electronics": 640, "fuel": 6900 },
       "time": 60
-    }
+    },
+    "role": "transport"
   },
   {
     "name": "Miner A",
@@ -109,7 +115,8 @@
     "build": {
       "cost": { "hullPlates": 3000, "electronics": 130, "fuel": 850 },
       "time": 60
-    }
+    },
+    "role": "mining"
   },
   {
     "name": "Miner B",
@@ -125,6 +132,7 @@
     "build": {
       "cost": { "hullPlates": 3100, "electronics": 110, "fuel": 800 },
       "time": 60
-    }
+    },
+    "role": "mining"
   }
 ]

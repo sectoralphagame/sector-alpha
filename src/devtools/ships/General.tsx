@@ -2,7 +2,7 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import { Table, TableCell, TableHeader } from "../components/Table";
-import { ShipInput } from "../../world/ships";
+import { ShipInput, shipRoles } from "../../world/ships";
 import { styles } from "./styles";
 import { FormData, useThrottledFormState } from "./utils";
 import { Textures, textures } from "../../components/render";
@@ -46,6 +46,21 @@ const ShipGeneralEditor: React.FC<{ index: number }> = ({ index }) => {
       </TableCell>
       <TableCell>
         <Select
+          value={getValues().ships[index].role}
+          onChange={(value) => setValue(`ships.${index}.role`, value)}
+        >
+          <SelectButton>{getValues().ships[index].role}</SelectButton>
+          <SelectOptions>
+            {shipRoles.map((role) => (
+              <SelectOption key={role} value={role}>
+                {role}
+              </SelectOption>
+            ))}
+          </SelectOptions>
+        </Select>
+      </TableCell>
+      <TableCell>
+        <Select
           value={getValues().ships[index].texture}
           onChange={(value: keyof Textures) =>
             setValue(`ships.${index}.texture`, value)
@@ -84,6 +99,7 @@ export const GeneralEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
       <col style={{ width: "48px" }} />
       <col style={{ width: "250px" }} />
       <col style={{ width: "200px" }} />
+      <col style={{ width: "150px" }} />
       <col style={{ width: "200px" }} />
       <col />
     </colgroup>
@@ -92,6 +108,7 @@ export const GeneralEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
         {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
         <th colSpan={2} />
         <TableHeader>Size</TableHeader>
+        <TableHeader>Role</TableHeader>
         <TableHeader>Texture</TableHeader>
       </tr>
     </thead>

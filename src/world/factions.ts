@@ -3,10 +3,12 @@ import { createFaction } from "../archetypes/faction";
 import { Sector, sectorSize } from "../archetypes/sector";
 import { createShip } from "../archetypes/ship";
 import { setMoney } from "../components/budget";
+import { DockSize } from "../components/dockable";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { Sim } from "../sim";
 import { requestShip } from "../systems/shipPlanning";
-import { pickRandomWithIndex } from "../utils/generators";
+import { pickRandom, pickRandomWithIndex } from "../utils/generators";
+import { shipClasses } from "./ships";
 
 function createTerritorialFaction(index: number, sim: Sim) {
   const char = String.fromCharCode(index + 65);
@@ -18,6 +20,18 @@ function createTerritorialFaction(index: number, sim: Sim) {
     priceModifier: random(0.002, 0.02),
   });
   setMoney(faction.cp.budget, 1e8);
+  faction.cp.blueprints.ships = [
+    ...(["small", "medium", "large"] as DockSize[]).map((size) =>
+      pickRandom(
+        shipClasses.filter((sc) => sc.role === "transport" && sc.size === size)
+      )
+    ),
+    ...(["medium"] as DockSize[]).map((size) =>
+      pickRandom(
+        shipClasses.filter((sc) => sc.role === "mining" && sc.size === size)
+      )
+    ),
+  ];
 
   return faction;
 }
@@ -32,6 +46,13 @@ function createTradingFaction(index: number, sim: Sim) {
     priceModifier: 0.01,
   });
   setMoney(faction.cp.budget, 1e4);
+  faction.cp.blueprints.ships = (
+    ["small", "medium", "large"] as DockSize[]
+  ).map((size) =>
+    pickRandom(
+      shipClasses.filter((sc) => sc.role === "transport" && sc.size === size)
+    )
+  );
 
   return faction;
 }
@@ -63,7 +84,7 @@ export const createFactions = (
           sectorSize / 10
         );
         createShip(sim, {
-          ...requestShip("trading"),
+          ...requestShip(faction, "transport"),
           position: add(
             sectorPosition,
             matrix([random(-30, 30), random(-30, 30)])
