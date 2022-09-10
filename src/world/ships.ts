@@ -1,11 +1,16 @@
-import { Buildable } from "../components/buildable";
 import { DockSize } from "../components/dockable";
 import { ShipDriveProps } from "../components/drive";
 import { Textures } from "../components/render";
+import { Commodity } from "../economy/commodity";
 import shipClassesData from "./data/ships.json";
 
+export interface ShipBuildInput {
+  time: number;
+  cost: Partial<Record<Commodity, number>>;
+}
+
 export interface ShipInput extends ShipDriveProps {
-  build: Omit<Buildable, "name">;
+  build: ShipBuildInput;
   name: string;
   storage: number;
   mining: number;

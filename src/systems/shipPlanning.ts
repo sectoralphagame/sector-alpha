@@ -51,7 +51,7 @@ export class ShipPlanningSystem extends System {
   exec = (): void => {
     // TODO: remove time limitation after introducing shipyards
     if (this.cooldowns.canUse("plan") && this.sim.getTime() === 0) {
-      this.cooldowns.use("plan", 500);
+      this.cooldowns.use("plan", 60);
 
       this.sim.queries.ai.get().forEach((faction) => {
         const shipRequests = this.sim.queries.facilityWithProduction

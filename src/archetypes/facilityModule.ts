@@ -87,8 +87,8 @@ export const facilityModules = {
   habitat: createFacilityModuleTemplate({
     name: "Habitation Zone",
     pac: {
-      food: { consumes: 900, produces: 0 },
-      fuel: { consumes: 1300, produces: 0 },
+      food: { consumes: 400, produces: 0 },
+      fuel: { consumes: 700, produces: 0 },
     },
     time: 2.5 * 60,
   }),
@@ -104,13 +104,6 @@ export const facilityModules = {
   }),
   shipyard: createFacilityModuleTemplate({
     name: "Shipyard",
-    pac: {
-      electronics: { consumes: 36000, produces: 0 },
-      food: { consumes: 600, produces: 0 },
-      fuel: { consumes: 900, produces: 0 },
-      hullPlates: { consumes: 24000, produces: 0 },
-    },
-    time: 5 * 60,
   }),
   gold: createFacilityModuleTemplate({
     name: "Gold Refinery",

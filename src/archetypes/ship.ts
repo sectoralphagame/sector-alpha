@@ -13,7 +13,6 @@ import { Faction } from "./faction";
 import { ShipInput } from "../world/ships";
 
 export const shipComponents = [
-  "buildable",
   "drive",
   "dockable",
   "name",
@@ -78,10 +77,6 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       name: "dockable",
       size: "small",
       dockedIn: null,
-    })
-    .addComponent({
-      ...initial.build,
-      name: "buildable",
     });
 
   if (initial.mining) {
