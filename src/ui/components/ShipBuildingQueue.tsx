@@ -28,9 +28,9 @@ const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
         <span>No ships in queue</span>
       ) : (
         <ul className={styles.list}>
-          {entity.cp.shipyard.queue.map((bp, bpIndex) => (
+          {entity.cp.shipyard.queue.map((queued, bpIndex) => (
             <li className={styles.item} key={bpIndex}>
-              {bp.name}
+              {queued.blueprint.name}
             </li>
           ))}
         </ul>

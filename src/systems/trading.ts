@@ -2,7 +2,11 @@ import { average, filter, flatMap, map, pipe, sum as fxSum } from "@fxts/core";
 import { randomInt, sum } from "mathjs";
 import { Sector } from "../archetypes/sector";
 import { PriceBelief, TradeOffer } from "../components/trade";
-import { commoditiesArray, Commodity } from "../economy/commodity";
+import {
+  commoditiesArray,
+  Commodity,
+  mineableCommoditiesArray,
+} from "../economy/commodity";
 import {
   getPlannedBudget,
   getSectorsInTeleportRange,
@@ -52,14 +56,15 @@ function getProductionCost(
  *
  * Gets average price on the market in n jumps proximity
  */
-function getAveragePrice(
+export function getAveragePrice(
   sectorId: number,
   commodity: Commodity,
-  sim: Sim
+  sim: Sim,
+  jumps: number
 ): number {
   return average(
     pipe(
-      getSectorsInTeleportRange(sim.getOrThrow<Sector>(sectorId), 4, sim),
+      getSectorsInTeleportRange(sim.getOrThrow<Sector>(sectorId), jumps, sim),
       flatMap((sector) =>
         pipe(
           sim.queries.trading.get(),
@@ -74,6 +79,8 @@ function getAveragePrice(
     )
   );
 }
+// @ts-expect-error
+window.getAveragePrice = getAveragePrice;
 
 function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
   const currentPrice = entity.cp.trade.offers[commodity].price;
@@ -113,7 +120,8 @@ function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
     const averagePrice = getAveragePrice(
       entity.cp.position.sector,
       commodity,
-      entity.sim
+      entity.sim,
+      3
     );
 
     if (currentPrice < averagePrice) {
@@ -130,13 +138,23 @@ function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
   }
 
   entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[commodity].map(
-    (v) => limit(v, minPrice, settings.global.maxPrice)
+    (v) =>
+      limit(
+        v,
+        minPrice,
+        (mineableCommoditiesArray as string[]).includes(commodity)
+          ? settings.global.maxMineablePrice
+          : settings.global.maxPrice
+      )
   ) as PriceBelief;
   if (
     entity.cp.trade.pricing[commodity][0] ===
     entity.cp.trade.pricing[commodity][1]
   ) {
-    entity.cp.trade.pricing[commodity][1] += 2;
+    entity.cp.trade.pricing[commodity][1] = Math.max(
+      entity.cp.trade.pricing[commodity][1] * 1.02,
+      entity.cp.trade.pricing[commodity][1] + 2
+    );
   }
 
   return randomInt(...entity.cp.trade.pricing[commodity]);
@@ -178,7 +196,8 @@ function adjustBuyPrice(entity: WithTrade, commodity: Commodity): number {
     const averagePrice = getAveragePrice(
       entity.cp.position.sector,
       commodity,
-      entity.sim
+      entity.sim,
+      3
     );
 
     if (currentPrice > averagePrice) {
@@ -194,13 +213,23 @@ function adjustBuyPrice(entity: WithTrade, commodity: Commodity): number {
   }
 
   entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[commodity].map(
-    (v) => limit(v, settings.global.minPrice, settings.global.maxPrice)
+    (v) =>
+      limit(
+        v,
+        settings.global.minPrice,
+        (mineableCommoditiesArray as string[]).includes(commodity)
+          ? settings.global.maxMineablePrice
+          : settings.global.maxPrice
+      )
   ) as PriceBelief;
   if (
     entity.cp.trade.pricing[commodity][0] ===
     entity.cp.trade.pricing[commodity][1]
   ) {
-    entity.cp.trade.pricing[commodity][1] += 2;
+    entity.cp.trade.pricing[commodity][1] = Math.max(
+      entity.cp.trade.pricing[commodity][1] * 1.02,
+      entity.cp.trade.pricing[commodity][1] + 2
+    );
   }
 
   return randomInt(...entity.cp.trade.pricing[commodity]);

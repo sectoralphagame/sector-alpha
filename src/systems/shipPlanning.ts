@@ -8,7 +8,7 @@ import { pickRandom } from "../utils/generators";
 import { perCommodity } from "../utils/perCommodity";
 import { ShipRole } from "../world/ships";
 import { System } from "./system";
-import { faction as asFaction, Faction } from "../archetypes/faction";
+import { Faction } from "../archetypes/faction";
 import { sector as asSector } from "../archetypes/sector";
 import { Entity } from "../components/entity";
 import { RequireComponent } from "../tsHelpers";
@@ -23,8 +23,11 @@ export function requestShip(
     faction.cp.blueprints.ships.filter((ship) => ship.role === role)
   );
 
-  if (queue) {
-    shipyard.cp.shipyard.queue.push(bp);
+  if (queue || Math.random() < 0.1) {
+    shipyard.cp.shipyard.queue.push({
+      blueprint: bp,
+      owner: faction.id,
+    });
   } else {
     createShip(faction.sim, {
       ...bp,
@@ -116,7 +119,7 @@ export class ShipPlanningSystem extends System {
           .get()
           .find((s) => s.cp.owner!.id === faction.id)!;
 
-        const spareTraders = shipRequests
+        const spareTraders: Entity[] = shipRequests
           .filter((request) => request.trading > 0)
           .flatMap(({ facility, trading }) =>
             this.sim.queries.commendables
@@ -130,6 +133,17 @@ export class ShipPlanningSystem extends System {
         spareTraders.forEach((ship) => {
           ship.removeComponent("commander");
         });
+        spareTraders.push(
+          ...this.sim.queries.orderable
+            .get()
+            .filter(
+              (ship) => ship.cp.owner?.id === faction.id && !ship.cp.commander
+            )
+        );
+
+        const tradingShipRequestInShipyards = shipRequests.filter(
+          ({ trading }) => trading > 0
+        );
 
         shipRequests
           .filter(({ trading }) => trading < 0)
@@ -137,27 +151,22 @@ export class ShipPlanningSystem extends System {
             Array(-trading)
               .fill(0)
               .forEach(() => {
-                const ship =
-                  spareTraders.length > 0
-                    ? spareTraders.pop()!
-                    : createShip(this.sim, {
-                        ...pickRandom(
-                          faction.cp.blueprints.ships.filter(
-                            (bp) => bp.role === "transport"
-                          )
-                        ),
-                        position: facility.cp.position.coord.clone(),
-                        owner: asFaction(
-                          this.sim.getOrThrow(facility.cp.owner!.id)
-                        ),
-                        sector: asSector(
-                          this.sim.getOrThrow(facility.cp.position.sector)
-                        ),
-                      });
-                ship.addComponent({
-                  name: "commander",
-                  id: facility.id,
-                });
+                if (spareTraders.length > 0) {
+                  const ship = spareTraders.pop()!;
+                  ship.addComponent({
+                    name: "commander",
+                    id: facility.id,
+                  });
+                } else if (tradingShipRequestInShipyards.length > 0) {
+                  tradingShipRequestInShipyards.pop();
+                } else {
+                  requestShip(
+                    faction,
+                    shipyard,
+                    "transport",
+                    this.sim.getTime() > 0
+                  );
+                }
               });
           });
 
@@ -212,7 +221,7 @@ export class ShipPlanningSystem extends System {
         const miningShipRequestInShipyards = [
           ...shipyard.cp.shipyard.queue,
           shipyard.cp.shipyard.building,
-        ].filter((bp) => bp?.mining);
+        ].filter((queued) => queued?.blueprint.mining);
 
         miningShipRequests.forEach(({ facility, mining }) => {
           while (mining < 0) {
@@ -224,7 +233,7 @@ export class ShipPlanningSystem extends System {
               });
               mining += ship.cp.mining!.efficiency;
             } else if (miningShipRequestInShipyards.length > 0) {
-              mining += miningShipRequestInShipyards.pop()!.mining;
+              mining += miningShipRequestInShipyards.pop()!.blueprint.mining;
             } else {
               const bp = requestShip(
                 faction,

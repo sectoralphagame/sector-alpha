@@ -1,7 +1,6 @@
-import { add, Matrix, matrix, random } from "mathjs";
+import { add, matrix, random } from "mathjs";
 import { createFaction } from "../archetypes/faction";
 import { Sector, sectorSize } from "../archetypes/sector";
-import { createShip } from "../archetypes/ship";
 import { setMoney } from "../components/budget";
 import { DockSize } from "../components/dockable";
 import { hecsToCartesian } from "../components/hecsPosition";
@@ -100,21 +99,15 @@ export const createFactions = (
     sim.queries.sectors
       .get()
       .filter((sector) => sector.cp.owner)
-      .forEach((sector) => {
+      .forEach(() => {
         if (Math.random() > 0.4) return;
-        const sectorPosition = hecsToCartesian(
-          sector.cp.hecsPosition.value,
-          sectorSize / 10
+
+        requestShip(
+          faction,
+          pickRandom(sim.queries.shipyards.get()),
+          "transport",
+          false
         );
-        // createShip(sim, {
-        //   ...requestShip(faction, null, "transport", false),
-        //   position: add(
-        //     sectorPosition,
-        //     matrix([random(-30, 30), random(-30, 30)])
-        //   ) as Matrix,
-        //   owner: faction,
-        //   sector,
-        // });
       });
   }
 };
