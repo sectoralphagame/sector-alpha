@@ -18,7 +18,9 @@ function getRandomWorld(
       createConnections(sim, islands);
 
       const sectors = sim.queries.sectors.get();
-      Array(sectors.length).fill(0).map(getRandomAsteroidField);
+      for (let i = 0; i < sectors.length * 2; i++) {
+        getRandomAsteroidField();
+      }
 
       try {
         createFactions(sim, islands.slice(1), numberOfFactions);

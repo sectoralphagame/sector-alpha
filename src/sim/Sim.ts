@@ -32,6 +32,7 @@ import { FacilityPlanningSystem } from "../systems/facilityPlanning";
 import { SectorStatisticGatheringSystem } from "../systems/sectorStatisticGathering";
 import { ShipPlanningSystem } from "../systems/shipPlanning";
 import { InflationStatisticGatheringSystem } from "../systems/inflationStatisticGathering";
+import { ShipBuildingSystem } from "../systems/shipBuilding";
 
 function reviveMathjs(value: any) {
   if (isPlainObject(value)) {
@@ -91,6 +92,7 @@ export class Sim extends BaseSim {
       new ShipPlanningSystem(this),
       new SectorStatisticGatheringSystem(this),
       new InflationStatisticGatheringSystem(this),
+      new ShipBuildingSystem(this),
     ];
   }
 

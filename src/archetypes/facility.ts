@@ -17,7 +17,6 @@ export const commanderRange = 4;
 
 export const facilityComponents = [
   "budget",
-  "compoundProduction",
   "docks",
   "modules",
   "name",
@@ -46,7 +45,6 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
 
   entity
     .addComponent(createBudget())
-    .addComponent(createCompoundProduction())
     .addComponent(createDocks({ large: 1, medium: 3, small: 3 }))
     .addComponent({
       name: "modules",

@@ -35,7 +35,7 @@ export function createShipyard(input: InitialFacilityInput, sim: Sim) {
   addFacilityModule(facility, facilityModules.shipyard.create(sim, facility));
   addFacilityModule(
     facility,
-    facilityModules.containerSmall.create(sim, facility)
+    facilityModules.containerMedium.create(sim, facility)
   );
 
   return facility;

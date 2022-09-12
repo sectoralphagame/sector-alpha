@@ -5,9 +5,11 @@ import { createShip } from "../archetypes/ship";
 import { setMoney } from "../components/budget";
 import { DockSize } from "../components/dockable";
 import { hecsToCartesian } from "../components/hecsPosition";
+import { setTexture } from "../components/render";
 import { Sim } from "../sim";
 import { requestShip } from "../systems/shipPlanning";
 import { pickRandom, pickRandomWithIndex } from "../utils/generators";
+import { createShipyard } from "./facilities";
 import { shipClasses } from "./ships";
 
 function createTerritorialFaction(index: number, sim: Sim) {
@@ -70,6 +72,27 @@ export const createFactions = (
     island.forEach((sector) =>
       sector.addComponent({ name: "owner", id: faction.id })
     );
+
+    const sectorWithShipyard = pickRandom(island);
+    const shipyard = createShipyard(
+      {
+        owner: faction,
+        sector: sectorWithShipyard,
+        position: add(
+          hecsToCartesian(
+            sectorWithShipyard.cp.hecsPosition.value,
+            sectorSize / 10
+          ),
+          matrix([
+            random(-sectorSize / 20, sectorSize / 20),
+            random(-sectorSize / 20, sectorSize / 20),
+          ])
+        ),
+      },
+      sim
+    );
+    shipyard.addComponent({ name: "shipyard", queue: [], building: null });
+    setTexture(shipyard.cp.render, "fShipyard");
   }
 
   for (let i = 0; i < 2; i++) {
@@ -83,15 +106,15 @@ export const createFactions = (
           sector.cp.hecsPosition.value,
           sectorSize / 10
         );
-        createShip(sim, {
-          ...requestShip(faction, "transport"),
-          position: add(
-            sectorPosition,
-            matrix([random(-30, 30), random(-30, 30)])
-          ) as Matrix,
-          owner: faction,
-          sector,
-        });
+        // createShip(sim, {
+        //   ...requestShip(faction, null, "transport", false),
+        //   position: add(
+        //     sectorPosition,
+        //     matrix([random(-30, 30), random(-30, 30)])
+        //   ) as Matrix,
+        //   owner: faction,
+        //   sector,
+        // });
       });
   }
 };

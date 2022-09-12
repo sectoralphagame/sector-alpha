@@ -5,6 +5,7 @@ import { Docks } from "./Docks";
 import { Subordinates } from "./Subordinates";
 import { Facility } from "../../archetypes/facility";
 import { Allocations } from "./Allocations";
+import ShipBuildingQueue from "./ShipBuildingQueue";
 
 const FacilityPanel: React.FC<{ entity: Facility }> = ({
   entity: facility,
@@ -16,6 +17,12 @@ const FacilityPanel: React.FC<{ entity: Facility }> = ({
     <hr />
     <Production entity={facility} />
     <hr />
+    {facility.hasComponents(["shipyard"]) && (
+      <>
+        <ShipBuildingQueue entity={facility.requireComponents(["shipyard"])} />
+        <hr />
+      </>
+    )}
     <Subordinates entity={facility} />
     <hr />
     <Allocations entity={facility} />

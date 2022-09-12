@@ -124,11 +124,11 @@ export const facilityModules = {
   electronics: createFacilityModuleTemplate({
     name: "Electronics Production",
     pac: {
-      food: { consumes: 2700, produces: 0 },
-      silicon: { consumes: 13000, produces: 0 },
-      gold: { consumes: 2400, produces: 0 },
-      electronics: { consumes: 0, produces: 1200 },
-      fuel: { consumes: 2100, produces: 0 },
+      food: { consumes: 600, produces: 0 },
+      silicon: { consumes: 2000, produces: 0 },
+      gold: { consumes: 1200, produces: 0 },
+      electronics: { consumes: 0, produces: 600 },
+      fuel: { consumes: 1050, produces: 0 },
     },
     time: 4 * 60,
   }),
