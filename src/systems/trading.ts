@@ -1,6 +1,7 @@
 import { average, filter, flatMap, map, pipe, sum as fxSum } from "@fxts/core";
 import { randomInt, sum } from "mathjs";
 import { Sector } from "../archetypes/sector";
+import { TradeEntry } from "../components/journal";
 import { PriceBelief, TradeOffer } from "../components/trade";
 import {
   commoditiesArray,
@@ -92,11 +93,12 @@ function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
       (entity.cp.compoundProduction
         ? entity.cp.compoundProduction.pac[commodity].consumes * 2
         : 0));
-  const hadAnySale = entity.cp.trade.transactions.some(
-    (transaction) =>
-      transaction.commodity === commodity &&
-      transaction.time > entity.cp.trade.lastPriceAdjust.time &&
-      transaction.type !== entity.cp.trade.offers[commodity].type
+  const hadAnySale = entity.cp.journal.entries.some(
+    (entry) =>
+      entry.type === "trade" &&
+      entry.commodity === commodity &&
+      entry.time > entity.cp.trade.lastPriceAdjust.time &&
+      entry.action !== entity.cp.trade.offers[commodity].type
   );
 
   const mean =
@@ -166,11 +168,12 @@ function adjustBuyPrice(entity: WithTrade, commodity: Commodity): number {
 
   const filled =
     entity.cp.storage.stored[commodity] / entity.cp.storage.quota[commodity];
-  const hadAnySale = entity.cp.trade.transactions.some(
-    (transaction) =>
-      transaction.commodity === commodity &&
-      transaction.time > entity.cp.trade.lastPriceAdjust.time &&
-      transaction.type !== entity.cp.trade.offers[commodity].type
+  const hadAnySale = entity.cp.journal.entries.some(
+    (entry) =>
+      entry.type === "trade" &&
+      entry.commodity === commodity &&
+      entry.time > entity.cp.trade.lastPriceAdjust.time &&
+      entry.action !== entity.cp.trade.offers[commodity].type
   );
   const mean =
     (entity.cp.trade.pricing[commodity][0] +
@@ -239,14 +242,15 @@ export function adjustPrices(entity: WithTrade) {
   const quantities = perCommodity(
     (commodity) =>
       sum(
-        entity.cp.trade.transactions
-          .filter(
-            (transaction) =>
-              transaction.commodity === commodity &&
-              transaction.time > entity.cp.trade.lastPriceAdjust.time &&
-              transaction.type !== entity.cp.trade.offers[commodity].type
-          )
-          .map((h) => h.quantity)
+        (
+          entity.cp.journal.entries.filter(
+            (entry) =>
+              entry.type === "trade" &&
+              entry.commodity === commodity &&
+              entry.time > entity.cp.trade.lastPriceAdjust.time &&
+              entry.action !== entity.cp.trade.offers[commodity].type
+          ) as TradeEntry[]
+        ).map((entry) => entry.quantity)
       ) as number
   );
 

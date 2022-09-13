@@ -37,6 +37,21 @@ export function createShipyard(input: InitialFacilityInput, sim: Sim) {
     facility,
     facilityModules.containerMedium.create(sim, facility)
   );
+  addFacilityModule(
+    facility,
+    facilityModules.containerMedium.create(sim, facility)
+  );
+  addFacilityModule(
+    facility,
+    facilityModules.containerMedium.create(sim, facility)
+  );
+  addFacilityModule(
+    facility,
+    facilityModules.containerMedium.create(sim, facility)
+  );
+
+  facility.addComponent({ name: "shipyard", queue: [], building: null });
+  setTexture(facility.cp.render, "fShipyard");
 
   return facility;
 }

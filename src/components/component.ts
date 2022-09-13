@@ -30,6 +30,7 @@ import { SystemManager } from "./systemManager";
 import { InflationStats } from "./inflationStats";
 import { Shipyard } from "./shipyard";
 import { Blueprints } from "./blueprints";
+import { Journal } from "./journal";
 
 export interface CoreComponents {
   ai: Ai;
@@ -47,6 +48,7 @@ export interface CoreComponents {
   drive: Drive;
   hecsPosition: HECSPosition;
   inflationStats: InflationStats;
+  journal: Journal;
   minable: Minable;
   mining: Mining;
   modules: Modules;

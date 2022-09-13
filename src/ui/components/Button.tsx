@@ -10,6 +10,13 @@ const styles = nano.sheet({
     "&:active": {
       background: "rgba(255, 255, 255, 0.3)",
     },
+    "&[disabled]": {
+      "&:hover": {
+        background: theme.palette.background,
+      },
+      borderColor: theme.palette.disabled,
+      cursor: "auto",
+    },
     appearance: "none",
     background: "#000",
     borderRadius: "4px",
@@ -29,9 +36,12 @@ const styles = nano.sheet({
   },
 });
 
-export const Button: React.FC<React.HTMLAttributes<HTMLButtonElement>> = (
-  props
-) => {
+export const Button: React.FC<
+  React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  >
+> = (props) => {
   const ref = React.useRef<HTMLButtonElement>(null);
 
   return (

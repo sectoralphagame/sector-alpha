@@ -37,6 +37,13 @@ export class ShipBuildingSystem extends System {
             ),
           });
           dockShip(ship, shipyard);
+          shipyard.cp.journal.entries.push({
+            type: "shipyard",
+            faction: shipyard.cp.shipyard.building.owner,
+            name: ship.cp.name.value,
+            price: 0,
+            time: this.sim.getTime(),
+          });
           shipyard.cp.shipyard.building = null;
         }
 
