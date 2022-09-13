@@ -68,7 +68,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
         ).rgbNumber(),
         defaultScale: 1,
         maxZ: 0.1,
-        texture: "fCiv",
+        texture: "fFactory",
         zIndex: 1,
       })
     )
