@@ -33,7 +33,7 @@ import { SectorStatisticGatheringSystem } from "../systems/sectorStatisticGather
 import { ShipPlanningSystem } from "../systems/shipPlanning";
 import { InflationStatisticGatheringSystem } from "../systems/inflationStatisticGathering";
 import { ShipBuildingSystem } from "../systems/shipBuilding";
-import type { RenderingSystem as RenderingSystemType } from "../systems/rendering";
+import { isHeadless } from "../settings";
 
 function reviveMathjs(value: any) {
   if (isPlainObject(value)) {
@@ -241,6 +241,10 @@ export class Sim extends BaseSim {
         entity.components
       );
     });
+
+    if (!isHeadless) {
+      sim.initRendering();
+    }
 
     sim.entities = entityMap;
 

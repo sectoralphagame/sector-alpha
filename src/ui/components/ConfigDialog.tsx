@@ -118,7 +118,6 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             onClick={async (id) => {
               window.sim.destroy();
               window.sim = Sim.load(saves.find((s) => s.id === id)!.data);
-              window.sim.initRendering();
               window.sim.start();
               onClose();
             }}
