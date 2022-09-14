@@ -12,6 +12,7 @@ import { Faction } from "../archetypes/faction";
 import { sector as asSector } from "../archetypes/sector";
 import { Entity } from "../components/entity";
 import { RequireComponent } from "../tsHelpers";
+import { notNull } from "../utils/maps";
 
 export function requestShip(
   faction: Faction,
@@ -49,7 +50,7 @@ export class ShipPlanningSystem extends System {
   }
 
   getShipRequests = (faction: Faction) =>
-    this.sim.queries.facilityWithProduction
+    this.sim.queries.facilities
       .get()
       .filter((facility) => facility.cp.owner?.id === faction.id)
       .map((facility) => {
@@ -80,6 +81,7 @@ export class ShipPlanningSystem extends System {
               0
             )
         );
+        const shipsForShipyards = facility.cp.shipyard ? 1 : 0;
 
         const currentMiningSpeed: number = sum(
           miners.map((miner) => miner.cp.mining.efficiency)
@@ -87,23 +89,30 @@ export class ShipPlanningSystem extends System {
 
         const mining =
           Object.entries(production)
-            .filter(([commodity]) =>
-              (Object.values(mineableCommodities) as string[]).includes(
-                commodity
-              )
+            .filter(
+              ([commodity, commodityProduction]) =>
+                commodityProduction < 0 &&
+                (Object.values(mineableCommodities) as string[]).includes(
+                  commodity
+                )
             )
-            .reduce((m, [, usage]) => m + usage, 0) + currentMiningSpeed;
+            .reduce(
+              (m, [, commodityProduction]) => m + commodityProduction,
+              0
+            ) + currentMiningSpeed;
+
+        const shipsForProduction =
+          Math.floor(
+            Object.entries(production).filter(
+              ([commodity, commodityUsage]) =>
+                !(Object.values(mineableCommodities) as string[]).includes(
+                  commodity
+                ) && commodityUsage !== 0
+            ).length / 1.5
+          ) || 1;
+
         const trading =
-          -(
-            Math.floor(
-              Object.entries(production).filter(
-                ([commodity]) =>
-                  !(Object.values(mineableCommodities) as string[]).includes(
-                    commodity
-                  ) && production[commodity] !== 0
-              ).length / 1.5
-            ) || 1
-          ) + traders.length;
+          traders.length - (shipsForProduction + shipsForShipyards);
 
         return { facility, mining, trading };
       });
@@ -115,9 +124,19 @@ export class ShipPlanningSystem extends System {
 
       this.sim.queries.ai.get().forEach((faction) => {
         const shipRequests = this.getShipRequests(faction);
-        const shipyard = this.sim.queries.shipyards
+        const requestsInShipyards = this.sim.queries.shipyards
           .get()
-          .find((s) => s.cp.owner!.id === faction.id)!;
+          .flatMap((shipyard) =>
+            [
+              ...shipyard.cp.shipyard.queue,
+              shipyard.cp.shipyard.building,
+            ].filter(notNull)
+          );
+        const shipyard =
+          this.sim.queries.shipyards
+            .get()
+            .find((s) => s.cp.owner.id === faction.id) ??
+          pickRandom(this.sim.queries.shipyards.get());
 
         const spareTraders: Entity[] = shipRequests
           .filter((request) => request.trading > 0)
@@ -137,12 +156,15 @@ export class ShipPlanningSystem extends System {
           ...this.sim.queries.orderable
             .get()
             .filter(
-              (ship) => ship.cp.owner?.id === faction.id && !ship.cp.commander
+              (ship) =>
+                ship.cp.owner?.id === faction.id &&
+                !ship.cp.commander &&
+                !ship.cp.mining
             )
         );
 
-        const tradingShipRequestInShipyards = shipRequests.filter(
-          ({ trading }) => trading > 0
+        const tradingShipRequestInShipyards = requestsInShipyards.filter(
+          (queued) => queued && !queued?.blueprint.mining
         );
 
         shipRequests
@@ -171,7 +193,7 @@ export class ShipPlanningSystem extends System {
           });
 
         const spareMiners: Entity[] = shipRequests
-          .filter((request) => request.mining > 0)
+          .filter((request) => request.mining >= 1)
           .flatMap(({ facility, mining }) => {
             const miners = sortBy(
               this.sim.queries.commendables
@@ -218,10 +240,9 @@ export class ShipPlanningSystem extends System {
 
         if (miningShipRequests.length === 0) return;
 
-        const miningShipRequestInShipyards = [
-          ...shipyard.cp.shipyard.queue,
-          shipyard.cp.shipyard.building,
-        ].filter((queued) => queued?.blueprint.mining);
+        const miningShipRequestInShipyards = requestsInShipyards.filter(
+          (queued) => queued?.blueprint.mining
+        );
 
         miningShipRequests.forEach(({ facility, mining }) => {
           while (mining < 0) {

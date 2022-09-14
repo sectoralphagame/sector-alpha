@@ -183,9 +183,7 @@ export function allocate(
   return null;
 }
 
-export function getNeededCommodities(
-  entity: WithTrade & RequireComponent<"compoundProduction">
-): Commodity[] {
+export function getNeededCommodities(entity: WithTrade): Commodity[] {
   const stored = entity.cp.storage.availableWares;
 
   return sortBy(
