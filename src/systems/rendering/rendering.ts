@@ -9,6 +9,7 @@ import { SystemWithHooks } from "../hooks";
 const minScale = 0.05;
 
 export class RenderingSystem extends SystemWithHooks {
+  rendering: true;
   selectionManger: RequireComponent<"selectionManager">;
   viewport: Viewport;
   app: PIXI.Application;

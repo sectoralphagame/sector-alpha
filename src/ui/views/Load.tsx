@@ -34,7 +34,7 @@ export const LoadGame: React.FC = () => {
           <Saves
             saves={saves}
             onClick={async (id) => {
-              window.sim = await Sim.load(saves.find((s) => s.id === id)!.data);
+              window.sim = Sim.load(saves.find((s) => s.id === id)!.data);
               window.sim.initRendering();
               window.sim.start();
               navigate("game");

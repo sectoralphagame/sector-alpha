@@ -47,12 +47,6 @@ function getRandomWorld(
           })
         );
 
-      for (let i = 0; i < 3600; i++) {
-        sim.next(1);
-      }
-
-      sim.initRendering();
-
       resolve();
     });
   });

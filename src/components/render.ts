@@ -9,7 +9,7 @@ import fTeleportTexture from "../../assets/f_teleport.svg";
 import fCivTexture from "../../assets/f_civ.svg";
 import fFactoryTexture from "../../assets/f_factory.svg";
 import fShipyardTexture from "../../assets/f_shipyard.svg";
-import { isTest } from "../settings";
+import { isHeadless } from "../settings";
 
 export const textures = {
   asteroid: asteroidTexture,
@@ -45,7 +45,7 @@ export class Render implements BaseComponent<"render"> {
 
 export function setTexture(render: Render, texture: keyof Textures) {
   render.texture = texture;
-  if (process.env.NODE_ENV !== "test") {
+  if (!isHeadless) {
     render.sprite = new PIXI.Sprite(
       PIXI.Texture.from(textures[texture], {
         resolution: 2,
@@ -77,7 +77,7 @@ export function createRender({
     texture,
   };
 
-  if (process.env.NODE_ENV !== "test") {
+  if (!isHeadless) {
     setTexture(component, texture);
 
     if (color) {
@@ -90,14 +90,14 @@ export function createRender({
 }
 
 export function hide(render: Render) {
-  if (!isTest) {
+  if (!isHeadless) {
     render.sprite.interactive = false;
     render.sprite.alpha = 0;
   }
 }
 
 export function show(render: Render) {
-  if (!isTest) {
+  if (!isHeadless) {
     render.sprite.interactive = true;
     render.sprite.alpha = 1;
   }

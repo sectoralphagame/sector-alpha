@@ -1,4 +1,5 @@
-export const isTest = process.env.NODE_ENV === "test";
+export const isHeadless =
+  !(global.window && global.document) || process.env.NODE_ENV === "test";
 
 const settings = {
   global: {
