@@ -18,7 +18,8 @@ export class SelectingSystem extends SystemWithHooks {
       }
     }, 500);
 
-  exec = (): void => {
+  exec = (delta: number): void => {
+    super.exec(delta);
     this.hook(
       this.sim.queries.settings.get()[0].cp.selectionManager.id,
       this.refresh
