@@ -62,13 +62,16 @@ export const Panel: React.FC = () => {
   const [, setRender] = React.useState(false);
   const interval = React.useRef<number>();
 
-  const [entity, setEntity] = React.useState<Entity | null>(
-    window.selected as Entity | null
+  const sim = window.sim as Sim;
+  const selectedId = sim.queries.settings.get()[0]!.cp.selectionManager.id;
+
+  const [entity, setEntity] = React.useState<Entity | undefined>(
+    selectedId ? sim.get(selectedId) : undefined
   );
 
   React.useEffect(() => {
-    if (entity !== window.selected) {
-      setEntity(window.selected as Entity | null);
+    if (entity?.id !== selectedId) {
+      setEntity(selectedId ? sim.get(selectedId) : undefined);
     }
   });
 

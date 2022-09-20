@@ -157,6 +157,8 @@ export class MovingSystem extends System {
   }
 
   exec = (delta: number): void => {
-    this.query.get().forEach((entity) => move(entity, delta));
+    if (delta > 0) {
+      this.query.get().forEach((entity) => move(entity, delta));
+    }
   };
 }

@@ -30,7 +30,7 @@ export class BaseSim {
         console.error(err);
         // eslint-disable-next-line no-console
         console.error(`This error occured at ${this.getTime()}`);
-        this.pause();
+        this.stop();
       }
     }, 1e3 / settings.global.targetFps) as unknown as number;
     this.lastTick = Date.now();
@@ -46,7 +46,11 @@ export class BaseSim {
     throw notImplemented;
   };
 
-  pause = () => {
+  pause = (): void => {
+    this.speed = 0;
+  };
+
+  stop = () => {
     clearInterval(this.intervalHandle!);
     this.intervalHandle = null;
   };
