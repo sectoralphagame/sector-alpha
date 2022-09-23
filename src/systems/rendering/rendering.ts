@@ -61,7 +61,7 @@ export class RenderingSystem extends SystemWithHooks {
       this.dragging = false;
     });
 
-    this.viewport.on("mousedown", (event) => {
+    this.viewport.on("mouseup", (event) => {
       if (event.target === event.currentTarget && !this.dragging) {
         clearFocus(this.selectionManger.cp.selectionManager);
       }
