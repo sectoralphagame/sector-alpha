@@ -31,6 +31,7 @@ import { InflationStats } from "./inflationStats";
 import { Shipyard } from "./shipyard";
 import { Blueprints } from "./blueprints";
 import { Journal } from "./journal";
+import { Player } from "./player";
 
 export interface CoreComponents {
   ai: Ai;
@@ -56,6 +57,7 @@ export interface CoreComponents {
   orders: Orders;
   owner: Owner;
   parent: Parent;
+  player: Player;
   position: Position;
   production: Production;
   render: Render;

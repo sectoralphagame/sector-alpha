@@ -1,4 +1,6 @@
-import { random } from "mathjs";
+import { matrix, random } from "mathjs";
+import { createFaction } from "../archetypes/faction";
+import { createShip } from "../archetypes/ship";
 import { MineableCommodity } from "../economy/commodity";
 import { Sim } from "../sim";
 import { pickRandom } from "../utils/generators";
@@ -6,6 +8,7 @@ import { getRandomAsteroidField, spawnAsteroidField } from "./asteroids";
 import { createConnections } from "./connections";
 import { createFactions } from "./factions";
 import { createIslands } from "./islands";
+import { shipClasses } from "./ships";
 
 function getRandomWorld(
   sim: Sim,
@@ -21,6 +24,22 @@ function getRandomWorld(
       for (let i = 0; i < sectors.length * 2; i++) {
         getRandomAsteroidField(sim);
       }
+
+      const player = createFaction("Player", sim);
+      player.addComponent({ name: "player" });
+      const sectorAlpha = sim.queries.sectors.get()[0]!;
+
+      const playerShip = createShip(sim, {
+        ...pickRandom(
+          shipClasses.filter(
+            ({ role, size }) => role === "transport" && size === "small"
+          )
+        ),
+        position: matrix([0, 0]),
+        owner: player,
+        sector: sectorAlpha,
+      });
+      playerShip.cp.autoOrder!.default = "hold";
 
       try {
         createFactions(sim, islands.slice(1), numberOfFactions);
