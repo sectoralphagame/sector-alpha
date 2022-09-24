@@ -14,6 +14,7 @@ import {
 import { Docks } from "./Docks";
 import { Sim } from "../../sim";
 import { asteroidField } from "../../archetypes/asteroidField";
+import AutoOrder from "./AutoOrder";
 
 const styles = nano.sheet(
   {
@@ -117,6 +118,12 @@ const ShipPanel: React.FC<{ entity: Ship }> = ({ entity: ship }) => {
             ))
         : "Empty storage"}
       <hr />
+      {ship.hasComponents(["autoOrder"]) && (
+        <>
+          <AutoOrder entity={ship.requireComponents(["autoOrder"])} />
+          <hr />
+        </>
+      )}
       {ship.cp.orders.value.length === 0
         ? "No orders"
         : ship.cp.orders.value.map((order, orderIndex) => (

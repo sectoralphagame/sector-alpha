@@ -15,6 +15,7 @@ const styles = nano.sheet({
         background: theme.palette.background,
       },
       borderColor: theme.palette.disabled,
+      color: theme.palette.disabled,
       cursor: "auto",
     },
     appearance: "none",
