@@ -80,7 +80,7 @@ export const DropdownButton: React.FC<{ className?: string }> = ({
     {...props}
   />
 );
-export const DropdownOptions: React.FC = (props) => (
+export const DropdownOptions: React.FC<{ static?: boolean }> = (props) => (
   <Menu.Items className={styles.dropdown} {...props} />
 );
 export const DropdownOption: React.FC<{
