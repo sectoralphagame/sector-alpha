@@ -103,15 +103,12 @@ function autoTradeForCommander(
   const commander = entity.sim
     .getOrThrow(entity.cp.commander.id)
     .requireComponents([...facilityComponents, "owner"]);
-  if (!commander.cp.compoundProduction) return;
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);
     idleMovement(entity);
   } else {
-    for (const commodity of getNeededCommodities(
-      commander.requireComponents([...tradeComponents, "compoundProduction"])
-    )) {
+    for (const commodity of getNeededCommodities(commander)) {
       const result = autoBuyMostNeededByCommander(
         entity,
         commodity,

@@ -9,7 +9,12 @@
     "maneuver": 0.3,
     "rotary": 86,
     "ttc": 7,
-    "acceleration": 0.1
+    "acceleration": 0.1,
+    "build": {
+      "cost": { "electronics": 15, "hullPlates": 400, "fuel": 200 },
+      "time": 60
+    },
+    "role": "transport"
   },
   {
     "name": "Courier B",
@@ -21,7 +26,12 @@
     "maneuver": 0.55,
     "rotary": 117,
     "ttc": 1,
-    "acceleration": 0.1
+    "acceleration": 0.1,
+    "build": {
+      "cost": { "hullPlates": 430, "electronics": 17, "fuel": 220 },
+      "time": 60
+    },
+    "role": "transport"
   },
   {
     "name": "Freighter A",
@@ -33,7 +43,12 @@
     "maneuver": 0.13,
     "rotary": 54,
     "ttc": 3.3,
-    "acceleration": 0.1
+    "acceleration": 0.1,
+    "build": {
+      "cost": { "hullPlates": 3400, "electronics": 85, "fuel": 1200 },
+      "time": 60
+    },
+    "role": "transport"
   },
   {
     "name": "Freighter B",
@@ -45,7 +60,12 @@
     "maneuver": 0.05,
     "rotary": 31,
     "ttc": 22,
-    "acceleration": 0.1
+    "acceleration": 0.1,
+    "build": {
+      "cost": { "fuel": 3500, "hullPlates": 95, "electronics": 1100 },
+      "time": 60
+    },
+    "role": "transport"
   },
   {
     "name": "Large Freighter A",
@@ -57,7 +77,12 @@
     "maneuver": 0.1,
     "rotary": 11,
     "ttc": 13,
-    "acceleration": 0.1
+    "acceleration": 0.1,
+    "build": {
+      "cost": { "hullPlates": 14000, "electronics": 590, "fuel": 7600 },
+      "time": 60
+    },
+    "role": "transport"
   },
   {
     "name": "Large Freighter B",
@@ -69,7 +94,12 @@
     "maneuver": 0.09,
     "rotary": 9,
     "ttc": 15,
-    "acceleration": 0.1
+    "acceleration": 0.1,
+    "build": {
+      "cost": { "hullPlates": 16500, "electronics": 640, "fuel": 6900 },
+      "time": 60
+    },
+    "role": "transport"
   },
   {
     "name": "Miner A",
@@ -81,7 +111,12 @@
     "maneuver": 0.15,
     "rotary": 54,
     "ttc": 6,
-    "acceleration": 0.1
+    "acceleration": 0.1,
+    "build": {
+      "cost": { "hullPlates": 3000, "electronics": 130, "fuel": 850 },
+      "time": 60
+    },
+    "role": "mining"
   },
   {
     "name": "Miner B",
@@ -93,6 +128,11 @@
     "maneuver": 0.3,
     "rotary": 68,
     "ttc": 3.5,
-    "acceleration": 0.1
+    "acceleration": 0.1,
+    "build": {
+      "cost": { "hullPlates": 3100, "electronics": 110, "fuel": 800 },
+      "time": 60
+    },
+    "role": "mining"
   }
 ]

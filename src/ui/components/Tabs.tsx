@@ -61,3 +61,7 @@ export const Tab: React.FC<{ className?: string }> = ({
     {...props}
   />
 );
+
+export const TabGroup = HeadlessTab.Group;
+export const TabPanels = HeadlessTab.Panels;
+export const TabPanel = HeadlessTab.Panel;

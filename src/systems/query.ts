@@ -1,5 +1,6 @@
 import { filter, map, pipe, toArray } from "@fxts/core";
 import { asteroidFieldComponents } from "../archetypes/asteroidField";
+import { facilityComponents } from "../archetypes/facility";
 import { factionComponents } from "../archetypes/faction";
 import { sectorComponents } from "../archetypes/sector";
 import { CoreComponents } from "../components/component";
@@ -73,6 +74,7 @@ export function createQueries(sim: Sim) {
     asteroidFields: new Query(sim, asteroidFieldComponents),
     autoOrderable: new Query(sim, ["autoOrder", "orders"]),
     commendables: new Query(sim, ["commander"]),
+    facilities: new Query(sim, ["modules", "position"]),
     facilityWithProduction: new Query(sim, [
       "compoundProduction",
       "modules",
@@ -90,6 +92,7 @@ export function createQueries(sim: Sim) {
       "systemManager",
       "inflationStats",
     ]),
+    shipyards: new Query(sim, [...facilityComponents, "owner", "shipyard"]),
     standaloneProduction: new Query(sim, ["production", "storage"]),
     storageAndTrading: new Query(sim, ["storage", "trade"]),
     teleports: new Query(sim, ["teleport"]),

@@ -7,7 +7,6 @@ export const Table = nano.jsx("table", {
   },
   "tbody td, thead th": {
     padding: `${theme.spacing(0.75)} ${theme.spacing(1)}`,
-    position: "relative",
   },
   "tbody tr:not(.no-border):last-child": {
     borderBottom: "none",

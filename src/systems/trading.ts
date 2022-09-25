@@ -1,16 +1,12 @@
-import {
-  average,
-  filter,
-  flatMap,
-  map,
-  pipe,
-  size,
-  sum as fxSum,
-} from "@fxts/core";
+import { average, filter, flatMap, map, pipe, sum as fxSum } from "@fxts/core";
 import { randomInt, sum } from "mathjs";
 import { Sector } from "../archetypes/sector";
 import { PriceBelief, TradeOffer } from "../components/trade";
-import { commoditiesArray, Commodity } from "../economy/commodity";
+import {
+  commoditiesArray,
+  Commodity,
+  mineableCommoditiesArray,
+} from "../economy/commodity";
 import {
   getPlannedBudget,
   getSectorsInTeleportRange,
@@ -60,14 +56,15 @@ function getProductionCost(
  *
  * Gets average price on the market in n jumps proximity
  */
-function getAveragePrice(
+export function getAveragePrice(
   sectorId: number,
   commodity: Commodity,
-  sim: Sim
+  sim: Sim,
+  jumps: number
 ): number {
   return average(
     pipe(
-      getSectorsInTeleportRange(sim.getOrThrow<Sector>(sectorId), 4, sim),
+      getSectorsInTeleportRange(sim.getOrThrow<Sector>(sectorId), jumps, sim),
       flatMap((sector) =>
         pipe(
           sim.queries.trading.get(),
@@ -82,26 +79,26 @@ function getAveragePrice(
     )
   );
 }
+// @ts-expect-error
+window.getAveragePrice = getAveragePrice;
 
 function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
   const currentPrice = entity.cp.trade.offers[commodity].price;
   if (!entity.cp.trade.offers[commodity].active) return currentPrice;
 
-  const filled =
+  const weight =
     entity.cp.storage.stored[commodity] /
     (entity.cp.storage.quota[commodity] -
       (entity.cp.compoundProduction
         ? entity.cp.compoundProduction.pac[commodity].consumes * 2
         : 0));
-  const hadAnySale = size(
-    filter(
-      (transaction) =>
-        transaction.commodity === commodity &&
-        transaction.time > entity.cp.trade.lastPriceAdjust.time &&
-        transaction.type !== entity.cp.trade.offers[commodity].type,
-      entity.cp.trade.transactions
-    )
+  const hadAnySale = entity.cp.trade.transactions.some(
+    (transaction) =>
+      transaction.commodity === commodity &&
+      transaction.time > entity.cp.trade.lastPriceAdjust.time &&
+      transaction.type !== entity.cp.trade.offers[commodity].type
   );
+
   const mean =
     (entity.cp.trade.pricing[commodity][0] +
       entity.cp.trade.pricing[commodity][1]) /
@@ -115,7 +112,7 @@ function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
     : settings.global.minPrice;
 
   if (!hadAnySale) {
-    const diff = filled * mean;
+    const diff = weight * mean;
     entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[commodity].map(
       (v) => v - diff / 6
     ) as PriceBelief;
@@ -123,7 +120,8 @@ function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
     const averagePrice = getAveragePrice(
       entity.cp.position.sector,
       commodity,
-      entity.sim
+      entity.sim,
+      3
     );
 
     if (currentPrice < averagePrice) {
@@ -131,7 +129,7 @@ function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
 
       entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[
         commodity
-      ].map((v) => v + overbid * filled) as PriceBelief;
+      ].map((v) => v + overbid * weight * 1.2) as PriceBelief;
     } else {
       entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[
         commodity
@@ -140,13 +138,23 @@ function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
   }
 
   entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[commodity].map(
-    (v) => limit(v, minPrice, settings.global.maxPrice)
+    (v) =>
+      limit(
+        v,
+        minPrice,
+        (mineableCommoditiesArray as string[]).includes(commodity)
+          ? settings.global.maxMineablePrice
+          : settings.global.maxPrice
+      )
   ) as PriceBelief;
   if (
     entity.cp.trade.pricing[commodity][0] ===
     entity.cp.trade.pricing[commodity][1]
   ) {
-    entity.cp.trade.pricing[commodity][1] += 2;
+    entity.cp.trade.pricing[commodity][1] = Math.max(
+      entity.cp.trade.pricing[commodity][1] * 1.02,
+      entity.cp.trade.pricing[commodity][1] + 2
+    );
   }
 
   return randomInt(...entity.cp.trade.pricing[commodity]);
@@ -158,14 +166,11 @@ function adjustBuyPrice(entity: WithTrade, commodity: Commodity): number {
 
   const filled =
     entity.cp.storage.stored[commodity] / entity.cp.storage.quota[commodity];
-  const hadAnySale = size(
-    filter(
-      (transaction) =>
-        transaction.commodity === commodity &&
-        transaction.time > entity.cp.trade.lastPriceAdjust.time &&
-        transaction.type !== entity.cp.trade.offers[commodity].type,
-      entity.cp.trade.transactions
-    )
+  const hadAnySale = entity.cp.trade.transactions.some(
+    (transaction) =>
+      transaction.commodity === commodity &&
+      transaction.time > entity.cp.trade.lastPriceAdjust.time &&
+      transaction.type !== entity.cp.trade.offers[commodity].type
   );
   const mean =
     (entity.cp.trade.pricing[commodity][0] +
@@ -191,7 +196,8 @@ function adjustBuyPrice(entity: WithTrade, commodity: Commodity): number {
     const averagePrice = getAveragePrice(
       entity.cp.position.sector,
       commodity,
-      entity.sim
+      entity.sim,
+      3
     );
 
     if (currentPrice > averagePrice) {
@@ -202,18 +208,28 @@ function adjustBuyPrice(entity: WithTrade, commodity: Commodity): number {
     } else {
       entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[
         commodity
-      ].map((v) => v - mean / 5) as PriceBelief;
+      ].map((v) => v + mean / 5) as PriceBelief;
     }
   }
 
   entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[commodity].map(
-    (v) => limit(v, settings.global.minPrice, settings.global.maxPrice)
+    (v) =>
+      limit(
+        v,
+        settings.global.minPrice,
+        (mineableCommoditiesArray as string[]).includes(commodity)
+          ? settings.global.maxMineablePrice
+          : settings.global.maxPrice
+      )
   ) as PriceBelief;
   if (
     entity.cp.trade.pricing[commodity][0] ===
     entity.cp.trade.pricing[commodity][1]
   ) {
-    entity.cp.trade.pricing[commodity][1] += 2;
+    entity.cp.trade.pricing[commodity][1] = Math.max(
+      entity.cp.trade.pricing[commodity][1] * 1.02,
+      entity.cp.trade.pricing[commodity][1] + 2
+    );
   }
 
   return randomInt(...entity.cp.trade.pricing[commodity]);
@@ -258,8 +274,21 @@ export function getProductionSurplus(
 }
 
 export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
+  const requiredBudget = getPlannedBudget(entity);
+  const availableBudget = entity.cp.budget.available;
+  const stored = entity.cp.storage.availableWares;
+  const quota = entity.cp.storage.quota[commodity];
+  const multiplier =
+    requiredBudget > availableBudget ? availableBudget / requiredBudget : 1;
+
+  if (entity.hasComponents(["shipyard"])) {
+    return stored[commodity] > quota
+      ? 0
+      : Math.floor(multiplier * (stored[commodity] - quota));
+  }
+
   if (!entity.hasComponents(["compoundProduction"])) {
-    return entity.cp.storage.availableWares[commodity];
+    return stored[commodity];
   }
 
   const entityWithProduction = entity.requireComponents([
@@ -280,24 +309,13 @@ export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
     return entity.cp.storage.availableWares[commodity];
   }
 
-  const stored = entityWithProduction.cp.storage.availableWares;
-
   if (getProductionSurplus(entityWithProduction, commodity) > 0) {
     return stored[commodity] - production.pac[commodity].consumes * 2;
   }
 
-  const requiredBudget = getPlannedBudget(entityWithProduction);
-  const availableBudget = entityWithProduction.cp.budget.available;
-  const quota = entityWithProduction.cp.storage.quota[commodity];
-
-  if (stored[commodity] > quota) {
-    return 0;
-  }
-
-  const multiplier =
-    requiredBudget > availableBudget ? availableBudget / requiredBudget : 1;
-
-  return Math.floor(multiplier * (stored[commodity] - quota));
+  return stored[commodity] > quota
+    ? 0
+    : Math.floor(multiplier * (stored[commodity] - quota));
 }
 
 export function createOffers(entity: WithTrade) {

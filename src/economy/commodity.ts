@@ -26,3 +26,6 @@ export const mineableCommodities = {
   silica: commodities.silica,
 };
 export type MineableCommodity = Values<typeof mineableCommodities>;
+export const mineableCommoditiesArray = Object.values(
+  mineableCommodities
+) as MineableCommodity[];

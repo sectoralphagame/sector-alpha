@@ -28,11 +28,14 @@ import { DestroyAfterUsage } from "./destroyAfterUsage";
 import { SectorStats } from "./sectorStats";
 import { SystemManager } from "./systemManager";
 import { InflationStats } from "./inflationStats";
+import { Shipyard } from "./shipyard";
+import { Blueprints } from "./blueprints";
 
 export interface CoreComponents {
   ai: Ai;
   asteroidSpawn: AsteroidSpawn;
   autoOrder: AutoOrder;
+  blueprints: Blueprints;
   budget: Budget;
   children: Children;
   color: Color;
@@ -58,6 +61,7 @@ export interface CoreComponents {
   sectorStats: SectorStats;
   selection: Selection;
   selectionManager: SelectionManager;
+  shipyard: Shipyard;
   storage: CommodityStorage;
   storageBonus: StorageBonus;
   systemManager: SystemManager;

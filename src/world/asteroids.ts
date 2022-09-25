@@ -12,7 +12,7 @@ const getSize = () => {
   if (r < 0.05) {
     return random(10, 14);
   }
-  if (r < 0.25) {
+  if (r < 0.75) {
     return random(1, 4);
   }
 

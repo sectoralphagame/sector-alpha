@@ -7,6 +7,7 @@ import lCivTexture from "../../assets/l_civ.svg";
 import mMinTexture from "../../assets/m_min.svg";
 import fTeleportTexture from "../../assets/f_teleport.svg";
 import fCivTexture from "../../assets/f_civ.svg";
+import fShipyardTexture from "../../assets/f_shipyard.svg";
 import { isTest } from "../settings";
 
 export const textures = {
@@ -16,6 +17,7 @@ export const textures = {
   lCiv: lCivTexture,
   mMin: mMinTexture,
   fTeleport: fTeleportTexture,
+  fShipyard: fShipyardTexture,
   fCiv: fCivTexture,
 };
 export type Textures = typeof textures;

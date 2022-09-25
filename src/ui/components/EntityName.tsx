@@ -6,18 +6,18 @@ import { RequireComponent } from "../../tsHelpers";
 const styles = nano.sheet({
   input: {
     "&:focus": {
-      backgroundColor: "white",
-      color: "black",
+      background: "rgba(255,255,255,0.2)",
     },
+    background: "rgba(255,255,255,0.1)",
     border: "none",
-    background: "none",
-    borderBottom: "1px solid white",
-    color: "inherit",
-    fontSize: "inherit",
+    borderRadius: "4px",
+    color: theme.palette.default,
+    fontSize: theme.typography.default,
     marginBottom: theme.spacing(1),
     outline: 0,
-    paddingBottom: theme.spacing(1),
-    paddingTop: theme.spacing(1),
+    height: "32px",
+    padding: "4px 8px",
+    transition: "200ms",
     width: "100%",
   },
 });

@@ -5,7 +5,7 @@ import { facilityModules } from "../archetypes/facilityModule";
 import { Faction } from "../archetypes/faction";
 import { Sector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
-import { PAC } from "../components/production";
+import { createCompoundProduction, PAC } from "../components/production";
 import { addStorage } from "../components/storage";
 import {
   commoditiesArray,
@@ -82,6 +82,7 @@ export class FacilityPlanningSystem extends System {
         ) as Matrix,
         sector,
       });
+      facility.addComponent(createCompoundProduction());
 
       const facilityModule = Object.values(facilityModules).find(
         (fm) => fm.pac && fm.pac[commodity]?.consumes
@@ -123,6 +124,7 @@ export class FacilityPlanningSystem extends System {
           ) as Matrix,
           sector,
         });
+        facility.addComponent(createCompoundProduction());
 
         addFacilityModule(
           facility,
@@ -183,7 +185,7 @@ export class FacilityPlanningSystem extends System {
       if (!facility || Math.random() > 0.6) {
         if (facility && this.sim.getTime() === 0) {
           commoditiesArray.forEach((commodity) => {
-            if (facility!.cp.compoundProduction.pac[commodity].consumes) {
+            if (facility!.cp.compoundProduction!.pac[commodity].consumes) {
               addStorage(facility!.cp.storage, commodity, 500);
             }
           });
@@ -210,6 +212,7 @@ export class FacilityPlanningSystem extends System {
           ) as Matrix,
           sector,
         });
+        facility.addComponent(createCompoundProduction());
       }
 
       const facilityModule = buildQueue.pop()!;
@@ -222,11 +225,13 @@ export class FacilityPlanningSystem extends System {
     }
 
     console.table(
-      perCommodity(
-        (commodity) =>
+      perCommodity((commodity) => ({
+        produced: resourcesProducedByFacilities[commodity],
+        consumed: resourceUsageInFacilities[commodity],
+        balance:
           resourcesProducedByFacilities[commodity] -
-          resourceUsageInFacilities[commodity]
-      )
+          resourceUsageInFacilities[commodity],
+      }))
     );
   };
 
