@@ -50,7 +50,6 @@ export const NewGame: React.FC = () => {
           sim.current?.destroy();
           sim.current = Sim.load(event.data.data);
           window.sim = sim.current;
-          sim.current.start();
           navigate("game");
         }
       };

@@ -6,7 +6,7 @@ import EventEmitter from "eventemitter3";
 // @ts-expect-error
 import { reviver, replacer } from "mathjs";
 import { Path } from "graphlib";
-import * as PIXI from "pixi.js";
+
 import isPlainObject from "lodash/isPlainObject";
 import { filter, map, pipe, toArray } from "@fxts/core";
 import { Entity, EntityComponents } from "../components/entity";
@@ -25,7 +25,6 @@ import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
 import { PathPlanningSystem } from "../systems/pathPlanning";
 import { CooldownUpdatingSystem } from "../systems/cooldowns";
 import { MissingEntityError } from "../errors";
-import { setTexture } from "../components/render";
 import { openDb } from "../db";
 import { AsteroidSpawningSystem } from "../systems/asteroidSpawning";
 import { FacilityPlanningSystem } from "../systems/facilityPlanning";
@@ -33,7 +32,6 @@ import { SectorStatisticGatheringSystem } from "../systems/sectorStatisticGather
 import { ShipPlanningSystem } from "../systems/shipPlanning";
 import { InflationStatisticGatheringSystem } from "../systems/inflationStatisticGathering";
 import { ShipBuildingSystem } from "../systems/shipBuilding";
-import { isHeadless } from "../settings";
 
 function reviveMathjs(value: any) {
   if (isPlainObject(value)) {
@@ -52,12 +50,17 @@ function reviveMathjs(value: any) {
   return value;
 }
 
+interface Queues {
+  systemsToAdd: System[];
+  systemsToRemove: System[];
+}
+
 @Exclude()
 export class Sim extends BaseSim {
   @Expose()
   entityIdCounter: number = 0;
   events: EventEmitter<
-    "add-component" | "remove-component" | "remove-entity",
+    "add-component" | "remove-component" | "remove-entity" | "destroy",
     Entity
   >;
 
@@ -67,6 +70,7 @@ export class Sim extends BaseSim {
   systems: System[];
   queries: Queries;
   paths: Record<string, Record<string, Path>>;
+  queues: Queues = { systemsToAdd: [], systemsToRemove: [] };
 
   constructor() {
     super();
@@ -97,23 +101,6 @@ export class Sim extends BaseSim {
     ];
   }
 
-  initRendering = () => {
-    // eslint-disable-next-line global-require
-    const { RenderingSystem } = require("../systems/rendering");
-    this.systems.push(new RenderingSystem(this));
-
-    this.entities.forEach((entity) => {
-      if (entity.cp.render) {
-        setTexture(entity.cp.render, entity.cp.render.texture);
-        entity.cp.render.initialized = false;
-      }
-      if (entity.cp.renderGraphics) {
-        entity.cp.renderGraphics.g = new PIXI.Graphics();
-        entity.cp.renderGraphics.initialized = false;
-      }
-    });
-  };
-
   registerEntity = (entity: Entity) => {
     entity.id = this.entityIdCounter;
     this.entities.set(entity.id, entity);
@@ -125,8 +112,27 @@ export class Sim extends BaseSim {
     this.events.emit("remove-entity", entity);
   };
 
+  registerSystem = (system: System) => {
+    this.queues.systemsToAdd.push(system);
+  };
+
+  unregisterSystem = (system: System) => {
+    this.queues.systemsToRemove.push(system);
+  };
+
   next = (delta: number) => {
     this.systems.forEach((s) => s.exec(delta));
+    if (this.queues.systemsToRemove.length > 0) {
+      this.systems = this.systems.filter(
+        (system) => !this.queues.systemsToRemove.includes(system)
+      );
+      this.queues.systemsToRemove.forEach((system) => system.destroy());
+      this.queues.systemsToRemove = [];
+    }
+    if (this.queues.systemsToAdd.length > 0) {
+      this.systems.push(...this.queues.systemsToAdd);
+      this.queues.systemsToAdd = [];
+    }
     this.updateTimer(delta);
   };
 
@@ -189,9 +195,11 @@ export class Sim extends BaseSim {
   };
 
   destroy = () => {
+    this.stop();
     this.systems.forEach((system) => system.destroy());
-    this.pause();
+    this.events.emit("destroy");
     window.selected = undefined!;
+    window.sim = undefined!;
   };
 
   serialize = () => JSON.stringify(this, replacer);
@@ -241,10 +249,6 @@ export class Sim extends BaseSim {
         entity.components
       );
     });
-
-    if (!isHeadless) {
-      sim.initRendering();
-    }
 
     sim.entities = entityMap;
 

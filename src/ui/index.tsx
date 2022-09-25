@@ -1,4 +1,5 @@
 import React from "react";
+import { RecoilRoot } from "recoil";
 import { LocationContext, View } from "./context/Location";
 import { Game } from "./views/Game";
 import { LoadGame } from "./views/Load";
@@ -19,8 +20,10 @@ export const Root: React.FC = () => {
   const Component = React.useMemo(() => viewComponents[view], [view]);
 
   return (
-    <LocationContext.Provider value={setView}>
-      <Component />
-    </LocationContext.Provider>
+    <RecoilRoot>
+      <LocationContext.Provider value={setView}>
+        <Component />
+      </LocationContext.Provider>
+    </RecoilRoot>
   );
 };
