@@ -1,15 +1,14 @@
 import clsx from "clsx";
 import React from "react";
+import ClickAwayListener from "react-click-away-listener";
 import { nano, theme } from "../../style";
 import { RenderingSystem } from "../../systems/rendering";
-import {
-  Dropdown,
-  DropdownOption,
-  DropdownOptions,
-} from "../components/Dropdown";
+
 import { Panel } from "../components/Panel";
 import { LayoutProvider, useLayout } from "../context/Layout";
 import { useSim } from "../atoms";
+import { ContextMenu } from "../components/ContextMenu";
+import { Dropdown, DropdownOptions } from "../components/Dropdown";
 
 const styles = nano.sheet({
   root: {
@@ -25,12 +24,15 @@ const styles = nano.sheet({
   },
 });
 
+const defaultMenu = { active: false, position: [0, 0], worldPosition: [0, 0] };
+export type Menu = typeof defaultMenu;
+
 const GameView: React.FC = () => {
   const { isCollapsed } = useLayout();
   const [sim] = useSim();
   const system = React.useRef<RenderingSystem>();
   const canvasRoot = React.useRef<HTMLDivElement>(null);
-  const [menu, setMenu] = React.useState({ active: false, position: [0, 0] });
+  const [menu, setMenu] = React.useState(defaultMenu);
 
   React.useEffect(() => {
     if (!sim) return () => undefined;
@@ -53,26 +55,22 @@ const GameView: React.FC = () => {
   React.useEffect(() => {
     const onContextMenu = (event: MouseEvent) => {
       event.preventDefault();
+      const { x: worldX, y: worldY } = system.current!.viewport.toWorld(
+        event.offsetX,
+        event.offsetY
+      );
       setMenu({
         active: true,
         position: [event.clientX, event.clientY],
+        worldPosition: [worldX / 10, worldY / 10],
       });
-    };
-    const onClick = (event: MouseEvent) => {
-      event.preventDefault();
-      setMenu((prevMenu) => ({
-        ...prevMenu,
-        active: false,
-      }));
     };
 
     if (canvasRoot.current) {
       canvasRoot.current!.addEventListener("contextmenu", onContextMenu);
-      canvasRoot.current!.addEventListener("click", onClick);
 
       return () => {
         canvasRoot.current?.removeEventListener("contextmenu", onContextMenu);
-        canvasRoot.current?.removeEventListener("click", onClick);
       };
     }
   }, [canvasRoot.current]);
@@ -85,18 +83,21 @@ const GameView: React.FC = () => {
     >
       <Panel />
       {menu.active && (
-        <div
-          className={styles.menu}
-          style={{ top: menu.position[1], left: menu.position[0] }}
+        <ClickAwayListener
+          mouseEvent="mousedown"
+          onClickAway={() => setMenu({ ...menu, active: false })}
         >
-          <Dropdown>
-            <DropdownOptions static>
-              <DropdownOption onClick={() => undefined}>
-                Zrób coś
-              </DropdownOption>
-            </DropdownOptions>
-          </Dropdown>
-        </div>
+          <div
+            className={styles.menu}
+            style={{ top: menu.position[1], left: menu.position[0] }}
+          >
+            <Dropdown onClick={() => setMenu({ ...menu, active: false })}>
+              <DropdownOptions static>
+                <ContextMenu menu={menu} />
+              </DropdownOptions>
+            </Dropdown>
+          </div>
+        </ClickAwayListener>
       )}
       {/* This div is managed by react so each render would override
       any changes made by pixi, like cursor property. That's why rendering

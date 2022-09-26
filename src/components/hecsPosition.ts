@@ -1,4 +1,5 @@
 import { add, matrix, Matrix, multiply, subtract, sum } from "mathjs";
+import { sectorSize } from "../archetypes/sector";
 import { BaseComponent } from "./component";
 
 export const transforms = {
@@ -16,6 +17,13 @@ export interface HECSPosition extends BaseComponent<"hecsPosition"> {
    * https://www.redblobgames.com/grids/hexagons/#coordinates-cube
    */
   value: Matrix;
+}
+
+export function axialToCube(axial: Matrix): Matrix {
+  return matrix([
+    ...(axial.toArray() as number[]),
+    -(axial.get([0]) + axial.get([1])),
+  ]);
 }
 
 export function hecsMove(
@@ -55,4 +63,23 @@ export function hecsToCartesian(position: Matrix, scale: number): Matrix {
     ),
     scale
   );
+}
+
+export function cartesianToHecs(position: Matrix, scale: number): Matrix {
+  return axialToCube(
+    multiply(
+      multiply(
+        matrix([
+          [2 / 3, 0],
+          [-1 / 3, Math.sqrt(3) / 3],
+        ]),
+        position.clone().resize([2])
+      ),
+      scale
+    )
+  );
+}
+
+export function worldToHecs(coords: number[]): Matrix {
+  return hecsRound(cartesianToHecs(matrix(coords), 10 / sectorSize));
 }
