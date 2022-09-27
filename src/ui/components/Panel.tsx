@@ -26,6 +26,7 @@ import SectorResources from "./SectorStats";
 import SectorPrices from "./SectorPrices";
 import Inflation from "./InflationStats";
 import { useSim } from "../atoms";
+import { PlayerShips } from "./PlayerShips";
 
 const styles = nano.sheet({
   iconBar: {
@@ -180,7 +181,15 @@ export const Panel: React.FC = () => {
             )}
           </div>
         ) : (
-          <Inflation sim={sim} />
+          <>
+            <PlayerShips />
+            {window.dev && (
+              <>
+                <Inflation sim={sim} />
+                <hr />
+              </>
+            )}
+          </>
         ))}
       <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)} />
     </div>

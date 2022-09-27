@@ -15,4 +15,5 @@ interface Window {
   selected: {
     id: number;
   } | null;
+  dev: boolean;
 }

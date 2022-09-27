@@ -9,6 +9,7 @@ import { LayoutProvider, useLayout } from "../context/Layout";
 import { useSim } from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
 import { Dropdown, DropdownOptions } from "../components/Dropdown";
+import { PlayerMoney } from "../components/PlayerMoney";
 
 const styles = nano.sheet({
   root: {
@@ -21,6 +22,14 @@ const styles = nano.sheet({
   menu: {
     position: "absolute",
     width: "200px",
+  },
+  canvasRoot: {
+    position: "relative",
+    height: "100vh",
+    width: `calc(100vw - ${theme.isMobile ? 380 : 450}px)`,
+  },
+  collapsedCanvasRoot: {
+    width: "calc(100vw - 32px)",
   },
 });
 
@@ -102,7 +111,15 @@ const GameView: React.FC = () => {
       {/* This div is managed by react so each render would override
       any changes made by pixi, like cursor property. That's why rendering
       system creates own canvas here */}
-      <div ref={canvasRoot} id="canvasRoot" />
+      <div
+        className={clsx(styles.canvasRoot, {
+          [styles.collapsedCanvasRoot]: isCollapsed,
+        })}
+        ref={canvasRoot}
+        id="canvasRoot"
+      >
+        <PlayerMoney />
+      </div>
     </div>
   );
 };

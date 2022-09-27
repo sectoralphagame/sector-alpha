@@ -76,7 +76,7 @@ export class RenderingSystem extends SystemWithHooks {
         window.innerHeight
       );
     });
-    this.resizeObserver.observe(toolbar);
+    this.resizeObserver.observe(canvasRoot);
 
     this.sim.entities.forEach((entity) => {
       if (entity.cp.render) {

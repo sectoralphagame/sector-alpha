@@ -7,6 +7,7 @@ import okIcon from "../../../assets/ui/ok.svg";
 import { Select, SelectButton, SelectOption, SelectOptions } from "./Select";
 import { IconButton } from "./IconButton";
 import Text from "./Text";
+import { useSim } from "../atoms";
 
 const styles = nano.sheet({
   form: {
@@ -23,6 +24,7 @@ const styles = nano.sheet({
 const AutoOrder: React.FC<{ entity: RequireComponent<"autoOrder"> }> = ({
   entity,
 }) => {
+  const [sim] = useSim();
   const [defaultOrder, setDefaultOrder] = React.useState(
     entity.cp.autoOrder.default
   );
@@ -35,7 +37,7 @@ const AutoOrder: React.FC<{ entity: RequireComponent<"autoOrder"> }> = ({
     reset();
   };
 
-  if (window.sim.queries.player.get()[0].id !== entity.cp.owner?.id) {
+  if (sim.queries.player.get()[0].id !== entity.cp.owner?.id) {
     return <Text>Default Order: {entity.cp.autoOrder.default}</Text>;
   }
 
