@@ -42,7 +42,10 @@ export class BudgetPlanningSystem extends System {
 
     if (this.cooldowns.canUse("settle")) {
       this.cooldowns.use("settle", 5 * 60);
-      this.query.get().forEach(settleBudget);
+      this.query
+        .get()
+        .filter((entity) => entity.sim.getOrThrow(entity.cp.owner.id).cp.ai)
+        .forEach(settleBudget);
     }
   };
 }

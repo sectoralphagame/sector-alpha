@@ -1,27 +1,21 @@
-import { deepEqual, matrix } from "mathjs";
+import { matrix } from "mathjs";
 import React from "react";
 import { createMarker } from "../../../archetypes/marker";
-import { worldToHecs } from "../../../components/hecsPosition";
 import { getSelected } from "../../../components/selection";
 import { moveToOrders } from "../../../utils/moving";
-import { useSim } from "../../atoms";
-import { Menu } from "../../views/Game";
+import { useContextMenu, useSim } from "../../atoms";
 import { DropdownOption } from "../Dropdown";
 import { NoAvailableActions } from "./NoAvailableActions";
 
-export const ShipToSpace: React.FC<{ menu: Menu }> = ({ menu }) => {
+export const ShipToSpace: React.FC = () => {
   const [sim] = useSim();
+  const [menu] = useContextMenu();
   const selected = getSelected(sim);
   const canBeOrdered =
     selected!.cp.owner?.id === sim.queries.player.get()[0].id &&
     selected?.hasComponents(["orders", "position"]);
-  const sector = sim.queries.sectors
-    .get()
-    .find((s) =>
-      deepEqual(s.cp.hecsPosition.value, worldToHecs(menu.worldPosition))
-    );
 
-  if (!(canBeOrdered && sector)) {
+  if (!canBeOrdered) {
     return <NoAvailableActions />;
   }
 
@@ -35,7 +29,7 @@ export const ShipToSpace: React.FC<{ menu: Menu }> = ({ menu }) => {
           orders: moveToOrders(
             entity,
             createMarker(sim, {
-              sector: sector.id,
+              sector: menu.sector!.id,
               value: matrix(menu.worldPosition),
             })
           ),

@@ -1,15 +1,17 @@
 import clsx from "clsx";
 import React from "react";
 import ClickAwayListener from "react-click-away-listener";
+import { deepEqual } from "mathjs";
 import { nano, theme } from "../../style";
 import { RenderingSystem } from "../../systems/rendering";
 
 import { Panel } from "../components/Panel";
 import { LayoutProvider, useLayout } from "../context/Layout";
-import { useSim } from "../atoms";
+import { useContextMenu, useSim } from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
 import { Dropdown, DropdownOptions } from "../components/Dropdown";
 import { PlayerMoney } from "../components/PlayerMoney";
+import { worldToHecs } from "../../components/hecsPosition";
 
 const styles = nano.sheet({
   root: {
@@ -33,15 +35,12 @@ const styles = nano.sheet({
   },
 });
 
-const defaultMenu = { active: false, position: [0, 0], worldPosition: [0, 0] };
-export type Menu = typeof defaultMenu;
-
 const GameView: React.FC = () => {
   const { isCollapsed } = useLayout();
   const [sim] = useSim();
   const system = React.useRef<RenderingSystem>();
   const canvasRoot = React.useRef<HTMLDivElement>(null);
-  const [menu, setMenu] = React.useState(defaultMenu);
+  const [menu, setMenu] = useContextMenu();
 
   React.useEffect(() => {
     if (!sim) return () => undefined;
@@ -68,10 +67,17 @@ const GameView: React.FC = () => {
         event.offsetX,
         event.offsetY
       );
+      const worldPosition = [worldX / 10, worldY / 10];
       setMenu({
         active: true,
         position: [event.clientX, event.clientY],
-        worldPosition: [worldX / 10, worldY / 10],
+        worldPosition,
+        sector:
+          sim.queries.sectors
+            .get()
+            .find((s) =>
+              deepEqual(s.cp.hecsPosition.value, worldToHecs(worldPosition))
+            ) ?? null,
       });
     };
 
@@ -91,7 +97,7 @@ const GameView: React.FC = () => {
       })}
     >
       <Panel />
-      {menu.active && (
+      {menu.active && !!menu.sector && (
         <ClickAwayListener
           mouseEvent="mousedown"
           onClickAway={() => setMenu({ ...menu, active: false })}
@@ -102,7 +108,7 @@ const GameView: React.FC = () => {
           >
             <Dropdown onClick={() => setMenu({ ...menu, active: false })}>
               <DropdownOptions static>
-                <ContextMenu menu={menu} />
+                <ContextMenu />
               </DropdownOptions>
             </Dropdown>
           </div>
