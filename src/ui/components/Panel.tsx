@@ -27,6 +27,7 @@ import Inflation from "./InflationStats";
 import { useSim } from "../atoms";
 import { PlayerShips } from "./PlayerShips";
 import { useRerender } from "../hooks/useRerender";
+import { PlayerFacilities } from "./PlayerFacilities";
 
 const styles = nano.sheet({
   iconBar: {
@@ -195,6 +196,7 @@ export const Panel: React.FC = () => {
           ) : (
             <>
               <PlayerShips />
+              <PlayerFacilities />
               {window.dev && (
                 <>
                   <Inflation sim={sim} />

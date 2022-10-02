@@ -7,21 +7,23 @@ import {
 import { useSim } from "../atoms";
 import { EntityList } from "./EntityList";
 
-export const PlayerShips: React.FC = () => {
+export const PlayerFacilities: React.FC = () => {
   const [sim] = useSim();
-  const ships = sim.queries.orderable
+  const facilities = sim.queries.facilities
     .get()
     .filter((ship) => ship.cp.owner?.id === sim.queries.player.get()[0].id);
 
   return (
     <Collapsible>
-      <CollapsibleSummary>Owned Ships</CollapsibleSummary>
+      <CollapsibleSummary>Owned Facilities</CollapsibleSummary>
       <CollapsibleContent>
-        {ships.length === 0 ? (
-          <div>Currently you have no ships</div>
+        {facilities.length === 0 ? (
+          <div>Currently you have no facilities</div>
         ) : (
           <EntityList
-            entities={ships.map((ship) => ship.requireComponents(["name"]))}
+            entities={facilities.map((ship) =>
+              ship.requireComponents(["name"])
+            )}
           />
         )}
       </CollapsibleContent>
@@ -29,4 +31,4 @@ export const PlayerShips: React.FC = () => {
   );
 };
 
-PlayerShips.displayName = "PlayerShips";
+PlayerFacilities.displayName = "PlayerFacilities";
