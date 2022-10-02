@@ -9,6 +9,7 @@ import { clearFocus } from "../../components/selection";
 import { setTexture } from "../../components/render";
 
 const minScale = 0.05;
+const maxScale = 20;
 
 export class RenderingSystem extends SystemWithHooks {
   rendering: true;
@@ -19,6 +20,7 @@ export class RenderingSystem extends SystemWithHooks {
   resizeObserver: ResizeObserver;
   cooldowns: Cooldowns<"graphics">;
   dragging: boolean = false;
+  keysPressed: string[] = [];
 
   init = () => {
     this.cooldowns = new Cooldowns("graphics");
@@ -38,13 +40,14 @@ export class RenderingSystem extends SystemWithHooks {
       antialias: true,
       autoDensity: true,
       resolution: window.devicePixelRatio,
-      width: root.clientWidth - toolbar.clientWidth,
+      width: root.clientWidth,
       height: window.innerHeight,
       view: canvas,
+      backgroundColor: Color("#101010").rgbNumber(),
     });
 
     this.viewport = new Viewport({
-      screenWidth: root.clientWidth - toolbar.clientWidth,
+      screenWidth: root.clientWidth,
       screenHeight: window.innerHeight,
       interaction: this.app.renderer.plugins.interaction,
     });
@@ -52,7 +55,7 @@ export class RenderingSystem extends SystemWithHooks {
     this.app.stage.addChild(this.viewport);
 
     this.viewport.drag().pinch().wheel();
-    this.viewport.clampZoom({ minScale });
+    this.viewport.clampZoom({ minScale, maxScale });
     this.viewport.on("drag-start", () => {
       this.selectionManger.cp.selectionManager.focused = false;
       this.viewport.plugins.remove("follow");
@@ -67,14 +70,28 @@ export class RenderingSystem extends SystemWithHooks {
         clearFocus(this.selectionManger.cp.selectionManager);
       }
     });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.target !== document.body) return;
+
+      if (!this.keysPressed.includes(event.key)) {
+        this.keysPressed.push(event.key);
+      }
+    });
+
+    window.addEventListener("keyup", (event) => {
+      if (event.target !== document.body) return;
+
+      if (this.keysPressed.includes(event.key)) {
+        this.keysPressed = this.keysPressed.filter((key) => key !== event.key);
+      }
+    });
+
     this.viewport.sortableChildren = true;
 
     this.resizeObserver = new ResizeObserver(() => {
       this.app.resizeTo = canvasRoot;
-      this.viewport.resize(
-        root.clientWidth - toolbar.clientWidth,
-        window.innerHeight
-      );
+      this.viewport.resize(root.clientWidth, window.innerHeight);
     });
     this.resizeObserver.observe(canvasRoot);
 
@@ -184,6 +201,38 @@ export class RenderingSystem extends SystemWithHooks {
     this.sim.queries.renderable.get().forEach(this.updateEntityScaling);
   };
 
+  updateViewport = () => {
+    this.keysPressed.forEach((key) => {
+      const dPos = 10;
+      const dScale = 40;
+      const keymap = {
+        w: { x: 0, y: -dPos },
+        ArrowUp: { x: 0, y: -dPos },
+        s: { x: 0, y: dPos },
+        ArrowDown: { x: 0, y: dPos },
+        a: { x: -dPos, y: 0 },
+        ArrowLeft: { x: -dPos, y: 0 },
+        d: { x: dPos, y: 0 },
+        ArrowRight: { x: dPos, y: 0 },
+        z: { scale: -dScale },
+        "=": { scale: -dScale },
+        x: { scale: dScale },
+        "-": { scale: dScale },
+      };
+
+      if (keymap[key]?.x !== undefined) {
+        this.viewport.moveCenter(
+          this.viewport.center.x + keymap[key].x / this.viewport.scale.x,
+          this.viewport.center.y + keymap[key].y / this.viewport.scale.x
+        );
+      }
+
+      if (keymap[key]?.scale !== undefined) {
+        this.viewport.zoom(keymap[key].scale / this.viewport.scale.x, true);
+      }
+    });
+  };
+
   exec = (delta: number): void => {
     super.exec(delta);
     if (!this.initialized) {
@@ -193,6 +242,7 @@ export class RenderingSystem extends SystemWithHooks {
     this.cooldowns.update(delta);
     this.selectionManger = this.sim.queries.settings.get()[0];
 
+    this.updateViewport();
     this.updateGraphics();
     this.updateRenderables();
 
