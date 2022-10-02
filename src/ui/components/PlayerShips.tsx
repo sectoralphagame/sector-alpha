@@ -1,25 +1,11 @@
 import React from "react";
-import SVG from "react-inlinesvg";
-import locationIcon from "../../../assets/ui/location.svg";
-import { IconButton } from "./IconButton";
-import { Table, TableCell } from "./Table";
-import { nano } from "../../style";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleSummary,
 } from "./Collapsible";
 import { useSim } from "../atoms";
-
-const styles = nano.sheet({
-  colAction: {
-    width: "48px",
-    textAlign: "right",
-  },
-  colName: {
-    textAlign: "left",
-  },
-});
+import { EntityList } from "./EntityList";
 
 export const PlayerShips: React.FC = () => {
   const [sim] = useSim();
@@ -34,37 +20,9 @@ export const PlayerShips: React.FC = () => {
         {ships.length === 0 ? (
           <div>No docked ships</div>
         ) : (
-          <Table>
-            <thead>
-              <tr>
-                <th className={styles.colName}>Name</th>
-                <th>&nbsp;</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ships.map((ship) => (
-                <tr key={ship.id}>
-                  <TableCell className={styles.colName}>
-                    {ship.cp.name?.value}
-                  </TableCell>
-                  <TableCell className={styles.colAction}>
-                    <IconButton
-                      onClick={() => {
-                        const { selectionManager } = sim
-                          .find((e) => e.hasComponents(["selectionManager"]))!
-                          .requireComponents(["selectionManager"]).cp;
-
-                        selectionManager.id = ship.id;
-                        selectionManager.focused = true;
-                      }}
-                    >
-                      <SVG src={locationIcon} />
-                    </IconButton>
-                  </TableCell>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <EntityList
+            entities={ships.map((ship) => ship.requireComponents(["name"]))}
+          />
         )}
       </CollapsibleContent>
     </Collapsible>

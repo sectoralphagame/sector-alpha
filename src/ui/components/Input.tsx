@@ -11,7 +11,7 @@ const styles = nano.sheet({
       background: "rgba(255, 255, 255, 0.3)",
     },
     appearance: "none",
-    background: "#000",
+    background: theme.palette.background,
     borderRadius: "4px",
     border: `1px solid ${theme.palette.default}`,
     color: theme.palette.default,

@@ -1,12 +1,10 @@
-import clsx from "clsx";
 import React from "react";
 import ClickAwayListener from "react-click-away-listener";
 import { deepEqual } from "mathjs";
-import { nano, theme } from "../../style";
+import { nano } from "../../style";
 import { RenderingSystem } from "../../systems/rendering";
 
 import { Panel } from "../components/Panel";
-import { LayoutProvider, useLayout } from "../context/Layout";
 import { useContextMenu, useSim } from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
 import { Dropdown, DropdownOptions } from "../components/Dropdown";
@@ -14,13 +12,6 @@ import { PlayerMoney } from "../components/PlayerMoney";
 import { worldToHecs } from "../../components/hecsPosition";
 
 const styles = nano.sheet({
-  root: {
-    display: "grid",
-    gridTemplateColumns: `${theme.isMobile ? 380 : 450}px 1fr`,
-  },
-  collapsed: {
-    gridTemplateColumns: `calc(32px + ${theme.spacing(6)}) 1fr`,
-  },
   menu: {
     position: "absolute",
     width: "200px",
@@ -28,15 +19,11 @@ const styles = nano.sheet({
   canvasRoot: {
     position: "relative",
     height: "100vh",
-    width: `calc(100vw - ${theme.isMobile ? 380 : 450}px)`,
-  },
-  collapsedCanvasRoot: {
-    width: "calc(100vw - 32px)",
+    width: "100vw",
   },
 });
 
-const GameView: React.FC = () => {
-  const { isCollapsed } = useLayout();
+export const Game: React.FC = () => {
   const [sim] = useSim();
   const system = React.useRef<RenderingSystem>();
   const canvasRoot = React.useRef<HTMLDivElement>(null);
@@ -91,11 +78,7 @@ const GameView: React.FC = () => {
   }, [canvasRoot.current]);
 
   return (
-    <div
-      className={clsx(styles.root, {
-        [styles.collapsed]: isCollapsed,
-      })}
-    >
+    <div>
       <Panel />
       {menu.active && !!menu.sector && (
         <ClickAwayListener
@@ -117,21 +100,9 @@ const GameView: React.FC = () => {
       {/* This div is managed by react so each render would override
       any changes made by pixi, like cursor property. That's why rendering
       system creates own canvas here */}
-      <div
-        className={clsx(styles.canvasRoot, {
-          [styles.collapsedCanvasRoot]: isCollapsed,
-        })}
-        ref={canvasRoot}
-        id="canvasRoot"
-      >
+      <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
         <PlayerMoney />
       </div>
     </div>
   );
 };
-
-export const Game: React.FC = () => (
-  <LayoutProvider>
-    <GameView />
-  </LayoutProvider>
-);

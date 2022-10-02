@@ -1,10 +1,11 @@
 import React from "react";
 import { nano, theme } from "../../style";
 import { useSim } from "../atoms";
+import { useRerender } from "../hooks/useRerender";
 
 const styles = nano.sheet({
   root: {
-    top: theme.spacing(1),
+    top: theme.spacing(2),
     padding: theme.spacing(1),
     position: "absolute",
     left: "0",
@@ -28,6 +29,8 @@ export const PlayerMoney: React.FC = () => {
   const [sim] = useSim();
   const [player, setPlayer] = React.useState(sim.queries.player.get()[0]);
 
+  useRerender(1000);
+
   React.useEffect(() => {
     const handle = setInterval(
       () => setPlayer(sim.queries.player.get()[0]),
@@ -38,7 +41,7 @@ export const PlayerMoney: React.FC = () => {
   }, []);
 
   return (
-    <div className={styles.root}>
+    <div id="money" className={styles.root}>
       {player.cp.budget!.available.toFixed(0)} UTT
     </div>
   );

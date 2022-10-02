@@ -51,8 +51,11 @@ const Journal: React.FC<{ entity: RequireComponent<"journal"> }> = ({
           .slice()
           .reverse()
           .slice(cursor, cursor + pageSize)
-          .map((entry) => (
-            <li className={styles.item}>
+          .map((entry, entryIndex) => (
+            <li
+              className={styles.item}
+              key={entry.time.toString() + entryIndex}
+            >
               {entry.type === "trade" ? (
                 <div>
                   {entry.action === "buy"

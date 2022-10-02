@@ -14,7 +14,6 @@ import { IconButton } from "./IconButton";
 import ShipPanel from "./ShipPanel";
 import { nano, theme } from "../../style";
 import { ConfigDialog } from "./ConfigDialog";
-import { useLayout } from "../context/Layout";
 import {
   facilityComponents,
   facility as asFacility,
@@ -27,6 +26,7 @@ import SectorPrices from "./SectorPrices";
 import Inflation from "./InflationStats";
 import { useSim } from "../atoms";
 import { PlayerShips } from "./PlayerShips";
+import { useRerender } from "../hooks/useRerender";
 
 const styles = nano.sheet({
   iconBar: {
@@ -36,17 +36,31 @@ const styles = nano.sheet({
   },
   iconBarCollapsed: {
     flexDirection: "column",
+    marginBottom: 0,
   },
   root: {
-    borderRight: `1px solid ${theme.palette.default}`,
+    border: `1px solid ${theme.palette.default}`,
+    borderLeft: "none",
+    borderTopRightRadius: "8px",
+    borderBottomRightRadius: "8px",
+    background: theme.palette.background,
+    maxHeight: "calc(100vh - 128px)",
     padding: theme.spacing(3),
+    position: "absolute",
+    top: "64px",
+    left: "0",
+    width: theme.isMobile ? "380px" : "450px",
+    zIndex: 1,
+  },
+  rootCollapsed: {
+    width: "80px",
   },
   scrollArea: {
     "&::-webkit-scrollbar": {
       display: "none",
     },
     overflowY: "scroll",
-    height: `calc(100vh - 32px - ${theme.spacing(9)})`,
+    height: "calc(100vh - 234px)",
     paddingBottom: theme.spacing(3),
   },
   rotate: {
@@ -58,10 +72,9 @@ const styles = nano.sheet({
 });
 
 export const Panel: React.FC = () => {
-  const { isCollapsed, toggleCollapse } = useLayout();
+  const [isCollapsed, setCollapsed] = React.useState(true);
   const [openConfig, setOpenConfig] = React.useState(false);
-  const [, setRender] = React.useState(false);
-  const interval = React.useRef<number>();
+  const toggleCollapse = React.useCallback(() => setCollapsed((c) => !c), []);
 
   const [sim] = useSim();
   const selectedId = sim.queries.settings.get()[0]!.cp.selectionManager.id;
@@ -69,6 +82,8 @@ export const Panel: React.FC = () => {
   const [entity, setEntity] = React.useState<Entity | undefined>(
     selectedId ? sim.get(selectedId) : undefined
   );
+
+  useRerender(250);
 
   React.useEffect(() => {
     if (entity?.id !== selectedId) {
@@ -91,19 +106,15 @@ export const Panel: React.FC = () => {
     }
   }, [openConfig]);
 
-  React.useEffect(() => {
-    interval.current = setInterval(
-      () => setRender((v) => !v),
-      250
-    ) as unknown as number;
-
-    return () => clearInterval(interval.current);
-  }, []);
-
   if (!sim) return null;
 
   return (
-    <div className={styles.root} id="toolbar">
+    <div
+      className={clsx(styles.root, {
+        [styles.rootCollapsed]: isCollapsed,
+      })}
+      id="toolbar"
+    >
       <div
         className={clsx(styles.iconBar, {
           [styles.iconBarCollapsed]: isCollapsed,
@@ -161,36 +172,39 @@ export const Panel: React.FC = () => {
           </IconButton>
         )}
       </div>
-      {!isCollapsed &&
-        (entity ? (
-          <div className={styles.scrollArea}>
-            {entity.hasComponents(["name"]) && (
-              <EntityName entity={entity.requireComponents(["name"])} />
-            )}
-            {entity.hasComponents(shipComponents) ? (
-              <ShipPanel entity={asShip(entity)} />
-            ) : entity.hasComponents(facilityComponents) ? (
-              <FacilityPanel entity={asFacility(entity)} />
-            ) : null}
-            {entity.hasComponents(sectorComponents) && (
-              <>
-                <Resources entity={sector(entity)} />
-                <SectorResources entity={sector(entity)} />
-                <SectorPrices entity={sector(entity)} />
-              </>
-            )}
-          </div>
-        ) : (
-          <>
-            <PlayerShips />
-            {window.dev && (
-              <>
-                <Inflation sim={sim} />
-                <hr />
-              </>
-            )}
-          </>
-        ))}
+      {!isCollapsed && (
+        <div className={styles.scrollArea}>
+          {entity ? (
+            <>
+              {entity.hasComponents(["name"]) && (
+                <EntityName entity={entity.requireComponents(["name"])} />
+              )}
+              {entity.hasComponents(shipComponents) ? (
+                <ShipPanel entity={asShip(entity)} />
+              ) : entity.hasComponents(facilityComponents) ? (
+                <FacilityPanel entity={asFacility(entity)} />
+              ) : null}
+              {entity.hasComponents(sectorComponents) && (
+                <>
+                  <Resources entity={sector(entity)} />
+                  <SectorResources entity={sector(entity)} />
+                  <SectorPrices entity={sector(entity)} />
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <PlayerShips />
+              {window.dev && (
+                <>
+                  <Inflation sim={sim} />
+                  <hr />
+                </>
+              )}
+            </>
+          )}
+        </div>
+      )}
       <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)} />
     </div>
   );

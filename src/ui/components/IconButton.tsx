@@ -23,7 +23,7 @@ const styles = nano.sheet({
       cursor: "auto",
     },
     appearance: "none",
-    background: "#000",
+    background: theme.palette.background,
     borderRadius: "4px",
     border: `1px solid ${theme.palette.default}`,
     color: theme.palette.default,
