@@ -1,11 +1,7 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import { Ship } from "../../archetypes/ship";
 import { MineOrder, Order, OrderGroup } from "../../components/orders";
 import { commodities } from "../../economy/commodity";
-import { IconButton } from "./IconButton";
-import locationIcon from "../../../assets/ui/location.svg";
-import { nano, theme } from "../../style";
 import {
   Collapsible,
   CollapsibleContent,
@@ -15,15 +11,7 @@ import { Docks } from "./Docks";
 import { Sim } from "../../sim";
 import { asteroidField } from "../../archetypes/asteroidField";
 import AutoOrder from "./AutoOrder";
-
-const styles = nano.sheet(
-  {
-    focus: {
-      marginLeft: theme.spacing(3),
-    },
-  },
-  "ShipPanel"
-);
+import { Commander } from "./Commander";
 
 function getOrderDescription(ship: Ship, order: Order) {
   switch (order.type) {
@@ -87,22 +75,10 @@ const ShipPanel: React.FC<{ entity: Ship }> = ({ entity: ship }) => {
   return (
     <div>
       {!!commander && (
-        <div>
-          {`Commander: ${commander.cp.name!.value}`}
-          <IconButton
-            className={styles.focus}
-            onClick={() => {
-              const { selectionManager } = ship.sim
-                .find((e) => e.hasComponents(["selectionManager"]))!
-                .requireComponents(["selectionManager"]).cp;
-
-              selectionManager.id = commander.id;
-              selectionManager.focused = true;
-            }}
-          >
-            <SVG src={locationIcon} />
-          </IconButton>
-        </div>
+        <Commander
+          commander={commander}
+          ship={ship.requireComponents(["commander"])}
+        />
       )}
       <hr />
       {storedCommodities.length > 0
