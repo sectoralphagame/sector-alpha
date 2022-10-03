@@ -33,11 +33,15 @@ const styles = nano.sheet({
   iconBar: {
     display: "flex",
     gap: theme.spacing(1),
-    marginBottom: theme.spacing(3),
+    marginBottom: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+    borderBottom: `1px solid ${theme.palette.default}`,
   },
   iconBarCollapsed: {
     flexDirection: "column",
     marginBottom: 0,
+    padding: 0,
+    borderBottom: "none",
   },
   root: {
     border: `1px solid ${theme.palette.default}`,
