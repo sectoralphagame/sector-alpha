@@ -22,6 +22,7 @@ const styles = nano.sheet({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    pointerEvents: "none",
   },
 });
 

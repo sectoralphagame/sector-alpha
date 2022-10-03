@@ -21,17 +21,18 @@ export class RenderingSystem extends SystemWithHooks {
   cooldowns: Cooldowns<"graphics">;
   dragging: boolean = false;
   keysPressed: string[] = [];
+  toolbar: HTMLDivElement;
 
   init = () => {
     this.cooldowns = new Cooldowns("graphics");
     this.selectionManger = this.sim.queries.settings.get()[0];
+    this.toolbar = document.querySelector("#toolbar")!;
     const root = document.querySelector("#root")!;
-    const toolbar = document.querySelector("#toolbar")!;
     const canvasRoot = document.querySelector(
       "#canvasRoot"
     )! as HTMLCanvasElement;
 
-    if (!(root || toolbar || canvasRoot)) return;
+    if (!(root || canvasRoot)) return;
 
     const canvas = document.createElement("canvas");
     canvasRoot.appendChild(canvas);
@@ -57,6 +58,7 @@ export class RenderingSystem extends SystemWithHooks {
     this.viewport.drag().pinch().wheel();
     this.viewport.clampZoom({ minScale, maxScale });
     this.viewport.on("drag-start", () => {
+      this.toolbar.style.pointerEvents = "none";
       this.selectionManger.cp.selectionManager.focused = false;
       this.viewport.plugins.remove("follow");
       this.dragging = true;
@@ -66,6 +68,7 @@ export class RenderingSystem extends SystemWithHooks {
     });
 
     this.viewport.on("mouseup", (event) => {
+      this.toolbar.style.pointerEvents = "unset";
       if (event.target === event.currentTarget && !this.dragging) {
         clearFocus(this.selectionManger.cp.selectionManager);
       }
