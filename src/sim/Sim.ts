@@ -141,6 +141,7 @@ export class Sim extends BaseSim {
     settingsEntity
       .addComponent({
         id: null,
+        secondaryId: null,
         focused: false,
         name: "selectionManager",
       })

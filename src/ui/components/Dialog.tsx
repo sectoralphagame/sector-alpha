@@ -43,6 +43,7 @@ export const Dialog: React.FC<DialogProps> = ({
         left: "50%",
         right: "auto",
         bottom: "auto",
+        maxWidth: `calc(100vw - ${theme.spacing(4)})`,
         width: width ?? "300px",
         marginRight: "-50%",
         transform: "translate(-50%, -50%)",

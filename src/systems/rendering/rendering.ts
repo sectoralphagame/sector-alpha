@@ -141,8 +141,13 @@ export class RenderingSystem extends SystemWithHooks {
         this.viewport.addChild(entityRender.sprite);
         if (entity.hasComponents(["selection"])) {
           entityRender.sprite.interactive = true;
-          entityRender.sprite.on("pointerdown", () => {
-            this.selectionManger.cp.selectionManager.id = entity.id;
+          entityRender.sprite.on("pointerdown", (event) => {
+            // Right click
+            if (event.data.originalEvent.which === 3) {
+              this.selectionManger.cp.selectionManager.secondaryId = entity.id;
+            } else if (event.data.originalEvent.which === 1) {
+              this.selectionManger.cp.selectionManager.id = entity.id;
+            }
           });
           entityRender.sprite.cursor = "pointer";
           entityRender.sprite.tint = entityRender.color;

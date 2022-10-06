@@ -16,17 +16,19 @@ import { Commander } from "./Commander";
 function getOrderDescription(ship: Ship, order: Order) {
   switch (order.type) {
     case "move":
-      return "Go to location";
+      return `Go to ${
+        ship.sim.getOrThrow(order.targetId).cp.name?.value ?? "location"
+      }`;
     case "teleport":
       return "Teleport to location";
     case "trade":
-      if (order.targetId === ship.cp.commander?.id)
-        return "Deliver wares to commander";
       return order.offer.type === "sell"
-        ? `Deliver wares to ${
-            ship.sim.getOrThrow(order.targetId).cp.name?.value
-          }`
-        : `Get wares from ${
+        ? order.targetId === ship.cp.commander?.id
+          ? `Deliver ${order.offer.quantity}x ${order.offer.commodity} to commander`
+          : `Deliver ${order.offer.quantity}x ${order.offer.commodity} to ${
+              ship.sim.getOrThrow(order.targetId).cp.name?.value
+            }`
+        : `Get ${order.offer.quantity}x ${order.offer.commodity} from ${
             ship.sim.getOrThrow(order.targetId).cp.name?.value
           }`;
     case "mine":
@@ -47,7 +49,7 @@ function getOrderDescription(ship: Ship, order: Order) {
 function getOrderGroupDescription(order: OrderGroup, sim: Sim) {
   switch (order.type) {
     case "move":
-      return "Go to location";
+      return "Move";
     case "trade":
       return "Trade";
     case "mine":

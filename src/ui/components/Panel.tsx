@@ -24,10 +24,11 @@ import { sector, sectorComponents } from "../../archetypes/sector";
 import SectorResources from "./SectorStats";
 import SectorPrices from "./SectorPrices";
 import Inflation from "./InflationStats";
-import { useSim } from "../atoms";
+import { useGameDialog, useSim } from "../atoms";
 import { PlayerShips } from "./PlayerShips";
 import { useRerender } from "../hooks/useRerender";
 import { PlayerFacilities } from "./PlayerFacilities";
+import { TradeDialog } from "./TradeDialog";
 
 const styles = nano.sheet({
   iconBar: {
@@ -78,7 +79,7 @@ const styles = nano.sheet({
 
 export const Panel: React.FC = () => {
   const [isCollapsed, setCollapsed] = React.useState(true);
-  const [openConfig, setOpenConfig] = React.useState(false);
+  const [dialog, setDialog] = useGameDialog();
   const toggleCollapse = React.useCallback(() => setCollapsed((c) => !c), []);
 
   const [sim] = useSim();
@@ -87,6 +88,8 @@ export const Panel: React.FC = () => {
   const [entity, setEntity] = React.useState<Entity | undefined>(
     selectedId ? sim.get(selectedId) : undefined
   );
+
+  const closeDialog = React.useCallback(() => setDialog(null), []);
 
   useRerender(250);
 
@@ -104,12 +107,10 @@ export const Panel: React.FC = () => {
 
   React.useEffect(() => {
     if (!sim) return;
-    if (openConfig) {
-      sim.pause();
-    } else {
-      sim.start();
+    if (dialog?.type === "config") {
+      sim.stop();
     }
-  }, [openConfig]);
+  }, [dialog]);
 
   if (!sim) return null;
 
@@ -130,7 +131,7 @@ export const Panel: React.FC = () => {
             <SVG src={arrowLeftIcon} />
           </IconButton>
         ) : (
-          <IconButton onClick={() => setOpenConfig(true)}>
+          <IconButton onClick={() => setDialog({ type: "config" })}>
             <SVG src={configIcon} />
           </IconButton>
         )}
@@ -172,7 +173,7 @@ export const Panel: React.FC = () => {
             </IconButton>
           </>
         ) : (
-          <IconButton onClick={() => setOpenConfig(true)}>
+          <IconButton onClick={() => setDialog({ type: "config" })}>
             <SVG src={configIcon} />
           </IconButton>
         )}
@@ -211,7 +212,14 @@ export const Panel: React.FC = () => {
           )}
         </div>
       )}
-      <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)} />
+      <ConfigDialog
+        open={dialog?.type === "config"}
+        onClose={() => {
+          closeDialog();
+          sim.start();
+        }}
+      />
+      <TradeDialog open={dialog?.type === "trade"} onClose={closeDialog} />
     </div>
   );
 };

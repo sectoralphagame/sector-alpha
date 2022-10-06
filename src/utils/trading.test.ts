@@ -8,7 +8,7 @@ import { Sim } from "../sim";
 import { settleStorageQuota } from "../systems/storageQuotaPlanning";
 import { createOffers } from "../systems/trading";
 import { createFarm, createWaterFacility } from "../world/facilities";
-import { allocate, getNeededCommodities, tradeCommodity } from "./trading";
+import { allocate, getNeededCommodities, resellCommodity } from "./trading";
 import { createShip, Ship } from "../archetypes/ship";
 import { shipClasses } from "../world/ships";
 import { dockShip } from "../systems/orderExecuting/dock";
@@ -139,9 +139,16 @@ describe("Trading module", () => {
       sector,
     });
 
-    const result = tradeCommodity(ship, "water", facility, waterFacility);
+    const result = resellCommodity(ship, "water", facility, waterFacility);
+    const orders = ship.cp.orders.value.flatMap((og) =>
+      og.orders.filter((o) => o.type === "trade")
+    );
 
     expect(result).toBe(true);
+    expect((orders[0] as TradeOrder).targetId).toBe(waterFacility.id);
+    expect((orders[0] as TradeOrder).offer.type).toBe("buy");
+    expect((orders[1] as TradeOrder).targetId).toBe(facility.id);
+    expect((orders[1] as TradeOrder).offer.type).toBe("sell");
     expect(shipFaction.cp.budget.allocations).toHaveLength(1);
     expect(facility.cp.budget.allocations).toHaveLength(1);
     expect(facility.cp.budget.allocations[0].id).toBe(10);
@@ -158,9 +165,16 @@ function trade(
   buyer: WithTrade,
   seller: WithTrade
 ) {
-  const result = tradeCommodity(ship, commodity, buyer, seller);
+  const result = resellCommodity(ship, commodity, buyer, seller);
+  const orders = ship.cp.orders.value.flatMap((og) =>
+    og.orders.filter((o) => o.type === "trade")
+  );
 
   expect(result).toBe(true);
+  expect((orders[0] as TradeOrder).targetId).toBe(seller.id);
+  expect((orders[0] as TradeOrder).offer.type).toBe("buy");
+  expect((orders[1] as TradeOrder).targetId).toBe(buyer.id);
+  expect((orders[1] as TradeOrder).offer.type).toBe("sell");
 
   const shipFactionBudget = ship.sim.getOrThrow<Faction>(ship.cp.owner.id).cp
     .budget;

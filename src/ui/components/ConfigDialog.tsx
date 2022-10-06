@@ -46,6 +46,10 @@ const styles = nano.sheet({
 const views = ["default", "load", "save", "settings"] as const;
 type Views = typeof views[number];
 
+export interface ConfigDialogProps {
+  type: "config";
+}
+
 export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const [view, setView] = React.useState<Views>("default");
   const [saves, setSaves] = React.useState<Save[]>();

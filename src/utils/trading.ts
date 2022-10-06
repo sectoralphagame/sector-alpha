@@ -1,11 +1,11 @@
 import merge from "lodash/merge";
 import { mean } from "mathjs";
-import { filter, map, pipe, sortBy } from "@fxts/core";
+import { filter, map, pipe, sortBy, toArray } from "@fxts/core";
 import { facilityComponents } from "../archetypes/facility";
-import { Order, tradeOrder } from "../components/orders";
+import { Order, TradeOrder, tradeOrder } from "../components/orders";
 import type { TransactionInput } from "../components/trade";
 import { Allocation } from "../components/utils/allocations";
-import { commodities, commoditiesArray, Commodity } from "../economy/commodity";
+import { commoditiesArray, Commodity } from "../economy/commodity";
 import { getFacilityWithMostProfit, WithTrade } from "../economy/utils";
 import {
   ExceededOfferQuantity,
@@ -30,6 +30,7 @@ import {
 import { Sector } from "../archetypes/sector";
 import { SectorPriceStats } from "../components/sectorStats";
 import { limitMax } from "./limit";
+import { Marker } from "../archetypes/marker";
 
 export function isTradeAccepted(
   entity: WithTrade,
@@ -237,10 +238,61 @@ export function getCommoditiesForSell(entity: WithTrade): Commodity[] {
 }
 
 /**
+ * Arrange a series of orders "go and buy or sell there"
+ * @param entity Ship that initiates trade
+ */
+export function tradeCommodity(
+  entity: RequireComponent<
+    "storage" | "owner" | "orders" | "position" | "dockable"
+  >,
+  offer: TransactionInput,
+  target: WithTrade,
+  position?: Marker
+): Order[] | null {
+  const allocations = allocate(target, offer);
+  if (!allocations) {
+    return null;
+  }
+
+  return [
+    ...moveToOrders(position ?? entity, target),
+    {
+      type: "dock",
+      targetId: target.id,
+    },
+    tradeOrder({
+      targetId: target.id,
+      offer: {
+        ...offer,
+        allocations:
+          offer.type === "buy"
+            ? {
+                buyer: {
+                  budget: allocations.budget?.id ?? null,
+                  storage: null,
+                },
+                seller: {
+                  budget: null,
+                  storage: allocations.storage?.id ?? null,
+                },
+              }
+            : {
+                buyer: {
+                  budget: allocations.budget?.id ?? null,
+                  storage: allocations.storage?.id ?? null,
+                },
+                seller: { budget: null, storage: null },
+              },
+      },
+    }),
+  ];
+}
+
+/**
  * Arrange a series of orders "buy here and sell there"
  * @param entity Ship that moves commodity
  */
-export function tradeCommodity(
+export function resellCommodity(
   entity: RequireComponent<
     "storage" | "owner" | "orders" | "position" | "dockable"
   >,
@@ -306,66 +358,29 @@ export function tradeCommodity(
     return false;
   }
 
-  const buyerAllocations = allocate(buyer, offerForBuyer);
-  if (!buyerAllocations) {
+  const sellOrders = tradeCommodity(entity, offerForBuyer, buyer, seller);
+  if (sellOrders === null) {
+    return false;
+  }
+  const buyOrders = tradeCommodity(entity, offerForSeller, seller);
+  if (buyOrders === null) {
+    const sellOrdersAllocations = (
+      sellOrders.find((o) => o.type === "trade") as TradeOrder
+    ).offer.allocations!;
+    if (sellOrdersAllocations.buyer!.budget) {
+      releaseBudgetAllocation(
+        buyer.cp.budget,
+        sellOrdersAllocations!.buyer!.budget!
+      );
+    }
+    releaseStorageAllocation(
+      buyer.cp.storage,
+      sellOrdersAllocations.seller!.storage!
+    );
     return false;
   }
 
-  const sellerAllocations = allocate(seller, offerForSeller);
-  if (!sellerAllocations) {
-    if (buyerAllocations.budget?.id) {
-      releaseBudgetAllocation(buyer.cp.budget, buyerAllocations.budget.id);
-    }
-    if (buyerAllocations.storage?.id) {
-      releaseStorageAllocation(buyer.cp.storage, buyerAllocations.storage.id);
-    }
-    return false;
-  }
-
-  const orders: Order[] = [];
-
-  if (entity.cp.dockable.dockedIn !== seller.id) {
-    orders.push(...moveToOrders(entity, seller), {
-      type: "dock",
-      targetId: seller.id,
-    });
-  }
-
-  orders.push(
-    tradeOrder({
-      targetId: seller.id,
-      offer: {
-        ...offerForSeller,
-        allocations: {
-          buyer: {
-            budget: sellerAllocations.budget?.id ?? null,
-            storage: null,
-          },
-          seller: {
-            budget: null,
-            storage: sellerAllocations.storage?.id ?? null,
-          },
-        },
-        type: "buy",
-      },
-    }),
-    ...moveToOrders(seller, buyer),
-    { type: "dock", targetId: buyer.id },
-    tradeOrder({
-      targetId: buyer.id,
-      offer: {
-        ...offerForBuyer,
-        allocations: {
-          buyer: {
-            budget: buyerAllocations.budget?.id ?? null,
-            storage: buyerAllocations.storage?.id ?? null,
-          },
-          seller: { budget: null, storage: null },
-        },
-        type: "sell",
-      },
-    })
-  );
+  const orders = [...buyOrders, ...sellOrders];
 
   entity.cp.orders.value.push({
     type: "trade",
@@ -403,7 +418,7 @@ export function autoBuyMostNeededByCommander(
 
   if (!target) return false;
 
-  return tradeCommodity(entity, commodity, commander, target);
+  return resellCommodity(entity, commodity, commander, target);
 }
 
 export function autoSellMostRedundantToCommander(
@@ -434,7 +449,7 @@ export function autoSellMostRedundantToCommander(
 
   if (!target) return false;
 
-  return tradeCommodity(entity, commodity, target, commander);
+  return resellCommodity(entity, commodity, target, commander);
 }
 
 export function returnToFacility(
@@ -451,20 +466,16 @@ export function returnToFacility(
   const commander = entity.sim
     .getOrThrow(entity.cp.commander.id)
     .requireComponents([...facilityComponents, "owner"]);
-  const orders: Order[] = [];
-  if (entity.cp.dockable.dockedIn !== commander.id) {
-    orders.push(...moveToOrders(entity, commander), {
-      type: "dock",
-      targetId: commander.id,
-    });
-  }
-  Object.values(commodities)
-    .filter(
+
+  const deliveryOrders = pipe(
+    commoditiesArray,
+    filter(
       (commodity) =>
         entity.cp.storage.availableWares[commodity] > 0 &&
-        commander.cp.trade.offers[commodity].quantity > 0
-    )
-    .forEach((commodity) => {
+        commander.cp.trade.offers[commodity].quantity > 0 &&
+        commander.cp.trade.offers[commodity].type === "buy"
+    ),
+    map((commodity) => {
       const offer: TransactionInput = {
         commodity,
         initiator: entity.id,
@@ -481,30 +492,41 @@ export function returnToFacility(
 
       const allocations = allocate(commander, offer);
       if (allocations) {
-        orders.push(
-          tradeOrder(
-            merge(
-              {
-                targetId: commander.id,
-                offer,
-              },
-              {
-                offer: {
-                  allocations: {
-                    buyer: {
-                      storage: allocations.storage?.id,
-                    },
+        return tradeOrder(
+          merge(
+            {
+              targetId: commander.id,
+              offer,
+            },
+            {
+              offer: {
+                allocations: {
+                  buyer: {
+                    storage: allocations.storage?.id,
                   },
                 },
-              }
-            )
+              },
+            }
           )
         );
       }
-    });
-  if (orders.length) {
+
+      return undefined;
+    }),
+    filter(Boolean),
+    toArray
+  );
+
+  if (deliveryOrders.length) {
     entity.cp.orders.value.push({
-      orders,
+      orders: [
+        ...moveToOrders(entity, commander),
+        {
+          type: "dock",
+          targetId: commander.id,
+        },
+        ...deliveryOrders,
+      ],
       type: "trade",
     });
   }

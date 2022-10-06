@@ -28,7 +28,7 @@ import {
   getCommoditiesForSell,
   getNeededCommodities,
   returnToFacility,
-  tradeCommodity,
+  resellCommodity,
 } from "../utils/trading";
 import { holdPosition } from "./orderExecuting/misc";
 import { System } from "./system";
@@ -83,7 +83,7 @@ function autoTrade(entity: Trading, sectorDistance: number) {
   let makingTrade = false;
   const trade = getTradeWithMostProfit(entity, sectorDistance);
   if (trade) {
-    makingTrade = tradeCommodity(
+    makingTrade = resellCommodity(
       entity,
       trade.commodity,
       trade.buyer,

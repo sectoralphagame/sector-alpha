@@ -1,6 +1,7 @@
 import { matrix } from "mathjs";
 import React from "react";
 import { createMarker } from "../../../archetypes/marker";
+import { isOwnedByPlayer } from "../../../components/player";
 import { getSelected } from "../../../components/selection";
 import { moveToOrders } from "../../../utils/moving";
 import { useContextMenu, useSim } from "../../atoms";
@@ -10,9 +11,9 @@ import { NoAvailableActions } from "./NoAvailableActions";
 export const ShipToSpace: React.FC = () => {
   const [sim] = useSim();
   const [menu] = useContextMenu();
-  const selected = getSelected(sim);
+  const selected = getSelected(sim)!;
   const canBeOrdered =
-    selected!.cp.owner?.id === sim.queries.player.get()[0].id &&
+    isOwnedByPlayer(selected) &&
     selected?.hasComponents(["orders", "position"]);
 
   if (!canBeOrdered) {
