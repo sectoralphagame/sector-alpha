@@ -1,8 +1,11 @@
-import { matrix } from "mathjs";
+import { matrix, norm, subtract } from "mathjs";
 import React from "react";
+import { Asteroid } from "../../../archetypes/asteroid";
 import { createMarker } from "../../../archetypes/marker";
+import { mineOrder } from "../../../components/orders";
 import { isOwnedByPlayer } from "../../../components/player";
 import { getSelected } from "../../../components/selection";
+import { pickRandom } from "../../../utils/generators";
 import { moveToOrders } from "../../../utils/moving";
 import { useContextMenu, useSim } from "../../atoms";
 import { DropdownOption } from "../Dropdown";
@@ -20,25 +23,62 @@ export const ShipToSpace: React.FC = () => {
     return <NoAvailableActions />;
   }
 
+  const fieldsToMine = selected.cp.mining
+    ? sim.queries.asteroidFields
+        .get()
+        .filter(
+          (field) =>
+            norm(
+              subtract(field.cp.position.coord, matrix(menu.worldPosition))
+            ) < field.cp.asteroidSpawn.size
+        )
+    : [];
+
   const entity = selected!.requireComponents(["orders", "position"]);
 
   return (
-    <DropdownOption
-      onClick={() => {
-        entity.cp.orders!.value.push({
-          type: "move",
-          orders: moveToOrders(
-            entity,
-            createMarker(sim, {
-              sector: menu.sector!.id,
-              value: matrix(menu.worldPosition),
-            })
-          ),
-        });
-      }}
-    >
-      Move
-    </DropdownOption>
+    <>
+      <DropdownOption
+        onClick={() => {
+          entity.cp.orders!.value.push({
+            type: "move",
+            orders: moveToOrders(
+              entity,
+              createMarker(sim, {
+                sector: menu.sector!.id,
+                value: matrix(menu.worldPosition),
+              })
+            ),
+          });
+        }}
+      >
+        Move
+      </DropdownOption>
+      {fieldsToMine.length > 0 &&
+        fieldsToMine.map((field) => (
+          <DropdownOption
+            key={field.id}
+            onClick={() => {
+              const asteroid = sim.getOrThrow<Asteroid>(
+                pickRandom(field.cp.children.entities)
+              );
+
+              entity.cp.orders!.value.push({
+                type: "mine",
+                orders: [
+                  ...moveToOrders(entity, asteroid),
+                  mineOrder({
+                    targetFieldId: field.id,
+                    targetRockId: asteroid.id,
+                  }),
+                ],
+              });
+            }}
+          >
+            Mine {field.cp.asteroidSpawn.type}
+          </DropdownOption>
+        ))}
+    </>
   );
 };
 

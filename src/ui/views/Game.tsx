@@ -77,6 +77,12 @@ export const Game: React.FC = () => {
     }
   }, [canvasRoot.current]);
 
+  React.useEffect(() => {
+    if (!menu.active) {
+      sim.queries.settings.get()[0].cp.selectionManager.secondaryId = null;
+    }
+  }, [menu.active]);
+
   return (
     <div>
       <Panel />
