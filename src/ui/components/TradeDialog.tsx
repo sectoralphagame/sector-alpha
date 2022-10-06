@@ -80,6 +80,16 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             .filter((commodity) => offers[commodity].active)
             .map((commodity) => {
               const action = getAction(commodity);
+              const max =
+                action === "buy"
+                  ? Math.min(
+                      offers[commodity].quantity,
+                      getAvailableSpace(initiator.cp.storage)
+                    )
+                  : Math.min(
+                      offers[commodity].quantity,
+                      initiator.cp.storage.availableWares[commodity]
+                    );
 
               return (
                 <tr className={styles.row} key={commodity}>
@@ -134,22 +144,18 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
                         className={styles.input}
                         placeholder="Quantity"
                         type="number"
-                        max={
-                          action === "buy"
-                            ? Math.min(
-                                offers[commodity].quantity,
-                                getAvailableSpace(initiator.cp.storage)
-                              )
-                            : Math.min(
-                                offers[commodity].quantity,
-                                initiator.cp.storage.availableWares[commodity]
-                              )
-                        }
+                        max={max}
                         min={0}
                         {...register(commodity)}
                       />
                       <Button
                         onClick={() => {
+                          const quantity = getValues()[commodity];
+
+                          if (!(quantity > 0 && quantity <= max)) {
+                            return;
+                          }
+
                           const orders = tradeCommodity(
                             initiator,
                             {
@@ -159,7 +165,7 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
                               factionId: sim.queries.player.get()[0].id,
                               initiator: initiator.id,
                               price: offers[commodity].price,
-                              quantity: getValues()[commodity],
+                              quantity,
                               type: action,
                             },
                             target
