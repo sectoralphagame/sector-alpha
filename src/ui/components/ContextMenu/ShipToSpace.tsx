@@ -1,6 +1,7 @@
 import { matrix, norm, subtract } from "mathjs";
 import React from "react";
 import { Asteroid } from "../../../archetypes/asteroid";
+import { AsteroidField } from "../../../archetypes/asteroidField";
 import { createMarker } from "../../../archetypes/marker";
 import { mineOrder } from "../../../components/orders";
 import { isOwnedByPlayer } from "../../../components/player";
@@ -36,45 +37,42 @@ export const ShipToSpace: React.FC = () => {
 
   const entity = selected!.requireComponents(["orders", "position"]);
 
+  const onMove = () => {
+    entity.cp.orders!.value.push({
+      type: "move",
+      orders: moveToOrders(
+        entity,
+        createMarker(sim, {
+          sector: menu.sector!.id,
+          value: matrix(menu.worldPosition),
+        })
+      ),
+    });
+  };
+
+  const onMine = (field: AsteroidField) => {
+    const asteroid = sim.getOrThrow<Asteroid>(
+      pickRandom(field.cp.children.entities)
+    );
+
+    entity.cp.orders!.value.push({
+      type: "mine",
+      orders: [
+        ...moveToOrders(entity, asteroid),
+        mineOrder({
+          targetFieldId: field.id,
+          targetRockId: asteroid.id,
+        }),
+      ],
+    });
+  };
+
   return (
     <>
-      <DropdownOption
-        onClick={() => {
-          entity.cp.orders!.value.push({
-            type: "move",
-            orders: moveToOrders(
-              entity,
-              createMarker(sim, {
-                sector: menu.sector!.id,
-                value: matrix(menu.worldPosition),
-              })
-            ),
-          });
-        }}
-      >
-        Move
-      </DropdownOption>
+      <DropdownOption onClick={onMove}>Move</DropdownOption>
       {fieldsToMine.length > 0 &&
         fieldsToMine.map((field) => (
-          <DropdownOption
-            key={field.id}
-            onClick={() => {
-              const asteroid = sim.getOrThrow<Asteroid>(
-                pickRandom(field.cp.children.entities)
-              );
-
-              entity.cp.orders!.value.push({
-                type: "mine",
-                orders: [
-                  ...moveToOrders(entity, asteroid),
-                  mineOrder({
-                    targetFieldId: field.id,
-                    targetRockId: asteroid.id,
-                  }),
-                ],
-              });
-            }}
-          >
+          <DropdownOption key={field.id} onClick={() => onMine(field)}>
             Mine {field.cp.asteroidSpawn.type}
           </DropdownOption>
         ))}

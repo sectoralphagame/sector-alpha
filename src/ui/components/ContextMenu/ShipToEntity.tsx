@@ -27,41 +27,37 @@ export const ShipToEntity: React.FC = () => {
 
   const entity = selected!.requireComponents(["orders", "position"]);
 
+  const onTrade = () => {
+    setDialog({
+      type: "trade",
+      initiator: selected.id,
+      target: actionable.id,
+    });
+  };
+
+  const onDock = () => {
+    entity.cp.orders!.value.push({
+      type: "dock",
+      orders: [
+        ...moveToOrders(
+          entity,
+          createMarker(sim, {
+            sector: menu.sector!.id,
+            value: matrix(menu.worldPosition),
+          })
+        ),
+        { type: "dock", targetId: actionable.id },
+      ],
+    });
+  };
+
   return (
     <>
       {actionable.hasComponents(["trade"]) && (
-        <DropdownOption
-          onClick={() => {
-            setDialog({
-              type: "trade",
-              initiator: selected.id,
-              target: actionable.id,
-            });
-          }}
-        >
-          Trade
-        </DropdownOption>
+        <DropdownOption onClick={onTrade}>Trade</DropdownOption>
       )}
       {actionable.hasComponents(["docks"]) && (
-        <DropdownOption
-          onClick={() => {
-            entity.cp.orders!.value.push({
-              type: "dock",
-              orders: [
-                ...moveToOrders(
-                  entity,
-                  createMarker(sim, {
-                    sector: menu.sector!.id,
-                    value: matrix(menu.worldPosition),
-                  })
-                ),
-                { type: "dock", targetId: actionable.id },
-              ],
-            });
-          }}
-        >
-          Dock
-        </DropdownOption>
+        <DropdownOption onClick={onDock}>Dock</DropdownOption>
       )}
     </>
   );
