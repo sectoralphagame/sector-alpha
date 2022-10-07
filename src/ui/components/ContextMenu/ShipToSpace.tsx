@@ -58,7 +58,13 @@ export const ShipToSpace: React.FC = () => {
     entity.cp.orders!.value.push({
       type: "mine",
       orders: [
-        ...moveToOrders(entity, asteroid),
+        ...moveToOrders(
+          entity,
+          createMarker(sim, {
+            sector: asteroid.cp.position.sector,
+            value: matrix(asteroid.cp.position.coord),
+          })
+        ),
         mineOrder({
           targetFieldId: field.id,
           targetRockId: asteroid.id,
