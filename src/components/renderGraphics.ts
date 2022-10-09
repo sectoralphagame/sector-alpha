@@ -106,6 +106,7 @@ export const graphics: Graphics = {
       orderGroup.orders.forEach((order) => {
         if (order.type !== "hold" && order.type !== "mine") {
           const target = entity.sim.get(order.targetId);
+          if (!target) return;
 
           const targetPosition = findInAncestors(target!, "position").cp
             .position;

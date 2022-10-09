@@ -90,7 +90,12 @@ const Orders: React.FC<{ ship: Ship }> = ({ ship }) => {
             <div className={styles.orderGroupHeader}>
               {getOrderGroupDescription(order, ship.sim)}
               {isOwned && (
-                <IconButton>
+                <IconButton
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    ship.cp.orders.value.splice(orderIndex, 1);
+                  }}
+                >
                   <SVG src={closeIcon} />
                 </IconButton>
               )}
