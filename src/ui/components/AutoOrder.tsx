@@ -51,16 +51,7 @@ const AutoOrder: React.FC<{ entity: RequireComponent<"autoOrder"> }> = ({
       >
         <SelectButton>{defaultOrder}</SelectButton>
         <SelectOptions>
-          {(
-            [
-              "dock",
-              "hold",
-              "mine",
-              "move",
-              "teleport",
-              "trade",
-            ] as Order["type"][]
-          ).map((type) => (
+          {(["hold", "mine", "trade"] as Order["type"][]).map((type) => (
             <SelectOption key={type} value={type}>
               {type}
             </SelectOption>
