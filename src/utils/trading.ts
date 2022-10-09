@@ -383,6 +383,7 @@ export function resellCommodity(
   const orders = [...buyOrders, ...sellOrders];
 
   entity.cp.orders.value.push({
+    origin: "auto",
     type: "trade",
     orders,
   });
@@ -519,6 +520,7 @@ export function returnToFacility(
 
   if (deliveryOrders.length) {
     entity.cp.orders.value.push({
+      origin: "auto",
       orders: [
         ...moveToOrders(entity, commander),
         {

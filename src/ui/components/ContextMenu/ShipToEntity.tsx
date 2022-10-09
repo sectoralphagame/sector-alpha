@@ -37,6 +37,7 @@ export const ShipToEntity: React.FC = () => {
 
   const onDock = () => {
     entity.cp.orders!.value.push({
+      origin: "manual",
       type: "dock",
       orders: [
         ...moveToOrders(

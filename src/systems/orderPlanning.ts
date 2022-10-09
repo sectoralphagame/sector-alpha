@@ -50,6 +50,7 @@ function idleMovement(entity: Trading) {
     entity.sim.getOrThrow<Marker>(entity.cp.commander.id);
 
   entity.cp.orders.value.push({
+    origin: "auto",
     orders: moveToOrders(
       entity,
       createMarker(
@@ -194,6 +195,7 @@ function autoMineForCommander(
       }
 
       entity.cp.orders.value.push({
+        origin: "auto",
         type: "mine",
         orders: [
           ...moveToOrders(entity, field),

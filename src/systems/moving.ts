@@ -16,6 +16,7 @@ function hold(entity: Driveable) {
         entity.cp.orders.value = [];
       } else {
         entity.cp.orders.value.unshift({
+          origin: "auto",
           type: "hold",
           orders: [{ type: "hold" }],
         });

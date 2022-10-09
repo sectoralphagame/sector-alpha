@@ -1,7 +1,10 @@
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
-import { drawGraphics } from "../../components/renderGraphics";
+import {
+  createRenderGraphics,
+  drawGraphics,
+} from "../../components/renderGraphics";
 import { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
 import { SystemWithHooks } from "../hooks";
@@ -119,16 +122,22 @@ export class RenderingSystem extends SystemWithHooks {
   }
 
   updateGraphics = () => {
-    if (this.cooldowns.canUse("graphics")) {
-      this.cooldowns.use("graphics", this.sim.speed);
-      this.sim.queries.renderableGraphics.get().forEach((entity) => {
+    this.sim.queries.renderableGraphics.get().forEach((entity) => {
+      if (
+        entity.cp.renderGraphics.redraw ||
+        !entity.cp.renderGraphics.initialized
+      ) {
         if (
-          entity.cp.renderGraphics.redraw ||
-          !entity.cp.renderGraphics.initialized
+          entity.cp.renderGraphics.realTime ||
+          this.cooldowns.canUse("graphics")
         ) {
           drawGraphics(entity, this.viewport);
         }
-      });
+      }
+    });
+
+    if (this.cooldowns.canUse("graphics")) {
+      this.cooldowns.use("graphics", this.sim.speed);
     }
   };
 
@@ -172,7 +181,12 @@ export class RenderingSystem extends SystemWithHooks {
     });
   };
 
-  updateSelection = () => {
+  updateSelection = (previousValue: number) => {
+    const previousSelected = this.sim.get(previousValue);
+    if (previousSelected?.cp.orders) {
+      previousSelected.removeComponent("renderGraphics");
+    }
+
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
       const selected =
@@ -183,6 +197,10 @@ export class RenderingSystem extends SystemWithHooks {
           .lighten(0.23)
           .rgbNumber();
         entityRender.sprite.zIndex = 10;
+
+        if (entity.cp.orders) {
+          entity.addComponent(createRenderGraphics("path"));
+        }
       } else if (!selected && entityRender.sprite.tint !== entityRender.color) {
         entityRender.sprite.tint = entityRender.color;
         entityRender.sprite.zIndex = entityRender.zIndex;

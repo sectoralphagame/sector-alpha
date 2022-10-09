@@ -26,7 +26,7 @@ function getOrderDescription(ship: Ship, order: Order) {
   switch (order.type) {
     case "move":
       return `Go to ${
-        ship.sim.getOrThrow(order.targetId).cp.name?.value ?? "location"
+        ship.sim.get(order.targetId)?.cp.name?.value ?? "location"
       }`;
     case "teleport":
       return "Teleport to location";

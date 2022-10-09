@@ -1,12 +1,10 @@
 import { matrix, norm, subtract } from "mathjs";
 import React from "react";
-import { Asteroid } from "../../../archetypes/asteroid";
 import { AsteroidField } from "../../../archetypes/asteroidField";
 import { createMarker } from "../../../archetypes/marker";
 import { mineOrder } from "../../../components/orders";
 import { isOwnedByPlayer } from "../../../components/player";
 import { getSelected } from "../../../components/selection";
-import { pickRandom } from "../../../utils/generators";
 import { moveToOrders } from "../../../utils/moving";
 import { useContextMenu, useSim } from "../../atoms";
 import { DropdownOption } from "../Dropdown";
@@ -39,6 +37,7 @@ export const ShipToSpace: React.FC = () => {
 
   const onMove = () => {
     entity.cp.orders!.value.push({
+      origin: "manual",
       type: "move",
       orders: moveToOrders(
         entity,
@@ -51,23 +50,14 @@ export const ShipToSpace: React.FC = () => {
   };
 
   const onMine = (field: AsteroidField) => {
-    const asteroid = sim.getOrThrow<Asteroid>(
-      pickRandom(field.cp.children.entities)
-    );
-
     entity.cp.orders!.value.push({
+      origin: "manual",
       type: "mine",
       orders: [
-        ...moveToOrders(
-          entity,
-          createMarker(sim, {
-            sector: asteroid.cp.position.sector,
-            value: matrix(asteroid.cp.position.coord),
-          })
-        ),
+        ...moveToOrders(entity, field),
         mineOrder({
           targetFieldId: field.id,
-          targetRockId: asteroid.id,
+          targetRockId: null,
         }),
       ],
     });

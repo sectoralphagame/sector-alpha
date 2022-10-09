@@ -173,6 +173,7 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
 
                           if (orders) {
                             initiator.cp.orders.value.push({
+                              origin: "manual",
                               type: "trade",
                               orders,
                             });

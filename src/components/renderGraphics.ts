@@ -1,5 +1,6 @@
 import Color from "color";
 import { add, matrix, Matrix } from "mathjs";
+import { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
 import { sectorSize } from "../archetypes/sector";
 import { theme } from "../style";
@@ -10,9 +11,9 @@ import { Entity } from "./entity";
 import { hecsToCartesian } from "./hecsPosition";
 
 export type Graphics = Record<
-  "asteroidField" | "link" | "marker" | "sector",
+  "asteroidField" | "link" | "marker" | "sector" | "path",
   // eslint-disable-next-line no-unused-vars
-  (opts: { g: PIXI.Graphics; entity: Entity }) => void
+  (opts: { g: PIXI.Graphics; entity: Entity; viewport: Viewport }) => void
 >;
 export const graphics: Graphics = {
   asteroidField: ({ g, entity }) => {
@@ -92,6 +93,41 @@ export const graphics: Graphics = {
       );
     }
   },
+  path: ({ g, entity, viewport }) => {
+    const { orders } = entity.requireComponents(["orders"]).cp;
+    let originPosition = findInAncestors(entity, "position").cp.position;
+
+    g.moveTo(
+      originPosition!.coord.get([0]) * 10,
+      originPosition!.coord.get([1]) * 10
+    );
+
+    orders.value.forEach((orderGroup) =>
+      orderGroup.orders.forEach((order) => {
+        if (order.type !== "hold" && order.type !== "mine") {
+          const target = entity.sim.get(order.targetId);
+
+          const targetPosition = findInAncestors(target!, "position").cp
+            .position;
+          g.lineStyle({
+            alpha: 0.3,
+            width: 3 / viewport.scale.x,
+            color: Color(theme.palette.disabled).rgbNumber(),
+          });
+          g.lineTo(
+            targetPosition!.coord.get([0]) * 10,
+            targetPosition!.coord.get([1]) * 10
+          );
+          g.drawCircle(
+            targetPosition!.coord.get([0]) * 10,
+            targetPosition!.coord.get([1]) * 10,
+            3 / viewport.scale.x
+          );
+          originPosition = targetPosition;
+        }
+      })
+    );
+  },
   marker: ({ g, entity }) => {
     const { position } = entity.requireComponents(["position"]).cp;
     g.lineStyle({
@@ -147,6 +183,7 @@ export interface RenderGraphics<T extends keyof Graphics>
   extends BaseComponent<"renderGraphics"> {
   draw: T;
   redraw: boolean;
+  realTime: boolean;
   g: PIXI.Graphics;
   initialized: boolean;
 }
@@ -156,7 +193,8 @@ export function createRenderGraphics<T extends keyof Graphics>(
 ): RenderGraphics<T> {
   return {
     draw,
-    redraw: draw === "sector",
+    redraw: ["path", "sector"].includes(draw),
+    realTime: draw === "path",
     initialized: false,
     g: new PIXI.Graphics(),
     name: "renderGraphics",
@@ -177,5 +215,6 @@ export function drawGraphics(
   graphics[entity.cp.renderGraphics.draw]({
     g: entity.cp.renderGraphics.g,
     entity,
+    viewport: container,
   });
 }
