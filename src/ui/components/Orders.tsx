@@ -1,6 +1,11 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { MineOrder, Order, OrderGroup } from "../../components/orders";
+import {
+  DockOrder,
+  MineOrder,
+  Order,
+  OrderGroup,
+} from "../../components/orders";
 import { asteroidField } from "../../archetypes/asteroidField";
 import {
   Collapsible,
@@ -69,6 +74,12 @@ function getOrderGroupDescription(order: OrderGroup, sim: Sim) {
               .targetFieldId
           )
         ).cp.asteroidSpawn.type
+      }`;
+    case "dock":
+      return `Dock at ${
+        sim.get(
+          (order.orders.find((o) => o.type === "dock") as DockOrder)!.targetId
+        )?.cp.name?.value ?? "target"
       }`;
     default:
       return "Hold position";
