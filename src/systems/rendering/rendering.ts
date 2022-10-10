@@ -183,7 +183,8 @@ export class RenderingSystem extends SystemWithHooks {
 
   updateSelection = (previousValue: number) => {
     const previousSelected = this.sim.get(previousValue);
-    if (previousSelected?.cp.orders) {
+    if (previousSelected?.cp.renderGraphics?.draw === "path") {
+      previousSelected.cp.renderGraphics.g.destroy();
       previousSelected.removeComponent("renderGraphics");
     }
 
@@ -268,15 +269,15 @@ export class RenderingSystem extends SystemWithHooks {
     this.cooldowns.update(delta);
     this.selectionManger = this.sim.queries.settings.get()[0];
 
-    this.updateViewport();
-    this.updateGraphics();
-    this.updateRenderables();
-
     this.hook(
       this.selectionManger.cp.selectionManager.id,
       this.updateSelection
     );
     this.hook(this.viewport.scale.x, this.updateScaling);
+
+    this.updateViewport();
+    this.updateGraphics();
+    this.updateRenderables();
 
     if (this.selectionManger.cp.selectionManager.focused) {
       const entity = this.sim.getOrThrow(

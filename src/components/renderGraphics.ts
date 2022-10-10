@@ -95,7 +95,7 @@ export const graphics: Graphics = {
   },
   path: ({ g, entity, viewport }) => {
     const { orders } = entity.requireComponents(["orders"]).cp;
-    let originPosition = findInAncestors(entity, "position").cp.position;
+    const originPosition = findInAncestors(entity, "position").cp.position;
 
     g.moveTo(
       originPosition!.coord.get([0]) * 10,
@@ -110,21 +110,28 @@ export const graphics: Graphics = {
 
           const targetPosition = findInAncestors(target!, "position").cp
             .position;
-          g.lineStyle({
-            alpha: 0.3,
-            width: 3 / viewport.scale.x,
-            color: Color(theme.palette.disabled).rgbNumber(),
-          });
-          g.lineTo(
-            targetPosition!.coord.get([0]) * 10,
-            targetPosition!.coord.get([1]) * 10
-          );
-          g.drawCircle(
-            targetPosition!.coord.get([0]) * 10,
-            targetPosition!.coord.get([1]) * 10,
-            3 / viewport.scale.x
-          );
-          originPosition = targetPosition;
+
+          if (order.type === "teleport") {
+            g.moveTo(
+              targetPosition!.coord.get([0]) * 10,
+              targetPosition!.coord.get([1]) * 10
+            );
+          } else {
+            g.lineStyle({
+              alpha: 0.3,
+              width: 3 / viewport.scale.x,
+              color: Color(theme.palette.disabled).rgbNumber(),
+            });
+            g.lineTo(
+              targetPosition!.coord.get([0]) * 10,
+              targetPosition!.coord.get([1]) * 10
+            );
+            g.drawCircle(
+              targetPosition!.coord.get([0]) * 10,
+              targetPosition!.coord.get([1]) * 10,
+              3 / viewport.scale.x
+            );
+          }
         }
       })
     );
