@@ -1,6 +1,7 @@
 import { matrix, random } from "mathjs";
 import { createFaction } from "../archetypes/faction";
 import { createShip } from "../archetypes/ship";
+import { changeBudgetMoney } from "../components/budget";
 import { MineableCommodity } from "../economy/commodity";
 import { Sim } from "../sim";
 import { pickRandom } from "../utils/generators";
@@ -27,6 +28,7 @@ function getRandomWorld(
 
       const player = createFaction("Player", sim);
       player.addComponent({ name: "player" });
+      changeBudgetMoney(player.cp.budget, 5000);
       const sectorAlpha = sim.queries.sectors.get()[0]!;
 
       const playerShip = createShip(sim, {

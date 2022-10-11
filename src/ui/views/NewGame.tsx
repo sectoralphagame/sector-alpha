@@ -10,6 +10,7 @@ import Text from "../components/Text";
 import { View } from "../components/View";
 import { useWorker } from "../hooks/useWorker";
 import { HeadlessSimMsg } from "../../workers/headlessSim";
+import { useSim } from "../atoms";
 
 const styles = nano.sheet({
   labelContainer: {
@@ -38,6 +39,7 @@ export const NewGame: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const sim = React.useRef<Sim>();
+  const [, setSim] = useSim();
 
   const headlessSimWorker = useWorker(
     () => new Worker(new URL("../../workers/headlessSim.ts", import.meta.url)),
@@ -50,6 +52,7 @@ export const NewGame: React.FC = () => {
           sim.current?.destroy();
           sim.current = Sim.load(event.data.data);
           window.sim = sim.current;
+          setSim(sim.current);
           navigate("game");
         }
       };

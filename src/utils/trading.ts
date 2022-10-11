@@ -121,7 +121,7 @@ export function acceptTrade(entity: WithTrade, input: TransactionInput) {
 export function allocate(
   entity: WithTrade,
   offer: Omit<TransactionInput, "allocations">
-): Record<"budget" | "storage", Allocation | null> | null {
+): { budget: Allocation | null; storage: Allocation } | null {
   if (isTradeAccepted(entity, offer)) {
     entity.cp.trade.offers[offer.commodity].quantity -= offer.quantity;
 
@@ -375,7 +375,7 @@ export function resellCommodity(
     }
     releaseStorageAllocation(
       buyer.cp.storage,
-      sellOrdersAllocations.seller!.storage!
+      sellOrdersAllocations.buyer!.storage!
     );
     return false;
   }
