@@ -2,6 +2,7 @@ import React from "react";
 import { nano, theme } from "../../style";
 
 export const Table = nano.jsx("table", {
+  borderCollapse: "collapse",
   width: "100%",
 });
 

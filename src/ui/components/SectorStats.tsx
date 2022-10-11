@@ -68,7 +68,7 @@ const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {
         },
         layout: {
           background: {
-            color: "black",
+            color: theme.palette.background,
             type: ColorType.Solid,
           },
           textColor: theme.palette.text(3),

@@ -4,10 +4,11 @@ export abstract class SystemWithHooks extends System {
   private hooks: Record<number, any> = {};
   private hookCounter: number = 0;
 
-  hook(value: any, cb: () => void): void {
+  // eslint-disable-next-line no-unused-vars
+  hook<T>(value: T, cb: (previousValue: T) => void): void {
     if (this.hooks[this.hookCounter] !== value) {
+      cb(this.hooks[this.hookCounter]);
       this.hooks[this.hookCounter] = value;
-      cb();
     }
     this.hookCounter += 1;
   }

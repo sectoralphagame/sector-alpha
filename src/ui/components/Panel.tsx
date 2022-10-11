@@ -14,7 +14,6 @@ import { IconButton } from "./IconButton";
 import ShipPanel from "./ShipPanel";
 import { nano, theme } from "../../style";
 import { ConfigDialog } from "./ConfigDialog";
-import { useLayout } from "../context/Layout";
 import {
   facilityComponents,
   facility as asFacility,
@@ -25,27 +24,49 @@ import { sector, sectorComponents } from "../../archetypes/sector";
 import SectorResources from "./SectorStats";
 import SectorPrices from "./SectorPrices";
 import Inflation from "./InflationStats";
-import { useSim } from "../atoms";
+import { useGameDialog, useSim } from "../atoms";
+import { PlayerShips } from "./PlayerShips";
+import { useRerender } from "../hooks/useRerender";
+import { PlayerFacilities } from "./PlayerFacilities";
+import { TradeDialog } from "./TradeDialog";
 
 const styles = nano.sheet({
   iconBar: {
     display: "flex",
     gap: theme.spacing(1),
-    marginBottom: theme.spacing(3),
+    marginBottom: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+    borderBottom: `1px solid ${theme.palette.default}`,
   },
   iconBarCollapsed: {
     flexDirection: "column",
+    marginBottom: 0,
+    padding: 0,
+    borderBottom: "none",
   },
   root: {
-    borderRight: `1px solid ${theme.palette.default}`,
+    border: `1px solid ${theme.palette.default}`,
+    borderLeft: "none",
+    borderTopRightRadius: "8px",
+    borderBottomRightRadius: "8px",
+    background: theme.palette.background,
+    maxHeight: "calc(100vh - 128px)",
     padding: theme.spacing(3),
+    position: "absolute",
+    top: "64px",
+    left: "0",
+    width: theme.isMobile ? "380px" : "450px",
+    zIndex: 1,
+  },
+  rootCollapsed: {
+    width: "80px",
   },
   scrollArea: {
     "&::-webkit-scrollbar": {
       display: "none",
     },
     overflowY: "scroll",
-    height: `calc(100vh - 32px - ${theme.spacing(9)})`,
+    height: "calc(100vh - 234px)",
     paddingBottom: theme.spacing(3),
   },
   rotate: {
@@ -57,10 +78,9 @@ const styles = nano.sheet({
 });
 
 export const Panel: React.FC = () => {
-  const { isCollapsed, toggleCollapse } = useLayout();
-  const [openConfig, setOpenConfig] = React.useState(false);
-  const [, setRender] = React.useState(false);
-  const interval = React.useRef<number>();
+  const [isCollapsed, setCollapsed] = React.useState(true);
+  const [dialog, setDialog] = useGameDialog();
+  const toggleCollapse = React.useCallback(() => setCollapsed((c) => !c), []);
 
   const [sim] = useSim();
   const selectedId = sim.queries.settings.get()[0]!.cp.selectionManager.id;
@@ -68,6 +88,10 @@ export const Panel: React.FC = () => {
   const [entity, setEntity] = React.useState<Entity | undefined>(
     selectedId ? sim.get(selectedId) : undefined
   );
+
+  const closeDialog = React.useCallback(() => setDialog(null), []);
+
+  useRerender(250);
 
   React.useEffect(() => {
     if (entity?.id !== selectedId) {
@@ -83,26 +107,20 @@ export const Panel: React.FC = () => {
 
   React.useEffect(() => {
     if (!sim) return;
-    if (openConfig) {
-      sim.pause();
-    } else {
-      sim.start();
+    if (dialog?.type === "config") {
+      sim.stop();
     }
-  }, [openConfig]);
-
-  React.useEffect(() => {
-    interval.current = setInterval(
-      () => setRender((v) => !v),
-      250
-    ) as unknown as number;
-
-    return () => clearInterval(interval.current);
-  }, []);
+  }, [dialog]);
 
   if (!sim) return null;
 
   return (
-    <div className={styles.root} id="toolbar">
+    <div
+      className={clsx(styles.root, {
+        [styles.rootCollapsed]: isCollapsed,
+      })}
+      id="toolbar"
+    >
       <div
         className={clsx(styles.iconBar, {
           [styles.iconBarCollapsed]: isCollapsed,
@@ -113,7 +131,7 @@ export const Panel: React.FC = () => {
             <SVG src={arrowLeftIcon} />
           </IconButton>
         ) : (
-          <IconButton onClick={() => setOpenConfig(true)}>
+          <IconButton onClick={() => setDialog({ type: "config" })}>
             <SVG src={configIcon} />
           </IconButton>
         )}
@@ -155,34 +173,53 @@ export const Panel: React.FC = () => {
             </IconButton>
           </>
         ) : (
-          <IconButton onClick={() => setOpenConfig(true)}>
+          <IconButton onClick={() => setDialog({ type: "config" })}>
             <SVG src={configIcon} />
           </IconButton>
         )}
       </div>
-      {!isCollapsed &&
-        (entity ? (
-          <div className={styles.scrollArea}>
-            {entity.hasComponents(["name"]) && (
-              <EntityName entity={entity.requireComponents(["name"])} />
-            )}
-            {entity.hasComponents(shipComponents) ? (
-              <ShipPanel entity={asShip(entity)} />
-            ) : entity.hasComponents(facilityComponents) ? (
-              <FacilityPanel entity={asFacility(entity)} />
-            ) : null}
-            {entity.hasComponents(sectorComponents) && (
-              <>
-                <Resources entity={sector(entity)} />
-                <SectorResources entity={sector(entity)} />
-                <SectorPrices entity={sector(entity)} />
-              </>
-            )}
-          </div>
-        ) : (
-          <Inflation sim={sim} />
-        ))}
-      <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)} />
+      {!isCollapsed && (
+        <div className={styles.scrollArea}>
+          {entity ? (
+            <>
+              {entity.hasComponents(["name"]) && (
+                <EntityName entity={entity.requireComponents(["name"])} />
+              )}
+              {entity.hasComponents(shipComponents) ? (
+                <ShipPanel entity={asShip(entity)} />
+              ) : entity.hasComponents(facilityComponents) ? (
+                <FacilityPanel entity={asFacility(entity)} />
+              ) : null}
+              {entity.hasComponents(sectorComponents) && (
+                <>
+                  <Resources entity={sector(entity)} />
+                  <SectorResources entity={sector(entity)} />
+                  <SectorPrices entity={sector(entity)} />
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <PlayerShips />
+              <PlayerFacilities />
+              {window.dev && (
+                <>
+                  <Inflation sim={sim} />
+                  <hr />
+                </>
+              )}
+            </>
+          )}
+        </div>
+      )}
+      <ConfigDialog
+        open={dialog?.type === "config"}
+        onClose={() => {
+          closeDialog();
+          sim.start();
+        }}
+      />
+      <TradeDialog open={dialog?.type === "trade"} onClose={closeDialog} />
     </div>
   );
 };

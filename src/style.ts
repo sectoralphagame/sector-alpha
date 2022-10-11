@@ -65,7 +65,7 @@ nano.global({
     fontFamily: '"Space Mono", monospace',
   },
   "html, body": {
-    backgroundColor: "black",
+    backgroundColor: theme.palette.background,
     color: "white",
     margin: 0,
     overscrollBehaviorY: "none",
@@ -83,10 +83,7 @@ nano.global({
     width: "100vw",
     height: "100vh",
     overflow: "hidden",
-  },
-  "#canvasRoot": {
-    width: "100%",
-    height: "100vh",
+    isolation: "isolate",
   },
   "input::-webkit-outer-spin-button, input::-webkit-inner-spin-button": {
     appearance: "none",

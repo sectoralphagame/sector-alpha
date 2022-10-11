@@ -1,30 +1,16 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import { Entity } from "../../components/entity";
-import locationIcon from "../../../assets/ui/location.svg";
-import { IconButton } from "./IconButton";
-import { Table, TableCell } from "./Table";
-import { nano } from "../../style";
 import { ship as asShip } from "../../archetypes/ship";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleSummary,
 } from "./Collapsible";
+import { EntityList } from "./EntityList";
 
 export interface SubordinatesProps {
   entity: Entity;
 }
-
-const styles = nano.sheet({
-  colAction: {
-    width: "48px",
-    textAlign: "right",
-  },
-  colName: {
-    textAlign: "left",
-  },
-});
 
 export const Subordinates: React.FC<SubordinatesProps> = ({ entity }) => {
   const subordinates = entity.sim.queries.commendables
@@ -39,31 +25,11 @@ export const Subordinates: React.FC<SubordinatesProps> = ({ entity }) => {
         {subordinates.length === 0 ? (
           <div>No Subordinates</div>
         ) : (
-          <Table>
-            <tbody>
-              {subordinates.map((ship) => (
-                <tr key={ship.id}>
-                  <TableCell className={styles.colName}>
-                    {ship.cp.name?.value}
-                  </TableCell>
-                  <TableCell className={styles.colAction}>
-                    <IconButton
-                      onClick={() => {
-                        const { selectionManager } = entity.sim
-                          .find((e) => e.hasComponents(["selectionManager"]))!
-                          .requireComponents(["selectionManager"]).cp;
-
-                        selectionManager.id = ship.id;
-                        selectionManager.focused = true;
-                      }}
-                    >
-                      <SVG src={locationIcon} />
-                    </IconButton>
-                  </TableCell>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <EntityList
+            entities={subordinates.map((ship) =>
+              ship.requireComponents(["name"])
+            )}
+          />
         )}
       </CollapsibleContent>
     </Collapsible>

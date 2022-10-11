@@ -13,6 +13,7 @@ import { Faction } from "./faction";
 import { ShipInput } from "../world/ships";
 
 export const shipComponents = [
+  "autoOrder",
   "drive",
   "dockable",
   "name",

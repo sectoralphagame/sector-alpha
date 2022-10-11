@@ -42,6 +42,14 @@ const styles = nano.sheet({
     "&:hover": {
       background: "rgba(255, 255, 255, 0.15)",
     },
+    "&[disabled]": {
+      "&:hover": {
+        background: theme.palette.background,
+      },
+      borderColor: theme.palette.disabled,
+      color: theme.palette.disabled,
+      cursor: "auto",
+    },
     background: "none",
     border: "none",
     borderRadius: "4px",
@@ -49,7 +57,7 @@ const styles = nano.sheet({
     cursor: "pointer",
     display: "block",
     fontSize: theme.typography.button,
-    height: "32px",
+    minHeight: "32px",
     lineHeight: 1,
     padding: theme.spacing(1),
     textAlign: "left",
@@ -63,10 +71,10 @@ const styles = nano.sheet({
   },
 });
 
-export const Dropdown: React.FC<{ className?: string }> = ({
+export const Dropdown: React.FC<React.HTMLProps<HTMLDivElement>> = ({
   className,
   ...props
-}) => <Menu as="div" className={clsx(styles.root, className)} {...props} />;
+}) => <Menu {...props} as="div" className={clsx(styles.root, className)} />;
 export const DropdownButton: React.FC<{ className?: string }> = ({
   className,
   ...props
@@ -80,18 +88,20 @@ export const DropdownButton: React.FC<{ className?: string }> = ({
     {...props}
   />
 );
-export const DropdownOptions: React.FC = (props) => (
+export const DropdownOptions: React.FC<{ static?: boolean }> = (props) => (
   <Menu.Items className={styles.dropdown} {...props} />
 );
 export const DropdownOption: React.FC<{
+  disabled?: boolean;
   onClick: React.MouseEventHandler<HTMLButtonElement>;
 }> = ({ children, onClick, ...props }) => (
   <Menu.Item {...props}>
-    {({ active }) => (
+    {({ active, disabled }) => (
       <button
         className={clsx(styles.option, {
           [styles.optionActive]: active,
         })}
+        disabled={disabled}
         type="button"
         onClick={onClick}
       >

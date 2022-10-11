@@ -43,6 +43,7 @@ export type Order =
   | TeleportOrder
   | DockOrder;
 export interface OrderGroup {
+  origin: "auto" | "manual";
   type: OrderGroupType;
   orders: Order[];
 }

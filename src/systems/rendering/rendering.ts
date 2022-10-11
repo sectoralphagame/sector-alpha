@@ -1,7 +1,10 @@
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
-import { drawGraphics } from "../../components/renderGraphics";
+import {
+  createRenderGraphics,
+  drawGraphics,
+} from "../../components/renderGraphics";
 import { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
 import { SystemWithHooks } from "../hooks";
@@ -9,6 +12,7 @@ import { clearFocus } from "../../components/selection";
 import { setTexture } from "../../components/render";
 
 const minScale = 0.05;
+const maxScale = 20;
 
 export class RenderingSystem extends SystemWithHooks {
   rendering: true;
@@ -19,17 +23,19 @@ export class RenderingSystem extends SystemWithHooks {
   resizeObserver: ResizeObserver;
   cooldowns: Cooldowns<"graphics">;
   dragging: boolean = false;
+  keysPressed: string[] = [];
+  toolbar: HTMLDivElement;
 
   init = () => {
     this.cooldowns = new Cooldowns("graphics");
     this.selectionManger = this.sim.queries.settings.get()[0];
+    this.toolbar = document.querySelector("#toolbar")!;
     const root = document.querySelector("#root")!;
-    const toolbar = document.querySelector("#toolbar")!;
     const canvasRoot = document.querySelector(
       "#canvasRoot"
     )! as HTMLCanvasElement;
 
-    if (!(root || toolbar || canvasRoot)) return;
+    if (!(root || canvasRoot)) return;
 
     const canvas = document.createElement("canvas");
     canvasRoot.appendChild(canvas);
@@ -38,13 +44,14 @@ export class RenderingSystem extends SystemWithHooks {
       antialias: true,
       autoDensity: true,
       resolution: window.devicePixelRatio,
-      width: root.clientWidth - toolbar.clientWidth,
+      width: root.clientWidth,
       height: window.innerHeight,
       view: canvas,
+      backgroundColor: Color("#101010").rgbNumber(),
     });
 
     this.viewport = new Viewport({
-      screenWidth: root.clientWidth - toolbar.clientWidth,
+      screenWidth: root.clientWidth,
       screenHeight: window.innerHeight,
       interaction: this.app.renderer.plugins.interaction,
     });
@@ -52,8 +59,9 @@ export class RenderingSystem extends SystemWithHooks {
     this.app.stage.addChild(this.viewport);
 
     this.viewport.drag().pinch().wheel();
-    this.viewport.clampZoom({ minScale });
+    this.viewport.clampZoom({ minScale, maxScale });
     this.viewport.on("drag-start", () => {
+      this.toolbar.style.pointerEvents = "none";
       this.selectionManger.cp.selectionManager.focused = false;
       this.viewport.plugins.remove("follow");
       this.dragging = true;
@@ -63,20 +71,35 @@ export class RenderingSystem extends SystemWithHooks {
     });
 
     this.viewport.on("mouseup", (event) => {
+      this.toolbar.style.pointerEvents = "unset";
       if (event.target === event.currentTarget && !this.dragging) {
         clearFocus(this.selectionManger.cp.selectionManager);
       }
     });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.target !== document.body) return;
+
+      if (!this.keysPressed.includes(event.key)) {
+        this.keysPressed.push(event.key);
+      }
+    });
+
+    window.addEventListener("keyup", (event) => {
+      if (event.target !== document.body) return;
+
+      if (this.keysPressed.includes(event.key)) {
+        this.keysPressed = this.keysPressed.filter((key) => key !== event.key);
+      }
+    });
+
     this.viewport.sortableChildren = true;
 
     this.resizeObserver = new ResizeObserver(() => {
       this.app.resizeTo = canvasRoot;
-      this.viewport.resize(
-        root.clientWidth - toolbar.clientWidth,
-        window.innerHeight
-      );
+      this.viewport.resize(root.clientWidth, window.innerHeight);
     });
-    this.resizeObserver.observe(toolbar);
+    this.resizeObserver.observe(canvasRoot);
 
     this.sim.entities.forEach((entity) => {
       if (entity.cp.render) {
@@ -99,16 +122,22 @@ export class RenderingSystem extends SystemWithHooks {
   }
 
   updateGraphics = () => {
-    if (this.cooldowns.canUse("graphics")) {
-      this.cooldowns.use("graphics", this.sim.speed);
-      this.sim.queries.renderableGraphics.get().forEach((entity) => {
+    this.sim.queries.renderableGraphics.get().forEach((entity) => {
+      if (
+        entity.cp.renderGraphics.redraw ||
+        !entity.cp.renderGraphics.initialized
+      ) {
         if (
-          entity.cp.renderGraphics.redraw ||
-          !entity.cp.renderGraphics.initialized
+          entity.cp.renderGraphics.realTime ||
+          this.cooldowns.canUse("graphics")
         ) {
           drawGraphics(entity, this.viewport);
         }
-      });
+      }
+    });
+
+    if (this.cooldowns.canUse("graphics")) {
+      this.cooldowns.use("graphics", this.sim.speed);
     }
   };
 
@@ -121,8 +150,13 @@ export class RenderingSystem extends SystemWithHooks {
         this.viewport.addChild(entityRender.sprite);
         if (entity.hasComponents(["selection"])) {
           entityRender.sprite.interactive = true;
-          entityRender.sprite.on("pointerdown", () => {
-            this.selectionManger.cp.selectionManager.id = entity.id;
+          entityRender.sprite.on("pointerdown", (event) => {
+            // Right click
+            if (event.data.originalEvent.which === 3) {
+              this.selectionManger.cp.selectionManager.secondaryId = entity.id;
+            } else if (event.data.originalEvent.which === 1) {
+              this.selectionManger.cp.selectionManager.id = entity.id;
+            }
           });
           entityRender.sprite.cursor = "pointer";
           entityRender.sprite.tint = entityRender.color;
@@ -147,7 +181,13 @@ export class RenderingSystem extends SystemWithHooks {
     });
   };
 
-  updateSelection = () => {
+  updateSelection = (previousValue: number) => {
+    const previousSelected = this.sim.get(previousValue);
+    if (previousSelected?.cp.renderGraphics?.draw === "path") {
+      previousSelected.cp.renderGraphics.g.destroy();
+      previousSelected.removeComponent("renderGraphics");
+    }
+
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
       const selected =
@@ -158,6 +198,10 @@ export class RenderingSystem extends SystemWithHooks {
           .lighten(0.23)
           .rgbNumber();
         entityRender.sprite.zIndex = 10;
+
+        if (entity.cp.orders) {
+          entity.addComponent(createRenderGraphics("path"));
+        }
       } else if (!selected && entityRender.sprite.tint !== entityRender.color) {
         entityRender.sprite.tint = entityRender.color;
         entityRender.sprite.zIndex = entityRender.zIndex;
@@ -184,6 +228,38 @@ export class RenderingSystem extends SystemWithHooks {
     this.sim.queries.renderable.get().forEach(this.updateEntityScaling);
   };
 
+  updateViewport = () => {
+    this.keysPressed.forEach((key) => {
+      const dPos = 10;
+      const dScale = 40;
+      const keymap = {
+        w: { x: 0, y: -dPos },
+        ArrowUp: { x: 0, y: -dPos },
+        s: { x: 0, y: dPos },
+        ArrowDown: { x: 0, y: dPos },
+        a: { x: -dPos, y: 0 },
+        ArrowLeft: { x: -dPos, y: 0 },
+        d: { x: dPos, y: 0 },
+        ArrowRight: { x: dPos, y: 0 },
+        z: { scale: -dScale },
+        "=": { scale: -dScale },
+        x: { scale: dScale },
+        "-": { scale: dScale },
+      };
+
+      if (keymap[key]?.x !== undefined) {
+        this.viewport.moveCenter(
+          this.viewport.center.x + keymap[key].x / this.viewport.scale.x,
+          this.viewport.center.y + keymap[key].y / this.viewport.scale.x
+        );
+      }
+
+      if (keymap[key]?.scale !== undefined) {
+        this.viewport.zoom(keymap[key].scale / this.viewport.scale.x, true);
+      }
+    });
+  };
+
   exec = (delta: number): void => {
     super.exec(delta);
     if (!this.initialized) {
@@ -193,14 +269,15 @@ export class RenderingSystem extends SystemWithHooks {
     this.cooldowns.update(delta);
     this.selectionManger = this.sim.queries.settings.get()[0];
 
-    this.updateGraphics();
-    this.updateRenderables();
-
     this.hook(
       this.selectionManger.cp.selectionManager.id,
       this.updateSelection
     );
     this.hook(this.viewport.scale.x, this.updateScaling);
+
+    this.updateViewport();
+    this.updateGraphics();
+    this.updateRenderables();
 
     if (this.selectionManger.cp.selectionManager.focused) {
       const entity = this.sim.getOrThrow(

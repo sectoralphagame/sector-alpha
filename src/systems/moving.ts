@@ -12,10 +12,14 @@ function hold(entity: Driveable) {
   clearTarget(entity.cp.drive);
   if (entity.cp.orders) {
     if (entity.cp.owner) {
-      if (entity.sim.getOrThrow(entity.cp.owner.id).cp.ai) {
+      if (
+        entity.sim.getOrThrow(entity.cp.owner.id).cp.ai ||
+        (entity.cp.commander && entity.cp.orders.value[0].origin === "auto")
+      ) {
         entity.cp.orders.value = [];
       } else {
         entity.cp.orders.value.unshift({
+          origin: "auto",
           type: "hold",
           orders: [{ type: "hold" }],
         });

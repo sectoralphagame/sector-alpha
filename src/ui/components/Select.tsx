@@ -59,11 +59,12 @@ const styles = nano.sheet({
 });
 
 export const Select: React.FC<{
+  className?: string;
   value: string;
   // eslint-disable-next-line no-unused-vars
   onChange: (value: any) => void;
-}> = ({ children, ...props }) => (
-  <Listbox as="div" className={styles.root} {...props}>
+}> = ({ children, className, ...props }) => (
+  <Listbox as="div" className={clsx(styles.root, className)} {...props}>
     {children}
   </Listbox>
 );

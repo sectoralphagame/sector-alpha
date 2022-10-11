@@ -141,6 +141,7 @@ export class Sim extends BaseSim {
     settingsEntity
       .addComponent({
         id: null,
+        secondaryId: null,
         focused: false,
         name: "selectionManager",
       })
@@ -177,7 +178,8 @@ export class Sim extends BaseSim {
    * Get entity or `undefined`, depending on entity's existence
    * @param id Entity ID
    */
-  get = (id: number): Entity | undefined => this.entities.get(id);
+  get = <T extends Entity = Entity>(id: number): T | undefined =>
+    this.entities.get(id) as T;
 
   /**
    * Use it when it should not be possible in any situation to get not existing
