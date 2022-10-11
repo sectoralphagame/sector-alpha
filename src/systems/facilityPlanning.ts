@@ -6,6 +6,7 @@ import { Faction } from "../archetypes/faction";
 import { Sector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { createCompoundProduction, PAC } from "../components/production";
+import { setTexture } from "../components/render";
 import { addStorage } from "../components/storage";
 import {
   commoditiesArray,
@@ -124,6 +125,7 @@ export class FacilityPlanningSystem extends System {
           ) as Matrix,
           sector,
         });
+        setTexture(facility.cp.render, "fCiv");
         facility.addComponent(createCompoundProduction());
 
         addFacilityModule(
