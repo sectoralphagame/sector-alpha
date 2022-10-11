@@ -4,7 +4,6 @@ import { Sector, sectorSize } from "../archetypes/sector";
 import { setMoney } from "../components/budget";
 import { DockSize } from "../components/dockable";
 import { hecsToCartesian } from "../components/hecsPosition";
-import { setTexture } from "../components/render";
 import { Sim } from "../sim";
 import { requestShip } from "../systems/shipPlanning";
 import { pickRandom, pickRandomWithIndex } from "../utils/generators";
@@ -73,7 +72,7 @@ export const createFactions = (
     );
 
     const sectorWithShipyard = pickRandom(island);
-    const shipyard = createShipyard(
+    createShipyard(
       {
         owner: faction,
         sector: sectorWithShipyard,
@@ -90,8 +89,6 @@ export const createFactions = (
       },
       sim
     );
-    shipyard.addComponent({ name: "shipyard", queue: [], building: null });
-    setTexture(shipyard.cp.render, "fShipyard");
   }
 
   for (let i = 0; i < 2; i++) {

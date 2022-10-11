@@ -22,7 +22,6 @@ export interface Budget
     Allocations<BudgetAllocation> {
   money: number;
   available: number;
-  transactions: BudgetTransaction[];
 }
 
 export function validateBudgetAllocation(
@@ -71,7 +70,7 @@ export function setMoney(budget: Budget, value: number) {
 }
 
 /**
- * Changes budget money by value and adds transaction entry
+ * Changes budget money by value
  * @param value Amount that budget should be increased or decreased, eg. -100
  * would decrease budget's money by 100
  */
@@ -80,14 +79,6 @@ export function changeBudgetMoney(budget: Budget, value: number) {
 
   if (budget.money < 0) {
     throw new NegativeBudget(budget.money);
-  }
-
-  budget.transactions.unshift({
-    amount: value,
-    time: window.sim ? window.sim.getTime() : 0,
-  });
-  if (budget.transactions.length > 50) {
-    budget.transactions.pop();
   }
   updateAvailableMoney(budget);
 }
@@ -111,6 +102,5 @@ export function createBudget(): Budget {
     available: 0,
     money: 0,
     name: "budget",
-    transactions: [],
   };
 }

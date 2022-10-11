@@ -43,7 +43,7 @@ export function isTradeAccepted(
     throw new NonPositiveAmount(offer.price);
   }
 
-  if (offer.type === input.type && input.factionId !== entity.cp.owner.id) {
+  if (offer.type === input.type) {
     throw new InvalidOfferType(input.type);
   }
 
@@ -78,7 +78,6 @@ export function isTradeAccepted(
   return result;
 }
 
-const maxTransactions = 100;
 export function acceptTrade(entity: WithTrade, input: TransactionInput) {
   if (input.price > 0) {
     const budget = input.budget
@@ -101,12 +100,17 @@ export function acceptTrade(entity: WithTrade, input: TransactionInput) {
     }
   }
 
-  entity.cp.trade.transactions.push({
-    ...input,
-    time: entity.sim.getTime(),
-  });
-  if (entity.cp.trade.transactions.length > maxTransactions) {
-    entity.cp.trade.transactions.shift();
+  if (entity.cp.owner.id !== input.factionId) {
+    entity.cp.journal.entries.push({
+      type: "trade",
+      action: input.type === "buy" ? "sell" : "buy",
+      commodity: input.commodity,
+      quantity: input.quantity,
+      price: input.price,
+      target: entity.sim.getOrThrow(input.initiator).requireComponents(["name"])
+        .cp.name.value,
+      time: entity.sim.getTime(),
+    });
   }
 }
 

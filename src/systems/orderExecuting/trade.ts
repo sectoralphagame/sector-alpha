@@ -17,6 +17,7 @@ export function tradeOrder(
       "owner",
       "docks",
       "position",
+      "journal",
     ]);
   if (entity.cp.dockable.dockedIn === target.id) {
     if (order.offer.type === "sell") {

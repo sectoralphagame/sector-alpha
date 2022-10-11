@@ -3,11 +3,6 @@ import { Commodity } from "../economy/commodity";
 import { perCommodity } from "../utils/perCommodity";
 import { BaseComponent } from "./component";
 
-export interface Transaction extends Omit<TradeOffer, "active"> {
-  commodity: Commodity;
-  time: number;
-}
-
 export type PriceBelief = [number, number];
 
 export interface TransactionInput extends Omit<TradeOffer, "active"> {
@@ -45,7 +40,6 @@ export interface Trade extends BaseComponent<"trade"> {
   pricing: Record<Commodity, PriceBelief>;
   offers: TradeOffers;
   lastPriceAdjust: { time: number; commodities: Record<Commodity, number> };
-  transactions: Transaction[];
 }
 
 export function createTrade(): Trade {
@@ -71,6 +65,5 @@ export function createTrade(): Trade {
         type: "sell",
       })
     ),
-    transactions: [],
   };
 }

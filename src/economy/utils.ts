@@ -20,6 +20,7 @@ export const tradeComponents = [
   "position",
   "owner",
   "docks",
+  "journal",
 ] as const;
 export type WithTrade = RequireComponent<typeof tradeComponents[number]>;
 
@@ -134,33 +135,34 @@ export function getFacilityWithMostProfit(
     ) as number;
 
   const profit = (f: WithTrade) =>
-    (facility.components.trade.offers[commodity].price -
-      f.components.trade.offers[commodity].price) *
-    (facility.components.trade.offers[commodity].type === "buy" ? 1 : -1);
+    f.cp.owner.id === facility.cp.owner.id
+      ? Infinity
+      : (facility.components.trade.offers[commodity].price -
+          f.components.trade.offers[commodity].price) *
+        (facility.components.trade.offers[commodity].type === "buy" ? 1 : -1);
 
   const sortedByProfit = sortBy(
-    (
-      getSectorsInTeleportRange(
-        asSector(facility.sim.getOrThrow(facility.cp.position.sector)!),
-        sectorDistance,
-        facility.sim
+    getSectorsInTeleportRange(
+      asSector(facility.sim.getOrThrow(facility.cp.position.sector)!),
+      sectorDistance,
+      facility.sim
+    )
+      .flatMap((sector) =>
+        facility.sim.queries.trading
+          .get()
+          .filter((f) => f.cp.position.sector === sector.id)
       )
-        .flatMap((sector) =>
-          facility.sim.queries.trading
-            .get()
-            .filter((f) => f.cp.position.sector === sector.id)
-        )
-        .filter(
-          (f) =>
-            f.components.trade.offers[commodity].active &&
-            f.components.trade.offers[commodity].type !==
-              facility.components.trade.offers[commodity].type &&
-            f.components.trade.offers[commodity].quantity >= minQuantity
-        ) as WithTrade[]
-    ).map((f) => ({
-      facility: f,
-      profit: profit(f),
-    })),
+      .filter(
+        (f) =>
+          f.components.trade.offers[commodity].active &&
+          f.components.trade.offers[commodity].type !==
+            facility.components.trade.offers[commodity].type &&
+          f.components.trade.offers[commodity].quantity >= minQuantity
+      )
+      .map((f) => ({
+        facility: f,
+        profit: profit(f),
+      })),
     "profit"
   ).reverse();
 
@@ -170,7 +172,10 @@ export function getFacilityWithMostProfit(
 
   return minBy(
     sortedByProfit
-      .filter((f, _, arr) => f.profit / arr[0].profit >= 0.95)
+      .filter(
+        (f, _, arr) =>
+          !Number.isFinite(f.profit) || f.profit / arr[0].profit >= 0.95
+      )
       .map((f) => f.facility),
     distance
   )!;

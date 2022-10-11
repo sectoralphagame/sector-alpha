@@ -21,6 +21,7 @@ export const facilityComponents = [
   "name",
   "position",
   "render",
+  "journal",
   "selection",
   "storage",
   "trade",
@@ -73,7 +74,8 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     )
     .addComponent({ name: "selection" })
     .addComponent(createCommodityStorage())
-    .addComponent(createTrade());
+    .addComponent(createTrade())
+    .addComponent({ name: "journal", entries: [] });
 
   if (initial.owner) {
     entity.addComponent({
