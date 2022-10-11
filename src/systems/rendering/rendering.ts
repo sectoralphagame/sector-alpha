@@ -5,6 +5,7 @@ import { drawGraphics } from "../../components/renderGraphics";
 import { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
 import { SystemWithHooks } from "../hooks";
+import { clearFocus } from "../../components/selection";
 
 const minScale = 0.05;
 
@@ -62,7 +63,7 @@ export class RenderingSystem extends SystemWithHooks {
 
     this.viewport.on("mouseup", (event) => {
       if (event.target === event.currentTarget && !this.dragging) {
-        this.selectionManger.cp.selectionManager.id = null;
+        clearFocus(this.selectionManger.cp.selectionManager);
       }
     });
     this.viewport.sortableChildren = true;

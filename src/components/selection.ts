@@ -8,6 +8,7 @@ export interface SelectionManager extends BaseComponent<"selectionManager"> {
 }
 
 export function clearFocus(manager: SelectionManager) {
-  manager.id = null;
   manager.focused = false;
+  manager.id = null;
+  window.selected = null;
 }
