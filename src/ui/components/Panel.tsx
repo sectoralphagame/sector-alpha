@@ -25,7 +25,7 @@ import { sector, sectorComponents } from "../../archetypes/sector";
 import SectorResources from "./SectorStats";
 import SectorPrices from "./SectorPrices";
 import Inflation from "./InflationStats";
-import type { Sim } from "../../sim";
+import { useSim } from "../atoms";
 
 const styles = nano.sheet({
   iconBar: {
@@ -62,7 +62,7 @@ export const Panel: React.FC = () => {
   const [, setRender] = React.useState(false);
   const interval = React.useRef<number>();
 
-  const sim = window.sim as Sim;
+  const [sim] = useSim();
   const selectedId = sim.queries.settings.get()[0]!.cp.selectionManager.id;
 
   const [entity, setEntity] = React.useState<Entity | undefined>(
@@ -82,11 +82,11 @@ export const Panel: React.FC = () => {
   }, [entity]);
 
   React.useEffect(() => {
-    if (!window.sim) return;
+    if (!sim) return;
     if (openConfig) {
-      window.sim.pause();
+      sim.pause();
     } else {
-      window.sim.start();
+      sim.start();
     }
   }, [openConfig]);
 
@@ -98,6 +98,8 @@ export const Panel: React.FC = () => {
 
     return () => clearInterval(interval.current);
   }, []);
+
+  if (!sim) return null;
 
   return (
     <div className={styles.root} id="toolbar">
@@ -115,21 +117,21 @@ export const Panel: React.FC = () => {
             <SVG src={configIcon} />
           </IconButton>
         )}
-        <IconButton onClick={window.sim?.pause}>
+        <IconButton onClick={sim?.pause}>
           <SVG src={pauseIcon} />
         </IconButton>
         <IconButton
           onClick={() => {
-            window.sim.setSpeed(1);
-            window.sim.start();
+            sim.setSpeed(1);
+            sim.start();
           }}
         >
           <SVG src={playIcon} />
         </IconButton>
         <IconButton
           onClick={() => {
-            window.sim.setSpeed(10);
-            window.sim.start();
+            sim.setSpeed(10);
+            sim.start();
           }}
         >
           <SVG src={ffIcon} />
@@ -137,9 +139,9 @@ export const Panel: React.FC = () => {
         {!!entity && (
           <IconButton
             onClick={() => {
-              window.sim.find((e) =>
+              sim.find((e) =>
                 e.hasComponents(["selectionManager"])
-              ).cp.selectionManager.focused = true;
+              )!.cp.selectionManager!.focused = true;
             }}
           >
             <SVG src={locationIcon} />
@@ -178,7 +180,7 @@ export const Panel: React.FC = () => {
             )}
           </div>
         ) : (
-          <Inflation sim={window.sim as Sim} />
+          <Inflation sim={sim} />
         ))}
       <ConfigDialog open={openConfig} onClose={() => setOpenConfig(false)} />
     </div>

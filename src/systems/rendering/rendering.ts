@@ -6,6 +6,7 @@ import { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
 import { SystemWithHooks } from "../hooks";
 import { clearFocus } from "../../components/selection";
+import { setTexture } from "../../components/render";
 
 const minScale = 0.05;
 
@@ -77,10 +78,22 @@ export class RenderingSystem extends SystemWithHooks {
     });
     this.resizeObserver.observe(toolbar);
 
+    this.sim.entities.forEach((entity) => {
+      if (entity.cp.render) {
+        setTexture(entity.cp.render, entity.cp.render.texture);
+        entity.cp.render.initialized = false;
+      }
+      if (entity.cp.renderGraphics) {
+        entity.cp.renderGraphics.g = new PIXI.Graphics();
+        entity.cp.renderGraphics.initialized = false;
+      }
+    });
+
     this.initialized = true;
   };
 
   destroy(): void {
+    this.resizeObserver.disconnect();
     this.viewport.destroy();
     this.app.destroy(true);
   }
@@ -114,13 +127,10 @@ export class RenderingSystem extends SystemWithHooks {
           entityRender.sprite.cursor = "pointer";
           entityRender.sprite.tint = entityRender.color;
           entityRender.sprite.zIndex = entityRender.zIndex;
-          entityRender.sprite.scale.set(
-            (1 / (scale * (scale < entityRender.maxZ * 2 ? 2 : 1))) *
-              entityRender.defaultScale
-          );
           entityRender.sprite.visible = entityRender.maxZ <= scale;
         }
 
+        this.updateEntityScaling(entity);
         entityRender.initialized = true;
         entity.cp.position.moved = true;
       }
@@ -153,23 +163,25 @@ export class RenderingSystem extends SystemWithHooks {
         entityRender.sprite.zIndex = entityRender.zIndex;
       }
     });
+    this.updateScaling();
+  };
+
+  updateEntityScaling = (entity: RequireComponent<"render">) => {
+    const entityRender = entity.cp.render;
+    const selected = entity.id === this.selectionManger.cp.selectionManager.id;
+    const scale = this.viewport.scale.x;
+
+    entityRender.sprite.scale.set(
+      (1 / (scale * (scale < entityRender.maxZ * 2 ? 2 : 1))) *
+        entityRender.defaultScale *
+        (selected ? 1.5 : 1)
+    );
+
+    entityRender.sprite.visible = entityRender.maxZ <= scale;
   };
 
   updateScaling = () => {
-    this.sim.queries.renderable.get().forEach((entity) => {
-      const entityRender = entity.cp.render;
-      const selected =
-        entity.id === this.selectionManger.cp.selectionManager.id;
-      const scale = this.viewport.scale.x;
-
-      entityRender.sprite.scale.set(
-        (1 / (scale * (scale < entityRender.maxZ * 2 ? 2 : 1))) *
-          entityRender.defaultScale *
-          (selected ? 1.5 : 1)
-      );
-
-      entityRender.sprite.visible = entityRender.maxZ <= scale;
-    });
+    this.sim.queries.renderable.get().forEach(this.updateEntityScaling);
   };
 
   exec = (delta: number): void => {

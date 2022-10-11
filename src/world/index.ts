@@ -19,7 +19,7 @@ function getRandomWorld(
 
       const sectors = sim.queries.sectors.get();
       for (let i = 0; i < sectors.length * 2; i++) {
-        getRandomAsteroidField();
+        getRandomAsteroidField(sim);
       }
 
       try {
@@ -37,6 +37,7 @@ function getRandomWorld(
             );
 
             spawnAsteroidField(
+              sim,
               commodity,
               random(
                 7 + Math.sqrt(ownedSectors.length),

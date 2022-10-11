@@ -5,6 +5,7 @@ import { Save } from "../../db";
 import { useLocation } from "../context/Location";
 import { Saves } from "../components/Saves";
 import { View } from "../components/View";
+import { useSim } from "../atoms";
 
 const styles = nano.sheet({
   button: {
@@ -22,6 +23,7 @@ const styles = nano.sheet({
 export const LoadGame: React.FC = () => {
   const navigate = useLocation();
   const [saves, setSaves] = React.useState<Save[]>();
+  const [, setSim] = useSim();
 
   React.useEffect(() => {
     Sim.listSaves().then(setSaves);
@@ -34,8 +36,9 @@ export const LoadGame: React.FC = () => {
           <Saves
             saves={saves}
             onClick={async (id) => {
-              window.sim = Sim.load(saves.find((s) => s.id === id)!.data);
-              window.sim.start();
+              const sim = Sim.load(saves.find((s) => s.id === id)!.data);
+              window.sim = sim;
+              setSim(sim);
               navigate("game");
             }}
             onDelete={async (id) => {

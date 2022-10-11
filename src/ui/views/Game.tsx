@@ -1,8 +1,10 @@
 import clsx from "clsx";
 import React from "react";
 import { nano, theme } from "../../style";
+import { RenderingSystem } from "../../systems/rendering";
 import { Panel } from "../components/Panel";
 import { LayoutProvider, useLayout } from "../context/Layout";
+import { useSim } from "../atoms";
 
 const styles = nano.sheet({
   root: {
@@ -16,6 +18,25 @@ const styles = nano.sheet({
 
 const GameView: React.FC = () => {
   const { isCollapsed } = useLayout();
+  const [sim] = useSim();
+  const system = React.useRef<RenderingSystem>();
+
+  React.useEffect(() => {
+    if (!sim) return () => undefined;
+
+    sim.start();
+    system.current = new RenderingSystem(sim);
+    sim.registerSystem(system.current);
+
+    const unmount = () => {
+      sim.unregisterSystem(system.current!);
+      sim.events.removeListener("destroy", unmount);
+    };
+
+    sim.events.on("destroy", unmount);
+
+    return unmount;
+  }, [sim]);
 
   return (
     <div

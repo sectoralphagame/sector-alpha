@@ -11,6 +11,7 @@ import { IconButton } from "../components/IconButton";
 import arrowLeftIcon from "../../../assets/ui/arrow_left.svg";
 import { Saves } from "./Saves";
 import useFullscreen from "../hooks/useFullscreen";
+import { useSim } from "../atoms";
 
 export interface ModalProps {
   open: boolean;
@@ -51,6 +52,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const input = React.useRef<HTMLInputElement>(null);
   const navigate = useLocation();
   const { fullscreenEnabled, toggle: toggleFullscreen } = useFullscreen();
+  const [sim, setSim] = useSim();
 
   React.useEffect(() => {
     if (["load", "save"].includes(view)) {
@@ -65,7 +67,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const saveNew: React.FormEventHandler = React.useCallback((event) => {
     event.preventDefault();
     if (input.current!.value) {
-      window.sim.save(input.current!.value);
+      sim.save(input.current!.value);
       onClose();
     }
   }, []);
@@ -102,8 +104,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
           </Button>
           <Button
             onClick={() => {
-              window.sim.destroy();
-              window.sim = undefined!;
+              sim.destroy();
               navigate("main");
             }}
             className={styles.buttonContainer}
@@ -116,9 +117,8 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
           <Saves
             saves={saves}
             onClick={async (id) => {
-              window.sim.destroy();
-              window.sim = Sim.load(saves.find((s) => s.id === id)!.data);
-              window.sim.start();
+              sim.destroy();
+              setSim(Sim.load(saves.find((s) => s.id === id)!.data));
               onClose();
             }}
             onDelete={async (id) => {
@@ -143,7 +143,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
                 className={styles.buttonContainer}
                 key={save.id}
                 onClick={() => {
-                  window.sim.save(save.name, save.id);
+                  sim.save(save.name, save.id);
                   onClose();
                 }}
               >

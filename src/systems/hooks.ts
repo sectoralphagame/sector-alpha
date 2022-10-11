@@ -8,8 +8,8 @@ export abstract class SystemWithHooks extends System {
     if (this.hooks[this.hookCounter] !== value) {
       this.hooks[this.hookCounter] = value;
       cb();
-      this.hookCounter++;
     }
+    this.hookCounter += 1;
   }
 
   // eslint-disable-next-line no-unused-vars
