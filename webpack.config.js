@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
 const config = {
-  entry: ["./src/index.ts"],
+  entry: ["./core/index.ts"],
   module: {
     rules: [
       {
@@ -46,7 +46,7 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       inject: true,
-      template: "./src/index.html",
+      template: "./core/index.html",
     }),
     new ForkTsCheckerWebpackPlugin(),
   ],
