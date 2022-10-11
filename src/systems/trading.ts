@@ -80,8 +80,6 @@ export function getAveragePrice(
     )
   );
 }
-// @ts-expect-error
-window.getAveragePrice = getAveragePrice;
 
 function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
   const currentPrice = entity.cp.trade.offers[commodity].price;

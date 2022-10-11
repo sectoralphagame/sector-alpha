@@ -8,6 +8,7 @@ import { addon as addonCache } from "nano-css/addon/cache";
 import { addon as addonGlobal } from "nano-css/addon/global";
 import Color from "color";
 import type { MineableCommodity } from "./economy/commodity";
+import { isHeadless } from "./settings";
 
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
@@ -30,7 +31,7 @@ addonCache(nano);
 addonJsx(nano);
 addonGlobal(nano);
 
-const isMobile = window.innerWidth < 1000;
+const isMobile = !isHeadless ? window.innerWidth < 1000 : false;
 const baseFontSize = isMobile ? 14 : 16;
 export const theme = {
   isMobile,

@@ -1,4 +1,5 @@
 import { clearFocus } from "../components/selection";
+import { isHeadless } from "../settings";
 import { System } from "./system";
 
 export class SelectingSystem extends System {
@@ -11,7 +12,9 @@ export class SelectingSystem extends System {
       window.selected = this.sim.getOrThrow(manager.cp.selectionManager.id!);
     } else if (manager.cp.selectionManager.id === null) {
       clearFocus(manager.cp.selectionManager);
-      window.selected = null;
+      if (!isHeadless) {
+        window.selected = null;
+      }
     }
   };
 }

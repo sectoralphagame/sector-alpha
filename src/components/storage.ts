@@ -24,12 +24,6 @@ interface StorageAllocation extends Allocation {
   type: StorageAllocationType;
 }
 
-interface CommodityStorageHistoryEntry {
-  commodity: Commodity;
-  quantity: number;
-  time: number;
-}
-
 export interface CommodityStorage
   extends Allocations<StorageAllocation>,
     BaseComponent<"storage"> {
@@ -38,7 +32,6 @@ export interface CommodityStorage
 
   max: number;
   quota: Record<Commodity, number>;
-  history: CommodityStorageHistoryEntry[];
 }
 
 export function hasSufficientStorage(
@@ -98,24 +91,7 @@ export function hasSufficientStorageSpace(
   return getAvailableSpace(storage) >= quantity;
 }
 
-export function addStorageHistoryEntry(
-  storage: CommodityStorage,
-  entry: CommodityStorageHistoryEntry
-) {
-  storage.history.unshift(entry);
-  if (storage.history.length > 50) {
-    storage.history.pop();
-  }
-}
-
-export function onStorageChange(
-  storage: CommodityStorage,
-  entry: Omit<CommodityStorageHistoryEntry, "time">
-) {
-  addStorageHistoryEntry(storage, {
-    ...entry,
-    time: window.sim ? window.sim.getTime() : 0,
-  });
+export function onStorageChange(storage: CommodityStorage) {
   updateAvailableWares(storage);
 }
 
@@ -154,7 +130,7 @@ export function addStorage(
 
   if (availableSpace >= quantity) {
     storage.stored[commodity] += quantity;
-    onStorageChange(storage, { commodity, quantity });
+    updateAvailableWares(storage);
     return 0;
   }
   if (exact) {
@@ -162,7 +138,7 @@ export function addStorage(
   }
 
   storage.stored[commodity] += availableSpace;
-  onStorageChange(storage, { commodity, quantity: availableSpace });
+  updateAvailableWares(storage);
 
   return quantity - availableSpace;
 }
@@ -186,7 +162,7 @@ export function removeStorage(
   }
 
   storage.stored[commodity] -= quantity;
-  onStorageChange(storage, { commodity, quantity: -quantity });
+  updateAvailableWares(storage);
 }
 
 export function transfer(
@@ -243,7 +219,6 @@ export function createCommodityStorage(): CommodityStorage {
   const storage: CommodityStorage = {
     allocationIdCounter: 1,
     allocations: [],
-    history: [],
     max: 0,
     availableWares: perCommodity(() => 0),
     stored: perCommodity(() => 0),

@@ -33,6 +33,7 @@ import { SectorStatisticGatheringSystem } from "../systems/sectorStatisticGather
 import { ShipPlanningSystem } from "../systems/shipPlanning";
 import { InflationStatisticGatheringSystem } from "../systems/inflationStatisticGathering";
 import { ShipBuildingSystem } from "../systems/shipBuilding";
+import { isHeadless } from "../settings";
 
 function reviveMathjs(value: any) {
   if (isPlainObject(value)) {
@@ -100,6 +101,17 @@ export class Sim extends BaseSim {
     // eslint-disable-next-line global-require
     const { RenderingSystem } = require("../systems/rendering");
     this.systems.push(new RenderingSystem(this));
+
+    this.entities.forEach((entity) => {
+      if (entity.cp.render) {
+        setTexture(entity.cp.render, entity.cp.render.texture);
+        entity.cp.render.initialized = false;
+      }
+      if (entity.cp.renderGraphics) {
+        entity.cp.renderGraphics.g = new PIXI.Graphics();
+        entity.cp.renderGraphics.initialized = false;
+      }
+    });
   };
 
   registerEntity = (entity: Entity) => {
@@ -115,6 +127,7 @@ export class Sim extends BaseSim {
 
   next = (delta: number) => {
     this.systems.forEach((s) => s.exec(delta));
+    this.updateTimer(delta);
   };
 
   init = () => {
@@ -181,8 +194,10 @@ export class Sim extends BaseSim {
     window.selected = undefined!;
   };
 
+  serialize = () => JSON.stringify(this, replacer);
+
   save = async (name: string, id?: number) => {
-    const data = JSON.stringify(this, replacer);
+    const data = this.serialize();
     const db = await openDb();
 
     const tx = db.transaction("saves", "readwrite");
@@ -210,7 +225,7 @@ export class Sim extends BaseSim {
     return tx.done;
   }
 
-  static async load(data: string) {
+  static load(data: string) {
     const save = JSON.parse(data);
     const sim = plainToInstance(Sim, save);
     Object.values(sim.queries).forEach((query) => query.reset());
@@ -225,16 +240,11 @@ export class Sim extends BaseSim {
         new EntityComponents(),
         entity.components
       );
-
-      if (entity.cp.render) {
-        setTexture(entity.cp.render, entity.cp.render.texture);
-        entity.cp.render.initialized = false;
-      }
-      if (entity.cp.renderGraphics) {
-        entity.cp.renderGraphics.g = new PIXI.Graphics();
-        entity.cp.renderGraphics.initialized = false;
-      }
     });
+
+    if (!isHeadless) {
+      sim.initRendering();
+    }
 
     sim.entities = entityMap;
 

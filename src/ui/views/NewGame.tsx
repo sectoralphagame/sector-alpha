@@ -8,6 +8,8 @@ import { Button } from "../components/Button";
 import world from "../../world";
 import Text from "../components/Text";
 import { View } from "../components/View";
+import { useWorker } from "../hooks/useWorker";
+import { HeadlessSimMsg } from "../../workers/headlessSim";
 
 const styles = nano.sheet({
   labelContainer: {
@@ -26,36 +28,63 @@ interface NewGameForm {
   islands: number;
 }
 
+const targetTime = 3600 * 2;
+
 export const NewGame: React.FC = () => {
   const { register, handleSubmit, getValues, control } = useForm<NewGameForm>({
     defaultValues: { islands: 8, factions: 4 },
   });
   const navigate = useLocation();
   const [loading, setLoading] = React.useState(false);
+  const [progress, setProgress] = React.useState(0);
+  const sim = React.useRef<Sim>();
+
+  const headlessSimWorker = useWorker(
+    () => new Worker(new URL("../../workers/headlessSim.ts", import.meta.url)),
+    (worker) => {
+      worker.onmessage = (event: MessageEvent<HeadlessSimMsg>) => {
+        if (event.data.type === "update") {
+          setProgress(event.data.time / targetTime);
+        }
+        if (event.data.type === "completed") {
+          sim.current?.destroy();
+          sim.current = Sim.load(event.data.data);
+          window.sim = sim.current;
+          sim.current.start();
+          navigate("game");
+        }
+      };
+    }
+  );
 
   const onSubmit = handleSubmit(async () => {
-    let sim: Sim;
     let success = false;
     while (!success) {
-      sim = new Sim();
-      sim.init();
-      window.sim = sim;
+      sim.current?.destroy();
+      sim.current = new Sim();
+      sim.current.init();
+      window.sim = sim.current;
       setLoading(true);
       try {
         // eslint-disable-next-line no-await-in-loop
-        await world(sim, getValues().islands, getValues().factions);
+        await world(sim.current, getValues().islands, getValues().factions);
         success = true;
         // eslint-disable-next-line no-empty
       } catch {}
     }
-    sim!.start();
-    navigate("game");
+
+    headlessSimWorker.current?.postMessage({
+      type: "init",
+      delta: 1,
+      targetTime,
+      sim: sim.current!.serialize(),
+    });
   });
 
   return (
     <View showBack={!loading} title={loading ? "" : "Start New Game"}>
       {loading ? (
-        "Loading"
+        `Loading... ${(progress * 100).toFixed(0)}%`
       ) : (
         <>
           <Text>Adjust world settings</Text>

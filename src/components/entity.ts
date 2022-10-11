@@ -7,7 +7,7 @@ import type { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { MissingComponentError } from "../errors";
 import { Cooldowns } from "../utils/cooldowns";
-import { isTest } from "../settings";
+import { isHeadless } from "../settings";
 import { CoreComponents } from "./component";
 
 export class EntityComponents {
@@ -79,7 +79,7 @@ export class Entity {
 
   unregister() {
     this.deleted = true;
-    if (!isTest && this.cp.render) {
+    if (!isHeadless && this.cp.render) {
       this.cp.render.sprite.destroy();
     }
     this.sim.unregisterEntity(this);

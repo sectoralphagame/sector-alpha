@@ -23,11 +23,11 @@ export function shouldSpawnAsteroid(entity: AsteroidField): boolean {
   return getFieldCurrent(entity) < getFieldMax(entity);
 }
 
-function spawn(field: AsteroidField) {
+function spawn(field: AsteroidField, sim: Sim) {
   const asteroidAngle = Math.random() * Math.PI;
 
   return createAsteroid(
-    window.sim as any,
+    sim,
     field,
     add(
       field.cp.position.coord,
@@ -61,13 +61,13 @@ export class AsteroidSpawningSystem extends System {
     this.sim.queries.asteroidFields.get().forEach((entity) => {
       if (this.sim.getTime() < 10) {
         while (shouldSpawnAsteroid(entity)) {
-          spawn(entity);
+          spawn(entity, this.sim);
         }
       } else if (shouldSpawnAsteroid(entity)) {
         let toSpawn = limitMax(getFieldMax(entity) * 0.05, getFieldMax(entity));
 
         while (toSpawn > 0) {
-          toSpawn -= spawn(entity).cp.minable.resources;
+          toSpawn -= spawn(entity, this.sim).cp.minable.resources;
         }
       }
     });
