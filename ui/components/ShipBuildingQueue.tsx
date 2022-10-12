@@ -5,7 +5,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleSummary,
-} from "./Collapsible";
+} from "@kit/Collapsible";
 
 const styles = nano.sheet({
   list: {

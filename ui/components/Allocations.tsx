@@ -4,7 +4,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleSummary,
-} from "./Collapsible";
+} from "@kit/Collapsible";
 
 export interface AllocationsProps {
   entity: RequireComponent<"storage">;

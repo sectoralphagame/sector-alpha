@@ -70,6 +70,7 @@
       "@assets/(.*)$": "<rootDir>/assets/$1",
       "@core/(.*)$": "<rootDir>/core/$1",
       "@devtools/(.*)$": "<rootDir>/devtools/$1",
+      "@kit/(.*)$": "<rootDir>/kit/$1",
       "@ui/(.*)$": "<rootDir>/ui/$1"
     }
   },

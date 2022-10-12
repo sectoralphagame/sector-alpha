@@ -4,8 +4,8 @@ import SVG from "react-inlinesvg";
 import { Save } from "@core/db";
 import closeIcon from "@assets/ui/close.svg";
 import { nano, theme } from "../style";
-import { Button } from "./Button";
-import { IconButton } from "./IconButton";
+import { Button } from "@kit/Button";
+import { IconButton } from "@kit/IconButton";
 
 const styles = nano.sheet({
   buttonContainer: {

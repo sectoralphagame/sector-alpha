@@ -3,7 +3,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleSummary,
-} from "./Collapsible";
+} from "@kit/Collapsible";
 import { useSim } from "../atoms";
 import { EntityList } from "./EntityList";
 

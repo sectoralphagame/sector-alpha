@@ -2,14 +2,14 @@ import React from "react";
 import groupBy from "lodash/groupBy";
 import SVG from "react-inlinesvg";
 import { RequireComponent } from "@core/tsHelpers";
-import { Table, TableCell } from "./Table";
-import { IconButton } from "./IconButton";
 import locationIcon from "@assets/ui/location.svg";
+import { Table, TableCell } from "@kit/Table";
+import { IconButton } from "@kit/IconButton";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleSummary,
-} from "./Collapsible";
+} from "@kit/Collapsible";
 
 export interface ProductionProps {
   entity: RequireComponent<"modules">;

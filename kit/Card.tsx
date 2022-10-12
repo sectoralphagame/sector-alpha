@@ -1,4 +1,4 @@
-import { nano, theme } from "../style";
+import { nano, theme } from "../ui/style";
 
 export const Card = nano.jsx("div", {
   border: `1px ${theme.palette.default} solid`,

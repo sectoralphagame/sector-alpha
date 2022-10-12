@@ -2,10 +2,10 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import clsx from "clsx";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
-import { IconButton } from "../../ui/components/IconButton";
+import { Button } from "@kit/Button";
+import { IconButton } from "@kit/IconButton";
 import { styles } from "./styles";
 import { useThrottledFormState } from "./utils";
-import { Button } from "../../ui/components/Button";
 
 export const JSONOutput: React.FC<{
   expanded: boolean;

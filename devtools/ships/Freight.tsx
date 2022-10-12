@@ -3,9 +3,9 @@ import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
-import { LabeledInput } from "../../ui/components/Input";
-import { Table, TableCell, TableHeader } from "../components/Table";
 import { ShipInput } from "@core/world/ships";
+import { LabeledInput } from "@kit/Input";
+import { Table, TableCell, TableHeader } from "../components/Table";
 import { styles } from "./styles";
 import {
   FormData,
@@ -15,8 +15,8 @@ import {
   useThrottledFormState,
   withDistance,
 } from "./utils";
-import { IconButton } from "../../ui/components/IconButton";
-import { Card, CardHeader } from "../../ui/components/Card";
+import { IconButton } from "@kit/IconButton";
+import { Card, CardHeader } from "@kit/Card";
 
 const ShipFreightEditor: React.FC<{ index: number }> = ({ index }) => {
   const { register, getValues } = useFormContext<FormData>();

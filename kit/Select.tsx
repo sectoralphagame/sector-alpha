@@ -1,7 +1,7 @@
-import { Menu } from "@headlessui/react";
+import { Listbox } from "@headlessui/react";
 import clsx from "clsx";
 import React from "react";
-import { nano, theme } from "../style";
+import { nano, theme } from "../ui/style";
 
 const styles = nano.sheet({
   button: {
@@ -42,26 +42,13 @@ const styles = nano.sheet({
     "&:hover": {
       background: "rgba(255, 255, 255, 0.15)",
     },
-    "&[disabled]": {
-      "&:hover": {
-        background: theme.palette.background,
-      },
-      borderColor: theme.palette.disabled,
-      color: theme.palette.disabled,
-      cursor: "auto",
-    },
-    background: "none",
-    border: "none",
     borderRadius: "4px",
-    color: theme.palette.default,
     cursor: "pointer",
     display: "block",
     fontSize: theme.typography.button,
-    minHeight: "32px",
+    height: "32px",
     lineHeight: 1,
     padding: theme.spacing(1),
-    textAlign: "left",
-    width: "100%",
   },
   optionActive: {
     background: "rgba(255, 255, 255, 0.15)",
@@ -71,15 +58,21 @@ const styles = nano.sheet({
   },
 });
 
-export const Dropdown: React.FC<React.HTMLProps<HTMLDivElement>> = ({
-  className,
-  ...props
-}) => <Menu {...props} as="div" className={clsx(styles.root, className)} />;
-export const DropdownButton: React.FC<{ className?: string }> = ({
+export const Select: React.FC<{
+  className?: string;
+  value: string;
+  // eslint-disable-next-line no-unused-vars
+  onChange: (value: any) => void;
+}> = ({ children, className, ...props }) => (
+  <Listbox as="div" className={clsx(styles.root, className)} {...props}>
+    {children}
+  </Listbox>
+);
+export const SelectButton: React.FC<{ className?: string }> = ({
   className,
   ...props
 }) => (
-  <Menu.Button
+  <Listbox.Button
     className={({ open }) =>
       clsx(className, styles.button, {
         [styles.buttonActive]: open,
@@ -88,25 +81,16 @@ export const DropdownButton: React.FC<{ className?: string }> = ({
     {...props}
   />
 );
-export const DropdownOptions: React.FC<{ static?: boolean }> = (props) => (
-  <Menu.Items className={styles.dropdown} {...props} />
+export const SelectOptions: React.FC = (props) => (
+  <Listbox.Options className={styles.dropdown} {...props} />
 );
-export const DropdownOption: React.FC<{
-  disabled?: boolean;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
-}> = ({ children, onClick, ...props }) => (
-  <Menu.Item {...props}>
-    {({ active, disabled }) => (
-      <button
-        className={clsx(styles.option, {
-          [styles.optionActive]: active,
-        })}
-        disabled={disabled}
-        type="button"
-        onClick={onClick}
-      >
-        {children}
-      </button>
-    )}
-  </Menu.Item>
+export const SelectOption: React.FC<{ value: string }> = (props) => (
+  <Listbox.Option
+    className={({ active }) =>
+      clsx(styles.option, {
+        [styles.optionActive]: active,
+      })
+    }
+    {...props}
+  />
 );

@@ -15,7 +15,7 @@ import configIcon from "@assets/ui/config.svg";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import playIcon from "@assets/ui/play.svg";
 import FacilityPanel from "./FacilityPanel";
-import { IconButton } from "./IconButton";
+import { IconButton } from "@kit/IconButton";
 import ShipPanel from "./ShipPanel";
 import { nano, theme } from "../style";
 import { ConfigDialog } from "./ConfigDialog";

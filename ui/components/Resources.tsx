@@ -1,7 +1,7 @@
 import React from "react";
 import { Sector } from "@core/archetypes/sector";
 import { getSectorResources } from "@core/utils/resources";
-import { Table, TableCell } from "./Table";
+import { Table, TableCell } from "@kit/Table";
 
 const Resources: React.FC<{ entity: Sector }> = ({ entity }) => {
   const fieldsByType = getSectorResources(entity);

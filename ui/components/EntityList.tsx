@@ -2,8 +2,8 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import { RequireComponent } from "@core/tsHelpers";
 import locationIcon from "@assets/ui/location.svg";
-import { IconButton } from "./IconButton";
-import { Table, TableCell } from "./Table";
+import { IconButton } from "@kit/IconButton";
+import { Table, TableCell } from "@kit/Table";
 import { nano } from "../style";
 
 const styles = nano.sheet({

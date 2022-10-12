@@ -15,8 +15,8 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleSummary,
-} from "./Collapsible";
-import { IconButton } from "./IconButton";
+} from "@kit/Collapsible";
+import { IconButton } from "@kit/IconButton";
 import { nano } from "../style";
 
 const styles = nano.sheet({

@@ -1,5 +1,5 @@
 import React from "react";
-import { nano, theme } from "../style";
+import { nano, theme } from "../ui/style";
 
 export const Table = nano.jsx("table", {
   borderCollapse: "collapse",

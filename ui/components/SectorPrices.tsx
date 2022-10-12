@@ -7,11 +7,11 @@ import {
 } from "lightweight-charts";
 import Color from "color";
 import { Sector } from "@core/archetypes/sector";
-import { nano, theme } from "../style";
-import { Button } from "./Button";
-import { Dialog } from "./Dialog";
-import { Checkbox } from "./Checkbox";
 import { commodities } from "@core/economy/commodity";
+import { nano, theme } from "../style";
+import { Button } from "@kit/Button";
+import { Dialog } from "@kit/Dialog";
+import { Checkbox } from "@kit/Checkbox";
 
 const styles = nano.sheet({
   commodities: {

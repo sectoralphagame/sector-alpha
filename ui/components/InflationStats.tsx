@@ -7,13 +7,13 @@ import {
 } from "lightweight-charts";
 import { Sim } from "@core/sim";
 import { nano, theme } from "../style";
-import { Button } from "./Button";
-import { Dialog } from "./Dialog";
+import { Button } from "@kit/Button";
+import { Dialog } from "@kit/Dialog";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleSummary,
-} from "./Collapsible";
+} from "@kit/Collapsible";
 
 const styles = nano.sheet({
   button: {

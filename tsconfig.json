@@ -11,9 +11,10 @@
     "strictNullChecks": true,
     "paths": {
       "@assets/*": ["./assets/*"],
-      "@ui/*": ["./ui/*"],
+      "@core/*": ["./core/*"],
       "@devtools/*": ["./devtools/*"],
-      "@core/*": ["./core/*"]
+      "@kit/*": ["./kit/*"],
+      "@ui/*": ["./ui/*"]
     }
   },
   "exclude": ["**/*.test.*"]

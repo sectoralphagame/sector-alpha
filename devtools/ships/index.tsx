@@ -8,8 +8,8 @@ import {
 import { Tab as HeadlessTab } from "@headlessui/react";
 import clsx from "clsx";
 import { shipClasses } from "@core/world/ships";
-import { Button } from "../../ui/components/Button";
-import { Tab, TabList } from "../../ui/components/Tabs";
+import { Button } from "@kit/Button";
+import { Tab, TabList } from "@kit/Tabs";
 import { FormData } from "./utils";
 import { styles } from "./styles";
 import { GeneralEditor } from "./General";

@@ -1,9 +1,9 @@
 import React from "react";
 import Modal from "react-modal";
 import SVG from "react-inlinesvg";
-import { IconButton } from "./IconButton";
 import closeIcon from "@assets/ui/close.svg";
-import { nano, theme } from "../style";
+import { IconButton } from "./IconButton";
+import { nano, theme } from "../ui/style";
 import Text from "./Text";
 
 Modal.setAppElement("#root");

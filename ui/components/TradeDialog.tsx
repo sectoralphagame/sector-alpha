@@ -6,13 +6,13 @@ import { RequireComponent } from "@core/tsHelpers";
 import { getAvailableSpace } from "@core/components/storage";
 import { tradeCommodity } from "@core/utils/trading";
 import { nano, theme } from "../style";
-import { Dialog } from "./Dialog";
-import { Button } from "./Button";
-import { Input } from "./Input";
+import { Dialog } from "@kit/Dialog";
+import { Button } from "@kit/Button";
+import { Input } from "@kit/Input";
 import { useGameDialog, useSim } from "../atoms";
 import { ModalProps } from "./ConfigDialog";
-import { Table, TableCell, TableHeader } from "./Table";
-import Text from "./Text";
+import { Table, TableCell, TableHeader } from "@kit/Table";
+import Text from "@kit/Text";
 
 const styles = nano.sheet({
   colName: { "&&": { textAlign: "left" } },

@@ -1,5 +1,5 @@
 import React from "react";
-import { DropdownOption } from "../Dropdown";
+import { DropdownOption } from "@kit/Dropdown";
 
 export const NoAvailableActions: React.FC = () => (
   <DropdownOption disabled onClick={() => undefined}>

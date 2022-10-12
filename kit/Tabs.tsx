@@ -1,7 +1,7 @@
 import React from "react";
 import { Tab as HeadlessTab } from "@headlessui/react";
 import clsx from "clsx";
-import { nano, theme } from "../style";
+import { nano, theme } from "../ui/style";
 
 const styles = nano.sheet({
   list: {

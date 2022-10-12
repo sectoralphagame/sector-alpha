@@ -7,7 +7,7 @@ import { isOwnedByPlayer } from "@core/components/player";
 import { getSelected } from "@core/components/selection";
 import { moveToOrders } from "@core/utils/moving";
 import { useContextMenu, useSim } from "../../atoms";
-import { DropdownOption } from "../Dropdown";
+import { DropdownOption } from "@kit/Dropdown";
 import { NoAvailableActions } from "./NoAvailableActions";
 
 export const ShipToSpace: React.FC = () => {

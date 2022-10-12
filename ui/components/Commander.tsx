@@ -2,10 +2,10 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import { Entity } from "@core/components/entity";
 import { RequireComponent } from "@core/tsHelpers";
-import { nano, theme } from "../style";
-import { IconButton } from "./IconButton";
 import locationIcon from "@assets/ui/location.svg";
 import closeIcon from "@assets/ui/close.svg";
+import { nano, theme } from "../style";
+import { IconButton } from "@kit/IconButton";
 import { useSim } from "../atoms";
 
 export interface CommanderProps {

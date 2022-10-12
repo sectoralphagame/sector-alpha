@@ -1,7 +1,7 @@
 import React from "react";
 import { commodities } from "@core/economy/commodity";
 import { RequireComponent } from "@core/tsHelpers";
-import { Table, TableCell } from "./Table";
+import { Table, TableCell } from "@kit/Table";
 
 export interface OffersProps {
   entity: RequireComponent<"storage" | "trade">;

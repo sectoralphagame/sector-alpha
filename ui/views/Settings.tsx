@@ -1,6 +1,6 @@
 import React from "react";
 import { nano, theme } from "../style";
-import { Button } from "../components/Button";
+import { Button } from "@kit/Button";
 import useFullscreen from "../hooks/useFullscreen";
 import { View } from "../components/View";
 

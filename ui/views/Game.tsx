@@ -8,7 +8,7 @@ import { nano } from "../style";
 import { Panel } from "../components/Panel";
 import { useContextMenu, useSim } from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
-import { Dropdown, DropdownOptions } from "../components/Dropdown";
+import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import { PlayerMoney } from "../components/PlayerMoney";
 
 const styles = nano.sheet({

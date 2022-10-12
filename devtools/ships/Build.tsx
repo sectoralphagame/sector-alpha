@@ -9,13 +9,13 @@ import closeIcon from "@assets/ui/close.svg";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import { styles } from "./styles";
 import { FormData, useThrottledFormState } from "./utils";
-import { IconButton } from "../../ui/components/IconButton";
+import { IconButton } from "@kit/IconButton";
 import {
   Dropdown,
   DropdownButton,
   DropdownOption,
   DropdownOptions,
-} from "../../ui/components/Dropdown";
+} from "@kit/Dropdown";
 
 const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
   const { register, getValues, setValue } = useFormContext<FormData>();

@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import { nano } from "../style";
+import { nano } from "../ui/style";
 
 const styles = nano.sheet({
   root: {

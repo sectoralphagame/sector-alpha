@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import { nano, theme } from "../style";
+import { nano, theme } from "../ui/style";
 
 export type TextColor = "default" | "disabled";
 export type TextVariant = "default" | "h1" | "h2";
