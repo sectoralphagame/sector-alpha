@@ -1,9 +1,9 @@
+import { fieldColors } from "@core/archetypes/asteroid";
 import Color from "color";
 import { add, matrix, Matrix } from "mathjs";
 import { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
 import { sectorSize } from "../archetypes/sector";
-import { theme } from "../style";
 import { RequireComponent } from "../tsHelpers";
 import { findInAncestors } from "../utils/findInAncestors";
 import { BaseComponent } from "./component";
@@ -24,7 +24,7 @@ export const graphics: Graphics = {
     g.lineStyle({
       alpha: 0.3,
       width: 1,
-      color: Color(theme.palette.asteroids[asteroidSpawn!.type]).rgbNumber(),
+      color: Color(fieldColors[asteroidSpawn!.type]).rgbNumber(),
     })
       .drawCircle(
         position!.coord.get([0]) * 10,
@@ -34,7 +34,7 @@ export const graphics: Graphics = {
       .lineStyle({
         alpha: 0.2,
         width: 0.8,
-        color: Color(theme.palette.asteroids[asteroidSpawn!.type]).rgbNumber(),
+        color: Color(fieldColors[asteroidSpawn!.type]).rgbNumber(),
       })
       .drawCircle(
         position!.coord.get([0]) * 10,
@@ -44,7 +44,7 @@ export const graphics: Graphics = {
       .lineStyle({
         alpha: 0.1,
         width: 0.6,
-        color: Color(theme.palette.asteroids[asteroidSpawn!.type]).rgbNumber(),
+        color: Color(fieldColors[asteroidSpawn!.type]).rgbNumber(),
       })
       .drawCircle(
         position!.coord.get([0]) * 10,
@@ -62,7 +62,7 @@ export const graphics: Graphics = {
     g.lineStyle({
       alpha: 0.3,
       width: 5,
-      color: Color(theme.palette.disabled).rgbNumber(),
+      color: Color.hsl(0, 0, 70).rgbNumber(),
     });
     g.moveTo(
       originPosition!.coord.get([0]) * 10,
@@ -120,7 +120,7 @@ export const graphics: Graphics = {
             g.lineStyle({
               alpha: 0.3,
               width: 3 / viewport.scale.x,
-              color: Color(theme.palette.disabled).rgbNumber(),
+              color: Color.hsl(0, 0, 70).rgbNumber(),
             });
             g.lineTo(
               targetPosition!.coord.get([0]) * 10,

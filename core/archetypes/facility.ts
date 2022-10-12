@@ -10,7 +10,6 @@ import { RequireComponent } from "../tsHelpers";
 import { Sector } from "./sector";
 import { createDocks } from "../components/dockable";
 import { Faction } from "./faction";
-import { theme } from "../style";
 
 export const commanderRange = 4;
 
@@ -63,9 +62,9 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     })
     .addComponent(
       createRender({
-        color: Color(
-          initial.owner?.cp.color.value || theme.palette.disabled
-        ).rgbNumber(),
+        color: initial.owner?.cp.color.value
+          ? Color(initial.owner?.cp.color.value).rgbNumber()
+          : Color.hsl(0, 0, 70).rgbNumber(),
         defaultScale: 1,
         maxZ: 0.1,
         texture: "fFactory",

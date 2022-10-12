@@ -1,11 +1,19 @@
 import { Matrix } from "mathjs";
 import Color from "color";
+import { MineableCommodity } from "@core/economy/commodity";
 import { Entity } from "../components/entity";
 import { createRender } from "../components/render";
 import { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { AsteroidField } from "./asteroidField";
-import { theme } from "../style";
+
+export const fieldColors = {
+  fuelium: "#ffab6b",
+  goldOre: "#ffe46b",
+  ice: "#e8ffff",
+  ore: "#ff5c7a",
+  silica: "#8f8f8f",
+} as Record<MineableCommodity, string>;
 
 export const asteroidComponents = [
   "minable",
@@ -51,7 +59,7 @@ export function createAsteroid(
     })
     .addComponent(
       createRender({
-        color: Color(theme.palette.asteroids[type]).rgbNumber(),
+        color: Color(fieldColors[type]).rgbNumber(),
         defaultScale: 0.6,
         maxZ: 3,
         texture: "asteroid",
