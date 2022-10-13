@@ -1,9 +1,10 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
 const config = {
-  entry: ["./src/index.ts"],
+  entry: ["./gateway/index.tsx"],
   module: {
     rules: [
       {
@@ -46,7 +47,7 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       inject: true,
-      template: "./src/index.html",
+      template: "./gateway/index.html",
     }),
     new ForkTsCheckerWebpackPlugin(),
   ],
@@ -61,6 +62,11 @@ const config = {
   },
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
+    plugins: [
+      new TsconfigPathsPlugin({
+        configFile: "./tsconfig.json",
+      }),
+    ],
   },
   devtool: "source-map",
 };

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "esModuleInterop": true,
     "target": "es2018",
     "module": "ES2020",
@@ -7,7 +8,14 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true,
     "jsx": "react",
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "paths": {
+      "@assets/*": ["./assets/*"],
+      "@core/*": ["./core/*"],
+      "@devtools/*": ["./devtools/*"],
+      "@kit/*": ["./kit/*"],
+      "@ui/*": ["./ui/*"]
+    }
   },
   "exclude": ["**/*.test.*"]
 }

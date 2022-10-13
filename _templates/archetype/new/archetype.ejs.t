@@ -1,5 +1,5 @@
 ---
-to: src/archetypes/<%= name %>.ts
+to: core/archetypes/<%= name %>.ts
 ---
 import { CoreComponents, Entity } from "../components/entity";
 import { MissingComponentError } from "../errors";
