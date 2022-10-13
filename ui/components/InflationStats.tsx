@@ -6,7 +6,6 @@ import {
   UTCTimestamp,
 } from "lightweight-charts";
 import { Sim } from "@core/sim";
-import { nano, theme } from "../style";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import {
@@ -14,6 +13,7 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
+import { nano, theme } from "../style";
 
 const styles = nano.sheet({
   button: {

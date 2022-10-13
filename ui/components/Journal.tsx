@@ -4,8 +4,8 @@ import { Faction } from "@core/archetypes/faction";
 import { RequireComponent } from "@core/tsHelpers";
 import { limitMax, limitMin } from "@core/utils/limit";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
-import { nano, theme } from "../style";
 import { IconButton } from "@kit/IconButton";
+import { nano, theme } from "../style";
 
 const styles = nano.sheet({
   arrowRight: {

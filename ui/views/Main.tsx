@@ -1,6 +1,6 @@
 import React from "react";
-import { nano, theme } from "../style";
 import { Button } from "@kit/Button";
+import { nano, theme } from "../style";
 import { View } from "../components/View";
 import { useLocation } from "../context/Location";
 

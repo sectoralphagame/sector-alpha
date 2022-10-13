@@ -1,12 +1,12 @@
 import React from "react";
 import { Facility } from "@core/archetypes/facility";
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@kit/Tabs";
 import { Production } from "./Production";
 import { Offers } from "./Offers";
 import { Docks } from "./Docks";
 import { Subordinates } from "./Subordinates";
 import { Allocations } from "./Allocations";
 import ShipBuildingQueue from "./ShipBuildingQueue";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@kit/Tabs";
 import { nano, theme } from "../style";
 import Journal from "./Journal";
 

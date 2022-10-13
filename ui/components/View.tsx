@@ -1,10 +1,10 @@
 import React from "react";
 import SVG from "react-inlinesvg";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
-import { nano, theme } from "../style";
-import { useLocation } from "../context/Location";
 import { IconButton } from "@kit/IconButton";
 import Text from "@kit/Text";
+import { nano, theme } from "../style";
+import { useLocation } from "../context/Location";
 
 const styles = nano.sheet({
   backButtonBar: {

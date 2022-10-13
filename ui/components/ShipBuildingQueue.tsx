@@ -1,11 +1,11 @@
 import React from "react";
 import { RequireComponent } from "@core/tsHelpers";
-import { nano } from "../style";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
+import { nano } from "../style";
 
 const styles = nano.sheet({
   list: {

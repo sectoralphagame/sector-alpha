@@ -4,8 +4,8 @@ import { createMarker } from "@core/archetypes/marker";
 import { isOwnedByPlayer } from "@core/components/player";
 import { getSelected, getSelectedSecondary } from "@core/components/selection";
 import { moveToOrders } from "@core/utils/moving";
-import { useContextMenu, useGameDialog, useSim } from "../../atoms";
 import { DropdownOption } from "@kit/Dropdown";
+import { useContextMenu, useGameDialog, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
 export const ShipToEntity: React.FC = () => {

@@ -5,14 +5,14 @@ import { commoditiesArray, Commodity } from "@core/economy/commodity";
 import { RequireComponent } from "@core/tsHelpers";
 import { getAvailableSpace } from "@core/components/storage";
 import { tradeCommodity } from "@core/utils/trading";
-import { nano, theme } from "../style";
 import { Dialog } from "@kit/Dialog";
 import { Button } from "@kit/Button";
 import { Input } from "@kit/Input";
-import { useGameDialog, useSim } from "../atoms";
-import { ModalProps } from "./ConfigDialog";
 import { Table, TableCell, TableHeader } from "@kit/Table";
 import Text from "@kit/Text";
+import { useGameDialog, useSim } from "../atoms";
+import { ModalProps } from "./ConfigDialog";
+import { nano, theme } from "../style";
 
 const styles = nano.sheet({
   colName: { "&&": { textAlign: "left" } },

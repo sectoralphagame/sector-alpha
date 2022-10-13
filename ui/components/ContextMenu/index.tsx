@@ -1,9 +1,9 @@
 import React from "react";
 import { shipComponents } from "@core/archetypes/ship";
+import { getSelected, getSelectedSecondary } from "@core/components/selection";
 import { useSim } from "../../atoms";
 import { ShipToSpace } from "./ShipToSpace";
 import { NoAvailableActions } from "./NoAvailableActions";
-import { getSelected, getSelectedSecondary } from "@core/components/selection";
 import { ShipToEntity } from "./ShipToEntity";
 
 export const ContextMenu: React.FC = () => {

@@ -5,6 +5,8 @@ import clsx from "clsx";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { ShipInput } from "@core/world/ships";
 import { LabeledInput } from "@kit/Input";
+import { IconButton } from "@kit/IconButton";
+import { Card, CardHeader } from "@kit/Card";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import { styles } from "./styles";
 import {
@@ -15,8 +17,6 @@ import {
   useThrottledFormState,
   withDistance,
 } from "./utils";
-import { IconButton } from "@kit/IconButton";
-import { Card, CardHeader } from "@kit/Card";
 
 const ShipFreightEditor: React.FC<{ index: number }> = ({ index }) => {
   const { register, getValues } = useFormContext<FormData>();

@@ -3,10 +3,10 @@ import SVG from "react-inlinesvg";
 import { Order } from "@core/components/orders";
 import { RequireComponent } from "@core/tsHelpers";
 import okIcon from "@assets/ui/ok.svg";
-import { nano, theme } from "../style";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { IconButton } from "@kit/IconButton";
 import Text from "@kit/Text";
+import { nano, theme } from "../style";
 import { useSim } from "../atoms";
 
 const styles = nano.sheet({

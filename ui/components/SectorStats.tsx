@@ -8,10 +8,10 @@ import {
 import { Sector } from "@core/archetypes/sector";
 import { getSectorResources } from "@core/utils/resources";
 import { fieldColors } from "@core/archetypes/asteroid";
-import { nano, theme } from "../style";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import { Checkbox } from "@kit/Checkbox";
+import { nano, theme } from "../style";
 
 const styles = nano.sheet({
   commodities: {

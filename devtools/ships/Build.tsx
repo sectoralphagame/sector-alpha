@@ -6,9 +6,6 @@ import { ShipInput } from "@core/world/ships";
 import { commoditiesArray, Commodity } from "@core/economy/commodity";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import closeIcon from "@assets/ui/close.svg";
-import { Table, TableCell, TableHeader } from "../components/Table";
-import { styles } from "./styles";
-import { FormData, useThrottledFormState } from "./utils";
 import { IconButton } from "@kit/IconButton";
 import {
   Dropdown,
@@ -16,6 +13,9 @@ import {
   DropdownOption,
   DropdownOptions,
 } from "@kit/Dropdown";
+import { Table, TableCell, TableHeader } from "../components/Table";
+import { styles } from "./styles";
+import { FormData, useThrottledFormState } from "./utils";
 
 const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
   const { register, getValues, setValue } = useFormContext<FormData>();

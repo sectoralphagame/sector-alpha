@@ -3,12 +3,12 @@ import ClickAwayListener from "react-click-away-listener";
 import { deepEqual } from "mathjs";
 import { RenderingSystem } from "@core/systems/rendering";
 import { worldToHecs } from "@core/components/hecsPosition";
+import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import { nano } from "../style";
 
 import { Panel } from "../components/Panel";
 import { useContextMenu, useSim } from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
-import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import { PlayerMoney } from "../components/PlayerMoney";
 
 const styles = nano.sheet({

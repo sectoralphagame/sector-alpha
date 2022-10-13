@@ -8,7 +8,7 @@
     "build": "NODE_ENV=production webpack",
     "gen-archetype": "hygen archetype new",
     "test": "jest",
-    "lint": "npx eslint \"src/**/*.@(tsx|ts|jsx|js)\" --fix ; npx prettier --check \"src/**/*.@(tsx|ts|jsx|js)\" --write"
+    "lint": "npx eslint \"@(core|ui|kit|devtools)/**/*.@(tsx|ts|jsx|js)\" --fix ; npx prettier --check \"@(core|ui|kit|devtools)/**/*.@(tsx|ts|jsx|js)\" --write"
   },
   "author": "Dominik Żegleń",
   "license": "ISC",
