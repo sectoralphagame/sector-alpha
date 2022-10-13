@@ -1,12 +1,12 @@
 import React from "react";
-import { nano, theme } from "@ui/style";
+import { nano } from "@ui/style";
 
 export const Table = nano.jsx("table", {
   "tbody tr:not(.no-border), thead tr:not(.no-border)": {
-    borderBottom: `1px ${theme.palette.disabled} solid`,
+    borderBottom: `1px ${"var(--palette-disabled)"} solid`,
   },
   "tbody td, thead th": {
-    padding: `${theme.spacing(0.75)} ${theme.spacing(1)}`,
+    padding: `${"var(--spacing-0-75)"} ${"var(--spacing-1)"}`,
   },
   "tbody tr:not(.no-border):last-child": {
     borderBottom: "none",
@@ -18,8 +18,8 @@ export const Table = nano.jsx("table", {
     background: "rgba(255,255,255,0.1)",
     border: "none",
     borderRadius: "4px",
-    color: theme.palette.default,
-    fontSize: theme.typography.default,
+    color: "var(--palette-default)",
+    fontSize: "var(--typography-default)",
     outline: 0,
     height: "32px",
     padding: "4px 8px",
@@ -41,6 +41,6 @@ export const TableCell: React.FC<
 }) as any;
 
 export const TableHeader = nano.jsx("th", {
-  fontSize: theme.typography.label,
+  fontSize: "var(--typography-label)",
   padding: "4px 0",
 });

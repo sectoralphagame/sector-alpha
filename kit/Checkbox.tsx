@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import { nano, theme } from "../ui/style";
+import { nano } from "../ui/style";
 
 const styles = nano.sheet({
   root: {
@@ -12,13 +12,13 @@ const styles = nano.sheet({
       top: "2px",
       left: "2px",
       display: "block",
-      background: theme.palette.default,
+      background: "var(--palette-default)",
     },
     cursor: "pointer",
     appearance: "none",
     width: "12px",
     height: "12px",
-    border: `1px solid ${theme.palette.default}`,
+    border: "1px solid var(--palette-default)",
     borderRadius: "2px",
     margin: "2px",
   },

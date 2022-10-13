@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { RequireComponent } from "@core/tsHelpers";
-import { nano, theme } from "../style";
+import { nano } from "../style";
 
 const styles = nano.sheet({
   input: {
@@ -11,9 +11,9 @@ const styles = nano.sheet({
     background: "rgba(255,255,255,0.1)",
     border: "none",
     borderRadius: "4px",
-    color: theme.palette.default,
-    fontSize: theme.typography.default,
-    marginBottom: theme.spacing(1),
+    color: "var(--palette-default)",
+    fontSize: "var(--typography-default)",
+    marginBottom: "var(--spacing-1)",
     outline: 0,
     height: "32px",
     padding: "4px 8px",

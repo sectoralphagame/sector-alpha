@@ -1,5 +1,5 @@
 import React from "react";
-import { nano, theme } from "../ui/style";
+import { nano } from "../ui/style";
 
 export const Table = nano.jsx("table", {
   borderCollapse: "collapse",
@@ -16,6 +16,6 @@ export const TableCell: React.FC<
 }) as any;
 
 export const TableHeader = nano.jsx("th", {
-  fontSize: theme.typography.label,
+  fontSize: "var(--typography-label)",
   padding: "4px 0",
 });

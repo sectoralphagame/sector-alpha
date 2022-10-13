@@ -11,7 +11,7 @@ import { commodities } from "@core/economy/commodity";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import { Checkbox } from "@kit/Checkbox";
-import { nano, theme } from "../style";
+import { nano } from "../style";
 
 const styles = nano.sheet({
   commodities: {
@@ -22,12 +22,12 @@ const styles = nano.sheet({
     width: "100%",
   },
   header: {
-    marginBottom: theme.spacing(1),
-    marginTop: theme.spacing(1),
+    marginBottom: "var(--spacing-1)",
+    marginTop: "var(--spacing-1)",
   },
   label: {
     cursor: "pointer",
-    marginLeft: theme.spacing(0.5),
+    marginLeft: "var(--spacing-0-5)",
   },
   labelContainer: {
     display: "inline-flex",
@@ -68,10 +68,10 @@ const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
         },
         grid: {
           horzLines: {
-            color: theme.palette.text(5),
+            color: "var(--palette-text-5)",
           },
           vertLines: {
-            color: theme.palette.text(5),
+            color: "var(--palette-text-5)",
           },
         },
         layout: {
@@ -79,7 +79,7 @@ const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
             color: "black",
             type: ColorType.Solid,
           },
-          textColor: theme.palette.text(3),
+          textColor: "var(--palette-text-3)",
           fontFamily: "Space Mono",
         },
         timeScale: {

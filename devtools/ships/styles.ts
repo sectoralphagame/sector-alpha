@@ -1,20 +1,20 @@
-import { nano, theme } from "@ui/style";
+import { nano } from "@ui/style";
 
 export const styles = nano.sheet({
   editorContainer: {
     overflowY: "scroll",
-    padding: theme.spacing(1),
+    padding: "var(--spacing-1)",
   },
   freightExpanded: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: theme.spacing(3),
-    padding: `${theme.spacing(3)} 0`,
+    gap: "var(--spacing-3)",
+    padding: `${"var(--spacing-3)"} 0`,
   },
   freightExpandedForm: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: theme.spacing(2),
+    gap: "var(--spacing-2)",
   },
   root: {
     display: "grid",
@@ -28,8 +28,8 @@ export const styles = nano.sheet({
     "json-viewer": {
       "--background-color": "transparent",
     },
-    borderLeft: `1px solid ${theme.palette.default}`,
-    padding: theme.spacing(1),
+    borderLeft: "1px solid var(--palette-default)",
+    padding: "var(--spacing-1)",
     overflowY: "scroll",
     fontFamily: "monospace",
     lineBreak: "anywhere",
@@ -37,16 +37,16 @@ export const styles = nano.sheet({
   column: {
     display: "flex",
     flexDirection: "column",
-    gap: theme.spacing(1),
-    padding: `${theme.spacing(1)} 0`,
+    gap: "var(--spacing-1)",
+    padding: `${"var(--spacing-1)"} 0`,
   },
   toolbar: {
     display: "flex",
-    gap: theme.spacing(1),
-    marginBottom: theme.spacing(1),
+    gap: "var(--spacing-1)",
+    marginBottom: "var(--spacing-1)",
   },
   hr: {
-    marginBottom: theme.spacing(1),
+    marginBottom: "var(--spacing-1)",
   },
   rotate: {
     transform: "rotate(180deg)",
@@ -68,7 +68,7 @@ export const styles = nano.sheet({
   buildExpanded: {
     display: "grid",
     gridTemplateColumns: "200px 80px 32px",
-    gap: theme.spacing(1),
-    padding: `${theme.spacing(3)} 0`,
+    gap: "var(--spacing-1)",
+    padding: `${"var(--spacing-3)"} 0`,
   },
 });

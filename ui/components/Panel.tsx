@@ -17,7 +17,7 @@ import playIcon from "@assets/ui/play.svg";
 import { IconButton } from "@kit/IconButton";
 import FacilityPanel from "./FacilityPanel";
 import ShipPanel from "./ShipPanel";
-import { nano, theme } from "../style";
+import { nano } from "../style";
 import { ConfigDialog } from "./ConfigDialog";
 import EntityName from "./EntityName";
 import Resources from "./Resources";
@@ -33,10 +33,10 @@ import { TradeDialog } from "./TradeDialog";
 const styles = nano.sheet({
   iconBar: {
     display: "flex",
-    gap: theme.spacing(1),
-    marginBottom: theme.spacing(2),
-    paddingBottom: theme.spacing(2),
-    borderBottom: `1px solid ${theme.palette.default}`,
+    gap: "var(--spacing-1)",
+    marginBottom: "var(--spacing-2)",
+    paddingBottom: "var(--spacing-2)",
+    borderBottom: "1px solid var(--palette-default)",
   },
   iconBarCollapsed: {
     flexDirection: "column",
@@ -45,17 +45,17 @@ const styles = nano.sheet({
     borderBottom: "none",
   },
   root: {
-    border: `1px solid ${theme.palette.default}`,
+    border: "1px solid var(--palette-default)",
     borderLeft: "none",
     borderTopRightRadius: "8px",
     borderBottomRightRadius: "8px",
-    background: theme.palette.background,
+    background: "var(--palette-background)",
     maxHeight: "calc(100vh - 128px)",
-    padding: theme.spacing(3),
+    padding: "var(--spacing-3)",
     position: "absolute",
     top: "64px",
     left: "0",
-    width: theme.isMobile ? "380px" : "450px",
+    width: "450px",
     zIndex: 1,
   },
   rootCollapsed: {
@@ -67,7 +67,7 @@ const styles = nano.sheet({
     },
     overflowY: "scroll",
     height: "calc(100vh - 234px)",
-    paddingBottom: theme.spacing(3),
+    paddingBottom: "var(--spacing-3)",
   },
   rotate: {
     transform: "rotate(180deg)",

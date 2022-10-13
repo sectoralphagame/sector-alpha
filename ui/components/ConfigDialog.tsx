@@ -8,7 +8,7 @@ import { Button } from "@kit/Button";
 import { Input } from "@kit/Input";
 import { IconButton } from "@kit/IconButton";
 import { useLocation } from "../context/Location";
-import { nano, theme } from "../style";
+import { nano } from "../style";
 import { Saves } from "./Saves";
 import useFullscreen from "../hooks/useFullscreen";
 import { useSim } from "../atoms";
@@ -20,17 +20,17 @@ export interface ModalProps {
 
 const styles = nano.sheet({
   backButton: {
-    marginBottom: theme.spacing(1),
+    marginBottom: "var(--spacing-1)",
   },
   buttons: {},
   buttonContainer: {
     "&:not(:last-child)": {
-      marginBottom: theme.spacing(1),
+      marginBottom: "var(--spacing-1)",
     },
     width: "100%",
   },
   input: {
-    marginBottom: theme.spacing(1),
+    marginBottom: "var(--spacing-1)",
     width: "100%",
   },
   saveContainer: {
@@ -39,7 +39,7 @@ const styles = nano.sheet({
     },
     display: "flex",
     alignItems: "center",
-    gap: theme.spacing(1),
+    gap: "var(--spacing-1)",
   },
 });
 

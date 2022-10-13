@@ -5,7 +5,7 @@ import { RequireComponent } from "@core/tsHelpers";
 import { limitMax, limitMin } from "@core/utils/limit";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { IconButton } from "@kit/IconButton";
-import { nano, theme } from "../style";
+import { nano } from "../style";
 
 const styles = nano.sheet({
   arrowRight: {
@@ -18,7 +18,7 @@ const styles = nano.sheet({
   },
   paginationButtons: {
     display: "flex",
-    gap: theme.spacing(1),
+    gap: "var(--spacing-1)",
   },
   list: {
     margin: 0,
@@ -32,8 +32,8 @@ const styles = nano.sheet({
       borderBottom: "none",
     },
     display: "block",
-    padding: `${theme.spacing(2)} 0`,
-    borderBottom: `1px solid ${theme.palette.default}`,
+    padding: `${"var(--spacing-2)"} 0`,
+    borderBottom: "1px solid var(--palette-default)",
   },
 });
 

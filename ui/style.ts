@@ -7,7 +7,10 @@ import { addon as addonJsx } from "nano-css/addon/jsx";
 import { addon as addonCache } from "nano-css/addon/cache";
 import { addon as addonGlobal } from "nano-css/addon/global";
 import Color from "color";
-import { isHeadless } from "@core/settings";
+import fromPairs from "lodash/fromPairs";
+import isObject from "lodash/isObject";
+
+import "./global.module.css";
 
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
@@ -30,58 +33,84 @@ addonCache(nano);
 addonJsx(nano);
 addonGlobal(nano);
 
-const isMobile = !isHeadless ? window.innerWidth < 1000 : false;
-const baseFontSize = isMobile ? 14 : 16;
-export const theme = {
-  isMobile,
-  spacing: (n: number) => `${n * (isMobile ? 6 : 8)}px`,
-  palette: {
-    background: "#000000",
-    default: "#FFFFFF",
-    text: (v: 1 | 2 | 3 | 4 | 5) => Color.hsl(0, 0, 100 - (v - 1) * 20).hex(),
-    disabled: Color.hsl(0, 0, 70).hex(),
-  },
-  typography: {
-    button: `${baseFontSize - 2}px`,
-    label: `${baseFontSize - 2}px`,
-    default: `${baseFontSize}px`,
-    header: `${Math.ceil(baseFontSize * 1.3 ** 2)}px`,
-    header2: `${Math.ceil(baseFontSize * 1.3)}px`,
-  },
-};
+const spacings = [0.25, 0.5, 0.75, 1, 2, 3, 4, 8] as const;
+const texts = [1, 2, 3, 4, 5] as const;
 
-nano.global({
-  "*": {
-    boxSizing: "border-box",
-    // eslint-disable-next-line quotes
-    fontFamily: '"Space Mono", monospace',
-  },
-  "html, body": {
-    backgroundColor: theme.palette.background,
-    color: "white",
-    margin: 0,
-    overscrollBehaviorY: "none",
-    fontSize: theme.typography.default,
-  },
-  label: {
-    display: "block",
-  },
-  th: {
-    textAlign: "left",
-    padding: 0,
-    fontSize: theme.typography.default,
-  },
-  "#root": {
-    width: "100vw",
-    height: "100vh",
-    overflow: "hidden",
-    isolation: "isolate",
-  },
-  "input::-webkit-outer-spin-button, input::-webkit-inner-spin-button": {
-    appearance: "none",
-    margin: 0,
-  },
-  "input[type=number]": {
-    appearance: "textfield",
-  },
-});
+export interface Theme {
+  spacing: Record<typeof spacings[number], string>;
+  palette: {
+    background: string;
+    default: string;
+    text: Record<typeof texts[number], string>;
+    disabled: string;
+  };
+  typography: {
+    button: string;
+    label: string;
+    default: string;
+    header: string;
+    header2: string;
+  };
+}
+
+export function createTheme(scale: number): Theme {
+  const baseFontSize = 16 * scale;
+  const baseSpacing = 8 * scale;
+
+  return {
+    spacing: fromPairs(
+      spacings.map((n) => [n, `${n * baseSpacing}px`])
+    ) as Record<typeof spacings[number], string>,
+    palette: {
+      background: "#000000",
+      default: "#FFFFFF",
+      text: fromPairs(
+        texts.map((v) => [v, Color.hsl(0, 0, 100 - (v - 1) * 20).hex()])
+      ) as Record<typeof texts[number], string>,
+      disabled: Color.hsl(0, 0, 70).hex(),
+    },
+    typography: {
+      button: `${baseFontSize * 0.875}px`,
+      label: `${baseFontSize * 0.875}px`,
+      default: `${baseFontSize}px`,
+      header: `${Math.ceil(baseFontSize * 1.3 ** 2)}px`,
+      header2: `${Math.ceil(baseFontSize * 1.3)}px`,
+    },
+  };
+}
+
+function getProperties(
+  o: Object,
+  prefix = ""
+): Array<{ key: string; value: string }> {
+  return Object.entries(o).flatMap(([k, v]) => {
+    if (isObject(v)) {
+      return getProperties(v, `${k}-`);
+    }
+
+    return { key: prefix + k, value: v };
+  });
+}
+
+export const Styles: React.FC = ({ children }) => {
+  const [scale] = React.useState(1);
+  const theme = React.useMemo(() => createTheme(scale), [scale]);
+  const cssVariables = React.useRef(
+    document.querySelector("style[data-css-variables]")
+  );
+
+  React.useEffect(() => {
+    if (!cssVariables.current) {
+      const styleTag = document.createElement("style");
+      styleTag.setAttribute("data-css-variable", "true");
+      document.head.append(styleTag);
+      cssVariables.current = styleTag;
+    }
+
+    cssVariables.current!.innerHTML = `:root { ${getProperties(theme)
+      .map(({ key, value }) => `--${key.replace(/\./g, "-")}: ${value};`)
+      .join(" ")} }`;
+  }, [theme]);
+
+  return children as any;
+};

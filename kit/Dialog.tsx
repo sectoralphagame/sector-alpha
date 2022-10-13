@@ -3,7 +3,7 @@ import Modal from "react-modal";
 import SVG from "react-inlinesvg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "./IconButton";
-import { nano, theme } from "../ui/style";
+import { nano } from "../ui/style";
 import Text from "./Text";
 
 Modal.setAppElement("#root");
@@ -19,7 +19,7 @@ const styles = nano.sheet({
   title: {
     display: "flex",
     justifyContent: "space-between",
-    marginBottom: theme.spacing(3),
+    marginBottom: "var(--spacing-3)",
   },
   titleText: {
     margin: 0,
@@ -43,7 +43,7 @@ export const Dialog: React.FC<DialogProps> = ({
         left: "50%",
         right: "auto",
         bottom: "auto",
-        maxWidth: `calc(100vw - ${theme.spacing(4)})`,
+        maxWidth: `calc(100vw - ${"var(--spacing-4)"})`,
         width: width ?? "300px",
         marginRight: "-50%",
         transform: "translate(-50%, -50%)",

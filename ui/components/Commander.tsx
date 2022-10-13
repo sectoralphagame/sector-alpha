@@ -5,7 +5,7 @@ import { RequireComponent } from "@core/tsHelpers";
 import locationIcon from "@assets/ui/location.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
-import { nano, theme } from "../style";
+import { nano } from "../style";
 import { useSim } from "../atoms";
 
 export interface CommanderProps {
@@ -20,7 +20,7 @@ const styles = nano.sheet({
     justifyContent: "space-between",
   },
   btn: {
-    marginLeft: theme.spacing(1),
+    marginLeft: "var(--spacing-1)",
   },
 });
 

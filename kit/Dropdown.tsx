@@ -1,7 +1,7 @@
 import { Menu } from "@headlessui/react";
 import clsx from "clsx";
 import React from "react";
-import { nano, theme } from "../ui/style";
+import { nano } from "../ui/style";
 
 const styles = nano.sheet({
   button: {
@@ -12,13 +12,13 @@ const styles = nano.sheet({
     background: "rgba(255, 255, 255, 0.1)",
     border: "none",
     borderRadius: "4px",
-    color: theme.palette.default,
+    color: "var(--palette-default)",
     cursor: "pointer",
     display: "block",
-    fontSize: theme.typography.button,
+    fontSize: "var(--typography-button)",
     height: "32px",
     lineHeight: 1,
-    padding: theme.spacing(1),
+    padding: "var(--spacing-1)",
     outline: 0,
     textAlign: "left",
     width: "100%",
@@ -27,13 +27,13 @@ const styles = nano.sheet({
     background: "rgba(255, 255, 255, 0.2)",
   },
   dropdown: {
-    background: theme.palette.background,
-    border: `1px ${theme.palette.default} solid`,
+    background: "var(--palette-background)",
+    border: "1px var(--palette-default) solid",
     borderRadius: "8px",
     maxHeight: "300px",
     overflow: "scroll",
     outline: 0,
-    padding: theme.spacing(1),
+    padding: "var(--spacing-1)",
     position: "absolute",
     width: "100%",
     zIndex: 1,
@@ -44,22 +44,22 @@ const styles = nano.sheet({
     },
     "&[disabled]": {
       "&:hover": {
-        background: theme.palette.background,
+        background: "var(--palette-background)",
       },
-      borderColor: theme.palette.disabled,
-      color: theme.palette.disabled,
+      borderColor: "var(--palette-disabled)",
+      color: "var(--palette-disabled)",
       cursor: "auto",
     },
     background: "none",
     border: "none",
     borderRadius: "4px",
-    color: theme.palette.default,
+    color: "var(--palette-default)",
     cursor: "pointer",
     display: "block",
-    fontSize: theme.typography.button,
+    fontSize: "var(--typography-button)",
     minHeight: "32px",
     lineHeight: 1,
-    padding: theme.spacing(1),
+    padding: "var(--spacing-1)",
     textAlign: "left",
     width: "100%",
   },

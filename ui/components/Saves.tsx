@@ -5,12 +5,12 @@ import { Save } from "@core/db";
 import closeIcon from "@assets/ui/close.svg";
 import { Button } from "@kit/Button";
 import { IconButton } from "@kit/IconButton";
-import { nano, theme } from "../style";
+import { nano } from "../style";
 
 const styles = nano.sheet({
   buttonContainer: {
     "&:not(:last-child)": {
-      marginBottom: theme.spacing(1),
+      marginBottom: "var(--spacing-1)",
     },
     width: "100%",
   },
@@ -20,7 +20,7 @@ const styles = nano.sheet({
     },
     display: "flex",
     alignItems: "center",
-    gap: theme.spacing(1),
+    gap: "var(--spacing-1)",
   },
 });
 

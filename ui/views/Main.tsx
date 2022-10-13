@@ -1,17 +1,17 @@
 import React from "react";
 import { Button } from "@kit/Button";
-import { nano, theme } from "../style";
+import { nano } from "../style";
 import { View } from "../components/View";
 import { useLocation } from "../context/Location";
 
 const styles = nano.sheet({
   container: {
-    padding: theme.spacing(4),
+    padding: "var(--spacing-4)",
     width: "420px",
   },
   button: {
     "&:not(:last-child)": {
-      marginBottom: theme.spacing(1),
+      marginBottom: "var(--spacing-1)",
     },
     width: "100%",
   },

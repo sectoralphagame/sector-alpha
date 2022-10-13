@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import { nano, theme } from "../ui/style";
+import { nano } from "../ui/style";
 
 const styles = nano.sheet({
   root: {
@@ -11,22 +11,22 @@ const styles = nano.sheet({
       background: "rgba(255, 255, 255, 0.3)",
     },
     appearance: "none",
-    background: theme.palette.background,
+    background: "var(--palette-background)",
     borderRadius: "4px",
-    border: `1px solid ${theme.palette.default}`,
-    color: theme.palette.default,
+    border: "1px solid var(--palette-default)",
+    color: "var(--palette-default)",
     height: "32px",
-    padding: theme.spacing(1),
+    padding: "var(--spacing-1)",
     lineHeight: 1,
-    fontSize: theme.typography.button,
+    fontSize: "var(--typography-button)",
     fontWeight: 600,
     transition: "200ms",
     outline: 0,
   },
   label: {
     cursor: "pointer",
-    fontSize: theme.typography.label,
-    marginLeft: theme.spacing(0.5),
+    fontSize: "var(--typography-label)",
+    marginLeft: "var(--spacing-0-5)",
   },
 });
 

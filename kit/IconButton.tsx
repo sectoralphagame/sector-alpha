@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import { nano, theme } from "../ui/style";
+import { nano } from "../ui/style";
 
 const styles = nano.sheet({
   root: {
@@ -16,20 +16,20 @@ const styles = nano.sheet({
     },
     "&[disabled]": {
       "&:hover": {
-        background: theme.palette.background,
+        background: "var(--palette-background)",
       },
-      borderColor: theme.palette.disabled,
-      color: theme.palette.disabled,
+      borderColor: "var(--palette-disabled)",
+      color: "var(--palette-disabled)",
       cursor: "auto",
     },
     appearance: "none",
-    background: theme.palette.background,
+    background: "var(--palette-background)",
     borderRadius: "4px",
-    border: `1px solid ${theme.palette.default}`,
-    color: theme.palette.default,
+    border: "1px solid var(--palette-default)",
+    color: "var(--palette-default)",
     cursor: "pointer",
     height: "32px",
-    padding: theme.spacing(1),
+    padding: "var(--spacing-1)",
     width: "32px",
     outline: 0,
   },

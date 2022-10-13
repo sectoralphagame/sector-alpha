@@ -1,13 +1,13 @@
 import React from "react";
 import { Tab as HeadlessTab } from "@headlessui/react";
 import clsx from "clsx";
-import { nano, theme } from "../ui/style";
+import { nano } from "../ui/style";
 
 const styles = nano.sheet({
   list: {
     borderRadius: "4px",
-    border: `1px solid ${theme.palette.default}`,
-    background: theme.palette.background,
+    border: "1px solid var(--palette-default)",
+    background: "var(--palette-background)",
   },
   tab: {
     "&:hover, &:focus": {
@@ -19,15 +19,15 @@ const styles = nano.sheet({
     appearance: "none",
     background: "transparent",
     border: "none",
-    color: theme.palette.default,
+    color: "var(--palette-default)",
     cursor: "pointer",
     height: "30px",
-    padding: theme.spacing(1),
+    padding: "var(--spacing-1)",
     textAlign: "center",
     whiteSpace: "nowrap",
     lineHeight: 1,
     textTransform: "uppercase",
-    fontSize: theme.typography.button,
+    fontSize: "var(--typography-button)",
     fontWeight: 600,
     transition: "200ms",
     outline: 0,

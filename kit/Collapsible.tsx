@@ -1,17 +1,17 @@
 import { Disclosure } from "@headlessui/react";
 import React from "react";
-import { nano, theme } from "../ui/style";
+import { nano } from "../ui/style";
 
 const styles = nano.sheet({
   root: {
-    marginBottom: theme.spacing(1),
+    marginBottom: "var(--spacing-1)",
   },
   header: {
     marginBottom: "4px",
     cursor: "pointer",
   },
   body: {
-    marginLeft: theme.spacing(3),
+    marginLeft: "var(--spacing-3)",
   },
 });
 

@@ -3,18 +3,18 @@ import SVG from "react-inlinesvg";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { IconButton } from "@kit/IconButton";
 import Text from "@kit/Text";
-import { nano, theme } from "../style";
+import { nano } from "../style";
 import { useLocation } from "../context/Location";
 
 const styles = nano.sheet({
   backButtonBar: {
     display: "flex",
     alignItems: "center",
-    gap: theme.spacing(2),
-    marginBottom: theme.spacing(1),
+    gap: "var(--spacing-2)",
+    marginBottom: "var(--spacing-1)",
   },
   container: {
-    padding: theme.spacing(4),
+    padding: "var(--spacing-4)",
     width: "420px",
   },
   root: {

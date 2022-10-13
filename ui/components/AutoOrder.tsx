@@ -6,7 +6,7 @@ import okIcon from "@assets/ui/ok.svg";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { IconButton } from "@kit/IconButton";
 import Text from "@kit/Text";
-import { nano, theme } from "../style";
+import { nano } from "../style";
 import { useSim } from "../atoms";
 
 const styles = nano.sheet({
@@ -14,7 +14,7 @@ const styles = nano.sheet({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: theme.spacing(1),
+    gap: "var(--spacing-1)",
   },
   select: {
     flex: 1,

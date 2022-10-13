@@ -1,4 +1,4 @@
-import "@ui/style";
+import { Styles } from "@ui/style";
 
 import ReactDOM from "react-dom";
 import React from "react";
@@ -7,11 +7,13 @@ import { DevTools } from "@devtools/index";
 import { Root } from "@ui/index";
 
 ReactDOM.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="dev/*" element={<DevTools />} />
-      <Route path="*" element={<Root />} />
-    </Routes>
-  </BrowserRouter>,
+  <Styles>
+    <BrowserRouter>
+      <Routes>
+        <Route path="dev/*" element={<DevTools />} />
+        <Route path="*" element={<Root />} />
+      </Routes>
+    </BrowserRouter>
+  </Styles>,
   document.querySelector("#root")
 );
