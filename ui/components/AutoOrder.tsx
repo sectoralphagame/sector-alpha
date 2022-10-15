@@ -6,20 +6,8 @@ import okIcon from "@assets/ui/ok.svg";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { IconButton } from "@kit/IconButton";
 import Text from "@kit/Text";
-import { nano } from "../style";
 import { useSim } from "../atoms";
-
-const styles = nano.sheet({
-  form: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: "var(--spacing-1)",
-  },
-  select: {
-    flex: 1,
-  },
-});
+import styles from "./AutoOrder.scss";
 
 const AutoOrder: React.FC<{ entity: RequireComponent<"autoOrder"> }> = ({
   entity,

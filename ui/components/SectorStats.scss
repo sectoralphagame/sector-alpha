@@ -1,0 +1,15 @@
+.commodities {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.container {
+  width: 100%;
+}
+.label {
+  cursor: pointer;
+  margin-left: var(--spacing-0-5);
+}
+.labelContainer {
+  display: inline-flex;
+  align-items: center;
+}

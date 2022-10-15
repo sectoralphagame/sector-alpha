@@ -17,7 +17,6 @@ import playIcon from "@assets/ui/play.svg";
 import { IconButton } from "@kit/IconButton";
 import FacilityPanel from "./FacilityPanel";
 import ShipPanel from "./ShipPanel";
-import { nano } from "../style";
 import { ConfigDialog } from "./ConfigDialog";
 import EntityName from "./EntityName";
 import Resources from "./Resources";
@@ -29,53 +28,7 @@ import { PlayerShips } from "./PlayerShips";
 import { useRerender } from "../hooks/useRerender";
 import { PlayerFacilities } from "./PlayerFacilities";
 import { TradeDialog } from "./TradeDialog";
-
-const styles = nano.sheet({
-  iconBar: {
-    display: "flex",
-    gap: "var(--spacing-1)",
-    marginBottom: "var(--spacing-2)",
-    paddingBottom: "var(--spacing-2)",
-    borderBottom: "1px solid var(--palette-default)",
-  },
-  iconBarCollapsed: {
-    flexDirection: "column",
-    marginBottom: 0,
-    padding: 0,
-    borderBottom: "none",
-  },
-  root: {
-    border: "1px solid var(--palette-default)",
-    borderLeft: "none",
-    borderTopRightRadius: "8px",
-    borderBottomRightRadius: "8px",
-    background: "var(--palette-background)",
-    maxHeight: "calc(100vh - 128px)",
-    padding: "var(--spacing-3)",
-    position: "absolute",
-    top: "64px",
-    left: "0",
-    width: "450px",
-    zIndex: 1,
-  },
-  rootCollapsed: {
-    width: "80px",
-  },
-  scrollArea: {
-    "&::-webkit-scrollbar": {
-      display: "none",
-    },
-    overflowY: "scroll",
-    height: "calc(100vh - 234px)",
-    paddingBottom: "var(--spacing-3)",
-  },
-  rotate: {
-    transform: "rotate(180deg)",
-  },
-  spacer: {
-    flex: 1,
-  },
-});
+import styles from "./Panel.scss";
 
 export const Panel: React.FC = () => {
   const [isCollapsed, setCollapsed] = React.useState(true);

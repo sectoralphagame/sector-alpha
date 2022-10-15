@@ -11,29 +11,7 @@ import { commodities } from "@core/economy/commodity";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import { Checkbox } from "@kit/Checkbox";
-import { nano } from "../style";
-
-const styles = nano.sheet({
-  commodities: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-  },
-  container: {
-    width: "100%",
-  },
-  header: {
-    marginBottom: "var(--spacing-1)",
-    marginTop: "var(--spacing-1)",
-  },
-  label: {
-    cursor: "pointer",
-    marginLeft: "var(--spacing-0-5)",
-  },
-  labelContainer: {
-    display: "inline-flex",
-    alignItems: "center",
-  },
-});
+import styles from "./SectorPrices.scss";
 
 const baseColor = Color.rgb(151, 255, 125);
 

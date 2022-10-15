@@ -1,30 +1,7 @@
 import React from "react";
-import { nano } from "../style";
 import { useSim } from "../atoms";
 import { useRerender } from "../hooks/useRerender";
-
-const styles = nano.sheet({
-  root: {
-    top: "var(--spacing-2)",
-    padding: "var(--spacing-1)",
-    position: "absolute",
-    left: "0",
-    right: "0",
-    margin: "auto",
-    textAlign: "center",
-    maxWidth: "300px",
-    width: "fit-content",
-    background: "var(--palette-background)",
-    border: "1px solid var(--palette-default)",
-    borderRadius: "4px",
-    lineHeight: 1,
-    height: "32px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    pointerEvents: "none",
-  },
-});
+import styles from "./PlayerMoney.scss";
 
 export const PlayerMoney: React.FC = () => {
   const [sim] = useSim();

@@ -4,17 +4,7 @@ import { RequireComponent } from "@core/tsHelpers";
 import locationIcon from "@assets/ui/location.svg";
 import { IconButton } from "@kit/IconButton";
 import { Table, TableCell } from "@kit/Table";
-import { nano } from "../style";
-
-const styles = nano.sheet({
-  colAction: {
-    width: "48px",
-    textAlign: "right",
-  },
-  colName: {
-    textAlign: "left",
-  },
-});
+import styles from "./EntityList.scss";
 
 export interface EntityListProps {
   entities: RequireComponent<"name">[];

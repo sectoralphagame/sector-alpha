@@ -12,16 +12,7 @@ import { Table, TableCell, TableHeader } from "@kit/Table";
 import Text from "@kit/Text";
 import { useGameDialog, useSim } from "../atoms";
 import { ModalProps } from "./ConfigDialog";
-import { nano } from "../style";
-
-const styles = nano.sheet({
-  colName: { "&&": { textAlign: "left" } },
-  input: {
-    marginRight: "var(--spacing-1)",
-    width: "70px",
-  },
-  row: { "& td, & th": { textAlign: "right" } },
-});
+import styles from "./TradeDialog.scss";
 
 export interface TradeDialogProps {
   type: "trade";

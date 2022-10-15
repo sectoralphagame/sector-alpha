@@ -13,16 +13,7 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
-import { nano } from "../style";
-
-const styles = nano.sheet({
-  button: {
-    marginTop: "var(--spacing-1)",
-  },
-  container: {
-    width: "100%",
-  },
-});
+import styles from "./InflationStats.scss";
 
 const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
   const [open, setOpen] = React.useState(false);

@@ -5,37 +5,7 @@ import { RequireComponent } from "@core/tsHelpers";
 import { limitMax, limitMin } from "@core/utils/limit";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { IconButton } from "@kit/IconButton";
-import { nano } from "../style";
-
-const styles = nano.sheet({
-  arrowRight: {
-    transform: "rotate(180deg)",
-  },
-  pagination: {
-    alignItems: "center",
-    display: "flex",
-    justifyContent: "space-between",
-  },
-  paginationButtons: {
-    display: "flex",
-    gap: "var(--spacing-1)",
-  },
-  list: {
-    margin: 0,
-    padding: 0,
-  },
-  item: {
-    "&:first-child": {
-      paddingTop: 0,
-    },
-    "&:last-child": {
-      borderBottom: "none",
-    },
-    display: "block",
-    padding: `${"var(--spacing-2)"} 0`,
-    borderBottom: "1px solid var(--palette-default)",
-  },
-});
+import styles from "./Journal.scss";
 
 const pageSize = 20;
 

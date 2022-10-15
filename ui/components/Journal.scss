@@ -1,0 +1,27 @@
+.arrowRight {
+  transform: rotate(180deg);
+}
+.pagination {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+.paginationButtons {
+  display: flex;
+  gap: var(--spacing-1);
+}
+.list {
+  margin: 0;
+  padding: 0;
+}
+.item {
+  &:first-child {
+    padding-top: 0;
+  }
+  &:last-child {
+    border-bottom: none;
+  }
+  display: block;
+  padding: var(--spacing-2) 0;
+  border-bottom: 1px solid var(--palette-default);
+}

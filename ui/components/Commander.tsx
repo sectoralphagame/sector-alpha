@@ -5,24 +5,13 @@ import { RequireComponent } from "@core/tsHelpers";
 import locationIcon from "@assets/ui/location.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
-import { nano } from "../style";
 import { useSim } from "../atoms";
+import styles from "./Commander.scss";
 
 export interface CommanderProps {
   commander: Entity;
   ship: RequireComponent<"commander">;
 }
-
-const styles = nano.sheet({
-  root: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  btn: {
-    marginLeft: "var(--spacing-1)",
-  },
-});
 
 export const Commander: React.FC<CommanderProps> = ({ commander, ship }) => {
   const [sim] = useSim();

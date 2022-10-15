@@ -17,15 +17,7 @@ import {
   CollapsibleSummary,
 } from "@kit/Collapsible";
 import { IconButton } from "@kit/IconButton";
-import { nano } from "../style";
-
-const styles = nano.sheet({
-  orderGroupHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-});
+import styles from "./Orders.scss";
 
 function getOrderDescription(ship: Ship, order: Order) {
   switch (order.type) {
