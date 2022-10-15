@@ -1,13 +1,15 @@
-import { nano } from "../ui/style";
+import clsx from "clsx";
+import React from "react";
+import styles from "./Card.scss";
 
-export const Card = nano.jsx("div", {
-  border: "1px var(--palette-default) solid",
-  borderRadius: "8px",
-  padding: "var(--spacing-3)",
-});
+export const Card: React.FC<
+  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+> = ({ className, ...props }) => (
+  <div className={clsx(className, styles.root)} {...props} />
+);
 
-export const CardHeader = nano.jsx("div", {
-  fontSize: "var(--typography-header2)",
-  fontWeight: "600",
-  marginBottom: "var(--spacing-3)",
-});
+export const CardHeader: React.FC<
+  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+> = ({ className, ...props }) => (
+  <div className={clsx(className, styles.header)} {...props} />
+);

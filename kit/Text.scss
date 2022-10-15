@@ -1,0 +1,22 @@
+.colorDefault {
+  color: var(--palette-default);
+}
+.colorDisabled {
+  color: var(--palette-disabled);
+}
+.default {
+  font-size: var(--typography-default);
+  margin-top: var(--spacing-1);
+  margin-bottom: var(--spacing-1);
+}
+.h1 {
+  font-size: var(--typography-header);
+  margin-bottom: var(--spacing-2);
+}
+.h2 {
+  font-size: var(--typography-header2);
+  margin-bottom: var(--spacing-1);
+}
+.root {
+  margin: 0;
+}

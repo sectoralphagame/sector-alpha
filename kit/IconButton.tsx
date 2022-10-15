@@ -1,39 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import { nano } from "../ui/style";
-
-const styles = nano.sheet({
-  root: {
-    "*": {
-      height: "100%",
-      width: "100%",
-    },
-    "&:hover, &:focus": {
-      background: "rgba(255, 255, 255, 0.15)",
-    },
-    "&:active": {
-      background: "rgba(255, 255, 255, 0.3)",
-    },
-    "&[disabled]": {
-      "&:hover": {
-        background: "var(--palette-background)",
-      },
-      borderColor: "var(--palette-disabled)",
-      color: "var(--palette-disabled)",
-      cursor: "auto",
-    },
-    appearance: "none",
-    background: "var(--palette-background)",
-    borderRadius: "4px",
-    border: "1px solid var(--palette-default)",
-    color: "var(--palette-default)",
-    cursor: "pointer",
-    height: "32px",
-    padding: "var(--spacing-1)",
-    width: "32px",
-    outline: 0,
-  },
-});
+import styles from "./IconButton.scss";
 
 export const IconButton: React.FC<
   React.DetailedHTMLProps<

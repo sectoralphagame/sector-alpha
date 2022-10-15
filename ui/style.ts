@@ -10,7 +10,7 @@ import Color from "color";
 import fromPairs from "lodash/fromPairs";
 import isObject from "lodash/isObject";
 
-import "./global.module.css";
+import "./global.scss";
 
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */

@@ -1,0 +1,65 @@
+.button {
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 4px;
+  color: var(--palette-default);
+  cursor: pointer;
+  display: block;
+  font-size: var(--typography-button);
+  height: 32px;
+  line-height: 1;
+  padding: var(--spacing-1);
+  outline: 0;
+  text-align: left;
+  width: 100%;
+}
+.buttonActive {
+  background: rgba(255, 255, 255, 0.2);
+}
+.dropdown {
+  background: var(--palette-background);
+  border: 1px var(--palette-default) solid;
+  border-radius: 8px;
+  max-height: 300px;
+  overflow: scroll;
+  outline: 0;
+  padding: var(--spacing-1);
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}
+.option {
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  &[disabled] {
+    &:hover {
+      background: var(--palette-background);
+    }
+    border-color: var(--palette-disabled);
+    color: var(--palette-disabled);
+    cursor: auto;
+  }
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--palette-default);
+  cursor: pointer;
+  display: block;
+  font-size: var(--typography-button);
+  min-height: 32px;
+  line-height: 1;
+  padding: var(--spacing-1);
+  text-align: left;
+  width: 100%;
+}
+.optionActive {
+  background: rgba(255, 255, 255, 0.15);
+}
+.root {
+  position: relative;
+}

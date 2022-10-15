@@ -1,48 +1,20 @@
 import clsx from "clsx";
 import React from "react";
-import { nano } from "../ui/style";
+import styles from "./Button.scss";
 
-const styles = nano.sheet({
-  root: {
-    "&:hover, &:focus": {
-      background: "rgba(255, 255, 255, 0.15)",
-    },
-    "&:active": {
-      background: "rgba(255, 255, 255, 0.3)",
-    },
-    "&[disabled]": {
-      "&:hover": {
-        background: "var(--palette-background)",
-      },
-      borderColor: "var(--palette-disabled)",
-      color: "var(--palette-disabled)",
-      cursor: "auto",
-    },
-    appearance: "none",
-    background: "var(--palette-background)",
-    borderRadius: "4px",
-    border: "1px solid var(--palette-default)",
-    color: "var(--palette-default)",
-    cursor: "pointer",
-    height: "32px",
-    padding: "var(--spacing-1)",
-    textAlign: "center",
-    whiteSpace: "nowrap",
-    lineHeight: 1,
-    textTransform: "uppercase",
-    fontSize: "var(--typography-button)",
-    fontWeight: 600,
-    transition: "200ms",
-    outline: 0,
-  },
-});
-
-export const Button: React.FC<
-  React.DetailedHTMLProps<
+export interface ButtonProps
+  extends React.DetailedHTMLProps<
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     HTMLButtonElement
-  >
-> = (props) => {
+  > {
+  active?: boolean;
+}
+
+export const Button: React.FC<ButtonProps> = ({
+  active,
+  className,
+  ...props
+}) => {
   const ref = React.useRef<HTMLButtonElement>(null);
 
   return (
@@ -53,8 +25,9 @@ export const Button: React.FC<
       onMouseUp={() => {
         ref.current?.blur();
       }}
-      // eslint-disable-next-line react/destructuring-assignment
-      className={clsx(styles.root, props?.className)}
+      className={clsx(styles.root, className, {
+        [styles.active]: active,
+      })}
     />
   );
 };

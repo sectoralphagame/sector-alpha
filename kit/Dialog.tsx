@@ -3,8 +3,8 @@ import Modal from "react-modal";
 import SVG from "react-inlinesvg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "./IconButton";
-import { nano } from "../ui/style";
 import Text from "./Text";
+import styles from "./Dialog.scss";
 
 Modal.setAppElement("#root");
 
@@ -14,17 +14,6 @@ export interface DialogProps {
   width?: string;
   onClose: () => void;
 }
-
-const styles = nano.sheet({
-  title: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "var(--spacing-3)",
-  },
-  titleText: {
-    margin: 0,
-  },
-});
 
 export const Dialog: React.FC<DialogProps> = ({
   children,

@@ -1,62 +1,7 @@
 import { Listbox } from "@headlessui/react";
 import clsx from "clsx";
 import React from "react";
-import { nano } from "../ui/style";
-
-const styles = nano.sheet({
-  button: {
-    "&:hover": {
-      background: "rgba(255, 255, 255, 0.2)",
-    },
-    appearance: "none",
-    background: "rgba(255, 255, 255, 0.1)",
-    border: "none",
-    borderRadius: "4px",
-    color: "var(--palette-default)",
-    cursor: "pointer",
-    display: "block",
-    fontSize: "var(--typography-button)",
-    height: "32px",
-    lineHeight: 1,
-    padding: "var(--spacing-1)",
-    outline: 0,
-    textAlign: "left",
-    width: "100%",
-  },
-  buttonActive: {
-    background: "rgba(255, 255, 255, 0.2)",
-  },
-  dropdown: {
-    background: "var(--palette-background)",
-    border: "1px var(--palette-default) solid",
-    borderRadius: "8px",
-    maxHeight: "300px",
-    overflow: "scroll",
-    outline: 0,
-    padding: "var(--spacing-1)",
-    position: "absolute",
-    width: "100%",
-    zIndex: 1,
-  },
-  option: {
-    "&:hover": {
-      background: "rgba(255, 255, 255, 0.15)",
-    },
-    borderRadius: "4px",
-    cursor: "pointer",
-    display: "block",
-    fontSize: "var(--typography-button)",
-    height: "32px",
-    lineHeight: 1,
-    padding: "var(--spacing-1)",
-  },
-  optionActive: {
-    background: "rgba(255, 255, 255, 0.15)",
-  },
-  root: {
-    position: "relative",
-  },
-});
+import styles from "./Select.scss";
 
 export const Select: React.FC<{
   className?: string;

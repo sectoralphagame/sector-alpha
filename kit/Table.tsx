@@ -1,21 +1,32 @@
+import clsx from "clsx";
 import React from "react";
-import { nano } from "../ui/style";
+import styles from "./Table.scss";
 
-export const Table = nano.jsx("table", {
-  borderCollapse: "collapse",
-  width: "100%",
-});
+export interface TableProps
+  extends React.DetailedHTMLProps<
+    React.TableHTMLAttributes<HTMLTableElement>,
+    HTMLTableElement
+  > {}
+export const Table: React.FC<TableProps> = ({ className, ...props }) => (
+  <table className={clsx(className, styles.table)} {...props} />
+);
 
-export const TableCell: React.FC<
-  React.DetailedHTMLProps<
+export interface TableCellProps
+  extends React.DetailedHTMLProps<
     React.TdHTMLAttributes<HTMLTableCellElement>,
     HTMLTableCellElement
-  >
-> = nano.jsx("td", {
-  padding: "4px 0",
-}) as any;
+  > {}
+export const TableCell: React.FC<TableCellProps> = ({
+  className,
+  ...props
+}) => <td className={clsx(className, styles.cell)} {...props} />;
 
-export const TableHeader = nano.jsx("th", {
-  fontSize: "var(--typography-label)",
-  padding: "4px 0",
-});
+export interface TableHeaderProps
+  extends React.DetailedHTMLProps<
+    React.ThHTMLAttributes<HTMLTableCellElement>,
+    HTMLTableCellElement
+  > {}
+export const TableHeader: React.FC<TableHeaderProps> = ({
+  className,
+  ...props
+}) => <th className={clsx(className, styles.header)} {...props} />;
