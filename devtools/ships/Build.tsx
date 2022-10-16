@@ -14,7 +14,7 @@ import {
   DropdownOptions,
 } from "@kit/Dropdown";
 import { Table, TableCell, TableHeader } from "../components/Table";
-import { styles } from "./styles";
+import styles from "./styles.scss";
 import { FormData, useThrottledFormState } from "./utils";
 
 const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {

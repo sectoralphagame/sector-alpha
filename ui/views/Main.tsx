@@ -5,10 +5,6 @@ import { View } from "../components/View";
 import { useLocation } from "../context/Location";
 
 const styles = nano.sheet({
-  container: {
-    padding: "var(--spacing-4)",
-    width: "420px",
-  },
   button: {
     "&:not(:last-child)": {
       marginBottom: "var(--spacing-1)",

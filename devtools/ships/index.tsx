@@ -11,7 +11,7 @@ import { shipClasses } from "@core/world/ships";
 import { Button } from "@kit/Button";
 import { Tab, TabList } from "@kit/Tabs";
 import { FormData } from "./utils";
-import { styles } from "./styles";
+import styles from "./styles.scss";
 import { GeneralEditor } from "./General";
 import { FreightEditor } from "./Freight";
 import { JSONOutput } from "./JSONOutput";

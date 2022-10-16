@@ -1,0 +1,70 @@
+.editorContainer {
+  overflow-y: scroll;
+  padding: var(--spacing-1);
+}
+.freightExpanded {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) 0;
+}
+.freightExpandedForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-2);
+}
+.root {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  height: 100vh;
+}
+.rootExpanded {
+  grid-template-columns: 1fr 350px;
+}
+.viewer {
+  json-viewer {
+    --background-color: transparent;
+  }
+  border-left: 1px solid var(--palette-default);
+  padding: var(--spacing-1);
+  overflow-y: scroll;
+  font-family: monospace;
+  line-break: anywhere;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) 0;
+}
+.toolbar {
+  display: flex;
+  gap: var(--spacing-1);
+  margin-bottom: var(--spacing-1);
+}
+.hr {
+  margin-bottom: var(--spacing-1);
+}
+.rotate {
+  transform: rotate(180deg);
+}
+.rowExpander {
+  transform: rotate(-90deg);
+}
+.rowExpanderToggled {
+  transform: rotate(90deg);
+}
+.textureLabel {
+  display: flex;
+  justify-content: space-between;
+}
+.texturePreview {
+  height: 16px;
+  width: 16px;
+}
+.buildExpanded {
+  display: grid;
+  grid-template-columns: 200px 80px 32px;
+  gap: var(--spacing-1);
+  padding: var(--spacing-3) 0;
+}

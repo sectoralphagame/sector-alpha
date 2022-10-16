@@ -8,7 +8,7 @@ import { LabeledInput } from "@kit/Input";
 import { IconButton } from "@kit/IconButton";
 import { Card, CardHeader } from "@kit/Card";
 import { Table, TableCell, TableHeader } from "../components/Table";
-import { styles } from "./styles";
+import styles from "./styles.scss";
 import {
   FormData,
   getShipMiningEfficiency,

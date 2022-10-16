@@ -6,7 +6,7 @@ import { Textures, textures } from "@core/components/render";
 import { DockSize } from "@core/components/dockable";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { Table, TableCell, TableHeader } from "../components/Table";
-import { styles } from "./styles";
+import styles from "./styles.scss";
 import { FormData, useThrottledFormState } from "./utils";
 
 const ShipGeneralEditor: React.FC<{ index: number }> = ({ index }) => {
