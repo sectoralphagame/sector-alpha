@@ -48,8 +48,8 @@ export const NewGame: React.FC = () => {
   );
 
   const onSubmit = handleSubmit(async () => {
-    let success = false;
-    while (!success) {
+    let tries = 0;
+    for (; tries < 20; tries++) {
       sim.current?.destroy();
       sim.current = new Sim();
       sim.current.init();
@@ -58,17 +58,21 @@ export const NewGame: React.FC = () => {
       try {
         // eslint-disable-next-line no-await-in-loop
         await world(sim.current, getValues().islands, getValues().factions);
-        success = true;
+        break;
         // eslint-disable-next-line no-empty
       } catch {}
     }
 
-    headlessSimWorker.current?.postMessage({
-      type: "init",
-      delta: 1,
-      targetTime,
-      sim: sim.current!.serialize(),
-    });
+    if (tries === 20) {
+      throw new Error("Maximum tries exceeded");
+    } else {
+      headlessSimWorker.current?.postMessage({
+        type: "init",
+        delta: 1,
+        targetTime,
+        sim: sim.current!.serialize(),
+      });
+    }
   });
 
   return (
