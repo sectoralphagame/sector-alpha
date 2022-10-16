@@ -13,16 +13,7 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
-import { nano, theme } from "../style";
-
-const styles = nano.sheet({
-  button: {
-    marginTop: theme.spacing(1),
-  },
-  container: {
-    width: "100%",
-  },
-});
+import styles from "./InflationStats.scss";
 
 const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
   const [open, setOpen] = React.useState(false);
@@ -45,10 +36,10 @@ const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
         },
         grid: {
           horzLines: {
-            color: theme.palette.text(5),
+            color: "var(--palette-text-5)",
           },
           vertLines: {
-            color: theme.palette.text(5),
+            color: "var(--palette-text-5)",
           },
         },
         layout: {
@@ -56,7 +47,7 @@ const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
             color: "black",
             type: ColorType.Solid,
           },
-          textColor: theme.palette.text(3),
+          textColor: "var(--palette-text-3)",
           fontFamily: "Space Mono",
         },
         timeScale: {
@@ -68,7 +59,7 @@ const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
       });
 
       const lineSeries = chart.current!.addLineSeries({
-        color: theme.palette.default,
+        color: "var(--palette-default)",
         title: "Inflation (10 minute period)",
         priceFormat: {
           type: "custom",

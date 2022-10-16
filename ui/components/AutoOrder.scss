@@ -1,0 +1,9 @@
+.form {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-1);
+}
+.select {
+  flex: 1;
+}

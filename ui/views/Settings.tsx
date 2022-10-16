@@ -1,17 +1,8 @@
 import React from "react";
 import { Button } from "@kit/Button";
-import { nano, theme } from "../style";
+import styles from "./Settings.scss";
 import useFullscreen from "../hooks/useFullscreen";
 import { View } from "../components/View";
-
-const styles = nano.sheet({
-  button: {
-    "&:not(:last-child)": {
-      marginBottom: theme.spacing(1),
-    },
-    width: "100%",
-  },
-});
 
 export const Settings: React.FC = () => {
   const { fullscreenEnabled, toggle } = useFullscreen();

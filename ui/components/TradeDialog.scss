@@ -1,0 +1,15 @@
+.colName {
+  &.colName {
+    text-align: left;
+  }
+}
+.input {
+  margin-right: var(--spacing-1);
+  width: 70px;
+}
+.row {
+  & td,
+  & th {
+    text-align: right;
+  }
+}

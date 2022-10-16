@@ -1,28 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import { nano, theme } from "../ui/style";
-
-const styles = nano.sheet({
-  root: {
-    "&:checked:before": {
-      position: "relative",
-      content: "''",
-      width: "6px",
-      height: "6px",
-      top: "2px",
-      left: "2px",
-      display: "block",
-      background: theme.palette.default,
-    },
-    cursor: "pointer",
-    appearance: "none",
-    width: "12px",
-    height: "12px",
-    border: `1px solid ${theme.palette.default}`,
-    borderRadius: "2px",
-    margin: "2px",
-  },
-});
+import styles from "./Checkbox.scss";
 
 export const Checkbox: React.FC<
   React.DetailedHTMLProps<

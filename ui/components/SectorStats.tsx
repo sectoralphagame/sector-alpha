@@ -11,25 +11,7 @@ import { fieldColors } from "@core/archetypes/asteroid";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import { Checkbox } from "@kit/Checkbox";
-import { nano, theme } from "../style";
-
-const styles = nano.sheet({
-  commodities: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-  },
-  container: {
-    width: "100%",
-  },
-  label: {
-    cursor: "pointer",
-    marginLeft: theme.spacing(0.5),
-  },
-  labelContainer: {
-    display: "inline-flex",
-    alignItems: "center",
-  },
-});
+import styles from "./SectorStats.scss";
 
 const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {
   const [open, setOpen] = React.useState(false);
@@ -61,18 +43,18 @@ const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {
         },
         grid: {
           horzLines: {
-            color: theme.palette.text(5),
+            color: "var(--palette-text-5)",
           },
           vertLines: {
-            color: theme.palette.text(5),
+            color: "var(--palette-text-5)",
           },
         },
         layout: {
           background: {
-            color: theme.palette.background,
+            color: "var(--palette-background)",
             type: ColorType.Solid,
           },
-          textColor: theme.palette.text(3),
+          textColor: "var(--palette-text-3)",
           fontFamily: "Space Mono",
         },
         timeScale: {

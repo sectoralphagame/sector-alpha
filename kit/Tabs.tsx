@@ -1,47 +1,7 @@
 import React from "react";
 import { Tab as HeadlessTab } from "@headlessui/react";
 import clsx from "clsx";
-import { nano, theme } from "../ui/style";
-
-const styles = nano.sheet({
-  list: {
-    borderRadius: "4px",
-    border: `1px solid ${theme.palette.default}`,
-    background: theme.palette.background,
-  },
-  tab: {
-    "&:hover, &:focus": {
-      background: "rgba(255, 255, 255, 0.15)",
-    },
-    "&:active": {
-      background: "rgba(255, 255, 255, 0.3)",
-    },
-    appearance: "none",
-    background: "transparent",
-    border: "none",
-    color: theme.palette.default,
-    cursor: "pointer",
-    height: "30px",
-    padding: theme.spacing(1),
-    textAlign: "center",
-    whiteSpace: "nowrap",
-    lineHeight: 1,
-    textTransform: "uppercase",
-    fontSize: theme.typography.button,
-    fontWeight: 600,
-    transition: "200ms",
-    outline: 0,
-  },
-  tabActive: {
-    "&:hover, &:focus": {
-      background: "rgba(255, 255, 255, 0.6)",
-    },
-    "&:active": {
-      background: "rgba(255, 255, 255, 0.8)",
-    },
-    background: "rgba(255, 255, 255, 0.5)",
-  },
-});
+import styles from "./Tabs.scss";
 
 export const TabList: React.FC<{ className?: string }> = ({
   className,

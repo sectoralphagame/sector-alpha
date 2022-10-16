@@ -1,0 +1,44 @@
+.iconBar {
+  display: flex;
+  gap: var(--spacing-1);
+  margin-bottom: var(--spacing-2);
+  padding-bottom: var(--spacing-2);
+  border-bottom: 1px solid var(--palette-default);
+}
+.iconBarCollapsed {
+  flex-direction: column;
+  margin-bottom: 0;
+  padding: 0;
+  border-bottom: none;
+}
+.root {
+  border: 1px solid var(--palette-default);
+  border-left: none;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  background: var(--palette-background);
+  max-height: calc(100vh - 128px);
+  padding: var(--spacing-3);
+  position: absolute;
+  top: 64px;
+  left: 0;
+  width: 450px;
+  z-index: 1;
+}
+.rootCollapsed {
+  width: 80px;
+}
+.scrollArea {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  overflow-y: scroll;
+  height: calc(100vh - 234px);
+  padding-bottom: var(--spacing-3);
+}
+.rotate {
+  transform: rotate(180deg);
+}
+.spacer {
+  flex: 1;
+}

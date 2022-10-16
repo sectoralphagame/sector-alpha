@@ -5,24 +5,7 @@ import { Save } from "@core/db";
 import closeIcon from "@assets/ui/close.svg";
 import { Button } from "@kit/Button";
 import { IconButton } from "@kit/IconButton";
-import { nano, theme } from "../style";
-
-const styles = nano.sheet({
-  buttonContainer: {
-    "&:not(:last-child)": {
-      marginBottom: theme.spacing(1),
-    },
-    width: "100%",
-  },
-  saveContainer: {
-    "& > button:first-child": {
-      flex: 1,
-    },
-    display: "flex",
-    alignItems: "center",
-    gap: theme.spacing(1),
-  },
-});
+import styles from "./Saves.scss";
 
 export interface SavesProps {
   saves: Save[];

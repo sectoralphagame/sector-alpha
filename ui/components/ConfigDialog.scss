@@ -1,0 +1,21 @@
+.backButton {
+  margin-bottom: var(--spacing-1);
+}
+.buttonContainer {
+  &:not(:last-child) {
+    margin-bottom: var(--spacing-1);
+  }
+  width: 100%;
+}
+.input {
+  margin-bottom: var(--spacing-1);
+  width: 100%;
+}
+.saveContainer {
+  & > button:first-child {
+    flex: 1;
+  }
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}

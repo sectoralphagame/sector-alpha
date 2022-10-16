@@ -8,7 +8,7 @@ import { Button } from "@kit/Button";
 import { Input } from "@kit/Input";
 import { IconButton } from "@kit/IconButton";
 import { useLocation } from "../context/Location";
-import { nano, theme } from "../style";
+import styles from "./ConfigDialog.scss";
 import { Saves } from "./Saves";
 import useFullscreen from "../hooks/useFullscreen";
 import { useSim } from "../atoms";
@@ -17,31 +17,6 @@ export interface ModalProps {
   open: boolean;
   onClose: () => void;
 }
-
-const styles = nano.sheet({
-  backButton: {
-    marginBottom: theme.spacing(1),
-  },
-  buttons: {},
-  buttonContainer: {
-    "&:not(:last-child)": {
-      marginBottom: theme.spacing(1),
-    },
-    width: "100%",
-  },
-  input: {
-    marginBottom: theme.spacing(1),
-    width: "100%",
-  },
-  saveContainer: {
-    "& > button:first-child": {
-      flex: 1,
-    },
-    display: "flex",
-    alignItems: "center",
-    gap: theme.spacing(1),
-  },
-});
 
 const views = ["default", "load", "save", "settings"] as const;
 type Views = typeof views[number];
@@ -87,7 +62,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
         </IconButton>
       )}
       {view === "default" ? (
-        <div className={styles.buttons}>
+        <div>
           <Button
             onClick={() => setView("load")}
             className={styles.buttonContainer}
@@ -132,7 +107,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
           />
         )
       ) : view === "save" ? (
-        <div className={styles.buttons}>
+        <div>
           <form onSubmit={saveNew}>
             <Input
               className={styles.input}
@@ -156,7 +131,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             ))}
         </div>
       ) : (
-        <div className={styles.buttons}>
+        <div>
           <Button className={styles.buttonContainer} onClick={toggleFullscreen}>
             {fullscreenEnabled ? "Disable Fullscreen" : "Enable Fullscreen"}
           </Button>

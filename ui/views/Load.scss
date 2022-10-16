@@ -1,0 +1,10 @@
+.button {
+  &:not(:last-child) {
+    margin-bottom: var(--spacing-1);
+  }
+  width: 100%;
+}
+.input {
+  margin-bottom: var(--spacing-1);
+  width: 100%;
+}

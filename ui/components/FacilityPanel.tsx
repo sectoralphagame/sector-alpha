@@ -7,21 +7,15 @@ import { Docks } from "./Docks";
 import { Subordinates } from "./Subordinates";
 import { Allocations } from "./Allocations";
 import ShipBuildingQueue from "./ShipBuildingQueue";
-import { nano, theme } from "../style";
+import styles from "./FacilityPanel.scss";
 import Journal from "./Journal";
-
-const tabClassName = nano.rule({
-  display: "inline-block",
-  marginTop: theme.spacing(1),
-  marginBottom: theme.spacing(2),
-});
 
 const FacilityPanel: React.FC<{ entity: Facility }> = ({
   entity: facility,
 }) => (
   <div>
     <TabGroup>
-      <TabList className={tabClassName}>
+      <TabList className={styles.tab}>
         <Tab>General</Tab>
         <Tab>Journal</Tab>
       </TabList>

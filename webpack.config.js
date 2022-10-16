@@ -34,6 +34,19 @@ const config = {
         },
       },
       {
+        test: /\.scss$/i,
+        use: [
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              modules: true,
+            },
+          },
+          "sass-loader",
+        ],
+      },
+      {
         test: /\.(svg|png|jpe?g)$/,
         type: "asset/resource",
       },

@@ -3,33 +3,8 @@ import SVG from "react-inlinesvg";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { IconButton } from "@kit/IconButton";
 import Text from "@kit/Text";
-import { nano, theme } from "../style";
+import styles from "./View.scss";
 import { useLocation } from "../context/Location";
-
-const styles = nano.sheet({
-  backButtonBar: {
-    display: "flex",
-    alignItems: "center",
-    gap: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-  },
-  container: {
-    padding: theme.spacing(4),
-    width: "420px",
-  },
-  root: {
-    alignItems: "center",
-    display: "flex",
-    justifyContent: "center",
-    height: "100%",
-  },
-  title: {
-    "&&": {
-      margin: "0",
-    },
-    display: "inline-block",
-  },
-});
 
 export interface ViewProps {
   showBack?: boolean;

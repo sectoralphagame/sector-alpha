@@ -4,7 +4,7 @@ import clsx from "clsx";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { Button } from "@kit/Button";
 import { IconButton } from "@kit/IconButton";
-import { styles } from "./styles";
+import styles from "./styles.scss";
 import { useThrottledFormState } from "./utils";
 
 export const JSONOutput: React.FC<{

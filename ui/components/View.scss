@@ -1,0 +1,22 @@
+.backButtonBar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-1);
+}
+.container {
+  padding: var(--spacing-4);
+  width: 420px;
+}
+.root {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+.title {
+  &.title {
+    margin: 0;
+  }
+  display: inline-block;
+}

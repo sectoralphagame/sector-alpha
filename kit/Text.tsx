@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import { nano, theme } from "../ui/style";
+import styles from "./Text.scss";
 
 export type TextColor = "default" | "disabled";
 export type TextVariant = "default" | "h1" | "h2";
@@ -15,25 +15,6 @@ const Components: Record<TextVariant, React.ElementType> = {
   h1: "h1",
   h2: "h2",
 };
-
-const styles = nano.sheet({
-  colorDefault: {
-    color: theme.palette.default,
-  },
-  colorDisabled: {
-    color: theme.palette.disabled,
-  },
-  default: {
-    fontSize: theme.typography.default,
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-  h1: { fontSize: theme.typography.header, marginBottom: theme.spacing(2) },
-  h2: { fontSize: theme.typography.header2, marginBottom: theme.spacing(1) },
-  root: {
-    margin: "0",
-  },
-});
 
 const Text: React.FC<TextProps> = ({
   color = "default",

@@ -5,16 +5,7 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
-import { nano } from "../style";
-
-const styles = nano.sheet({
-  list: {
-    padding: 0,
-  },
-  item: {
-    display: "block",
-  },
-});
+import styles from "./ShipBuildingQueue.scss";
 
 const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
   entity,
