@@ -6,23 +6,11 @@ import { Slider } from "@kit/Slider";
 import { Button } from "@kit/Button";
 import Text from "@kit/Text";
 import { useLocation } from "../context/Location";
-import { nano } from "../style";
+import styles from "./NewGame.scss";
 import { View } from "../components/View";
 import { useWorker } from "../hooks/useWorker";
 import { HeadlessSimMsg } from "../workers/headlessSim";
 import { useSim } from "../atoms";
-
-const styles = nano.sheet({
-  labelContainer: {
-    marginBottom: "var(--spacing-1)",
-  },
-  button: {
-    width: "100%",
-  },
-  slider: {
-    width: "100%",
-  },
-});
 
 interface NewGameForm {
   factions: number;

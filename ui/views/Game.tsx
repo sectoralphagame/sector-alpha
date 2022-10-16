@@ -4,24 +4,12 @@ import { deepEqual } from "mathjs";
 import { RenderingSystem } from "@core/systems/rendering";
 import { worldToHecs } from "@core/components/hecsPosition";
 import { Dropdown, DropdownOptions } from "@kit/Dropdown";
-import { nano } from "../style";
+import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
 import { useContextMenu, useSim } from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
 import { PlayerMoney } from "../components/PlayerMoney";
-
-const styles = nano.sheet({
-  menu: {
-    position: "absolute",
-    width: "200px",
-  },
-  canvasRoot: {
-    position: "relative",
-    height: "100vh",
-    width: "100vw",
-  },
-});
 
 export const Game: React.FC = () => {
   const [sim] = useSim();
