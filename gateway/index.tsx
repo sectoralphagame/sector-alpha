@@ -1,5 +1,4 @@
-import { Styles } from "@ui/style";
-
+import { Styles } from "@kit/theming/style";
 import ReactDOM from "react-dom";
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
