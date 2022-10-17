@@ -27,7 +27,7 @@ const Text: React.FC<TextProps> = ({
   return (
     <Component
       className={clsx(className, styles.root, {
-        [styles.default]: variant === "default",
+        [styles.defaultFont]: variant === "default",
         [styles.h1]: variant === "h1",
         [styles.h2]: variant === "h2",
         [styles.colorDefault]: color === "default",

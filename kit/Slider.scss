@@ -2,15 +2,25 @@
   &::-webkit-slider-thumb {
     appearance: none;
     height: 15px;
-    width: 3px;
-    background: var(--palette-background);
+    width: 5px;
+    background: var(--palette-default);
     position: relative;
-    top: -6px;
   }
   &::-webkit-slider-runnable-track {
+    background: var(--palette-background);
     padding: 0;
-    height: 3px;
+    height: 15px;
     margin: 0;
+  }
+  &::after {
+    background: var(--palette-default);
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    z-index: 1;
   }
   appearance: none;
   cursor: pointer;

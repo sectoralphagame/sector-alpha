@@ -38,3 +38,8 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   appearance: textfield;
 }
+
+// Having stylesheet without class breaks type generation
+.dummmy {
+  margin: 0;
+}
