@@ -74,7 +74,6 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
                         valueAsNumber: true,
                         min: 1,
                       })}
-                      className={styles.buildInput}
                       step={1}
                     />
                     <IconButton

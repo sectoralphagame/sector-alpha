@@ -38,6 +38,12 @@ const config = {
         use: [
           "style-loader",
           {
+            loader: "dts-css-modules-loader",
+            options: {
+              namedExport: true,
+            },
+          },
+          {
             loader: "css-loader",
             options: {
               modules: true,

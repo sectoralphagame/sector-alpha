@@ -1,7 +1,6 @@
 import React from "react";
 import { Sim } from "@core/sim";
 import { Save } from "@core/db";
-import styles from "./Load.scss";
 import { useLocation } from "../context/Location";
 import { Saves } from "../components/Saves";
 import { View } from "../components/View";
@@ -18,7 +17,7 @@ export const LoadGame: React.FC = () => {
 
   return (
     <View title="Load Game">
-      <div className={styles.buttons}>
+      <div>
         {!!saves && (
           <Saves
             saves={saves}
