@@ -29,6 +29,10 @@ const Editor: React.FC<{}> = () => {
           <Button
             onClick={() => {
               append({
+                acceleration: 0,
+                build: { time: 0, cost: {} },
+                mining: 0,
+                role: "transport",
                 cruise: 0,
                 maneuver: 0,
                 rotary: 0,
