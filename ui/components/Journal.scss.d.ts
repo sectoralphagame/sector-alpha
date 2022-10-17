@@ -1,3 +1,6 @@
+/* @generated */
+/* prettier-ignore */
+/* eslint-disable */
 export const arrowRight: string;
 export const pagination: string;
 export const paginationButtons: string;

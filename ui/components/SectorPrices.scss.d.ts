@@ -1,3 +1,6 @@
+/* @generated */
+/* prettier-ignore */
+/* eslint-disable */
 export const commodities: string;
 export const container: string;
 export const header: string;

@@ -1,3 +1,6 @@
+/* @generated */
+/* prettier-ignore */
+/* eslint-disable */
 export const editorContainer: string;
 export const freightExpanded: string;
 export const freightExpandedForm: string;

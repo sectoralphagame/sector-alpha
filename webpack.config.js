@@ -41,6 +41,8 @@ const config = {
             loader: "dts-css-modules-loader",
             options: {
               namedExport: true,
+              banner:
+                "/* @generated */\n/* prettier-ignore */\n/* eslint-disable */",
             },
           },
           {

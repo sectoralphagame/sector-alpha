@@ -1,3 +1,6 @@
+/* @generated */
+/* prettier-ignore */
+/* eslint-disable */
 export const colorDefault: string;
 export const colorDisabled: string;
 export const defaultFont: string;
