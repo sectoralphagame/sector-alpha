@@ -1,13 +1,13 @@
 .table {
-  tbody tr:not(.no-border),
-  thead tr:not(.no-border) {
+  tbody tr:not(.noBorder),
+  thead tr:not(.noBorder) {
     border-bottom: 1px var(--palette-disabled) solid;
   }
   tbody td,
   thead th {
     padding: var(--spacing-0-75) var(--spacing-1);
   }
-  tbody tr:not(.no-border):last-child {
+  tbody tr:not(.noBorder):last-child {
     border-bottom: none;
   }
   tbody input {
