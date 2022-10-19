@@ -79,38 +79,54 @@ export function isTradeAccepted(
   return result;
 }
 
-export function acceptTrade(entity: WithTrade, input: TransactionInput) {
+export function acceptTrade(
+  entityWithOffer: WithTrade,
+  input: TransactionInput
+) {
   if (input.price > 0) {
     const budget = input.budget
-      ? entity.sim.getOrThrow(input.budget).requireComponents(["budget"]).cp
-          .budget
+      ? entityWithOffer.sim
+          .getOrThrow(input.budget)
+          .requireComponents(["budget"]).cp.budget
       : null;
     // They are buying from us
     if (input.type === "sell" && input.allocations?.buyer?.budget && budget) {
       const allocation = releaseBudgetAllocation(
-        entity.cp.budget,
+        entityWithOffer.cp.budget,
         input.allocations.buyer.budget
       );
-      transferMoney(entity.cp.budget, allocation.amount, budget);
+      transferMoney(entityWithOffer.cp.budget, allocation.amount, budget);
     } else if (input.allocations?.buyer?.budget && budget) {
       const allocation = releaseBudgetAllocation(
         budget,
         input.allocations.buyer.budget
       );
-      transferMoney(budget, allocation.amount, entity.cp.budget);
+      transferMoney(budget, allocation.amount, entityWithOffer.cp.budget);
     }
   }
 
-  if (entity.cp.owner.id !== input.factionId) {
-    entity.cp.journal.entries.push({
+  if (entityWithOffer.cp.owner.id !== input.factionId) {
+    const initiator = entityWithOffer.sim
+      .getOrThrow(input.initiator)
+      .requireComponents(["name", "journal"]);
+
+    entityWithOffer.cp.journal.entries.push({
       type: "trade",
       action: input.type === "buy" ? "sell" : "buy",
       commodity: input.commodity,
       quantity: input.quantity,
       price: input.price,
-      target: entity.sim.getOrThrow(input.initiator).requireComponents(["name"])
-        .cp.name.value,
-      time: entity.sim.getTime(),
+      target: initiator.cp.name.value,
+      time: entityWithOffer.sim.getTime(),
+    });
+    initiator.cp.journal.entries.push({
+      type: "trade",
+      action: input.type,
+      commodity: input.commodity,
+      quantity: input.quantity,
+      price: input.price,
+      target: entityWithOffer.requireComponents(["name"]).cp.name.value,
+      time: entityWithOffer.sim.getTime(),
     });
   }
 }
