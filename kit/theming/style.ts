@@ -57,9 +57,8 @@ function getProperties(
 ): Array<{ key: string; value: string }> {
   return Object.entries(o).flatMap(([k, v]) => {
     if (isObject(v)) {
-      return getProperties(v, `${k}-`);
+      return getProperties(v, `${prefix + k}-`);
     }
-
     return { key: prefix + k, value: v };
   });
 }
@@ -86,3 +85,8 @@ export const Styles: React.FC = ({ children }) => {
 
   return children as any;
 };
+
+const documentStyles = getComputedStyle(document.documentElement);
+export function getVar(varName: string): string {
+  return documentStyles.getPropertyValue(varName).trim();
+}

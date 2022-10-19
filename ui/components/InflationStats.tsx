@@ -13,6 +13,7 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
+import { getVar } from "@kit/theming/style";
 import styles from "./InflationStats.scss";
 
 const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
@@ -36,10 +37,10 @@ const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
         },
         grid: {
           horzLines: {
-            color: "var(--palette-text-5)",
+            color: getVar("--palette-text-5"),
           },
           vertLines: {
-            color: "var(--palette-text-5)",
+            color: getVar("--palette-text-5"),
           },
         },
         layout: {
@@ -47,7 +48,7 @@ const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
             color: "black",
             type: ColorType.Solid,
           },
-          textColor: "var(--palette-text-3)",
+          textColor: getVar("--palette-text-3"),
           fontFamily: "Space Mono",
         },
         timeScale: {
@@ -59,7 +60,7 @@ const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
       });
 
       const lineSeries = chart.current!.addLineSeries({
-        color: "var(--palette-default)",
+        color: getVar("--palette-default"),
         title: "Inflation (10 minute period)",
         priceFormat: {
           type: "custom",
