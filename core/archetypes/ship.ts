@@ -22,6 +22,7 @@ export const shipComponents = [
   "position",
   "render",
   "storage",
+  "journal",
 ] as const;
 
 export type ShipComponent = typeof shipComponents[number];
@@ -78,7 +79,8 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       name: "dockable",
       size: "small",
       dockedIn: null,
-    });
+    })
+    .addComponent({ name: "journal", entries: [] });
 
   if (initial.mining) {
     entity.addComponent(createMining(initial.mining));

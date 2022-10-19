@@ -5,7 +5,7 @@ import { RequireComponent } from "../../tsHelpers";
 import { acceptTrade } from "../../utils/trading";
 
 export function tradeOrder(
-  entity: RequireComponent<"drive" | "storage" | "dockable">,
+  entity: RequireComponent<"drive" | "storage" | "dockable" | "journal">,
   order: TradeOrder
 ): boolean {
   const target = entity.sim
