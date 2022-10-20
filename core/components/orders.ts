@@ -2,7 +2,13 @@ import { NegativeQuantity } from "../errors";
 import { BaseComponent } from "./component";
 import { TransactionInput } from "./trade";
 
-export type OrderGroupType = "mine" | "trade" | "hold" | "move" | "dock";
+export type OrderGroupType =
+  | "mine"
+  | "trade"
+  | "hold"
+  | "move"
+  | "dock"
+  | "follow";
 
 export interface DockOrder {
   type: "dock";
@@ -16,6 +22,11 @@ export interface TeleportOrder {
 
 export interface MoveOrder {
   type: "move";
+  targetId: number;
+}
+
+export interface FollowOrder {
+  type: "follow";
   targetId: number;
 }
 
@@ -37,6 +48,7 @@ export interface HoldPositionOrder {
 
 export type Order =
   | MoveOrder
+  | FollowOrder
   | TradeOrder
   | MineOrder
   | HoldPositionOrder

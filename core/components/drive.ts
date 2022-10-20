@@ -40,6 +40,10 @@ export interface Drive extends BaseComponent<"drive"> {
   state: "maneuver" | "warming" | "cruise";
   target: number | null;
   targetReached: boolean;
+  /**
+   * Minimal distance to target to set targetReached to true
+   */
+  minimalDistance: number;
 }
 
 export function createDrive(input: ShipDriveProps): Drive {
@@ -51,6 +55,7 @@ export function createDrive(input: ShipDriveProps): Drive {
     target: null,
     targetReached: false,
     name: "drive",
+    minimalDistance: 0.01,
   };
 }
 

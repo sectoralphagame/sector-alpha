@@ -2,6 +2,7 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import {
   DockOrder,
+  FollowOrder,
   MineOrder,
   Order,
   OrderGroup,
@@ -47,6 +48,10 @@ function getOrderDescription(ship: Ship, order: Order) {
       if (order.targetId === ship.cp.commander?.id)
         return "Dock at commanding facility";
       return `Dock at ${ship.sim.getOrThrow(order.targetId).cp.name?.value}`;
+    case "follow":
+      return `Follow ${
+        ship.sim.getOrThrow(order.targetId).cp.name?.value ?? "target"
+      }`;
     default:
       return "Hold position";
   }
@@ -71,6 +76,13 @@ function getOrderGroupDescription(order: OrderGroup, sim: Sim) {
       return `Dock at ${
         sim.get(
           (order.orders.find((o) => o.type === "dock") as DockOrder)!.targetId
+        )?.cp.name?.value ?? "target"
+      }`;
+    case "follow":
+      return `Follow ${
+        sim.get(
+          (order.orders.find((o) => o.type === "follow") as FollowOrder)!
+            .targetId
         )?.cp.name?.value ?? "target"
       }`;
     default:

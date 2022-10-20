@@ -99,7 +99,7 @@ function move(entity: Driveable, delta: number) {
   );
 
   const targetAngle = Math.atan2(path.get([1]), path.get([0]));
-  const distance = norm(path);
+  const distance = norm(path) as number;
   const angleOffset = Math.abs(targetAngle - entityAngle);
   const canCruise =
     distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
@@ -113,10 +113,14 @@ function move(entity: Driveable, delta: number) {
           angleOffset < Math.PI / 8 ? drive.currentSpeed * delta : 0
         ) as Matrix)
       : matrix([0, 0]);
+  const dDistance = norm(dPos) as number;
   const dAngle = getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
 
-  if (norm(dPos) >= distance) {
-    entityPosition.coord = matrix(targetPosition.coord);
+  if (dDistance - distance >= drive.minimalDistance) {
+    entityPosition.coord =
+      dDistance >= distance
+        ? matrix(targetPosition.coord)
+        : add(entityPosition.coord, dPos);
     drive.targetReached = true;
     if (targetEntity.cp.destroyAfterUsage) {
       targetEntity.unregister();
@@ -137,7 +141,7 @@ function move(entity: Driveable, delta: number) {
     stopCruise(drive);
   }
 
-  entityPosition.coord = add(entityPosition.coord, dPos) as Matrix;
+  entityPosition.coord = add(entityPosition.coord, dPos);
   entityPosition.angle += dAngle;
   entityPosition.moved = true;
 

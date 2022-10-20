@@ -3,6 +3,7 @@ import { Order } from "../../components/orders";
 import { System } from "../system";
 import { dockOrder } from "./dock";
 import { mineOrder } from "./mine";
+import { followOrder } from "./follow";
 import { holdPosition, moveOrder, teleportOrder } from "./misc";
 import { tradeOrder } from "./trade";
 
@@ -22,6 +23,9 @@ export class OrderExecutingSystem extends System {
             break;
           case "move":
             orderFn = moveOrder;
+            break;
+          case "follow":
+            orderFn = followOrder;
             break;
           case "teleport":
             orderFn = teleportOrder;

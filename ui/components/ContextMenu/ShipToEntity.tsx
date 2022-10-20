@@ -49,6 +49,14 @@ export const ShipToEntity: React.FC = () => {
     });
   };
 
+  const onFollow = () => {
+    entity.cp.orders!.value.push({
+      origin: "manual",
+      type: "follow",
+      orders: [{ type: "follow", targetId: actionable.id }],
+    });
+  };
+
   return (
     <>
       {actionable.hasComponents(["trade"]) && (
@@ -56,6 +64,9 @@ export const ShipToEntity: React.FC = () => {
       )}
       {actionable.hasComponents(["docks"]) && (
         <DropdownOption onClick={onDock}>Dock</DropdownOption>
+      )}
+      {actionable.hasComponents(["drive"]) && (
+        <DropdownOption onClick={onFollow}>Follow</DropdownOption>
       )}
     </>
   );
