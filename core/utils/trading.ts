@@ -2,7 +2,7 @@ import merge from "lodash/merge";
 import { mean } from "mathjs";
 import { filter, map, pipe, sortBy, toArray } from "@fxts/core";
 import { facilityComponents } from "../archetypes/facility";
-import { Order, TradeOrder, tradeOrder } from "../components/orders";
+import { Action, tradeAction, TradeAction } from "../components/orders";
 import type { TransactionInput } from "../components/trade";
 import { Allocation } from "../components/utils/allocations";
 import { commoditiesArray, Commodity } from "../economy/commodity";
@@ -14,7 +14,7 @@ import {
 } from "../errors";
 import type { RequireComponent } from "../tsHelpers";
 import { perCommodity } from "./perCommodity";
-import { moveToOrders } from "./moving";
+import { moveToActions } from "./moving";
 import {
   getAvailableSpace,
   hasSufficientStorage,
@@ -264,19 +264,19 @@ export function tradeCommodity(
   offer: TransactionInput,
   target: WithTrade,
   position?: Marker
-): Order[] | null {
+): Action[] | null {
   const allocations = allocate(target, offer);
   if (!allocations) {
     return null;
   }
 
   return [
-    ...moveToOrders(position ?? entity, target),
+    ...moveToActions(position ?? entity, target),
     {
       type: "dock",
       targetId: target.id,
     },
-    tradeOrder({
+    tradeAction({
       targetId: target.id,
       offer: {
         ...offer,
@@ -374,14 +374,14 @@ export function resellCommodity(
     return false;
   }
 
-  const sellOrders = tradeCommodity(entity, offerForBuyer, buyer, seller);
-  if (sellOrders === null) {
+  const sellActions = tradeCommodity(entity, offerForBuyer, buyer, seller);
+  if (sellActions === null) {
     return false;
   }
-  const buyOrders = tradeCommodity(entity, offerForSeller, seller);
-  if (buyOrders === null) {
+  const buyActions = tradeCommodity(entity, offerForSeller, seller);
+  if (buyActions === null) {
     const sellOrdersAllocations = (
-      sellOrders.find((o) => o.type === "trade") as TradeOrder
+      sellActions.find((o) => o.type === "trade") as TradeAction
     ).offer.allocations!;
     if (sellOrdersAllocations.buyer!.budget) {
       releaseBudgetAllocation(
@@ -396,12 +396,12 @@ export function resellCommodity(
     return false;
   }
 
-  const orders = [...buyOrders, ...sellOrders];
+  const actions = [...buyActions, ...sellActions];
 
   entity.cp.orders.value.push({
     origin: "auto",
     type: "trade",
-    orders,
+    actions,
   });
 
   return true;
@@ -509,7 +509,7 @@ export function returnToFacility(
 
       const allocations = allocate(commander, offer);
       if (allocations) {
-        return tradeOrder(
+        return tradeAction(
           merge(
             {
               targetId: commander.id,
@@ -537,8 +537,8 @@ export function returnToFacility(
   if (deliveryOrders.length) {
     entity.cp.orders.value.push({
       origin: "auto",
-      orders: [
-        ...moveToOrders(entity, commander),
+      actions: [
+        ...moveToActions(entity, commander),
         {
           type: "dock",
           targetId: commander.id,

@@ -1,17 +1,17 @@
 import { Marker } from "@core/archetypes/marker";
 import { clearTarget } from "@core/components/drive";
-import { FollowOrderGroup, MoveOrder } from "@core/components/orders";
+import { FollowOrder, MoveAction } from "@core/components/orders";
 import { RequireComponent } from "@core/tsHelpers";
-import { moveToOrders } from "@core/utils/moving";
+import { moveToActions } from "@core/utils/moving";
 import { norm, subtract } from "mathjs";
 
 export function followOrderGroup(
   entity: RequireComponent<"drive" | "position" | "orders">,
-  group: FollowOrderGroup
+  group: FollowOrder
 ) {
   const target = entity.sim.getOrThrow<Marker>(group.targetId);
-  const moveOrders = group.orders.filter((o) => o.type === "move");
-  const lastMoveOrder = moveOrders.at(-1) as MoveOrder;
+  const moveOrders = group.actions.filter((o) => o.type === "move");
+  const lastMoveOrder = moveOrders.at(-1) as MoveAction;
   const inTheSameSector =
     target.cp.position.sector === entity.cp.position.sector;
 
@@ -20,7 +20,7 @@ export function followOrderGroup(
     : true;
 
   if (shouldRecreateOrders) {
-    group.orders = moveToOrders(entity, target);
+    group.actions = moveToActions(entity, target);
     group.ordersForSector = target.cp.position.sector;
   }
 

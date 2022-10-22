@@ -1,12 +1,12 @@
 import { Marker } from "../archetypes/marker";
-import { Order } from "../components/orders";
+import { Action } from "../components/orders";
 import { findInAncestors } from "./findInAncestors";
 
 /**
- * Creates array of orders necessary to get to target entity
+ * Creates array of actions necessary to get to target entity
  */
-export function moveToOrders(origin: Marker, target: Marker) {
-  const orders: Order[] = [];
+export function moveToActions(origin: Marker, target: Marker): Action[] {
+  const orders: Action[] = [];
   const targetSector = target.cp.position.sector.toString();
   const paths = origin.sim.paths[targetSector];
 

@@ -13,7 +13,7 @@ import { createShip, Ship } from "../archetypes/ship";
 import { shipClasses } from "../world/ships";
 import { dockShip } from "../systems/orderExecuting/dock";
 import { tradeOrder } from "../systems/orderExecuting/trade";
-import { TradeOrder } from "../components/orders";
+import { TradeAction } from "../components/orders";
 import { Commodity } from "../economy/commodity";
 import { RequireComponent } from "../tsHelpers";
 import { WithTrade } from "../economy/utils";
@@ -140,15 +140,15 @@ describe("Trading module", () => {
     });
 
     const result = resellCommodity(ship, "water", facility, waterFacility);
-    const orders = ship.cp.orders.value.flatMap((og) =>
-      og.orders.filter((o) => o.type === "trade")
+    const actions = ship.cp.orders.value.flatMap((og) =>
+      og.actions.filter((o) => o.type === "trade")
     );
 
     expect(result).toBe(true);
-    expect((orders[0] as TradeOrder).targetId).toBe(waterFacility.id);
-    expect((orders[0] as TradeOrder).offer.type).toBe("buy");
-    expect((orders[1] as TradeOrder).targetId).toBe(facility.id);
-    expect((orders[1] as TradeOrder).offer.type).toBe("sell");
+    expect((actions[0] as TradeAction).targetId).toBe(waterFacility.id);
+    expect((actions[0] as TradeAction).offer.type).toBe("buy");
+    expect((actions[1] as TradeAction).targetId).toBe(facility.id);
+    expect((actions[1] as TradeAction).offer.type).toBe("sell");
     expect(shipFaction.cp.budget.allocations).toHaveLength(1);
     expect(facility.cp.budget.allocations).toHaveLength(1);
     expect(facility.cp.budget.allocations[0].id).toBe(10);
@@ -167,26 +167,26 @@ function trade(
 ) {
   const result = resellCommodity(ship, commodity, buyer, seller);
   const orders = ship.cp.orders.value.flatMap((og) =>
-    og.orders.filter((o) => o.type === "trade")
+    og.actions.filter((o) => o.type === "trade")
   );
 
   expect(result).toBe(true);
-  expect((orders[0] as TradeOrder).targetId).toBe(seller.id);
-  expect((orders[0] as TradeOrder).offer.type).toBe("buy");
-  expect((orders[1] as TradeOrder).targetId).toBe(buyer.id);
-  expect((orders[1] as TradeOrder).offer.type).toBe("sell");
+  expect((orders[0] as TradeAction).targetId).toBe(seller.id);
+  expect((orders[0] as TradeAction).offer.type).toBe("buy");
+  expect((orders[1] as TradeAction).targetId).toBe(buyer.id);
+  expect((orders[1] as TradeAction).offer.type).toBe("sell");
 
   const shipFactionBudget = ship.sim.getOrThrow<Faction>(ship.cp.owner.id).cp
     .budget;
   let prevShipFactionBudget = shipFactionBudget.available;
   dockShip(ship, seller);
-  const buyOrderIndex = ship.cp.orders.value[0].orders.findIndex(
+  const buyOrderIndex = ship.cp.orders.value[0].actions.findIndex(
     (o) => o.type === "trade"
   );
-  const buyOrder = ship.cp.orders.value[0].orders.splice(
+  const buyOrder = ship.cp.orders.value[0].actions.splice(
     buyOrderIndex,
     1
-  )[0] as TradeOrder;
+  )[0] as TradeAction;
   const buyResult = tradeOrder(ship, buyOrder);
 
   expect(shipFactionBudget.available).toBeLessThanOrEqual(
@@ -196,9 +196,9 @@ function trade(
 
   prevShipFactionBudget = shipFactionBudget.available;
   dockShip(ship, buyer);
-  const sellOrder = ship.cp.orders.value[0].orders.find(
+  const sellOrder = ship.cp.orders.value[0].actions.find(
     (o) => o.type === "trade"
-  ) as TradeOrder;
+  ) as TradeAction;
   const sellResult = tradeOrder(ship, sellOrder);
 
   expect(shipFactionBudget.available).toBeGreaterThanOrEqual(

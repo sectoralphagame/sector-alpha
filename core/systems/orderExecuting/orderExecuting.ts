@@ -1,4 +1,4 @@
-import { OrderGroup } from "@core/components/orders";
+import { Order } from "@core/components/orders";
 import { Entity } from "@core/components/entity";
 import { System } from "../system";
 import { dockOrder } from "./dock";
@@ -9,12 +9,12 @@ import { tradeOrder } from "./trade";
 
 const orderGroupFns: Partial<
   Record<
-    OrderGroup["type"],
+    Order["type"],
     {
       /* eslint-disable no-unused-vars */
-      exec: (entity: Entity, group: OrderGroup) => void;
-      isCompleted: (entity: Entity, group: OrderGroup) => boolean;
-      onCompleted: (entity: Entity, group: OrderGroup) => void;
+      exec: (entity: Entity, group: Order) => void;
+      isCompleted: (entity: Entity, group: Order) => boolean;
+      onCompleted: (entity: Entity, group: Order) => void;
       /* eslint-enable */
     }
   >
@@ -45,13 +45,13 @@ export class OrderExecutingSystem extends System {
         };
         exec(entity, orderGroup);
 
-        const orderFn = orderFns[orderGroup.orders[0].type] ?? holdPosition;
-        const completed = orderFn(entity, orderGroup.orders[0]);
+        const orderFn = orderFns[orderGroup.actions[0].type] ?? holdPosition;
+        const completed = orderFn(entity, orderGroup.actions[0]);
 
         if (completed) {
-          orderGroup.orders.splice(0, 1);
+          orderGroup.actions.splice(0, 1);
           if (
-            orderGroup.orders.length === 0 &&
+            orderGroup.actions.length === 0 &&
             isCompleted(entity, orderGroup)
           ) {
             entity.cp.orders.value.splice(0, 1);

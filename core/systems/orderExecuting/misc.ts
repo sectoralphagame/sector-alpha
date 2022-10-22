@@ -1,12 +1,12 @@
 import { marker } from "../../archetypes/marker";
 import { clearTarget, setTarget } from "../../components/drive";
-import { MoveOrder, TeleportOrder } from "../../components/orders";
+import { MoveAction, TeleportAction } from "../../components/orders";
 import { show } from "../../components/render";
 import { RequireComponent } from "../../tsHelpers";
 
 export function moveOrder(
   entity: RequireComponent<"drive" | "orders">,
-  order: MoveOrder
+  order: MoveAction
 ): boolean {
   setTarget(entity.cp.drive, order.targetId);
 
@@ -32,7 +32,7 @@ export function moveOrder(
 
 export function teleportOrder(
   entity: RequireComponent<"position" | "orders">,
-  order: TeleportOrder
+  order: TeleportAction
 ): boolean {
   const destination = marker(entity.sim.getOrThrow(order.targetId));
 

@@ -3,7 +3,7 @@ import React from "react";
 import { createMarker } from "@core/archetypes/marker";
 import { isOwnedByPlayer } from "@core/components/player";
 import { getSelected, getSelectedSecondary } from "@core/components/selection";
-import { moveToOrders } from "@core/utils/moving";
+import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
 import { useContextMenu, useGameDialog, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
@@ -36,8 +36,8 @@ export const ShipToEntity: React.FC = () => {
     entity.cp.orders!.value.push({
       origin: "manual",
       type: "dock",
-      orders: [
-        ...moveToOrders(
+      actions: [
+        ...moveToActions(
           entity,
           createMarker(sim, {
             sector: menu.sector!.id,
@@ -54,7 +54,7 @@ export const ShipToEntity: React.FC = () => {
       origin: "manual",
       type: "follow",
       targetId: actionable.id,
-      orders: [],
+      actions: [],
       ordersForSector: 0,
     });
   };

@@ -38,7 +38,7 @@ describe("Ship", () => {
       }).id
     );
 
-    for (let index = 0; index < 5; index++) {
+    for (let index = 0; index < 7; index++) {
       movingSystem.exec(1);
     }
 
@@ -63,8 +63,9 @@ describe("Ship", () => {
     const orderExecutingSystem = new OrderExecutingSystem(sim);
     const m = createMarker(sim, { sector: sector.id, value: matrix([1, 1]) });
     ship.cp.orders.value.push({
+      origin: "manual",
       type: "move",
-      orders: [
+      actions: [
         {
           type: "move",
           targetId: m.id,
@@ -73,7 +74,7 @@ describe("Ship", () => {
     });
 
     orderExecutingSystem.exec();
-    for (let index = 0; index < 5; index++) {
+    for (let index = 0; index < 7; index++) {
       movingSystem.exec(1);
     }
 
