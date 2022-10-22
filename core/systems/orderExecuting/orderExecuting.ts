@@ -1,46 +1,59 @@
-import { Entity } from "../../components/entity";
-import { Order } from "../../components/orders";
+import { OrderGroup } from "@core/components/orders";
+import { Entity } from "@core/components/entity";
 import { System } from "../system";
 import { dockOrder } from "./dock";
 import { mineOrder } from "./mine";
-import { followOrder } from "./follow";
+import { follorOrderGroupCleanup, followOrderGroup } from "./follow";
 import { holdPosition, moveOrder, teleportOrder } from "./misc";
 import { tradeOrder } from "./trade";
+
+const orderGroupFns: Partial<
+  Record<
+    OrderGroup["type"],
+    {
+      /* eslint-disable no-unused-vars */
+      exec: (entity: Entity, group: OrderGroup) => void;
+      isCompleted: (entity: Entity, group: OrderGroup) => boolean;
+      onCompleted: (entity: Entity, group: OrderGroup) => void;
+      /* eslint-enable */
+    }
+  >
+> = {
+  follow: {
+    exec: followOrderGroup,
+    isCompleted: () => false,
+    onCompleted: follorOrderGroupCleanup,
+  },
+};
+
+const orderFns = {
+  trade: tradeOrder,
+  mine: mineOrder,
+  move: moveOrder,
+  teleport: teleportOrder,
+  dock: dockOrder,
+};
 
 export class OrderExecutingSystem extends System {
   exec = () => {
     this.sim.queries.orderable.get().forEach((entity) => {
       if (entity.cp.orders.value.length) {
-        // eslint-disable-next-line no-unused-vars, no-shadow
-        let orderFn: (entity: Entity, order: Order) => boolean;
+        const orderGroup = entity.cp.orders.value[0];
+        const { exec, isCompleted } = orderGroupFns[orderGroup.type] ?? {
+          exec: () => undefined,
+          isCompleted: () => true,
+        };
+        exec(entity, orderGroup);
 
-        switch (entity.cp.orders.value[0].orders[0].type) {
-          case "trade":
-            orderFn = tradeOrder;
-            break;
-          case "mine":
-            orderFn = mineOrder;
-            break;
-          case "move":
-            orderFn = moveOrder;
-            break;
-          case "follow":
-            orderFn = followOrder;
-            break;
-          case "teleport":
-            orderFn = teleportOrder;
-            break;
-          case "dock":
-            orderFn = dockOrder;
-            break;
-          default:
-            orderFn = holdPosition;
-        }
+        const orderFn = orderFns[orderGroup.orders[0].type] ?? holdPosition;
+        const completed = orderFn(entity, orderGroup.orders[0]);
 
-        const completed = orderFn(entity, entity.cp.orders.value[0].orders[0]);
         if (completed) {
-          entity.cp.orders.value[0].orders.splice(0, 1);
-          if (entity.cp.orders.value[0].orders.length === 0) {
+          orderGroup.orders.splice(0, 1);
+          if (
+            orderGroup.orders.length === 0 &&
+            isCompleted(entity, orderGroup)
+          ) {
             entity.cp.orders.value.splice(0, 1);
           }
         }

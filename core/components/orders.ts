@@ -2,14 +2,6 @@ import { NegativeQuantity } from "../errors";
 import { BaseComponent } from "./component";
 import { TransactionInput } from "./trade";
 
-export type OrderGroupType =
-  | "mine"
-  | "trade"
-  | "hold"
-  | "move"
-  | "dock"
-  | "follow";
-
 export interface DockOrder {
   type: "dock";
   targetId: number;
@@ -22,11 +14,6 @@ export interface TeleportOrder {
 
 export interface MoveOrder {
   type: "move";
-  targetId: number;
-}
-
-export interface FollowOrder {
-  type: "follow";
   targetId: number;
 }
 
@@ -48,17 +35,28 @@ export interface HoldPositionOrder {
 
 export type Order =
   | MoveOrder
-  | FollowOrder
   | TradeOrder
   | MineOrder
   | HoldPositionOrder
   | TeleportOrder
   | DockOrder;
-export interface OrderGroup {
+export interface BaseOrderGroup {
   origin: "auto" | "manual";
-  type: OrderGroupType;
   orders: Order[];
 }
+
+export interface FollowOrderGroup extends BaseOrderGroup {
+  type: "follow";
+  targetId: number;
+  /** Used to prevent endless path recalculations */
+  ordersForSector: number;
+}
+
+export type OrderGroup =
+  | ({
+      type: "mine" | "trade" | "hold" | "move" | "dock";
+    } & BaseOrderGroup)
+  | FollowOrderGroup;
 
 export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder {
   if (order.offer.quantity <= 0) {

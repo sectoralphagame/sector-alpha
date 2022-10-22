@@ -53,7 +53,9 @@ export const ShipToEntity: React.FC = () => {
     entity.cp.orders!.value.push({
       origin: "manual",
       type: "follow",
-      orders: [{ type: "follow", targetId: actionable.id }],
+      targetId: actionable.id,
+      orders: [],
+      ordersForSector: 0,
     });
   };
 
