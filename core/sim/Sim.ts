@@ -9,6 +9,7 @@ import { Path } from "graphlib";
 
 import isPlainObject from "lodash/isPlainObject";
 import { filter, map, pipe, toArray } from "@fxts/core";
+import { NavigatingSystem } from "@core/systems/navigating";
 import { Entity, EntityComponents } from "../components/entity";
 import { BaseSim } from "./BaseSim";
 import { System } from "../systems/system";
@@ -89,6 +90,7 @@ export class Sim extends BaseSim {
       new BudgetPlanningSystem(this),
       new SelectingSystem(this),
       new OrderPlanningSystem(this),
+      new NavigatingSystem(this),
       new MovingSystem(this),
       new MiningSystem(this),
       new OrderExecutingSystem(this),

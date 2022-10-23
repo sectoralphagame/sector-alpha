@@ -5,7 +5,7 @@ import { RequireComponent } from "@core/tsHelpers";
 import { moveToActions } from "@core/utils/moving";
 import { norm, subtract } from "mathjs";
 
-export function followOrderGroup(
+export function followOrder(
   entity: RequireComponent<"drive" | "position" | "orders">,
   group: FollowOrder
 ) {
@@ -24,23 +24,10 @@ export function followOrderGroup(
     group.ordersForSector = target.cp.position.sector;
   }
 
-  if (inTheSameSector) {
-    const distance = norm(
-      subtract(entity.cp.position.coord, target.cp.position.coord)
-    );
-    entity.cp.drive.minimalDistance = 0.1;
-
-    if (distance <= 0.5) {
-      entity.cp.drive.limit = target.cp.drive!.currentSpeed;
-    } else {
-      entity.cp.drive.limit = 2000;
-    }
-  } else {
-    entity.cp.drive.minimalDistance = 0.01;
-  }
+  entity.cp.drive.mode = inTheSameSector ? "follow" : "goto";
 }
 
-export function follorOrderGroupCleanup(
+export function follorOrderGroup(
   entity: RequireComponent<"drive" | "position" | "orders">
 ) {
   clearTarget(entity.cp.drive);

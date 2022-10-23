@@ -28,6 +28,7 @@ export interface Drive extends BaseComponent<"drive"> {
   cruise: number;
   /** Expressed in radians per second */
   rotary: number;
+  currentRotary: number;
   /** Time to initiate cruise engine */
   ttc: number;
 
@@ -38,12 +39,14 @@ export interface Drive extends BaseComponent<"drive"> {
   minimalDistance: number;
   /** Limits maximum speed */
   limit: number;
+  mode: "goto" | "follow";
 }
 
 export function createDrive(input: ShipDriveProps): Drive {
   return {
     ...input,
     currentSpeed: 0,
+    currentRotary: 0,
     rotary: (input.rotary * Math.PI) / 180,
     state: "maneuver",
     target: null,
@@ -51,6 +54,7 @@ export function createDrive(input: ShipDriveProps): Drive {
     name: "drive",
     minimalDistance: 0.01,
     limit: 2000,
+    mode: "goto",
   };
 }
 
@@ -76,4 +80,9 @@ export function setTarget(drive: Drive, target: number | null) {
 export function clearTarget(drive: Drive) {
   setTarget(drive, null);
   drive.targetReached = true;
+}
+
+export function stop(drive: Drive) {
+  drive.currentRotary = 0;
+  drive.currentSpeed = 0;
 }

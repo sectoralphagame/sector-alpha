@@ -1,10 +1,10 @@
 import { marker } from "../../archetypes/marker";
-import { clearTarget, setTarget } from "../../components/drive";
+import { clearTarget, setTarget, stop } from "../../components/drive";
 import { MoveAction, TeleportAction } from "../../components/orders";
 import { show } from "../../components/render";
 import { RequireComponent } from "../../tsHelpers";
 
-export function moveOrder(
+export function moveAction(
   entity: RequireComponent<"drive" | "orders">,
   order: MoveAction
 ): boolean {
@@ -30,7 +30,15 @@ export function moveOrder(
   return reached;
 }
 
-export function teleportOrder(
+export function holdAction(
+  entity: RequireComponent<"drive" | "orders">
+): boolean {
+  stop(entity.cp.drive);
+
+  return false;
+}
+
+export function teleportAction(
   entity: RequireComponent<"position" | "orders">,
   order: TeleportAction
 ): boolean {
