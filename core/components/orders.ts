@@ -2,70 +2,80 @@ import { NegativeQuantity } from "../errors";
 import { BaseComponent } from "./component";
 import { TransactionInput } from "./trade";
 
-export type OrderGroupType = "mine" | "trade" | "hold" | "move" | "dock";
-
-export interface DockOrder {
+export interface DockAction {
   type: "dock";
   targetId: number;
 }
 
-export interface TeleportOrder {
+export interface TeleportAction {
   type: "teleport";
   targetId: number;
 }
 
-export interface MoveOrder {
+export interface MoveAction {
   type: "move";
   targetId: number;
 }
 
-export interface TradeOrder {
+export interface TradeAction {
   type: "trade";
   offer: TransactionInput;
   targetId: number;
 }
 
-export interface MineOrder {
+export interface MineAction {
   type: "mine";
   targetFieldId: number;
   targetRockId: number | null;
 }
 
-export interface HoldPositionOrder {
+export interface HoldPositionAction {
   type: "hold";
 }
 
-export type Order =
-  | MoveOrder
-  | TradeOrder
-  | MineOrder
-  | HoldPositionOrder
-  | TeleportOrder
-  | DockOrder;
-export interface OrderGroup {
+export type Action =
+  | MoveAction
+  | TradeAction
+  | MineAction
+  | HoldPositionAction
+  | TeleportAction
+  | DockAction;
+export interface BaseOrder {
   origin: "auto" | "manual";
-  type: OrderGroupType;
-  orders: Order[];
+  actions: Action[];
 }
 
-export function tradeOrder(order: Omit<TradeOrder, "type">): TradeOrder {
-  if (order.offer.quantity <= 0) {
-    throw new NegativeQuantity(order.offer.quantity);
+export interface FollowOrder extends BaseOrder {
+  type: "follow";
+  targetId: number;
+  /** Used to prevent endless path recalculations */
+  ordersForSector: number;
+}
+
+export type Order =
+  | ({
+      type: "mine" | "trade" | "hold" | "move" | "dock";
+    } & BaseOrder)
+  | FollowOrder;
+
+export function tradeAction(action: Omit<TradeAction, "type">): TradeAction {
+  if (action.offer.quantity <= 0) {
+    throw new NegativeQuantity(action.offer.quantity);
   }
 
   return {
-    ...order,
+    ...action,
     type: "trade",
   };
 }
 
-export function mineOrder(order: Omit<MineOrder, "type">): MineOrder {
+export function mineAction(action: Omit<MineAction, "type">): MineAction {
   return {
-    ...order,
+    ...action,
     type: "mine",
   };
 }
 
 export interface Orders extends BaseComponent<"orders"> {
-  value: OrderGroup[];
+  value: Order[];
 }

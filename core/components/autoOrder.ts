@@ -1,6 +1,6 @@
 import { BaseComponent } from "./component";
-import { Order } from "./orders";
+import { Action } from "./orders";
 
 export interface AutoOrder extends BaseComponent<"autoOrder"> {
-  default: Order["type"];
+  default: Action["type"];
 }

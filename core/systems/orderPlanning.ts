@@ -10,7 +10,7 @@ import {
 import { createMarker, Marker } from "../archetypes/marker";
 import { sector as asSector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
-import { mineOrder } from "../components/orders";
+import { mineAction } from "../components/orders";
 import { getAvailableSpace } from "../components/storage";
 import { mineableCommodities } from "../economy/commodity";
 import {
@@ -21,7 +21,7 @@ import {
 import type { Sim } from "../sim";
 import { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
-import { moveToOrders } from "../utils/moving";
+import { moveToActions } from "../utils/moving";
 import {
   autoBuyMostNeededByCommander,
   autoSellMostRedundantToCommander,
@@ -51,7 +51,7 @@ function idleMovement(entity: Trading) {
 
   entity.cp.orders.value.push({
     origin: "auto",
-    orders: moveToOrders(
+    actions: moveToActions(
       entity,
       createMarker(
         entity.sim,
@@ -197,9 +197,9 @@ function autoMineForCommander(
       entity.cp.orders.value.push({
         origin: "auto",
         type: "mine",
-        orders: [
-          ...moveToOrders(entity, field),
-          mineOrder({
+        actions: [
+          ...moveToActions(entity, field),
+          mineAction({
             targetFieldId: field.id,
             targetRockId: null,
           }),

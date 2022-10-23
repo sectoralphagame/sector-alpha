@@ -21,25 +21,23 @@ export interface ShipDriveProps {
 }
 
 export interface Drive extends BaseComponent<"drive"> {
-  /**
-   * Expressed in percent of max speed per second
-   */
+  /** Expressed in percent of max speed per second */
   acceleration: number;
   currentSpeed: number;
   maneuver: number;
   cruise: number;
-  /**
-   * Expressed in radians per second
-   */
+  /** Expressed in radians per second */
   rotary: number;
-  /**
-   * Time to initiate cruise engine
-   */
+  /** Time to initiate cruise engine */
   ttc: number;
 
   state: "maneuver" | "warming" | "cruise";
   target: number | null;
   targetReached: boolean;
+  /** Minimal distance to target to set targetReached to true */
+  minimalDistance: number;
+  /** Limits maximum speed */
+  limit: number;
 }
 
 export function createDrive(input: ShipDriveProps): Drive {
@@ -51,6 +49,8 @@ export function createDrive(input: ShipDriveProps): Drive {
     target: null,
     targetReached: false,
     name: "drive",
+    minimalDistance: 0.01,
+    limit: 2000,
   };
 }
 

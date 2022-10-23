@@ -1,4 +1,4 @@
-import { TradeOrder } from "../../components/orders";
+import { TradeAction } from "../../components/orders";
 import { releaseStorageAllocation, transfer } from "../../components/storage";
 import { NotDockedError } from "../../errors";
 import { RequireComponent } from "../../tsHelpers";
@@ -6,7 +6,7 @@ import { acceptTrade } from "../../utils/trading";
 
 export function tradeOrder(
   entity: RequireComponent<"drive" | "storage" | "dockable" | "journal">,
-  order: TradeOrder
+  order: TradeAction
 ): boolean {
   const target = entity.sim
     .getOrThrow(order.targetId)

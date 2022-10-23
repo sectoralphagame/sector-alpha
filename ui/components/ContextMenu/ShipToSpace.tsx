@@ -2,10 +2,10 @@ import { matrix, norm, subtract } from "mathjs";
 import React from "react";
 import { AsteroidField } from "@core/archetypes/asteroidField";
 import { createMarker } from "@core/archetypes/marker";
-import { mineOrder } from "@core/components/orders";
+import { mineAction } from "@core/components/orders";
 import { isOwnedByPlayer } from "@core/components/player";
 import { getSelected } from "@core/components/selection";
-import { moveToOrders } from "@core/utils/moving";
+import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
 import { useContextMenu, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
@@ -39,7 +39,7 @@ export const ShipToSpace: React.FC = () => {
     entity.cp.orders!.value.push({
       origin: "manual",
       type: "move",
-      orders: moveToOrders(
+      actions: moveToActions(
         entity,
         createMarker(sim, {
           sector: menu.sector!.id,
@@ -53,9 +53,9 @@ export const ShipToSpace: React.FC = () => {
     entity.cp.orders!.value.push({
       origin: "manual",
       type: "mine",
-      orders: [
-        ...moveToOrders(entity, field),
-        mineOrder({
+      actions: [
+        ...moveToActions(entity, field),
+        mineAction({
           targetFieldId: field.id,
           targetRockId: null,
         }),

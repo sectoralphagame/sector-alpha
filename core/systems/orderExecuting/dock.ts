@@ -1,6 +1,6 @@
 import { availableDocks, WithDock } from "../../components/dockable";
 import { clearTarget, setTarget } from "../../components/drive";
-import { DockOrder } from "../../components/orders";
+import { DockAction } from "../../components/orders";
 import { hide } from "../../components/render";
 import { DockSizeMismatchError } from "../../errors";
 import { RequireComponent } from "../../tsHelpers";
@@ -20,7 +20,7 @@ export function dockShip(
 
 export function dockOrder(
   entity: RequireComponent<"drive" | "dockable" | "position">,
-  order: DockOrder
+  order: DockAction
 ): boolean {
   const target = entity.sim
     .getOrThrow(order.targetId)

@@ -1,11 +1,6 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import {
-  DockOrder,
-  MineOrder,
-  Order,
-  OrderGroup,
-} from "@core/components/orders";
+import { DockAction, MineAction, Action, Order } from "@core/components/orders";
 import { asteroidField } from "@core/archetypes/asteroidField";
 import { Ship } from "@core/archetypes/ship";
 import { Sim } from "@core/sim";
@@ -19,7 +14,7 @@ import {
 import { IconButton } from "@kit/IconButton";
 import styles from "./Orders.scss";
 
-function getOrderDescription(ship: Ship, order: Order) {
+function getOrderDescription(ship: Ship, order: Action) {
   switch (order.type) {
     case "move":
       return `Go to ${
@@ -52,7 +47,7 @@ function getOrderDescription(ship: Ship, order: Order) {
   }
 }
 
-function getOrderGroupDescription(order: OrderGroup, sim: Sim) {
+function getOrderGroupDescription(order: Order, sim: Sim) {
   switch (order.type) {
     case "move":
       return "Move";
@@ -62,7 +57,7 @@ function getOrderGroupDescription(order: OrderGroup, sim: Sim) {
       return `Mine ${
         asteroidField(
           sim.getOrThrow(
-            (order.orders.find((o) => o.type === "mine") as MineOrder)!
+            (order.actions.find((o) => o.type === "mine") as MineAction)!
               .targetFieldId
           )
         ).cp.asteroidSpawn.type
@@ -70,9 +65,11 @@ function getOrderGroupDescription(order: OrderGroup, sim: Sim) {
     case "dock":
       return `Dock at ${
         sim.get(
-          (order.orders.find((o) => o.type === "dock") as DockOrder)!.targetId
+          (order.actions.find((o) => o.type === "dock") as DockAction)!.targetId
         )?.cp.name?.value ?? "target"
       }`;
+    case "follow":
+      return `Follow ${sim.get(order.targetId)?.cp.name?.value ?? "target"}`;
     default:
       return "Hold position";
   }
@@ -105,7 +102,7 @@ const Orders: React.FC<{ ship: Ship }> = ({ ship }) => {
             </div>
           </CollapsibleSummary>
           <CollapsibleContent>
-            {order.orders.map((o, index) => (
+            {order.actions.map((o, index) => (
               <div key={o.type + index}>{getOrderDescription(ship, o)}</div>
             ))}
           </CollapsibleContent>

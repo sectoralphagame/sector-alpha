@@ -1,6 +1,6 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { Order } from "@core/components/orders";
+import { Action } from "@core/components/orders";
 import { RequireComponent } from "@core/tsHelpers";
 import okIcon from "@assets/ui/ok.svg";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
@@ -39,7 +39,7 @@ const AutoOrder: React.FC<{ entity: RequireComponent<"autoOrder"> }> = ({
       >
         <SelectButton>{defaultOrder}</SelectButton>
         <SelectOptions>
-          {(["hold", "mine", "trade"] as Order["type"][]).map((type) => (
+          {(["hold", "mine", "trade"] as Action["type"][]).map((type) => (
             <SelectOption key={type} value={type}>
               {type}
             </SelectOption>

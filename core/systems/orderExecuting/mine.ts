@@ -1,14 +1,14 @@
 import { asteroid } from "../../archetypes/asteroid";
 import { asteroidField } from "../../archetypes/asteroidField";
-import { MineOrder } from "../../components/orders";
+import { MineAction } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
 import { getMineableAsteroid } from "../../economy/utils";
 import { RequireComponent } from "../../tsHelpers";
-import { moveToOrders } from "../../utils/moving";
+import { moveToActions } from "../../utils/moving";
 
 export function mineOrder(
   entity: RequireComponent<"drive" | "mining" | "position" | "storage">,
-  order: MineOrder
+  order: MineAction
 ): boolean {
   const targetField = asteroidField(entity.sim.getOrThrow(order.targetFieldId));
   const targetRock = order.targetRockId
@@ -25,7 +25,7 @@ export function mineOrder(
       return true;
     }
     order.targetRockId = rock.id;
-    entity.cp.orders!.value[0].orders.unshift(...moveToOrders(entity, rock));
+    entity.cp.orders!.value[0].actions.unshift(...moveToActions(entity, rock));
   }
 
   if (entity.cp.drive.targetReached) {

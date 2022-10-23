@@ -17,12 +17,6 @@ function hold(entity: Driveable) {
         (entity.cp.commander && entity.cp.orders.value[0].origin === "auto")
       ) {
         entity.cp.orders.value = [];
-      } else {
-        entity.cp.orders.value.unshift({
-          origin: "auto",
-          type: "hold",
-          orders: [{ type: "hold" }],
-        });
       }
     }
   }
@@ -74,6 +68,7 @@ function move(entity: Driveable, delta: number) {
   }
   const targetPosition = targetEntity.cp.position!;
   const isInSector = targetPosition.sector === entityPosition.sector;
+
   if (!isInSector) {
     hold(entity);
     return;
@@ -92,31 +87,37 @@ function move(entity: Driveable, delta: number) {
     // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
     entityPosition.angle - Math.PI / 2
   );
-  const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
-  drive.currentSpeed = limitMax(
-    drive.currentSpeed + maxSpeed * drive.acceleration * delta,
-    maxSpeed
-  );
 
   const targetAngle = Math.atan2(path.get([1]), path.get([0]));
-  const distance = norm(path);
+  const distance = norm(path) as number;
   const angleOffset = Math.abs(targetAngle - entityAngle);
   const canCruise =
     distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
     angleOffset < Math.PI / 12;
   const moveVec = matrix([Math.cos(entityAngle), Math.sin(entityAngle)]);
 
+  const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
+  const maxSpeedLimited = Math.min(drive.limit ?? Infinity, maxSpeed);
+  drive.currentSpeed =
+    angleOffset < Math.PI / 8
+      ? limitMax(
+          drive.currentSpeed + maxSpeed * drive.acceleration * delta,
+          maxSpeedLimited
+        )
+      : 0;
+
   const dPos =
     norm(path) > 0
-      ? (multiply(
-          moveVec,
-          angleOffset < Math.PI / 8 ? drive.currentSpeed * delta : 0
-        ) as Matrix)
+      ? (multiply(moveVec, drive.currentSpeed * delta) as Matrix)
       : matrix([0, 0]);
+  const dDistance = norm(dPos) as number;
   const dAngle = getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
 
-  if (norm(dPos) >= distance) {
-    entityPosition.coord = matrix(targetPosition.coord);
+  if (dDistance - distance >= drive.minimalDistance) {
+    entityPosition.coord =
+      dDistance >= distance
+        ? matrix(targetPosition.coord)
+        : add(entityPosition.coord, dPos);
     drive.targetReached = true;
     if (targetEntity.cp.destroyAfterUsage) {
       targetEntity.unregister();
@@ -137,7 +138,7 @@ function move(entity: Driveable, delta: number) {
     stopCruise(drive);
   }
 
-  entityPosition.coord = add(entityPosition.coord, dPos) as Matrix;
+  entityPosition.coord = add(entityPosition.coord, dPos);
   entityPosition.angle += dAngle;
   entityPosition.moved = true;
 
