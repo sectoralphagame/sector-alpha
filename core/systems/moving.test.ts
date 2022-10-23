@@ -6,11 +6,13 @@ import { createShip, Ship } from "../archetypes/ship";
 import { setTarget } from "../components/drive";
 import { Sim } from "../sim";
 import { shipClasses } from "../world/ships";
+import { NavigatingSystem } from "./navigating";
 import { MovingSystem } from "./moving";
 import { OrderExecutingSystem } from "./orderExecuting/orderExecuting";
 
 describe("Ship", () => {
   let sim: Sim;
+  let navigatingSystem: NavigatingSystem;
   let movingSystem: MovingSystem;
   let ship: Ship;
   let sector: Sector;
@@ -18,6 +20,7 @@ describe("Ship", () => {
   beforeEach(() => {
     sim = new Sim();
     movingSystem = new MovingSystem(sim);
+    navigatingSystem = new NavigatingSystem(sim);
     sector = createSector(sim, { position: matrix([0, 0, 0]), name: "" });
     ship = createShip(sim, {
       ...shipClasses.find((s) => s.name === "Courier A")!,
@@ -39,6 +42,7 @@ describe("Ship", () => {
     );
 
     for (let index = 0; index < 7; index++) {
+      navigatingSystem.exec(1);
       movingSystem.exec(1);
     }
 
@@ -54,6 +58,7 @@ describe("Ship", () => {
       }).id
     );
 
+    navigatingSystem.exec(1);
     movingSystem.exec(1);
 
     expect(ship.cp.drive.targetReached).toBe(false);
@@ -75,6 +80,7 @@ describe("Ship", () => {
 
     orderExecutingSystem.exec();
     for (let index = 0; index < 7; index++) {
+      navigatingSystem.exec(1);
       movingSystem.exec(1);
     }
 

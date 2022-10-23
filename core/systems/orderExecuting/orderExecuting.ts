@@ -2,9 +2,9 @@ import { Order } from "@core/components/orders";
 import { Entity } from "@core/components/entity";
 import { System } from "../system";
 import { dockOrder } from "./dock";
-import { mineOrder } from "./mine";
-import { follorOrderGroupCleanup, followOrderGroup } from "./follow";
-import { holdPosition, moveOrder, teleportOrder } from "./misc";
+import { mineAction } from "./mine";
+import { follorOrderGroup, followOrder } from "./follow";
+import { holdAction, holdPosition, moveAction, teleportAction } from "./misc";
 import { tradeOrder } from "./trade";
 
 const orderGroupFns: Partial<
@@ -20,17 +20,22 @@ const orderGroupFns: Partial<
   >
 > = {
   follow: {
-    exec: followOrderGroup,
+    exec: followOrder,
     isCompleted: () => false,
-    onCompleted: follorOrderGroupCleanup,
+    onCompleted: follorOrderGroup,
+  },
+  hold: {
+    exec: holdAction,
+    isCompleted: () => false,
+    onCompleted: () => undefined,
   },
 };
 
 const orderFns = {
   trade: tradeOrder,
-  mine: mineOrder,
-  move: moveOrder,
-  teleport: teleportOrder,
+  mine: mineAction,
+  move: moveAction,
+  teleport: teleportAction,
   dock: dockOrder,
 };
 
