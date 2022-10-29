@@ -21,9 +21,16 @@ export class BaseSim {
 
   start = () => {
     if (this.intervalHandle) return;
+
     this.intervalHandle = setInterval(() => {
       try {
-        const delta = ((Date.now() - this.lastTick) / 1000) * this.speed;
+        let delta = ((Date.now() - this.lastTick) / 1000) * this.speed;
+        const deltaThreshold = (this.speed * 3) / settings.global.targetFps;
+
+        if (delta > deltaThreshold) {
+          delta = deltaThreshold;
+          console.warn("Throttling sim");
+        }
         this.next(delta);
       } catch (err) {
         // eslint-disable-next-line no-console

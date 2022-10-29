@@ -10,6 +10,7 @@ import { Path } from "graphlib";
 import isPlainObject from "lodash/isPlainObject";
 import { filter, map, pipe, toArray } from "@fxts/core";
 import { NavigatingSystem } from "@core/systems/navigating";
+import { OutOfBoundsCheckingSystem } from "@core/systems/reporting/outOfBoundsChecking";
 import { Entity, EntityComponents } from "../components/entity";
 import { BaseSim } from "./BaseSim";
 import { System } from "../systems/system";
@@ -100,6 +101,7 @@ export class Sim extends BaseSim {
       new SectorStatisticGatheringSystem(this),
       new InflationStatisticGatheringSystem(this),
       new ShipBuildingSystem(this),
+      new OutOfBoundsCheckingSystem(this),
     ];
   }
 
