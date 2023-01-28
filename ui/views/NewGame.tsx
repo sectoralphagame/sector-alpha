@@ -1,7 +1,7 @@
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Sim } from "@core/sim";
-import world from "@core/world";
+import { getFixedWorld as world } from "@core/world";
 import { Slider } from "@kit/Slider";
 import { Button } from "@kit/Button";
 import Text from "@kit/Text";
@@ -17,7 +17,7 @@ interface NewGameForm {
   islands: number;
 }
 
-const targetTime = 3600 / 2;
+const targetTime = 3600 / 20;
 
 export const NewGame: React.FC = () => {
   const { register, handleSubmit, getValues, control } = useForm<NewGameForm>({

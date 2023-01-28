@@ -29,7 +29,7 @@ function move(entity: Driveable, delta: number) {
   );
   const moveVec = matrix([Math.cos(entityAngle), Math.sin(entityAngle)]);
   const dPos = multiply(moveVec, drive.currentSpeed * delta) as Matrix;
-  const dAngle = drive.currentRotary * delta;
+  const dAngle = drive.currentRotary;
 
   entityPosition.coord = add(entityPosition.coord, dPos);
   entityPosition.angle += dAngle;

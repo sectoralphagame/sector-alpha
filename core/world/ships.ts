@@ -15,6 +15,7 @@ export interface ShipBuildInput {
 export interface ShipInput extends ShipDriveProps {
   build: ShipBuildInput;
   name: string;
+  slug: string;
   storage: number;
   mining: number;
   texture: keyof Textures;

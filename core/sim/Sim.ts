@@ -73,6 +73,7 @@ export class Sim extends BaseSim {
   queries: Queries;
   paths: Record<string, Record<string, Path>>;
   queues: Queues = { systemsToAdd: [], systemsToRemove: [] };
+  diagnostics = false;
 
   constructor() {
     super();
@@ -101,7 +102,6 @@ export class Sim extends BaseSim {
       new SectorStatisticGatheringSystem(this),
       new InflationStatisticGatheringSystem(this),
       new ShipBuildingSystem(this),
-      new OutOfBoundsCheckingSystem(this),
     ];
   }
 
@@ -224,6 +224,19 @@ export class Sim extends BaseSim {
     tx.commit();
 
     return tx.done;
+  };
+
+  toggleDiagnostics = () => {
+    const diagnosticsSystems = [OutOfBoundsCheckingSystem];
+    if (this.diagnostics) {
+      this.diagnostics = false;
+      this.systems = this.systems.filter((system) =>
+        diagnosticsSystems.every((DS) => !(system instanceof DS))
+      );
+    } else {
+      this.diagnostics = true;
+      this.systems.push(...diagnosticsSystems.map((DS) => new DS(this)));
+    }
   };
 
   static async deleteSave(id: number) {

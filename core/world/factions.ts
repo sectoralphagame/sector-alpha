@@ -1,5 +1,5 @@
 import { add, matrix, random } from "mathjs";
-import { createFaction } from "../archetypes/faction";
+import { createFaction, Faction } from "../archetypes/faction";
 import { Sector, sectorSize } from "../archetypes/sector";
 import { setMoney } from "../components/budget";
 import { DockSize } from "../components/dockable";
@@ -57,38 +57,42 @@ function createTradingFaction(index: number, sim: Sim) {
   return faction;
 }
 
+export function populateSectors(sim: Sim, sectors: Sector[], faction: Faction) {
+  sectors.forEach((sector) =>
+    sector.addComponent({ name: "owner", id: faction.id })
+  );
+
+  const sectorWithShipyard = pickRandom(sectors);
+  createShipyard(
+    {
+      owner: faction,
+      sector: sectorWithShipyard,
+      position: add(
+        hecsToCartesian(
+          sectorWithShipyard.cp.hecsPosition.value,
+          sectorSize / 10
+        ),
+        matrix([
+          random(-sectorSize / 20, sectorSize / 20),
+          random(-sectorSize / 20, sectorSize / 20),
+        ])
+      ),
+    },
+    sim
+  );
+}
+
 export const createFactions = (
   sim: Sim,
   islands: Sector[][],
   factions: number
 ) => {
-  let freeIslands = islands.filter((island) => island.length > 2);
+  let freeIslands = islands.filter((island) => island.length > 1);
   for (let i = 0; i < factions; i++) {
-    const faction = createTerritorialFaction(i, sim);
     const [island, islandIndex] = pickRandomWithIndex(freeIslands);
     freeIslands = freeIslands.filter((_, index) => index !== islandIndex);
-    island.forEach((sector) =>
-      sector.addComponent({ name: "owner", id: faction.id })
-    );
-
-    const sectorWithShipyard = pickRandom(island);
-    createShipyard(
-      {
-        owner: faction,
-        sector: sectorWithShipyard,
-        position: add(
-          hecsToCartesian(
-            sectorWithShipyard.cp.hecsPosition.value,
-            sectorSize / 10
-          ),
-          matrix([
-            random(-sectorSize / 20, sectorSize / 20),
-            random(-sectorSize / 20, sectorSize / 20),
-          ])
-        ),
-      },
-      sim
-    );
+    const faction = createTerritorialFaction(i, sim);
+    populateSectors(sim, island, faction);
   }
 
   for (let i = 0; i < 2; i++) {

@@ -25,6 +25,7 @@ export function shouldSpawnAsteroid(entity: AsteroidField): boolean {
 
 function spawn(field: AsteroidField, sim: Sim) {
   const asteroidAngle = Math.random() * Math.PI;
+  const asteroidDistance = random(-1, 1) * field.cp.asteroidSpawn.size;
 
   return createAsteroid(
     sim,
@@ -32,13 +33,10 @@ function spawn(field: AsteroidField, sim: Sim) {
     add(
       field.cp.position.coord,
       matrix([
-        random(-field.cp.asteroidSpawn.size, field.cp.asteroidSpawn.size) *
-          Math.cos(asteroidAngle),
-        random(-field.cp.asteroidSpawn.size, field.cp.asteroidSpawn.size) *
-          Math.sin(asteroidAngle),
+        asteroidDistance * Math.cos(asteroidAngle),
+        asteroidDistance * Math.sin(asteroidAngle),
       ])
     ) as Matrix,
-    field.cp.position.sector,
     randomInt(
       field.cp.asteroidSpawn.asteroidResources.min,
       field.cp.asteroidSpawn.asteroidResources.max

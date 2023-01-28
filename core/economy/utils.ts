@@ -29,7 +29,7 @@ export function getSectorsInTeleportRange(
   jumps: number,
   sim: Sim
 ): Sector[] {
-  const ids = Object.entries(sim.paths[origin.id.toString()])
+  const ids = Object.entries(sim.paths[origin.id.toString()] ?? {})
     .filter(([, path]) => path.distance <= jumps)
     .map(([id]) => parseInt(id, 10));
   return sim.queries.sectors.get().filter((sector) => ids.includes(sector.id));

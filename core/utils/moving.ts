@@ -20,7 +20,11 @@ export function moveToActions(origin: Marker, target: Marker): Action[] {
             origin.sim.getOrThrow(t.cp.teleport.destinationId!),
             "position"
           ).cp.position.sector.toString() === paths[s.toString()].predecessor
-      )!;
+      );
+
+    if (!teleport) {
+      return orders;
+    }
 
     const t1 = findInAncestors(teleport, "position");
     const t2 = findInAncestors(

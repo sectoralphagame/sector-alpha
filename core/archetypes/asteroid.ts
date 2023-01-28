@@ -33,7 +33,6 @@ export function createAsteroid(
   sim: Sim,
   parent: AsteroidField,
   position: Matrix,
-  sectorId: number,
   resources: number
 ) {
   const entity = new Entity(sim);
@@ -54,7 +53,7 @@ export function createAsteroid(
       name: "position",
       coord: position,
       angle: 0,
-      sector: sectorId,
+      sector: parent.cp.position.sector,
       moved: false,
     })
     .addComponent(

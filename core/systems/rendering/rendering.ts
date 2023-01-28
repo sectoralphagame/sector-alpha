@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
+import { Entity } from "@core/components/entity";
 import {
   createRenderGraphics,
   drawGraphics,
@@ -25,6 +26,7 @@ export class RenderingSystem extends SystemWithHooks {
   dragging: boolean = false;
   keysPressed: string[] = [];
   toolbar: HTMLDivElement;
+  grid: RequireComponent<"renderGraphics"> | null = null;
 
   init = () => {
     this.cooldowns = new Cooldowns("graphics");
@@ -47,7 +49,7 @@ export class RenderingSystem extends SystemWithHooks {
       width: root.clientWidth,
       height: window.innerHeight,
       view: canvas,
-      backgroundColor: Color("#101010").rgbNumber(),
+      backgroundColor: Color("#080808").rgbNumber(),
     });
 
     this.viewport = new Viewport({
@@ -100,6 +102,10 @@ export class RenderingSystem extends SystemWithHooks {
       this.viewport.resize(root.clientWidth, window.innerHeight);
     });
     this.resizeObserver.observe(canvasRoot);
+
+    if (window.dev) {
+      this.toggleGrid();
+    }
 
     this.sim.entities.forEach((entity) => {
       if (entity.cp.render) {
@@ -260,6 +266,15 @@ export class RenderingSystem extends SystemWithHooks {
     });
   };
 
+  toggleGrid = () => {
+    if (!this.grid) {
+      const grid = new Entity(this.sim);
+      this.sim.registerEntity(grid);
+      grid.addComponent(createRenderGraphics("hexGrid"));
+      this.grid = grid as RequireComponent<"renderGraphics">;
+    }
+  };
+
   exec = (delta: number): void => {
     super.exec(delta);
     if (!this.initialized) {
@@ -274,6 +289,7 @@ export class RenderingSystem extends SystemWithHooks {
       this.updateSelection
     );
     this.hook(this.viewport.scale.x, this.updateScaling);
+    this.hook(window.dev, this.toggleGrid);
 
     this.updateViewport();
     this.updateGraphics();

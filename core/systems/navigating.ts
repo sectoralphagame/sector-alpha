@@ -76,6 +76,7 @@ function setDrive(entity: Driveable, delta: number) {
 
   const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
   if (norm(path) < 0.1) {
+    drive.currentSpeed = 0;
     drive.targetReached = true;
     if (targetEntity.cp.destroyAfterUsage) {
       targetEntity.unregister();
@@ -114,6 +115,9 @@ function setDrive(entity: Driveable, delta: number) {
     entity.cp.drive.limit = Infinity;
 
     if (distance <= drive.minimalDistance) {
+      if (entity === window.selected) {
+        console.log("now");
+      }
       drive.currentSpeed = 0;
       drive.targetReached = true;
       if (targetEntity.cp.destroyAfterUsage) {
