@@ -10,6 +10,10 @@ body {
   margin: 0;
   overscroll-behavior-y: none;
   font-size: var(--typography-default);
+
+  &:-webkit-full-screen {
+    background-color: var(--palette-background);
+  }
 }
 
 label {

@@ -1,5 +1,6 @@
-import { createSector } from "@core/archetypes/sector";
+import { createSector, sectorSize } from "@core/archetypes/sector";
 import { matrix, random } from "mathjs";
+import { hecsToCartesian } from "@core/components/hecsPosition";
 import { createFaction } from "../archetypes/faction";
 import { createShip } from "../archetypes/ship";
 import { changeBudgetMoney } from "../components/budget";
@@ -114,7 +115,7 @@ export function getFixedWorld(
     const player = createFaction("Player", sim);
     player.addComponent({ name: "player" });
     changeBudgetMoney(player.cp.budget, 5000);
-    const sectorAlpha = getSector("sector-alpha");
+    const startingSector = getSector("sector-alpha");
 
     const playerShip = createShip(sim, {
       ...pickRandom(
@@ -122,9 +123,12 @@ export function getFixedWorld(
           ({ role, size }) => role === "transport" && size === "small"
         )
       ),
-      position: matrix([0, 0]),
+      position: hecsToCartesian(
+        startingSector.cp.hecsPosition.value,
+        sectorSize / 10
+      ),
       owner: player,
-      sector: sectorAlpha,
+      sector: startingSector,
     });
     playerShip.cp.autoOrder!.default = "hold";
 
