@@ -29,7 +29,7 @@ export const Dialog: React.FC<DialogProps> = ({
     onRequestClose={onClose}
     style={{
       content: {
-        backgroundColor: "rgb(0 0 0 / 85%)",
+        backgroundColor: "rgb(0 0 0)",
         top: "50%",
         left: "50%",
         right: "auto",
