@@ -1,6 +1,8 @@
 import { createSector, sectorSize } from "@core/archetypes/sector";
 import { matrix, random } from "mathjs";
 import { hecsToCartesian } from "@core/components/hecsPosition";
+import type { AiType } from "@core/components/ai";
+import { requestShip } from "@core/systems/shipPlanning";
 import { createFaction } from "../archetypes/faction";
 import { createShip } from "../archetypes/ship";
 import { changeBudgetMoney } from "../components/budget";
@@ -134,9 +136,10 @@ export function getFixedWorld(
 
     mapData.factions.forEach((factionData) => {
       const faction = createFaction(factionData.name, sim);
+      changeBudgetMoney(faction.cp.budget, Infinity);
       faction.addComponent({
         name: "ai",
-        type: "territorial",
+        type: factionData.type as AiType,
         stockpiling: random(0.6, 1.2),
         priceModifier: random(0.002, 0.02),
       });
@@ -146,6 +149,17 @@ export function getFixedWorld(
       );
       changeBudgetMoney(faction.cp.budget, 1e8);
       populateSectors(sim, factionData.sectors.map(getSector), faction);
+
+      if (factionData.type === "travelling") {
+        for (let index = 0; index < Math.random() * 10; index++) {
+          requestShip(
+            faction,
+            pickRandom(sim.queries.shipyards.get()),
+            "transport",
+            false
+          );
+        }
+      }
     });
 
     sim.queries.ai

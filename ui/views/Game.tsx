@@ -5,6 +5,7 @@ import { RenderingSystem } from "@core/systems/rendering";
 import { worldToHecs } from "@core/components/hecsPosition";
 import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import { Entity } from "@core/components/entity";
+import { MapView } from "@ui/components/MapView";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -108,6 +109,7 @@ export const Game: React.FC = () => {
       system creates own canvas here */}
       <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
         <PlayerMoney />
+        <MapView />
       </div>
     </div>
   );

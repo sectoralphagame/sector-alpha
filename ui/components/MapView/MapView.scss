@@ -1,0 +1,44 @@
+.root {
+  top: var(--spacing-2);
+  padding: var(--spacing-1);
+  position: absolute;
+  right: -1px;
+  margin: auto;
+  text-align: left;
+  max-width: 300px;
+  width: fit-content;
+  background: var(--palette-background);
+  border: 1px solid var(--palette-default);
+  border-bottom-left-radius: 4px;
+  line-height: 1;
+}
+
+.caption {
+  &:not(:last-child) {
+    margin-bottom: var(--spacing-1);
+  }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.faction {
+  align-items: center;
+  display: flex;
+  font-size: var(--typography-label);
+  margin-bottom: var(--spacing-0-5);
+
+  &Color {
+    width: 20px;
+    height: 20px;
+    margin-right: var(--spacing-1);
+  }
+}
+
+.expand {
+  margin-left: var(--spacing-1);
+}
+
+.rotate {
+  transform: rotate(180deg);
+}
