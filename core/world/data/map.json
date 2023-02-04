@@ -134,7 +134,16 @@
     {
       "name": "Federation of Free Worlds",
       "slug": "FFW",
-      "sectors": ["juno-2", "juno-3", "juno-4", "teegarden-1", "teegarden-2"],
+      "sectors": [
+        "juno-2",
+        "juno-3",
+        "juno-4",
+        "teegarden-1",
+        "teegarden-2",
+        "gj-1002-1",
+        "gj-1002-2",
+        "tau-ceti-e"
+      ],
       "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerB"],
       "color": "#42f5e3",
       "type": "territorial"
