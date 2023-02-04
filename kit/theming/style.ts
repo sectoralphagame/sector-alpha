@@ -26,7 +26,7 @@ export interface Theme {
 }
 
 export function createTheme(scale: number): Theme {
-  const baseFontSize = 16 * scale;
+  const baseFontSize = 14 * scale;
   const baseSpacing = 8 * scale;
 
   return {

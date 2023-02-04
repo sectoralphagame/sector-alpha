@@ -51,7 +51,9 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     })
     .addComponent({
       name: "name",
-      value: `Facility #${entity.id}`,
+      value: initial.owner?.cp.name.slug
+        ? `${initial.owner.cp.name.slug} Facility #${entity.id}`
+        : `Facility #${entity.id}`,
     })
     .addComponent({
       name: "position",

@@ -35,6 +35,7 @@ export function requestShip(
       position: shipyard.cp.position.coord.clone(),
       owner: faction,
       sector: asSector(shipyard.sim.getOrThrow(shipyard.cp.position.sector)),
+      name: `${faction.cp.name.slug!} ${bp.name}`,
     });
   }
 

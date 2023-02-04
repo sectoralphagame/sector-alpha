@@ -17,7 +17,7 @@ interface NewGameForm {
   islands: number;
 }
 
-const targetTime = 3600 * 2;
+const targetTime = 3600 / 2;
 
 export const NewGame: React.FC = () => {
   const { register, handleSubmit, getValues, control } = useForm<NewGameForm>({
@@ -48,31 +48,19 @@ export const NewGame: React.FC = () => {
   );
 
   const onSubmit = handleSubmit(async () => {
-    let tries = 0;
-    for (; tries < 20; tries++) {
-      sim.current?.destroy();
-      sim.current = new Sim();
-      sim.current.init();
-      window.sim = sim.current;
-      setLoading(true);
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        await world(sim.current, getValues().islands, getValues().factions);
-        break;
-        // eslint-disable-next-line no-empty
-      } catch {}
-    }
+    sim.current?.destroy();
+    sim.current = new Sim();
+    sim.current.init();
+    window.sim = sim.current;
+    setLoading(true);
+    await world(sim.current, getValues().islands, getValues().factions);
 
-    if (tries === 20) {
-      throw new Error("Maximum tries exceeded");
-    } else {
-      headlessSimWorker.current?.postMessage({
-        type: "init",
-        delta: 1,
-        targetTime,
-        sim: sim.current!.serialize(),
-      });
-    }
+    headlessSimWorker.current?.postMessage({
+      type: "init",
+      delta: 1,
+      targetTime,
+      sim: sim.current!.serialize(),
+    });
   });
 
   return (

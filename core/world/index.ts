@@ -136,6 +136,7 @@ export function getFixedWorld(
 
     mapData.factions.forEach((factionData) => {
       const faction = createFaction(factionData.name, sim);
+      faction.cp.name.slug = factionData.slug;
       changeBudgetMoney(faction.cp.budget, Infinity);
       faction.addComponent({
         name: "ai",
