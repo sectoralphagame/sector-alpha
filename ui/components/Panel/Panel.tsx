@@ -15,42 +15,35 @@ import configIcon from "@assets/ui/config.svg";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import playIcon from "@assets/ui/play.svg";
 import { IconButton } from "@kit/IconButton";
-import FacilityPanel from "./FacilityPanel";
-import ShipPanel from "./ShipPanel";
-import { ConfigDialog } from "./ConfigDialog";
-import EntityName from "./EntityName";
-import Resources from "./Resources";
-import SectorResources from "./SectorStats";
-import SectorPrices from "./SectorPrices";
-import Inflation from "./InflationStats";
-import { useGameDialog, useSim } from "../atoms";
-import { PlayerShips } from "./PlayerShips";
-import { useRerender } from "../hooks/useRerender";
-import { PlayerFacilities } from "./PlayerFacilities";
-import { TradeDialog } from "./TradeDialog";
+import FacilityPanel from "../FacilityPanel";
+import ShipPanel from "../ShipPanel";
+import { ConfigDialog } from "../ConfigDialog";
+import EntityName from "../EntityName";
+import Resources from "../Resources";
+import SectorResources from "../SectorStats";
+import SectorPrices from "../SectorPrices";
+import Inflation from "../InflationStats";
+import { useGameDialog, useSim } from "../../atoms";
+import { PlayerShips } from "../PlayerShips";
+import { useRerender } from "../../hooks/useRerender";
+import { PlayerFacilities } from "../PlayerFacilities";
+import { TradeDialog } from "../TradeDialog";
 import styles from "./Panel.scss";
 
-export const Panel: React.FC = () => {
+export interface PanelProps {
+  entity: Entity | undefined;
+}
+
+export const Panel: React.FC<PanelProps> = ({ entity }) => {
   const [isCollapsed, setCollapsed] = React.useState(true);
   const [dialog, setDialog] = useGameDialog();
   const toggleCollapse = React.useCallback(() => setCollapsed((c) => !c), []);
 
   const [sim] = useSim();
-  const selectedId = sim.queries.settings.get()[0]!.cp.selectionManager.id;
-
-  const [entity, setEntity] = React.useState<Entity | undefined>(
-    selectedId ? sim.get(selectedId) : undefined
-  );
 
   const closeDialog = React.useCallback(() => setDialog(null), []);
 
   useRerender(250);
-
-  React.useEffect(() => {
-    if (entity?.id !== selectedId) {
-      setEntity(selectedId ? sim.get(selectedId) : undefined);
-    }
-  });
 
   React.useEffect(() => {
     if (entity && isCollapsed) {

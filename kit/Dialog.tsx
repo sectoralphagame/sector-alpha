@@ -6,7 +6,9 @@ import { IconButton } from "./IconButton";
 import Text from "./Text";
 import styles from "./Dialog.scss";
 
-Modal.setAppElement("#root");
+try {
+  Modal.setAppElement("#root");
+} catch {}
 
 export interface DialogProps {
   open: boolean;
