@@ -1,6 +1,4 @@
 import React from "react";
-import SVG from "react-inlinesvg";
-import clsx from "clsx";
 import { shipComponents, ship as asShip } from "@core/archetypes/ship";
 import { Entity } from "@core/components/entity";
 import {
@@ -8,13 +6,6 @@ import {
   facility as asFacility,
 } from "@core/archetypes/facility";
 import { sector, sectorComponents } from "@core/archetypes/sector";
-import ffIcon from "@assets/ui/ff.svg";
-import pauseIcon from "@assets/ui/pause.svg";
-import locationIcon from "@assets/ui/location.svg";
-import configIcon from "@assets/ui/config.svg";
-import arrowLeftIcon from "@assets/ui/arrow_left.svg";
-import playIcon from "@assets/ui/play.svg";
-import { IconButton } from "@kit/IconButton";
 import FacilityPanel from "../FacilityPanel";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
@@ -28,14 +19,15 @@ import { PlayerShips } from "../PlayerShips";
 import { useRerender } from "../../hooks/useRerender";
 import { PlayerFacilities } from "../PlayerFacilities";
 import { TradeDialog } from "../TradeDialog";
-import styles from "./Panel.scss";
+import { PanelComponent } from "./PanelComponent";
 
 export interface PanelProps {
+  expanded?: boolean;
   entity: Entity | undefined;
 }
 
-export const Panel: React.FC<PanelProps> = ({ entity }) => {
-  const [isCollapsed, setCollapsed] = React.useState(true);
+export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
+  const [isCollapsed, setCollapsed] = React.useState(!expanded);
   const [dialog, setDialog] = useGameDialog();
   const toggleCollapse = React.useCallback(() => setCollapsed((c) => !c), []);
 
@@ -58,75 +50,33 @@ export const Panel: React.FC<PanelProps> = ({ entity }) => {
     }
   }, [dialog]);
 
-  if (!sim) return null;
-
   return (
-    <div
-      className={clsx(styles.root, {
-        [styles.rootCollapsed]: isCollapsed,
-      })}
-      id="toolbar"
-    >
-      <div
-        className={clsx(styles.iconBar, {
-          [styles.iconBarCollapsed]: isCollapsed,
-        })}
+    <>
+      <PanelComponent
+        isCollapsed={isCollapsed}
+        onCollapseToggle={toggleCollapse}
+        onConfig={() => setDialog({ type: "config" })}
+        onFocus={
+          entity
+            ? () => {
+                sim.find((e) =>
+                  e.hasComponents(["selectionManager"])
+                )!.cp.selectionManager!.focused = true;
+              }
+            : undefined
+        }
+        onPause={sim?.pause}
+        onPlay={() => {
+          sim.setSpeed(1);
+          sim.start();
+        }}
+        onSpeed={() => {
+          sim.setSpeed(10);
+          sim.start();
+        }}
       >
-        {isCollapsed ? (
-          <IconButton className={styles.rotate} onClick={toggleCollapse}>
-            <SVG src={arrowLeftIcon} />
-          </IconButton>
-        ) : (
-          <IconButton onClick={() => setDialog({ type: "config" })}>
-            <SVG src={configIcon} />
-          </IconButton>
-        )}
-        <IconButton onClick={sim?.pause}>
-          <SVG src={pauseIcon} />
-        </IconButton>
-        <IconButton
-          onClick={() => {
-            sim.setSpeed(1);
-            sim.start();
-          }}
-        >
-          <SVG src={playIcon} />
-        </IconButton>
-        <IconButton
-          onClick={() => {
-            sim.setSpeed(10);
-            sim.start();
-          }}
-        >
-          <SVG src={ffIcon} />
-        </IconButton>
-        {!!entity && (
-          <IconButton
-            onClick={() => {
-              sim.find((e) =>
-                e.hasComponents(["selectionManager"])
-              )!.cp.selectionManager!.focused = true;
-            }}
-          >
-            <SVG src={locationIcon} />
-          </IconButton>
-        )}
-        {!isCollapsed ? (
-          <>
-            <div className={styles.spacer} />
-            <IconButton onClick={toggleCollapse}>
-              <SVG src={arrowLeftIcon} />
-            </IconButton>
-          </>
-        ) : (
-          <IconButton onClick={() => setDialog({ type: "config" })}>
-            <SVG src={configIcon} />
-          </IconButton>
-        )}
-      </div>
-      {!isCollapsed && (
-        <div className={styles.scrollArea}>
-          {entity ? (
+        {!isCollapsed &&
+          (entity ? (
             <>
               {entity.hasComponents(["name"]) && (
                 <EntityName entity={entity.requireComponents(["name"])} />
@@ -155,9 +105,8 @@ export const Panel: React.FC<PanelProps> = ({ entity }) => {
                 </>
               )}
             </>
-          )}
-        </div>
-      )}
+          ))}
+      </PanelComponent>
       <ConfigDialog
         open={dialog?.type === "config"}
         onClose={() => {
@@ -166,6 +115,6 @@ export const Panel: React.FC<PanelProps> = ({ entity }) => {
         }}
       />
       <TradeDialog open={dialog?.type === "trade"} onClose={closeDialog} />
-    </div>
+    </>
   );
 };
