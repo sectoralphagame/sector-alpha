@@ -190,5 +190,14 @@
     "slug": "teleport",
     "time": 480,
     "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Basic Module",
+    "type": "storage",
+    "pac": {},
+    "slug": "basic",
+    "time": 0,
+    "build": { "cost": {}, "time": 0 },
+    "storage": "1000"
   }
 ]
