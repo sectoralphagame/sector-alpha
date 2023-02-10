@@ -33,13 +33,18 @@ export interface HoldPositionAction {
   type: "hold";
 }
 
+export interface FacilityDeployAction {
+  type: "deployFacility";
+}
+
 export type Action =
   | MoveAction
   | TradeAction
   | MineAction
   | HoldPositionAction
   | TeleportAction
-  | DockAction;
+  | DockAction
+  | FacilityDeployAction;
 export interface BaseOrder {
   origin: "auto" | "manual";
   actions: Action[];
@@ -54,7 +59,7 @@ export interface FollowOrder extends BaseOrder {
 
 export type Order =
   | ({
-      type: "mine" | "trade" | "hold" | "move" | "dock";
+      type: "mine" | "trade" | "hold" | "move" | "dock" | "deployFacility";
     } & BaseOrder)
   | FollowOrder;
 

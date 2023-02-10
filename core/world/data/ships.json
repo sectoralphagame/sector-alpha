@@ -160,5 +160,28 @@
     "storage": 210,
     "texture": "mMin",
     "slug": "minerTau"
+  },
+  {
+    "acceleration": 0.05,
+    "build": {
+      "time": 0,
+      "cost": {
+        "drones": 10,
+        "electronics": 2100,
+        "hullPlates": 51000,
+        "fuel": 12000
+      }
+    },
+    "mining": 0,
+    "role": "building",
+    "cruise": 1.1,
+    "maneuver": 0.07,
+    "rotary": 8,
+    "ttc": 14,
+    "name": "Station Builder",
+    "size": "large",
+    "storage": 100,
+    "texture": "lBuilder",
+    "slug": "stationBuilder"
   }
 ]

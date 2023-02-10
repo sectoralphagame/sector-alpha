@@ -86,6 +86,13 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
     entity.addComponent(createMining(initial.mining));
   }
 
+  if (initial.role === "building") {
+    entity.addComponent({
+      name: "deployable",
+      type: "facility",
+    });
+  }
+
   const shipEntity = ship(entity);
   shipEntity.cp.storage!.max = initial.storage;
 

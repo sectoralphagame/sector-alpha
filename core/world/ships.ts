@@ -4,7 +4,12 @@ import { Textures } from "../components/render";
 import { Commodity } from "../economy/commodity";
 import shipClassesData from "./data/ships.json";
 
-export const shipRoles = ["transport", "mining", "military"] as const;
+export const shipRoles = [
+  "transport",
+  "mining",
+  "military",
+  "building",
+] as const;
 export type ShipRole = (typeof shipRoles)[number];
 
 export interface ShipBuildInput {

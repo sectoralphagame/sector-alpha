@@ -2,12 +2,10 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
-import { ShipInput } from "@core/world/ships";
 import { commoditiesArray, Commodity } from "@core/economy/commodity";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
-import allModules from "@core/world/data/facilityModules.json";
 import {
   Dropdown,
   DropdownButton,
@@ -15,17 +13,22 @@ import {
   DropdownOptions,
 } from "@kit/Dropdown";
 import { formatInt, getCost, useThrottledFormState } from "@devtools/utils";
+import { FacilityModuleInput } from "@core/archetypes/facilityModule";
 import { max, min } from "@fxts/core";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
 import { FormData } from "./utils";
 
-const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
-  const { register, getValues, setValue } = useFormContext<FormData>();
-  const ship = useThrottledFormState<ShipInput>(`ships.${index.toString()}`);
+const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
+  const { register, setValue } = useFormContext<FormData>();
+  const facilityModule = useThrottledFormState<FacilityModuleInput>(
+    `facilityModules.${index.toString()}`
+  );
+  const allModules =
+    useThrottledFormState<FacilityModuleInput[]>("facilityModules");
   const [expanded, setExpanded] = React.useState(false);
 
-  if (!ship) {
+  if (!facilityModule) {
     return null;
   }
 
@@ -44,51 +47,54 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
         </TableCell>
         <TableCell>
           <input
-            {...register(`ships.${index}.name`)}
-            defaultValue={getValues().ships[index].name}
+            {...register(`facilityModules.${index}.name`)}
+            defaultValue={facilityModule.name}
           />
         </TableCell>
         <TableCell>
           <input
-            {...register(`ships.${index}.build.time`, {
+            {...register(`facilityModules.${index}.build.time`, {
               valueAsNumber: true,
               min: 0,
             })}
             type="number"
-            defaultValue={getValues().ships[index].build.time}
+            defaultValue={facilityModule.build.time}
           />
         </TableCell>
         <TableCell>Expand row to see details</TableCell>
         <TableCell>
           {formatInt(
-            Object.entries(ship.build.cost).reduce(
-              (acc, [commodity, quantity]) =>
-                acc +
-                getCost(commodity as Commodity, allModules as any) * quantity,
-              0
-            )
+            Object.entries(facilityModule?.build.cost)
+              .filter(([_, cost]) => cost > 0)
+              .reduce(
+                (acc, [commodity, quantity]) =>
+                  acc + getCost(commodity as Commodity, allModules) * quantity,
+                0
+              )
           )}
         </TableCell>
         <TableCell>
           {formatInt(
-            Object.entries(ship.build.cost).reduce(
-              (acc, [commodity, quantity]) =>
-                acc +
-                getCost(commodity as Commodity, allModules as any, min) *
-                  quantity,
-              0
-            )
+            Object.entries(facilityModule?.build.cost)
+              .filter(([_, cost]) => cost > 0)
+              .reduce(
+                (acc, [commodity, quantity]) =>
+                  acc +
+                  getCost(commodity as Commodity, allModules, min) * quantity,
+                0
+              )
           )}
         </TableCell>
         <TableCell>
           {formatInt(
-            Object.entries(ship.build.cost).reduce(
-              (acc, [commodity, quantity]) =>
-                acc +
-                getCost(commodity as Commodity, allModules as any, max) *
-                  quantity,
-              0
-            )
+            Object.entries(facilityModule?.build.cost)
+              .filter(([_, cost]) => cost > 0)
+              .reduce(
+                (acc, [commodity, quantity]) =>
+                  acc +
+                  getCost(commodity as Commodity, allModules, max) * quantity,
+                0
+              )
           )}
         </TableCell>
       </tr>
@@ -97,26 +103,29 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
           <TableCell colSpan={3} />
           <TableCell>
             <div className={styles.buildExpanded}>
-              {Object.keys(getValues().ships[index].build.cost)
+              {Object.keys(facilityModule.build.cost)
                 .filter(
                   (commodity) =>
-                    getValues().ships[index].build.cost[commodity] !== undefined
+                    facilityModule.build.cost[commodity] !== undefined
                 )
                 .map((commodity: Commodity) => (
                   <React.Fragment key={commodity}>
                     <span>{commodity}</span>
                     <input
-                      {...register(`ships.${index}.build.cost.${commodity}`, {
-                        valueAsNumber: true,
-                        min: 1,
-                      })}
+                      {...register(
+                        `facilityModules.${index}.build.cost.${commodity}`,
+                        {
+                          valueAsNumber: true,
+                          min: 1,
+                        }
+                      )}
                       type="number"
                       step={1}
                     />
                     <IconButton
                       onClick={() =>
                         setValue(
-                          `ships.${index}.build.cost.${commodity}`,
+                          `facilityModules.${index}.build.cost.${commodity}`,
                           undefined
                         )
                       }
@@ -131,13 +140,15 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
                   {commoditiesArray
                     .filter(
                       (commodity) =>
-                        getValues().ships[index].build.cost[commodity] ===
-                        undefined
+                        facilityModule.build.cost[commodity] === undefined
                     )
                     .map((commodity) => (
                       <DropdownOption
                         onClick={() =>
-                          setValue(`ships.${index}.build.cost.${commodity}`, 0)
+                          setValue(
+                            `facilityModules.${index}.build.cost.${commodity}`,
+                            0
+                          )
                         }
                         key={commodity}
                       >
@@ -154,13 +165,15 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
   );
 };
 
-export const BuildEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
+export const BuildEditor: React.FC<{
+  facilityModules: FacilityModuleInput[];
+}> = ({ facilityModules }) => (
   <Table>
     <colgroup>
       <col style={{ width: "48px" }} />
       <col style={{ width: "250px" }} />
       <col style={{ width: "150px" }} />
-      <col style={{ width: "200px" }} />
+      <col style={{ width: "250px" }} />
       <col style={{ width: "200px" }} />
       <col style={{ width: "200px" }} />
       <col />
@@ -177,8 +190,11 @@ export const BuildEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
       </tr>
     </thead>
     <tbody>
-      {Object.values(ships).map((_, shipIndex) => (
-        <ShipBuildEditor index={shipIndex} key={shipIndex} />
+      {Object.values(facilityModules).map((_, facilityModuleIndex) => (
+        <FacilityModuleBuildEditor
+          index={facilityModuleIndex}
+          key={facilityModuleIndex}
+        />
       ))}
     </tbody>
   </Table>

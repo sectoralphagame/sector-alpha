@@ -1,6 +1,7 @@
 import { Values } from "../tsHelpers";
 
 export const commodities = {
+  drones: "drones",
   electronics: "electronics",
   food: "food",
   fuel: "fuel",

@@ -32,6 +32,7 @@ import { Shipyard } from "./shipyard";
 import { Blueprints } from "./blueprints";
 import { Journal } from "./journal";
 import { Player } from "./player";
+import { Deployable } from "./deployable";
 
 export interface CoreComponents {
   ai: Ai;
@@ -43,6 +44,7 @@ export interface CoreComponents {
   color: Color;
   commander: Commander;
   compoundProduction: CompoundProduction;
+  deployable: Deployable;
   destroyAfterUsage: DestroyAfterUsage;
   dockable: Dockable;
   docks: Docks;

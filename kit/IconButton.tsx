@@ -2,12 +2,18 @@ import clsx from "clsx";
 import React from "react";
 import styles from "./IconButton.scss";
 
-export const IconButton: React.FC<
-  React.DetailedHTMLProps<
+interface IconButtonProps
+  extends React.DetailedHTMLProps<
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     HTMLButtonElement
-  >
-> = (props) => {
+  > {
+  variant?: "outlined" | "naked";
+}
+
+export const IconButton: React.FC<IconButtonProps> = ({
+  variant = "outlined",
+  ...props
+}) => {
   const ref = React.useRef<HTMLButtonElement>(null);
 
   return (
@@ -19,7 +25,10 @@ export const IconButton: React.FC<
         ref.current?.blur();
       }}
       // eslint-disable-next-line react/destructuring-assignment
-      className={clsx(styles.root, props?.className)}
+      className={clsx(styles.root, props?.className, {
+        [styles.outlined]: variant === "outlined",
+        [styles.naked]: variant === "naked",
+      })}
     />
   );
 };

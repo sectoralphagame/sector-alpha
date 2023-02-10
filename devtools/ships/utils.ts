@@ -1,6 +1,3 @@
-import throttle from "lodash/throttle";
-import { useCallback, useEffect, useState } from "react";
-import { useWatch } from "react-hook-form";
 import { limitMax } from "@core/utils/limit";
 import { ShipInput } from "@core/world/ships";
 
@@ -81,16 +78,4 @@ export function getShipMiningEfficiency(
 // eslint-disable-next-line no-unused-vars
 export function withDistance(cb: (distance: number) => any): string {
   return [10, 100, 1000, 10000].map(cb).join("/");
-}
-
-export function useThrottledFormState<T>(name?: string): T {
-  const data = useWatch(name ? { name } : undefined!);
-  const [display, setDisplay] = useState<T>();
-  const refreshDisplay = useCallback(throttle(setDisplay, 500), []);
-
-  useEffect(() => {
-    refreshDisplay(data);
-  }, [data]);
-
-  return display!;
 }

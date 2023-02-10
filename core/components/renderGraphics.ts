@@ -104,7 +104,11 @@ export const graphics: Graphics = {
 
     orders.value.forEach((orderGroup) =>
       orderGroup.actions.forEach((order) => {
-        if (order.type !== "hold" && order.type !== "mine") {
+        if (
+          order.type !== "hold" &&
+          order.type !== "mine" &&
+          order.type !== "deployFacility"
+        ) {
           const target = entity.sim.get(order.targetId);
           if (!target) return;
 

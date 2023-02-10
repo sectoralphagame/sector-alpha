@@ -5,6 +5,7 @@ import { Ships } from "./ships";
 import "@alenaksu/json-viewer";
 import { UniverseMap } from "./map";
 import styles from "./index.scss";
+import { FacilityModules } from "./facilityModules";
 
 const DevToolsCard: React.FC<{
   link: string;
@@ -20,7 +21,7 @@ const DevToolsCard: React.FC<{
 );
 
 const DevToolsIndex: React.FC = () => (
-  <div className={styles.root}>
+  <div className={styles.index}>
     <div className={styles.grid}>
       <DevToolsCard
         name="Ship Editor"
@@ -32,14 +33,22 @@ const DevToolsIndex: React.FC = () => (
         description="See nearest stars map and distances between them"
         link="/dev/map"
       />
+      <DevToolsCard
+        name="Facility Modules"
+        description="Manage facility modules such as water production or fuelium refining"
+        link="/dev/facility-modules"
+      />
     </div>
   </div>
 );
 
 export const DevTools: React.FC = () => (
-  <Routes>
-    <Route path="ships" element={<Ships />} />
-    <Route path="map" element={<UniverseMap />} />
-    <Route path="/" element={<DevToolsIndex />} />
-  </Routes>
+  <div className={styles.root}>
+    <Routes>
+      <Route path="ships" element={<Ships />} />
+      <Route path="map" element={<UniverseMap />} />
+      <Route path="facility-modules" element={<FacilityModules />} />
+      <Route path="/" element={<DevToolsIndex />} />
+    </Routes>
+  </div>
 );

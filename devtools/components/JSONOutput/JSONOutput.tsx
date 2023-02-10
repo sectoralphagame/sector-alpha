@@ -4,8 +4,8 @@ import clsx from "clsx";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { Button } from "@kit/Button";
 import { IconButton } from "@kit/IconButton";
-import styles from "./styles.scss";
-import { useThrottledFormState } from "./utils";
+import styles from "./JSONOutput.scss";
+import { useThrottledFormState } from "../../utils";
 
 export const JSONOutput: React.FC<{
   expanded: boolean;
@@ -18,7 +18,7 @@ export const JSONOutput: React.FC<{
   );
 
   return (
-    <div className={styles.viewer}>
+    <div className={styles.root}>
       <div className={styles.toolbar}>
         <IconButton onClick={onExpand}>
           <SVG

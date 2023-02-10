@@ -1,4 +1,4 @@
-.root {
+.index {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,4 +20,9 @@
     flex: 1;
     text-decoration: none;
   }
+}
+
+.root {
+  overflow-y: scroll;
+  height: 100vh;
 }

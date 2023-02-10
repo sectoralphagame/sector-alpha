@@ -9,6 +9,7 @@ import fTeleportTexture from "../../assets/f_teleport.svg";
 import fCivTexture from "../../assets/f_civ.svg";
 import fFactoryTexture from "../../assets/f_factory.svg";
 import fShipyardTexture from "../../assets/f_shipyard.svg";
+import lBuilderTexture from "../../assets/l_bld.svg";
 import { isHeadless } from "../settings";
 
 export const textures = {
@@ -21,6 +22,7 @@ export const textures = {
   fShipyard: fShipyardTexture,
   fCiv: fCivTexture,
   fFactory: fFactoryTexture,
+  lBuilder: lBuilderTexture,
 };
 export type Textures = typeof textures;
 
@@ -57,6 +59,10 @@ export function setTexture(render: Render, texture: keyof Textures) {
     render.sprite.anchor.set(0.5, 0.5);
     render.sprite.zIndex = render.zIndex;
   }
+}
+
+export function destroy(render: Render) {
+  render.sprite.destroy();
 }
 
 export function createRender({

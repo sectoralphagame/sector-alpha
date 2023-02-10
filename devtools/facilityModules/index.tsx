@@ -7,20 +7,23 @@ import {
 } from "react-hook-form";
 import { Tab as HeadlessTab } from "@headlessui/react";
 import clsx from "clsx";
-import { shipClasses } from "@core/world/ships";
+import facilityModulesData from "@core/world/data/facilityModules.json";
 import { Button } from "@kit/Button";
 import { Tab, TabList } from "@kit/Tabs";
+import { FacilityModuleInput } from "@core/archetypes/facilityModule";
 import { FormData } from "./utils";
 import styles from "./styles.scss";
-import { GeneralEditor } from "./General";
-import { FreightEditor } from "./Freight";
 import { JSONOutput } from "../components/JSONOutput";
 import { BuildEditor } from "./Build";
+import { GeneralEditor } from "./General";
+import { ProductionEditor } from "./Production";
 
 const Editor: React.FC<{}> = () => {
   const { getValues, control } = useFormContext<FormData>();
-  const { append } = useFieldArray({ control, name: "ships" });
-  const [ships, setShips] = React.useState(getValues().ships);
+  const { append } = useFieldArray({ control, name: "facilityModules" });
+  const [facilityModules, setFacilityModules] = React.useState(
+    getValues().facilityModules
+  );
 
   return (
     <div className={styles.editorContainer}>
@@ -29,27 +32,24 @@ const Editor: React.FC<{}> = () => {
           <Button
             onClick={() => {
               append({
-                acceleration: 0,
-                build: { time: 0, cost: {} },
-                mining: 0,
-                role: "transport",
-                cruise: 0,
-                maneuver: 0,
-                rotary: 0,
-                ttc: 0,
-                name: "New Ship",
-                size: "medium",
-                storage: 0,
-                texture: "mCiv",
+                name: "",
+                type: "production",
+                pac: {},
+                slug: "",
+                time: 0,
+                build: {
+                  cost: {},
+                  time: 0,
+                },
               });
-              setShips(getValues().ships);
+              setFacilityModules(getValues().facilityModules);
             }}
           >
-            + Add new ship
+            + Add new Module
           </Button>
           <TabList>
             <Tab>General</Tab>
-            <Tab>Freight</Tab>
+            <Tab>Production</Tab>
             <Tab>Build</Tab>
           </TabList>
         </div>
@@ -58,13 +58,13 @@ const Editor: React.FC<{}> = () => {
 
         <HeadlessTab.Panels>
           <HeadlessTab.Panel>
-            <GeneralEditor ships={ships} />
+            <GeneralEditor facilityModules={facilityModules} />
           </HeadlessTab.Panel>
           <HeadlessTab.Panel>
-            <FreightEditor ships={ships} />
+            <ProductionEditor facilityModules={facilityModules} />
           </HeadlessTab.Panel>
           <HeadlessTab.Panel>
-            <BuildEditor ships={ships} />
+            <BuildEditor facilityModules={facilityModules} />
           </HeadlessTab.Panel>
         </HeadlessTab.Panels>
       </HeadlessTab.Group>
@@ -72,9 +72,11 @@ const Editor: React.FC<{}> = () => {
   );
 };
 
-export const Ships: React.FC = () => {
+export const FacilityModules: React.FC = () => {
   const form = useForm<FormData>({
-    defaultValues: { ships: shipClasses },
+    defaultValues: {
+      facilityModules: facilityModulesData as FacilityModuleInput[],
+    },
   });
   const [expanded, setExpanded] = React.useState(false);
 

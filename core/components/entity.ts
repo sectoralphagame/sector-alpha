@@ -72,9 +72,11 @@ export class Entity {
     return this;
   }
 
-  removeComponent(name: keyof CoreComponents) {
+  removeComponent(name: keyof CoreComponents): Entity {
     delete this.components[name];
     this.sim.events.emit("remove-component", { name, entity: this });
+
+    return this;
   }
 
   unregister() {
