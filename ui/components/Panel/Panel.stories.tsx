@@ -4,7 +4,7 @@ import { Styles } from "@kit/theming/style";
 import { PanelComponent } from "./PanelComponent";
 
 export default {
-  title: "Example/Panel",
+  title: "Panel / Root",
   component: PanelComponent,
   parameters: {
     layout: "fullscreen",
