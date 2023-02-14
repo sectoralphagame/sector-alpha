@@ -3,6 +3,7 @@ import type { Sim } from "@core/sim";
 import { ConfigDialogProps } from "./components/ConfigDialog";
 import { ContextMenu } from "./components/ContextMenu/types";
 import { TradeDialogProps } from "./components/TradeDialog";
+import { FacilityModuleManagerProps } from "./components/FacilityModuleManager";
 
 export const sim = atom<Sim>({
   key: "sim",
@@ -23,7 +24,11 @@ export const contextMenu = atom<ContextMenu>({
 });
 export const useContextMenu = () => useRecoilState(contextMenu);
 
-export type GameDialogProps = TradeDialogProps | ConfigDialogProps | null;
+export type GameDialogProps =
+  | TradeDialogProps
+  | ConfigDialogProps
+  | FacilityModuleManagerProps
+  | null;
 
 export const gameDialog = atom<GameDialogProps>({
   key: "gameDialog",

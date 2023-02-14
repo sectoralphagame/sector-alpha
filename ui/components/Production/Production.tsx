@@ -12,6 +12,7 @@ import {
 } from "@kit/Collapsible";
 import { isOwnedByPlayer } from "@core/components/player";
 import configIcon from "@assets/ui/config.svg";
+import { useGameDialog } from "@ui/atoms";
 import styles from "./Production.scss";
 
 export interface ProductionProps {
@@ -29,9 +30,14 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
         ? "productionModules"
         : "utilityModules"
   );
+  const [, setDialog] = useGameDialog();
 
   const openModuleManager: React.MouseEventHandler = (event) => {
     event.stopPropagation();
+    setDialog({
+      type: "facilityModuleManager",
+      entityId: entity.id,
+    });
   };
 
   return (

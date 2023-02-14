@@ -2,7 +2,11 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
-import { commoditiesArray, Commodity } from "@core/economy/commodity";
+import {
+  commoditiesArray,
+  Commodity,
+  commodityLabel,
+} from "@core/economy/commodity";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
@@ -126,7 +130,7 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
                 .filter((commodity) => fm.pac[commodity] !== undefined)
                 .map((commodity: Commodity) => (
                   <React.Fragment key={commodity}>
-                    <span>{commodity}</span>
+                    <span>{commodityLabel[commodity]}</span>
                     <input
                       {...register(
                         `facilityModules.${index}.pac.${commodity}.consumes`,
@@ -180,7 +184,7 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
                         }}
                         key={commodity}
                       >
-                        {commodity}
+                        {commodityLabel[commodity]}
                       </DropdownOption>
                     ))}
                 </DropdownOptions>

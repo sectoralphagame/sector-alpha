@@ -48,6 +48,7 @@ export function deployFacilityAction(entity: Ship): boolean {
     })
     .addComponent(createCommodityStorage())
     .addComponent(createTrade())
+    .addComponent({ name: "facilityModuleQueue", building: null, queue: [] })
     .addComponent({ name: "journal", entries: [] })
     .addComponent(render);
 

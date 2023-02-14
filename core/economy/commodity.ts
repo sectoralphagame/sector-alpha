@@ -30,3 +30,20 @@ export type MineableCommodity = Values<typeof mineableCommodities>;
 export const mineableCommoditiesArray = Object.values(
   mineableCommodities
 ) as MineableCommodity[];
+
+export const commodityLabel: Record<Commodity, string> = {
+  drones: "Drones",
+  electronics: "Electronics",
+  food: "Food",
+  fuel: "Fuel",
+  fuelium: "Fuelium",
+  gold: "Gold",
+  goldOre: "Gold ore",
+  hullPlates: "Hull plates",
+  ice: "Ice",
+  metals: "Metals",
+  ore: "Ore",
+  silica: "Silica",
+  silicon: "Silicon",
+  water: "Water",
+};

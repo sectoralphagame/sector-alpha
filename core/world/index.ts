@@ -115,7 +115,10 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     player.addComponent({ name: "player" });
     changeBudgetMoney(player.cp.budget, 5000);
     const startingSector = getSector("sector-alpha");
-    player.cp.blueprints.facilityModules.push(facilityModules.water);
+    player.cp.blueprints.facilityModules.push(
+      facilityModules.containerSmall,
+      facilityModules.farm
+    );
 
     const playerShip = createShip(sim, {
       ...pickRandom(

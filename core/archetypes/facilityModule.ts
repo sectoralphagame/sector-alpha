@@ -89,106 +89,12 @@ export function createFacilityModuleTemplate(input: FacilityModuleInput) {
 export const facilityModules: Record<
   string,
   ReturnType<typeof createFacilityModuleTemplate>
-> = {
-  ...pipe(
-    modules,
-    map(
-      ({ slug, ...rest }) =>
-        // @ts-ignore
-        [slug, createFacilityModuleTemplate({ slug, ...rest })] as const
-    ),
-    fromEntries
+> = pipe(
+  modules,
+  map(
+    ({ slug, ...rest }) =>
+      // @ts-ignore
+      [slug, createFacilityModuleTemplate({ slug, ...rest })] as const
   ),
-  // water: createFacilityModuleTemplate({
-  //   name: "Water Production",
-  //   slug: "waterProd",
-  //   pac: {
-  //     ice: { consumes: 4800, produces: 0 },
-  //     water: { consumes: 0, produces: 2400 },
-  //   },
-  //   time: 2 * 60,
-  //   type: "production",
-  // }),
-  // farm: createFacilityModuleTemplate({
-  //   name: "Farm",
-  //   slug: "farm",
-  //   pac: {
-  //     food: { consumes: 0, produces: 1300 },
-  //     fuel: { consumes: 350, produces: 0 },
-  //     water: { consumes: 700, produces: 0 },
-  //   },
-  //   time: 3 * 60,
-  //   type: "production",
-  // }),
-  // refinery: createFacilityModuleTemplate({
-  //   name: "Refinery",
-  //   pac: {
-  //     ore: { consumes: 4000, produces: 0 },
-  //     metals: { consumes: 0, produces: 2000 },
-  //   },
-  //   time: 2.5 * 60,
-  // }),
-  // fuelFabrication: createFacilityModuleTemplate({
-  //   name: "Fuel Fabrication",
-  //   pac: {
-  //     fuelium: { consumes: 4800, produces: 0 },
-  //     fuel: { consumes: 0, produces: 2900 },
-  //   },
-  //   time: 3 * 60,
-  // }),
-  // habitat: createFacilityModuleTemplate({
-  //   name: "Habitation Zone",
-  //   pac: {
-  //     food: { consumes: 400, produces: 0 },
-  //     fuel: { consumes: 700, produces: 0 },
-  //   },
-  //   time: 2.5 * 60,
-  // }),
-  // hullPlates: createFacilityModuleTemplate({
-  //   name: "Hull Plates Production",
-  //   pac: {
-  //     food: { consumes: 130, produces: 0 },
-  //     fuel: { consumes: 1300, produces: 0 },
-  //     metals: { consumes: 1600, produces: 0 },
-  //     hullPlates: { consumes: 0, produces: 4600 },
-  //   },
-  //   time: 55,
-  // }),
-  // gold: createFacilityModuleTemplate({
-  //   name: "Gold Refinery",
-  //   pac: {
-  //     goldOre: { consumes: 4700, produces: 0 },
-  //     gold: { consumes: 0, produces: 6200 },
-  //   },
-  //   time: 230,
-  // }),
-  // silicon: createFacilityModuleTemplate({
-  //   name: "Silicon Purification",
-  //   pac: {
-  //     silica: { consumes: 3600, produces: 0 },
-  //     silicon: { consumes: 0, produces: 6000 },
-  //   },
-  //   time: 2 * 60,
-  // }),
-  // electronics: createFacilityModuleTemplate({
-  //   name: "Electronics Production",
-  //   pac: {
-  //     food: { consumes: 600, produces: 0 },
-  //     silicon: { consumes: 2000, produces: 0 },
-  //     gold: { consumes: 1200, produces: 0 },
-  //     electronics: { consumes: 0, produces: 600 },
-  //     fuel: { consumes: 1050, produces: 0 },
-  //   },
-  //   time: 4 * 60,
-  // }),
-  // containerSmall: createFacilityModuleTemplate({
-  //   name: "Small Container",
-  //   storage: 4000,
-  //   time: undefined,
-  // }),
-  // containerMedium: createFacilityModuleTemplate({
-  //   name: "Medium Container",
-  //   storage: 15000,
-  //   time: undefined,
-  // }),
-} as const;
+  fromEntries
+);

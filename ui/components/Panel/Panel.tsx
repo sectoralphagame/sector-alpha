@@ -20,6 +20,7 @@ import { useRerender } from "../../hooks/useRerender";
 import { PlayerFacilities } from "../PlayerFacilities";
 import { TradeDialog } from "../TradeDialog";
 import { PanelComponent } from "./PanelComponent";
+import { FacilityModuleManager } from "../FacilityModuleManager";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -115,6 +116,10 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
         }}
       />
       <TradeDialog open={dialog?.type === "trade"} onClose={closeDialog} />
+      <FacilityModuleManager
+        open={dialog?.type === "facilityModuleManager"}
+        onClose={closeDialog}
+      />
     </>
   );
 };

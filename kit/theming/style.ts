@@ -15,6 +15,10 @@ export interface Theme {
     default: string;
     text: Record<(typeof texts)[number], string>;
     disabled: string;
+    border: string;
+    warning: string;
+    error: string;
+    success: string;
   };
   typography: {
     button: string;
@@ -40,6 +44,10 @@ export function createTheme(scale: number): Theme {
         texts.map((v) => [v, Color.hsl(0, 0, 100 - (v - 1) * 20).hex()])
       ) as Record<(typeof texts)[number], string>,
       disabled: Color.hsl(0, 0, 70).hex(),
+      border: Color.hsl(0, 0, 60).hex(),
+      warning: "#ffe645",
+      error: "#ff5b45",
+      success: "#52fa6e",
     },
     typography: {
       button: `${baseFontSize * 0.875}px`,

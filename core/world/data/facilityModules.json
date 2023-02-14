@@ -12,7 +12,6 @@
       "cost": {
         "hullPlates": 8500,
         "fuel": 20000,
-        "gold": 900,
         "electronics": 2600,
         "drones": 50
       },
@@ -52,7 +51,7 @@
     "build": {
       "cost": {
         "hullPlates": 70000,
-        "fuel": 16000,
+        "fuel": 24000,
         "electronics": 12000,
         "drones": 1000
       },

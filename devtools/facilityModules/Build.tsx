@@ -2,7 +2,11 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
-import { commoditiesArray, Commodity } from "@core/economy/commodity";
+import {
+  commoditiesArray,
+  Commodity,
+  commodityLabel,
+} from "@core/economy/commodity";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
@@ -62,7 +66,7 @@ const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
           />
         </TableCell>
         <TableCell>Expand row to see details</TableCell>
-        <TableCell>
+        <TableCell align="right">
           {formatInt(
             Object.entries(facilityModule?.build.cost)
               .filter(([_, cost]) => cost > 0)
@@ -73,7 +77,7 @@ const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
               )
           )}
         </TableCell>
-        <TableCell>
+        <TableCell align="right">
           {formatInt(
             Object.entries(facilityModule?.build.cost)
               .filter(([_, cost]) => cost > 0)
@@ -85,7 +89,7 @@ const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
               )
           )}
         </TableCell>
-        <TableCell>
+        <TableCell align="right">
           {formatInt(
             Object.entries(facilityModule?.build.cost)
               .filter(([_, cost]) => cost > 0)
@@ -95,6 +99,13 @@ const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
                   getCost(commodity as Commodity, allModules, max) * quantity,
                 0
               )
+          )}
+        </TableCell>
+        <TableCell align="right">
+          {formatInt(
+            Object.entries(facilityModule?.build.cost)
+              .filter(([_, cost]) => cost > 0)
+              .reduce((acc, [, quantity]) => acc + quantity, 0)
           )}
         </TableCell>
       </tr>
@@ -110,7 +121,7 @@ const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
                 )
                 .map((commodity: Commodity) => (
                   <React.Fragment key={commodity}>
-                    <span>{commodity}</span>
+                    <span>{commodityLabel[commodity]}</span>
                     <input
                       {...register(
                         `facilityModules.${index}.build.cost.${commodity}`,
@@ -176,6 +187,7 @@ export const BuildEditor: React.FC<{
       <col style={{ width: "250px" }} />
       <col style={{ width: "200px" }} />
       <col style={{ width: "200px" }} />
+      <col style={{ width: "200px" }} />
       <col />
     </colgroup>
     <thead>
@@ -184,9 +196,10 @@ export const BuildEditor: React.FC<{
         <th colSpan={2} />
         <TableHeader>Build [s]</TableHeader>
         <TableHeader>Cost</TableHeader>
-        <TableHeader>Average Cost [UTT]</TableHeader>
-        <TableHeader>Minimal Cost [UTT]</TableHeader>
-        <TableHeader>Maximal Cost [UTT]</TableHeader>
+        <TableHeader align="right">Average Cost [UTT]</TableHeader>
+        <TableHeader align="right">Minimal Cost [UTT]</TableHeader>
+        <TableHeader align="right">Maximal Cost [UTT]</TableHeader>
+        <TableHeader align="right">Required Storage</TableHeader>
       </tr>
     </thead>
     <tbody>

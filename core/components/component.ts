@@ -33,6 +33,7 @@ import { Blueprints } from "./blueprints";
 import { Journal } from "./journal";
 import { Player } from "./player";
 import { Deployable } from "./deployable";
+import { FacilityModuleQueue } from "./facilityModuleQueue";
 
 export interface CoreComponents {
   ai: Ai;
@@ -49,6 +50,7 @@ export interface CoreComponents {
   dockable: Dockable;
   docks: Docks;
   drive: Drive;
+  facilityModuleQueue: FacilityModuleQueue;
   hecsPosition: HECSPosition;
   inflationStats: InflationStats;
   journal: Journal;
