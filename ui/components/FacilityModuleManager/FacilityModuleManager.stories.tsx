@@ -31,7 +31,7 @@ Default.args = {
   queue: {
     name: "facilityModuleQueue",
     queue: [{ blueprint: Object.values(facilityModules)[3] }],
-    building: null,
+    building: { blueprint: Object.values(facilityModules)[2], progress: 0.34 },
   },
   facilityModules: [0, 2, 5, 6].map((index) =>
     Object.values(facilityModules)[index].create(s, new Entity(s))

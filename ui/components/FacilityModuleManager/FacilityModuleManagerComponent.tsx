@@ -14,7 +14,8 @@ interface FacilityModuleManagerComponentProps extends ModalProps {
   facilityModules: RequireComponent<"name">[];
   queue: FacilityModuleQueue;
   onBuild: (_bp: Blueprints["facilityModules"][number]) => void;
-  onCancel: (_number: number) => void;
+  onQueueCancel: (_number: number) => void;
+  onBuiltCancel: () => void;
 }
 
 const ModuleItem: React.FC<{ onClick: () => void; isActive: boolean }> = ({
@@ -42,17 +43,23 @@ export const FacilityModuleManagerComponent: React.FC<
   queue,
   facilityModules,
   onBuild,
-  onCancel,
+  onQueueCancel,
+  onBuiltCancel,
 }) => {
   const [activeModule, setActiveModule] = React.useState<
     | { type: "blueprint"; slug: string }
     | { type: "queue" | "existing"; index: number }
+    | { type: "built" }
   >();
   const selectedBlueprint = blueprints.find(
     (bp) => activeModule?.type === "blueprint" && bp.slug === activeModule?.slug
   );
   const selectedQueueItem =
-    activeModule?.type === "queue" ? queue.queue[activeModule.index] : null;
+    activeModule?.type === "queue"
+      ? queue.queue[activeModule.index]
+      : activeModule?.type === "built"
+      ? queue.building
+      : null;
 
   return (
     <Dialog
@@ -104,32 +111,37 @@ export const FacilityModuleManagerComponent: React.FC<
               </Button>
             </>
           )}
-          {activeModule?.type === "queue" && selectedQueueItem && (
-            <>
-              <h4 className={styles.sectionHeader}>
-                {selectedQueueItem.blueprint.name}
-              </h4>
-              <div className={styles.buildCost}>
-                {Object.entries(selectedQueueItem.blueprint.build.cost).map(
-                  ([commodity, quantity]) => (
-                    <div>
-                      {commodityLabel[commodity]} <b>x {quantity}</b>
-                    </div>
-                  )
-                )}
-              </div>
-              <div className={styles.buildTime}>
-                Build time:{" "}
-                <span>{selectedQueueItem.blueprint.build.time}s</span>
-              </div>
-              <Button
-                className={clsx(styles.buildBtn, styles.buildBtnCancel)}
-                onClick={() => onCancel(activeModule.index)}
-              >
-                Cancel construction
-              </Button>
-            </>
-          )}
+          {(activeModule?.type === "queue" || activeModule?.type === "built") &&
+            selectedQueueItem && (
+              <>
+                <h4 className={styles.sectionHeader}>
+                  {selectedQueueItem.blueprint.name}
+                </h4>
+                <div className={styles.buildCost}>
+                  {Object.entries(selectedQueueItem.blueprint.build.cost).map(
+                    ([commodity, quantity]) => (
+                      <div>
+                        {commodityLabel[commodity]} <b>x {quantity}</b>
+                      </div>
+                    )
+                  )}
+                </div>
+                <div className={styles.buildTime}>
+                  Build time:{" "}
+                  <span>{selectedQueueItem.blueprint.build.time}s</span>
+                </div>
+                <Button
+                  className={clsx(styles.buildBtn, styles.buildBtnCancel)}
+                  onClick={
+                    activeModule?.type === "queue"
+                      ? () => onQueueCancel(activeModule.index)
+                      : onBuiltCancel
+                  }
+                >
+                  Cancel construction
+                </Button>
+              </>
+            )}
         </div>
         <div>
           <h4 className={styles.sectionHeader}>Modules</h4>
@@ -150,6 +162,17 @@ export const FacilityModuleManagerComponent: React.FC<
                 {facilityModule.cp.name.value}
               </ModuleItem>
             ))}
+            {!!queue.building && (
+              <ModuleItem
+                isActive={activeModule?.type === "built"}
+                onClick={() => setActiveModule({ type: "built" })}
+              >
+                {queue.building.blueprint.name}
+                <small className={styles.queueItem}>
+                  Building {(queue.building.progress * 100).toFixed(0)}%
+                </small>
+              </ModuleItem>
+            )}
             {queue.queue.map((queueItem, queueItemIndex) => (
               <ModuleItem
                 isActive={
