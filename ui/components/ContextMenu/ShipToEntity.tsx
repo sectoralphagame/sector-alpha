@@ -59,6 +59,14 @@ export const ShipToEntity: React.FC = () => {
     });
   };
 
+  const onWorkFor = () => {
+    entity.cp.orders!.value = [];
+    entity.addComponent({
+      name: "commander",
+      id: actionable.id,
+    });
+  };
+
   return (
     <>
       {actionable.hasComponents(["trade"]) && (
@@ -70,6 +78,12 @@ export const ShipToEntity: React.FC = () => {
       {actionable.hasComponents(["drive"]) && (
         <DropdownOption onClick={onFollow}>Follow</DropdownOption>
       )}
+      {actionable.hasComponents(["trade", "name"]) &&
+        isOwnedByPlayer(actionable) && (
+          <DropdownOption onClick={onWorkFor}>
+            Work for: {actionable.cp.name!.value}
+          </DropdownOption>
+        )}
     </>
   );
 };

@@ -6,6 +6,7 @@ import { worldToHecs } from "@core/components/hecsPosition";
 import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import { Entity } from "@core/components/entity";
 import { MapView } from "@ui/components/MapView";
+import { useRerender } from "@ui/hooks/useRerender";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -83,6 +84,8 @@ export const Game: React.FC = () => {
       sim.queries.settings.get()[0].cp.selectionManager.secondaryId = null;
     }
   }, [menu.active]);
+
+  useRerender(250);
 
   return (
     <div>

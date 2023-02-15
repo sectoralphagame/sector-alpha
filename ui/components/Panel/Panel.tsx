@@ -1,5 +1,6 @@
 import React from "react";
 import { shipComponents, ship as asShip } from "@core/archetypes/ship";
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@kit/Tabs";
 import { Entity } from "@core/components/entity";
 import {
   facilityComponents,
@@ -16,16 +17,35 @@ import SectorPrices from "../SectorPrices";
 import Inflation from "../InflationStats";
 import { useGameDialog, useSim } from "../../atoms";
 import { PlayerShips } from "../PlayerShips";
-import { useRerender } from "../../hooks/useRerender";
 import { PlayerFacilities } from "../PlayerFacilities";
 import { TradeDialog } from "../TradeDialog";
 import { PanelComponent } from "./PanelComponent";
 import { FacilityModuleManager } from "../FacilityModuleManager";
+import Journal from "../Journal";
+import styles from "./Panel.scss";
 
 export interface PanelProps {
   expanded?: boolean;
   entity: Entity | undefined;
 }
+
+const JournalWrapper: React.FC<{ entity: Entity }> = ({ entity, children }) =>
+  entity.hasComponents(["journal"]) ? (
+    <TabGroup>
+      <TabList className={styles.tab}>
+        <Tab>General</Tab>
+        <Tab>Journal</Tab>
+      </TabList>
+      <TabPanels>
+        <TabPanel>{children}</TabPanel>
+        <TabPanel>
+          <Journal entity={entity.requireComponents(["journal"])} />
+        </TabPanel>
+      </TabPanels>
+    </TabGroup>
+  ) : (
+    (children as any)
+  );
 
 export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
   const [isCollapsed, setCollapsed] = React.useState(!expanded);
@@ -35,8 +55,6 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
   const [sim] = useSim();
 
   const closeDialog = React.useCallback(() => setDialog(null), []);
-
-  useRerender(250);
 
   React.useEffect(() => {
     if (entity && isCollapsed) {
@@ -82,18 +100,20 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
               {entity.hasComponents(["name"]) && (
                 <EntityName entity={entity.requireComponents(["name"])} />
               )}
-              {entity.hasComponents(shipComponents) ? (
-                <ShipPanel entity={asShip(entity)} />
-              ) : entity.hasComponents(facilityComponents) ? (
-                <FacilityPanel entity={asFacility(entity)} />
-              ) : null}
-              {entity.hasComponents(sectorComponents) && (
-                <>
-                  <Resources entity={sector(entity)} />
-                  <SectorResources entity={sector(entity)} />
-                  <SectorPrices entity={sector(entity)} />
-                </>
-              )}
+              <JournalWrapper entity={entity}>
+                {entity.hasComponents(shipComponents) ? (
+                  <ShipPanel entity={asShip(entity)} />
+                ) : entity.hasComponents(facilityComponents) ? (
+                  <FacilityPanel entity={asFacility(entity)} />
+                ) : null}
+                {entity.hasComponents(sectorComponents) && (
+                  <>
+                    <Resources entity={sector(entity)} />
+                    <SectorResources entity={sector(entity)} />
+                    <SectorPrices entity={sector(entity)} />
+                  </>
+                )}
+              </JournalWrapper>
             </>
           ) : (
             <>

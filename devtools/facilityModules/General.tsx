@@ -51,7 +51,9 @@ const FacilityModuleGeneralEditor: React.FC<{ index: number }> = ({
       <TableCell>
         {facilityModule.type === "storage" && (
           <input
-            {...register(`facilityModules.${index}.storage`)}
+            {...register(`facilityModules.${index}.storage`, {
+              valueAsNumber: true,
+            })}
             defaultValue={facilityModule.storage}
           />
         )}

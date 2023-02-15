@@ -42,3 +42,8 @@
 .spacer {
   flex: 1;
 }
+.tab {
+  display: inline-block;
+  margin-top: var(--spacing-1);
+  margin-bottom: var(--spacing-2);
+}
