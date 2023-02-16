@@ -74,7 +74,8 @@ function idleMovement(entity: Trading) {
                 matrix([random(-25, 25), random(-25, 25)])
               ),
             }
-      )
+      ),
+      true
     ),
     type: "move",
   });

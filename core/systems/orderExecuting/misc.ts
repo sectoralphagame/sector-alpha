@@ -1,5 +1,10 @@
 import { marker } from "../../archetypes/marker";
-import { clearTarget, setTarget, stop } from "../../components/drive";
+import {
+  clearTarget,
+  defaultDriveLimit,
+  setTarget,
+  stop,
+} from "../../components/drive";
 import { MoveAction, TeleportAction } from "../../components/orders";
 import { show } from "../../components/render";
 import { RequireComponent } from "../../tsHelpers";
@@ -9,6 +14,9 @@ export function moveAction(
   order: MoveAction
 ): boolean {
   setTarget(entity.cp.drive, order.targetId);
+  entity.cp.drive.limit = order.onlyManeuver
+    ? entity.cp.drive.maneuver
+    : defaultDriveLimit;
 
   if (entity.cp.dockable?.dockedIn) {
     const dock = entity.sim.entities
@@ -25,6 +33,7 @@ export function moveAction(
 
   if (reached) {
     clearTarget(entity.cp.drive);
+    entity.cp.drive.limit = defaultDriveLimit;
   }
 
   return reached;

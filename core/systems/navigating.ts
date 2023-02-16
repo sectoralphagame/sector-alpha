@@ -96,7 +96,8 @@ function setDrive(entity: Driveable, delta: number) {
   const angleOffset = Math.abs(targetAngle - entityAngle);
   const canCruise =
     distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
-    angleOffset < Math.PI / 12;
+    angleOffset < Math.PI / 12 &&
+    drive.limit > drive.maneuver;
 
   if (drive.mode === "follow") {
     if (targetEntity.cp.drive!.currentSpeed > drive.maneuver) {

@@ -15,6 +15,7 @@ export interface TeleportAction {
 export interface MoveAction {
   type: "move";
   targetId: number;
+  onlyManeuver?: boolean;
 }
 
 export interface TradeAction {
