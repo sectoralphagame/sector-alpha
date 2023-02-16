@@ -53,7 +53,7 @@ export const NewGame: React.FC = () => {
     sim.current.init();
     window.sim = sim.current;
     setLoading(true);
-    await world(sim.current, getValues().islands, getValues().factions);
+    await world(sim.current);
 
     headlessSimWorker.current?.postMessage({
       type: "init",
