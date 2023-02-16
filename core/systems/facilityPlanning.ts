@@ -141,7 +141,7 @@ export class FacilityPlanningSystem extends System {
 
   planFactories = (faction: Faction): void => {
     const modulesToBuild: Array<
-      typeof facilityModules[keyof typeof facilityModules]
+      (typeof facilityModules)[keyof typeof facilityModules]
     > = [];
     this.sim.queries.facilityWithProduction.reset();
     const facilities = this.sim.queries.facilityWithProduction

@@ -4,7 +4,12 @@ module.exports = {
     es2021: true,
     "jest/globals": true,
   },
-  extends: ["plugin:react/recommended", "airbnb", "prettier"],
+  extends: [
+    "plugin:react/recommended",
+    "airbnb",
+    "prettier",
+    "plugin:storybook/recommended",
+  ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaFeatures: {
@@ -51,5 +56,6 @@ module.exports = {
         controlComponents: ["Slider"],
       },
     ],
+    "import/no-extraneous-dependencies": "off",
   },
 };

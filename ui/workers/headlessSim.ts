@@ -33,7 +33,7 @@ self.onmessage = (event: MessageEvent<HeadlessSimInitMsg>) => {
     sim.next(event.data.delta);
 
     cycles++;
-    if (cycles === 100) {
+    if (cycles === 10) {
       cycles = 0;
       self.postMessage({
         time: sim.getTime(),

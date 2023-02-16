@@ -15,7 +15,7 @@ export const sectorComponents = [
   "sectorStats",
 ] as const;
 
-export type SectorComponent = typeof sectorComponents[number];
+export type SectorComponent = (typeof sectorComponents)[number];
 export type Sector = RequireComponent<SectorComponent>;
 
 export const sectorSize = 500;

@@ -11,7 +11,7 @@ import { Entity } from "./entity";
 import { hecsToCartesian } from "./hecsPosition";
 
 export type Graphics = Record<
-  "asteroidField" | "link" | "marker" | "sector" | "path",
+  "asteroidField" | "link" | "marker" | "sector" | "path" | "hexGrid",
   // eslint-disable-next-line no-unused-vars
   (opts: { g: PIXI.Graphics; entity: Entity; viewport: Viewport }) => void
 >;
@@ -160,7 +160,7 @@ export const graphics: Graphics = {
         ? Color(
             entity.sim.getOrThrow(entity.cp.owner.id).cp.color?.value
           ).rgbNumber()
-        : 0x292929,
+        : 0x3a3a3a,
       width: 5,
     });
     g.drawRegularPolygon!(
@@ -184,6 +184,38 @@ export const graphics: Graphics = {
     });
     textGraphics.cursor = "pointer";
     g.addChild(textGraphics);
+  },
+  hexGrid: ({ g }) => {
+    for (let q = -10; q < 11; q++) {
+      for (let r = -10; r < 11; r++) {
+        const sectorPos = hecsToCartesian(matrix([q, r, -q - r]), sectorSize);
+
+        const coordG = new PIXI.Text([q, r].join(","), {
+          fill: 0x404040,
+          fontFamily: "Space Mono",
+        });
+        coordG.resolution = 8;
+        const coordPos = add(
+          sectorPos,
+          matrix([sectorSize / 3, (sectorSize * 3) / 4])
+        ) as Matrix;
+        coordG.anchor.set(0.5, 0.5);
+        coordG.position.set(coordPos.get([0]), coordPos.get([1]));
+        g.addChild(coordG);
+
+        g.lineStyle({
+          color: 0x323232,
+          width: 1,
+        });
+        g.drawRegularPolygon!(
+          sectorPos.get([0]),
+          sectorPos.get([1]),
+          sectorSize - 2.5,
+          6,
+          Math.PI / 6
+        );
+      }
+    }
   },
 };
 

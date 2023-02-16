@@ -6,7 +6,10 @@ import { IconButton } from "./IconButton";
 import Text from "./Text";
 import styles from "./Dialog.scss";
 
-Modal.setAppElement("#root");
+try {
+  Modal.setAppElement("#root");
+  // eslint-disable-next-line no-empty
+} catch {}
 
 export interface DialogProps {
   open: boolean;
@@ -27,7 +30,7 @@ export const Dialog: React.FC<DialogProps> = ({
     onRequestClose={onClose}
     style={{
       content: {
-        backgroundColor: "rgb(0 0 0 / 85%)",
+        backgroundColor: "rgb(0 0 0)",
         top: "50%",
         left: "50%",
         right: "auto",

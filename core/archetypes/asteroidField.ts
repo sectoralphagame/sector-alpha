@@ -13,7 +13,7 @@ export const asteroidFieldComponents = [
   "renderGraphics",
 ] as const;
 
-export type AsteroidFieldComponent = typeof asteroidFieldComponents[number];
+export type AsteroidFieldComponent = (typeof asteroidFieldComponents)[number];
 export type AsteroidField = RequireComponent<AsteroidFieldComponent>;
 
 export function asteroidField(entity: Entity): AsteroidField {

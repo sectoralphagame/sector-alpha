@@ -27,6 +27,12 @@ const ShipGeneralEditor: React.FC<{ index: number }> = ({ index }) => {
         />
       </TableCell>
       <TableCell>
+        <input
+          {...register(`ships.${index}.slug`)}
+          defaultValue={getValues().ships[index].slug}
+        />
+      </TableCell>
+      <TableCell>
         <Select
           value={getValues().ships[index].size}
           onChange={(value: DockSize) => setValue(`ships.${index}.size`, value)}
@@ -93,6 +99,7 @@ export const GeneralEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
     <colgroup>
       <col style={{ width: "48px" }} />
       <col style={{ width: "250px" }} />
+      <col style={{ width: "250px" }} />
       <col style={{ width: "200px" }} />
       <col style={{ width: "150px" }} />
       <col style={{ width: "200px" }} />
@@ -102,6 +109,7 @@ export const GeneralEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
       <tr>
         {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
         <th colSpan={2} />
+        <TableHeader>Slug</TableHeader>
         <TableHeader>Size</TableHeader>
         <TableHeader>Role</TableHeader>
         <TableHeader>Texture</TableHeader>

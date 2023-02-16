@@ -17,13 +17,11 @@ export class OutOfBoundsCheckingSystem extends System {
         .get()
         .reduce((acc, entity) => {
           const sector = this.sim.getOrThrow<Sector>(entity.cp.position.sector);
+          const hecsCoors = worldToHecs(
+            entity.cp.position.coord.toArray() as number[]
+          );
 
-          if (
-            !deepEqual(
-              worldToHecs(entity.cp.position.coord.toArray() as number[]),
-              sector.cp.hecsPosition.value
-            )
-          ) {
+          if (!deepEqual(hecsCoors, sector.cp.hecsPosition.value)) {
             acc.push(entity);
           }
 

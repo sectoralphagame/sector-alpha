@@ -1,6 +1,7 @@
 [
   {
     "name": "Courier A",
+    "slug": "courierA",
     "storage": 11,
     "mining": 0,
     "texture": "sCiv",
@@ -18,6 +19,7 @@
   },
   {
     "name": "Courier B",
+    "slug": "courierB",
     "storage": 6,
     "mining": 0,
     "texture": "sCiv",
@@ -35,6 +37,7 @@
   },
   {
     "name": "Freighter A",
+    "slug": "freighterA",
     "storage": 160,
     "mining": 0,
     "texture": "mCiv",
@@ -52,6 +55,7 @@
   },
   {
     "name": "Freighter B",
+    "slug": "freighterB",
     "storage": 260,
     "mining": 0,
     "texture": "mCiv",
@@ -69,6 +73,7 @@
   },
   {
     "name": "Large Freighter A",
+    "slug": "largeFreighterA",
     "storage": 800,
     "mining": 0,
     "texture": "lCiv",
@@ -86,6 +91,7 @@
   },
   {
     "name": "Large Freighter B",
+    "slug": "largeFreighterB",
     "storage": 940,
     "mining": 0,
     "texture": "lCiv",
@@ -103,6 +109,7 @@
   },
   {
     "name": "Miner A",
+    "slug": "minerA",
     "storage": 160,
     "mining": 1,
     "texture": "mMin",
@@ -120,6 +127,7 @@
   },
   {
     "name": "Miner B",
+    "slug": "minerB",
     "storage": 96,
     "mining": 1.4,
     "texture": "mMin",
@@ -134,5 +142,23 @@
       "time": 60
     },
     "role": "mining"
+  },
+  {
+    "acceleration": 0.13,
+    "build": {
+      "time": 190,
+      "cost": { "hullPlates": 11400, "electronics": 290, "fuel": 4000 }
+    },
+    "mining": 1.7,
+    "role": "mining",
+    "cruise": 5,
+    "maneuver": 0.5,
+    "rotary": 114,
+    "ttc": 1,
+    "name": "Tau Miner",
+    "size": "medium",
+    "storage": 210,
+    "texture": "mMin",
+    "slug": "minerTau"
   }
 ]

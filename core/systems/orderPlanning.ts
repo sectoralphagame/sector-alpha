@@ -42,7 +42,7 @@ const tradingComponents = [
   "position",
   "dockable",
 ] as const;
-type Trading = RequireComponent<typeof tradingComponents[number]>;
+type Trading = RequireComponent<(typeof tradingComponents)[number]>;
 
 function idleMovement(entity: Trading) {
   const commander =
@@ -276,7 +276,7 @@ export class OrderPlanningSystem extends System {
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("autoOrder")) {
-      this.cooldowns.use("autoOrder", 5);
+      this.cooldowns.use("autoOrder", 3);
       this.sim.queries.autoOrderable.get().forEach(autoOrder);
     }
   };

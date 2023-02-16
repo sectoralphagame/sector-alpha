@@ -26,7 +26,7 @@ export const facilityComponents = [
   "trade",
 ] as const;
 
-export type FacilityComponent = typeof facilityComponents[number];
+export type FacilityComponent = (typeof facilityComponents)[number];
 export type Facility = RequireComponent<FacilityComponent>;
 
 export function facility(entity: Entity): Facility {
@@ -51,7 +51,9 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     })
     .addComponent({
       name: "name",
-      value: `Facility #${entity.id}`,
+      value: initial.owner?.cp.name.slug
+        ? `${initial.owner.cp.name.slug} Facility #${entity.id}`
+        : `Facility #${entity.id}`,
     })
     .addComponent({
       name: "position",
@@ -66,7 +68,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
           ? Color(initial.owner?.cp.color.value).rgbNumber()
           : Color.hsl(0, 0, 70).rgbNumber(),
         defaultScale: 1,
-        maxZ: 0.1,
+        maxZ: 0.065,
         texture: "fFactory",
         zIndex: 1,
       })

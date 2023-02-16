@@ -14,7 +14,7 @@ export const factionComponents = [
   "name",
 ] as const;
 
-export type FactionComponent = typeof factionComponents[number];
+export type FactionComponent = (typeof factionComponents)[number];
 export type Faction = RequireComponent<FactionComponent>;
 
 export function faction(entity: Entity): Faction {

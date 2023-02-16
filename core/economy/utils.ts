@@ -22,14 +22,14 @@ export const tradeComponents = [
   "docks",
   "journal",
 ] as const;
-export type WithTrade = RequireComponent<typeof tradeComponents[number]>;
+export type WithTrade = RequireComponent<(typeof tradeComponents)[number]>;
 
 export function getSectorsInTeleportRange(
   origin: Sector,
   jumps: number,
   sim: Sim
 ): Sector[] {
-  const ids = Object.entries(sim.paths[origin.id.toString()])
+  const ids = Object.entries(sim.paths[origin.id.toString()] ?? {})
     .filter(([, path]) => path.distance <= jumps)
     .map(([id]) => parseInt(id, 10));
   return sim.queries.sectors.get().filter((sector) => ids.includes(sector.id));

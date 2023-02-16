@@ -4,6 +4,8 @@ import { deepEqual } from "mathjs";
 import { RenderingSystem } from "@core/systems/rendering";
 import { worldToHecs } from "@core/components/hecsPosition";
 import { Dropdown, DropdownOptions } from "@kit/Dropdown";
+import { Entity } from "@core/components/entity";
+import { MapView } from "@ui/components/MapView";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -16,6 +18,11 @@ export const Game: React.FC = () => {
   const system = React.useRef<RenderingSystem>();
   const canvasRoot = React.useRef<HTMLDivElement>(null);
   const [menu, setMenu] = useContextMenu();
+
+  const selectedId = sim?.queries.settings.get()[0]!.cp.selectionManager.id;
+  const [selectedEntity, setSelectedEntity] = React.useState<
+    Entity | undefined
+  >(selectedId ? sim?.get(selectedId) : undefined);
 
   React.useEffect(() => {
     if (!sim) return () => undefined;
@@ -33,6 +40,12 @@ export const Game: React.FC = () => {
 
     return unmount;
   }, [sim]);
+
+  React.useEffect(() => {
+    if (selectedEntity?.id !== selectedId) {
+      setSelectedEntity(selectedId ? sim.get(selectedId) : undefined);
+    }
+  });
 
   // eslint-disable-next-line consistent-return
   React.useEffect(() => {
@@ -73,7 +86,7 @@ export const Game: React.FC = () => {
 
   return (
     <div>
-      <Panel />
+      <Panel entity={selectedEntity} />
       {menu.active && !!menu.sector && (
         <ClickAwayListener
           mouseEvent="mousedown"
@@ -96,6 +109,7 @@ export const Game: React.FC = () => {
       system creates own canvas here */}
       <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
         <PlayerMoney />
+        <MapView />
       </div>
     </div>
   );

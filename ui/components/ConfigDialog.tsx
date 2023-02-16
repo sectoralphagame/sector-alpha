@@ -19,7 +19,7 @@ export interface ModalProps {
 }
 
 const views = ["default", "load", "save", "settings"] as const;
-type Views = typeof views[number];
+type Views = (typeof views)[number];
 
 export interface ConfigDialogProps {
   type: "config";

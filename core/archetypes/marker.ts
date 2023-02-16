@@ -6,7 +6,7 @@ import { RequireComponent } from "../tsHelpers";
 
 export const markerComponents = ["position"] as const;
 
-export type MarkerComponent = typeof markerComponents[number];
+export type MarkerComponent = (typeof markerComponents)[number];
 export type Marker = RequireComponent<MarkerComponent>;
 
 export function marker(entity: Entity): Marker {

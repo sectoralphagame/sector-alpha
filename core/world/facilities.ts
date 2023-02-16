@@ -52,6 +52,7 @@ export function createShipyard(input: InitialFacilityInput, sim: Sim) {
 
   facility.addComponent({ name: "shipyard", queue: [], building: null });
   setTexture(facility.cp.render, "fShipyard");
+  facility.cp.name.value = `${input.owner.cp.name.slug!} Shipyard`;
 
   return facility;
 }

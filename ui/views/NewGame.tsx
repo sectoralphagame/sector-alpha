@@ -1,7 +1,7 @@
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Sim } from "@core/sim";
-import world from "@core/world";
+import { getFixedWorld as world } from "@core/world";
 import { Slider } from "@kit/Slider";
 import { Button } from "@kit/Button";
 import Text from "@kit/Text";
@@ -20,7 +20,7 @@ interface NewGameForm {
 const targetTime = 3600 / 2;
 
 export const NewGame: React.FC = () => {
-  const { register, handleSubmit, getValues, control } = useForm<NewGameForm>({
+  const { register, handleSubmit, control } = useForm<NewGameForm>({
     defaultValues: { islands: 8, factions: 4 },
   });
   const navigate = useLocation();
@@ -48,31 +48,19 @@ export const NewGame: React.FC = () => {
   );
 
   const onSubmit = handleSubmit(async () => {
-    let tries = 0;
-    for (; tries < 20; tries++) {
-      sim.current?.destroy();
-      sim.current = new Sim();
-      sim.current.init();
-      window.sim = sim.current;
-      setLoading(true);
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        await world(sim.current, getValues().islands, getValues().factions);
-        break;
-        // eslint-disable-next-line no-empty
-      } catch {}
-    }
+    sim.current?.destroy();
+    sim.current = new Sim();
+    sim.current.init();
+    window.sim = sim.current;
+    setLoading(true);
+    await world(sim.current);
 
-    if (tries === 20) {
-      throw new Error("Maximum tries exceeded");
-    } else {
-      headlessSimWorker.current?.postMessage({
-        type: "init",
-        delta: 1,
-        targetTime,
-        sim: sim.current!.serialize(),
-      });
-    }
+    headlessSimWorker.current?.postMessage({
+      type: "init",
+      delta: 1,
+      targetTime,
+      sim: sim.current!.serialize(),
+    });
   });
 
   return (

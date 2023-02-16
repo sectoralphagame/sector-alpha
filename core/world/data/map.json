@@ -1,0 +1,176 @@
+{
+  "sectors": [
+    { "name": "Terra", "position": [0, 0], "id": "terra" },
+    { "name": "Luna", "position": [1, -1], "id": "luna" },
+    { "name": "Mars", "position": [1, -2], "id": "mars" },
+    { "name": "Saturn", "position": [2, -3], "id": "saturn" },
+    { "name": "Sedna", "position": [2, -4], "id": "sedna" },
+
+    { "name": "Gaia", "position": [-1, -1], "id": "gaia" },
+    { "name": "Arges", "position": [-2, 0], "id": "arges" },
+    { "name": "Pontus", "position": [-2, -1], "id": "pontus" },
+
+    { "name": "Sector Alpha", "position": [0, -3], "id": "sector-alpha" },
+
+    { "name": "Eris", "position": [-1, 2], "id": "eris" },
+    { "name": "Discordis c", "position": [0, 2], "id": "discordis-c" },
+
+    { "name": "Juno II", "position": [2, 0], "id": "juno-2" },
+    { "name": "Juno III", "position": [3, 0], "id": "juno-3" },
+    { "name": "Juno IV", "position": [2, 1], "id": "juno-4" },
+
+    { "name": "Therr", "position": [-1, 4], "id": "gj-229-1" },
+    { "name": "GJ 229 II", "position": [-1, 5], "id": "gj-229-2" },
+
+    {
+      "name": "Teegarden's Star I",
+      "position": [5, 0],
+      "id": "teegarden-1"
+    },
+    {
+      "name": "Teegarden's Star II",
+      "position": [5, -1],
+      "id": "teegarden-2"
+    },
+
+    { "name": "Tau Ceti e", "position": [4, -2], "id": "tau-ceti-e" },
+    { "name": "Tau Ceti f", "position": [3, -2], "id": "tau-ceti-f" },
+    { "name": "The Hive", "position": [4, -3], "id": "the-hive" },
+
+    { "name": "GJ 1002 I", "position": [6, -3], "id": "gj-1002-1" },
+    { "name": "GJ 1002 II", "position": [6, -4], "id": "gj-1002-2" },
+    { "name": "GJ 1002 III", "position": [6, -5], "id": "gj-1002-3" },
+
+    { "name": "Ross 128 I", "position": [-3, 2], "id": "ross-128-1" },
+    { "name": "Ross 128 II", "position": [-4, 2], "id": "ross-128-2" },
+    { "name": "Ross 128 III", "position": [-4, 3], "id": "ross-128-3" },
+    { "name": "Ross 128 IV", "position": [-4, 1], "id": "ross-128-4" },
+
+    { "name": "Wolf 1061 I", "position": [-4, -1], "id": "wolf-1061-1" },
+    { "name": "Wolf 1061 II", "position": [-3, -2], "id": "wolf-1061-2" },
+    { "name": "Wolf 1061 III", "position": [-2, -3], "id": "wolf-1061-3" },
+
+    { "name": "GJ 625", "position": [-5, -2], "id": "gj-625" }
+  ],
+  "inactive": [],
+  "links": [
+    { "sectors": ["terra", "luna"], "type": "accelerator" },
+    { "sectors": ["terra", "mars"], "type": "accelerator" },
+    { "sectors": ["mars", "saturn"], "type": "accelerator" },
+    { "sectors": ["saturn", "sedna"], "type": "accelerator" },
+
+    { "sectors": ["gaia", "arges"], "type": "accelerator" },
+    { "sectors": ["arges", "pontus"], "type": "accelerator" },
+
+    { "sectors": ["eris", "discordis-c"], "type": "accelerator" },
+
+    { "sectors": ["juno-2", "juno-3"], "type": "accelerator" },
+    { "sectors": ["juno-2", "juno-4"], "type": "accelerator" },
+
+    { "sectors": ["gj-229-1", "gj-229-2"], "type": "accelerator" },
+
+    { "sectors": ["teegarden-1", "teegarden-2"], "type": "accelerator" },
+
+    { "sectors": ["tau-ceti-e", "tau-ceti-f"], "type": "accelerator" },
+    { "sectors": ["tau-ceti-f", "the-hive"], "type": "accelerator" },
+
+    { "sectors": ["gj-1002-1", "gj-1002-2"], "type": "accelerator" },
+    { "sectors": ["gj-1002-2", "gj-1002-3"], "type": "accelerator" },
+
+    { "sectors": ["ross-128-1", "ross-128-2"], "type": "accelerator" },
+    { "sectors": ["ross-128-2", "ross-128-3"], "type": "accelerator" },
+    { "sectors": ["ross-128-2", "ross-128-4"], "type": "accelerator" },
+
+    { "sectors": ["wolf-1061-1", "wolf-1061-2"], "type": "accelerator" },
+    { "sectors": ["wolf-1061-2", "wolf-1061-3"], "type": "accelerator" },
+
+    { "sectors": ["arges", "ross-128-1"], "type": "gate" },
+    { "sectors": ["eris", "gj-229-1"], "type": "gate" },
+    { "sectors": ["gaia", "sector-alpha"], "type": "gate" },
+    { "sectors": ["gj-229-1", "ross-128-3"], "type": "gate" },
+    { "sectors": ["juno-2", "tau-ceti-e"], "type": "gate" },
+    { "sectors": ["juno-3", "gj-1002-1"], "type": "gate" },
+    { "sectors": ["juno-3", "teegarden-1"], "type": "gate" },
+    { "sectors": ["pontus", "wolf-1061-2"], "type": "gate" },
+    { "sectors": ["teegarden-2", "gj-1002-1"], "type": "gate" },
+    { "sectors": ["terra", "eris"], "type": "gate" },
+    { "sectors": ["terra", "gaia"], "type": "gate" },
+    { "sectors": ["terra", "juno-2"], "type": "gate" },
+    { "sectors": ["wolf-1061-1", "gj-625"], "type": "gate" },
+    { "sectors": ["sedna", "gj-1002-3"], "type": "gate" }
+  ],
+  "factions": [
+    {
+      "name": "United Earth's Nations",
+      "slug": "UEN",
+      "sectors": ["terra", "luna", "mars", "saturn", "eris", "discordis-c"],
+      "blueprints": ["courierA", "freighterB", "largeFreighterA", "minerA"],
+      "color": "#6fc9f2",
+      "type": "territorial"
+    },
+    {
+      "name": "Alpha Centauri's Technocracy",
+      "slug": "ACT",
+      "sectors": [
+        "gaia",
+        "arges",
+        "pontus",
+        "sector-alpha",
+        "ross-128-1",
+        "ross-128-2"
+      ],
+      "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerB"],
+      "color": "#ffc34d",
+      "type": "territorial"
+    },
+    {
+      "name": "Tau",
+      "slug": "TAU",
+      "sectors": ["the-hive"],
+      "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerTau"],
+      "color": "#9534eb",
+      "type": "territorial"
+    },
+    {
+      "name": "Federation of Free Worlds",
+      "slug": "FFW",
+      "sectors": [
+        "juno-2",
+        "juno-3",
+        "juno-4",
+        "teegarden-1",
+        "teegarden-2",
+        "gj-1002-1",
+        "gj-1002-2",
+        "tau-ceti-e"
+      ],
+      "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerB"],
+      "color": "#42f5e3",
+      "type": "territorial"
+    },
+    {
+      "name": "Alkali Mining Sindicate",
+      "slug": "AMS",
+      "sectors": ["sedna", "gj-1002-3"],
+      "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerB"],
+      "color": "#ff63e5",
+      "type": "territorial"
+    },
+    {
+      "name": "Pirates",
+      "slug": "PIR",
+      "sectors": ["wolf-1061-3", "gj-229-2", "gj-625"],
+      "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerA"],
+      "color": "#fcc7c5",
+      "type": "travelling"
+    },
+    {
+      "name": "Therr Traders",
+      "slug": "THT",
+      "sectors": ["gj-229-1"],
+      "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerA"],
+      "color": "#f7fc5b",
+      "type": "travelling"
+    }
+  ]
+}
