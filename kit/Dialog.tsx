@@ -8,6 +8,7 @@ import styles from "./Dialog.scss";
 
 try {
   Modal.setAppElement("#root");
+  // eslint-disable-next-line no-empty
 } catch {}
 
 export interface DialogProps {

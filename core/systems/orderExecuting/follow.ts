@@ -3,7 +3,6 @@ import { clearTarget } from "@core/components/drive";
 import { FollowOrder, MoveAction } from "@core/components/orders";
 import { RequireComponent } from "@core/tsHelpers";
 import { moveToActions } from "@core/utils/moving";
-import { norm, subtract } from "mathjs";
 
 export function followOrder(
   entity: RequireComponent<"drive" | "position" | "orders">,

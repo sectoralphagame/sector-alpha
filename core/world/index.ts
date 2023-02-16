@@ -78,12 +78,8 @@ function getRandomWorld(
   });
 }
 
-export function getFixedWorld(
-  sim: Sim,
-  numberOfIslands: number,
-  numberOfFactions: number
-): Promise<void> {
-  return new Promise((resolve, reject) => {
+export function getFixedWorld(sim: Sim): Promise<void> {
+  return new Promise((resolve) => {
     const sectors = mapData.sectors.map((data) =>
       createSector(sim, {
         ...data,
