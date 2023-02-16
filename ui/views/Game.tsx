@@ -7,6 +7,8 @@ import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import { Entity } from "@core/components/entity";
 import { MapView } from "@ui/components/MapView";
 import { useRerender } from "@ui/hooks/useRerender";
+import type { Commodity } from "@core/economy/commodity";
+import { addStorage } from "@core/components/storage";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -38,6 +40,15 @@ export const Game: React.FC = () => {
     };
 
     sim.events.on("destroy", unmount);
+
+    (window as any).cheats = {
+      addCommodity: (commodity: Commodity, quantity: number, id?: number) => {
+        const entity = id ? sim.getOrThrow(id) : (window.selected as Entity);
+        if (entity) {
+          addStorage(entity.cp.storage!, commodity, quantity);
+        }
+      },
+    };
 
     return unmount;
   }, [sim]);

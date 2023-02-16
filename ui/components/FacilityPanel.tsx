@@ -1,7 +1,6 @@
 import React from "react";
 import { Facility } from "@core/archetypes/facility";
 import { Production } from "./Production";
-import { Offers } from "./Offers";
 import { Docks } from "./Docks";
 import { Subordinates } from "./Subordinates";
 import { Allocations } from "./Allocations";
@@ -11,10 +10,6 @@ const FacilityPanel: React.FC<{ entity: Facility }> = ({
   entity: facility,
 }) => (
   <div>
-    <div>Money: {facility.components.budget.available.toFixed(0)}</div>
-    <hr />
-    <Offers entity={facility} />
-    <hr />
     <Production entity={facility} />
     <hr />
     {facility.hasComponents(["shipyard"]) && (

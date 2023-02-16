@@ -9,6 +9,7 @@ export const shipRoles = [
   "mining",
   "military",
   "building",
+  "storage",
 ] as const;
 export type ShipRole = (typeof shipRoles)[number];
 

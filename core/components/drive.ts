@@ -21,6 +21,7 @@ export interface ShipDriveProps {
 }
 
 export interface Drive extends BaseComponent<"drive"> {
+  active: boolean;
   /** Expressed in percent of max speed per second */
   acceleration: number;
   currentSpeed: number;
@@ -45,6 +46,7 @@ export interface Drive extends BaseComponent<"drive"> {
 export function createDrive(input: ShipDriveProps): Drive {
   return {
     ...input,
+    active: true,
     currentSpeed: 0,
     currentRotary: 0,
     rotary: (input.rotary * Math.PI) / 180,

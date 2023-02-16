@@ -32,6 +32,18 @@ import { SectorPriceStats } from "../components/sectorStats";
 import { limitMax } from "./limit";
 import { Marker } from "../archetypes/marker";
 
+const tradingCommanderComponents = [
+  "budget",
+  "docks",
+  "name",
+  "position",
+  "journal",
+  "selection",
+  "storage",
+  "trade",
+  "owner",
+] as const;
+
 export function isTradeAccepted(
   entity: WithTrade,
   input: Omit<TransactionInput, "allocations">
@@ -423,7 +435,7 @@ export function autoBuyMostNeededByCommander(
   const minQuantity = entity.cp.storage.max / 10;
   const commander = entity.sim
     .getOrThrow(entity.cp.commander.id)
-    .requireComponents([...facilityComponents, "owner"]);
+    .requireComponents(tradingCommanderComponents);
   if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
   const target = getFacilityWithMostProfit(
@@ -454,7 +466,7 @@ export function autoSellMostRedundantToCommander(
   const minQuantity = entity.cp.storage.max / 10;
   const commander = entity.sim
     .getOrThrow(entity.cp.commander.id)
-    .requireComponents([...facilityComponents, "owner"]);
+    .requireComponents(tradingCommanderComponents);
   if (commander.cp.trade.offers[commodity].quantity < minQuantity) return false;
 
   const target = getFacilityWithMostProfit(
@@ -482,7 +494,7 @@ export function returnToFacility(
 ) {
   const commander = entity.sim
     .getOrThrow(entity.cp.commander.id)
-    .requireComponents([...facilityComponents, "owner"]);
+    .requireComponents(tradingCommanderComponents);
 
   const deliveryOrders = pipe(
     commoditiesArray,

@@ -1,5 +1,5 @@
 import React from "react";
-import { commodities } from "@core/economy/commodity";
+import { commodities, commodityLabel } from "@core/economy/commodity";
 import { RequireComponent } from "@core/tsHelpers";
 import { Table, TableCell } from "@kit/Table";
 
@@ -43,7 +43,7 @@ export const Offers: React.FC<OffersProps> = ({ entity }) => {
         ) : (
           offered.map((data) => (
             <tr key={data.commodity}>
-              <TableCell>{data.commodity}</TableCell>
+              <TableCell>{commodityLabel[data.commodity]}</TableCell>
               <TableCell>{data.stored}</TableCell>
               <TableCell>{data.quantity}</TableCell>
               <TableCell>{data.type === "buy" ? data.price : "-"}</TableCell>

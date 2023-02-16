@@ -88,8 +88,17 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
 
   if (initial.role === "building") {
     entity.addComponent({
+      active: false,
       name: "deployable",
       type: "facility",
+    });
+  }
+
+  if (initial.role === "storage") {
+    entity.addComponent({
+      active: false,
+      name: "deployable",
+      type: "builder",
     });
   }
 

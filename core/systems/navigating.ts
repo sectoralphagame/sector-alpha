@@ -50,6 +50,8 @@ export function getDeltaAngle(
 const cruiseTimer = "cruise";
 
 function setDrive(entity: Driveable, delta: number) {
+  if (!entity.cp.drive.active) return;
+
   const entityPosition = entity.cp.position;
   const drive = entity.cp.drive;
 

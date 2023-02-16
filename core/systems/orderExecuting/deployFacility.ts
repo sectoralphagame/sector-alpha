@@ -32,6 +32,7 @@ export function deployFacilityAction(entity: Ship): boolean {
       "name",
       "render",
       "storage",
+      "orders",
     ] as Array<keyof CoreComponents>
   ).reduce((ship, component) => ship.removeComponent(component), entity);
 

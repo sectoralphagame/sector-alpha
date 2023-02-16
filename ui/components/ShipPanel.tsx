@@ -1,6 +1,6 @@
 import React from "react";
 import { Ship } from "@core/archetypes/ship";
-import { commodities } from "@core/economy/commodity";
+import { commodities, commodityLabel } from "@core/economy/commodity";
 import { Docks } from "./Docks";
 import AutoOrder from "./AutoOrder";
 import { Commander } from "./Commander";
@@ -30,9 +30,9 @@ const ShipPanel: React.FC<{ entity: Ship }> = ({ entity: ship }) => {
               stored: ship.cp.storage.availableWares[commodity],
             }))
             .map((data) => (
-              <div
-                key={data.commodity}
-              >{`${data.commodity}: ${data.stored}`}</div>
+              <div key={data.commodity}>{`${commodityLabel[data.commodity]}: ${
+                data.stored
+              }`}</div>
             ))
         : "Empty storage"}
       <hr />

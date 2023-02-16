@@ -34,6 +34,7 @@ import { Journal } from "./journal";
 import { Player } from "./player";
 import { Deployable } from "./deployable";
 import { FacilityModuleQueue } from "./facilityModuleQueue";
+import { Builder } from "./builder";
 
 export interface CoreComponents {
   ai: Ai;
@@ -41,6 +42,7 @@ export interface CoreComponents {
   autoOrder: AutoOrder;
   blueprints: Blueprints;
   budget: Budget;
+  builder: Builder;
   children: Children;
   color: Color;
   commander: Commander;

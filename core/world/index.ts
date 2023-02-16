@@ -146,6 +146,17 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     });
     builderShip.cp.autoOrder!.default = "hold";
 
+    const storageShip = createShip(sim, {
+      ...pickRandom(shipClasses.filter(({ role }) => role === "storage")),
+      position: hecsToCartesian(
+        startingSector.cp.hecsPosition.value,
+        sectorSize / 10
+      ),
+      owner: player,
+      sector: startingSector,
+    });
+    storageShip.cp.autoOrder!.default = "hold";
+
     mapData.factions.forEach((factionData) => {
       const faction = createFaction(factionData.name, sim);
       faction.cp.name.slug = factionData.slug;

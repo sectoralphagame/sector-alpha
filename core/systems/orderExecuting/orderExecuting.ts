@@ -7,6 +7,7 @@ import { follorOrderGroup, followOrder } from "./follow";
 import { holdAction, holdPosition, moveAction, teleportAction } from "./misc";
 import { tradeOrder } from "./trade";
 import { deployFacilityAction } from "./deployFacility";
+import { deployBuilderAction } from "./deployBuilder";
 
 const orderGroupFns: Partial<
   Record<
@@ -42,6 +43,7 @@ const orderFns: Partial<
   teleport: teleportAction,
   dock: dockOrder,
   deployFacility: deployFacilityAction,
+  deployBuilder: deployBuilderAction,
 };
 
 export class OrderExecutingSystem extends System {
@@ -64,7 +66,7 @@ export class OrderExecutingSystem extends System {
             orderGroup.actions.length === 0 &&
             isCompleted(entity, orderGroup)
           ) {
-            entity.cp.orders.value.splice(0, 1);
+            entity.cp.orders?.value.splice(0, 1);
           }
         }
       }

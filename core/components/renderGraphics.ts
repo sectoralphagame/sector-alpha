@@ -94,6 +94,8 @@ export const graphics: Graphics = {
     }
   },
   path: ({ g, entity, viewport }) => {
+    if (!entity.hasComponents(["orders"])) return;
+
     const { orders } = entity.requireComponents(["orders"]).cp;
     const originPosition = findInAncestors(entity, "position").cp.position;
 
@@ -105,9 +107,9 @@ export const graphics: Graphics = {
     orders.value.forEach((orderGroup) =>
       orderGroup.actions.forEach((order) => {
         if (
-          order.type !== "hold" &&
-          order.type !== "mine" &&
-          order.type !== "deployFacility"
+          order.type === "dock" ||
+          order.type === "teleport" ||
+          order.type === "move"
         ) {
           const target = entity.sim.get(order.targetId);
           if (!target) return;

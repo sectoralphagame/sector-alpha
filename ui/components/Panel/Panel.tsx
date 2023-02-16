@@ -23,6 +23,7 @@ import { PanelComponent } from "./PanelComponent";
 import { FacilityModuleManager } from "../FacilityModuleManager";
 import Journal from "../Journal";
 import styles from "./Panel.scss";
+import { Offers } from "../Offers";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -101,6 +102,22 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                 <EntityName entity={entity.requireComponents(["name"])} />
               )}
               <JournalWrapper entity={entity}>
+                {entity.hasComponents(["trade", "storage", "budget"]) && (
+                  <>
+                    <div>
+                      Money: {entity.components.budget!.available.toFixed(0)}
+                    </div>
+                    <hr />
+                    <Offers
+                      entity={entity.requireComponents([
+                        "trade",
+                        "storage",
+                        "budget",
+                      ])}
+                    />
+                    <hr />
+                  </>
+                )}
                 {entity.hasComponents(shipComponents) ? (
                   <ShipPanel entity={asShip(entity)} />
                 ) : entity.hasComponents(facilityComponents) ? (

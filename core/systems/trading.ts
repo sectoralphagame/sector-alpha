@@ -237,6 +237,8 @@ function adjustBuyPrice(entity: WithTrade, commodity: Commodity): number {
 }
 
 export function adjustPrices(entity: WithTrade) {
+  if (entity.cp.deployable) return;
+
   const quantities = perCommodity(
     (commodity) =>
       sum(
@@ -321,6 +323,8 @@ export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
 }
 
 export function createOffers(entity: WithTrade) {
+  if (entity.cp.deployable) return;
+
   entity.cp.trade.offers = perCommodity((commodity): TradeOffer => {
     const offeredQuantity = getOfferedQuantity(entity, commodity);
     const producedNet = entity.hasComponents(["compoundProduction"])
@@ -332,10 +336,8 @@ export function createOffers(entity: WithTrade) {
 
     return {
       active: !(offeredQuantity === 0 && producedNet === 0),
-      price:
-        (entity.cp.trade.offers && entity.cp.trade.offers[commodity].price) ??
-        0,
-      quantity: offeredQuantity > 0 ? offeredQuantity : -offeredQuantity,
+      price: entity.cp.trade.offers?.[commodity].price ?? 100,
+      quantity: Math.abs(offeredQuantity),
       type: producedNet > 0 ? "sell" : "buy",
     };
   });

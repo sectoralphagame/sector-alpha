@@ -66,7 +66,9 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
                   <tr key={`${facilityModule.cp.name!.value}-${index}`}>
                     <TableCell>{facilityModule.cp.name!.value}</TableCell>
                     <TableCell style={{ textAlign: "right" }}>
-                      {facilityModule.cooldowns.timers.production.toFixed(0)}s
+                      {facilityModule.cooldowns.timers.production?.toFixed(0) ??
+                        "0"}
+                      s
                     </TableCell>
                   </tr>
                 ))}

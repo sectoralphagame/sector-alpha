@@ -1,4 +1,4 @@
-import { matrix } from "mathjs";
+import { add, matrix, random } from "mathjs";
 import React from "react";
 import { createMarker } from "@core/archetypes/marker";
 import { isOwnedByPlayer } from "@core/components/player";
@@ -67,6 +67,29 @@ export const ShipToEntity: React.FC = () => {
     });
   };
 
+  const onBuild = () => {
+    entity.cp.orders!.value.push({
+      actions: [
+        ...moveToActions(
+          entity,
+          createMarker(entity.sim, {
+            sector: actionable.cp.position.sector,
+            value: add(
+              actionable.cp.position.coord,
+              matrix([random(-1, 1), random(-1, 1)])
+            ),
+          })
+        ),
+        {
+          type: "deployBuilder",
+          targetId: actionable.id,
+        },
+      ],
+      origin: "manual",
+      type: "deployBuilder",
+    });
+  };
+
   return (
     <>
       {actionable.hasComponents(["trade"]) && (
@@ -78,11 +101,17 @@ export const ShipToEntity: React.FC = () => {
       {actionable.hasComponents(["drive"]) && (
         <DropdownOption onClick={onFollow}>Follow</DropdownOption>
       )}
-      {actionable.hasComponents(["trade", "name"]) &&
+      {entity.hasComponents(["storage"]) &&
+        actionable.hasComponents(["trade", "name"]) &&
         isOwnedByPlayer(actionable) && (
           <DropdownOption onClick={onWorkFor}>
-            Work for: {actionable.cp.name!.value}
+            Work for {actionable.cp.name!.value}
           </DropdownOption>
+        )}
+      {entity.hasComponents(["deployable"]) &&
+        actionable.hasComponents(["facilityModuleQueue"]) &&
+        isOwnedByPlayer(actionable) && (
+          <DropdownOption onClick={onBuild}>Build</DropdownOption>
         )}
     </>
   );

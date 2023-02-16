@@ -10,6 +10,7 @@ import fCivTexture from "../../assets/f_civ.svg";
 import fFactoryTexture from "../../assets/f_factory.svg";
 import fShipyardTexture from "../../assets/f_shipyard.svg";
 import lBuilderTexture from "../../assets/l_bld.svg";
+import lStorageTexture from "../../assets/l_stg.svg";
 import { isHeadless } from "../settings";
 
 export const textures = {
@@ -23,6 +24,7 @@ export const textures = {
   fCiv: fCivTexture,
   fFactory: fFactoryTexture,
   lBuilder: lBuilderTexture,
+  lStorage: lStorageTexture,
 };
 export type Textures = typeof textures;
 
