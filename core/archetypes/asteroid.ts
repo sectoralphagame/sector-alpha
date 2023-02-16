@@ -22,7 +22,7 @@ export const asteroidComponents = [
   "render",
 ] as const;
 
-export type AsteroidComponent = typeof asteroidComponents[number];
+export type AsteroidComponent = (typeof asteroidComponents)[number];
 export type Asteroid = RequireComponent<AsteroidComponent>;
 
 export function asteroid(entity: Entity): Asteroid {

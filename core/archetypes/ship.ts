@@ -25,7 +25,7 @@ export const shipComponents = [
   "journal",
 ] as const;
 
-export type ShipComponent = typeof shipComponents[number];
+export type ShipComponent = (typeof shipComponents)[number];
 export type Ship = RequireComponent<ShipComponent>;
 
 export function ship(entity: Entity): Ship {

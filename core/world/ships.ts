@@ -5,7 +5,7 @@ import { Commodity } from "../economy/commodity";
 import shipClassesData from "./data/ships.json";
 
 export const shipRoles = ["transport", "mining", "military"] as const;
-export type ShipRole = typeof shipRoles[number];
+export type ShipRole = (typeof shipRoles)[number];
 
 export interface ShipBuildInput {
   time: number;

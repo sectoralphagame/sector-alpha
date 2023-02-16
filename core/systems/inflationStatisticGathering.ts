@@ -11,7 +11,7 @@ const basketCommodities = [
   commodities.hullPlates,
   commodities.electronics,
 ] as const;
-type BasketCommodities = typeof basketCommodities[number];
+type BasketCommodities = (typeof basketCommodities)[number];
 const basketWeights: Record<BasketCommodities, number> = {
   food: 30,
   water: 30,

@@ -26,7 +26,7 @@ export const facilityComponents = [
   "trade",
 ] as const;
 
-export type FacilityComponent = typeof facilityComponents[number];
+export type FacilityComponent = (typeof facilityComponents)[number];
 export type Facility = RequireComponent<FacilityComponent>;
 
 export function facility(entity: Entity): Facility {

@@ -42,7 +42,7 @@ const tradingComponents = [
   "position",
   "dockable",
 ] as const;
-type Trading = RequireComponent<typeof tradingComponents[number]>;
+type Trading = RequireComponent<(typeof tradingComponents)[number]>;
 
 function idleMovement(entity: Trading) {
   const commander =

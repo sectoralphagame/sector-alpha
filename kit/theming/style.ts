@@ -9,11 +9,11 @@ const spacings = [0.25, 0.5, 0.75, 1, 2, 3, 4, 8] as const;
 const texts = [1, 2, 3, 4, 5] as const;
 
 export interface Theme {
-  spacing: Record<typeof spacings[number], string>;
+  spacing: Record<(typeof spacings)[number], string>;
   palette: {
     background: string;
     default: string;
-    text: Record<typeof texts[number], string>;
+    text: Record<(typeof texts)[number], string>;
     disabled: string;
   };
   typography: {
@@ -32,13 +32,13 @@ export function createTheme(scale: number): Theme {
   return {
     spacing: fromPairs(
       spacings.map((n) => [n, `${n * baseSpacing}px`])
-    ) as Record<typeof spacings[number], string>,
+    ) as Record<(typeof spacings)[number], string>,
     palette: {
       background: "#000000",
       default: "#FFFFFF",
       text: fromPairs(
         texts.map((v) => [v, Color.hsl(0, 0, 100 - (v - 1) * 20).hex()])
-      ) as Record<typeof texts[number], string>,
+      ) as Record<(typeof texts)[number], string>,
       disabled: Color.hsl(0, 0, 70).hex(),
     },
     typography: {

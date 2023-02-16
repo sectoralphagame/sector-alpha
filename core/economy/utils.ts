@@ -22,7 +22,7 @@ export const tradeComponents = [
   "docks",
   "journal",
 ] as const;
-export type WithTrade = RequireComponent<typeof tradeComponents[number]>;
+export type WithTrade = RequireComponent<(typeof tradeComponents)[number]>;
 
 export function getSectorsInTeleportRange(
   origin: Sector,
