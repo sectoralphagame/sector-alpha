@@ -12,6 +12,7 @@ import { filter, map, pipe, toArray } from "@fxts/core";
 import { NavigatingSystem } from "@core/systems/navigating";
 import { OutOfBoundsCheckingSystem } from "@core/systems/reporting/outOfBoundsChecking";
 import { FacilityBuildingSystem } from "@core/systems/facilityBuilding";
+import { UndeployingSystem } from "@core/systems/undeploying";
 import { Entity, EntityComponents } from "../components/entity";
 import { BaseSim } from "./BaseSim";
 import { System } from "../systems/system";
@@ -85,26 +86,27 @@ export class Sim extends BaseSim {
     this.queries = createQueries(this);
 
     this.systems = [
-      new PathPlanningSystem(this),
-      new CooldownUpdatingSystem(this),
-      new ProducingSystem(this),
-      new StorageQuotaPlanningSystem(this),
-      new TradingSystem(this),
-      new BudgetPlanningSystem(this),
-      new SelectingSystem(this),
-      new OrderPlanningSystem(this),
-      new NavigatingSystem(this),
-      new MovingSystem(this),
-      new MiningSystem(this),
-      new OrderExecutingSystem(this),
-      new AsteroidSpawningSystem(this),
-      new FacilityPlanningSystem(this),
-      new ShipPlanningSystem(this),
-      new SectorStatisticGatheringSystem(this),
-      new InflationStatisticGatheringSystem(this),
-      new ShipBuildingSystem(this),
-      new FacilityBuildingSystem(this),
-    ];
+      PathPlanningSystem,
+      CooldownUpdatingSystem,
+      ProducingSystem,
+      StorageQuotaPlanningSystem,
+      TradingSystem,
+      BudgetPlanningSystem,
+      SelectingSystem,
+      OrderPlanningSystem,
+      NavigatingSystem,
+      MovingSystem,
+      MiningSystem,
+      OrderExecutingSystem,
+      AsteroidSpawningSystem,
+      FacilityPlanningSystem,
+      ShipPlanningSystem,
+      SectorStatisticGatheringSystem,
+      InflationStatisticGatheringSystem,
+      ShipBuildingSystem,
+      FacilityBuildingSystem,
+      UndeployingSystem,
+    ].map((S) => new S(this));
   }
 
   registerEntity = (entity: Entity) => {

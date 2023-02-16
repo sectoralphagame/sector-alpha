@@ -237,7 +237,7 @@ function adjustBuyPrice(entity: WithTrade, commodity: Commodity): number {
 }
 
 export function adjustPrices(entity: WithTrade) {
-  if (entity.cp.deployable) return;
+  if (!entity.cp.trade.auto) return;
 
   const quantities = perCommodity(
     (commodity) =>
@@ -323,7 +323,7 @@ export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
 }
 
 export function createOffers(entity: WithTrade) {
-  if (entity.cp.deployable) return;
+  if (!entity.cp.trade.auto) return;
 
   entity.cp.trade.offers = perCommodity((commodity): TradeOffer => {
     const offeredQuantity = getOfferedQuantity(entity, commodity);

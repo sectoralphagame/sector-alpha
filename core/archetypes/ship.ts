@@ -91,6 +91,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       active: false,
       name: "deployable",
       type: "facility",
+      cancel: false,
     });
   }
 
@@ -99,6 +100,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       active: false,
       name: "deployable",
       type: "builder",
+      cancel: false,
     });
   }
 

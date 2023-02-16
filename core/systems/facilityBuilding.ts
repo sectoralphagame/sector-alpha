@@ -31,7 +31,9 @@ export class FacilityBuildingSystem extends System {
       builder.cp.trade.offers = perCommodity((commodity): TradeOffer => {
         const needed = facility.cp.facilityModuleQueue.queue.reduce(
           (quantity, bp) =>
-            quantity + (bp.blueprint.build.cost[commodity] ?? 0),
+            quantity +
+            (bp.blueprint.build.cost[commodity] ?? 0) -
+            builder.cp.storage.availableWares[commodity],
           0
         );
 

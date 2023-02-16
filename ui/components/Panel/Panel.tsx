@@ -24,6 +24,8 @@ import { FacilityModuleManager } from "../FacilityModuleManager";
 import Journal from "../Journal";
 import styles from "./Panel.scss";
 import { Offers } from "../Offers";
+import { Undeploy } from "../Undeploy";
+import { Subordinates } from "../Subordinates";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -129,6 +131,18 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                     <SectorResources entity={sector(entity)} />
                     <SectorPrices entity={sector(entity)} />
                   </>
+                )}
+                <Subordinates entity={entity} />
+                <hr />
+                {entity.hasComponents(["deployable"]) && (
+                  <Undeploy
+                    deployable={entity.requireComponents(["deployable"])}
+                    facility={
+                      entity.cp.builder?.targetId
+                        ? sim.get(entity.cp.builder.targetId)
+                        : undefined
+                    }
+                  />
                 )}
               </JournalWrapper>
             </>

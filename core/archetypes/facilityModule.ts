@@ -61,7 +61,7 @@ export function createFacilityModule(
       name: "name",
       value: input.name,
     });
-  if (input.type === "production") {
+  if (input.type === "production" || input.type === "habitat") {
     entity.addComponent(createProduction(input.time, input.pac));
   } else if (input.type === "storage") {
     entity.addComponent({

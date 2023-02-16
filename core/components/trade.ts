@@ -37,6 +37,10 @@ export interface TradeOffer {
 export type TradeOffers = Record<Commodity, TradeOffer>;
 
 export interface Trade extends BaseComponent<"trade"> {
+  /**
+   * Automatically creates offers
+   */
+  auto: boolean;
   pricing: Record<Commodity, PriceBelief>;
   offers: TradeOffers;
   lastPriceAdjust: { time: number; commodities: Record<Commodity, number> };
@@ -51,6 +55,7 @@ export function createTrade(): Trade {
   });
 
   return {
+    auto: true,
     name: "trade",
     pricing,
     lastPriceAdjust: {

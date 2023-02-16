@@ -18,8 +18,13 @@ export function deployBuilderAction(
     .addComponent(createBudget())
     .addComponent(createDocks({ large: 1, medium: 3, small: 3 }))
     .addComponent(createTrade())
-    .addComponent({ name: "builder", targetId: order.targetId });
+    .addComponent({ name: "builder", targetId: order.targetId })
+    .addComponent({
+      name: "storageBonus",
+      value: 1e6 - entity.cp.storage!.max,
+    });
 
+  entity.cp.trade!.auto = false;
   entity.cp.deployable.active = true;
   entity.cp.storage!.max = 1e6;
 
