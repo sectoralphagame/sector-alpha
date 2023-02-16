@@ -43,6 +43,7 @@ const handlers: Partial<
     });
 
     builder.cp.deployable.cancel = false;
+    builder.cp.deployable.active = false;
   },
 };
 
