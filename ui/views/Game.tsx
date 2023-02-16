@@ -9,6 +9,7 @@ import { MapView } from "@ui/components/MapView";
 import { useRerender } from "@ui/hooks/useRerender";
 import type { Commodity } from "@core/economy/commodity";
 import { addStorage } from "@core/components/storage";
+import { changeBudgetMoney } from "@core/components/budget";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -47,6 +48,13 @@ export const Game: React.FC = () => {
         if (entity) {
           addStorage(entity.cp.storage!, commodity, quantity);
         }
+      },
+      addMoney: (quantity: number, id?: number) => {
+        const entity = id
+          ? sim.getOrThrow(id)
+          : (window.selected as Entity | undefined) ??
+            sim.queries.player.get()[0]!;
+        changeBudgetMoney(entity.cp.budget!, quantity);
       },
     };
 
