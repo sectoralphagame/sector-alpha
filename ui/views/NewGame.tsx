@@ -20,7 +20,7 @@ interface NewGameForm {
 const targetTime = 3600 / 2;
 
 export const NewGame: React.FC = () => {
-  const { register, handleSubmit, getValues, control } = useForm<NewGameForm>({
+  const { register, handleSubmit, control } = useForm<NewGameForm>({
     defaultValues: { islands: 8, factions: 4 },
   });
   const navigate = useLocation();
