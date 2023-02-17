@@ -1,6 +1,7 @@
-import { createFacility, InitialFacilityInput } from "../archetypes/facility";
+import type { InitialFacilityInput } from "../archetypes/facility";
+import { createFacility } from "../archetypes/facility";
 import { facilityModules } from "../archetypes/facilityModule";
-import { Sim } from "../sim";
+import type { Sim } from "../sim";
 import { addFacilityModule } from "../utils/entityModules";
 import { addStorage } from "../components/storage";
 import { setTexture } from "../components/render";

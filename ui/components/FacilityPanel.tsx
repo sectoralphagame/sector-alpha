@@ -1,5 +1,5 @@
 import React from "react";
-import { Facility } from "@core/archetypes/facility";
+import type { Facility } from "@core/archetypes/facility";
 import { Production } from "./Production";
 import { Docks } from "./Docks";
 import { Allocations } from "./Allocations";

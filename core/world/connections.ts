@@ -1,7 +1,7 @@
 import minBy from "lodash/minBy";
-import { Sector } from "../archetypes/sector";
+import type { Sector } from "../archetypes/sector";
 import { hecsDistance } from "../components/hecsPosition";
-import { Sim } from "../sim";
+import type { Sim } from "../sim";
 import { createLink } from "./teleporters";
 
 export function createConnections(sim: Sim, islands: Sector[][]): void {

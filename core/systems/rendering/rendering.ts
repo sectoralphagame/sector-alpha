@@ -6,7 +6,7 @@ import {
   createRenderGraphics,
   drawGraphics,
 } from "../../components/renderGraphics";
-import { RequireComponent } from "../../tsHelpers";
+import type { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
 import { SystemWithHooks } from "../hooks";
 import { clearFocus } from "../../components/selection";

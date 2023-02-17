@@ -1,5 +1,5 @@
-import { Action, Order } from "@core/components/orders";
-import { Entity } from "@core/components/entity";
+import type { Action, Order } from "@core/components/orders";
+import type { Entity } from "@core/components/entity";
 import { System } from "../system";
 import { dockOrder } from "./dock";
 import { mineAction } from "./mine";

@@ -5,9 +5,9 @@ import {
   setTarget,
   stop,
 } from "../../components/drive";
-import { MoveAction, TeleportAction } from "../../components/orders";
+import type { MoveAction, TeleportAction } from "../../components/orders";
 import { show } from "../../components/render";
-import { RequireComponent } from "../../tsHelpers";
+import type { RequireComponent } from "../../tsHelpers";
 
 export function moveAction(
   entity: RequireComponent<"drive" | "orders">,

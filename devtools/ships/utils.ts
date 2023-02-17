@@ -1,5 +1,5 @@
 import { limitMax } from "@core/utils/limit";
-import { ShipInput } from "@core/world/ships";
+import type { ShipInput } from "@core/world/ships";
 
 export type FormData = { ships: ShipInput[] };
 

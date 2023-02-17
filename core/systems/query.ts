@@ -3,11 +3,11 @@ import { asteroidFieldComponents } from "../archetypes/asteroidField";
 import { facilityComponents } from "../archetypes/facility";
 import { factionComponents } from "../archetypes/faction";
 import { sectorComponents } from "../archetypes/sector";
-import { CoreComponents } from "../components/component";
-import { Entity } from "../components/entity";
+import type { CoreComponents } from "../components/component";
+import type { Entity } from "../components/entity";
 import { tradeComponents } from "../economy/utils";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
 
 type QueryEntities<T extends keyof CoreComponents> = Array<RequireComponent<T>>;
 

@@ -1,7 +1,7 @@
 import { difference } from "lodash";
-import { CoreComponents } from "./components/component";
-import { DockSize } from "./components/dockable";
-import { Entity } from "./components/entity";
+import type { CoreComponents } from "./components/component";
+import type { DockSize } from "./components/dockable";
+import type { Entity } from "./components/entity";
 
 export const notImplemented = new Error("Not implemented");
 

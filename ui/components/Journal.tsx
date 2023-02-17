@@ -1,7 +1,7 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { Faction } from "@core/archetypes/faction";
-import { RequireComponent } from "@core/tsHelpers";
+import type { Faction } from "@core/archetypes/faction";
+import type { RequireComponent } from "@core/tsHelpers";
 import { limitMax, limitMin } from "@core/utils/limit";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { IconButton } from "@kit/IconButton";

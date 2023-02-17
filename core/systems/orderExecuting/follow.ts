@@ -1,7 +1,7 @@
-import { Marker } from "@core/archetypes/marker";
+import type { Marker } from "@core/archetypes/marker";
 import { clearTarget } from "@core/components/drive";
-import { FollowOrder, MoveAction } from "@core/components/orders";
-import { RequireComponent } from "@core/tsHelpers";
+import type { FollowOrder, MoveAction } from "@core/components/orders";
+import type { RequireComponent } from "@core/tsHelpers";
 import { moveToActions } from "@core/utils/moving";
 
 export function followOrder(

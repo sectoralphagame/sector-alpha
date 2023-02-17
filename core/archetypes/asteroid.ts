@@ -1,11 +1,11 @@
-import { Matrix } from "mathjs";
+import type { Matrix } from "mathjs";
 import Color from "color";
-import { MineableCommodity } from "@core/economy/commodity";
+import type { MineableCommodity } from "@core/economy/commodity";
 import { Entity } from "../components/entity";
 import { createRender } from "../components/render";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
-import { AsteroidField } from "./asteroidField";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
+import type { AsteroidField } from "./asteroidField";
 
 export const fieldColors = {
   fuelium: "#ffab6b",

@@ -1,4 +1,4 @@
-import { Values } from "../tsHelpers";
+import type { Values } from "../tsHelpers";
 
 export const commodities = {
   drones: "drones",

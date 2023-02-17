@@ -1,13 +1,11 @@
 import { minBy } from "lodash";
-import { add, matrix, Matrix, norm, random, subtract } from "mathjs";
+import type { Matrix } from "mathjs";
+import { add, matrix, norm, random, subtract } from "mathjs";
 import { asteroid } from "../archetypes/asteroid";
 import { asteroidField } from "../archetypes/asteroidField";
-import {
-  commanderRange,
-  facility,
-  facilityComponents,
-} from "../archetypes/facility";
-import { createMarker, Marker } from "../archetypes/marker";
+import { commanderRange, facility } from "../archetypes/facility";
+import type { Marker } from "../archetypes/marker";
+import { createMarker } from "../archetypes/marker";
 import { sector as asSector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { mineAction } from "../components/orders";
@@ -19,7 +17,7 @@ import {
   tradeComponents,
 } from "../economy/utils";
 import type { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
 import { moveToActions } from "../utils/moving";
 import {

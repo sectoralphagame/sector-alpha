@@ -1,7 +1,8 @@
 import { cloneDeep, merge } from "lodash";
-import { commoditiesArray, Commodity } from "../economy/commodity";
+import type { Commodity } from "../economy/commodity";
+import { commoditiesArray } from "../economy/commodity";
 import { perCommodity } from "../utils/perCommodity";
-import { BaseComponent } from "./component";
+import type { BaseComponent } from "./component";
 
 export interface CommodityPAC {
   /**

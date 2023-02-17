@@ -1,5 +1,5 @@
-import { Matrix } from "mathjs";
-import { BaseComponent } from "./component";
+import type { Matrix } from "mathjs";
+import type { BaseComponent } from "./component";
 
 export interface Position extends BaseComponent<"position"> {
   angle: number;

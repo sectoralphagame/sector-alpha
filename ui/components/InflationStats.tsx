@@ -1,11 +1,7 @@
 import React from "react";
-import {
-  ColorType,
-  createChart,
-  IChartApi,
-  UTCTimestamp,
-} from "lightweight-charts";
-import { Sim } from "@core/sim";
+import type { IChartApi, UTCTimestamp } from "lightweight-charts";
+import { ColorType, createChart } from "lightweight-charts";
+import type { Sim } from "@core/sim";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import {

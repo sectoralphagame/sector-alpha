@@ -1,12 +1,12 @@
-import { Blueprints } from "@core/components/blueprints";
-import { FacilityModuleQueue } from "@core/components/facilityModuleQueue";
+import type { Blueprints } from "@core/components/blueprints";
+import type { FacilityModuleQueue } from "@core/components/facilityModuleQueue";
 import { commodityLabel } from "@core/economy/commodity";
-import { RequireComponent } from "@core/tsHelpers";
+import type { RequireComponent } from "@core/tsHelpers";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import clsx from "clsx";
 import React from "react";
-import { ModalProps } from "../ConfigDialog";
+import type { ModalProps } from "../ConfigDialog";
 import styles from "./FacilityModuleManager.scss";
 
 interface FacilityModuleManagerComponentProps extends ModalProps {

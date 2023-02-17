@@ -1,7 +1,7 @@
 import { changeBudgetMoney } from "@core/components/budget";
-import { DeployableType } from "@core/components/deployable";
-import { Sim } from "@core/sim";
-import { RequireComponent } from "@core/tsHelpers";
+import type { DeployableType } from "@core/components/deployable";
+import type { Sim } from "@core/sim";
+import type { RequireComponent } from "@core/tsHelpers";
 import { Cooldowns } from "@core/utils/cooldowns";
 import { Query } from "./query";
 import { System } from "./system";

@@ -1,12 +1,14 @@
 import merge from "lodash/merge";
 import { mean } from "mathjs";
 import { filter, map, pipe, sortBy, toArray } from "@fxts/core";
-import { facilityComponents } from "../archetypes/facility";
-import { Action, tradeAction, TradeAction } from "../components/orders";
+import type { Action, TradeAction } from "../components/orders";
+import { tradeAction } from "../components/orders";
 import type { TransactionInput } from "../components/trade";
-import { Allocation } from "../components/utils/allocations";
-import { commoditiesArray, Commodity } from "../economy/commodity";
-import { getFacilityWithMostProfit, WithTrade } from "../economy/utils";
+import type { Allocation } from "../components/utils/allocations";
+import type { Commodity } from "../economy/commodity";
+import { commoditiesArray } from "../economy/commodity";
+import type { WithTrade } from "../economy/utils";
+import { getFacilityWithMostProfit } from "../economy/utils";
 import {
   ExceededOfferQuantity,
   InvalidOfferType,
@@ -27,10 +29,10 @@ import {
   releaseBudgetAllocation,
   transferMoney,
 } from "../components/budget";
-import { Sector } from "../archetypes/sector";
-import { SectorPriceStats } from "../components/sectorStats";
+import type { Sector } from "../archetypes/sector";
+import type { SectorPriceStats } from "../components/sectorStats";
 import { limitMax } from "./limit";
-import { Marker } from "../archetypes/marker";
+import type { Marker } from "../archetypes/marker";
 
 const tradingCommanderComponents = [
   "budget",

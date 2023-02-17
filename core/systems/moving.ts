@@ -1,6 +1,7 @@
-import { add, Matrix, matrix, multiply } from "mathjs";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { Matrix } from "mathjs";
+import { add, matrix, multiply } from "mathjs";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
 import { Query } from "./query";
 import { System } from "./system";
 

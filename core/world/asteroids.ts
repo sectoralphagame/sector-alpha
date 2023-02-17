@@ -1,8 +1,11 @@
-import { add, matrix, Matrix, random } from "mathjs";
-import { mineableCommodities, MineableCommodity } from "../economy/commodity";
+import type { Matrix } from "mathjs";
+import { add, matrix, random } from "mathjs";
+import type { MineableCommodity } from "../economy/commodity";
+import { mineableCommodities } from "../economy/commodity";
 import { createAsteroidField } from "../archetypes/asteroidField";
-import { Sim } from "../sim";
-import { Sector, sectorSize } from "../archetypes/sector";
+import type { Sim } from "../sim";
+import type { Sector } from "../archetypes/sector";
+import { sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { pickRandom } from "../utils/generators";
 

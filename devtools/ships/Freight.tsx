@@ -3,15 +3,15 @@ import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
-import { ShipInput } from "@core/world/ships";
+import type { ShipInput } from "@core/world/ships";
 import { LabeledInput } from "@kit/Input";
 import { IconButton } from "@kit/IconButton";
 import { Card, CardHeader } from "@kit/Card";
 import { useThrottledFormState } from "@devtools/utils";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
+import type { FormData } from "./utils";
 import {
-  FormData,
   getShipMiningEfficiency,
   getShipStorageEfficiency,
   getShipTravelSpeed,

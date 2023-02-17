@@ -1,6 +1,6 @@
 import { matrix, norm, subtract } from "mathjs";
 import React from "react";
-import { AsteroidField } from "@core/archetypes/asteroidField";
+import type { AsteroidField } from "@core/archetypes/asteroidField";
 import { createMarker } from "@core/archetypes/marker";
 import { mineAction } from "@core/components/orders";
 import { isOwnedByPlayer } from "@core/components/player";

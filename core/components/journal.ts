@@ -1,6 +1,6 @@
-import { Commodity } from "../economy/commodity";
-import { BaseComponent } from "./component";
-import { TradeOfferType } from "./trade";
+import type { Commodity } from "../economy/commodity";
+import type { BaseComponent } from "./component";
+import type { TradeOfferType } from "./trade";
 
 interface Entry {
   time: number;

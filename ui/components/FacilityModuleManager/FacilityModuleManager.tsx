@@ -1,10 +1,10 @@
-import { Facility } from "@core/archetypes/facility";
-import { FacilityModule } from "@core/archetypes/facilityModule";
-import { Faction } from "@core/archetypes/faction";
+import type { Facility } from "@core/archetypes/facility";
+import type { FacilityModule } from "@core/archetypes/facilityModule";
+import type { Faction } from "@core/archetypes/faction";
 import { clearBuiltModule } from "@core/components/facilityModuleQueue";
 import { useGameDialog, useSim } from "@ui/atoms";
 import React from "react";
-import { ModalProps } from "../ConfigDialog";
+import type { ModalProps } from "../ConfigDialog";
 import { FacilityModuleManagerComponent } from "./FacilityModuleManagerComponent";
 
 export interface FacilityModuleManagerProps {

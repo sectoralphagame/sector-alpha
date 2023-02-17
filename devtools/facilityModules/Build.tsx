@@ -2,11 +2,8 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
-import {
-  commoditiesArray,
-  Commodity,
-  commodityLabel,
-} from "@core/economy/commodity";
+import type { Commodity } from "@core/economy/commodity";
+import { commoditiesArray, commodityLabel } from "@core/economy/commodity";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
@@ -16,12 +13,13 @@ import {
   DropdownOption,
   DropdownOptions,
 } from "@kit/Dropdown";
-import { formatInt, getCost, useThrottledFormState } from "@devtools/utils";
-import { FacilityModuleInput } from "@core/archetypes/facilityModule";
+import { formatInt, useThrottledFormState } from "@devtools/utils";
+import type { FacilityModuleInput } from "@core/archetypes/facilityModule";
 import { max, min } from "@fxts/core";
+import { getCommodityCost } from "@core/economy/utils";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
-import { FormData } from "./utils";
+import type { FormData } from "./utils";
 
 const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
   const { register, setValue } = useFormContext<FormData>();
@@ -72,7 +70,9 @@ const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
               .filter(([_, cost]) => cost > 0)
               .reduce(
                 (acc, [commodity, quantity]) =>
-                  acc + getCost(commodity as Commodity, allModules) * quantity,
+                  acc +
+                  getCommodityCost(commodity as Commodity, allModules) *
+                    quantity,
                 0
               )
           )}
@@ -84,7 +84,8 @@ const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
               .reduce(
                 (acc, [commodity, quantity]) =>
                   acc +
-                  getCost(commodity as Commodity, allModules, min) * quantity,
+                  getCommodityCost(commodity as Commodity, allModules, min) *
+                    quantity,
                 0
               )
           )}
@@ -96,7 +97,8 @@ const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
               .reduce(
                 (acc, [commodity, quantity]) =>
                   acc +
-                  getCost(commodity as Commodity, allModules, max) * quantity,
+                  getCommodityCost(commodity as Commodity, allModules, max) *
+                    quantity,
                 0
               )
           )}

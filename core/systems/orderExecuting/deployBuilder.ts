@@ -1,9 +1,9 @@
 import { createBudget } from "@core/components/budget";
-import { CoreComponents } from "@core/components/component";
+import type { CoreComponents } from "@core/components/component";
 import { createDocks } from "@core/components/dockable";
-import { BuilderDeployAction } from "@core/components/orders";
+import type { BuilderDeployAction } from "@core/components/orders";
 import { createTrade } from "@core/components/trade";
-import { RequireComponent } from "@core/tsHelpers";
+import type { RequireComponent } from "@core/tsHelpers";
 
 export function deployBuilderAction(
   entity: RequireComponent<"deployable" | "storage">,

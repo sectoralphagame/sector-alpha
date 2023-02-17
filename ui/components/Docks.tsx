@@ -1,5 +1,5 @@
 import React from "react";
-import { RequireComponent } from "@core/tsHelpers";
+import type { RequireComponent } from "@core/tsHelpers";
 import {
   Collapsible,
   CollapsibleContent,

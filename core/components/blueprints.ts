@@ -1,6 +1,6 @@
-import { FacilityModuleInput } from "@core/archetypes/facilityModule";
-import { ShipInput } from "../world/ships";
-import { BaseComponent } from "./component";
+import type { FacilityModuleInput } from "@core/archetypes/facilityModule";
+import type { ShipInput } from "../world/ships";
+import type { BaseComponent } from "./component";
 
 export interface Blueprints extends BaseComponent<"blueprints"> {
   facilityModules: FacilityModuleInput[];

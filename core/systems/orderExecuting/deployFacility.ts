@@ -1,10 +1,11 @@
 import { facility } from "@core/archetypes/facility";
 import { facilityModules } from "@core/archetypes/facilityModule";
-import { Ship } from "@core/archetypes/ship";
+import type { Ship } from "@core/archetypes/ship";
 import { createBudget } from "@core/components/budget";
-import { CoreComponents } from "@core/components/component";
+import type { CoreComponents } from "@core/components/component";
 import { createDocks } from "@core/components/dockable";
-import { createRender, destroy, Render } from "@core/components/render";
+import type { Render } from "@core/components/render";
+import { createRender, destroy } from "@core/components/render";
 import { createCommodityStorage } from "@core/components/storage";
 import { createTrade } from "@core/components/trade";
 import { addFacilityModule } from "@core/utils/entityModules";

@@ -1,10 +1,12 @@
 import { add, matrix, random } from "mathjs";
-import { createFaction, Faction } from "../archetypes/faction";
-import { Sector, sectorSize } from "../archetypes/sector";
+import type { Faction } from "../archetypes/faction";
+import { createFaction } from "../archetypes/faction";
+import type { Sector } from "../archetypes/sector";
+import { sectorSize } from "../archetypes/sector";
 import { setMoney } from "../components/budget";
-import { DockSize } from "../components/dockable";
+import type { DockSize } from "../components/dockable";
 import { hecsToCartesian } from "../components/hecsPosition";
-import { Sim } from "../sim";
+import type { Sim } from "../sim";
 import { requestShip } from "../systems/shipPlanning";
 import { pickRandom, pickRandomWithIndex } from "../utils/generators";
 import { createShipyard } from "./facilities";

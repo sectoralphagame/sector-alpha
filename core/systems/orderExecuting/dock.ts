@@ -1,9 +1,10 @@
-import { availableDocks, WithDock } from "../../components/dockable";
+import type { WithDock } from "../../components/dockable";
+import { availableDocks } from "../../components/dockable";
 import { clearTarget, setTarget } from "../../components/drive";
-import { DockAction } from "../../components/orders";
+import type { DockAction } from "../../components/orders";
 import { hide } from "../../components/render";
 import { DockSizeMismatchError } from "../../errors";
-import { RequireComponent } from "../../tsHelpers";
+import type { RequireComponent } from "../../tsHelpers";
 
 export function dockShip(
   ship: RequireComponent<"drive" | "dockable" | "position">,

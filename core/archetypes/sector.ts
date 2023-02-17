@@ -1,10 +1,10 @@
-import { Matrix } from "mathjs";
+import type { Matrix } from "mathjs";
 import mapValues from "lodash/mapValues";
 import { Entity } from "../components/entity";
 import { createRenderGraphics } from "../components/renderGraphics";
 import { MissingComponentError } from "../errors";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
 import "@pixi/graphics-extras";
 import { commodities, mineableCommodities } from "../economy/commodity";
 

@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { BaseComponent } from "./component";
+import type { BaseComponent } from "./component";
 import asteroidTexture from "../../assets/asteroid.svg";
 import sCivTexture from "../../assets/s_civ.svg";
 import mCivTexture from "../../assets/m_civ.svg";

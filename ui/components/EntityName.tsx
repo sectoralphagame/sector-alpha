@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { RequireComponent } from "@core/tsHelpers";
+import type { RequireComponent } from "@core/tsHelpers";
 import styles from "./EntityName.scss";
 
 const EntityName: React.FC<{ entity: RequireComponent<"name"> }> = ({

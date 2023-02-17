@@ -2,8 +2,9 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
-import { ShipInput } from "@core/world/ships";
-import { commoditiesArray, Commodity } from "@core/economy/commodity";
+import type { ShipInput } from "@core/world/ships";
+import type { Commodity } from "@core/economy/commodity";
+import { commoditiesArray } from "@core/economy/commodity";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
@@ -14,11 +15,12 @@ import {
   DropdownOption,
   DropdownOptions,
 } from "@kit/Dropdown";
-import { formatInt, getCost, useThrottledFormState } from "@devtools/utils";
+import { formatInt, useThrottledFormState } from "@devtools/utils";
 import { max, min } from "@fxts/core";
+import { getCommodityCost } from "@core/economy/utils";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
-import { FormData } from "./utils";
+import type { FormData } from "./utils";
 
 const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
   const { register, getValues, setValue } = useFormContext<FormData>();
@@ -64,17 +66,7 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
             Object.entries(ship.build.cost).reduce(
               (acc, [commodity, quantity]) =>
                 acc +
-                getCost(commodity as Commodity, allModules as any) * quantity,
-              0
-            )
-          )}
-        </TableCell>
-        <TableCell>
-          {formatInt(
-            Object.entries(ship.build.cost).reduce(
-              (acc, [commodity, quantity]) =>
-                acc +
-                getCost(commodity as Commodity, allModules as any, min) *
+                getCommodityCost(commodity as Commodity, allModules as any) *
                   quantity,
               0
             )
@@ -85,7 +77,26 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
             Object.entries(ship.build.cost).reduce(
               (acc, [commodity, quantity]) =>
                 acc +
-                getCost(commodity as Commodity, allModules as any, max) *
+                getCommodityCost(
+                  commodity as Commodity,
+                  allModules as any,
+                  min
+                ) *
+                  quantity,
+              0
+            )
+          )}
+        </TableCell>
+        <TableCell>
+          {formatInt(
+            Object.entries(ship.build.cost).reduce(
+              (acc, [commodity, quantity]) =>
+                acc +
+                getCommodityCost(
+                  commodity as Commodity,
+                  allModules as any,
+                  max
+                ) *
                   quantity,
               0
             )

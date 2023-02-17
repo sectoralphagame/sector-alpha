@@ -4,11 +4,11 @@ import omit from "lodash/omit";
 import reduce from "lodash/reduce";
 import pick from "lodash/pick";
 import type { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { RequireComponent } from "../tsHelpers";
 import { MissingComponentError } from "../errors";
 import { Cooldowns } from "../utils/cooldowns";
 import { isHeadless } from "../settings";
-import { CoreComponents } from "./component";
+import type { CoreComponents } from "./component";
 import { destroy } from "./render";
 
 export class EntityComponents {

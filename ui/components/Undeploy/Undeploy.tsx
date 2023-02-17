@@ -1,7 +1,7 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { Entity } from "@core/components/entity";
-import { RequireComponent } from "@core/tsHelpers";
+import type { Entity } from "@core/components/entity";
+import type { RequireComponent } from "@core/tsHelpers";
 import locationIcon from "@assets/ui/location.svg";
 import { IconButton } from "@kit/IconButton";
 import { isOwnedByPlayer } from "@core/components/player";

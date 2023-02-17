@@ -1,6 +1,6 @@
 import React from "react";
 import { commodities, commodityLabel } from "@core/economy/commodity";
-import { RequireComponent } from "@core/tsHelpers";
+import type { RequireComponent } from "@core/tsHelpers";
 import { Table, TableCell } from "@kit/Table";
 
 export interface OffersProps {

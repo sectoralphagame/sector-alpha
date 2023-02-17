@@ -1,5 +1,5 @@
-import { RequireComponent } from "../tsHelpers";
-import { BaseComponent } from "./component";
+import type { RequireComponent } from "../tsHelpers";
+import type { BaseComponent } from "./component";
 
 export type Target = RequireComponent<"position">;
 

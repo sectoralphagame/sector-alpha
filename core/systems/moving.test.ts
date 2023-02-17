@@ -1,8 +1,10 @@
 import { matrix } from "mathjs";
 import { createFaction } from "../archetypes/faction";
 import { createMarker } from "../archetypes/marker";
-import { createSector, Sector } from "../archetypes/sector";
-import { createShip, Ship } from "../archetypes/ship";
+import type { Sector } from "../archetypes/sector";
+import { createSector } from "../archetypes/sector";
+import type { Ship } from "../archetypes/ship";
+import { createShip } from "../archetypes/ship";
 import { setTarget } from "../components/drive";
 import { Sim } from "../sim";
 import { shipClasses } from "../world/ships";

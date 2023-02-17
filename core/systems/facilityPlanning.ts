@@ -1,20 +1,21 @@
 import { discriminate } from "@core/utils/maps";
 import shuffle from "lodash/shuffle";
-import { add, matrix, random, Matrix } from "mathjs";
-import { createFacility, Facility } from "../archetypes/facility";
+import type { Matrix } from "mathjs";
+import { add, matrix, random } from "mathjs";
+import type { Facility } from "../archetypes/facility";
+import { createFacility } from "../archetypes/facility";
 import { facilityModules } from "../archetypes/facilityModule";
-import { Faction } from "../archetypes/faction";
-import { Sector, sectorSize } from "../archetypes/sector";
+import type { Faction } from "../archetypes/faction";
+import type { Sector } from "../archetypes/sector";
+import { sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
-import { createCompoundProduction, PAC } from "../components/production";
+import type { PAC } from "../components/production";
+import { createCompoundProduction } from "../components/production";
 import { setTexture } from "../components/render";
 import { addStorage } from "../components/storage";
-import {
-  commoditiesArray,
-  Commodity,
-  mineableCommodities,
-} from "../economy/commodity";
-import { Sim } from "../sim";
+import type { Commodity } from "../economy/commodity";
+import { commoditiesArray, mineableCommodities } from "../economy/commodity";
+import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { addFacilityModule } from "../utils/entityModules";
 import { pickRandom } from "../utils/generators";

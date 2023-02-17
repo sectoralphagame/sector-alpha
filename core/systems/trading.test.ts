@@ -1,5 +1,5 @@
 import { matrix } from "mathjs";
-import { Facility } from "../archetypes/facility";
+import type { Facility } from "../archetypes/facility";
 import { createFaction, factionComponents } from "../archetypes/faction";
 import { createSector } from "../archetypes/sector";
 import { changeBudgetMoney } from "../components/budget";

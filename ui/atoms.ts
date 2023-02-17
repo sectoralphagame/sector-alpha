@@ -1,9 +1,9 @@
 import { atom, useRecoilState } from "recoil";
 import type { Sim } from "@core/sim";
-import { ConfigDialogProps } from "./components/ConfigDialog";
-import { ContextMenu } from "./components/ContextMenu/types";
-import { TradeDialogProps } from "./components/TradeDialog";
-import { FacilityModuleManagerProps } from "./components/FacilityModuleManager";
+import type { ConfigDialogProps } from "./components/ConfigDialog";
+import type { ContextMenu } from "./components/ContextMenu/types";
+import type { TradeDialogProps } from "./components/TradeDialog";
+import type { FacilityModuleManagerProps } from "./components/FacilityModuleManager";
 
 export const sim = atom<Sim>({
   key: "sim",

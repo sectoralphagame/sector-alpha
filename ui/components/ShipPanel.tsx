@@ -1,5 +1,5 @@
 import React from "react";
-import { Ship } from "@core/archetypes/ship";
+import type { Ship } from "@core/archetypes/ship";
 import { commodities, commodityLabel } from "@core/economy/commodity";
 import { Docks } from "./Docks";
 import AutoOrder from "./AutoOrder";

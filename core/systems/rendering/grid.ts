@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js";
+import type * as PIXI from "pixi.js";
 import { Graphics } from "@pixi/graphics";
 import "@pixi/graphics-extras";
 

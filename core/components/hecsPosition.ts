@@ -1,6 +1,7 @@
-import { add, matrix, Matrix, multiply, subtract, sum } from "mathjs";
+import type { Matrix } from "mathjs";
+import { add, matrix, multiply, subtract, sum } from "mathjs";
 import { sectorSize } from "../archetypes/sector";
-import { BaseComponent } from "./component";
+import type { BaseComponent } from "./component";
 
 export const transforms = {
   s: matrix([0, 1, -1]),

@@ -1,5 +1,5 @@
 import type { Component } from "react";
-import { CoreComponents } from "./components/component";
+import type { CoreComponents } from "./components/component";
 import type { Entity } from "./components/entity";
 
 export type KeyOf<T> = keyof T;

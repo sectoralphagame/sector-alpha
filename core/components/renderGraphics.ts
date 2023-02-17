@@ -1,13 +1,14 @@
 import { fieldColors } from "@core/archetypes/asteroid";
 import Color from "color";
-import { add, matrix, Matrix } from "mathjs";
-import { Viewport } from "pixi-viewport";
+import type { Matrix } from "mathjs";
+import { add, matrix } from "mathjs";
+import type { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
 import { sectorSize } from "../archetypes/sector";
-import { RequireComponent } from "../tsHelpers";
+import type { RequireComponent } from "../tsHelpers";
 import { findInAncestors } from "../utils/findInAncestors";
-import { BaseComponent } from "./component";
-import { Entity } from "./entity";
+import type { BaseComponent } from "./component";
+import type { Entity } from "./entity";
 import { hecsToCartesian } from "./hecsPosition";
 
 export type Graphics = Record<

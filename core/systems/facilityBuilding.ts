@@ -1,17 +1,12 @@
-import { clone } from "mathjs";
 import { createFacilityModule } from "@core/archetypes/facilityModule";
 import { perCommodity } from "@core/utils/perCommodity";
-import { Facility } from "@core/archetypes/facility";
-import { TradeOffer } from "@core/components/trade";
-import { createShip } from "../archetypes/ship";
-import { Commodity } from "../economy/commodity";
-import { Sim } from "../sim";
+import type { Facility } from "@core/archetypes/facility";
+import type { TradeOffer } from "@core/components/trade";
+import type { Commodity } from "../economy/commodity";
+import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { System } from "./system";
-import { Faction } from "../archetypes/faction";
-import { Sector } from "../archetypes/sector";
 import { hasSufficientStorage, removeStorage } from "../components/storage";
-import { dockShip } from "./orderExecuting/dock";
 
 const buildTimer = "facilityModuleBuild";
 

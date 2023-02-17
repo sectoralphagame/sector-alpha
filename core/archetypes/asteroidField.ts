@@ -1,10 +1,10 @@
-import { Matrix } from "mathjs";
-import { AsteroidSpawn } from "../components/asteroidSpawn";
+import type { Matrix } from "mathjs";
+import type { AsteroidSpawn } from "../components/asteroidSpawn";
 import { Entity } from "../components/entity";
 import { createRenderGraphics } from "../components/renderGraphics";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
-import { Sector } from "./sector";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
+import type { Sector } from "./sector";
 
 export const asteroidFieldComponents = [
   "asteroidSpawn",

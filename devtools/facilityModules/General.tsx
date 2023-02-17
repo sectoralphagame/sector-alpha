@@ -2,9 +2,9 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { useThrottledFormState } from "@devtools/utils";
-import { FacilityModuleInput } from "@core/archetypes/facilityModule";
+import type { FacilityModuleInput } from "@core/archetypes/facilityModule";
 import { Table, TableCell, TableHeader } from "../components/Table";
-import { FormData } from "./utils";
+import type { FormData } from "./utils";
 
 const FacilityModuleGeneralEditor: React.FC<{ index: number }> = ({
   index,

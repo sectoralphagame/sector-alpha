@@ -1,6 +1,6 @@
-import { Facility } from "@core/archetypes/facility";
-import { FacilityModuleInput } from "@core/archetypes/facilityModule";
-import { BaseComponent } from "./component";
+import type { Facility } from "@core/archetypes/facility";
+import type { FacilityModuleInput } from "@core/archetypes/facilityModule";
+import type { BaseComponent } from "./component";
 
 export interface FacilityModuleQueueItem {
   blueprint: FacilityModuleInput;

@@ -1,7 +1,7 @@
 import React from "react";
 import groupBy from "lodash/groupBy";
 import SVG from "react-inlinesvg";
-import { RequireComponent } from "@core/tsHelpers";
+import type { RequireComponent } from "@core/tsHelpers";
 import locationIcon from "@assets/ui/location.svg";
 import { Table, TableCell } from "@kit/Table";
 import { IconButton } from "@kit/IconButton";

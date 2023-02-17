@@ -1,7 +1,8 @@
-import { Facility } from "../archetypes/facility";
-import { FacilityModule } from "../archetypes/facilityModule";
+import type { Facility } from "../archetypes/facility";
+import type { FacilityModule } from "../archetypes/facilityModule";
 import { createCompoundProduction } from "../components/production";
-import { commodities, Commodity } from "../economy/commodity";
+import type { Commodity } from "../economy/commodity";
+import { commodities } from "../economy/commodity";
 
 export function addFacilityModule(
   facility: Facility,

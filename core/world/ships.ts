@@ -1,7 +1,7 @@
-import { DockSize } from "../components/dockable";
-import { ShipDriveProps } from "../components/drive";
-import { Textures } from "../components/render";
-import { Commodity } from "../economy/commodity";
+import type { DockSize } from "../components/dockable";
+import type { ShipDriveProps } from "../components/drive";
+import type { Textures } from "../components/render";
+import type { Commodity } from "../economy/commodity";
 import shipClassesData from "./data/ships.json";
 
 export const shipRoles = [

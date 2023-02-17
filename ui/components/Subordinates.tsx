@@ -1,5 +1,5 @@
 import React from "react";
-import { Entity } from "@core/components/entity";
+import type { Entity } from "@core/components/entity";
 import { ship as asShip } from "@core/archetypes/ship";
 import {
   Collapsible,

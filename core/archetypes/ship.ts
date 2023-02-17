@@ -1,4 +1,4 @@
-import { Matrix } from "mathjs";
+import type { Matrix } from "mathjs";
 import Color from "color";
 import pick from "lodash/pick";
 import { createDrive } from "../components/drive";
@@ -6,11 +6,11 @@ import { Entity } from "../components/entity";
 import { createMining } from "../components/mining";
 import { createRender } from "../components/render";
 import { createCommodityStorage } from "../components/storage";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
-import { Sector } from "./sector";
-import { Faction } from "./faction";
-import { ShipInput } from "../world/ships";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
+import type { Sector } from "./sector";
+import type { Faction } from "./faction";
+import type { ShipInput } from "../world/ships";
 
 export const shipComponents = [
   "autoOrder",

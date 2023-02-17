@@ -1,8 +1,9 @@
-import { add, Matrix, matrix, random, randomInt, sum } from "mathjs";
+import type { Matrix } from "mathjs";
+import { add, matrix, random, randomInt, sum } from "mathjs";
 import { asteroid, createAsteroid } from "../archetypes/asteroid";
 import { System } from "./system";
-import { AsteroidField } from "../archetypes/asteroidField";
-import { Sim } from "../sim";
+import type { AsteroidField } from "../archetypes/asteroidField";
+import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { limitMax } from "../utils/limit";
 

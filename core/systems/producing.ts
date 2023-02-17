@@ -1,14 +1,15 @@
 import { every } from "@fxts/core";
-import { Production } from "../components/production";
+import type { Production } from "../components/production";
+import type { CommodityStorage } from "../components/storage";
 import {
   addStorage,
-  CommodityStorage,
   hasSufficientStorage,
   removeStorage,
 } from "../components/storage";
-import { commodities, Commodity } from "../economy/commodity";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { Commodity } from "../economy/commodity";
+import { commodities } from "../economy/commodity";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
 import { findInAncestors } from "../utils/findInAncestors";
 import { limitMax } from "../utils/limit";

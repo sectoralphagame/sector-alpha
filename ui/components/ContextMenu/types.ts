@@ -1,4 +1,4 @@
-import { Sector } from "@core/archetypes/sector";
+import type { Sector } from "@core/archetypes/sector";
 
 export interface ContextMenu {
   active: boolean;

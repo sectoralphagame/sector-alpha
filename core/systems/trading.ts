@@ -1,24 +1,17 @@
 import { average, filter, flatMap, map, pipe, sum as fxSum } from "@fxts/core";
 import { randomInt, sum } from "mathjs";
-import { Sector } from "../archetypes/sector";
-import { TradeEntry } from "../components/journal";
-import { PriceBelief, TradeOffer } from "../components/trade";
-import {
-  commoditiesArray,
-  Commodity,
-  mineableCommoditiesArray,
-} from "../economy/commodity";
-import {
-  getPlannedBudget,
-  getSectorsInTeleportRange,
-  WithTrade,
-} from "../economy/utils";
-import settings from "../settings";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { Sector } from "../archetypes/sector";
+import type { TradeEntry } from "../components/journal";
+import type { PriceBelief, TradeOffer } from "../components/trade";
+import type { Commodity } from "../economy/commodity";
+import { commoditiesArray } from "../economy/commodity";
+import type { WithTrade } from "../economy/utils";
+import { getPlannedBudget, getSectorsInTeleportRange } from "../economy/utils";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
 import { limit } from "../utils/limit";
-import { perCommodity } from "../utils/perCommodity";
+import { commodityPrices, perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
 
 /**
@@ -109,7 +102,7 @@ function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
         entity.requireComponents(["compoundProduction", "trade", "modules"]),
         commodity
       )
-    : settings.global.minPrice;
+    : commodityPrices[commodity].min;
 
   if (!hadAnySale) {
     const diff = weight * mean;
@@ -138,14 +131,7 @@ function adjustSellPrice(entity: WithTrade, commodity: Commodity): number {
   }
 
   entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[commodity].map(
-    (v) =>
-      limit(
-        v,
-        minPrice,
-        (mineableCommoditiesArray as string[]).includes(commodity)
-          ? settings.global.maxMineablePrice
-          : settings.global.maxPrice
-      )
+    (v) => limit(v, minPrice, commodityPrices[commodity].max)
   ) as PriceBelief;
   if (
     entity.cp.trade.pricing[commodity][0] ===
@@ -215,13 +201,7 @@ function adjustBuyPrice(entity: WithTrade, commodity: Commodity): number {
 
   entity.cp.trade.pricing[commodity] = entity.cp.trade.pricing[commodity].map(
     (v) =>
-      limit(
-        v,
-        settings.global.minPrice,
-        (mineableCommoditiesArray as string[]).includes(commodity)
-          ? settings.global.maxMineablePrice
-          : settings.global.maxPrice
-      )
+      limit(v, commodityPrices[commodity].min, commodityPrices[commodity].max)
   ) as PriceBelief;
   if (
     entity.cp.trade.pricing[commodity][0] ===
@@ -336,7 +316,9 @@ export function createOffers(entity: WithTrade) {
 
     return {
       active: !(offeredQuantity === 0 && producedNet === 0),
-      price: entity.cp.trade.offers?.[commodity].price ?? 100,
+      price:
+        entity.cp.trade.offers?.[commodity].price ??
+        commodityPrices[commodity].avg,
       quantity: Math.abs(offeredQuantity),
       type: producedNet > 0 ? "sell" : "buy",
     };

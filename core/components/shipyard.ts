@@ -1,5 +1,5 @@
-import { ShipInput } from "../world/ships";
-import { BaseComponent } from "./component";
+import type { ShipInput } from "../world/ships";
+import type { BaseComponent } from "./component";
 
 export interface ShipyardQueueItem {
   /**

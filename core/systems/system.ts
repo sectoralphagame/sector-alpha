@@ -1,5 +1,5 @@
 import { notImplemented } from "../errors";
-import { Sim } from "../sim";
+import type { Sim } from "../sim";
 
 /**
  * Base class to extend new systems. Use `-ingSystem` postfix in system names.

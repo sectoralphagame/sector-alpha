@@ -1,7 +1,7 @@
 import React from "react";
 import { shipComponents, ship as asShip } from "@core/archetypes/ship";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@kit/Tabs";
-import { Entity } from "@core/components/entity";
+import type { Entity } from "@core/components/entity";
 import {
   facilityComponents,
   facility as asFacility,

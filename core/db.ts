@@ -1,4 +1,5 @@
-import { openDB, DBSchema } from "idb";
+import type { DBSchema } from "idb";
+import { openDB } from "idb";
 
 export interface Save {
   id?: number;

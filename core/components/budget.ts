@@ -1,12 +1,8 @@
 import { sum } from "mathjs";
 import { InsufficientMoney, NegativeBudget, NegativeQuantity } from "../errors";
-import { BaseComponent } from "./component";
-import {
-  Allocation,
-  Allocations,
-  newAllocation,
-  releaseAllocation,
-} from "./utils/allocations";
+import type { BaseComponent } from "./component";
+import type { Allocation, Allocations } from "./utils/allocations";
+import { newAllocation, releaseAllocation } from "./utils/allocations";
 
 export interface BudgetTransaction {
   amount: number;

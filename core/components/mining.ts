@@ -1,4 +1,4 @@
-import { BaseComponent } from "./component";
+import type { BaseComponent } from "./component";
 
 export interface Mining extends BaseComponent<"mining"> {
   /**

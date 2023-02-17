@@ -5,7 +5,7 @@ import EventEmitter from "eventemitter3";
 // For some reason replacer is not exported in types
 // @ts-expect-error
 import { reviver, replacer } from "mathjs";
-import { Path } from "graphlib";
+import type { Path } from "graphlib";
 
 import isPlainObject from "lodash/isPlainObject";
 import { filter, map, pipe, toArray } from "@fxts/core";
@@ -15,7 +15,7 @@ import { FacilityBuildingSystem } from "@core/systems/facilityBuilding";
 import { UndeployingSystem } from "@core/systems/undeploying";
 import { Entity, EntityComponents } from "../components/entity";
 import { BaseSim } from "./BaseSim";
-import { System } from "../systems/system";
+import type { System } from "../systems/system";
 import { BudgetPlanningSystem } from "../systems/budgetPlanning";
 import { ProducingSystem } from "../systems/producing";
 import { StorageQuotaPlanningSystem } from "../systems/storageQuotaPlanning";
@@ -24,7 +24,8 @@ import { SelectingSystem } from "../systems/selecting";
 import { OrderPlanningSystem } from "../systems/orderPlanning";
 import { MovingSystem } from "../systems/moving";
 import { MiningSystem } from "../systems/mining";
-import { createQueries, Queries } from "../systems/query";
+import type { Queries } from "../systems/query";
+import { createQueries } from "../systems/query";
 import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
 import { PathPlanningSystem } from "../systems/pathPlanning";
 import { CooldownUpdatingSystem } from "../systems/cooldowns";

@@ -1,9 +1,14 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { DockAction, MineAction, Action, Order } from "@core/components/orders";
+import type {
+  DockAction,
+  MineAction,
+  Action,
+  Order,
+} from "@core/components/orders";
 import { asteroidField } from "@core/archetypes/asteroidField";
-import { Ship } from "@core/archetypes/ship";
-import { Sim } from "@core/sim";
+import type { Ship } from "@core/archetypes/ship";
+import type { Sim } from "@core/sim";
 import { isOwnedByPlayer } from "@core/components/player";
 import closeIcon from "@assets/ui/close.svg";
 import {

@@ -1,7 +1,7 @@
-import { TradeAction } from "../../components/orders";
+import type { TradeAction } from "../../components/orders";
 import { releaseStorageAllocation, transfer } from "../../components/storage";
 import { NotDockedError } from "../../errors";
-import { RequireComponent } from "../../tsHelpers";
+import type { RequireComponent } from "../../tsHelpers";
 import { acceptTrade } from "../../utils/trading";
 
 export function tradeOrder(

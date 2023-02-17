@@ -1,7 +1,9 @@
 import { matrix } from "mathjs";
 import { facilityModules } from "../archetypes/facilityModule";
-import { createFaction, Faction } from "../archetypes/faction";
-import { createSector, Sector } from "../archetypes/sector";
+import type { Faction } from "../archetypes/faction";
+import { createFaction } from "../archetypes/faction";
+import type { Sector } from "../archetypes/sector";
+import { createSector } from "../archetypes/sector";
 import { Entity } from "../components/entity";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { linkTeleportModules } from "../components/teleport";

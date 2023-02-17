@@ -1,15 +1,28 @@
-import { Matrix, norm, subtract, sum } from "mathjs";
+import type { Matrix } from "mathjs";
+import { norm, subtract, sum } from "mathjs";
+import type { FacilityModuleInput } from "@core/archetypes/facilityModule";
+import { discriminate } from "@core/utils/maps";
 import sortBy from "lodash/sortBy";
 import minBy from "lodash/minBy";
 import maxBy from "lodash/maxBy";
-import { filter, map, pipe, toArray } from "@fxts/core";
-import { Sim } from "../sim";
-import { commoditiesArray, Commodity } from "./commodity";
-import { RequireComponent } from "../tsHelpers";
-import { AsteroidField } from "../archetypes/asteroidField";
-import { asteroid, Asteroid } from "../archetypes/asteroid";
-import { Sector, sector as asSector } from "../archetypes/sector";
-import { Marker } from "../archetypes/marker";
+import {
+  filter,
+  map,
+  pipe,
+  toArray,
+  average,
+  sum as fxtsSum,
+} from "@fxts/core";
+import type { Sim } from "../sim";
+import type { Commodity } from "./commodity";
+import { commoditiesArray } from "./commodity";
+import type { RequireComponent } from "../tsHelpers";
+import type { AsteroidField } from "../archetypes/asteroidField";
+import type { Asteroid } from "../archetypes/asteroid";
+import { asteroid } from "../archetypes/asteroid";
+import type { Sector } from "../archetypes/sector";
+import { sector as asSector } from "../archetypes/sector";
+import type { Marker } from "../archetypes/marker";
 import { perCommodity } from "../utils/perCommodity";
 import { pickRandom } from "../utils/generators";
 
@@ -208,5 +221,54 @@ export function getPlannedBudget(entity: WithTrade): number {
           : entity.cp.storage.quota[commodity] -
             entity.cp.storage.stored[commodity]) * offer.price
     )
+  );
+}
+
+/**
+ * Calculates price of commodity given its production capabilities
+ */
+export function getCommodityCost(
+  commodity: Commodity,
+  facilityModules: FacilityModuleInput[],
+  fn: (_it: Iterable<number>) => number = average
+): number {
+  const productionModules = facilityModules.filter(
+    discriminate("type", "production")
+  );
+
+  if (!productionModules.find((fm) => fm.pac[commodity]?.produces)) {
+    const x3 = (v: number) => [v, v * 3];
+    return fn(
+      {
+        ice: x3(9),
+        ore: x3(14),
+        silica: x3(17),
+        fuelium: x3(25),
+        goldOre: x3(32),
+      }[commodity]
+    );
+  }
+
+  return pipe(
+    productionModules,
+    filter((fm) => fm.pac[commodity]?.produces),
+    map((fm) =>
+      pipe(
+        Object.entries(fm.pac),
+        filter(([_, pac]) => pac.consumes),
+        map(
+          ([consumedCommodity, { consumes }]) =>
+            (getCommodityCost(
+              consumedCommodity as Commodity,
+              productionModules,
+              fn
+            ) *
+              consumes) /
+            fm.pac[commodity]!.produces
+        ),
+        fxtsSum
+      )
+    ),
+    fn
   );
 }

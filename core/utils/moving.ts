@@ -1,5 +1,5 @@
-import { Marker } from "../archetypes/marker";
-import { Action } from "../components/orders";
+import type { Marker } from "../archetypes/marker";
+import type { Action } from "../components/orders";
 import { findInAncestors } from "./findInAncestors";
 
 /**

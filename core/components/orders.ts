@@ -1,6 +1,6 @@
 import { NegativeQuantity } from "../errors";
-import { BaseComponent } from "./component";
-import { TransactionInput } from "./trade";
+import type { BaseComponent } from "./component";
+import type { TransactionInput } from "./trade";
 
 export interface DockAction {
   type: "dock";

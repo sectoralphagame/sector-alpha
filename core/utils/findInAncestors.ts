@@ -1,7 +1,7 @@
-import { CoreComponents } from "../components/component";
-import { Entity } from "../components/entity";
+import type { CoreComponents } from "../components/component";
+import type { Entity } from "../components/entity";
 import { MissingComponentError } from "../errors";
-import { RequireComponent } from "../tsHelpers";
+import type { RequireComponent } from "../tsHelpers";
 
 export function findInAncestors<T extends keyof CoreComponents>(
   entity: Entity,

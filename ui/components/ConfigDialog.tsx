@@ -1,7 +1,7 @@
 import React from "react";
 import SVG from "react-inlinesvg";
 import { Sim } from "@core/sim";
-import { Save } from "@core/db";
+import type { Save } from "@core/db";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { Dialog } from "@kit/Dialog";
 import { Button } from "@kit/Button";

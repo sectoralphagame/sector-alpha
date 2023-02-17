@@ -1,4 +1,5 @@
-import P5, { Camera } from "p5";
+import type { Camera } from "p5";
+import type P5 from "p5";
 import { limit } from "../../utils/limit";
 
 export const zMin = 90;

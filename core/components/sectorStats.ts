@@ -1,5 +1,5 @@
-import { Commodity, MineableCommodity } from "../economy/commodity";
-import { BaseComponent } from "./component";
+import type { Commodity, MineableCommodity } from "../economy/commodity";
+import type { BaseComponent } from "./component";
 
 export type SectorPriceStats = Record<
   Commodity,

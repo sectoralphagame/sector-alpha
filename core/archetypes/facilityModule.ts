@@ -1,9 +1,10 @@
-import { Commodity } from "@core/economy/commodity";
+import type { Commodity } from "@core/economy/commodity";
 import { fromEntries, pipe, map } from "@fxts/core";
 import { Entity } from "../components/entity";
-import { createProduction, PAC } from "../components/production";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { PAC } from "../components/production";
+import { createProduction } from "../components/production";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
 import modules from "../world/data/facilityModules.json";
 
 export interface FacilityModuleCommonInput {

@@ -1,8 +1,8 @@
 import Color from "color";
 import { Entity } from "../components/entity";
 import { MissingComponentError } from "../errors";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
 import { createBudget } from "../components/budget";
 
 let factionCounter = 0;

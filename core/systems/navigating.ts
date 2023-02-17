@@ -1,7 +1,8 @@
-import { Matrix, norm, subtract } from "mathjs";
+import type { Matrix } from "mathjs";
+import { norm, subtract } from "mathjs";
 import { clearTarget, startCruise, stopCruise } from "../components/drive";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
 import { limitMax } from "../utils/limit";
 import { Query } from "./query";
 import { System } from "./system";

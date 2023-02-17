@@ -1,9 +1,10 @@
 import { pipe, map, uniq, flat, toArray } from "@fxts/core";
-import { Faction } from "../archetypes/faction";
+import type { Faction } from "../archetypes/faction";
 import { getRequiredStorage } from "../components/production";
-import { commoditiesArray, Commodity } from "../economy/commodity";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { Commodity } from "../economy/commodity";
+import { commoditiesArray } from "../economy/commodity";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
 import { Cooldowns } from "../utils/cooldowns";
 import { System } from "./system";
 

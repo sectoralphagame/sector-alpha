@@ -1,6 +1,6 @@
 import { asteroidField } from "../archetypes/asteroidField";
 import { addStorage } from "../components/storage";
-import { RequireComponent } from "../tsHelpers";
+import type { RequireComponent } from "../tsHelpers";
 import { System } from "./system";
 
 type WithMining = RequireComponent<"mining" | "storage">;

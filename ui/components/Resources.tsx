@@ -1,5 +1,5 @@
 import React from "react";
-import { Sector } from "@core/archetypes/sector";
+import type { Sector } from "@core/archetypes/sector";
 import { getSectorResources } from "@core/utils/resources";
 import { Table, TableCell } from "@kit/Table";
 

@@ -1,7 +1,7 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import { Action } from "@core/components/orders";
-import { RequireComponent } from "@core/tsHelpers";
+import type { Action } from "@core/components/orders";
+import type { RequireComponent } from "@core/tsHelpers";
 import okIcon from "@assets/ui/ok.svg";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { IconButton } from "@kit/IconButton";

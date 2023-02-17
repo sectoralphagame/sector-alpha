@@ -1,17 +1,18 @@
 import { sum } from "mathjs";
 import sortBy from "lodash/sortBy";
-import { createShip, InitialShipInput } from "../archetypes/ship";
+import type { InitialShipInput } from "../archetypes/ship";
+import { createShip } from "../archetypes/ship";
 import { mineableCommodities } from "../economy/commodity";
-import { Sim } from "../sim";
+import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { pickRandom } from "../utils/generators";
 import { perCommodity } from "../utils/perCommodity";
-import { ShipRole } from "../world/ships";
+import type { ShipRole } from "../world/ships";
 import { System } from "./system";
-import { Faction } from "../archetypes/faction";
+import type { Faction } from "../archetypes/faction";
 import { sector as asSector } from "../archetypes/sector";
-import { Entity } from "../components/entity";
-import { RequireComponent } from "../tsHelpers";
+import type { Entity } from "../components/entity";
+import type { RequireComponent } from "../tsHelpers";
 import { notNull } from "../utils/maps";
 
 export function requestShip(

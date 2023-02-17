@@ -1,10 +1,10 @@
 import { stop } from "@core/components/drive";
 import { asteroid } from "../../archetypes/asteroid";
 import { asteroidField } from "../../archetypes/asteroidField";
-import { MineAction } from "../../components/orders";
+import type { MineAction } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
 import { getMineableAsteroid } from "../../economy/utils";
-import { RequireComponent } from "../../tsHelpers";
+import type { RequireComponent } from "../../tsHelpers";
 import { moveToActions } from "../../utils/moving";
 
 export function mineAction(

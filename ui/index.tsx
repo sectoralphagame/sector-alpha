@@ -1,6 +1,7 @@
 import React from "react";
 import { RecoilRoot } from "recoil";
-import { LocationContext, View } from "./context/Location";
+import type { View } from "./context/Location";
+import { LocationContext } from "./context/Location";
 import { Game } from "./views/Game";
 import { LoadGame } from "./views/Load";
 import { Main } from "./views/Main";

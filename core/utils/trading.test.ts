@@ -1,7 +1,10 @@
 import { matrix } from "mathjs";
-import { Facility, facilityComponents } from "../archetypes/facility";
-import { createFaction, Faction } from "../archetypes/faction";
-import { createSector, Sector } from "../archetypes/sector";
+import type { Facility } from "../archetypes/facility";
+import { facilityComponents } from "../archetypes/facility";
+import type { Faction } from "../archetypes/faction";
+import { createFaction } from "../archetypes/faction";
+import type { Sector } from "../archetypes/sector";
+import { createSector } from "../archetypes/sector";
 import { changeBudgetMoney } from "../components/budget";
 import { addStorage, removeStorage } from "../components/storage";
 import { Sim } from "../sim";
@@ -9,14 +12,15 @@ import { settleStorageQuota } from "../systems/storageQuotaPlanning";
 import { createOffers } from "../systems/trading";
 import { createFarm, createWaterFacility } from "../world/facilities";
 import { allocate, getNeededCommodities, resellCommodity } from "./trading";
-import { createShip, Ship } from "../archetypes/ship";
+import type { Ship } from "../archetypes/ship";
+import { createShip } from "../archetypes/ship";
 import { shipClasses } from "../world/ships";
 import { dockShip } from "../systems/orderExecuting/dock";
 import { tradeOrder } from "../systems/orderExecuting/trade";
-import { TradeAction } from "../components/orders";
-import { Commodity } from "../economy/commodity";
-import { RequireComponent } from "../tsHelpers";
-import { WithTrade } from "../economy/utils";
+import type { TradeAction } from "../components/orders";
+import type { Commodity } from "../economy/commodity";
+import type { RequireComponent } from "../tsHelpers";
+import type { WithTrade } from "../economy/utils";
 
 describe("Trading module", () => {
   let sim: Sim;

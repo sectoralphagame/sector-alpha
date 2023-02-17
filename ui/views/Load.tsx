@@ -1,6 +1,6 @@
 import React from "react";
 import { Sim } from "@core/sim";
-import { Save } from "@core/db";
+import type { Save } from "@core/db";
 import { useLocation } from "../context/Location";
 import { Saves } from "../components/Saves";
 import { View } from "../components/View";

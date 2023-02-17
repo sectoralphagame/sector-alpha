@@ -1,4 +1,4 @@
-import { BaseComponent } from "./component";
+import type { BaseComponent } from "./component";
 
 export type DeployableType = "facility" | "builder";
 

@@ -1,15 +1,15 @@
 import Color from "color";
-import { Matrix } from "mathjs";
+import type { Matrix } from "mathjs";
 import { createBudget } from "../components/budget";
 import { Entity } from "../components/entity";
 import { createRender } from "../components/render";
 import { createCommodityStorage } from "../components/storage";
 import { createTrade } from "../components/trade";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
-import { Sector } from "./sector";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
+import type { Sector } from "./sector";
 import { createDocks } from "../components/dockable";
-import { Faction } from "./faction";
+import type { Faction } from "./faction";
 
 export const commanderRange = 4;
 

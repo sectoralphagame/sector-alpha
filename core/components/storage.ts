@@ -8,14 +8,13 @@ import {
   NonIntegerQuantity,
 } from "../errors";
 import { perCommodity } from "../utils/perCommodity";
+import type { Allocation, Allocations } from "../components/utils/allocations";
 import {
-  Allocation,
-  Allocations,
   newAllocation,
   releaseAllocation,
 } from "../components/utils/allocations";
-import { Commodity } from "../economy/commodity";
-import { BaseComponent } from "./component";
+import type { Commodity } from "../economy/commodity";
+import type { BaseComponent } from "./component";
 
 export type StorageAllocationType = "incoming" | "outgoing";
 

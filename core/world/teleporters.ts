@@ -1,9 +1,11 @@
-import { add, Matrix, matrix, random, subtract } from "mathjs";
-import { Sector, sectorSize } from "../archetypes/sector";
+import type { Matrix } from "mathjs";
+import { add, matrix, random, subtract } from "mathjs";
+import type { Sector } from "../archetypes/sector";
+import { sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { createRenderGraphics } from "../components/renderGraphics";
 import { linkTeleportModules } from "../components/teleport";
-import { Sim } from "../sim";
+import type { Sim } from "../sim";
 import { createTeleporter } from "./facilities";
 
 export function createLink(sim: Sim, sectors: Sector[], position?: number[][]) {

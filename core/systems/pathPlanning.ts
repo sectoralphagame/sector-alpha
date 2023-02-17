@@ -1,5 +1,5 @@
 import { Graph, alg } from "graphlib";
-import { Sim } from "../sim";
+import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { findInAncestors } from "../utils/findInAncestors";
 import { System } from "./system";

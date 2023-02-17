@@ -1,7 +1,9 @@
-import { Matrix, matrix, randomInt } from "mathjs";
-import { createSector, Sector } from "../archetypes/sector";
+import type { Matrix } from "mathjs";
+import { matrix, randomInt } from "mathjs";
+import type { Sector } from "../archetypes/sector";
+import { createSector } from "../archetypes/sector";
 import { hecsDistance, hecsMove, transforms } from "../components/hecsPosition";
-import { Sim } from "../sim";
+import type { Sim } from "../sim";
 import { pickRandom } from "../utils/generators";
 import { getSectorName } from "./sectorNames";
 import { createLink } from "./teleporters";

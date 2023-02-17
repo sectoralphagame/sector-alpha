@@ -18,7 +18,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["react", "@typescript-eslint", "jest"],
+  plugins: ["react", "@typescript-eslint", "jest", "import"],
   rules: {
     quotes: ["error", "double"],
     "import/extensions": "off",
@@ -63,5 +63,7 @@ module.exports = {
         argsIgnorePattern: "^_",
       },
     ],
+    "import/no-cycle": ["error", { maxDepth: Infinity }],
+    "@typescript-eslint/consistent-type-imports": "error",
   },
 };

@@ -1,5 +1,5 @@
-import { MineableCommodity } from "../economy/commodity";
-import { BaseComponent } from "./component";
+import type { MineableCommodity } from "../economy/commodity";
+import type { BaseComponent } from "./component";
 
 export interface AsteroidSpawn extends BaseComponent<"asteroidSpawn"> {
   type: MineableCommodity;

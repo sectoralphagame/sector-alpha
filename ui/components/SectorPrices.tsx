@@ -1,12 +1,8 @@
 import React from "react";
-import {
-  ColorType,
-  createChart,
-  IChartApi,
-  UTCTimestamp,
-} from "lightweight-charts";
+import type { IChartApi, UTCTimestamp } from "lightweight-charts";
+import { ColorType, createChart } from "lightweight-charts";
 import Color from "color";
-import { Sector } from "@core/archetypes/sector";
+import type { Sector } from "@core/archetypes/sector";
 import { commodities } from "@core/economy/commodity";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";

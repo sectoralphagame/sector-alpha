@@ -1,7 +1,8 @@
 import { faction } from "../archetypes/faction";
 import { transferMoney } from "../components/budget";
-import { getPlannedBudget, WithTrade } from "../economy/utils";
-import { Sim } from "../sim";
+import type { WithTrade } from "../economy/utils";
+import { getPlannedBudget } from "../economy/utils";
+import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { limitMax } from "../utils/limit";
 import { Query } from "./query";

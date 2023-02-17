@@ -1,8 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { WithTrade } from "@core/economy/utils";
-import { commoditiesArray, Commodity } from "@core/economy/commodity";
-import { RequireComponent } from "@core/tsHelpers";
+import type { WithTrade } from "@core/economy/utils";
+import type { Commodity } from "@core/economy/commodity";
+import { commoditiesArray } from "@core/economy/commodity";
+import type { RequireComponent } from "@core/tsHelpers";
 import { getAvailableSpace } from "@core/components/storage";
 import { tradeCommodity } from "@core/utils/trading";
 import { Dialog } from "@kit/Dialog";
@@ -11,7 +12,7 @@ import { Input } from "@kit/Input";
 import { Table, TableCell, TableHeader } from "@kit/Table";
 import Text from "@kit/Text";
 import { useGameDialog, useSim } from "../atoms";
-import { ModalProps } from "./ConfigDialog";
+import type { ModalProps } from "./ConfigDialog";
 import styles from "./TradeDialog.scss";
 
 export interface TradeDialogProps {

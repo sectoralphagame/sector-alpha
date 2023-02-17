@@ -2,11 +2,8 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
-import {
-  commoditiesArray,
-  Commodity,
-  commodityLabel,
-} from "@core/economy/commodity";
+import type { Commodity } from "@core/economy/commodity";
+import { commoditiesArray, commodityLabel } from "@core/economy/commodity";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
@@ -16,16 +13,17 @@ import {
   DropdownOption,
   DropdownOptions,
 } from "@kit/Dropdown";
-import { formatInt, getCost, useThrottledFormState } from "@devtools/utils";
-import {
+import { formatInt, useThrottledFormState } from "@devtools/utils";
+import type {
   FacilityModuleInput,
   HabitatFacilityModuleInput,
   ProductionFacilityModuleInput,
 } from "@core/archetypes/facilityModule";
 import { max, min } from "@fxts/core";
+import { getCommodityCost } from "@core/economy/utils";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
-import { FormData } from "./utils";
+import type { FormData } from "./utils";
 
 const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
   index,
@@ -93,7 +91,7 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
               .filter(([_, pac]) => pac.produces)
               .reduce(
                 (acc, [commodity]) =>
-                  acc + getCost(commodity as Commodity, allModules),
+                  acc + getCommodityCost(commodity as Commodity, allModules),
                 0
               )
           )}
@@ -104,7 +102,8 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
               .filter(([_, pac]) => pac.produces)
               .reduce(
                 (acc, [commodity]) =>
-                  acc + getCost(commodity as Commodity, allModules, min),
+                  acc +
+                  getCommodityCost(commodity as Commodity, allModules, min),
                 0
               )
           )}
@@ -115,7 +114,8 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
               .filter(([_, pac]) => pac.produces)
               .reduce(
                 (acc, [commodity]) =>
-                  acc + getCost(commodity as Commodity, allModules, max),
+                  acc +
+                  getCommodityCost(commodity as Commodity, allModules, max),
                 0
               )
           )}

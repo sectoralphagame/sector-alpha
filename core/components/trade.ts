@@ -1,7 +1,7 @@
 import { random, randomInt } from "mathjs";
-import { Commodity } from "../economy/commodity";
-import { perCommodity } from "../utils/perCommodity";
-import { BaseComponent } from "./component";
+import type { Commodity } from "../economy/commodity";
+import { commodityPrices, perCommodity } from "../utils/perCommodity";
+import type { BaseComponent } from "./component";
 
 export type PriceBelief = [number, number];
 
@@ -47,8 +47,11 @@ export interface Trade extends BaseComponent<"trade"> {
 }
 
 export function createTrade(): Trade {
-  const pricing = perCommodity(() => {
-    const lower = random(50, 150);
+  const pricing = perCommodity((commodity) => {
+    const lower = random(
+      commodityPrices[commodity].min,
+      commodityPrices[commodity].max
+    );
     const upper = lower + random(5, 20);
 
     return [lower, upper] as PriceBelief;

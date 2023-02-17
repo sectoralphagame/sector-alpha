@@ -1,6 +1,6 @@
-import { Sector } from "@core/archetypes/sector";
+import type { Sector } from "@core/archetypes/sector";
 import { worldToHecs } from "@core/components/hecsPosition";
-import { RequireComponent } from "@core/tsHelpers";
+import type { RequireComponent } from "@core/tsHelpers";
 import { Cooldowns } from "@core/utils/cooldowns";
 import { deepEqual } from "mathjs";
 import { System } from "../system";

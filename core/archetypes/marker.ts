@@ -1,8 +1,8 @@
-import { Matrix } from "mathjs";
+import type { Matrix } from "mathjs";
 import { Entity } from "../components/entity";
 import { MissingComponentError } from "../errors";
-import { Sim } from "../sim";
-import { RequireComponent } from "../tsHelpers";
+import type { Sim } from "../sim";
+import type { RequireComponent } from "../tsHelpers";
 
 export const markerComponents = ["position"] as const;
 

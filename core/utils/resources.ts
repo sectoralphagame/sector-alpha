@@ -1,8 +1,8 @@
 import { groupBy } from "lodash";
 import { sum } from "mathjs";
-import { Sector } from "../archetypes/sector";
-import { Commodity } from "../economy/commodity";
-import { RequireComponent } from "../tsHelpers";
+import type { Sector } from "../archetypes/sector";
+import type { Commodity } from "../economy/commodity";
+import type { RequireComponent } from "../tsHelpers";
 import { perCommodity } from "./perCommodity";
 
 export interface SectorResources {
