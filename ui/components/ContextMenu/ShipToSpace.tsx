@@ -63,6 +63,25 @@ export const ShipToSpace: React.FC = () => {
     });
   };
 
+  const onFacilityDeploy = () => {
+    entity.cp.orders!.value.push({
+      origin: "manual",
+      type: "move",
+      actions: [
+        ...moveToActions(
+          entity,
+          createMarker(sim, {
+            sector: menu.sector!.id,
+            value: matrix(menu.worldPosition),
+          })
+        ),
+        {
+          type: "deployFacility",
+        },
+      ],
+    });
+  };
+
   return (
     <>
       <DropdownOption onClick={onMove}>Move</DropdownOption>
@@ -72,6 +91,11 @@ export const ShipToSpace: React.FC = () => {
             Mine {field.cp.asteroidSpawn.type}
           </DropdownOption>
         ))}
+      {entity.cp.deployable?.type === "facility" && (
+        <DropdownOption onClick={onFacilityDeploy}>
+          Deploy Facility
+        </DropdownOption>
+      )}
     </>
   );
 };

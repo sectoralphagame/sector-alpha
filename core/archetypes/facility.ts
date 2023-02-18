@@ -24,6 +24,7 @@ export const facilityComponents = [
   "selection",
   "storage",
   "trade",
+  "facilityModuleQueue",
 ] as const;
 
 export type FacilityComponent = (typeof facilityComponents)[number];
@@ -45,6 +46,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
   entity
     .addComponent(createBudget())
     .addComponent(createDocks({ large: 1, medium: 3, small: 3 }))
+    .addComponent({ name: "facilityModuleQueue", building: null, queue: [] })
     .addComponent({
       name: "modules",
       ids: [],

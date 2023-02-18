@@ -30,8 +30,8 @@ export function getSelected(
 
 export function getSelectedSecondary(
   sim: Sim
-): RequireComponent<"selection"> | undefined {
-  return sim.get<RequireComponent<"selection">>(
+): RequireComponent<"selection" | "position"> | undefined {
+  return sim.get<RequireComponent<"selection" | "position">>(
     sim.queries.settings.get()[0].cp.selectionManager.secondaryId!
   );
 }

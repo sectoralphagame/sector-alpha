@@ -91,7 +91,7 @@ export const UniverseMap: React.FC = () => {
   }, [canvas]);
 
   return (
-    <div className={styles.root}>
+    <>
       <canvas
         height={window.innerHeight}
         width={window.innerWidth}
@@ -132,6 +132,6 @@ export const UniverseMap: React.FC = () => {
           </tbody>
         </Table>
       </div>
-    </div>
+    </>
   );
 };

@@ -1,0 +1,6 @@
+/* @generated */
+/* prettier-ignore */
+/* eslint-disable */
+export const root: string;
+export const btn: string;
+export const btnDetach: string;

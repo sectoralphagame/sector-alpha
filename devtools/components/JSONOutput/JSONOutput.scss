@@ -1,0 +1,21 @@
+.root {
+  border-left: 1px solid var(--palette-default);
+  padding: var(--spacing-1);
+  overflow-y: scroll;
+  font-family: monospace;
+  line-break: anywhere;
+
+  & json-viewer {
+    --background-color: transparent;
+  }
+
+  & .toolbar {
+    display: flex;
+    gap: var(--spacing-1);
+    margin-bottom: var(--spacing-1);
+  }
+}
+
+.rotate {
+  transform: rotate(180deg);
+}

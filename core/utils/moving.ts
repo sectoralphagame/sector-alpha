@@ -5,12 +5,17 @@ import { findInAncestors } from "./findInAncestors";
 /**
  * Creates array of actions necessary to get to target entity
  */
-export function moveToActions(origin: Marker, target: Marker): Action[] {
-  const orders: Action[] = [];
+export function moveToActions(
+  origin: Marker,
+  target: Marker,
+  onlyManeuver?: boolean
+): Action[] {
+  const actions: Action[] = [];
   const targetSector = target.cp.position.sector.toString();
   const paths = origin.sim.paths[targetSector];
 
-  for (let s = origin.cp.position.sector.toString(); s !== targetSector; ) {
+  let s = origin.cp.position.sector.toString();
+  while (s !== targetSector) {
     const teleport = origin.sim.queries.teleports
       .get()
       .find(
@@ -23,7 +28,7 @@ export function moveToActions(origin: Marker, target: Marker): Action[] {
       );
 
     if (!teleport) {
-      return orders;
+      return actions;
     }
 
     const t1 = findInAncestors(teleport, "position");
@@ -32,7 +37,7 @@ export function moveToActions(origin: Marker, target: Marker): Action[] {
       "position"
     );
 
-    orders.push(
+    actions.push(
       {
         type: "move",
         targetId: t1.id,
@@ -45,10 +50,15 @@ export function moveToActions(origin: Marker, target: Marker): Action[] {
     s = paths[s.toString()].predecessor;
   }
 
-  orders.push({
+  actions.push({
     type: "move",
     targetId: target.id,
   });
 
-  return orders;
+  const lastAction = actions.at(-1);
+  if (lastAction?.type === "move" && onlyManeuver && actions.length === 1) {
+    lastAction.onlyManeuver = true;
+  }
+
+  return actions;
 }

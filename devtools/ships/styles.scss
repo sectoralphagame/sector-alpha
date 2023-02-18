@@ -21,15 +21,10 @@
 .rootExpanded {
   grid-template-columns: 1fr 350px;
 }
-.viewer {
-  json-viewer {
-    --background-color: transparent;
-  }
-  border-left: 1px solid var(--palette-default);
-  padding: var(--spacing-1);
-  overflow-y: scroll;
-  font-family: monospace;
-  line-break: anywhere;
+.toolbar {
+  display: flex;
+  gap: var(--spacing-1);
+  margin-bottom: var(--spacing-1);
 }
 .column {
   display: flex;
@@ -37,16 +32,8 @@
   gap: var(--spacing-1);
   padding: var(--spacing-1) 0;
 }
-.toolbar {
-  display: flex;
-  gap: var(--spacing-1);
-  margin-bottom: var(--spacing-1);
-}
 .hr {
   margin-bottom: var(--spacing-1);
-}
-.rotate {
-  transform: rotate(180deg);
 }
 .rowExpander {
   transform: rotate(-90deg);

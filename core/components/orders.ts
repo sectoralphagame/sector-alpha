@@ -15,6 +15,7 @@ export interface TeleportAction {
 export interface MoveAction {
   type: "move";
   targetId: number;
+  onlyManeuver?: boolean;
 }
 
 export interface TradeAction {
@@ -33,13 +34,24 @@ export interface HoldPositionAction {
   type: "hold";
 }
 
+export interface FacilityDeployAction {
+  type: "deployFacility";
+}
+
+export interface BuilderDeployAction {
+  type: "deployBuilder";
+  targetId: number;
+}
+
 export type Action =
   | MoveAction
   | TradeAction
   | MineAction
   | HoldPositionAction
   | TeleportAction
-  | DockAction;
+  | DockAction
+  | FacilityDeployAction
+  | BuilderDeployAction;
 export interface BaseOrder {
   origin: "auto" | "manual";
   actions: Action[];
@@ -54,7 +66,14 @@ export interface FollowOrder extends BaseOrder {
 
 export type Order =
   | ({
-      type: "mine" | "trade" | "hold" | "move" | "dock";
+      type:
+        | "mine"
+        | "trade"
+        | "hold"
+        | "move"
+        | "dock"
+        | "deployFacility"
+        | "deployBuilder";
     } & BaseOrder)
   | FollowOrder;
 

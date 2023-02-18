@@ -59,7 +59,10 @@ export function createShipyard(input: InitialFacilityInput, sim: Sim) {
 
 export function createWaterFacility(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
-  addFacilityModule(facility, facilityModules.water.create(sim, facility));
+  addFacilityModule(
+    facility,
+    facilityModules.waterProduction.create(sim, facility)
+  );
   addFacilityModule(
     facility,
     facilityModules.containerSmall.create(sim, facility)
@@ -76,7 +79,7 @@ export function createFuelFabricationFacility(
   const facility = createFacility(sim, input);
   addFacilityModule(
     facility,
-    facilityModules.fuelFabrication.create(sim, facility)
+    facilityModules.fueliumRefinery.create(sim, facility)
   );
   addFacilityModule(
     facility,
@@ -92,7 +95,10 @@ export function createHullPlatesFacility(
   sim: Sim
 ) {
   const facility = createFacility(sim, input);
-  addFacilityModule(facility, facilityModules.hullPlates.create(sim, facility));
+  addFacilityModule(
+    facility,
+    facilityModules.hullPlatesFactory.create(sim, facility)
+  );
   addFacilityModule(
     facility,
     facilityModules.containerSmall.create(sim, facility)
@@ -104,7 +110,10 @@ export function createHullPlatesFacility(
 
 export function createGoldRefinery(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
-  addFacilityModule(facility, facilityModules.gold.create(sim, facility));
+  addFacilityModule(
+    facility,
+    facilityModules.goldRefinery.create(sim, facility)
+  );
   addFacilityModule(
     facility,
     facilityModules.containerSmall.create(sim, facility)
@@ -119,7 +128,10 @@ export function createSiliconPurificationFacility(
   sim: Sim
 ) {
   const facility = createFacility(sim, input);
-  addFacilityModule(facility, facilityModules.silicon.create(sim, facility));
+  addFacilityModule(
+    facility,
+    facilityModules.siliconPurification.create(sim, facility)
+  );
   addFacilityModule(
     facility,
     facilityModules.containerSmall.create(sim, facility)
@@ -136,7 +148,7 @@ export function createElectronicsFacility(
   const facility = createFacility(sim, input);
   addFacilityModule(
     facility,
-    facilityModules.electronics.create(sim, facility)
+    facilityModules.electronicsFactory.create(sim, facility)
   );
   addFacilityModule(
     facility,

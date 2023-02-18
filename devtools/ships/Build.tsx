@@ -7,15 +7,18 @@ import { commoditiesArray, Commodity } from "@core/economy/commodity";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
+import allModules from "@core/world/data/facilityModules.json";
 import {
   Dropdown,
   DropdownButton,
   DropdownOption,
   DropdownOptions,
 } from "@kit/Dropdown";
+import { formatInt, getCost, useThrottledFormState } from "@devtools/utils";
+import { max, min } from "@fxts/core";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
-import { FormData, useThrottledFormState } from "./utils";
+import { FormData } from "./utils";
 
 const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
   const { register, getValues, setValue } = useFormContext<FormData>();
@@ -51,10 +54,43 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
               valueAsNumber: true,
               min: 0,
             })}
+            type="number"
             defaultValue={getValues().ships[index].build.time}
           />
         </TableCell>
         <TableCell>Expand row to see details</TableCell>
+        <TableCell>
+          {formatInt(
+            Object.entries(ship.build.cost).reduce(
+              (acc, [commodity, quantity]) =>
+                acc +
+                getCost(commodity as Commodity, allModules as any) * quantity,
+              0
+            )
+          )}
+        </TableCell>
+        <TableCell>
+          {formatInt(
+            Object.entries(ship.build.cost).reduce(
+              (acc, [commodity, quantity]) =>
+                acc +
+                getCost(commodity as Commodity, allModules as any, min) *
+                  quantity,
+              0
+            )
+          )}
+        </TableCell>
+        <TableCell>
+          {formatInt(
+            Object.entries(ship.build.cost).reduce(
+              (acc, [commodity, quantity]) =>
+                acc +
+                getCost(commodity as Commodity, allModules as any, max) *
+                  quantity,
+              0
+            )
+          )}
+        </TableCell>
       </tr>
       {expanded && (
         <tr>
@@ -74,6 +110,7 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
                         valueAsNumber: true,
                         min: 1,
                       })}
+                      type="number"
                       step={1}
                     />
                     <IconButton
@@ -123,14 +160,20 @@ export const BuildEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
       <col style={{ width: "48px" }} />
       <col style={{ width: "250px" }} />
       <col style={{ width: "150px" }} />
+      <col style={{ width: "200px" }} />
+      <col style={{ width: "200px" }} />
+      <col style={{ width: "200px" }} />
       <col />
     </colgroup>
     <thead>
       <tr>
         {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
         <th colSpan={2} />
-        <TableHeader>Buikd [s]</TableHeader>
+        <TableHeader>Build [s]</TableHeader>
         <TableHeader>Cost</TableHeader>
+        <TableHeader>Average Cost [UTT]</TableHeader>
+        <TableHeader>Minimal Cost [UTT]</TableHeader>
+        <TableHeader>Maximal Cost [UTT]</TableHeader>
       </tr>
     </thead>
     <tbody>

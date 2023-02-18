@@ -21,6 +21,7 @@ export interface ShipDriveProps {
 }
 
 export interface Drive extends BaseComponent<"drive"> {
+  active: boolean;
   /** Expressed in percent of max speed per second */
   acceleration: number;
   currentSpeed: number;
@@ -42,9 +43,12 @@ export interface Drive extends BaseComponent<"drive"> {
   mode: "goto" | "follow";
 }
 
+export const defaultDriveLimit = 2000;
+
 export function createDrive(input: ShipDriveProps): Drive {
   return {
     ...input,
+    active: true,
     currentSpeed: 0,
     currentRotary: 0,
     rotary: (input.rotary * Math.PI) / 180,
@@ -53,7 +57,7 @@ export function createDrive(input: ShipDriveProps): Drive {
     targetReached: false,
     name: "drive",
     minimalDistance: 0.01,
-    limit: 2000,
+    limit: defaultDriveLimit,
     mode: "goto",
   };
 }

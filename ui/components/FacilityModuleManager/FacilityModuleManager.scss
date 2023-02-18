@@ -1,0 +1,58 @@
+.root {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  gap: var(--spacing-4);
+}
+
+.sectionHeader {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.blueprints {
+  height: 364px;
+  overflow-y: scroll;
+
+  &Item {
+    border-color: var(--palette-border);
+    border-radius: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    text-transform: none;
+    width: 100%;
+    text-align: left;
+    height: 48px;
+
+    &Active {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+  }
+}
+
+.build {
+  position: relative;
+
+  &Time {
+    margin-top: var(--spacing-4);
+  }
+  &Cost {
+    line-height: 1.6;
+  }
+  &Btn {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+
+    &Cancel {
+      border-color: var(--palette-warning);
+      color: var(--palette-warning);
+    }
+  }
+}
+
+.queue {
+  &Item {
+    display: block;
+    color: var(--palette-warning);
+  }
+}

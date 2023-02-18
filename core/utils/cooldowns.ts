@@ -20,6 +20,11 @@ export class Cooldowns<T extends string> {
     return this.timers[key] === 0;
   }
 
+  /**
+   *
+   * @param key Timer ID
+   * @param time Time in seconds
+   */
   use(key: T, time: number) {
     if (this.timers[key] === undefined) {
       this.add(key);

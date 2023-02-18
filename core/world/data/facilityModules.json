@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Water Production",
+    "slug": "waterProduction",
+    "pac": {
+      "ice": { "consumes": 4800, "produces": 0 },
+      "water": { "consumes": 0, "produces": 2400 }
+    },
+    "time": 120,
+    "type": "production",
+    "build": {
+      "cost": {
+        "hullPlates": 8500,
+        "fuel": 20000,
+        "electronics": 2600,
+        "drones": 50
+      },
+      "time": 220
+    }
+  },
+  {
+    "name": "Small Container",
+    "slug": "containerSmall",
+    "storage": 4000,
+    "type": "storage",
+    "build": {
+      "cost": {
+        "hullPlates": 1000,
+        "fuel": 800,
+        "electronics": 120,
+        "drones": 20
+      },
+      "time": 70
+    }
+  },
+  {
+    "name": "Medium Container",
+    "type": "storage",
+    "pac": {},
+    "slug": "containerMedium",
+    "time": 0,
+    "build": { "cost": {}, "time": 0 },
+    "storage": 20000
+  },
+  {
+    "name": "Shipyard",
+    "type": "shipyard",
+    "pac": {},
+    "slug": "shipyard",
+    "time": 0,
+    "build": {
+      "cost": {
+        "hullPlates": 70000,
+        "fuel": 24000,
+        "electronics": 12000,
+        "drones": 1000
+      },
+      "time": 0
+    }
+  },
+  {
+    "name": "Habitation Dome",
+    "type": "habitat",
+    "pac": {
+      "food": { "consumes": 400, "produces": 0 },
+      "fuel": { "consumes": 700, "produces": 0 }
+    },
+    "slug": "habitat",
+    "time": 150,
+    "build": {
+      "cost": { "electronics": 2300, "fuel": 1450, "hullPlates": 22000 },
+      "time": 410
+    },
+    "crew": "100"
+  },
+  {
+    "name": "Large Container",
+    "type": "storage",
+    "pac": {},
+    "slug": "containerLarge",
+    "time": 0,
+    "build": { "cost": {}, "time": 0 },
+    "storage": 60000
+  },
+  {
+    "name": "Farm",
+    "type": "production",
+    "pac": {
+      "food": { "consumes": 0, "produces": 1300 },
+      "fuel": { "consumes": 350, "produces": 0 },
+      "water": { "consumes": 700, "produces": 0 }
+    },
+    "slug": "farm",
+    "time": 180,
+    "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Refinery",
+    "type": "production",
+    "pac": {
+      "ore": { "consumes": 4000, "produces": 0 },
+      "metals": { "consumes": 0, "produces": 2000 }
+    },
+    "slug": "refinery",
+    "time": 150,
+    "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Fuelium Refinery",
+    "type": "production",
+    "pac": {
+      "fuel": { "consumes": 0, "produces": 2900 },
+      "fuelium": { "consumes": 4800, "produces": 0 }
+    },
+    "slug": "fueliumRefinery",
+    "time": 180,
+    "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Hull Plates Factory",
+    "type": "production",
+    "pac": {
+      "food": { "consumes": 130, "produces": 0 },
+      "fuel": { "consumes": 1300, "produces": 0 },
+      "metals": { "consumes": 1600, "produces": 0 },
+      "hullPlates": { "consumes": 0, "produces": 4600 }
+    },
+    "slug": "hullPlatesFactory",
+    "time": 55,
+    "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Gold Refinery",
+    "type": "production",
+    "pac": {
+      "goldOre": { "consumes": 4700, "produces": 0 },
+      "gold": { "consumes": 0, "produces": 620 },
+      "fuel": { "consumes": 550, "produces": 0 }
+    },
+    "slug": "goldRefinery",
+    "time": 230,
+    "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Silicon Purification",
+    "type": "production",
+    "pac": {
+      "silica": { "consumes": 3600, "produces": 0 },
+      "silicon": { "consumes": 0, "produces": 6000 }
+    },
+    "slug": "siliconPurification",
+    "time": 120,
+    "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Electronics Factory",
+    "type": "production",
+    "pac": {
+      "electronics": { "consumes": 0, "produces": 600 },
+      "food": { "consumes": 600, "produces": 0 },
+      "silicon": { "consumes": 2000, "produces": 0 },
+      "fuel": { "consumes": 600, "produces": 0 },
+      "gold": { "consumes": 1200, "produces": 0 }
+    },
+    "slug": "electronicsFactory",
+    "time": 260,
+    "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Drone Factory",
+    "type": "production",
+    "pac": {
+      "hullPlates": { "consumes": 96, "produces": 0 },
+      "electronics": { "consumes": 82, "produces": 0 },
+      "drones": { "consumes": 0, "produces": 50 }
+    },
+    "slug": "droneFactory",
+    "time": 480,
+    "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Hyperspace Generator",
+    "type": "teleport",
+    "pac": {
+      "hullPlates": { "consumes": 96, "produces": 0 },
+      "electronics": { "consumes": 82, "produces": 0 },
+      "drones": { "consumes": 0, "produces": 50 }
+    },
+    "slug": "teleport",
+    "time": 480,
+    "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Basic Module",
+    "type": "storage",
+    "pac": {},
+    "slug": "basic",
+    "time": 0,
+    "build": { "cost": {}, "time": 0 },
+    "storage": 1000
+  }
+]

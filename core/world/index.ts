@@ -3,6 +3,7 @@ import { matrix, random } from "mathjs";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { AiType } from "@core/components/ai";
 import { requestShip } from "@core/systems/shipPlanning";
+import { facilityModules } from "@core/archetypes/facilityModule";
 import { createFaction } from "../archetypes/faction";
 import { createShip } from "../archetypes/ship";
 import { changeBudgetMoney } from "../components/budget";
@@ -114,6 +115,10 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     player.addComponent({ name: "player" });
     changeBudgetMoney(player.cp.budget, 5000);
     const startingSector = getSector("sector-alpha");
+    player.cp.blueprints.facilityModules.push(
+      facilityModules.containerSmall,
+      facilityModules.farm
+    );
 
     const playerShip = createShip(sim, {
       ...pickRandom(
@@ -129,6 +134,28 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       sector: startingSector,
     });
     playerShip.cp.autoOrder!.default = "hold";
+
+    const builderShip = createShip(sim, {
+      ...pickRandom(shipClasses.filter(({ role }) => role === "building")),
+      position: hecsToCartesian(
+        startingSector.cp.hecsPosition.value,
+        sectorSize / 10
+      ),
+      owner: player,
+      sector: startingSector,
+    });
+    builderShip.cp.autoOrder!.default = "hold";
+
+    const storageShip = createShip(sim, {
+      ...pickRandom(shipClasses.filter(({ role }) => role === "storage")),
+      position: hecsToCartesian(
+        startingSector.cp.hecsPosition.value,
+        sectorSize / 10
+      ),
+      owner: player,
+      sector: startingSector,
+    });
+    storageShip.cp.autoOrder!.default = "hold";
 
     mapData.factions.forEach((factionData) => {
       const faction = createFaction(factionData.name, sim);

@@ -36,7 +36,7 @@ export function createFaction(name: string, sim: Sim) {
     })
     .addComponent(createBudget())
     .addComponent({ name: "name", value: name })
-    .addComponent({ name: "blueprints", ships: [] });
+    .addComponent({ name: "blueprints", ships: [], facilityModules: [] });
   factionCounter++;
 
   return entity as Faction;

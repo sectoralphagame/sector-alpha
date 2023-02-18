@@ -160,5 +160,51 @@
     "storage": 210,
     "texture": "mMin",
     "slug": "minerTau"
+  },
+  {
+    "acceleration": 0.05,
+    "build": {
+      "time": 0,
+      "cost": {
+        "drones": 10,
+        "electronics": 2100,
+        "hullPlates": 51000,
+        "fuel": 12000
+      }
+    },
+    "mining": 0,
+    "role": "building",
+    "cruise": 1.1,
+    "maneuver": 0.07,
+    "rotary": 8,
+    "ttc": 14,
+    "name": "Facility Starter",
+    "size": "large",
+    "storage": 100,
+    "texture": "lBuilder",
+    "slug": "facilityStarter"
+  },
+  {
+    "acceleration": 0.06,
+    "build": {
+      "time": 0,
+      "cost": {
+        "drones": 7,
+        "electronics": 1500,
+        "hullPlates": 33000,
+        "fuel": 8000
+      }
+    },
+    "mining": 0,
+    "role": "storage",
+    "cruise": 0.9,
+    "maneuver": 0.055,
+    "rotary": 11,
+    "ttc": 21,
+    "name": "Facility Builder",
+    "size": "large",
+    "storage": 0,
+    "texture": "lStorage",
+    "slug": "facilityBuilder"
   }
 ]

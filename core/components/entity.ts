@@ -9,6 +9,7 @@ import { MissingComponentError } from "../errors";
 import { Cooldowns } from "../utils/cooldowns";
 import { isHeadless } from "../settings";
 import { CoreComponents } from "./component";
+import { destroy } from "./render";
 
 export class EntityComponents {
   toJSON() {
@@ -72,15 +73,17 @@ export class Entity {
     return this;
   }
 
-  removeComponent(name: keyof CoreComponents) {
+  removeComponent(name: keyof CoreComponents): Entity {
     delete this.components[name];
     this.sim.events.emit("remove-component", { name, entity: this });
+
+    return this;
   }
 
   unregister() {
     this.deleted = true;
     if (!isHeadless && this.cp.render) {
-      this.cp.render.sprite.destroy();
+      destroy(this.cp.render);
     }
     this.sim.unregisterEntity(this);
   }

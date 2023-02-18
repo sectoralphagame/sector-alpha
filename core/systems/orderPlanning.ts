@@ -74,7 +74,8 @@ function idleMovement(entity: Trading) {
                 matrix([random(-25, 25), random(-25, 25)])
               ),
             }
-      )
+      ),
+      true
     ),
     type: "move",
   });
@@ -103,7 +104,17 @@ function autoTradeForCommander(
 ) {
   const commander = entity.sim
     .getOrThrow(entity.cp.commander.id)
-    .requireComponents([...facilityComponents, "owner"]);
+    .requireComponents([
+      "budget",
+      "docks",
+      "name",
+      "position",
+      "journal",
+      "selection",
+      "storage",
+      "trade",
+      "owner",
+    ]);
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     returnToFacility(entity);

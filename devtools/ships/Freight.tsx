@@ -7,6 +7,7 @@ import { ShipInput } from "@core/world/ships";
 import { LabeledInput } from "@kit/Input";
 import { IconButton } from "@kit/IconButton";
 import { Card, CardHeader } from "@kit/Card";
+import { useThrottledFormState } from "@devtools/utils";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
 import {
@@ -14,7 +15,6 @@ import {
   getShipMiningEfficiency,
   getShipStorageEfficiency,
   getShipTravelSpeed,
-  useThrottledFormState,
   withDistance,
 } from "./utils";
 

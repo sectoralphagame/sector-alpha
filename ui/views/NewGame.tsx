@@ -17,7 +17,7 @@ interface NewGameForm {
   islands: number;
 }
 
-const targetTime = 3600 / 2;
+const targetTime = 3600 / 20;
 
 export const NewGame: React.FC = () => {
   const { register, handleSubmit, control } = useForm<NewGameForm>({

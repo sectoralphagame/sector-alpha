@@ -1,3 +1,4 @@
+import { discriminate } from "@core/utils/maps";
 import shuffle from "lodash/shuffle";
 import { add, matrix, random, Matrix } from "mathjs";
 import { createFacility, Facility } from "../archetypes/facility";
@@ -64,9 +65,13 @@ export class FacilityPlanningSystem extends System {
     );
 
     perCommodity((commodity) => {
+      const facilityModule = Object.values(facilityModules)
+        .filter(discriminate("type", "production"))
+        .find((fm) => fm.pac?.[commodity]?.consumes);
       const canBeMined =
         resources[commodity].max > 0 &&
-        resourceUsageInFacilities[commodity] === 0;
+        resourceUsageInFacilities[commodity] === 0 &&
+        !!facilityModule;
 
       if (!canBeMined) {
         return;
@@ -85,9 +90,6 @@ export class FacilityPlanningSystem extends System {
       });
       facility.addComponent(createCompoundProduction());
 
-      const facilityModule = Object.values(facilityModules).find(
-        (fm) => fm.pac && fm.pac[commodity]?.consumes
-      )!;
       for (
         let i = 0;
         i <
@@ -150,7 +152,7 @@ export class FacilityPlanningSystem extends System {
     const resourceUsageInFacilities = getResourceUsage(facilities);
     const resourcesProducedByFacilities = getResourceProduction(facilities);
     const factoryModules = Object.values(facilityModules).filter(
-      (fm) => fm !== facilityModules.habitat
+      discriminate("type", "production")
     );
 
     // eslint-disable-next-line no-constant-condition

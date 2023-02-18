@@ -6,6 +6,10 @@ import { worldToHecs } from "@core/components/hecsPosition";
 import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import { Entity } from "@core/components/entity";
 import { MapView } from "@ui/components/MapView";
+import { useRerender } from "@ui/hooks/useRerender";
+import type { Commodity } from "@core/economy/commodity";
+import { addStorage } from "@core/components/storage";
+import { changeBudgetMoney } from "@core/components/budget";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -37,6 +41,22 @@ export const Game: React.FC = () => {
     };
 
     sim.events.on("destroy", unmount);
+
+    (window as any).cheats = {
+      addCommodity: (commodity: Commodity, quantity: number, id?: number) => {
+        const entity = id ? sim.getOrThrow(id) : (window.selected as Entity);
+        if (entity) {
+          addStorage(entity.cp.storage!, commodity, quantity);
+        }
+      },
+      addMoney: (quantity: number, id?: number) => {
+        const entity = id
+          ? sim.getOrThrow(id)
+          : (window.selected as Entity | undefined) ??
+            sim.queries.player.get()[0]!;
+        changeBudgetMoney(entity.cp.budget!, quantity);
+      },
+    };
 
     return unmount;
   }, [sim]);
@@ -83,6 +103,8 @@ export const Game: React.FC = () => {
       sim.queries.settings.get()[0].cp.selectionManager.secondaryId = null;
     }
   }, [menu.active]);
+
+  useRerender(250);
 
   return (
     <div>

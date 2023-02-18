@@ -57,5 +57,11 @@ module.exports = {
       },
     ],
     "import/no-extraneous-dependencies": "off",
+    "no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_",
+      },
+    ],
   },
 };

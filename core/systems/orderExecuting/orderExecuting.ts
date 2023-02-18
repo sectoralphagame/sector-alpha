@@ -1,4 +1,4 @@
-import { Order } from "@core/components/orders";
+import { Action, Order } from "@core/components/orders";
 import { Entity } from "@core/components/entity";
 import { System } from "../system";
 import { dockOrder } from "./dock";
@@ -6,6 +6,8 @@ import { mineAction } from "./mine";
 import { follorOrderGroup, followOrder } from "./follow";
 import { holdAction, holdPosition, moveAction, teleportAction } from "./misc";
 import { tradeOrder } from "./trade";
+import { deployFacilityAction } from "./deployFacility";
+import { deployBuilderAction } from "./deployBuilder";
 
 const orderGroupFns: Partial<
   Record<
@@ -31,12 +33,17 @@ const orderGroupFns: Partial<
   },
 };
 
-const orderFns = {
+const orderFns: Partial<
+  // eslint-disable-next-line no-unused-vars
+  Record<Action["type"], (entity: Entity, order: Action) => boolean | void>
+> = {
   trade: tradeOrder,
   mine: mineAction,
   move: moveAction,
   teleport: teleportAction,
   dock: dockOrder,
+  deployFacility: deployFacilityAction,
+  deployBuilder: deployBuilderAction,
 };
 
 export class OrderExecutingSystem extends System {
@@ -59,7 +66,7 @@ export class OrderExecutingSystem extends System {
             orderGroup.actions.length === 0 &&
             isCompleted(entity, orderGroup)
           ) {
-            entity.cp.orders.value.splice(0, 1);
+            entity.cp.orders?.value.splice(0, 1);
           }
         }
       }

@@ -14,7 +14,7 @@ import { FormData } from "./utils";
 import styles from "./styles.scss";
 import { GeneralEditor } from "./General";
 import { FreightEditor } from "./Freight";
-import { JSONOutput } from "./JSONOutput";
+import { JSONOutput } from "../components/JSONOutput";
 import { BuildEditor } from "./Build";
 
 const Editor: React.FC<{}> = () => {
