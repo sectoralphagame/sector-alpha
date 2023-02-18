@@ -89,6 +89,7 @@ export const FacilityModules: React.FC = () => {
       >
         <Editor />
         <JSONOutput
+          fn={(data) => Object.values(data!)[0]}
           expanded={expanded}
           onExpand={() => setExpanded(!expanded)}
         />

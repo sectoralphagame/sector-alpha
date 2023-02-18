@@ -6,6 +6,7 @@ import "@alenaksu/json-viewer";
 import { UniverseMap } from "./map";
 import styles from "./index.scss";
 import { FacilityModules } from "./facilityModules";
+import { Factions } from "./factions";
 
 const DevToolsCard: React.FC<{
   link: string;
@@ -38,6 +39,11 @@ const DevToolsIndex: React.FC = () => (
         description="Manage facility modules such as water production or fuelium refining"
         link="/dev/facility-modules"
       />
+      <DevToolsCard
+        name="Factions"
+        description="Manage factions and relations between them"
+        link="/dev/factions"
+      />
     </div>
   </div>
 );
@@ -48,6 +54,7 @@ export const DevTools: React.FC = () => (
       <Route path="ships" element={<Ships />} />
       <Route path="map" element={<UniverseMap />} />
       <Route path="facility-modules" element={<FacilityModules />} />
+      <Route path="factions" element={<Factions />} />
       <Route path="/" element={<DevToolsIndex />} />
     </Routes>
   </div>

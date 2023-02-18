@@ -1,0 +1,49 @@
+.editorContainer {
+  overflow-y: scroll;
+  padding: var(--spacing-1);
+}
+.root {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  height: 100vh;
+}
+.rootExpanded {
+  grid-template-columns: 1fr 350px;
+}
+.toolbar {
+  display: flex;
+  gap: var(--spacing-1);
+  margin-bottom: var(--spacing-1);
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) 0;
+}
+.hr {
+  margin-bottom: var(--spacing-1);
+}
+.rowExpander {
+  transform: rotate(-90deg);
+}
+.rowExpanderToggled {
+  transform: rotate(90deg);
+}
+
+.color {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+
+  &Input {
+    text-align: right;
+  }
+  &Swatch {
+    flex-shrink: 0;
+    border-radius: 2px;
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+  }
+}

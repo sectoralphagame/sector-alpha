@@ -10,10 +10,11 @@ import { useThrottledFormState } from "../../utils";
 export const JSONOutput: React.FC<{
   expanded: boolean;
   onExpand: () => void;
-}> = ({ expanded, onExpand }) => {
+  fn: (_data) => any;
+}> = ({ expanded, onExpand, fn }) => {
   const data = useThrottledFormState<FormData>();
   const display = React.useMemo(
-    () => (data ? JSON.stringify(Object.values(data!)[0]) : null),
+    () => (data ? JSON.stringify(fn(data)) : null),
     [data]
   );
 

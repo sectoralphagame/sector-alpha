@@ -35,6 +35,7 @@ import type { Player } from "./player";
 import type { Deployable } from "./deployable";
 import type { FacilityModuleQueue } from "./facilityModuleQueue";
 import type { Builder } from "./builder";
+import type { Relations } from "./relations";
 
 export interface CoreComponents {
   ai: Ai;
@@ -66,6 +67,7 @@ export interface CoreComponents {
   player: Player;
   position: Position;
   production: Production;
+  relations: Relations;
   render: Render;
   renderGraphics: RenderGraphics<any>;
   sectorStats: SectorStats;

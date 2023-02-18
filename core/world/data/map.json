@@ -172,5 +172,6 @@
       "color": "#f7fc5b",
       "type": "travelling"
     }
-  ]
+  ],
+  "relations": [{ "factions": ["UEN", "TAU"], "value": -25 }]
 }
