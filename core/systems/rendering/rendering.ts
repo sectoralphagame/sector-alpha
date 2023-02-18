@@ -10,7 +10,7 @@ import type { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
 import { SystemWithHooks } from "../hooks";
 import { clearFocus } from "../../components/selection";
-import { setTexture } from "../../components/render";
+import { destroy, setTexture } from "../../components/render";
 
 const minScale = 0.05;
 const maxScale = 20;
@@ -95,6 +95,15 @@ export class RenderingSystem extends SystemWithHooks {
       }
     });
 
+    this.sim.events.on("remove-entity", (entity: Entity) => {
+      if (entity.cp.render) {
+        destroy(entity.cp.render);
+      }
+      if (entity.cp.renderGraphics) {
+        entity.cp.renderGraphics.g.destroy();
+      }
+    });
+
     this.viewport.sortableChildren = true;
 
     this.resizeObserver = new ResizeObserver(() => {
@@ -103,9 +112,7 @@ export class RenderingSystem extends SystemWithHooks {
     });
     this.resizeObserver.observe(canvasRoot);
 
-    if (window.dev) {
-      this.toggleGrid();
-    }
+    window.cheats.hexGrid = this.toggleGrid;
 
     this.sim.entities.forEach((entity) => {
       if (entity.cp.render) {
@@ -267,7 +274,10 @@ export class RenderingSystem extends SystemWithHooks {
   };
 
   toggleGrid = () => {
-    if (!this.grid) {
+    if (this.grid) {
+      this.grid.unregister();
+      this.grid = null;
+    } else {
       const grid = new Entity(this.sim);
       this.sim.registerEntity(grid);
       grid.addComponent(createRenderGraphics("hexGrid"));
@@ -289,7 +299,6 @@ export class RenderingSystem extends SystemWithHooks {
       this.updateSelection
     );
     this.hook(this.viewport.scale.x, this.updateScaling);
-    this.hook(window.dev, this.toggleGrid);
 
     this.updateViewport();
     this.updateGraphics();

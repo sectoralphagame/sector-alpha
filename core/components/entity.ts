@@ -82,9 +82,6 @@ export class Entity {
 
   unregister() {
     this.deleted = true;
-    if (!isHeadless && this.cp.render) {
-      destroy(this.cp.render);
-    }
     this.sim.unregisterEntity(this);
   }
 

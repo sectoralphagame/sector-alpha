@@ -108,6 +108,10 @@ export class Sim extends BaseSim {
       FacilityBuildingSystem,
       UndeployingSystem,
     ].map((S) => new S(this));
+
+    if (window) {
+      window.cheats = {};
+    }
   }
 
   registerEntity = (entity: Entity) => {

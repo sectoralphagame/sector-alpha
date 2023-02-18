@@ -16,4 +16,5 @@ interface Window {
     id: number;
   } | null;
   dev: boolean;
+  cheats: Record<string, any>;
 }
