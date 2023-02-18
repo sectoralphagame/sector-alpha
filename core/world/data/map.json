@@ -5,51 +5,32 @@
     { "name": "Mars", "position": [1, -2], "id": "mars" },
     { "name": "Saturn", "position": [2, -3], "id": "saturn" },
     { "name": "Sedna", "position": [2, -4], "id": "sedna" },
-
     { "name": "Gaia", "position": [-1, -1], "id": "gaia" },
     { "name": "Arges", "position": [-2, 0], "id": "arges" },
     { "name": "Pontus", "position": [-2, -1], "id": "pontus" },
-
     { "name": "Sector Alpha", "position": [0, -3], "id": "sector-alpha" },
-
     { "name": "Eris", "position": [-1, 2], "id": "eris" },
     { "name": "Discordis c", "position": [0, 2], "id": "discordis-c" },
-
     { "name": "Juno II", "position": [2, 0], "id": "juno-2" },
     { "name": "Juno III", "position": [3, 0], "id": "juno-3" },
     { "name": "Juno IV", "position": [2, 1], "id": "juno-4" },
-
     { "name": "Therr", "position": [-1, 4], "id": "gj-229-1" },
     { "name": "GJ 229 II", "position": [-1, 5], "id": "gj-229-2" },
-
-    {
-      "name": "Teegarden's Star I",
-      "position": [5, 0],
-      "id": "teegarden-1"
-    },
-    {
-      "name": "Teegarden's Star II",
-      "position": [5, -1],
-      "id": "teegarden-2"
-    },
-
+    { "name": "Teegarden's Star I", "position": [5, 0], "id": "teegarden-1" },
+    { "name": "Teegarden's Star II", "position": [5, -1], "id": "teegarden-2" },
     { "name": "Tau Ceti e", "position": [4, -2], "id": "tau-ceti-e" },
     { "name": "Tau Ceti f", "position": [3, -2], "id": "tau-ceti-f" },
     { "name": "The Hive", "position": [4, -3], "id": "the-hive" },
-
     { "name": "GJ 1002 I", "position": [6, -3], "id": "gj-1002-1" },
     { "name": "GJ 1002 II", "position": [6, -4], "id": "gj-1002-2" },
     { "name": "GJ 1002 III", "position": [6, -5], "id": "gj-1002-3" },
-
     { "name": "Ross 128 I", "position": [-3, 2], "id": "ross-128-1" },
     { "name": "Ross 128 II", "position": [-4, 2], "id": "ross-128-2" },
     { "name": "Ross 128 III", "position": [-4, 3], "id": "ross-128-3" },
     { "name": "Ross 128 IV", "position": [-4, 1], "id": "ross-128-4" },
-
     { "name": "Wolf 1061 I", "position": [-4, -1], "id": "wolf-1061-1" },
     { "name": "Wolf 1061 II", "position": [-3, -2], "id": "wolf-1061-2" },
     { "name": "Wolf 1061 III", "position": [-2, -3], "id": "wolf-1061-3" },
-
     { "name": "GJ 625", "position": [-5, -2], "id": "gj-625" }
   ],
   "inactive": [],
@@ -58,32 +39,22 @@
     { "sectors": ["terra", "mars"], "type": "accelerator" },
     { "sectors": ["mars", "saturn"], "type": "accelerator" },
     { "sectors": ["saturn", "sedna"], "type": "accelerator" },
-
     { "sectors": ["gaia", "arges"], "type": "accelerator" },
     { "sectors": ["arges", "pontus"], "type": "accelerator" },
-
     { "sectors": ["eris", "discordis-c"], "type": "accelerator" },
-
     { "sectors": ["juno-2", "juno-3"], "type": "accelerator" },
     { "sectors": ["juno-2", "juno-4"], "type": "accelerator" },
-
     { "sectors": ["gj-229-1", "gj-229-2"], "type": "accelerator" },
-
     { "sectors": ["teegarden-1", "teegarden-2"], "type": "accelerator" },
-
     { "sectors": ["tau-ceti-e", "tau-ceti-f"], "type": "accelerator" },
     { "sectors": ["tau-ceti-f", "the-hive"], "type": "accelerator" },
-
     { "sectors": ["gj-1002-1", "gj-1002-2"], "type": "accelerator" },
     { "sectors": ["gj-1002-2", "gj-1002-3"], "type": "accelerator" },
-
     { "sectors": ["ross-128-1", "ross-128-2"], "type": "accelerator" },
     { "sectors": ["ross-128-2", "ross-128-3"], "type": "accelerator" },
     { "sectors": ["ross-128-2", "ross-128-4"], "type": "accelerator" },
-
     { "sectors": ["wolf-1061-1", "wolf-1061-2"], "type": "accelerator" },
     { "sectors": ["wolf-1061-2", "wolf-1061-3"], "type": "accelerator" },
-
     { "sectors": ["arges", "ross-128-1"], "type": "gate" },
     { "sectors": ["eris", "gj-229-1"], "type": "gate" },
     { "sectors": ["gaia", "sector-alpha"], "type": "gate" },
@@ -173,5 +144,27 @@
       "type": "travelling"
     }
   ],
-  "relations": [{ "factions": ["UEN", "TAU"], "value": -25 }]
+  "relations": [
+    { "factions": ["ACT", "UEN"], "value": -10 },
+    { "factions": ["TAU", "UEN"], "value": -25 },
+    { "factions": ["ACT", "TAU"], "value": -25 },
+    { "factions": ["FFW", "UEN"], "value": 20 },
+    { "factions": ["ACT", "FFW"], "value": -10 },
+    { "factions": ["FFW", "TAU"], "value": -25 },
+    { "factions": ["AMS", "UEN"], "value": 50 },
+    { "factions": ["AMS", "ACT"], "value": -5 },
+    { "factions": ["AMS", "TAU"], "value": -25 },
+    { "factions": ["AMS", "FFW"], "value": 10 },
+    { "factions": ["PIR", "UEN"], "value": -25 },
+    { "factions": ["ACT", "PIR"], "value": -30 },
+    { "factions": ["PIR", "TAU"], "value": -25 },
+    { "factions": ["FFW", "PIR"], "value": -25 },
+    { "factions": ["AMS", "PIR"], "value": -30 },
+    { "factions": ["THT", "UEN"], "value": 10 },
+    { "factions": ["ACT", "THT"], "value": 10 },
+    { "factions": ["TAU", "THT"], "value": -25 },
+    { "factions": ["FFW", "THT"], "value": 10 },
+    { "factions": ["AMS", "THT"], "value": 5 },
+    { "factions": ["PIR", "THT"], "value": -25 }
+  ]
 }

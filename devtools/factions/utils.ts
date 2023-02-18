@@ -8,7 +8,7 @@ export interface FactionInput {
 }
 
 export interface RelationInput {
-  factions: string[];
+  factions: number[];
   value: number;
 }
 

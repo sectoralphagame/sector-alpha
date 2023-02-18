@@ -14,11 +14,16 @@ import type { FormData } from "./utils";
 import styles from "./styles.scss";
 import { JSONOutput } from "../components/JSONOutput";
 import { GeneralEditor } from "./General";
+import { RelationEditor } from "./Relations";
 
 const Editor: React.FC<{}> = () => {
   const { getValues, control } = useFormContext<FormData>();
   const { append } = useFieldArray({ control, name: "factions" });
-  const [factions, setFactions] = React.useState(getValues().factions);
+  const { append: appendRelation } = useFieldArray({
+    control,
+    name: "relations",
+  });
+  const [form, setForm] = React.useState(getValues());
 
   return (
     <div className={styles.editorContainer}>
@@ -34,13 +39,21 @@ const Editor: React.FC<{}> = () => {
                 slug: "",
                 type: "territorial",
               });
-              setFactions(getValues().factions);
+              const newFactions = getValues().factions;
+              newFactions.slice(0, newFactions.length - 2).forEach((_, index) =>
+                appendRelation({
+                  factions: [index, newFactions.length - 1],
+                  value: 0,
+                })
+              );
+              setForm(getValues());
             }}
           >
             + Add new faction
           </Button>
           <TabList>
             <Tab>General</Tab>
+            <Tab>Relations</Tab>
           </TabList>
         </div>
 
@@ -48,7 +61,10 @@ const Editor: React.FC<{}> = () => {
 
         <HeadlessTab.Panels>
           <HeadlessTab.Panel>
-            <GeneralEditor factions={factions} />
+            <GeneralEditor factions={form.factions} />
+          </HeadlessTab.Panel>
+          <HeadlessTab.Panel>
+            <RelationEditor />
           </HeadlessTab.Panel>
         </HeadlessTab.Panels>
       </HeadlessTab.Group>
@@ -58,7 +74,21 @@ const Editor: React.FC<{}> = () => {
 
 export const Factions: React.FC = () => {
   const form = useForm<FormData>({
-    defaultValues: mapData,
+    defaultValues: {
+      ...mapData,
+      relations: mapData.factions
+        .flatMap((fY, y) =>
+          mapData.factions.map((fX, x) => ({
+            factions: [x, y],
+            value:
+              mapData.relations.find(
+                ({ factions }) =>
+                  factions.includes(fX.slug) && factions.includes(fY.slug)
+              )?.value ?? 0,
+          }))
+        )
+        .filter(({ factions: [x, y] }) => y > x),
+    },
   });
   const [expanded, setExpanded] = React.useState(false);
 
@@ -71,7 +101,13 @@ export const Factions: React.FC = () => {
       >
         <Editor />
         <JSONOutput
-          fn={(data) => data}
+          fn={(data: FormData) => ({
+            ...data,
+            relations: data.relations.map((relation) => ({
+              ...relation,
+              factions: relation.factions.map((f) => data.factions[f].slug),
+            })),
+          })}
           expanded={expanded}
           onExpand={() => setExpanded(!expanded)}
         />

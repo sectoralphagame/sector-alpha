@@ -6,7 +6,7 @@
 html,
 body {
   background-color: var(--palette-background);
-  color: white;
+  color: var(--palette-text-1);
   margin: 0;
   overscroll-behavior-y: none;
   font-size: var(--typography-default);
