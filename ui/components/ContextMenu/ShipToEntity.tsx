@@ -13,6 +13,11 @@ export const ShipToEntity: React.FC = () => {
   const [sim] = useSim();
   const [menu] = useContextMenu();
   const selected = getSelected(sim)!;
+
+  if (!selected) {
+    return null;
+  }
+
   const actionable = getSelectedSecondary(sim)!;
   const canBeOrdered =
     isOwnedByPlayer(selected) &&

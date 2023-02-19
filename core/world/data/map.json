@@ -179,6 +179,7 @@
     { "factions": ["PLA", "TAU"], "value": -25 },
     { "factions": ["FFW", "PLA"], "value": 0 },
     { "factions": ["AMS", "PLA"], "value": 0 },
-    { "factions": ["PIR", "PLA"], "value": 0 }
+    { "factions": ["PIR", "PLA"], "value": 0 },
+    { "factions": ["PLA", "THT"], "value": 0 }
   ]
 }

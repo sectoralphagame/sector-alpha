@@ -14,6 +14,11 @@ export const ShipToSpace: React.FC = () => {
   const [sim] = useSim();
   const [menu] = useContextMenu();
   const selected = getSelected(sim)!;
+
+  if (!selected) {
+    return null;
+  }
+
   const canBeOrdered =
     isOwnedByPlayer(selected) &&
     selected?.hasComponents(["orders", "position"]);
