@@ -49,7 +49,7 @@ export const Dialog: React.FC<DialogProps> = ({
       <Text className={styles.titleText} variant="h1">
         {title}
       </Text>
-      <IconButton onClick={onClose}>
+      <IconButton className={styles.close} onClick={onClose}>
         <SVG src={closeIcon} />
       </IconButton>
     </div>

@@ -1,0 +1,31 @@
+.grid {
+  & span:nth-child(2n) {
+    text-align: right;
+  }
+  grid-template-columns: 1fr 2fr;
+  display: grid;
+}
+
+.slider {
+  width: 100%;
+  margin-top: var(--spacing-2);
+}
+
+.diff {
+  &Positive {
+    color: var(--palette-success);
+  }
+  &Negative {
+    color: var(--palette-error);
+  }
+}
+
+.input {
+  width: 120px;
+  border: none;
+  display: inline-block;
+  text-align: right;
+  background: none;
+  color: var(--palette-text-1);
+  outline: none;
+}

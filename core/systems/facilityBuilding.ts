@@ -1,5 +1,5 @@
 import { createFacilityModule } from "@core/archetypes/facilityModule";
-import { perCommodity } from "@core/utils/perCommodity";
+import { commodityPrices, perCommodity } from "@core/utils/perCommodity";
 import type { Facility } from "@core/archetypes/facility";
 import type { TradeOffer } from "@core/components/trade";
 import type { Commodity } from "../economy/commodity";
@@ -35,7 +35,7 @@ export class FacilityBuildingSystem extends System {
         if (needed > 0) {
           return {
             active: true,
-            price: 100,
+            price: commodityPrices[commodity].max,
             quantity: needed,
             type: "buy",
           };
@@ -50,7 +50,7 @@ export class FacilityBuildingSystem extends System {
       });
     });
 
-  build = (delta: number): void =>
+  build = (_delta: number): void =>
     this.sim.queries.facilities.get().forEach((facility) => {
       if (!facility.cooldowns.canUse(buildTimer)) {
         facility.cp.facilityModuleQueue.building!.progress =

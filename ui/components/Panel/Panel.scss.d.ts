@@ -9,3 +9,4 @@ export const scrollArea: string;
 export const rotate: string;
 export const spacer: string;
 export const tab: string;
+export const manage: string;

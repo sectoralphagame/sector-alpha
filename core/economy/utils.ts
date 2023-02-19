@@ -275,6 +275,7 @@ export function getCommodityCost(
         fxtsSum
       )
     ),
-    fn
+    fn,
+    Math.floor
   );
 }

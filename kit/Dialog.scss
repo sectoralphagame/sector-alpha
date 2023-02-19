@@ -7,3 +7,14 @@
 .titleText {
   margin: 0;
 }
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-3);
+  gap: var(--spacing-1);
+}
+
+.close {
+  flex: none;
+}

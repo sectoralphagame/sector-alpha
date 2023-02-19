@@ -1,3 +1,5 @@
+import configIcon from "@assets/ui/config.svg";
+import SVG from "react-inlinesvg";
 import React from "react";
 import { shipComponents, ship as asShip } from "@core/archetypes/ship";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@kit/Tabs";
@@ -7,6 +9,8 @@ import {
   facility as asFacility,
 } from "@core/archetypes/facility";
 import { sector, sectorComponents } from "@core/archetypes/sector";
+import { isOwnedByPlayer } from "@core/components/player";
+import { IconButton } from "@kit/IconButton";
 import FacilityPanel from "../FacilityPanel";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
@@ -26,6 +30,7 @@ import styles from "./Panel.scss";
 import { Offers } from "../Offers";
 import { Undeploy } from "../Undeploy";
 import { Subordinates } from "../Subordinates";
+import { FacilityMoneyManager } from "../FacilityMoneyManager ";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -108,6 +113,20 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                   <>
                     <div>
                       Money: {entity.components.budget!.available.toFixed(0)}
+                      {isOwnedByPlayer(entity) && (
+                        <IconButton
+                          className={styles.manage}
+                          variant="naked"
+                          onClick={() =>
+                            setDialog({
+                              type: "facilityMoneyManager",
+                              entityId: entity.id,
+                            })
+                          }
+                        >
+                          <SVG src={configIcon} />
+                        </IconButton>
+                      )}
                     </div>
                     <hr />
                     <Offers
@@ -169,6 +188,10 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
       <TradeDialog open={dialog?.type === "trade"} onClose={closeDialog} />
       <FacilityModuleManager
         open={dialog?.type === "facilityModuleManager"}
+        onClose={closeDialog}
+      />
+      <FacilityMoneyManager
+        open={dialog?.type === "facilityMoneyManager"}
         onClose={closeDialog}
       />
     </>
