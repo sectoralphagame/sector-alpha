@@ -42,6 +42,30 @@ const tradingComponents = [
 ] as const;
 type Trading = RequireComponent<(typeof tradingComponents)[number]>;
 
+function getRandomPositionInBounds(entity: Trading): Matrix {
+  let position: Matrix;
+
+  do {
+    position = add(
+      entity.cp.position.coord,
+      matrix([random(-2, 2), random(-2, 2)])
+    );
+  } while (
+    norm(
+      subtract(
+        hecsToCartesian(
+          entity.sim.getOrThrow(entity.cp.position.sector).cp.hecsPosition!
+            .value,
+          sectorSize / 10
+        ),
+        position
+      )
+    ) > sectorSize
+  );
+
+  return position;
+}
+
 function idleMovement(entity: Trading) {
   const commander =
     entity.cp.commander &&
@@ -58,19 +82,12 @@ function idleMovement(entity: Trading) {
               sector: commander.cp.position.sector,
               value: add(
                 commander.cp.position.coord,
-                matrix([random(-4, 4), random(-4, 4)])
+                matrix([random(-2, 2), random(-2, 2)])
               ),
             }
           : {
               sector: entity.cp.position.sector,
-              value: add(
-                hecsToCartesian(
-                  entity.sim.getOrThrow(entity.cp.position.sector).cp
-                    .hecsPosition!.value,
-                  sectorSize / 10
-                ),
-                matrix([random(-25, 25), random(-25, 25)])
-              ),
+              value: getRandomPositionInBounds(entity),
             }
       ),
       true
