@@ -21,10 +21,12 @@ export const Root: React.FC = () => {
   const Component = React.useMemo(() => viewComponents[view], [view]);
 
   return (
-    <RecoilRoot>
-      <LocationContext.Provider value={setView}>
-        <Component />
-      </LocationContext.Provider>
-    </RecoilRoot>
+    <div style={{ userSelect: "none", display: "contents" }}>
+      <RecoilRoot>
+        <LocationContext.Provider value={setView}>
+          <Component />
+        </LocationContext.Provider>
+      </RecoilRoot>
+    </div>
   );
 };

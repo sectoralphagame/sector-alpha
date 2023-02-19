@@ -13,6 +13,7 @@ import { NavigatingSystem } from "@core/systems/navigating";
 import { OutOfBoundsCheckingSystem } from "@core/systems/reporting/outOfBoundsChecking";
 import { FacilityBuildingSystem } from "@core/systems/facilityBuilding";
 import { UndeployingSystem } from "@core/systems/undeploying";
+import { isHeadless } from "@core/settings";
 import { Entity, EntityComponents } from "../components/entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -109,7 +110,7 @@ export class Sim extends BaseSim {
       UndeployingSystem,
     ].map((S) => new S(this));
 
-    if (window) {
+    if (!isHeadless) {
       window.cheats = {};
     }
   }

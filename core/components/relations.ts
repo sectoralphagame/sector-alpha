@@ -10,12 +10,12 @@ export const relationThresholds = {
 } as const;
 
 export function changeRelations(a: Faction, b: Faction, change: number) {
-  if (a.cp.relations.values[b.cp.name.slug!]) {
-    a.cp.relations.values[b.cp.name.slug!] = 0;
+  if (!a.cp.relations.values[b.id]) {
+    a.cp.relations.values[b.id] = 0;
   }
-  if (b.cp.relations.values[a.cp.name.slug!]) {
-    b.cp.relations.values[a.cp.name.slug!] = 0;
+  if (!b.cp.relations.values[a.id]) {
+    b.cp.relations.values[a.id] = 0;
   }
-  a.cp.relations.values[b.cp.name.slug!] += change;
-  b.cp.relations.values[a.cp.name.slug!] += change;
+  a.cp.relations.values[b.id] += change;
+  b.cp.relations.values[a.id] += change;
 }

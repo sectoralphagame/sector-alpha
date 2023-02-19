@@ -187,7 +187,11 @@ export class FacilityPlanningSystem extends System {
 
     const buildQueue = shuffle(modulesToBuild);
     while (buildQueue.length > 0) {
-      if (!facility || Math.random() > 0.6) {
+      if (
+        !facility ||
+        Math.random() > 0.7 ||
+        facility.cp.modules.ids.length > 16
+      ) {
         if (facility && this.sim.getTime() === 0) {
           commoditiesArray.forEach((commodity) => {
             if (facility!.cp.compoundProduction!.pac[commodity].consumes) {
@@ -229,6 +233,7 @@ export class FacilityPlanningSystem extends System {
       addFacilityModule(facility, facilityModule.create(this.sim, facility));
     }
 
+    console.log(`Faction ${faction.cp.name.slug}`);
     console.table(
       perCommodity((commodity) => ({
         produced: resourcesProducedByFacilities[commodity],
@@ -253,10 +258,8 @@ export class FacilityPlanningSystem extends System {
             this.planMiningFacilities(sector, faction);
           });
 
-        if (faction.cp.ai.type === "territorial") {
-          this.planHabitats(faction);
-          this.planFactories(faction);
-        }
+        this.planHabitats(faction);
+        this.planFactories(faction);
       });
     }
   };

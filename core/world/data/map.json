@@ -133,7 +133,7 @@
       "sectors": ["wolf-1061-3", "gj-229-2", "gj-625"],
       "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerA"],
       "color": "#fcc7c5",
-      "type": "travelling"
+      "type": "pirate"
     },
     {
       "name": "Therr Traders",
@@ -142,6 +142,14 @@
       "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerA"],
       "color": "#f7fc5b",
       "type": "travelling"
+    },
+    {
+      "name": "Player Faction",
+      "blueprints": [],
+      "color": "#97ff7d",
+      "sectors": [],
+      "slug": "PLA",
+      "type": "territorial"
     }
   ],
   "relations": [
@@ -165,6 +173,12 @@
     { "factions": ["TAU", "THT"], "value": -25 },
     { "factions": ["FFW", "THT"], "value": 10 },
     { "factions": ["AMS", "THT"], "value": 5 },
-    { "factions": ["PIR", "THT"], "value": -25 }
+    { "factions": ["PIR", "THT"], "value": -5 },
+    { "factions": ["PLA", "UEN"], "value": 0 },
+    { "factions": ["ACT", "PLA"], "value": 0 },
+    { "factions": ["PLA", "TAU"], "value": -25 },
+    { "factions": ["FFW", "PLA"], "value": 0 },
+    { "factions": ["AMS", "PLA"], "value": 0 },
+    { "factions": ["PIR", "PLA"], "value": 0 }
   ]
 }

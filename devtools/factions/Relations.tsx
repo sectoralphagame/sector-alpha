@@ -3,7 +3,6 @@ import { useFormContext } from "react-hook-form";
 import { useThrottledFormState } from "@devtools/utils";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import type { FactionInput, FormData, RelationInput } from "./utils";
-import styles from "./styles.scss";
 
 function getLabel(faction: FormData["factions"][number]): string {
   return `${faction.slug} ${faction.name}`;

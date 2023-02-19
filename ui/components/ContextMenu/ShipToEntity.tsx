@@ -5,6 +5,7 @@ import { isOwnedByPlayer } from "@core/components/player";
 import { getSelected, getSelectedSecondary } from "@core/components/selection";
 import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
+import { relationThresholds } from "@core/components/relations";
 import { useContextMenu, useGameDialog, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
@@ -23,6 +24,9 @@ export const ShipToEntity: React.FC = () => {
   }
 
   const entity = selected!.requireComponents(["orders", "position"]);
+  const actionableRelationship = actionable.cp.owner?.id
+    ? sim.queries.player.get()[0].cp.relations.values[actionable.cp.owner?.id]
+    : 0;
 
   const onTrade = () => {
     setDialog({
@@ -92,12 +96,14 @@ export const ShipToEntity: React.FC = () => {
 
   return (
     <>
-      {actionable.hasComponents(["trade"]) && (
-        <DropdownOption onClick={onTrade}>Trade</DropdownOption>
-      )}
-      {actionable.hasComponents(["docks"]) && (
-        <DropdownOption onClick={onDock}>Dock</DropdownOption>
-      )}
+      {actionable.hasComponents(["trade"]) &&
+        actionableRelationship > relationThresholds.trade && (
+          <DropdownOption onClick={onTrade}>Trade</DropdownOption>
+        )}
+      {actionable.hasComponents(["docks"]) &&
+        actionableRelationship > relationThresholds.trade && (
+          <DropdownOption onClick={onDock}>Dock</DropdownOption>
+        )}
       {actionable.hasComponents(["drive"]) && (
         <DropdownOption onClick={onFollow}>Follow</DropdownOption>
       )}

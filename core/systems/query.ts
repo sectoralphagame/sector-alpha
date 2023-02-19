@@ -84,7 +84,7 @@ export function createQueries(sim: Sim) {
     ]),
     mining: new Query(sim, ["mining", "storage"]),
     orderable: new Query(sim, ["orders"]),
-    player: new Query(sim, ["player"]),
+    player: new Query(sim, [...factionComponents, "player"]),
     productionByModules: new Query(sim, ["production", "parent"]),
     renderable: new Query(sim, ["render", "position"]),
     renderableGraphics: new Query(sim, ["renderGraphics"]),

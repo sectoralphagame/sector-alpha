@@ -18,7 +18,7 @@ function createTerritorialFaction(index: number, sim: Sim) {
   faction.addComponent({
     name: "ai",
     type: "territorial",
-    stockpiling: random(0.6, 1.2),
+    stockpiling: random(0.5, 0.8),
     priceModifier: random(0.002, 0.02),
   });
   setMoney(faction.cp.budget, 1e8);
@@ -65,6 +65,8 @@ export function populateSectors(sim: Sim, sectors: Sector[], faction: Faction) {
   );
 
   const sectorWithShipyard = pickRandom(sectors);
+  if (!sectorWithShipyard) return;
+
   createShipyard(
     {
       owner: faction,

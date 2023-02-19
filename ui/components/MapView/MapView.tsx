@@ -20,7 +20,7 @@ export const MapView: React.FC = () => {
         >
           <SVG
             className={clsx({
-              [styles.rotate]: !expanded,
+              [styles.rotate]: expanded,
             })}
             src={arrowLeftIcon}
           />

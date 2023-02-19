@@ -13,6 +13,8 @@ import {
   average,
   sum as fxtsSum,
 } from "@fxts/core";
+import type { Faction } from "@core/archetypes/faction";
+import { relationThresholds } from "@core/components/relations";
 import type { Sim } from "../sim";
 import type { Commodity } from "./commodity";
 import { commoditiesArray } from "./commodity";
@@ -147,6 +149,8 @@ export function getFacilityWithMostProfit(
       subtract(facility.cp.position.coord, f.cp.position.coord) as Matrix
     ) as number;
 
+  const faction = facility.sim.getOrThrow<Faction>(facility.cp.owner.id);
+
   const profit = (f: WithTrade) =>
     f.cp.owner.id === facility.cp.owner.id
       ? Infinity
@@ -167,6 +171,8 @@ export function getFacilityWithMostProfit(
       )
       .filter(
         (f) =>
+          faction.cp.relations.values[f.cp.owner.id] >
+            relationThresholds.trade &&
           f.components.trade.offers[commodity].active &&
           f.components.trade.offers[commodity].type !==
             facility.components.trade.offers[commodity].type &&
