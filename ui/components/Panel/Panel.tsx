@@ -31,6 +31,7 @@ import { Offers } from "../Offers";
 import { Undeploy } from "../Undeploy";
 import { Subordinates } from "../Subordinates";
 import { FacilityMoneyManager } from "../FacilityMoneyManager ";
+import { Allocations } from "../Allocations";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -149,6 +150,14 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                     <Resources entity={sector(entity)} />
                     <SectorResources entity={sector(entity)} />
                     <SectorPrices entity={sector(entity)} />
+                  </>
+                )}
+                {entity.hasComponents(["storage"]) && (
+                  <>
+                    <Allocations
+                      entity={entity.requireComponents(["storage"])}
+                    />
+                    <hr />
                   </>
                 )}
                 <Subordinates entity={entity} />

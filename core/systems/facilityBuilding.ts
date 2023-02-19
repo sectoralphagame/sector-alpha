@@ -2,6 +2,7 @@ import { createFacilityModule } from "@core/archetypes/facilityModule";
 import { commodityPrices, perCommodity } from "@core/utils/perCommodity";
 import type { Facility } from "@core/archetypes/facility";
 import type { TradeOffer } from "@core/components/trade";
+import { map, pipe, sum } from "@fxts/core";
 import type { Commodity } from "../economy/commodity";
 import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
@@ -24,13 +25,12 @@ export class FacilityBuildingSystem extends System {
         builder.cp.builder.targetId
       );
       builder.cp.trade.offers = perCommodity((commodity): TradeOffer => {
-        const needed = facility.cp.facilityModuleQueue.queue.reduce(
-          (quantity, bp) =>
-            quantity +
-            (bp.blueprint.build.cost[commodity] ?? 0) -
-            builder.cp.storage.availableWares[commodity],
-          0
-        );
+        const needed =
+          pipe(
+            facility.cp.facilityModuleQueue.queue,
+            map((bp) => bp.blueprint.build.cost[commodity] ?? 0),
+            sum
+          ) - builder.cp.storage.availableWares[commodity];
 
         if (needed > 0) {
           return {
@@ -103,7 +103,7 @@ export class FacilityBuildingSystem extends System {
     }
 
     if (this.cooldowns.canUse("offers")) {
-      this.cooldowns.use("offers", 1);
+      this.cooldowns.use("offers", 5);
       this.createOffers();
     }
   };
