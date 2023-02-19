@@ -214,11 +214,11 @@ export function releaseStorageAllocation(
   return allocation;
 }
 
-export function createCommodityStorage(): CommodityStorage {
+export function createCommodityStorage(max?: number): CommodityStorage {
   const storage: CommodityStorage = {
     allocationIdCounter: 1,
     allocations: [],
-    max: 0,
+    max: max ?? 0,
     availableWares: perCommodity(() => 0),
     stored: perCommodity(() => 0),
     quota: perCommodity(() => 0),

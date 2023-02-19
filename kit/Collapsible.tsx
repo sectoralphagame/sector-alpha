@@ -1,10 +1,15 @@
 import { Disclosure } from "@headlessui/react";
+import clsx from "clsx";
 import React from "react";
 import styles from "./Collapsible.scss";
 
-export const Collapsible: React.FC<React.HTMLAttributes<HTMLDivElement>> = (
-  props
-) => <Disclosure {...props} as="div" className={styles.root} />;
+interface CollapsibleProps extends React.HTMLAttributes<HTMLDivElement> {
+  defaultOpen?: boolean;
+}
+
+export const Collapsible: React.FC<CollapsibleProps> = (props) => (
+  <Disclosure {...props} as="div" className={styles.root} />
+);
 
 export const CollapsibleSummary: React.FC<
   React.HTMLAttributes<HTMLDivElement>
@@ -14,4 +19,10 @@ export const CollapsibleSummary: React.FC<
 
 export const CollapsibleContent: React.FC<
   React.HTMLAttributes<HTMLDivElement>
-> = (props) => <Disclosure.Panel {...props} as="div" className={styles.body} />;
+> = ({ className, ...props }) => (
+  <Disclosure.Panel
+    {...props}
+    as="div"
+    className={clsx(className, styles.body)}
+  />
+);

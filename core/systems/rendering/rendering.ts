@@ -254,9 +254,9 @@ export class RenderingSystem extends SystemWithHooks {
         ArrowLeft: { x: -dPos, y: 0 },
         d: { x: dPos, y: 0 },
         ArrowRight: { x: dPos, y: 0 },
-        z: { scale: -dScale },
+        x: { scale: -dScale },
         "=": { scale: -dScale },
-        x: { scale: dScale },
+        z: { scale: dScale },
         "-": { scale: dScale },
       };
 

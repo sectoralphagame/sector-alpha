@@ -15,6 +15,14 @@ export type RequireComponent<T extends keyof CoreComponents> = Entity & {
   cp: Components<T>;
 };
 
+export type RequirePureComponent<T extends keyof CoreComponents> = Pick<
+  Entity,
+  "id" | "tags"
+> & {
+  components: Components<T>;
+  cp: Components<T>;
+};
+
 export type NonNullableFields<T extends {}> = {
   [P in keyof T]: NonNullable<T[P]>;
 };

@@ -7,9 +7,7 @@ import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import { MissingComponentError } from "../errors";
 import { Cooldowns } from "../utils/cooldowns";
-import { isHeadless } from "../settings";
 import type { CoreComponents } from "./component";
-import { destroy } from "./render";
 
 export class EntityComponents {
   toJSON() {
@@ -87,5 +85,16 @@ export class Entity {
 
   toJSON() {
     return pick(this, ["components", "cooldowns", "id"]);
+  }
+}
+
+export class PureEntity {
+  components = new EntityComponents() as Partial<CoreComponents>;
+  cooldowns = new Cooldowns<string>();
+  tags: Set<string>;
+  id: number;
+
+  get cp(): Partial<CoreComponents> {
+    return this.components;
   }
 }
