@@ -171,8 +171,9 @@ export function getFacilityWithMostProfit(
       )
       .filter(
         (f) =>
-          faction.cp.relations.values[f.cp.owner.id] >
-            relationThresholds.trade &&
+          (f.cp.owner.id === faction.id ||
+            faction.cp.relations.values[f.cp.owner.id] >
+              relationThresholds.trade) &&
           f.components.trade.offers[commodity].active &&
           f.components.trade.offers[commodity].type !==
             facility.components.trade.offers[commodity].type &&
