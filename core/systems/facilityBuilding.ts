@@ -2,7 +2,7 @@ import { createFacilityModule } from "@core/archetypes/facilityModule";
 import { commodityPrices, perCommodity } from "@core/utils/perCommodity";
 import type { Facility } from "@core/archetypes/facility";
 import type { TradeOffer } from "@core/components/trade";
-import { map, pipe, sum } from "@fxts/core";
+import { filter, map, pipe, sum } from "@fxts/core";
 import type { Commodity } from "../economy/commodity";
 import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
@@ -30,7 +30,14 @@ export class FacilityBuildingSystem extends System {
             facility.cp.facilityModuleQueue.queue,
             map((bp) => bp.blueprint.build.cost[commodity] ?? 0),
             sum
-          ) - builder.cp.storage.availableWares[commodity];
+          ) -
+          builder.cp.storage.availableWares[commodity] -
+          (pipe(
+            facility.cp.storage.allocations,
+            map((allocation) => allocation.amount[commodity]),
+            filter((amount) => amount[commodity] > 0),
+            sum
+          ) ?? 0);
 
         if (needed > 0) {
           return {

@@ -32,6 +32,7 @@ import { Undeploy } from "../Undeploy";
 import { Subordinates } from "../Subordinates";
 import { FacilityMoneyManager } from "../FacilityMoneyManager ";
 import { Allocations } from "../Allocations";
+import { FacilityTradeManager } from "../FacilityTradeManager";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -78,6 +79,8 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
     }
   }, [dialog]);
 
+  const playerOwned = entity ? isOwnedByPlayer(entity) : false;
+
   return (
     <>
       <PanelComponent
@@ -114,7 +117,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                   <>
                     <div>
                       Money: {entity.components.budget!.available.toFixed(0)}
-                      {isOwnedByPlayer(entity) && (
+                      {playerOwned && (
                         <IconButton
                           className={styles.manage}
                           variant="naked"
@@ -136,6 +139,15 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                         "storage",
                         "budget",
                       ])}
+                      onManage={
+                        playerOwned
+                          ? () =>
+                              setDialog({
+                                type: "facilityTradeManager",
+                                entityId: entity.id,
+                              })
+                          : undefined
+                      }
                     />
                     <hr />
                   </>
@@ -201,6 +213,10 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
       />
       <FacilityMoneyManager
         open={dialog?.type === "facilityMoneyManager"}
+        onClose={closeDialog}
+      />
+      <FacilityTradeManager
+        open={dialog?.type === "facilityTradeManager"}
         onClose={closeDialog}
       />
     </>

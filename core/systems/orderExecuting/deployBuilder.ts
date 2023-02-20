@@ -24,7 +24,7 @@ export function deployBuilderAction(
       value: 1e6 - entity.cp.storage!.max,
     });
 
-  entity.cp.trade!.auto = false;
+  entity.cp.trade!.auto = { pricing: false, quantity: false };
   entity.cp.deployable.active = true;
   entity.cp.storage!.max = 1e6;
 

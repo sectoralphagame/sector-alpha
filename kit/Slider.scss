@@ -22,9 +22,15 @@
     width: 100%;
     z-index: 1;
   }
+  &[disabled] {
+    &::after,
+    &::-webkit-slider-thumb {
+      background: var(--palette-disabled);
+    }
+  }
   appearance: none;
+  background: var(--palette-background);
   cursor: pointer;
   margin: 0;
   position: relative;
-  top: -4px;
 }

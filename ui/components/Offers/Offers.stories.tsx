@@ -65,4 +65,11 @@ defaultEntity.components.trade!.offers.food = {
 };
 Default.args = {
   entity: defaultEntity,
+  onManage: undefined,
+} as OffersProps;
+
+export const PlayerOwned = Template.bind({});
+PlayerOwned.args = {
+  entity: defaultEntity,
+  onManage: action("onManage"),
 } as OffersProps;

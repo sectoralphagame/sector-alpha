@@ -1,0 +1,36 @@
+.slider {
+  width: 100%;
+  margin-top: var(--spacing-2);
+}
+
+.input {
+  width: 100%;
+  border: none;
+  display: inline-block;
+  text-align: right;
+  background: none;
+  color: var(--palette-text-1);
+  outline: none;
+}
+
+.label {
+  cursor: pointer;
+  margin-left: var(--spacing-0-5);
+
+  &Container {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+.grid {
+  margin-top: var(--spacing-2);
+  grid-template-columns: 1fr 2fr 60px 28px;
+  display: grid;
+  gap: var(--spacing-1);
+  row-gap: var(--spacing-2);
+}
+
+.currency {
+  text-align: right;
+}

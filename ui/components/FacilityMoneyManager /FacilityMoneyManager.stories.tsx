@@ -1,9 +1,6 @@
 import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
-import { facilityModules } from "@core/archetypes/facilityModule";
-import { Sim } from "@core/sim";
-import { Entity } from "@core/components/entity";
 import { FacilityMoneyManagerComponent } from "./FacilityMoneyManagerComponent";
 
 export default {

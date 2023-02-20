@@ -1,3 +1,5 @@
+import configIcon from "@assets/ui/config.svg";
+import SVG from "react-inlinesvg";
 import React from "react";
 import { commodities, commodityLabel } from "@core/economy/commodity";
 import type { RequirePureComponent } from "@core/tsHelpers";
@@ -7,13 +9,15 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
+import { IconButton } from "@kit/IconButton";
 import styles from "./Offers.scss";
 
 export interface OffersProps {
   entity: RequirePureComponent<"storage" | "trade">;
+  onManage: (() => void) | undefined;
 }
 
-export const Offers: React.FC<OffersProps> = ({ entity }) => {
+export const Offers: React.FC<OffersProps> = ({ entity, onManage }) => {
   const { compoundProduction, trade, storage } = entity.cp;
   const offered = Object.values(commodities)
 
@@ -29,7 +33,21 @@ export const Offers: React.FC<OffersProps> = ({ entity }) => {
 
   return (
     <Collapsible defaultOpen>
-      <CollapsibleSummary>Trade offers</CollapsibleSummary>
+      <CollapsibleSummary>
+        Trade offers
+        {!!onManage && (
+          <IconButton
+            className={styles.manage}
+            variant="naked"
+            onClick={(event) => {
+              event.stopPropagation();
+              onManage();
+            }}
+          >
+            <SVG src={configIcon} />
+          </IconButton>
+        )}
+      </CollapsibleSummary>
       <CollapsibleContent className={styles.collapsibleContent}>
         <Table>
           <thead>
@@ -44,6 +62,7 @@ export const Offers: React.FC<OffersProps> = ({ entity }) => {
           <tbody>
             {offered.length === 0 ? (
               <tr>
+                <TableCell>-</TableCell>
                 <TableCell>-</TableCell>
                 <TableCell>-</TableCell>
                 <TableCell>-</TableCell>

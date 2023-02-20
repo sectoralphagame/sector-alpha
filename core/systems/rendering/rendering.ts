@@ -195,6 +195,8 @@ export class RenderingSystem extends SystemWithHooks {
   };
 
   updateSelection = (previousValue: number) => {
+    this.selectionManger.cp.selectionManager.focused = false;
+    this.viewport.plugins.remove("follow");
     const previousSelected = this.sim.get(previousValue);
     if (previousSelected?.cp.renderGraphics?.draw === "path") {
       previousSelected.cp.renderGraphics.g.destroy();
@@ -265,6 +267,9 @@ export class RenderingSystem extends SystemWithHooks {
           this.viewport.center.x + keymap[key].x / this.viewport.scale.x,
           this.viewport.center.y + keymap[key].y / this.viewport.scale.x
         );
+
+        this.selectionManger.cp.selectionManager.focused = false;
+        this.viewport.plugins.remove("follow");
       }
 
       if (keymap[key]?.scale !== undefined) {
