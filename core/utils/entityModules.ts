@@ -1,11 +1,11 @@
-import type { Facility } from "../archetypes/facility";
+import type { RequireComponent } from "@core/tsHelpers";
 import type { FacilityModule } from "../archetypes/facilityModule";
 import { createCompoundProduction } from "../components/production";
 import type { Commodity } from "../economy/commodity";
 import { commodities } from "../economy/commodity";
 
 export function addFacilityModule(
-  facility: Facility,
+  facility: RequireComponent<"modules" | "storage">,
   facilityModule: FacilityModule
 ) {
   facility.cp.modules.ids.push(facilityModule.id);

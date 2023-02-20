@@ -3,6 +3,7 @@ import { commodityPrices, perCommodity } from "@core/utils/perCommodity";
 import type { Facility } from "@core/archetypes/facility";
 import type { TradeOffer } from "@core/components/trade";
 import { filter, map, pipe, sum } from "@fxts/core";
+import { addFacilityModule } from "@core/utils/entityModules";
 import type { Commodity } from "../economy/commodity";
 import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
@@ -78,7 +79,10 @@ export class FacilityBuildingSystem extends System {
           ...facility.cp.facilityModuleQueue.building.blueprint,
           parent: facility,
         });
-        facility.cp.modules.ids.push(facilityModule.id);
+        addFacilityModule(
+          facility.requireComponents(["storage", "modules"]),
+          facilityModule
+        );
         facility.cp.facilityModuleQueue.building = null;
       }
       if (facility.cp.facilityModuleQueue.queue.length === 0) return;

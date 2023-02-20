@@ -56,7 +56,7 @@ export const FacilityTradeManagerComponent: React.FC<
                     ...offers,
                     [commodity]: {
                       ...offers[commodity],
-                      price: event.target.value,
+                      price: parseInt(event.target.value, 10),
                     },
                   })
                 }
@@ -69,7 +69,7 @@ export const FacilityTradeManagerComponent: React.FC<
                     ...offers,
                     [commodity]: {
                       ...offers[commodity],
-                      price: event.target.value,
+                      price: parseInt(event.target.value, 10),
                     },
                   })
                 }
