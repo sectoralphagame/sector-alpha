@@ -258,17 +258,13 @@ export function getProductionSurplus(
 }
 
 export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
-  const requiredBudget = getPlannedBudget(entity);
-  const availableBudget = entity.cp.budget.available;
   const stored = entity.cp.storage.availableWares;
   const quota = entity.cp.storage.quota[commodity];
-  const multiplier =
-    requiredBudget > availableBudget ? availableBudget / requiredBudget : 1;
 
   if (entity.hasComponents(["shipyard"])) {
     return stored[commodity] > quota
       ? 0
-      : Math.floor(multiplier * (stored[commodity] - quota));
+      : Math.floor(stored[commodity] - quota);
   }
 
   if (!entity.hasComponents(["compoundProduction"])) {
@@ -297,9 +293,7 @@ export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
     return stored[commodity] - production.pac[commodity].consumes * 2;
   }
 
-  return stored[commodity] > quota
-    ? 0
-    : Math.floor(multiplier * (stored[commodity] - quota));
+  return stored[commodity] > quota ? 0 : Math.floor(stored[commodity] - quota);
 }
 
 export function updateOfferQuantity(entity: WithTrade) {

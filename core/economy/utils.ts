@@ -220,14 +220,16 @@ export function getMineableAsteroid(
  * into account sell and inactive offers
  */
 export function getPlannedBudget(entity: WithTrade): number {
-  return sum(
-    Object.entries(entity.components.trade.offers).map(
-      ([commodity, offer]) =>
-        (offer.type === "sell" || !offer.active
-          ? 0
-          : entity.cp.storage.quota[commodity] -
-            entity.cp.storage.stored[commodity]) * offer.price
-    )
+  return commoditiesArray.reduce(
+    (budget, commodity) =>
+      budget +
+      (entity.components.trade.offers[commodity].type === "sell" ||
+      !entity.components.trade.offers[commodity].active
+        ? 0
+        : entity.cp.storage.quota[commodity] -
+          entity.cp.storage.stored[commodity]) *
+        entity.components.trade.offers[commodity].price,
+    0
   );
 }
 
