@@ -225,8 +225,9 @@ export class Sim extends BaseSim {
     this.stop();
     this.systems.forEach((system) => system.destroy());
     this.hooks.destroy.call();
-    window.selected = undefined!;
-    window.sim = undefined!;
+    if (!isHeadless) {
+      window.selected = undefined!;
+    }
   };
 
   serialize = () => JSON.stringify(this, replacer);
