@@ -57,6 +57,8 @@ export const Game: React.FC = () => {
       },
     };
 
+    window.sim = sim;
+
     return unmount;
   }, [sim]);
 

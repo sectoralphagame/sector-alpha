@@ -23,7 +23,6 @@ export const LoadGame: React.FC = () => {
             saves={saves}
             onClick={async (id) => {
               const sim = Sim.load(saves.find((s) => s.id === id)!.data);
-              window.sim = sim;
               setSim(sim);
               navigate("game");
             }}

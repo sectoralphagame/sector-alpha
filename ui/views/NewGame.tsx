@@ -39,7 +39,6 @@ export const NewGame: React.FC = () => {
         if (event.data.type === "completed") {
           sim.current?.destroy();
           sim.current = Sim.load(event.data.data);
-          window.sim = sim.current;
           setSim(sim.current);
           navigate("game");
         }
@@ -51,7 +50,6 @@ export const NewGame: React.FC = () => {
     sim.current?.destroy();
     sim.current = new Sim();
     sim.current.init();
-    window.sim = sim.current;
     setLoading(true);
     await world(sim.current);
 
