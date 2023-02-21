@@ -37,10 +37,9 @@ export const Game: React.FC = () => {
 
     const unmount = () => {
       sim.unregisterSystem(system.current!);
-      sim.events.removeListener("destroy", unmount);
     };
 
-    sim.events.on("destroy", unmount);
+    sim.hooks.destroy.tap("Game", unmount);
 
     (window as any).cheats = {
       addCommodity: (commodity: Commodity, quantity: number, id?: number) => {

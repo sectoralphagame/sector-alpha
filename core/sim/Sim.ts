@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import pick from "lodash/pick";
 import { Exclude, Expose, Type, plainToInstance } from "class-transformer";
-import EventEmitter from "eventemitter3";
 // For some reason replacer is not exported in types
 // @ts-expect-error
 import { reviver, replacer } from "mathjs";
 import type { Path } from "graphlib";
+import { SyncHook } from "tapable";
 
 import isPlainObject from "lodash/isPlainObject";
 import { filter, map, pipe, toArray } from "@fxts/core";
@@ -14,6 +14,7 @@ import { OutOfBoundsCheckingSystem } from "@core/systems/reporting/outOfBoundsCh
 import { FacilityBuildingSystem } from "@core/systems/facilityBuilding";
 import { UndeployingSystem } from "@core/systems/undeploying";
 import { isHeadless } from "@core/settings";
+import type { CoreComponents } from "@core/components/component";
 import { Entity, EntityComponents } from "../components/entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -65,10 +66,15 @@ interface Queues {
 export class Sim extends BaseSim {
   @Expose()
   entityIdCounter: number = 0;
-  events: EventEmitter<
-    "add-component" | "remove-component" | "remove-entity" | "destroy",
-    Entity
-  >;
+  hooks: {
+    addComponent: SyncHook<{ entity: Entity; component: keyof CoreComponents }>;
+    removeComponent: SyncHook<{
+      entity: Entity;
+      component: keyof CoreComponents;
+    }>;
+    removeEntity: SyncHook<Entity>;
+    destroy: SyncHook<void>;
+  };
 
   @Expose()
   @Type(() => Entity)
@@ -83,7 +89,12 @@ export class Sim extends BaseSim {
     super();
 
     this.entities = new Map();
-    this.events = new EventEmitter();
+    this.hooks = {
+      addComponent: new SyncHook(["addComponent"]),
+      removeComponent: new SyncHook(["removeComponent"]),
+      removeEntity: new SyncHook(["removeEntity"]),
+      destroy: new SyncHook(["destroy"]),
+    };
 
     this.queries = createQueries(this);
 
@@ -123,7 +134,7 @@ export class Sim extends BaseSim {
 
   unregisterEntity = (entity: Entity) => {
     this.entities.delete(entity.id);
-    this.events.emit("remove-entity", entity);
+    this.hooks.removeEntity.call(entity);
   };
 
   registerSystem = (system: System) => {
@@ -213,7 +224,7 @@ export class Sim extends BaseSim {
   destroy = () => {
     this.stop();
     this.systems.forEach((system) => system.destroy());
-    this.events.emit("destroy");
+    this.hooks.destroy.call();
     window.selected = undefined!;
     window.sim = undefined!;
   };

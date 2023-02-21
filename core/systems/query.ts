@@ -20,7 +20,7 @@ export class Query<T extends keyof CoreComponents> {
     this.requiredComponents = requiredComponents;
     this.sim = sim;
 
-    sim.events.on("add-component", (entity: Entity) => {
+    sim.hooks.addComponent.tap("query", ({ entity }) => {
       if (
         this.entities &&
         entity.hasComponents(this.requiredComponents) &&
@@ -30,21 +30,16 @@ export class Query<T extends keyof CoreComponents> {
       }
     });
 
-    sim.events.on(
-      "remove-component",
-      (payload: { name: keyof CoreComponents; entity: Entity }) => {
-        if (
-          this.entities &&
-          (this.requiredComponents as readonly string[]).includes(payload.name)
-        ) {
-          this.entities = this.entities.filter(
-            (e) => e.id !== payload.entity.id
-          );
-        }
+    sim.hooks.removeComponent.tap("query", ({ component, entity }) => {
+      if (
+        this.entities &&
+        (this.requiredComponents as readonly string[]).includes(component)
+      ) {
+        this.entities = this.entities.filter((e) => e.id !== entity.id);
       }
-    );
+    });
 
-    sim.events.on("remove-entity", (entity: Entity) => {
+    sim.hooks.removeEntity.tap("query", (entity: Entity) => {
       if (this.entities) {
         this.entities = this.entities.filter((e) => e.id !== entity.id);
       }

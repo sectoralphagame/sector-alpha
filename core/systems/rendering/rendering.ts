@@ -95,7 +95,7 @@ export class RenderingSystem extends SystemWithHooks {
       }
     });
 
-    this.sim.events.on("remove-entity", (entity: Entity) => {
+    this.sim.hooks.removeEntity.tap("RenderingSystem", (entity: Entity) => {
       if (entity.cp.render) {
         destroy(entity.cp.render);
       }

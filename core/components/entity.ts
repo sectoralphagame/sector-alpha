@@ -66,14 +66,17 @@ export class Entity {
   ): Entity {
     const componentName: CoreComponents[T]["name"] = component.name;
     this.components[componentName] = component;
-    this.sim.events.emit("add-component", this);
+    this.sim.hooks.addComponent.call({
+      entity: this,
+      component: component.name,
+    });
 
     return this;
   }
 
   removeComponent(name: keyof CoreComponents): Entity {
     delete this.components[name];
-    this.sim.events.emit("remove-component", { name, entity: this });
+    this.sim.hooks.removeComponent.call({ entity: this, component: name });
 
     return this;
   }
