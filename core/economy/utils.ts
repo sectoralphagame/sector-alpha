@@ -270,7 +270,8 @@ export function getCommodityCost(
               productionModules,
               fn
             ) *
-              consumes) /
+              consumes *
+              1.2) /
             fm.pac[commodity]!.produces
         ),
         fxtsSum
