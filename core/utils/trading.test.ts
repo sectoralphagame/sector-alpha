@@ -216,6 +216,8 @@ describe("Trade flow", () => {
 
   beforeAll(() => {
     sim = new Sim();
+    const player = createFaction("Player", sim);
+    player.addComponent({ name: "player" });
     // Run path planning
     sim.systems[0].exec(0);
   });
