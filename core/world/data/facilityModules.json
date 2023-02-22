@@ -6,7 +6,7 @@
       "ice": { "consumes": 4800, "produces": 0 },
       "water": { "consumes": 0, "produces": 2400 }
     },
-    "time": 120,
+    "time": 300,
     "type": "production",
     "build": {
       "cost": {
@@ -66,7 +66,7 @@
       "fuel": { "consumes": 700, "produces": 0 }
     },
     "slug": "habitat",
-    "time": 150,
+    "time": 900,
     "build": {
       "cost": { "electronics": 2300, "fuel": 1450, "hullPlates": 22000 },
       "time": 410
@@ -91,7 +91,7 @@
       "water": { "consumes": 700, "produces": 0 }
     },
     "slug": "farm",
-    "time": 180,
+    "time": 240,
     "build": { "cost": {}, "time": 0 }
   },
   {
@@ -102,7 +102,7 @@
       "metals": { "consumes": 0, "produces": 2000 }
     },
     "slug": "refinery",
-    "time": 150,
+    "time": 330,
     "build": { "cost": {}, "time": 0 }
   },
   {
@@ -113,7 +113,7 @@
       "fuelium": { "consumes": 4800, "produces": 0 }
     },
     "slug": "fueliumRefinery",
-    "time": 180,
+    "time": 359,
     "build": { "cost": {}, "time": 0 }
   },
   {
@@ -126,7 +126,7 @@
       "hullPlates": { "consumes": 0, "produces": 4600 }
     },
     "slug": "hullPlatesFactory",
-    "time": 55,
+    "time": 600,
     "build": { "cost": {}, "time": 0 }
   },
   {
@@ -138,7 +138,7 @@
       "fuel": { "consumes": 550, "produces": 0 }
     },
     "slug": "goldRefinery",
-    "time": 230,
+    "time": 900,
     "build": { "cost": {}, "time": 0 }
   },
   {
@@ -149,7 +149,7 @@
       "silicon": { "consumes": 0, "produces": 6000 }
     },
     "slug": "siliconPurification",
-    "time": 120,
+    "time": 360,
     "build": { "cost": {}, "time": 0 }
   },
   {
@@ -163,7 +163,7 @@
       "gold": { "consumes": 1200, "produces": 0 }
     },
     "slug": "electronicsFactory",
-    "time": 260,
+    "time": 420,
     "build": { "cost": {}, "time": 0 }
   },
   {
@@ -175,7 +175,7 @@
       "drones": { "consumes": 0, "produces": 50 }
     },
     "slug": "droneFactory",
-    "time": 480,
+    "time": 960,
     "build": { "cost": {}, "time": 0 }
   },
   {
