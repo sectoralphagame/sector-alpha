@@ -1,5 +1,10 @@
-import type { Action, Order } from "@core/components/orders";
+import { releaseBudgetAllocation } from "@core/components/budget";
 import type { Entity } from "@core/components/entity";
+import { releaseStorageAllocation } from "@core/components/storage";
+import type { Allocation } from "@core/components/utils/allocations";
+import type { Action, Order } from "@core/components/orders";
+import type { Sim } from "@core/sim";
+import type { RequireComponent } from "@core/tsHelpers";
 import { System } from "../system";
 import { dockOrder } from "./dock";
 import { mineAction } from "./mine";
@@ -33,6 +38,40 @@ const orderGroupFns: Partial<
   },
 };
 
+function cleanupAllocations(entity: Entity): void {
+  [entity.cp.budget, entity.cp.storage].forEach((manager) => {
+    if (manager) {
+      manager.allocations.forEach((allocation: Allocation) => {
+        if (allocation.meta.tradeId) {
+          for (const entityWithStorage of entity.sim.queries.storage.get()) {
+            for (const entityAllocation of entityWithStorage.cp.storage
+              .allocations) {
+              if (entityAllocation.meta.tradeId === allocation.meta.tradeId) {
+                releaseStorageAllocation(
+                  entityWithStorage.cp.storage,
+                  entityAllocation.id
+                );
+              }
+            }
+          }
+
+          for (const entityWithBudget of entity.sim.queries.budget.get()) {
+            for (const entityAllocation of entityWithBudget.cp.budget
+              .allocations) {
+              if (entityAllocation.meta.tradeId === allocation.meta.tradeId) {
+                releaseBudgetAllocation(
+                  entityWithBudget.cp.budget,
+                  entityAllocation.id
+                );
+              }
+            }
+          }
+        }
+      });
+    }
+  });
+}
+
 const orderFns: Partial<
   // eslint-disable-next-line no-unused-vars
   Record<Action["type"], (entity: Entity, order: Action) => boolean | void>
@@ -47,6 +86,11 @@ const orderFns: Partial<
 };
 
 export class OrderExecutingSystem extends System {
+  constructor(sim: Sim) {
+    super(sim);
+    this.sim.hooks.removeEntity.tap("TradingSystem", cleanupAllocations);
+  }
+
   exec = () => {
     this.sim.queries.orderable.get().forEach((entity) => {
       if (entity.cp.orders.value.length) {

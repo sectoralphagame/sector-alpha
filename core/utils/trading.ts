@@ -162,7 +162,7 @@ export function acceptTrade(
 export function allocate(
   entity: WithTrade,
   offer: Omit<TransactionInput, "allocations">
-): { budget: Allocation | null; storage: Allocation } | null {
+) {
   if (isTradeAccepted(entity, offer)) {
     entity.cp.trade.offers[offer.commodity].quantity -= offer.quantity;
 
@@ -170,8 +170,57 @@ export function allocate(
       offer.type
     }:${entity.sim.getTime()}`;
 
-    if (offer.type === "sell") {
+    if (offer.type === "buy") {
       return {
+        buyer: {
+          budget:
+            offer.price === 0
+              ? null
+              : newBudgetAllocation(
+                  entity.sim
+                    .getOrThrow(offer.budget!)
+                    .requireComponents(["budget"]).cp.budget,
+                  {
+                    amount: offer.price * offer.quantity,
+                    issued: entity.sim.getTime(),
+                  },
+                  { tradeId }
+                )?.id,
+          storage: newStorageAllocation(
+            entity.sim
+              .getOrThrow(offer.initiator)
+              .requireComponents(["storage"]).cp.storage,
+            {
+              amount: {
+                ...perCommodity(() => 0),
+                [offer.commodity]: offer.quantity,
+              },
+              issued: entity.sim.getTime(),
+              type: "incoming",
+            },
+            { tradeId }
+          )?.id,
+        },
+        seller: {
+          budget: null,
+          storage: newStorageAllocation(
+            entity.cp.storage,
+            {
+              amount: {
+                ...perCommodity(() => 0),
+                [offer.commodity]: offer.quantity,
+              },
+              issued: entity.sim.getTime(),
+              type: "outgoing",
+            },
+            { tradeId }
+          )?.id,
+        },
+      };
+    }
+
+    return {
+      buyer: {
         budget:
           offer.price === 0
             ? null
@@ -182,7 +231,7 @@ export function allocate(
                   issued: entity.sim.getTime(),
                 },
                 { tradeId }
-              ),
+              )?.id,
         storage: newStorageAllocation(
           entity.cp.storage,
           {
@@ -194,35 +243,24 @@ export function allocate(
             type: "incoming",
           },
           { tradeId }
-        ),
-      };
-    }
-
-    return {
-      budget:
-        offer.price === 0
-          ? null
-          : newBudgetAllocation(
-              entity.sim.getOrThrow(offer.budget!).requireComponents(["budget"])
-                .cp.budget,
-              {
-                amount: offer.price * offer.quantity,
-                issued: entity.sim.getTime(),
-              },
-              { tradeId }
-            ),
-      storage: newStorageAllocation(
-        entity.cp.storage,
-        {
-          amount: {
-            ...perCommodity(() => 0),
-            [offer.commodity]: offer.quantity,
+        )?.id,
+      },
+      seller: {
+        budget: null,
+        storage: newStorageAllocation(
+          entity.sim.getOrThrow(offer.initiator).requireComponents(["storage"])
+            .cp.storage,
+          {
+            amount: {
+              ...perCommodity(() => 0),
+              [offer.commodity]: offer.quantity,
+            },
+            issued: entity.sim.getTime(),
+            type: "outgoing",
           },
-          issued: entity.sim.getTime(),
-          type: "outgoing",
-        },
-        { tradeId }
-      ),
+          { tradeId }
+        )?.id,
+      },
     };
   }
 
@@ -305,25 +343,7 @@ export function tradeCommodity(
       targetId: target.id,
       offer: {
         ...offer,
-        allocations:
-          offer.type === "buy"
-            ? {
-                buyer: {
-                  budget: allocations.budget?.id ?? null,
-                  storage: null,
-                },
-                seller: {
-                  budget: null,
-                  storage: allocations.storage?.id ?? null,
-                },
-              }
-            : {
-                buyer: {
-                  budget: allocations.budget?.id ?? null,
-                  storage: allocations.storage?.id ?? null,
-                },
-                seller: { budget: null, storage: null },
-              },
+        allocations,
       },
     }),
   ];
@@ -399,23 +419,27 @@ export function resellCommodity(
     return false;
   }
 
-  const sellActions = tradeCommodity(entity, offerForBuyer, buyer, seller);
-  if (sellActions === null) {
-    return false;
-  }
   const buyActions = tradeCommodity(entity, offerForSeller, seller);
   if (buyActions === null) {
+    return false;
+  }
+  const sellActions = tradeCommodity(entity, offerForBuyer, buyer, seller);
+  if (sellActions === null) {
     const sellOrdersAllocations = (
-      sellActions.find((o) => o.type === "trade") as TradeAction
+      buyActions.find((o) => o.type === "trade") as TradeAction
     ).offer.allocations!;
     if (sellOrdersAllocations.buyer!.budget) {
       releaseBudgetAllocation(
-        buyer.cp.budget,
+        entityWithBudget.cp.budget,
         sellOrdersAllocations!.buyer!.budget!
       );
     }
     releaseStorageAllocation(
-      buyer.cp.storage,
+      seller.cp.storage,
+      sellOrdersAllocations.seller!.storage!
+    );
+    releaseStorageAllocation(
+      entity.cp.storage,
       sellOrdersAllocations.buyer!.storage!
     );
     return false;
@@ -542,11 +566,7 @@ export function returnToFacility(
             },
             {
               offer: {
-                allocations: {
-                  buyer: {
-                    storage: allocations.storage?.id,
-                  },
-                },
+                allocations,
               },
             }
           )

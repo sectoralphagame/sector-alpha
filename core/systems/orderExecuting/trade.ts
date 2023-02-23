@@ -27,6 +27,12 @@ export function tradeOrder(
           order.offer.allocations.buyer.storage
         );
       }
+      if (order.offer.allocations?.seller?.storage) {
+        releaseStorageAllocation(
+          entity.cp.storage,
+          order.offer.allocations.seller.storage
+        );
+      }
 
       transfer(
         entity.cp.storage,
@@ -36,6 +42,12 @@ export function tradeOrder(
         true
       );
     } else {
+      if (order.offer.allocations?.buyer?.storage) {
+        releaseStorageAllocation(
+          entity.cp.storage,
+          order.offer.allocations.buyer.storage
+        );
+      }
       if (order.offer.allocations?.seller?.storage) {
         releaseStorageAllocation(
           target.cp.storage,

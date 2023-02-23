@@ -21,6 +21,7 @@ import type { TradeAction } from "../components/orders";
 import type { Commodity } from "../economy/commodity";
 import type { RequireComponent } from "../tsHelpers";
 import type { WithTrade } from "../economy/utils";
+import { commodityPrices } from "./perCommodity";
 
 describe("Trading module", () => {
   let sim: Sim;
@@ -74,11 +75,18 @@ describe("Trading module", () => {
     };
     const shipFaction = createFaction("Ship faction", sim);
     changeBudgetMoney(shipFaction.cp.budget, 100);
+    const ship = createShip(sim, {
+      ...shipClasses[0],
+      owner: shipFaction,
+      position: matrix([0, 0, 0]),
+      sector,
+    });
+    ship.cp.storage.max = 1000;
 
     const allocations = allocate(facility, {
       budget: shipFaction.id,
       commodity: "food",
-      initiator: 4,
+      initiator: ship.id,
       factionId: shipFaction.id,
       price: 20,
       quantity: 5,
@@ -86,7 +94,8 @@ describe("Trading module", () => {
     });
 
     expect(allocations).toBeTruthy();
-    expect(allocations!.storage?.id).toBe(1);
+    expect(allocations!.buyer.storage).toBe(1);
+    expect(allocations!.seller.storage).toBe(1);
     expect(shipFaction.cp.budget.allocations).toHaveLength(1);
     expect(shipFaction.cp.budget.allocations[0].id).toBe(1);
     expect(facility.cp.storage.allocations).toHaveLength(1);
@@ -94,7 +103,6 @@ describe("Trading module", () => {
   });
 
   it("properly allocates budget and storage for sell offers", () => {
-    addStorage(facility.cp.storage, "food", 100, true);
     facility.cp.trade.offers.water = {
       price: 20,
       quantity: 100,
@@ -103,11 +111,19 @@ describe("Trading module", () => {
     };
     const shipFaction = createFaction("Ship faction", sim);
     changeBudgetMoney(shipFaction.cp.budget, 0);
+    const ship = createShip(sim, {
+      ...shipClasses[0],
+      owner: shipFaction,
+      position: matrix([0, 0, 0]),
+      sector,
+    });
+    ship.cp.storage.max = 1000;
+    addStorage(ship.cp.storage, "water", 100, true);
 
     allocate(facility, {
       budget: shipFaction.id,
       commodity: "water",
-      initiator: 4,
+      initiator: ship.id,
       factionId: shipFaction.id,
       price: 20,
       quantity: 5,
@@ -160,6 +176,44 @@ describe("Trading module", () => {
     expect(facility.cp.storage.allocations[0].id).toBe(1);
     expect(waterFacility.cp.storage.allocations).toHaveLength(1);
     expect(waterFacility.cp.storage.allocations[0].id).toBe(1);
+  });
+
+  it("properly cleans up dangling allocations if any entity was destroyed", () => {
+    const shipFaction = createFaction("Ship faction", sim);
+    changeBudgetMoney(shipFaction.cp.budget, 1000000);
+    addStorage(facility.cp.storage, "food", 100);
+    facility.cp.trade.offers.food = {
+      active: true,
+      price: commodityPrices.food.avg,
+      quantity: 100,
+      type: "sell",
+    };
+    const ship = createShip(sim, {
+      ...shipClasses[0],
+      owner: shipFaction,
+      position: matrix([0, 0, 0]),
+      sector,
+    });
+
+    const allocations = allocate(facility, {
+      budget: shipFaction.id,
+      commodity: "food",
+      factionId: shipFaction.id,
+      initiator: ship.id,
+      price: commodityPrices.food.max,
+      quantity: 10,
+      type: "buy",
+    });
+
+    expect(allocations).not.toBeNull();
+    expect(facility.cp.storage.allocations.length).toBe(1);
+    expect(facility.cp.budget.allocations.length).toBe(0);
+    expect(shipFaction.cp.budget.allocations.length).toBe(1);
+
+    ship.unregister();
+
+    expect(facility.cp.storage.allocations.length).toBe(0);
+    expect(shipFaction.cp.budget.allocations.length).toBe(0);
   });
 });
 

@@ -8,7 +8,11 @@ import {
   NonIntegerQuantity,
 } from "../errors";
 import { perCommodity } from "../utils/perCommodity";
-import type { Allocation, Allocations } from "../components/utils/allocations";
+import type {
+  Allocation,
+  AllocationMeta,
+  Allocations,
+} from "../components/utils/allocations";
 import {
   newAllocation,
   releaseAllocation,
@@ -18,7 +22,7 @@ import type { BaseComponent } from "./component";
 
 export type StorageAllocationType = "incoming" | "outgoing";
 
-interface StorageAllocation extends Allocation {
+export interface StorageAllocation extends Allocation {
   amount: Record<Commodity, number>;
   type: StorageAllocationType;
 }
@@ -99,14 +103,31 @@ export function validateStorageAllocation(
   allocation: StorageAllocation
 ) {
   if (allocation.type === "incoming") {
-    return sum(Object.values(allocation.amount)) <= getAvailableSpace(storage);
+    return (
+      sum(Object.values(allocation.amount)) <=
+      getAvailableSpace(storage) +
+        sum(
+          storage.allocations
+            .filter((a) => a.type === "outgoing")
+            .map((a) => sum(Object.values(a.amount)))
+        )
+    );
   }
 
-  return Object.entries(allocation.amount)
+  const result = Object.entries(allocation.amount)
     .map(
-      ([commodity, quantity]) => storage.availableWares[commodity] >= quantity
+      ([commodity, quantity]) =>
+        storage.availableWares[commodity] +
+          sum(
+            storage.allocations
+              .filter((a) => a.type === "incoming")
+              .map((a) => a.amount[commodity])
+          ) >=
+        quantity
     )
     .every(Boolean);
+
+  return result;
 }
 
 export function addStorage(
@@ -194,7 +215,7 @@ export function transfer(
 export function newStorageAllocation(
   storage: CommodityStorage,
   input: Omit<StorageAllocation, "id" | "meta">,
-  meta: object = {}
+  meta: AllocationMeta = {}
 ) {
   const allocation = newAllocation(storage, { ...input, meta }, (a) =>
     validateStorageAllocation(storage, a)

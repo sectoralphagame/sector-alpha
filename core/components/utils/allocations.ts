@@ -1,9 +1,11 @@
 import { NotFound } from "../../errors";
 
+export type AllocationMeta = Record<string, string>;
+
 export interface Allocation {
   id: number;
   issued: number;
-  meta: object;
+  meta: AllocationMeta;
 }
 
 export interface CreateAllocationManagerOpts<T> {
