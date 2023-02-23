@@ -1,5 +1,5 @@
 import type { BaseComponent } from "./component";
-import type { Entity } from "./entity";
+import type { Entity } from "../entity";
 
 export interface Player extends BaseComponent<"player"> {}
 

@@ -1,5 +1,5 @@
 import type { Matrix } from "mathjs";
-import { Entity } from "../components/entity";
+import { Entity } from "../entity";
 import { MissingComponentError } from "../errors";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";

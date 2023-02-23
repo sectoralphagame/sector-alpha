@@ -11,7 +11,7 @@ import type { ShipRole } from "../world/ships";
 import { System } from "./system";
 import type { Faction } from "../archetypes/faction";
 import { sector as asSector } from "../archetypes/sector";
-import type { Entity } from "../components/entity";
+import type { Entity } from "../entity";
 import type { RequireComponent } from "../tsHelpers";
 import { notNull } from "../utils/maps";
 

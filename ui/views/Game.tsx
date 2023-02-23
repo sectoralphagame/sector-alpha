@@ -4,7 +4,7 @@ import { deepEqual } from "mathjs";
 import { RenderingSystem } from "@core/systems/rendering";
 import { worldToHecs } from "@core/components/hecsPosition";
 import { Dropdown, DropdownOptions } from "@kit/Dropdown";
-import type { Entity } from "@core/components/entity";
+import type { Entity } from "@core/entity";
 import { MapView } from "@ui/components/MapView";
 import { useRerender } from "@ui/hooks/useRerender";
 import type { Commodity } from "@core/economy/commodity";

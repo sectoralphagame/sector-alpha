@@ -2,7 +2,7 @@ import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 import { Styles } from "@kit/theming/style";
-import { PureEntity } from "@core/components/entity";
+import { PureEntity } from "@core/entity";
 import { addStorage, createCommodityStorage } from "@core/components/storage";
 import { createTrade } from "@core/components/trade";
 import { Offers } from "./Offers";

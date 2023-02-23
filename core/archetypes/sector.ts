@@ -1,6 +1,6 @@
 import type { Matrix } from "mathjs";
 import mapValues from "lodash/mapValues";
-import { Entity } from "../components/entity";
+import { Entity } from "../entity";
 import { createRenderGraphics } from "../components/renderGraphics";
 import { MissingComponentError } from "../errors";
 import type { Sim } from "../sim";

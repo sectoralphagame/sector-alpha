@@ -4,7 +4,7 @@ import type { Faction } from "../archetypes/faction";
 import { createFaction } from "../archetypes/faction";
 import type { Sector } from "../archetypes/sector";
 import { createSector } from "../archetypes/sector";
-import { Entity } from "../components/entity";
+import { Entity } from "../entity";
 import { hecsToCartesian } from "../components/hecsPosition";
 import { linkTeleportModules } from "../components/teleport";
 import { Sim } from "../sim/Sim";
@@ -20,6 +20,7 @@ function createTeleporter(sim: Sim, sector: Sector, owner: Faction) {
       angle: 0,
       coord: hecsToCartesian(sector.cp.hecsPosition.value, 1),
       sector: sector.id,
+      moved: false,
     })
     .addComponent({ name: "modules", ids: [] })
     .addComponent({

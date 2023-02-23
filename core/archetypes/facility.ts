@@ -1,7 +1,7 @@
 import Color from "color";
 import type { Matrix } from "mathjs";
 import { createBudget } from "../components/budget";
-import { Entity } from "../components/entity";
+import { Entity } from "../entity";
 import { createRender } from "../components/render";
 import { createCommodityStorage } from "../components/storage";
 import { createTrade } from "../components/trade";

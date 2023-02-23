@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
-import { Entity } from "@core/components/entity";
+import { Entity } from "@core/entity";
 import {
   createRenderGraphics,
   drawGraphics,

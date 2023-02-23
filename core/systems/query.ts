@@ -4,7 +4,7 @@ import { facilityComponents } from "../archetypes/facility";
 import { factionComponents } from "../archetypes/faction";
 import { sectorComponents } from "../archetypes/sector";
 import type { CoreComponents } from "../components/component";
-import type { Entity } from "../components/entity";
+import type { Entity } from "../entity";
 import { tradeComponents } from "../economy/utils";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";

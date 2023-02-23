@@ -8,7 +8,7 @@ import { sectorSize } from "../archetypes/sector";
 import type { RequireComponent } from "../tsHelpers";
 import { findInAncestors } from "../utils/findInAncestors";
 import type { BaseComponent } from "./component";
-import type { Entity } from "./entity";
+import type { Entity } from "../entity";
 import { hecsToCartesian } from "./hecsPosition";
 
 export type Graphics = Record<

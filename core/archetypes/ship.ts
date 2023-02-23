@@ -2,7 +2,7 @@ import type { Matrix } from "mathjs";
 import Color from "color";
 import pick from "lodash/pick";
 import { createDrive } from "../components/drive";
-import { Entity } from "../components/entity";
+import { Entity } from "../entity";
 import { createMining } from "../components/mining";
 import { createRender } from "../components/render";
 import { createCommodityStorage } from "../components/storage";

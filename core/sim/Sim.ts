@@ -15,7 +15,7 @@ import { FacilityBuildingSystem } from "@core/systems/facilityBuilding";
 import { UndeployingSystem } from "@core/systems/undeploying";
 import { isHeadless } from "@core/settings";
 import type { CoreComponents } from "@core/components/component";
-import { Entity, EntityComponents } from "../components/entity";
+import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
 import { BudgetPlanningSystem } from "../systems/budgetPlanning";

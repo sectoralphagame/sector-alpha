@@ -1,7 +1,7 @@
 import type { Matrix } from "mathjs";
 import Color from "color";
 import type { MineableCommodity } from "@core/economy/commodity";
-import { Entity } from "../components/entity";
+import { Entity } from "../entity";
 import { createRender } from "../components/render";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";

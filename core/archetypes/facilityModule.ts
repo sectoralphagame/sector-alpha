@@ -1,6 +1,6 @@
 import type { Commodity } from "@core/economy/commodity";
 import { fromEntries, pipe, map } from "@fxts/core";
-import { Entity } from "../components/entity";
+import { Entity } from "../entity";
 import type { PAC } from "../components/production";
 import { createProduction } from "../components/production";
 import type { Sim } from "../sim";

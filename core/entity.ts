@@ -3,11 +3,11 @@ import { Expose, Exclude, Type } from "class-transformer";
 import omit from "lodash/omit";
 import reduce from "lodash/reduce";
 import pick from "lodash/pick";
-import type { Sim } from "../sim";
-import type { RequireComponent } from "../tsHelpers";
-import { MissingComponentError } from "../errors";
-import { Cooldowns } from "../utils/cooldowns";
-import type { CoreComponents } from "./component";
+import type { Sim } from "./sim";
+import type { RequireComponent } from "./tsHelpers";
+import { MissingComponentError } from "./errors";
+import { Cooldowns } from "./utils/cooldowns";
+import type { CoreComponents } from "./components/component";
 
 export class EntityComponents {
   toJSON() {

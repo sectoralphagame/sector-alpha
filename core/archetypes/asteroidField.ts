@@ -1,6 +1,6 @@
 import type { Matrix } from "mathjs";
 import type { AsteroidSpawn } from "../components/asteroidSpawn";
-import { Entity } from "../components/entity";
+import { Entity } from "../entity";
 import { createRenderGraphics } from "../components/renderGraphics";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";

@@ -1,6 +1,6 @@
 import React from "react";
 import SVG from "react-inlinesvg";
-import type { Entity } from "@core/components/entity";
+import type { Entity } from "@core/entity";
 import type { RequireComponent } from "@core/tsHelpers";
 import locationIcon from "@assets/ui/location.svg";
 import closeIcon from "@assets/ui/close.svg";

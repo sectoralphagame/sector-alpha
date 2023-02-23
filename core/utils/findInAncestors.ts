@@ -1,5 +1,5 @@
 import type { CoreComponents } from "../components/component";
-import type { Entity } from "../components/entity";
+import type { Entity } from "../entity";
 import { MissingComponentError } from "../errors";
 import type { RequireComponent } from "../tsHelpers";
 

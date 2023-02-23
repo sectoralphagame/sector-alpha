@@ -1,5 +1,5 @@
 import { releaseBudgetAllocation } from "@core/components/budget";
-import type { Entity } from "@core/components/entity";
+import type { Entity } from "@core/entity";
 import { releaseStorageAllocation } from "@core/components/storage";
 import type { Allocation } from "@core/components/utils/allocations";
 import type { Action, Order } from "@core/components/orders";

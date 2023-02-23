@@ -3,7 +3,7 @@ import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { facilityModules } from "@core/archetypes/facilityModule";
 import { Sim } from "@core/sim";
-import { Entity } from "@core/components/entity";
+import { Entity } from "@core/entity";
 import { FacilityModuleManagerComponent } from "./FacilityModuleManagerComponent";
 
 export default {
