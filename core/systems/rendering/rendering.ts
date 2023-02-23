@@ -102,6 +102,12 @@ export class RenderingSystem extends SystemWithHooks {
       if (entity.cp.renderGraphics) {
         entity.cp.renderGraphics.g.destroy();
       }
+      if (entity.id === this.selectionManger.cp.selectionManager.id) {
+        this.selectionManger.cp.selectionManager.id = null;
+      }
+      if (entity.id === this.selectionManger.cp.selectionManager.secondaryId) {
+        this.selectionManger.cp.selectionManager.secondaryId = null;
+      }
     });
 
     this.viewport.sortableChildren = true;
