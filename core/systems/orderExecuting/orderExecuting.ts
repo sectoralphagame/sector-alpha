@@ -4,7 +4,6 @@ import { releaseStorageAllocation } from "@core/components/storage";
 import type { Allocation } from "@core/components/utils/allocations";
 import type { Action, Order } from "@core/components/orders";
 import type { Sim } from "@core/sim";
-import type { RequireComponent } from "@core/tsHelpers";
 import { System } from "../system";
 import { dockOrder } from "./dock";
 import { mineAction } from "./mine";
