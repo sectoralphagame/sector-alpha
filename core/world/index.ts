@@ -148,6 +148,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     });
 
     const player = sim.queries.ai.get().find((f) => f.cp.name.slug === "PLA")!;
+    player.addTag("player");
     player.removeComponent("ai").removeComponent("budget");
     player.addComponent(createBudget());
     player.addComponent({ name: "player" });

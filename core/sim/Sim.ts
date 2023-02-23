@@ -15,6 +15,7 @@ import { FacilityBuildingSystem } from "@core/systems/facilityBuilding";
 import { UndeployingSystem } from "@core/systems/undeploying";
 import { isHeadless } from "@core/settings";
 import type { CoreComponents } from "@core/components/component";
+import type { EntityTag } from "@core/tags";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -72,6 +73,8 @@ export class Sim extends BaseSim {
       entity: Entity;
       component: keyof CoreComponents;
     }>;
+    addTag: SyncHook<{ entity: Entity; tag: EntityTag }>;
+    removeTag: SyncHook<{ entity: Entity; tag: EntityTag }>;
     removeEntity: SyncHook<Entity>;
     destroy: SyncHook<void>;
   };
@@ -92,6 +95,8 @@ export class Sim extends BaseSim {
     this.hooks = {
       addComponent: new SyncHook(["addComponent"]),
       removeComponent: new SyncHook(["removeComponent"]),
+      addTag: new SyncHook(["addTag"]),
+      removeTag: new SyncHook(["removeTag"]),
       removeEntity: new SyncHook(["removeEntity"]),
       destroy: new SyncHook(["destroy"]),
     };

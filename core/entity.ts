@@ -8,6 +8,7 @@ import type { RequireComponent } from "./tsHelpers";
 import { MissingComponentError } from "./errors";
 import { Cooldowns } from "./utils/cooldowns";
 import type { CoreComponents } from "./components/component";
+import type { EntityTag } from "./tags";
 
 export class EntityComponents {
   toJSON() {
@@ -30,7 +31,8 @@ export class Entity {
   @Type(() => Cooldowns)
   cooldowns = new Cooldowns<string>();
   @Expose()
-  tags: Set<string>;
+  @Type(() => Set)
+  tags: Set<EntityTag>;
   @Expose()
   id: number;
   sim: Sim;
@@ -41,6 +43,8 @@ export class Entity {
       this.sim = sim;
       sim.registerEntity(this);
     }
+
+    this.tags = new Set();
   }
 
   get cp(): Partial<CoreComponents> {
@@ -81,13 +85,30 @@ export class Entity {
     return this;
   }
 
+  addTag(tag: EntityTag): Entity {
+    this.tags.add(tag);
+    this.sim.hooks.addTag.call({ tag, entity: this });
+
+    return this;
+  }
+
+  removeTag(tag: EntityTag): Entity {
+    this.tags.delete(tag);
+    this.sim.hooks.removeTag.call({ tag, entity: this });
+
+    return this;
+  }
+
   unregister() {
     this.deleted = true;
     this.sim.unregisterEntity(this);
   }
 
   toJSON() {
-    return pick(this, ["components", "cooldowns", "id"]);
+    return {
+      ...pick(this, ["components", "cooldowns", "id"]),
+      tags: [...this.tags],
+    };
   }
 }
 
