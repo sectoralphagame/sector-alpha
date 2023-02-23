@@ -70,6 +70,26 @@ function cleanupAllocations(entity: Entity): void {
       });
     }
   });
+
+  entity.sim.queries.orderable.get().forEach((ship) =>
+    ship.cp.orders.value.forEach((order, orderIndex) => {
+      if (
+        order.actions.some(
+          (action) =>
+            (action.type === "dock" ||
+              action.type === "deployBuilder" ||
+              action.type === "trade") &&
+            action.targetId === entity.id
+        ) ||
+        (order.type === "follow" && order.targetId === entity.id)
+      ) {
+        ship.cp.orders.value.splice(
+          orderIndex,
+          ship.cp.orders.value.length - orderIndex
+        );
+      }
+    })
+  );
 }
 
 const orderFns: Partial<
