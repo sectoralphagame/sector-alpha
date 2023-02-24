@@ -9,8 +9,8 @@ import {
   facility as asFacility,
 } from "@core/archetypes/facility";
 import { sector, sectorComponents } from "@core/archetypes/sector";
-import { isOwnedByPlayer } from "@core/components/player";
 import { IconButton } from "@kit/IconButton";
+import { isOwnedByPlayer } from "@core/utils/misc";
 import FacilityPanel from "../FacilityPanel";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";

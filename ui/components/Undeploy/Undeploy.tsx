@@ -4,9 +4,9 @@ import type { Entity } from "@core/entity";
 import type { RequireComponent } from "@core/tsHelpers";
 import locationIcon from "@assets/ui/location.svg";
 import { IconButton } from "@kit/IconButton";
-import { isOwnedByPlayer } from "@core/components/player";
 import { Button } from "@kit/Button";
 import clsx from "clsx";
+import { isOwnedByPlayer } from "@core/utils/misc";
 import styles from "./Undeploy.scss";
 
 export interface UndeployProps {

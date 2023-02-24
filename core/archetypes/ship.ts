@@ -73,14 +73,14 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
         zIndex: 2,
       })
     )
-    .addComponent({ name: "selection" })
     .addComponent(createCommodityStorage())
     .addComponent({
       name: "dockable",
       size: "small",
       dockedIn: null,
     })
-    .addComponent({ name: "journal", entries: [] });
+    .addComponent({ name: "journal", entries: [] })
+    .addTag("selection");
 
   if (initial.mining) {
     entity.addComponent(createMining(initial.mining));

@@ -9,7 +9,6 @@ import type {
 import { asteroidField } from "@core/archetypes/asteroidField";
 import type { Ship } from "@core/archetypes/ship";
 import type { Sim } from "@core/sim";
-import { isOwnedByPlayer } from "@core/components/player";
 import closeIcon from "@assets/ui/close.svg";
 import {
   Collapsible,
@@ -17,6 +16,7 @@ import {
   CollapsibleSummary,
 } from "@kit/Collapsible";
 import { IconButton } from "@kit/IconButton";
+import { isOwnedByPlayer } from "@core/utils/misc";
 import styles from "./Orders.scss";
 
 function getOrderDescription(ship: Ship, order: Action) {

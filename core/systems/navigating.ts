@@ -81,7 +81,7 @@ function setDrive(entity: Driveable, delta: number) {
   if (norm(path) < 0.1) {
     drive.currentSpeed = 0;
     drive.targetReached = true;
-    if (targetEntity.cp.destroyAfterUsage) {
+    if (targetEntity.tags.has("destroyAfterUsage")) {
       targetEntity.unregister();
     }
     return;
@@ -119,12 +119,9 @@ function setDrive(entity: Driveable, delta: number) {
     entity.cp.drive.limit = Infinity;
 
     if (distance <= drive.minimalDistance) {
-      if (entity === window.selected) {
-        console.log("now");
-      }
       drive.currentSpeed = 0;
       drive.targetReached = true;
-      if (targetEntity.cp.destroyAfterUsage) {
+      if (targetEntity.tags.has("destroyAfterUsage")) {
         targetEntity.unregister();
       }
     }

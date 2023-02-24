@@ -34,7 +34,7 @@ function getRandomWorld(
     }
 
     const player = createFaction("Player", sim);
-    player.addComponent({ name: "player" });
+    player.addTag("player");
     changeBudgetMoney(player.cp.budget, 5000);
     const sectorAlpha = sim.queries.sectors.get()[0]!;
 
@@ -151,7 +151,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     player.addTag("player");
     player.removeComponent("ai").removeComponent("budget");
     player.addComponent(createBudget());
-    player.addComponent({ name: "player" });
+    player.addTag("player");
     changeBudgetMoney(player.cp.budget, 5000);
     player.cp.name.slug = "PLA";
     const startingSector = getSector("sector-alpha");

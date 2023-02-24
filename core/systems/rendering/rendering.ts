@@ -167,7 +167,7 @@ export class RenderingSystem extends SystemWithHooks {
 
       if (!entityRender.initialized) {
         this.viewport.addChild(entityRender.sprite);
-        if (entity.hasComponents(["selection"])) {
+        if (entity.tags.has("selection")) {
           entityRender.sprite.interactive = true;
           entityRender.sprite.on("pointerdown", (event) => {
             // Right click

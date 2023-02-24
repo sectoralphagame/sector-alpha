@@ -1,11 +1,11 @@
 import { add, matrix, random } from "mathjs";
 import React from "react";
 import { createMarker } from "@core/archetypes/marker";
-import { isOwnedByPlayer } from "@core/components/player";
 import { getSelected, getSelectedSecondary } from "@core/components/selection";
 import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
 import { relationThresholds } from "@core/components/relations";
+import { isOwnedByPlayer } from "@core/utils/misc";
 import { useContextMenu, useGameDialog, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 

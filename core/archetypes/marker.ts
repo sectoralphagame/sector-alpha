@@ -33,7 +33,7 @@ export function createMarker(sim: Sim, { value, sector }: MarkerInput) {
       sector,
       moved: false,
     })
-    .addComponent({ name: "destroyAfterUsage" });
+    .addTag("destroyAfterUsage");
 
   return entity as Marker;
 }

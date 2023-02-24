@@ -118,7 +118,7 @@ export function createQueries(sim: Sim) {
     renderable: new Query(sim, ["render", "position"]),
     renderableGraphics: new Query(sim, ["renderGraphics"]),
     sectors: new Query(sim, sectorComponents),
-    selectable: new Query(sim, ["render", "position", "selection"]),
+    selectable: new Query(sim, ["render", "position"], ["selection"]),
     settings: new Query(sim, [
       "selectionManager",
       "systemManager",

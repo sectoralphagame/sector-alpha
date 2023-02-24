@@ -42,7 +42,6 @@ const tradingCommanderComponents = [
   "name",
   "position",
   "journal",
-  "selection",
   "storage",
   "trade",
   "owner",

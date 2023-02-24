@@ -50,7 +50,7 @@ export function createSector(sim: Sim, { position, name }: InitialSectorInput) {
       prices: mapValues(commodities, () => ({ buy: [], sell: [] })),
     })
     .addComponent(createRenderGraphics("sector"))
-    .addComponent({ name: "selection" });
+    .addTag("selection");
 
   return entity as Sector;
 }

@@ -10,9 +10,9 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
-import { isOwnedByPlayer } from "@core/components/player";
 import configIcon from "@assets/ui/config.svg";
 import { useGameDialog } from "@ui/atoms";
+import { isOwnedByPlayer } from "@core/utils/misc";
 import styles from "./Production.scss";
 
 export interface ProductionProps {

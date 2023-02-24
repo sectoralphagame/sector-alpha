@@ -1,8 +1,7 @@
+import type { Entity } from "@core/entity";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import type { BaseComponent } from "./component";
-
-export interface Selection extends BaseComponent<"selection"> {}
 
 export interface SelectionManager extends BaseComponent<"selectionManager"> {
   id: number | null;
@@ -20,18 +19,14 @@ export function clearFocus(manager: SelectionManager) {
   window.selected = null;
 }
 
-export function getSelected(
-  sim: Sim
-): RequireComponent<"selection"> | undefined {
-  return sim.get<RequireComponent<"selection">>(
-    sim.queries.settings.get()[0].cp.selectionManager.id!
-  );
+export function getSelected(sim: Sim): Entity | undefined {
+  return sim.get<Entity>(sim.queries.settings.get()[0].cp.selectionManager.id!);
 }
 
 export function getSelectedSecondary(
   sim: Sim
-): RequireComponent<"selection" | "position"> | undefined {
-  return sim.get<RequireComponent<"selection" | "position">>(
+): RequireComponent<"position"> | undefined {
+  return sim.get<RequireComponent<"position">>(
     sim.queries.settings.get()[0].cp.selectionManager.secondaryId!
   );
 }

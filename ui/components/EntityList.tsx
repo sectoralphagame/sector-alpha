@@ -18,7 +18,7 @@ export const EntityList: React.FC<EntityListProps> = ({ entities }) => (
           <TableCell className={styles.colName}>
             {entity.cp.name?.value}
           </TableCell>
-          {entity.hasComponents(["selection"]) && (
+          {entity.tags.has("selection") && (
             <TableCell className={styles.colAction}>
               <IconButton
                 onClick={() => {

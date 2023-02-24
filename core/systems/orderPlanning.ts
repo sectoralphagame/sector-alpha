@@ -125,7 +125,6 @@ function autoTradeForCommander(
       "name",
       "position",
       "journal",
-      "selection",
       "storage",
       "trade",
       "owner",

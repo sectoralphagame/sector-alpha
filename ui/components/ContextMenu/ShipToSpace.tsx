@@ -3,10 +3,10 @@ import React from "react";
 import type { AsteroidField } from "@core/archetypes/asteroidField";
 import { createMarker } from "@core/archetypes/marker";
 import { mineAction } from "@core/components/orders";
-import { isOwnedByPlayer } from "@core/components/player";
 import { getSelected } from "@core/components/selection";
 import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
+import { isOwnedByPlayer } from "@core/utils/misc";
 import { useContextMenu, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
