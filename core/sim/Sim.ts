@@ -294,6 +294,7 @@ export class Sim extends BaseSim {
         new EntityComponents(),
         entity.components
       );
+      entity.tags = new Set(entity.tags);
     });
 
     sim.entities = entityMap;

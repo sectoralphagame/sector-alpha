@@ -1,4 +1,5 @@
 import { filter, map, pipe, toArray } from "@fxts/core";
+import type { EntityTag } from "@core/tags";
 import { asteroidFieldComponents } from "../archetypes/asteroidField";
 import { facilityComponents } from "../archetypes/facility";
 import { factionComponents } from "../archetypes/faction";
@@ -13,16 +14,23 @@ type QueryEntities<T extends keyof CoreComponents> = Array<RequireComponent<T>>;
 
 export class Query<T extends keyof CoreComponents> {
   entities: QueryEntities<T> | undefined;
-  requiredComponents: readonly T[];
+  requiredComponents: readonly (keyof CoreComponents)[];
+  requiredTags: readonly EntityTag[];
   sim: Sim;
 
-  constructor(sim: Sim, requiredComponents: readonly T[]) {
+  constructor(
+    sim: Sim,
+    requiredComponents: readonly T[],
+    requiredTags: readonly EntityTag[] = []
+  ) {
     this.requiredComponents = requiredComponents;
+    this.requiredTags = requiredTags;
     this.sim = sim;
 
-    sim.hooks.addComponent.tap("query", ({ entity }) => {
+    sim.hooks.addComponent.tap("query", ({ entity, component }) => {
       if (
         this.entities &&
+        this.requiredComponents.includes(component) &&
         entity.hasComponents(this.requiredComponents) &&
         !this.entities.find((e) => e === entity)
       ) {
@@ -33,6 +41,27 @@ export class Query<T extends keyof CoreComponents> {
     sim.hooks.removeComponent.tap("query", ({ component, entity }) => {
       if (
         this.entities &&
+        (this.requiredComponents as readonly string[]).includes(component)
+      ) {
+        this.entities = this.entities.filter((e) => e.id !== entity.id);
+      }
+    });
+
+    sim.hooks.addTag.tap("query", ({ entity, tag }) => {
+      if (
+        this.entities &&
+        this.requiredTags.includes(tag) &&
+        entity.hasTags(this.requiredTags) &&
+        !this.entities.find((e) => e === entity)
+      ) {
+        this.entities.push(entity as RequireComponent<T>);
+      }
+    });
+
+    sim.hooks.removeComponent.tap("query", ({ component, entity }) => {
+      if (
+        this.entities &&
+        this.requiredComponents.includes(component) &&
         (this.requiredComponents as readonly string[]).includes(component)
       ) {
         this.entities = this.entities.filter((e) => e.id !== entity.id);
@@ -50,13 +79,17 @@ export class Query<T extends keyof CoreComponents> {
     if (!this.entities) {
       this.entities = pipe(
         this.sim.entities,
+        filter(
+          ([, e]) =>
+            e.hasComponents(this.requiredComponents) &&
+            e.hasTags(this.requiredTags)
+        ),
         map(([, e]) => e),
-        filter((e) => e.hasComponents(this.requiredComponents)),
         toArray
       ) as QueryEntities<T>;
     }
 
-    return this.entities.filter((e) => !e.deleted);
+    return this.entities;
   };
 
   reset = (): void => {
@@ -80,7 +113,7 @@ export function createQueries(sim: Sim) {
     ]),
     mining: new Query(sim, ["mining", "storage"]),
     orderable: new Query(sim, ["orders"]),
-    player: new Query(sim, [...factionComponents, "player"]),
+    player: new Query(sim, factionComponents, ["player"]),
     productionByModules: new Query(sim, ["production", "parent"]),
     renderable: new Query(sim, ["render", "position"]),
     renderableGraphics: new Query(sim, ["renderGraphics"]),

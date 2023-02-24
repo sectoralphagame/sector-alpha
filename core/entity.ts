@@ -99,6 +99,10 @@ export class Entity {
     return this;
   }
 
+  hasTags(tags: readonly EntityTag[]): boolean {
+    return tags.every((tag) => this.tags.has(tag));
+  }
+
   unregister() {
     this.deleted = true;
     this.sim.unregisterEntity(this);
