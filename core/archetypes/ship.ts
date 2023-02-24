@@ -80,7 +80,8 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       dockedIn: null,
     })
     .addComponent({ name: "journal", entries: [] })
-    .addTag("selection");
+    .addTag("selection")
+    .addTag("ship");
 
   if (initial.mining) {
     entity.addComponent(createMining(initial.mining));

@@ -164,14 +164,15 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                     <SectorPrices entity={sector(entity)} />
                   </>
                 )}
-                {entity.hasComponents(["storage"]) && (
-                  <>
-                    <Allocations
-                      entity={entity.requireComponents(["storage"])}
-                    />
-                    <hr />
-                  </>
-                )}
+                {entity.hasComponents(["storage"]) &&
+                  entity.tags.has("facility") && (
+                    <>
+                      <Allocations
+                        entity={entity.requireComponents(["storage"])}
+                      />
+                      <hr />
+                    </>
+                  )}
                 <Subordinates entity={entity} />
                 <hr />
                 {entity.hasComponents(["deployable"]) && (

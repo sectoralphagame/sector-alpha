@@ -77,7 +77,8 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     .addComponent(createCommodityStorage())
     .addComponent(createTrade())
     .addComponent({ name: "journal", entries: [] })
-    .addTag("selection");
+    .addTag("selection")
+    .addTag("facility");
 
   if (initial.owner) {
     entity.addComponent({

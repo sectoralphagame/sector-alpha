@@ -1,4 +1,10 @@
-const tags = ["player", "destroyAfterUsage", "selection"] as const;
+const tags = [
+  "player",
+  "destroyAfterUsage",
+  "selection",
+  "ship",
+  "facility",
+] as const;
 
 export type EntityTag = (typeof tags)[number];
 export const EntityTags = tags.reduce(
