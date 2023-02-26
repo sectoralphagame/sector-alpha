@@ -2,6 +2,7 @@ import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
 import { Entity } from "@core/entity";
+import { Graphics } from "pixi.js";
 import {
   createRenderGraphics,
   drawGraphics,
@@ -14,6 +15,59 @@ import { destroy, setTexture } from "../../components/render";
 
 const minScale = 0.05;
 const maxScale = 20;
+
+function drawHpBars(entity: RequireComponent<"render">) {
+  if (entity.cp.hitpoints) {
+    if (entity.cp.hitpoints.hit !== false) {
+      entity.cp.hitpoints.hit = false;
+
+      if (!entity.cp.hitpoints.g) {
+        entity.cp.hitpoints.g = {} as any;
+      }
+      if (entity.cp.hitpoints.hp.value === entity.cp.hitpoints.hp.max) {
+        entity.cp.hitpoints.g.hp?.destroy();
+      } else {
+        if (!entity.cp.hitpoints.g.hp) {
+          entity.cp.hitpoints.g.hp = new Graphics();
+          entity.cp.render.sprite.addChild(entity.cp.hitpoints.g.hp);
+        }
+
+        const hp = entity.cp.hitpoints.hp.value / entity.cp.hitpoints.hp.max;
+
+        entity.cp.hitpoints.g.hp
+          .beginFill(0x00ff00)
+          .drawRect(-25, -30, hp * 50, 9);
+      }
+
+      if (entity.cp.hitpoints.shield) {
+        if (
+          entity.cp.hitpoints.shield?.value === entity.cp.hitpoints.shield?.max
+        ) {
+          entity.cp.hitpoints.g.shield?.destroy();
+        } else {
+          if (!entity.cp.hitpoints.g.shield) {
+            entity.cp.hitpoints.g.shield = new Graphics();
+            entity.cp.render.sprite.addChild(entity.cp.hitpoints.g.shield);
+          }
+
+          const shield =
+            entity.cp.hitpoints.shield.value / entity.cp.hitpoints.shield.max;
+
+          entity.cp.hitpoints.g.shield
+            .beginFill(0x0000ff)
+            .drawRect(-25, -42, shield * 50, 9);
+        }
+      }
+    }
+
+    if (entity.cp.hitpoints.g?.hp) {
+      entity.cp.hitpoints.g.hp.rotation = -entity.cp.render.sprite.rotation;
+    }
+    if (entity.cp.hitpoints.g?.shield) {
+      entity.cp.hitpoints.g.shield.rotation = -entity.cp.render.sprite.rotation;
+    }
+  }
+}
 
 export class RenderingSystem extends SystemWithHooks {
   rendering: true;
@@ -187,6 +241,8 @@ export class RenderingSystem extends SystemWithHooks {
         entityRender.initialized = true;
         entity.cp.position.moved = true;
       }
+
+      drawHpBars(entity);
 
       if (entity.cp.position.moved) {
         entity.cp.position.moved = false;

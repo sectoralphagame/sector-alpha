@@ -19,7 +19,7 @@ export const asteroidComponents = [
   "minable",
   "parent",
   "position",
-  "render",
+  // "render",
 ] as const;
 
 export type AsteroidComponent = (typeof asteroidComponents)[number];
@@ -55,16 +55,16 @@ export function createAsteroid(
       angle: 0,
       sector: parent.cp.position.sector,
       moved: false,
-    })
-    .addComponent(
-      createRender({
-        color: Color(fieldColors[type]).rgbNumber(),
-        defaultScale: 0.6,
-        maxZ: 3,
-        texture: "asteroid",
-        zIndex: 0,
-      })
-    );
+    });
+  // .addComponent(
+  //   createRender({
+  //     color: Color(fieldColors[type]).rgbNumber(),
+  //     defaultScale: 0.6,
+  //     maxZ: 3,
+  //     texture: "asteroid",
+  //     zIndex: 0,
+  //   })
+  // );
 
   parent.components.children.entities.push(entity.id);
 

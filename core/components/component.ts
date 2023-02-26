@@ -34,6 +34,7 @@ import type { Deployable } from "./deployable";
 import type { FacilityModuleQueue } from "./facilityModuleQueue";
 import type { Builder } from "./builder";
 import type { Relations } from "./relations";
+import type { HitPoints } from "./hitpoints";
 
 export interface CoreComponents {
   ai: Ai;
@@ -52,6 +53,7 @@ export interface CoreComponents {
   drive: Drive;
   facilityModuleQueue: FacilityModuleQueue;
   hecsPosition: HECSPosition;
+  hitpoints: HitPoints;
   inflationStats: InflationStats;
   journal: Journal;
   minable: Minable;
