@@ -100,13 +100,13 @@ export function createRender({
 export function hide(render: Render) {
   if (!isHeadless && render.sprite) {
     render.sprite.interactive = false;
-    render.sprite.alpha = 0;
+    render.sprite.visible = false;
   }
 }
 
 export function show(render: Render) {
   if (!isHeadless && render.sprite) {
     render.sprite.interactive = true;
-    render.sprite.alpha = 1;
+    render.sprite.visible = true;
   }
 }
