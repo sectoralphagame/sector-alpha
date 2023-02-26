@@ -99,6 +99,16 @@ export const ShipToEntity: React.FC = () => {
     });
   };
 
+  const onAttack = () => {
+    entity.cp.orders!.value.push({
+      origin: "manual",
+      type: "attack",
+      targetId: actionable.id,
+      actions: [],
+      ordersForSector: 0,
+    });
+  };
+
   return (
     <>
       {actionable.hasComponents(["trade"]) &&
@@ -123,6 +133,10 @@ export const ShipToEntity: React.FC = () => {
         actionable.hasComponents(["facilityModuleQueue"]) &&
         isOwnedByPlayer(actionable) && (
           <DropdownOption onClick={onBuild}>Build</DropdownOption>
+        )}
+      {entity.hasComponents(["damage"]) &&
+        actionable.hasComponents(["hitpoints"]) && (
+          <DropdownOption onClick={onAttack}>Attack</DropdownOption>
         )}
     </>
   );

@@ -75,6 +75,8 @@ function getOrderGroupDescription(order: Order, sim: Sim) {
       }`;
     case "follow":
       return `Follow ${sim.get(order.targetId)?.cp.name?.value ?? "target"}`;
+    case "attack":
+      return `Attack ${sim.get(order.targetId)?.cp.name?.value ?? "target"}`;
     default:
       return "Hold position";
   }

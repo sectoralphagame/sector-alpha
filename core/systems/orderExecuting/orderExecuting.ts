@@ -12,6 +12,7 @@ import { holdAction, holdPosition, moveAction, teleportAction } from "./misc";
 import { tradeOrder } from "./trade";
 import { deployFacilityAction } from "./deployFacility";
 import { deployBuilderAction } from "./deployBuilder";
+import { attackOrder, attackOrderGroup } from "./attack";
 
 const orderGroupFns: Partial<
   Record<
@@ -25,6 +26,13 @@ const orderGroupFns: Partial<
     }
   >
 > = {
+  attack: {
+    exec: attackOrder,
+    isCompleted: (entity) =>
+      !!entity.cp.damage?.targetId &&
+      !entity.sim.get(entity.cp.damage.targetId),
+    onCompleted: attackOrderGroup,
+  },
   follow: {
     exec: followOrder,
     isCompleted: () => false,
@@ -69,8 +77,10 @@ function cleanupAllocations(entity: Entity): void {
       });
     }
   });
+}
 
-  entity.sim.queries.orderable.get().forEach((ship) =>
+function cleanupOrders(entity: Entity): void {
+  entity.sim.queries.orderable.get().forEach((ship) => {
     ship.cp.orders.value.forEach((order, orderIndex) => {
       if (
         order.actions.some(
@@ -80,15 +90,19 @@ function cleanupAllocations(entity: Entity): void {
               action.type === "trade") &&
             action.targetId === entity.id
         ) ||
-        (order.type === "follow" && order.targetId === entity.id)
+        ((order.type === "follow" || order.type === "attack") &&
+          order.targetId === entity.id)
       ) {
-        ship.cp.orders.value.splice(
-          orderIndex,
-          ship.cp.orders.value.length - orderIndex
-        );
+        if (orderIndex === 0) {
+          orderGroupFns[ship.cp.orders.value[0].type]?.onCompleted(
+            ship,
+            ship.cp.orders.value[0]
+          );
+        }
+        ship.cp.orders.value.splice(orderIndex, 1);
       }
-    })
-  );
+    });
+  });
 }
 
 const orderFns: Partial<
@@ -107,7 +121,14 @@ const orderFns: Partial<
 export class OrderExecutingSystem extends System {
   constructor(sim: Sim) {
     super(sim);
-    this.sim.hooks.removeEntity.tap("TradingSystem", cleanupAllocations);
+    this.sim.hooks.removeEntity.tap(
+      "OrderExecutingSystem-allocations",
+      cleanupAllocations
+    );
+    this.sim.hooks.removeEntity.tap(
+      "OrderExecutingSystem-orders",
+      cleanupOrders
+    );
   }
 
   exec = () => {

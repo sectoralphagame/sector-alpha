@@ -57,6 +57,13 @@ export interface BaseOrder {
   actions: Action[];
 }
 
+export interface AttackOrder extends BaseOrder {
+  type: "attack";
+  targetId: number;
+  /** Used to prevent endless path recalculations */
+  ordersForSector: number;
+}
+
 export interface FollowOrder extends BaseOrder {
   type: "follow";
   targetId: number;
@@ -75,6 +82,7 @@ export type Order =
         | "deployFacility"
         | "deployBuilder";
     } & BaseOrder)
+  | AttackOrder
   | FollowOrder;
 
 export function tradeAction(action: Omit<TradeAction, "type">): TradeAction {

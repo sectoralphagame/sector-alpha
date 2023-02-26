@@ -81,12 +81,14 @@ export function setTarget(drive: Drive, target: number | null) {
   }
 }
 
-export function clearTarget(drive: Drive) {
-  setTarget(drive, null);
-  drive.targetReached = true;
-}
-
 export function stop(drive: Drive) {
   drive.currentRotary = 0;
   drive.currentSpeed = 0;
+}
+
+export function clearTarget(drive: Drive) {
+  stop(drive);
+  setTarget(drive, null);
+  drive.targetReached = true;
+  drive.mode = "goto";
 }

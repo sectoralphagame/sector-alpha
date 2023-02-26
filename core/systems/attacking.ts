@@ -1,0 +1,44 @@
+import { stopCruise } from "@core/components/drive";
+import { changeHp } from "@core/components/hitpoints";
+import type { Sim } from "@core/sim";
+import { Cooldowns } from "@core/utils/cooldowns";
+import { distance } from "mathjs";
+import { Query } from "./query";
+import { System } from "./system";
+
+export class AttackingSystem extends System {
+  cooldowns: Cooldowns<"exec">;
+  query: Query<"damage" | "position">;
+
+  constructor(sim: Sim) {
+    super(sim);
+    this.query = new Query(sim, ["damage", "position"]);
+    this.cooldowns = new Cooldowns("exec");
+  }
+
+  exec = (delta: number): void => {
+    this.cooldowns.update(delta);
+
+    if (this.cooldowns.canUse("exec")) {
+      this.cooldowns.use("exec", 1);
+
+      this.query.get().forEach((entity) => {
+        if (entity.cp.damage.targetId) {
+          const target = this.sim
+            .getOrThrow(entity.cp.damage.targetId)
+            .requireComponents(["position", "hitpoints"]);
+
+          if (
+            distance(entity.cp.position.coord, target.cp.position.coord) <=
+            entity.cp.damage.range
+          ) {
+            changeHp(target, entity.cp.damage.value);
+            if (target.cp.drive) {
+              stopCruise(target.cp.drive);
+            }
+          }
+        }
+      });
+    }
+  };
+}

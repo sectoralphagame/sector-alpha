@@ -35,6 +35,7 @@ import type { FacilityModuleQueue } from "./facilityModuleQueue";
 import type { Builder } from "./builder";
 import type { Relations } from "./relations";
 import type { HitPoints } from "./hitpoints";
+import type { Damage } from "./damage";
 
 export interface CoreComponents {
   ai: Ai;
@@ -47,6 +48,7 @@ export interface CoreComponents {
   color: Color;
   commander: Commander;
   compoundProduction: CompoundProduction;
+  damage: Damage;
   deployable: Deployable;
   dockable: Dockable;
   docks: Docks;

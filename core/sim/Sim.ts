@@ -17,6 +17,7 @@ import { isHeadless } from "@core/settings";
 import type { CoreComponents } from "@core/components/component";
 import type { EntityTag } from "@core/tags";
 import { DeadUnregisteringSystem } from "@core/systems/deadUnregistering";
+import { AttackingSystem } from "@core/systems/attacking";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -125,6 +126,7 @@ export class Sim extends BaseSim {
       ShipBuildingSystem,
       FacilityBuildingSystem,
       UndeployingSystem,
+      AttackingSystem,
       DeadUnregisteringSystem,
     ].map((S) => new S(this));
 
