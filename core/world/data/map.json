@@ -75,7 +75,13 @@
       "name": "United Earth's Nations",
       "slug": "UEN",
       "sectors": ["terra", "luna", "mars", "saturn", "eris", "discordis-c"],
-      "blueprints": ["courierA", "freighterB", "largeFreighterA", "minerA"],
+      "blueprints": [
+        "courierA",
+        "freighterB",
+        "largeFreighterA",
+        "minerA",
+        "fighter"
+      ],
       "color": "#6fc9f2",
       "type": "territorial"
     },
@@ -90,7 +96,13 @@
         "ross-128-1",
         "ross-128-2"
       ],
-      "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerB"],
+      "blueprints": [
+        "courierB",
+        "freighterA",
+        "largeFreighterB",
+        "minerB",
+        "fighter"
+      ],
       "color": "#ffc34d",
       "type": "territorial"
     },
@@ -115,7 +127,13 @@
         "gj-1002-2",
         "tau-ceti-e"
       ],
-      "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerB"],
+      "blueprints": [
+        "courierB",
+        "freighterA",
+        "largeFreighterB",
+        "minerB",
+        "fighter"
+      ],
       "color": "#42f5e3",
       "type": "territorial"
     },
@@ -123,7 +141,13 @@
       "name": "Alkali Mining Sindicate",
       "slug": "AMS",
       "sectors": ["sedna", "gj-1002-3"],
-      "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerB"],
+      "blueprints": [
+        "courierB",
+        "freighterA",
+        "largeFreighterB",
+        "minerB",
+        "fighter"
+      ],
       "color": "#ff63e5",
       "type": "territorial"
     },
@@ -131,7 +155,13 @@
       "name": "Pirates",
       "slug": "PIR",
       "sectors": ["wolf-1061-3", "gj-229-2", "gj-625"],
-      "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerA"],
+      "blueprints": [
+        "courierB",
+        "freighterA",
+        "largeFreighterB",
+        "minerA",
+        "fighter"
+      ],
       "color": "#fcc7c5",
       "type": "pirate"
     },
@@ -139,7 +169,13 @@
       "name": "Therr Traders",
       "slug": "THT",
       "sectors": ["gj-229-1"],
-      "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerA"],
+      "blueprints": [
+        "courierB",
+        "freighterA",
+        "largeFreighterB",
+        "minerA",
+        "fighter"
+      ],
       "color": "#f7fc5b",
       "type": "travelling"
     },

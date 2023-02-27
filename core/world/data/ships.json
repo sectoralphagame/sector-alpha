@@ -206,5 +206,28 @@
     "storage": 0,
     "texture": "lStorage",
     "slug": "facilityBuilder"
+  },
+  {
+    "acceleration": 0,
+    "build": {
+      "time": 70,
+      "cost": {
+        "drones": 1,
+        "fuel": 700,
+        "hullPlates": 1400,
+        "electronics": 50
+      }
+    },
+    "mining": 0,
+    "role": "military",
+    "cruise": 0,
+    "maneuver": 0,
+    "rotary": 0,
+    "ttc": 0,
+    "name": "Fighter",
+    "size": "small",
+    "storage": 0,
+    "texture": "sMin",
+    "slug": "fighter"
   }
 ]

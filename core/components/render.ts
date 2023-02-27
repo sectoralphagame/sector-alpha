@@ -5,6 +5,8 @@ import sCivTexture from "../../assets/s_civ.svg";
 import mCivTexture from "../../assets/m_civ.svg";
 import lCivTexture from "../../assets/l_civ.svg";
 import mMinTexture from "../../assets/m_min.svg";
+import lMinTexture from "../../assets/l_min.svg";
+import sMinTexture from "../../assets/s_min.svg";
 import fTeleportTexture from "../../assets/f_teleport.svg";
 import fCivTexture from "../../assets/f_civ.svg";
 import fFactoryTexture from "../../assets/f_factory.svg";
@@ -18,7 +20,9 @@ export const textures = {
   sCiv: sCivTexture,
   mCiv: mCivTexture,
   lCiv: lCivTexture,
+  sMin: sMinTexture,
   mMin: mMinTexture,
+  lMin: lMinTexture,
   fTeleport: fTeleportTexture,
   fShipyard: fShipyardTexture,
   fCiv: fCivTexture,
