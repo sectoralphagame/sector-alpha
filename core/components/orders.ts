@@ -2,6 +2,11 @@ import { NegativeQuantity } from "../errors";
 import type { BaseComponent } from "./component";
 import type { TransactionInput } from "./trade";
 
+export interface AttackAction {
+  type: "attack";
+  targetId: number;
+}
+
 export interface DockAction {
   type: "dock";
   targetId: number;
@@ -44,6 +49,7 @@ export interface BuilderDeployAction {
 }
 
 export type Action =
+  | AttackAction
   | MoveAction
   | TradeAction
   | MineAction

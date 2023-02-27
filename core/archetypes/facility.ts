@@ -77,6 +77,11 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     .addComponent(createCommodityStorage())
     .addComponent(createTrade())
     .addComponent({ name: "journal", entries: [] })
+    .addComponent({
+      name: "hitpoints",
+      g: { hp: null!, shield: null! },
+      hp: { max: 100000, regen: 0, value: 100000 },
+    })
     .addTag("selection")
     .addTag("facility");
 

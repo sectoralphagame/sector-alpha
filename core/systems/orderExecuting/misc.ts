@@ -47,6 +47,16 @@ export function holdAction(
   return false;
 }
 
+export function attackAction(
+  entity: RequireComponent<"drive" | "orders" | "damage">
+): boolean {
+  stop(entity.cp.drive);
+
+  return entity.cp.damage.targetId
+    ? !entity.sim.get(entity.cp.damage.targetId)
+    : true;
+}
+
 export function teleportAction(
   entity: RequireComponent<"position" | "orders">,
   order: TeleportAction

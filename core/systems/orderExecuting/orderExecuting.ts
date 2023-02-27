@@ -8,13 +8,19 @@ import { System } from "../system";
 import { dockOrder } from "./dock";
 import { mineAction } from "./mine";
 import { follorOrderGroup, followOrder } from "./follow";
-import { holdAction, holdPosition, moveAction, teleportAction } from "./misc";
+import {
+  attackAction,
+  holdAction,
+  holdPosition,
+  moveAction,
+  teleportAction,
+} from "./misc";
 import { tradeOrder } from "./trade";
 import { deployFacilityAction } from "./deployFacility";
 import { deployBuilderAction } from "./deployBuilder";
 import { attackOrder, attackOrderGroup } from "./attack";
 
-const orderGroupFns: Partial<
+const orderFns: Partial<
   Record<
     Order["type"],
     {
@@ -35,7 +41,9 @@ const orderGroupFns: Partial<
   },
   follow: {
     exec: followOrder,
-    isCompleted: () => false,
+    isCompleted: (entity) =>
+      !!entity.cp.damage?.targetId &&
+      !entity.sim.get(entity.cp.damage.targetId),
     onCompleted: follorOrderGroup,
   },
   hold: {
@@ -94,7 +102,7 @@ function cleanupOrders(entity: Entity): void {
           order.targetId === entity.id)
       ) {
         if (orderIndex === 0) {
-          orderGroupFns[ship.cp.orders.value[0].type]?.onCompleted(
+          orderFns[ship.cp.orders.value[0].type]?.onCompleted(
             ship,
             ship.cp.orders.value[0]
           );
@@ -105,10 +113,27 @@ function cleanupOrders(entity: Entity): void {
   });
 }
 
-const orderFns: Partial<
+function cleanupChildren(entity: Entity): void {
+  entity.sim.queries.commendables.get().forEach((ship) => {
+    if (ship.cp.commander.id === entity.id) {
+      ship.removeComponent("commander");
+      ship.cp.orders.value = [];
+      ship.cp.autoOrder.default = "hold";
+    }
+  });
+
+  entity.sim.queries.children.get().forEach((child) => {
+    if (child.cp.parent.id === entity.id) {
+      child.unregister();
+    }
+  });
+}
+
+const actionFns: Partial<
   // eslint-disable-next-line no-unused-vars
   Record<Action["type"], (entity: Entity, order: Action) => boolean | void>
 > = {
+  attack: attackAction,
   trade: tradeOrder,
   mine: mineAction,
   move: moveAction,
@@ -129,27 +154,28 @@ export class OrderExecutingSystem extends System {
       "OrderExecutingSystem-orders",
       cleanupOrders
     );
+    this.sim.hooks.removeEntity.tap(
+      "OrderExecutingSystem-children",
+      cleanupChildren
+    );
   }
 
   exec = () => {
     this.sim.queries.orderable.get().forEach((entity) => {
       if (entity.cp.orders.value.length) {
-        const orderGroup = entity.cp.orders.value[0];
-        const { exec, isCompleted } = orderGroupFns[orderGroup.type] ?? {
+        const order = entity.cp.orders.value[0];
+        const { exec, isCompleted } = orderFns[order.type] ?? {
           exec: () => undefined,
           isCompleted: () => true,
         };
-        exec(entity, orderGroup);
+        exec(entity, order);
 
-        const orderFn = orderFns[orderGroup.actions[0].type] ?? holdPosition;
-        const completed = orderFn(entity, orderGroup.actions[0]);
+        const actionFn = actionFns[order.actions[0].type] ?? holdPosition;
+        const completed = actionFn(entity, order.actions[0]);
 
         if (completed) {
-          orderGroup.actions.splice(0, 1);
-          if (
-            orderGroup.actions.length === 0 &&
-            isCompleted(entity, orderGroup)
-          ) {
+          order.actions.splice(0, 1);
+          if (order.actions.length === 0 && isCompleted(entity, order)) {
             entity.cp.orders?.value.splice(0, 1);
           }
         }

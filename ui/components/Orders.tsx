@@ -47,6 +47,10 @@ function getOrderDescription(ship: Ship, order: Action) {
       if (order.targetId === ship.cp.commander?.id)
         return "Dock at commanding facility";
       return `Dock at ${ship.sim.getOrThrow(order.targetId).cp.name?.value}`;
+    case "attack":
+      return `Attack ${
+        ship.sim.get(order.targetId)?.cp.name?.value ?? "target"
+      }`;
     default:
       return "Hold position";
   }

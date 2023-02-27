@@ -104,7 +104,8 @@ export function createQueries(sim: Sim) {
     autoOrderable: new Query(sim, ["autoOrder", "orders"]),
     budget: new Query(sim, ["budget"]),
     builders: new Query(sim, ["builder", "storage", "trade", "docks"]),
-    commendables: new Query(sim, ["commander"]),
+    children: new Query(sim, ["parent"]),
+    commendables: new Query(sim, ["commander", "orders", "autoOrder"]),
     facilities: new Query(sim, ["modules", "position", "facilityModuleQueue"]),
     facilityWithProduction: new Query(sim, [
       "compoundProduction",
