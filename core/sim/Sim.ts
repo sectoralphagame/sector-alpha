@@ -18,6 +18,7 @@ import type { CoreComponents } from "@core/components/component";
 import type { EntityTag } from "@core/tags";
 import { DeadUnregisteringSystem } from "@core/systems/deadUnregistering";
 import { AttackingSystem } from "@core/systems/attacking";
+import { SpottingSystem } from "@core/systems/spotting";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -127,6 +128,7 @@ export class Sim extends BaseSim {
       FacilityBuildingSystem,
       UndeployingSystem,
       AttackingSystem,
+      SpottingSystem,
       DeadUnregisteringSystem,
     ].map((S) => new S(this));
 

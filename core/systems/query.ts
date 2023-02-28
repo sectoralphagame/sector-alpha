@@ -113,7 +113,7 @@ export function createQueries(sim: Sim) {
       "position",
     ]),
     mining: new Query(sim, ["mining", "storage"]),
-    orderable: new Query(sim, ["orders"]),
+    orderable: new Query(sim, ["orders", "position"]),
     player: new Query(sim, factionComponents, ["player"]),
     productionByModules: new Query(sim, ["production", "parent"]),
     renderable: new Query(sim, ["render", "position"]),

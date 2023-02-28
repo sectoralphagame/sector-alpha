@@ -200,7 +200,7 @@
     { "factions": ["AMS", "TAU"], "value": -25 },
     { "factions": ["AMS", "FFW"], "value": 10 },
     { "factions": ["PIR", "UEN"], "value": -25 },
-    { "factions": ["ACT", "PIR"], "value": -30 },
+    { "factions": ["ACT", "PIR"], "value": -70 },
     { "factions": ["PIR", "TAU"], "value": -25 },
     { "factions": ["FFW", "PIR"], "value": -25 },
     { "factions": ["AMS", "PIR"], "value": -30 },

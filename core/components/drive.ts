@@ -67,7 +67,7 @@ export function startCruise(drive: Drive) {
 }
 
 export function stopCruise(drive: Drive) {
-  drive.currentSpeed = drive.maneuver;
+  drive.currentSpeed = Math.min(drive.currentSpeed, drive.maneuver);
   drive.state = "maneuver";
 }
 

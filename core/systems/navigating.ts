@@ -100,7 +100,7 @@ function setDrive(entity: Driveable, delta: number) {
     angleOffset < Math.PI / 12 &&
     drive.limit > drive.maneuver;
 
-  if (drive.mode === "follow") {
+  if (drive.mode === "follow" && targetEntity.cp.drive) {
     if (targetEntity.cp.drive!.currentSpeed > drive.maneuver) {
       if (canCruise && drive.state === "maneuver") {
         entity.cooldowns.use(cruiseTimer, drive.ttc);

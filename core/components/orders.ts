@@ -61,6 +61,7 @@ export type Action =
 export interface BaseOrder {
   origin: "auto" | "manual";
   actions: Action[];
+  interrupt?: boolean;
 }
 
 export interface AttackOrder extends BaseOrder {

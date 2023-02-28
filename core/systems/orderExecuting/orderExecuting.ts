@@ -7,7 +7,7 @@ import type { Sim } from "@core/sim";
 import { System } from "../system";
 import { dockOrder } from "./dock";
 import { mineAction } from "./mine";
-import { follorOrderGroup, followOrder } from "./follow";
+import { followOrderCompleted, followOrder } from "./follow";
 import {
   attackAction,
   holdAction,
@@ -50,7 +50,7 @@ const orderFns: Partial<
     isCompleted: (entity) =>
       !!entity.cp.damage?.targetId &&
       !entity.sim.get(entity.cp.damage.targetId),
-    onCompleted: follorOrderGroup,
+    onCompleted: followOrderCompleted,
   },
   hold: {
     exec: holdAction,
@@ -182,8 +182,21 @@ export class OrderExecutingSystem extends System {
         if (completed) {
           order.actions.splice(0, 1);
           if (order.actions.length === 0 && isCompleted(entity, order)) {
+            orderFns[entity.cp.orders.value[0].type]?.onCompleted(
+              entity,
+              entity.cp.orders.value[0]
+            );
             entity.cp.orders?.value.splice(0, 1);
           }
+        } else if (order.interrupt) {
+          order.interrupt = false;
+          orderFns[entity.cp.orders.value[0].type]?.onCompleted(
+            entity,
+            entity.cp.orders.value[0]
+          );
+
+          entity.cp.orders.value.splice(0, 1);
+          entity.cp.orders.value.splice(1, 0, order);
         }
       }
     });

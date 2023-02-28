@@ -26,7 +26,7 @@ export function followOrder(
   entity.cp.drive.mode = inTheSameSector ? "follow" : "goto";
 }
 
-export function follorOrderGroup(
+export function followOrderCompleted(
   entity: RequireComponent<"drive" | "position" | "orders">
 ) {
   clearTarget(entity.cp.drive);
