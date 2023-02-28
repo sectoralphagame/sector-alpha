@@ -44,7 +44,12 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
   entity
     .addComponent({
       name: "autoOrder",
-      default: initial.mining ? "mine" : "trade",
+      default:
+        initial.role === "mining"
+          ? "mine"
+          : initial.role === "transport"
+          ? "trade"
+          : "hold",
     })
     .addComponent(
       createDrive(
@@ -108,6 +113,15 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       name: "deployable",
       type: "builder",
       cancel: false,
+    });
+  }
+
+  if (initial.damage && initial.range) {
+    entity.addComponent({
+      name: "damage",
+      range: initial.range,
+      targetId: null,
+      value: initial.range,
     });
   }
 

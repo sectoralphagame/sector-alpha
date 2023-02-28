@@ -1,7 +1,8 @@
 import { sum } from "mathjs";
 import sortBy from "lodash/sortBy";
+import type { ShipyardQueueItem } from "@core/components/shipyard";
 import type { InitialShipInput } from "../archetypes/ship";
-import { createShip } from "../archetypes/ship";
+import { shipComponents, createShip } from "../archetypes/ship";
 import { mineableCommodities } from "../economy/commodity";
 import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
@@ -10,22 +11,33 @@ import { perCommodity } from "../utils/perCommodity";
 import type { ShipRole } from "../world/ships";
 import { System } from "./system";
 import type { Faction } from "../archetypes/faction";
+import type { Sector } from "../archetypes/sector";
 import { sector as asSector } from "../archetypes/sector";
 import type { Entity } from "../entity";
 import type { RequireComponent } from "../tsHelpers";
 import { notNull } from "../utils/maps";
+
+interface ShipRequest {
+  trading: number;
+  mining: number;
+  facility?: RequireComponent<"position" | "facilityModuleQueue" | "modules">;
+  sector?: Sector;
+  patrols: number;
+}
 
 export function requestShip(
   faction: Faction,
   shipyard: RequireComponent<"shipyard" | "position">,
   role: ShipRole,
   queue: boolean
-): Omit<InitialShipInput, "position" | "owner" | "sector"> {
+): Omit<InitialShipInput, "position" | "owner" | "sector"> | null {
   const bp = pickRandom(
     faction.cp.blueprints.ships.filter((ship) => ship.role === role)
   );
 
-  if (queue || Math.random() < 0.1) {
+  if (!bp) return null;
+
+  if (queue) {
     shipyard.cp.shipyard.queue.push({
       blueprint: bp,
       owner: faction.id,
@@ -51,7 +63,7 @@ export class ShipPlanningSystem extends System {
     this.cooldowns = new Cooldowns("plan");
   }
 
-  getShipRequests = (faction: Faction) =>
+  getFacilityShipRequests = (faction: Faction): ShipRequest[] =>
     this.sim.queries.facilities
       .get()
       .filter((facility) => facility.cp.owner?.id === faction.id)
@@ -116,8 +128,229 @@ export class ShipPlanningSystem extends System {
         const trading =
           traders.length - (shipsForProduction + shipsForShipyards);
 
-        return { facility, mining, trading };
+        return { facility, mining, trading, patrols: 0 };
       });
+
+  getPatrolRequests = (faction: Faction): ShipRequest[] =>
+    this.sim.queries.sectors
+      .get()
+      .filter((sector) => sector.cp.owner?.id === faction.id)
+      .map((sector) => {
+        const sectorShips = this.sim.queries.commendables
+          .get()
+          .filter(
+            (ship) =>
+              ship.cp.owner?.id === faction.id &&
+              ship.cp.orders.value[0]?.type === "patrol" &&
+              ship.cp.orders.value[0].sectorId === sector.id
+          );
+        const patrols = sectorShips.map((ship) =>
+          ship.requireComponents([...shipComponents, "damage"])
+        );
+
+        return { sector, patrols: patrols.length - 10, trading: 0, mining: 0 };
+      });
+
+  getShipRequests = (faction: Faction): ShipRequest[] => [
+    ...this.getFacilityShipRequests(faction),
+    ...this.getPatrolRequests(faction),
+  ];
+
+  assignTraders = (
+    faction: Faction,
+    shipRequests: ShipRequest[],
+    requestsInShipyards: ShipyardQueueItem[],
+    shipyard: RequireComponent<"shipyard" | "position">
+  ) => {
+    const spareTraders: Entity[] = shipRequests
+      .filter((request) => request.trading > 0)
+      .flatMap(({ facility, trading }) =>
+        this.sim.queries.commendables
+          .get()
+          .filter(
+            (ship) =>
+              ship.cp.commander.id === facility?.id &&
+              !ship.cp.mining &&
+              !ship.cp.damage
+          )
+          .slice(0, trading)
+      );
+    spareTraders.forEach((ship) => {
+      ship.removeComponent("commander");
+    });
+    spareTraders.push(
+      ...this.sim.queries.orderable
+        .get()
+        .filter(
+          (ship) =>
+            ship.cp.owner?.id === faction.id &&
+            !ship.cp.commander &&
+            !ship.cp.damage &&
+            !ship.cp.mining
+        )
+    );
+
+    const shipRequestInShipyards = requestsInShipyards.filter(
+      (queued) => queued && !queued?.blueprint.mining
+    );
+
+    shipRequests
+      .filter(({ trading }) => trading < 0)
+      .forEach(({ facility, trading }) => {
+        for (let i = 0; i < -trading; i++) {
+          if (spareTraders.length > 0 && facility) {
+            const ship = spareTraders.pop()!;
+            ship.addComponent({
+              name: "commander",
+              id: facility.id,
+            });
+          } else if (shipRequestInShipyards.length > 0) {
+            shipRequestInShipyards.pop();
+          } else {
+            requestShip(faction, shipyard, "transport", this.sim.getTime() > 0);
+          }
+        }
+      });
+  };
+
+  assignMiners = (
+    faction: Faction,
+    shipRequests: ShipRequest[],
+    requestsInShipyards: ShipyardQueueItem[],
+    shipyard: RequireComponent<"shipyard" | "position">
+  ) => {
+    const spareMiners: Entity[] = shipRequests
+      .filter((request) => request.mining >= 1)
+      .flatMap(({ facility, mining }) => {
+        const miners = sortBy(
+          this.sim.queries.commendables
+            .get()
+            .filter(
+              (ship) => ship.cp.commander.id === facility?.id && ship.cp.mining
+            ),
+          (ship) => ship.cp.mining!.efficiency
+        );
+        const sliceIndex = miners.reduce(
+          ({ current, index }, ship, shipIndex) => {
+            if (
+              current < mining &&
+              ship.cp.mining!.efficiency <= mining - current
+            ) {
+              return {
+                index: shipIndex,
+                current: current + ship.cp.mining!.efficiency,
+              };
+            }
+
+            return { index, current };
+          },
+          { index: -1, current: 0 }
+        ).index;
+
+        return miners.slice(0, sliceIndex);
+      });
+    spareMiners.forEach((ship) => {
+      ship.removeComponent("commander");
+    });
+    spareMiners.push(
+      ...this.sim.queries.mining
+        .get()
+        .filter(
+          (ship) => ship.cp.owner?.id === faction.id && !ship.cp.commander
+        )
+    );
+
+    const miningShipRequests = shipRequests.filter(({ mining }) => mining < 0);
+
+    if (miningShipRequests.length === 0) return;
+
+    const miningShipRequestInShipyards = requestsInShipyards.filter(
+      (queued) => queued?.blueprint.mining
+    );
+
+    miningShipRequests.forEach(({ facility, mining }) => {
+      while (mining < 0) {
+        if (spareMiners.length > 0 && facility) {
+          const ship = spareMiners.pop()!;
+          ship.addComponent({
+            name: "commander",
+            id: facility.id,
+          });
+          mining += ship.cp.mining!.efficiency;
+        } else if (miningShipRequestInShipyards.length > 0) {
+          mining += miningShipRequestInShipyards.pop()!.blueprint.mining;
+        } else {
+          const bp = requestShip(
+            faction,
+            shipyard,
+            "mining",
+            this.sim.getTime() > 0
+          );
+          mining += bp?.mining ?? 0;
+        }
+      }
+    });
+  };
+
+  assignPatrols = (
+    faction: Faction,
+    shipRequests: ShipRequest[],
+    requestsInShipyards: ShipyardQueueItem[],
+    shipyard: RequireComponent<"shipyard" | "position">
+  ) => {
+    const spareMilitary: Entity[] = shipRequests
+      .filter((request) => request.patrols > 0)
+      .flatMap(({ sector, patrols }) =>
+        this.sim.queries.orderable
+          .get()
+          .filter(
+            (ship) =>
+              ship.cp.owner?.id === faction.id &&
+              !ship.cp.commander &&
+              ship.cp.orders.value[0].type === "patrol" &&
+              ship.cp.orders.value[0].sectorId === sector?.id
+          )
+          .slice(0, patrols)
+      );
+
+    spareMilitary.push(
+      ...this.sim.queries.orderable
+        .get()
+        .filter(
+          (ship) =>
+            ship.cp.owner?.id === faction.id &&
+            !ship.cp.commander &&
+            ship.cp.damage &&
+            ship.cp.orders.value.length === 0
+        )
+    );
+
+    const shipRequestInShipyards = requestsInShipyards.filter(
+      (queued) => queued?.blueprint.role === "military"
+    );
+
+    shipRequests
+      .filter(({ sector }) => sector)
+      .forEach(({ sector, patrols }) => {
+        for (let i = 0; i < -patrols; i++) {
+          if (spareMilitary.length > 0 && sector) {
+            const ship = spareMilitary.pop()!;
+            ship.cp.orders!.value = [
+              {
+                type: "patrol",
+                origin: "auto",
+                sectorId: sector!.id,
+                actions: [],
+              },
+            ];
+          } else if (shipRequestInShipyards.length > 0) {
+            shipRequestInShipyards.pop();
+          } else {
+            requestShip(faction, shipyard, "military", this.sim.getTime() > 0);
+          }
+        }
+      });
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);
@@ -140,134 +373,19 @@ export class ShipPlanningSystem extends System {
             .find((s) => s.cp.owner.id === faction.id) ??
           pickRandom(this.sim.queries.shipyards.get());
 
-        const spareTraders: Entity[] = shipRequests
-          .filter((request) => request.trading > 0)
-          .flatMap(({ facility, trading }) =>
-            this.sim.queries.commendables
-              .get()
-              .filter(
-                (ship) =>
-                  ship.cp.commander.id === facility.id && !ship.cp.mining
-              )
-              .slice(0, trading)
-          );
-        spareTraders.forEach((ship) => {
-          ship.removeComponent("commander");
-        });
-        spareTraders.push(
-          ...this.sim.queries.orderable
-            .get()
-            .filter(
-              (ship) =>
-                ship.cp.owner?.id === faction.id &&
-                !ship.cp.commander &&
-                !ship.cp.mining
-            )
+        this.assignTraders(
+          faction,
+          shipRequests,
+          requestsInShipyards,
+          shipyard
         );
-
-        const tradingShipRequestInShipyards = requestsInShipyards.filter(
-          (queued) => queued && !queued?.blueprint.mining
+        this.assignMiners(faction, shipRequests, requestsInShipyards, shipyard);
+        this.assignPatrols(
+          faction,
+          shipRequests,
+          requestsInShipyards,
+          shipyard
         );
-
-        shipRequests
-          .filter(({ trading }) => trading < 0)
-          .forEach(({ facility, trading }) => {
-            Array(-trading)
-              .fill(0)
-              .forEach(() => {
-                if (spareTraders.length > 0) {
-                  const ship = spareTraders.pop()!;
-                  ship.addComponent({
-                    name: "commander",
-                    id: facility.id,
-                  });
-                } else if (tradingShipRequestInShipyards.length > 0) {
-                  tradingShipRequestInShipyards.pop();
-                } else {
-                  requestShip(
-                    faction,
-                    shipyard,
-                    "transport",
-                    this.sim.getTime() > 0
-                  );
-                }
-              });
-          });
-
-        const spareMiners: Entity[] = shipRequests
-          .filter((request) => request.mining >= 1)
-          .flatMap(({ facility, mining }) => {
-            const miners = sortBy(
-              this.sim.queries.commendables
-                .get()
-                .filter(
-                  (ship) =>
-                    ship.cp.commander.id === facility.id && ship.cp.mining
-                ),
-              (ship) => ship.cp.mining!.efficiency
-            );
-            const sliceIndex = miners.reduce(
-              ({ current, index }, ship, shipIndex) => {
-                if (
-                  current < mining &&
-                  ship.cp.mining!.efficiency <= mining - current
-                ) {
-                  return {
-                    index: shipIndex,
-                    current: current + ship.cp.mining!.efficiency,
-                  };
-                }
-
-                return { index, current };
-              },
-              { index: -1, current: 0 }
-            ).index;
-
-            return miners.slice(0, sliceIndex);
-          });
-        spareMiners.forEach((ship) => {
-          ship.removeComponent("commander");
-        });
-        spareMiners.push(
-          ...this.sim.queries.mining
-            .get()
-            .filter(
-              (ship) => ship.cp.owner?.id === faction.id && !ship.cp.commander
-            )
-        );
-
-        const miningShipRequests = shipRequests.filter(
-          ({ mining }) => mining < 0
-        );
-
-        if (miningShipRequests.length === 0) return;
-
-        const miningShipRequestInShipyards = requestsInShipyards.filter(
-          (queued) => queued?.blueprint.mining
-        );
-
-        miningShipRequests.forEach(({ facility, mining }) => {
-          while (mining < 0) {
-            if (spareMiners.length > 0) {
-              const ship = spareMiners.pop()!;
-              ship.addComponent({
-                name: "commander",
-                id: facility.id,
-              });
-              mining += ship.cp.mining!.efficiency;
-            } else if (miningShipRequestInShipyards.length > 0) {
-              mining += miningShipRequestInShipyards.pop()!.blueprint.mining;
-            } else {
-              const bp = requestShip(
-                faction,
-                shipyard,
-                "mining",
-                this.sim.getTime() > 0
-              );
-              mining += bp.mining;
-            }
-          }
-        });
       });
     }
   };

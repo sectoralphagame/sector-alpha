@@ -20,6 +20,8 @@ export interface ShipBuildInput {
 
 export interface ShipInput extends ShipDriveProps {
   build: ShipBuildInput;
+  damage: number;
+  range: number;
   name: string;
   slug: string;
   storage: number;
