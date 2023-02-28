@@ -16,9 +16,8 @@ export function deployFacilityAction(entity: Ship): boolean {
   const render: Render = createRender({
     ...entity.cp.render,
     defaultScale: 1,
-    maxZ: 0.065,
     texture: "fFactory",
-    zIndex: 1,
+    layer: "facility",
   });
 
   (

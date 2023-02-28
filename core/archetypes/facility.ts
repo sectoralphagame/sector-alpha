@@ -69,9 +69,8 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
           ? Color(initial.owner?.cp.color.value).rgbNumber()
           : Color.hsl(0, 0, 70).rgbNumber(),
         defaultScale: 1,
-        maxZ: 0.065,
         texture: "fFactory",
-        zIndex: 1,
+        layer: "facility",
       })
     )
     .addComponent(createCommodityStorage())

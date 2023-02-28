@@ -31,23 +31,22 @@ export const textures = {
   lStorage: lStorageTexture,
 };
 export type Textures = typeof textures;
+export type Layer = "facility" | "ship" | "global" | "selection";
 
 export interface RenderInput {
   color?: number;
   defaultScale: number;
-  maxZ: number;
   texture: keyof Textures;
-  zIndex: number;
+  layer: Layer;
 }
 
 export class Render implements BaseComponent<"render"> {
   color: number;
   defaultScale: number = 1;
   initialized: boolean = false;
-  maxZ: number;
   sprite: PIXI.Sprite;
   texture: keyof Textures;
-  zIndex: number;
+  layer: Layer;
   name: "render" = "render";
 }
 
@@ -63,7 +62,6 @@ export function setTexture(render: Render, texture: keyof Textures) {
       })
     );
     render.sprite.anchor.set(0.5, 0.5);
-    render.sprite.zIndex = render.zIndex;
   }
 }
 
@@ -74,17 +72,15 @@ export function destroy(render: Render) {
 export function createRender({
   color,
   defaultScale,
-  maxZ,
   texture,
-  zIndex,
+  layer,
 }: RenderInput): Render {
   const component: Render = {
     color: color ?? 0xffffff,
     defaultScale,
     initialized: false,
     name: "render",
-    zIndex,
-    maxZ,
+    layer,
     sprite: null!,
     texture,
   };

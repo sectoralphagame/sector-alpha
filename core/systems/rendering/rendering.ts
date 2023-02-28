@@ -11,10 +11,16 @@ import type { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
 import { SystemWithHooks } from "../hooks";
 import { clearFocus } from "../../components/selection";
+import type { Layer } from "../../components/render";
 import { destroy, setTexture } from "../../components/render";
 
 const minScale = 0.05;
 const maxScale = 20;
+
+const layerScaleThresholds: Partial<Record<Layer, number>> = {
+  facility: 0.065,
+  ship: 0.1,
+};
 
 function drawHpBars(entity: RequireComponent<"render">) {
   if (entity.cp.hitpoints) {
@@ -81,6 +87,7 @@ export class RenderingSystem extends SystemWithHooks {
   keysPressed: string[] = [];
   toolbar: HTMLDivElement;
   grid: RequireComponent<"renderGraphics"> | null = null;
+  layers: Record<Layer, PIXI.Container>;
 
   init = () => {
     this.cooldowns = new Cooldowns("graphics");
@@ -113,6 +120,22 @@ export class RenderingSystem extends SystemWithHooks {
     });
 
     this.app.stage.addChild(this.viewport);
+
+    this.layers = {
+      facility: new PIXI.Container(),
+      ship: new PIXI.Container(),
+      global: new PIXI.Container(),
+      selection: new PIXI.Container(),
+    };
+
+    this.layers.global.zIndex = 0;
+    this.layers.facility.zIndex = 1;
+    this.layers.ship.zIndex = 2;
+    this.layers.selection.zIndex = 100;
+
+    Object.values(this.layers).forEach((layer) =>
+      this.viewport.addChild(layer)
+    );
 
     this.viewport.drag().pinch().wheel();
     this.viewport.clampZoom({ minScale, maxScale });
@@ -217,7 +240,6 @@ export class RenderingSystem extends SystemWithHooks {
   updateRenderables = () => {
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
-      const scale = this.viewport.scale.x;
 
       if (!entityRender.initialized) {
         this.viewport.addChild(entityRender.sprite);
@@ -233,8 +255,7 @@ export class RenderingSystem extends SystemWithHooks {
           });
           entityRender.sprite.cursor = "pointer";
           entityRender.sprite.tint = entityRender.color;
-          entityRender.sprite.zIndex = entityRender.zIndex;
-          entityRender.sprite.visible = entityRender.maxZ <= scale;
+          this.layers[entityRender.layer].addChild(entityRender.sprite);
         }
 
         this.updateEntityScaling(entity);
@@ -274,14 +295,16 @@ export class RenderingSystem extends SystemWithHooks {
         entityRender.sprite.tint = Color(entityRender.sprite.tint)
           .lighten(0.23)
           .rgbNumber();
-        entityRender.sprite.zIndex = 10;
+        entityRender.sprite.parent?.removeChild(entityRender.sprite);
+        this.layers.selection.addChild(entityRender.sprite);
 
         if (entity.cp.orders) {
           entity.addComponent(createRenderGraphics("path"));
         }
       } else if (!selected && entityRender.sprite.tint !== entityRender.color) {
         entityRender.sprite.tint = entityRender.color;
-        entityRender.sprite.zIndex = entityRender.zIndex;
+        entityRender.sprite.parent?.removeChild(entityRender.sprite);
+        this.layers[entityRender.layer].addChild(entityRender.sprite);
       }
     });
     this.updateScaling();
@@ -293,16 +316,22 @@ export class RenderingSystem extends SystemWithHooks {
     const scale = this.viewport.scale.x;
 
     entityRender.sprite.scale.set(
-      (1 / (scale * (scale < entityRender.maxZ * 2 ? 2 : 1))) *
+      (1 /
+        (scale *
+          (scale < (layerScaleThresholds[entityRender.layer] ?? 1) * 2
+            ? 2
+            : 1))) *
         entityRender.defaultScale *
         (selected ? 1.5 : 1)
     );
-
-    entityRender.sprite.visible = entityRender.maxZ <= scale;
   };
 
   updateScaling = () => {
     this.sim.queries.renderable.get().forEach(this.updateEntityScaling);
+    Object.entries(this.layers).forEach(([name, layer]) => {
+      layer.visible =
+        (layerScaleThresholds[name] ?? 0) <= this.viewport.scale.x;
+    });
   };
 
   updateViewport = () => {
