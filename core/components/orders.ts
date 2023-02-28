@@ -77,6 +77,11 @@ export interface FollowOrder extends BaseOrder {
   ordersForSector: number;
 }
 
+export interface PatrolOrder extends BaseOrder {
+  type: "patrol";
+  sectorId: number;
+}
+
 export type Order =
   | ({
       type:
@@ -89,7 +94,8 @@ export type Order =
         | "deployBuilder";
     } & BaseOrder)
   | AttackOrder
-  | FollowOrder;
+  | FollowOrder
+  | PatrolOrder;
 
 export function tradeAction(action: Omit<TradeAction, "type">): TradeAction {
   if (action.offer.quantity <= 0) {

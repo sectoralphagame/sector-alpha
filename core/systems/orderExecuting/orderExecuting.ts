@@ -19,6 +19,7 @@ import { tradeOrder } from "./trade";
 import { deployFacilityAction } from "./deployFacility";
 import { deployBuilderAction } from "./deployBuilder";
 import { attackOrder, attackOrderGroup } from "./attack";
+import { patrolOrder } from "./patrol";
 
 const orderFns: Partial<
   Record<
@@ -38,6 +39,11 @@ const orderFns: Partial<
       !!entity.cp.damage?.targetId &&
       !entity.sim.get(entity.cp.damage.targetId),
     onCompleted: attackOrderGroup,
+  },
+  patrol: {
+    exec: patrolOrder,
+    isCompleted: () => false,
+    onCompleted: () => undefined,
   },
   follow: {
     exec: followOrder,
