@@ -35,6 +35,11 @@ export class AttackingSystem extends System {
 
       this.query.get().forEach((entity) => {
         if (entity.cp.damage.targetId) {
+          if (!this.sim.entities.has(entity.cp.damage.targetId)) {
+            entity.cp.damage.targetId = null;
+            return;
+          }
+
           const target = this.sim
             .getOrThrow(entity.cp.damage.targetId)
             .requireComponents(["position", "hitpoints"]);

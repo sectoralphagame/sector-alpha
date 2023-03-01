@@ -37,7 +37,7 @@ export function requestShip(
 
   if (!bp) return null;
 
-  if (queue) {
+  if (queue || Math.random() < 0.15) {
     shipyard.cp.shipyard.queue.push({
       blueprint: bp,
       owner: faction.id,
@@ -170,8 +170,7 @@ export class ShipPlanningSystem extends System {
           .filter(
             (ship) =>
               ship.cp.commander.id === facility?.id &&
-              !ship.cp.mining &&
-              !ship.cp.damage
+              ship.tags.has("role:transport")
           )
           .slice(0, trading)
       );
@@ -185,8 +184,7 @@ export class ShipPlanningSystem extends System {
           (ship) =>
             ship.cp.owner?.id === faction.id &&
             !ship.cp.commander &&
-            !ship.cp.damage &&
-            !ship.cp.mining
+            ship.tags.has("role:transport")
         )
     );
 
@@ -226,7 +224,9 @@ export class ShipPlanningSystem extends System {
           this.sim.queries.commendables
             .get()
             .filter(
-              (ship) => ship.cp.commander.id === facility?.id && ship.cp.mining
+              (ship) =>
+                ship.cp.commander.id === facility?.id &&
+                ship.tags.has("role:mining")
             ),
           (ship) => ship.cp.mining!.efficiency
         );
@@ -320,7 +320,7 @@ export class ShipPlanningSystem extends System {
           (ship) =>
             ship.cp.owner?.id === faction.id &&
             !ship.cp.commander &&
-            ship.cp.damage &&
+            ship.tags.has("role:military") &&
             ship.cp.orders.value.length === 0
         )
     );

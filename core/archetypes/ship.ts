@@ -91,7 +91,8 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       shield: { max: 100, regen: 0, value: 100 },
     })
     .addTag("selection")
-    .addTag("ship");
+    .addTag("ship")
+    .addTag(`role:${initial.role}`);
 
   if (initial.mining) {
     entity.addComponent(createMining(initial.mining));
