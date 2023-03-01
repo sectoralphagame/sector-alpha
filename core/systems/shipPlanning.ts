@@ -136,19 +136,23 @@ export class ShipPlanningSystem extends System {
       .get()
       .filter((sector) => sector.cp.owner?.id === faction.id)
       .map((sector) => {
-        const sectorShips = this.sim.queries.commendables
+        const sectorPatrols = this.sim.queries.orderable
           .get()
           .filter(
             (ship) =>
               ship.cp.owner?.id === faction.id &&
-              ship.cp.orders.value[0]?.type === "patrol" &&
-              ship.cp.orders.value[0].sectorId === sector.id
+              ship.cp.orders.value.some(
+                (order) =>
+                  order.type === "patrol" && order.sectorId === sector?.id
+              )
           );
-        const patrols = sectorShips.map((ship) =>
-          ship.requireComponents([...shipComponents, "damage"])
-        );
 
-        return { sector, patrols: patrols.length - 10, trading: 0, mining: 0 };
+        return {
+          sector,
+          patrols: sectorPatrols.length - 10,
+          trading: 0,
+          mining: 0,
+        };
       });
 
   getShipRequests = (faction: Faction): ShipRequest[] => [
@@ -299,16 +303,17 @@ export class ShipPlanningSystem extends System {
     shipyard: RequireComponent<"shipyard" | "position">
   ) => {
     const spareMilitary: Entity[] = shipRequests
-      .filter((request) => request.patrols > 0)
+      .filter(({ patrols }) => patrols > 0)
       .flatMap(({ sector, patrols }) =>
         this.sim.queries.orderable
           .get()
           .filter(
             (ship) =>
               ship.cp.owner?.id === faction.id &&
-              !ship.cp.commander &&
-              ship.cp.orders.value[0].type === "patrol" &&
-              ship.cp.orders.value[0].sectorId === sector?.id
+              ship.cp.orders.value.some(
+                (order) =>
+                  order.type === "patrol" && order.sectorId === sector?.id
+              )
           )
           .slice(0, patrols)
       );
@@ -362,10 +367,9 @@ export class ShipPlanningSystem extends System {
         const requestsInShipyards = this.sim.queries.shipyards
           .get()
           .flatMap((shipyard) =>
-            [
-              ...shipyard.cp.shipyard.queue,
-              shipyard.cp.shipyard.building,
-            ].filter(notNull)
+            [...shipyard.cp.shipyard.queue, shipyard.cp.shipyard.building]
+              .filter(notNull)
+              .filter((queueItem) => queueItem.owner === faction.id)
           );
         const shipyard =
           this.sim.queries.shipyards

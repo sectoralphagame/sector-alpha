@@ -42,6 +42,7 @@ export class SpottingSystem extends System {
           this.query.get(),
           filter(
             (e) =>
+              e.tags.has("ship") &&
               entity.cp.owner &&
               entityOwner &&
               e.cp.position.sector === entity.cp.position.sector &&

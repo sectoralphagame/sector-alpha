@@ -1,3 +1,5 @@
+import type { Faction } from "@core/archetypes/faction";
+import { relationThresholds } from "@core/components/relations";
 import { minBy } from "lodash";
 import type { Matrix } from "mathjs";
 import { add, matrix, norm, random, subtract } from "mathjs";
@@ -98,7 +100,15 @@ function idleMovement(entity: Trading) {
 
 function autoTrade(entity: Trading, sectorDistance: number) {
   let makingTrade = false;
-  const trade = getTradeWithMostProfit(entity, sectorDistance);
+  const trade = getTradeWithMostProfit(
+    entity,
+    sectorDistance,
+    Object.entries(
+      entity.sim.getOrThrow<Faction>(entity.cp.owner.id).cp.relations.values
+    )
+      .filter(([, value]) => value <= relationThresholds.trade)
+      .map(([id]) => id as unknown as number)
+  );
   if (trade) {
     makingTrade = resellCommodity(
       entity,
