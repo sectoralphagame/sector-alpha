@@ -87,8 +87,8 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
     .addComponent({
       name: "hitpoints",
       g: { hp: null!, shield: null! },
-      hp: { max: 100, regen: 0, value: 100 },
-      shield: { max: 100, regen: 0, value: 100 },
+      hp: { max: 100, regen: 1, value: 100 },
+      shield: { max: 100, regen: 3, value: 100 },
     })
     .addTag("selection")
     .addTag("ship")
