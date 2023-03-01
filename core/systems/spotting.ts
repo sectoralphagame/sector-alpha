@@ -1,7 +1,8 @@
-import { filter, map, pipe, reduce } from "@fxts/core";
+import { filter, map, pipe, reduce, toArray } from "@fxts/core";
 import type { Faction } from "@core/archetypes/faction";
 import { relationThresholds } from "@core/components/relations";
 import { distance } from "mathjs";
+import type { RequireComponent } from "@core/tsHelpers";
 import { System } from "./system";
 import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
@@ -21,22 +22,39 @@ export class SpottingSystem extends System {
     this.cooldowns.update(delta);
     if (!this.cooldowns.canUse("exec")) return;
 
+    const cache: Record<
+      string,
+      Array<RequireComponent<"hitpoints" | "owner" | "position">>
+    > = {};
+
     this.sim.queries.orderable.get().forEach((entity) => {
       if (entity.cp.orders.value[0]?.type !== "patrol") return;
 
-      const entityOwner = entity.cp.owner?.id
-        ? this.sim.get<Faction>(entity.cp.owner?.id)
-        : null;
+      if (!entity.cp.owner) return;
+      const entityOwner = this.sim.getOrThrow<Faction>(entity.cp.owner.id);
+
+      const cacheKey = [entity.cp.owner!.id, entity.cp.position.sector].join(
+        ":"
+      );
+      const enemies =
+        cache[cacheKey] ??
+        pipe(
+          this.query.get(),
+          filter(
+            (e) =>
+              entity.cp.owner &&
+              entityOwner &&
+              e.cp.position.sector === entity.cp.position.sector &&
+              entityOwner.cp.relations.values[e.cp.owner.id]! <
+                relationThresholds.attack
+          ),
+          toArray
+        );
+      if (!cache[cacheKey]) {
+        cache[cacheKey] = enemies;
+      }
       const closestEnemy = pipe(
-        this.query.get(),
-        filter(
-          (e) =>
-            entity.cp.owner &&
-            entityOwner &&
-            e.cp.position.sector &&
-            entityOwner.cp.relations.values[e.cp.owner.id]! <
-              relationThresholds.attack
-        ),
+        enemies,
         map((e) => ({
           entity: e,
           distance: distance(
