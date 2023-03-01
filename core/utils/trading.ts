@@ -1,12 +1,14 @@
 import merge from "lodash/merge";
 import { mean } from "mathjs";
 import { filter, map, pipe, sortBy, toArray } from "@fxts/core";
-import { changeRelations } from "@core/components/relations";
+import {
+  changeRelations,
+  relationThresholds,
+} from "@core/components/relations";
 import type { Faction } from "@core/archetypes/faction";
 import type { Action, TradeAction } from "../components/orders";
 import { tradeAction } from "../components/orders";
 import type { TransactionInput } from "../components/trade";
-import type { Allocation } from "../components/utils/allocations";
 import type { Commodity } from "../economy/commodity";
 import { commoditiesArray } from "../economy/commodity";
 import type { WithTrade } from "../economy/utils";
@@ -67,8 +69,10 @@ export function isTradeAccepted(
     throw new ExceededOfferQuantity(input.quantity, offer.quantity);
   }
 
+  const isTheSameFaction = input.factionId === entity.cp.owner.id;
+
   if (input.type === "buy") {
-    if (input.factionId === entity.cp.owner.id) {
+    if (isTheSameFaction) {
       validPrice = true;
     } else {
       validPrice = input.price >= offer.price;
@@ -80,13 +84,20 @@ export function isTradeAccepted(
     );
   }
 
-  if (input.factionId === entity.cp.owner.id) {
+  if (isTheSameFaction) {
     validPrice = true;
   } else {
     validPrice = input.price <= offer.price;
   }
 
+  const isNotEnemy =
+    isTheSameFaction ||
+    entity.sim.getOrThrow<Faction>(entity.cp.owner.id).cp.relations.values[
+      input.factionId
+    ] > relationThresholds.trade;
+
   const result =
+    isNotEnemy &&
     validPrice &&
     entity.cp.budget.available >= input.price * input.quantity &&
     hasSufficientStorageSpace(entity.cp.storage, input.quantity);

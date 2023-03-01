@@ -62,7 +62,8 @@ export interface TradeWithMostProfit {
  */
 export function getTradeWithMostProfit(
   from: Marker,
-  sectorDistance: number
+  sectorDistance: number,
+  notAllowedFactions: number[]
 ): TradeWithMostProfit | null {
   const facilitiesInRange = getSectorsInTeleportRange(
     asSector(from.sim.getOrThrow(from.cp.position.sector)!),
@@ -71,7 +72,11 @@ export function getTradeWithMostProfit(
   ).flatMap((sector) =>
     from.sim.queries.trading
       .get()
-      .filter((f) => f.cp.position.sector === sector.id)
+      .filter(
+        (f) =>
+          f.cp.position.sector === sector.id &&
+          !notAllowedFactions.includes(f.cp.owner.id)
+      )
   );
 
   const bestOffers = perCommodity((commodity) => ({
