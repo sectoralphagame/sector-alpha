@@ -8,7 +8,7 @@ import Orders from "./Orders";
 
 const ShipPanel: React.FC<{ entity: Ship }> = ({ entity: ship }) => {
   const storedCommodities = Object.values(commodities).filter(
-    (commodity) => ship.cp.storage.availableWares[commodity] > 0
+    (commodity) => ship.cp.storage.stored[commodity] > 0
   );
   const commander = ship.cp.commander?.id
     ? ship.sim.get(ship.cp.commander?.id)
@@ -27,12 +27,13 @@ const ShipPanel: React.FC<{ entity: Ship }> = ({ entity: ship }) => {
         ? storedCommodities
             .map((commodity) => ({
               commodity,
-              stored: ship.cp.storage.availableWares[commodity],
+              stored: ship.cp.storage.stored[commodity],
+              available: ship.cp.storage.availableWares[commodity],
             }))
             .map((data) => (
               <div key={data.commodity}>{`${commodityLabel[data.commodity]}: ${
                 data.stored
-              }`}</div>
+              } (${data.available})`}</div>
             ))
         : "Empty storage"}
       <hr />
