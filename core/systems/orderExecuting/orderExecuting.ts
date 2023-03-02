@@ -47,9 +47,12 @@ const orderFns: Partial<
   },
   follow: {
     exec: followOrder,
-    isCompleted: (entity) =>
-      !!entity.cp.damage?.targetId &&
-      !entity.sim.get(entity.cp.damage.targetId),
+    isCompleted: () => false,
+    onCompleted: followOrderCompleted,
+  },
+  escort: {
+    exec: followOrder,
+    isCompleted: () => false,
     onCompleted: followOrderCompleted,
   },
   hold: {
@@ -104,7 +107,9 @@ function cleanupOrders(entity: Entity): void {
               action.type === "trade") &&
             action.targetId === entity.id
         ) ||
-        ((order.type === "follow" || order.type === "attack") &&
+        ((order.type === "follow" ||
+          order.type === "attack" ||
+          order.type === "escort") &&
           order.targetId === entity.id)
       ) {
         if (orderIndex === 0) {

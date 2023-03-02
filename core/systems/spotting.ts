@@ -28,7 +28,11 @@ export class SpottingSystem extends System {
     > = {};
 
     this.sim.queries.orderable.get().forEach((entity) => {
-      if (entity.cp.orders.value[0]?.type !== "patrol") return;
+      if (
+        entity.cp.orders.value[0]?.type !== "patrol" &&
+        entity.cp.orders.value[0]?.type !== "escort"
+      )
+        return;
 
       if (!entity.cp.owner) return;
       const entityOwner = this.sim.getOrThrow<Faction>(entity.cp.owner.id);

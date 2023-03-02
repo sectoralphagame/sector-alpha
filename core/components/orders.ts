@@ -83,6 +83,13 @@ export interface PatrolOrder extends BaseOrder {
   sectorId: number;
 }
 
+export interface EscortOrder extends BaseOrder {
+  type: "escort";
+  targetId: number;
+  /** Used to prevent endless path recalculations */
+  ordersForSector: number;
+}
+
 export type Order =
   | ({
       type:
@@ -96,7 +103,8 @@ export type Order =
     } & BaseOrder)
   | AttackOrder
   | FollowOrder
-  | PatrolOrder;
+  | PatrolOrder
+  | EscortOrder;
 
 export function tradeAction(action: Omit<TradeAction, "type">): TradeAction {
   if (action.offer.quantity <= 0) {

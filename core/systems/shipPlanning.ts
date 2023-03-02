@@ -18,8 +18,8 @@ import type { Entity } from "../entity";
 import type { RequireComponent } from "../tsHelpers";
 import { notNull } from "../utils/maps";
 
-const patrolsPerSector = 3;
-const fightersPerPatrol = 3;
+const patrolsPerSector = 4;
+const fightersPerPatrol = 2;
 
 interface ShipRequest {
   trading: number;
@@ -429,7 +429,7 @@ export class ShipPlanningSystem extends System {
             if (commander) {
               ship.cp.orders!.value = [
                 {
-                  type: "follow",
+                  type: "escort",
                   origin: "auto",
                   targetId: commander.id,
                   actions: [],
