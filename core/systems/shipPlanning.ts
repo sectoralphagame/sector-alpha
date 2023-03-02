@@ -1,8 +1,9 @@
 import { sum } from "mathjs";
 import sortBy from "lodash/sortBy";
 import type { ShipyardQueueItem } from "@core/components/shipyard";
+import type { DockSize } from "@core/components/dockable";
 import type { InitialShipInput } from "../archetypes/ship";
-import { shipComponents, createShip } from "../archetypes/ship";
+import { createShip } from "../archetypes/ship";
 import { mineableCommodities } from "../economy/commodity";
 import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
@@ -17,22 +18,29 @@ import type { Entity } from "../entity";
 import type { RequireComponent } from "../tsHelpers";
 import { notNull } from "../utils/maps";
 
+const patrolsPerSector = 3;
+const fightersPerPatrol = 3;
+
 interface ShipRequest {
   trading: number;
   mining: number;
   facility?: RequireComponent<"position" | "facilityModuleQueue" | "modules">;
   sector?: Sector;
   patrols: number;
+  fighters: number;
 }
 
 export function requestShip(
   faction: Faction,
   shipyard: RequireComponent<"shipyard" | "position">,
   role: ShipRole,
-  queue: boolean
+  queue: boolean,
+  size?: DockSize
 ): Omit<InitialShipInput, "position" | "owner" | "sector"> | null {
   const bp = pickRandom(
-    faction.cp.blueprints.ships.filter((ship) => ship.role === role)
+    faction.cp.blueprints.ships.filter(
+      (ship) => ship.role === role && (size ? ship.size === size : true)
+    )
   );
 
   if (!bp) return null;
@@ -128,7 +136,7 @@ export class ShipPlanningSystem extends System {
         const trading =
           traders.length - (shipsForProduction + shipsForShipyards);
 
-        return { facility, mining, trading, patrols: 0 };
+        return { facility, mining, trading, patrols: 0, fighters: 0 };
       });
 
   getPatrolRequests = (faction: Faction): ShipRequest[] =>
@@ -141,15 +149,27 @@ export class ShipPlanningSystem extends System {
           .filter(
             (ship) =>
               ship.cp.owner?.id === faction.id &&
+              ship.cp.dockable?.size === "medium" &&
               ship.cp.orders.value.some(
                 (order) =>
                   order.type === "patrol" && order.sectorId === sector?.id
               )
           );
+        const sectorPatrolsFollowers = sectorPatrols.flatMap((ship) =>
+          this.sim.queries.commendables
+            .get()
+            .filter(
+              (commendable) =>
+                commendable.cp.commander.id === ship.id &&
+                commendable.cp.dockable?.size === "small"
+            )
+        ).length;
 
         return {
           sector,
-          patrols: sectorPatrols.length - 10,
+          patrols: sectorPatrols.length - patrolsPerSector,
+          fighters:
+            sectorPatrolsFollowers - patrolsPerSector * fightersPerPatrol,
           trading: 0,
           mining: 0,
         };
@@ -193,7 +213,7 @@ export class ShipPlanningSystem extends System {
     );
 
     const shipRequestInShipyards = requestsInShipyards.filter(
-      (queued) => queued && !queued?.blueprint.mining
+      (queued) => queued && queued?.blueprint.role === "transport"
     );
 
     shipRequests
@@ -302,7 +322,7 @@ export class ShipPlanningSystem extends System {
     requestsInShipyards: ShipyardQueueItem[],
     shipyard: RequireComponent<"shipyard" | "position">
   ) => {
-    const spareMilitary: Entity[] = shipRequests
+    const spareFrigates: Entity[] = shipRequests
       .filter(({ patrols }) => patrols > 0)
       .flatMap(({ sector, patrols }) =>
         this.sim.queries.orderable
@@ -310,6 +330,7 @@ export class ShipPlanningSystem extends System {
           .filter(
             (ship) =>
               ship.cp.owner?.id === faction.id &&
+              ship.cp.dockable?.size === "medium" &&
               ship.cp.orders.value.some(
                 (order) =>
                   order.type === "patrol" && order.sectorId === sector?.id
@@ -318,28 +339,31 @@ export class ShipPlanningSystem extends System {
           .slice(0, patrols)
       );
 
-    spareMilitary.push(
+    spareFrigates.push(
       ...this.sim.queries.orderable
         .get()
         .filter(
           (ship) =>
             ship.cp.owner?.id === faction.id &&
             !ship.cp.commander &&
+            ship.cp.dockable?.size === "medium" &&
             ship.tags.has("role:military") &&
             ship.cp.orders.value.length === 0
         )
     );
 
-    const shipRequestInShipyards = requestsInShipyards.filter(
-      (queued) => queued?.blueprint.role === "military"
+    const frigatesInShipyards = requestsInShipyards.filter(
+      (queued) =>
+        queued?.blueprint.role === "military" &&
+        queued?.blueprint.size === "medium"
     );
 
     shipRequests
       .filter(({ sector }) => sector)
       .forEach(({ sector, patrols }) => {
         for (let i = 0; i < -patrols; i++) {
-          if (spareMilitary.length > 0 && sector) {
-            const ship = spareMilitary.pop()!;
+          if (spareFrigates.length > 0 && sector) {
+            const ship = spareFrigates.pop()!;
             ship.cp.orders!.value = [
               {
                 type: "patrol",
@@ -348,10 +372,82 @@ export class ShipPlanningSystem extends System {
                 actions: [],
               },
             ];
-          } else if (shipRequestInShipyards.length > 0) {
-            shipRequestInShipyards.pop();
+          } else if (frigatesInShipyards.length > 0) {
+            frigatesInShipyards.pop();
           } else {
-            requestShip(faction, shipyard, "military", this.sim.getTime() > 0);
+            requestShip(
+              faction,
+              shipyard,
+              "military",
+              this.sim.getTime() > 0,
+              "medium"
+            );
+          }
+        }
+      });
+
+    const spareFighters = this.sim.queries.orderable
+      .get()
+      .filter(
+        (ship) =>
+          ship.cp.owner?.id === faction.id &&
+          !ship.cp.commander &&
+          ship.cp.dockable?.size === "small" &&
+          ship.tags.has("role:military") &&
+          ship.cp.orders.value.length === 0
+      );
+
+    const fightersInShipyards = requestsInShipyards.filter(
+      (queued) =>
+        queued?.blueprint.role === "military" &&
+        queued?.blueprint.size === "small"
+    );
+
+    shipRequests
+      .filter(({ fighters }) => fighters)
+      .forEach(({ fighters }) => {
+        for (let i = 0; i < -fighters; i++) {
+          if (spareFighters.length > 0) {
+            const ship = spareFighters.pop()!;
+            const commander = this.sim.queries.orderable
+              .get()
+              .find(
+                (patrolLeader) =>
+                  patrolLeader.cp.owner?.id === faction.id &&
+                  patrolLeader.cp.dockable?.size === "medium" &&
+                  patrolLeader.cp.orders.value.some(
+                    (order) => order.type === "patrol"
+                  ) &&
+                  this.sim.queries.commendables
+                    .get()
+                    .filter(
+                      (commendable) =>
+                        commendable.cp.commander.id === patrolLeader.id
+                    ).length < fightersPerPatrol
+              );
+
+            if (commander) {
+              ship.cp.orders!.value = [
+                {
+                  type: "follow",
+                  origin: "auto",
+                  targetId: commander.id,
+                  actions: [],
+                  ordersForSector: 0,
+                },
+              ];
+              ship.addComponent({ name: "commander", id: commander.id });
+            }
+          } else if (fightersInShipyards.length > 0) {
+            fightersInShipyards.pop();
+          } else {
+            requestShip(
+              faction,
+              shipyard,
+              "military",
+              this.sim.getTime() > 0,
+              "small"
+            );
           }
         }
       });

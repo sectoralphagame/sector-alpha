@@ -229,7 +229,32 @@
     "name": "Fighter",
     "size": "small",
     "storage": 10,
-    "texture": "sMin",
+    "texture": "sMil",
     "slug": "fighter"
+  },
+  {
+    "acceleration": 0.15,
+    "build": {
+      "time": 0,
+      "cost": {
+        "drones": 50,
+        "electronics": 1000,
+        "fuel": 2600,
+        "hullPlates": 8900
+      }
+    },
+    "damage": 4,
+    "range": 2.7,
+    "mining": 0,
+    "role": "military",
+    "cruise": 1.1,
+    "maneuver": 0.15,
+    "rotary": 61,
+    "ttc": 3,
+    "name": "Gunboat",
+    "size": "medium",
+    "storage": 80,
+    "texture": "mMil",
+    "slug": "gunboat"
   }
 ]

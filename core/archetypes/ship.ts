@@ -80,7 +80,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
     .addComponent(createCommodityStorage())
     .addComponent({
       name: "dockable",
-      size: "small",
+      size: initial.size,
       dockedIn: null,
     })
     .addComponent({ name: "journal", entries: [] })
