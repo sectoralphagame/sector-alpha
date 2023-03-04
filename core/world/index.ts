@@ -127,6 +127,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
         type: factionData.type as AiType,
         stockpiling: random(0.6, 1.2),
         priceModifier: random(0.002, 0.02),
+        patrols: factionData.patrols!,
       });
       faction.cp.color.value = factionData.color;
       faction.cp.blueprints.ships = shipClasses.filter((s) =>

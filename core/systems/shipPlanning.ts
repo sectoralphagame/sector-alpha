@@ -18,9 +18,6 @@ import type { Entity } from "../entity";
 import type { RequireComponent } from "../tsHelpers";
 import { notNull } from "../utils/maps";
 
-const patrolsPerSector = 4;
-const fightersPerPatrol = 2;
-
 interface ShipRequest {
   trading: number;
   mining: number;
@@ -167,9 +164,11 @@ export class ShipPlanningSystem extends System {
 
         return {
           sector,
-          patrols: sectorPatrols.length - patrolsPerSector,
+          patrols: sectorPatrols.length - faction.cp.ai!.patrols.perSector,
           fighters:
-            sectorPatrolsFollowers - patrolsPerSector * fightersPerPatrol,
+            sectorPatrolsFollowers -
+            faction.cp.ai!.patrols.perSector *
+              faction.cp.ai!.patrols.formation.fighters,
           trading: 0,
           mining: 0,
         };
@@ -423,7 +422,7 @@ export class ShipPlanningSystem extends System {
                     .filter(
                       (commendable) =>
                         commendable.cp.commander.id === patrolLeader.id
-                    ).length < fightersPerPatrol
+                    ).length < faction.cp.ai!.patrols.formation.fighters
               );
 
             if (commander) {

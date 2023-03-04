@@ -15,4 +15,10 @@ export interface Ai extends BaseComponent<"ai"> {
    */
   stockpiling: number;
   priceModifier: number;
+  patrols: {
+    formation: {
+      fighters: number;
+    };
+    perSector: number;
+  };
 }

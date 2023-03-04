@@ -20,6 +20,12 @@ function createTerritorialFaction(index: number, sim: Sim) {
     type: "territorial",
     stockpiling: random(0.5, 0.8),
     priceModifier: random(0.002, 0.02),
+    patrols: {
+      formation: {
+        fighters: 3,
+      },
+      perSector: 4,
+    },
   });
   setMoney(faction.cp.budget, 1e8);
   faction.cp.blueprints.ships = [
@@ -46,6 +52,12 @@ function createTradingFaction(index: number, sim: Sim) {
     type: "travelling",
     stockpiling: 1,
     priceModifier: 0.01,
+    patrols: {
+      formation: {
+        fighters: 3,
+      },
+      perSector: 4,
+    },
   });
   setMoney(faction.cp.budget, 1e4);
   faction.cp.blueprints.ships = (

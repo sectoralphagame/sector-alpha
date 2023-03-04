@@ -84,7 +84,13 @@
         "gunboat"
       ],
       "color": "#6fc9f2",
-      "type": "territorial"
+      "type": "territorial",
+      "patrols": {
+        "formation": {
+          "fighters": 3
+        },
+        "perSector": 4
+      }
     },
     {
       "name": "Alpha Centauri's Technocracy",
@@ -106,7 +112,13 @@
         "gunboat"
       ],
       "color": "#ffc34d",
-      "type": "territorial"
+      "type": "territorial",
+      "patrols": {
+        "formation": {
+          "fighters": 2
+        },
+        "perSector": 6
+      }
     },
     {
       "name": "Tau",
@@ -114,7 +126,13 @@
       "sectors": ["the-hive"],
       "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerTau"],
       "color": "#9534eb",
-      "type": "territorial"
+      "type": "territorial",
+      "patrols": {
+        "formation": {
+          "fighters": 2
+        },
+        "perSector": 4
+      }
     },
     {
       "name": "Federation of Free Worlds",
@@ -138,7 +156,13 @@
         "gunboat"
       ],
       "color": "#42f5e3",
-      "type": "territorial"
+      "type": "territorial",
+      "patrols": {
+        "formation": {
+          "fighters": 3
+        },
+        "perSector": 2
+      }
     },
     {
       "name": "Alkali Mining Sindicate",
@@ -153,7 +177,13 @@
         "gunboat"
       ],
       "color": "#ff63e5",
-      "type": "territorial"
+      "type": "territorial",
+      "patrols": {
+        "formation": {
+          "fighters": 2
+        },
+        "perSector": 3
+      }
     },
     {
       "name": "Pirates",
@@ -168,7 +198,13 @@
         "gunboat"
       ],
       "color": "#fcc7c5",
-      "type": "pirate"
+      "type": "pirate",
+      "patrols": {
+        "formation": {
+          "fighters": 2
+        },
+        "perSector": 6
+      }
     },
     {
       "name": "Therr Traders",
@@ -183,11 +219,17 @@
         "gunboat"
       ],
       "color": "#f7fc5b",
-      "type": "travelling"
+      "type": "travelling",
+      "patrols": {
+        "formation": {
+          "fighters": 2
+        },
+        "perSector": 3
+      }
     },
     {
       "name": "Player Faction",
-      "blueprints": [],
+      "blueprints": ["courierA"],
       "color": "#97ff7d",
       "sectors": [],
       "slug": "PLA",
