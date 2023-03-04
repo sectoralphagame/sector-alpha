@@ -40,7 +40,7 @@ export interface Drive extends BaseComponent<"drive"> {
   minimalDistance: number;
   /** Limits maximum speed */
   limit: number;
-  mode: "goto" | "follow";
+  mode: "goto" | "follow" | "flyby";
 }
 
 export const defaultDriveLimit = 2000;

@@ -30,10 +30,28 @@ export function attackOrder(
     group.ordersForSector = target.cp.position.sector;
   }
 
-  entity.cp.drive.mode = inTheSameSector && target.cp.drive ? "follow" : "goto";
+  entity.cp.drive.mode =
+    inTheSameSector && target.id === entity.cp.drive.target && target.cp.drive
+      ? entity.cp.dockable?.size === "small"
+        ? "flyby"
+        : "follow"
+      : "goto";
 }
 
-export function attackOrderGroup(
+export function isAttackOrderCompleted(
+  entity: RequireComponent<"drive" | "position" | "orders" | "damage">,
+  group: AttackOrder
+) {
+  const target = entity.cp.damage.targetId
+    ? entity.sim.get<Marker>(entity.cp.damage.targetId)
+    : null;
+
+  return !target || group.followOutsideSector
+    ? false
+    : target.cp.position.sector !== entity.cp.position.sector;
+}
+
+export function attackOrderCompleted(
   entity: RequireComponent<"drive" | "position" | "orders" | "damage">
 ) {
   clearTarget(entity.cp.drive);

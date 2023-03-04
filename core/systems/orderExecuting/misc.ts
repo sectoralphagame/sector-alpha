@@ -29,6 +29,8 @@ export function moveAction(
     }
   }
 
+  if (order.ignoreReached) return false;
+
   const reached = entity.cp.drive.targetReached;
 
   if (reached) {
@@ -50,8 +52,6 @@ export function holdAction(
 export function attackAction(
   entity: RequireComponent<"drive" | "orders" | "damage">
 ): boolean {
-  stop(entity.cp.drive);
-
   return entity.cp.damage.targetId
     ? !entity.sim.get(entity.cp.damage.targetId)
     : true;

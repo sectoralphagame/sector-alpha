@@ -8,7 +8,13 @@ import { findInAncestors } from "./findInAncestors";
 export function moveToActions(
   origin: Marker,
   target: Marker,
-  onlyManeuver?: boolean
+  {
+    onlyManeuver,
+    ignoreReached,
+  }: {
+    onlyManeuver?: boolean;
+    ignoreReached?: true;
+  } = {}
 ): Action[] {
   const actions: Action[] = [];
   const targetSector = target.cp.position.sector.toString();
@@ -58,6 +64,9 @@ export function moveToActions(
   const lastAction = actions.at(-1);
   if (lastAction?.type === "move" && onlyManeuver && actions.length === 1) {
     lastAction.onlyManeuver = true;
+  }
+  if (lastAction?.type === "move" && ignoreReached && actions.length === 1) {
+    lastAction.ignoreReached = true;
   }
 
   return actions;

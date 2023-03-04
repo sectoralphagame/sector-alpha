@@ -18,7 +18,11 @@ import {
 import { tradeOrder } from "./trade";
 import { deployFacilityAction } from "./deployFacility";
 import { deployBuilderAction } from "./deployBuilder";
-import { attackOrder, attackOrderGroup } from "./attack";
+import {
+  attackOrder,
+  attackOrderCompleted,
+  isAttackOrderCompleted,
+} from "./attack";
 import { patrolOrder } from "./patrol";
 
 const orderFns: Partial<
@@ -35,10 +39,8 @@ const orderFns: Partial<
 > = {
   attack: {
     exec: attackOrder,
-    isCompleted: (entity) =>
-      !!entity.cp.damage?.targetId &&
-      !entity.sim.get(entity.cp.damage.targetId),
-    onCompleted: attackOrderGroup,
+    isCompleted: isAttackOrderCompleted,
+    onCompleted: attackOrderCompleted,
   },
   patrol: {
     exec: patrolOrder,
@@ -175,9 +177,10 @@ export class OrderExecutingSystem extends System {
     this.sim.queries.orderable.get().forEach((entity) => {
       if (entity.cp.orders.value.length) {
         const order = entity.cp.orders.value[0];
-        const { exec, isCompleted } = orderFns[order.type] ?? {
+        const { exec, isCompleted, onCompleted } = orderFns[order.type] ?? {
           exec: () => undefined,
           isCompleted: () => true,
+          onCompleted: () => undefined,
         };
         exec(entity, order);
 
@@ -185,22 +188,16 @@ export class OrderExecutingSystem extends System {
         const completed = actionFn(entity, order.actions[0]);
 
         if (completed) {
-          order.actions.splice(0, 1);
+          order.actions.shift();
           if (order.actions.length === 0 && isCompleted(entity, order)) {
-            orderFns[entity.cp.orders.value[0].type]?.onCompleted(
-              entity,
-              entity.cp.orders.value[0]
-            );
-            entity.cp.orders?.value.splice(0, 1);
+            onCompleted(entity, order);
+            entity.cp.orders.value.shift();
           }
         } else if (order.interrupt) {
           order.interrupt = false;
-          orderFns[entity.cp.orders.value[0].type]?.onCompleted(
-            entity,
-            entity.cp.orders.value[0]
-          );
+          onCompleted(entity, order);
 
-          entity.cp.orders.value.splice(0, 1);
+          entity.cp.orders.value.shift();
           entity.cp.orders.value.splice(1, 0, order);
         }
       }

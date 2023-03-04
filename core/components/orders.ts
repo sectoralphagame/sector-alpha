@@ -21,6 +21,7 @@ export interface MoveAction {
   type: "move";
   targetId: number;
   onlyManeuver?: boolean;
+  ignoreReached?: boolean;
 }
 
 export interface TradeAction {
@@ -69,6 +70,7 @@ export interface AttackOrder extends BaseOrder {
   targetId: number;
   /** Used to prevent endless path recalculations */
   ordersForSector: number;
+  followOutsideSector: boolean;
 }
 
 export interface FollowOrder extends BaseOrder {

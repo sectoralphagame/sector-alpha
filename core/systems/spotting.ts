@@ -78,6 +78,7 @@ export class SpottingSystem extends System {
           origin: "auto",
           targetId: closestEnemy.entity.id,
           actions: [],
+          followOutsideSector: entity.cp.orders.value[0]?.type !== "patrol",
         });
       }
     });

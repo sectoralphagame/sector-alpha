@@ -22,8 +22,6 @@ function move(entity: Driveable, delta: number) {
   const entityPosition = entity.cp.position;
   const drive = entity.cp.drive;
 
-  entity.cooldowns.update(delta);
-
   const entityAngle = normalizeAngle(
     // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
     entityPosition.angle - Math.PI / 2

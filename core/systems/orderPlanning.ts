@@ -44,7 +44,9 @@ const tradingComponents = [
 ] as const;
 type Trading = RequireComponent<(typeof tradingComponents)[number]>;
 
-function getRandomPositionInBounds(entity: Trading): Matrix {
+function getRandomPositionInBounds(
+  entity: RequireComponent<"position">
+): Matrix {
   let position: Matrix;
 
   do {
@@ -68,7 +70,7 @@ function getRandomPositionInBounds(entity: Trading): Matrix {
   return position;
 }
 
-function idleMovement(entity: Trading) {
+function idleMovement(entity: RequireComponent<"position" | "orders">) {
   const commander =
     entity.cp.commander &&
     entity.sim.getOrThrow<Marker>(entity.cp.commander.id);
@@ -84,7 +86,7 @@ function idleMovement(entity: Trading) {
               sector: commander.cp.position.sector,
               value: add(
                 commander.cp.position.coord,
-                matrix([random(-2, 2), random(-2, 2)])
+                matrix([random(-1, 1), random(-1, 1)])
               ),
             }
           : {
@@ -92,7 +94,7 @@ function idleMovement(entity: Trading) {
               value: getRandomPositionInBounds(entity),
             }
       ),
-      true
+      { onlyManeuver: true }
     ),
     type: "move",
   });
@@ -246,6 +248,26 @@ function autoMineForCommander(
   }
 }
 
+function escortCommander(
+  entity: RequireComponent<"autoOrder" | "orders" | "commander" | "position">
+) {
+  const commander = entity.sim.getOrThrow(entity.cp.commander.id);
+
+  if (commander.tags.has("facility")) {
+    idleMovement(entity);
+  } else {
+    entity.cp.orders.value = [
+      {
+        actions: [],
+        type: "escort",
+        ordersForSector: 0,
+        origin: "auto",
+        targetId: commander.id,
+      },
+    ];
+  }
+}
+
 function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
   if (entity.cp.orders.value.length !== 0) {
     return;
@@ -292,6 +314,16 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
           "position",
         ]),
         commanderRange
+      );
+      break;
+    case "escort":
+      escortCommander(
+        entity.requireComponents([
+          "commander",
+          "autoOrder",
+          "orders",
+          "position",
+        ])
       );
       break;
     default:

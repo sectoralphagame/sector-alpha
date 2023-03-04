@@ -106,6 +106,7 @@ export const ShipToEntity: React.FC = () => {
       targetId: actionable.id,
       actions: [],
       ordersForSector: 0,
+      followOutsideSector: true,
     });
   };
 

@@ -49,6 +49,19 @@ export class AttackingSystem extends System {
             if (target.cp.drive) {
               stopCruise(target.cp.drive);
             }
+            if (
+              target.tags.has("role:military") &&
+              target.cp.orders?.value[0]?.type !== "attack"
+            ) {
+              target.cp.orders?.value.unshift({
+                type: "attack",
+                actions: [],
+                followOutsideSector: false,
+                ordersForSector: 0,
+                origin: "auto",
+                targetId: entity.id,
+              });
+            }
           }
         }
       });

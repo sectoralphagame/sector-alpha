@@ -436,6 +436,9 @@ export class ShipPlanningSystem extends System {
                   ordersForSector: 0,
                 },
               ];
+              if (ship.cp.autoOrder) {
+                ship.cp.autoOrder.default = "escort";
+              }
               ship.addComponent({ name: "commander", id: commander.id });
             }
           } else if (fightersInShipyards.length > 0) {

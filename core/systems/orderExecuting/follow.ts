@@ -19,7 +19,7 @@ export function followOrder(
     : true;
 
   if (shouldRecreateOrders) {
-    group.actions = moveToActions(entity, target);
+    group.actions = moveToActions(entity, target, { ignoreReached: true });
     group.ordersForSector = target.cp.position.sector;
   }
 
