@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20" fill="none" viewBox="0 0 40 20">
-  <path fill="#fff" d="M1 15 20 1l19 14-19-4-19 4Z"/>
-  <path fill="#fff" d="M20 13 1 17v2l19-4 19 4v-2l-19-4Z"/>
-  <path stroke="#fff" stroke-linejoin="round" d="M1 15 20 1l19 14-19-4-19 4Z"/>
-  <path stroke="#fff" stroke-linejoin="round" d="M20 13 1 17v2l19-4 19 4v-2l-19-4Z"/>
+<svg width="40" height="32" viewBox="0 0 40 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M1 23L20 1L39 23L20 19L1 23Z" fill="#fff"/>
+<path d="M17.5657 25.4343C16.1711 26.8289 16.231 29.1079 17.6971 30.4273C19.0063 31.6056 20.9937 31.6056 22.3029 30.4273C23.769 29.1079 23.8289 26.8289 22.4343 25.4343C21.0899 24.0899 18.9101 24.0899 17.5657 25.4343Z" fill="#fff"/>
+<path d="M1 23L20 1L39 23L20 19L1 23Z" stroke="#fff" stroke-linejoin="round"/>
+<path d="M17.5657 25.4343C16.1711 26.8289 16.231 29.1079 17.6971 30.4273C19.0063 31.6056 20.9937 31.6056 22.3029 30.4273C23.769 29.1079 23.8289 26.8289 22.4343 25.4343C21.0899 24.0899 18.9101 24.0899 17.5657 25.4343Z" stroke="#fff" stroke-linejoin="round"/>
 </svg>
