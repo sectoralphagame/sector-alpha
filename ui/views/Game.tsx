@@ -13,7 +13,7 @@ import { changeBudgetMoney } from "@core/components/budget";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
-import { useContextMenu, useSim } from "../atoms";
+import { useContextMenu, useGameDialog, useSim } from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
 import { PlayerMoney } from "../components/PlayerMoney";
 
@@ -105,9 +105,23 @@ export const Game: React.FC = () => {
     }
   }, [menu.active]);
 
+  const [dialog, setDialog] = useGameDialog();
+  React.useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (event.code === "Escape") {
+        setDialog(dialog ? null : { type: "config" });
+      }
+    };
+
+    document.addEventListener("keydown", handler);
+
+    return () => document.removeEventListener("keydown", handler);
+  }, [setDialog]);
+
   useRerender(250);
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div>
       <Panel entity={selectedEntity} />
       {menu.active && !!menu.sector && (
