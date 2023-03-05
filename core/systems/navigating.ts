@@ -1,6 +1,11 @@
 import type { Matrix } from "mathjs";
 import { norm, subtract } from "mathjs";
-import { clearTarget, startCruise, stopCruise } from "../components/drive";
+import {
+  clearTarget,
+  defaultDriveLimit,
+  startCruise,
+  stopCruise,
+} from "../components/drive";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import { limitMax } from "../utils/limit";
@@ -107,7 +112,10 @@ function setDrive(entity: Driveable, delta: number) {
     drive.limit > drive.maneuver;
 
   if (drive.mode === "follow" && targetEntity.cp.drive) {
-    if (targetEntity.cp.drive!.currentSpeed > drive.maneuver) {
+    if (
+      targetEntity.cp.drive!.currentSpeed > drive.maneuver ||
+      distance > drive.maneuver * drive.ttc
+    ) {
       if (canCruise && drive.state === "maneuver") {
         entity.cooldowns.use(cruiseTimer, drive.ttc);
         startCruise(drive);
@@ -119,10 +127,14 @@ function setDrive(entity: Driveable, delta: number) {
     if (distance <= 0.5) {
       entity.cp.drive.limit = targetEntity.cp.drive!.currentSpeed;
     } else {
-      entity.cp.drive.limit = Infinity;
+      entity.cp.drive.limit = defaultDriveLimit;
     }
   } else if (drive.mode === "flyby") {
-    if ((targetEntity.cp.drive?.currentSpeed ?? 0) > drive.maneuver) {
+    entity.cp.drive.limit = defaultDriveLimit;
+    if (
+      (targetEntity.cp.drive?.currentSpeed ?? 0) > drive.maneuver ||
+      distance > drive.maneuver * drive.ttc
+    ) {
       if (canCruise && drive.state === "maneuver") {
         entity.cooldowns.use(cruiseTimer, drive.ttc);
         startCruise(drive);
@@ -131,7 +143,7 @@ function setDrive(entity: Driveable, delta: number) {
       stopCruise(drive);
     }
   } else {
-    entity.cp.drive.limit = Infinity;
+    entity.cp.drive.limit = defaultDriveLimit;
 
     if (distance <= drive.minimalDistance) {
       drive.currentSpeed = 0;
