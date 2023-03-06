@@ -181,7 +181,7 @@ export const graphics: Graphics = {
       fill: 0x404040,
       fontFamily: "Space Mono",
     });
-    textGraphics.resolution = 8;
+    textGraphics.resolution = 7;
     const textPos = add(pos, matrix([0, 90 - sectorSize])) as Matrix;
     textGraphics.anchor.set(0.5, 0.5);
     textGraphics.position.set(textPos.get([0]), textPos.get([1]));
@@ -240,7 +240,7 @@ export function createRenderGraphics<T extends keyof Graphics>(
 ): RenderGraphics<T> {
   return {
     draw,
-    redraw: ["path", "sector"].includes(draw),
+    redraw: ["path"].includes(draw),
     realTime: draw === "path",
     initialized: false,
     g: new PIXI.Graphics(),
