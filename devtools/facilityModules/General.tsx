@@ -45,6 +45,7 @@ const FacilityModuleGeneralEditor: React.FC<{ index: number }> = ({
             <SelectOption value="shipyard">Shipyard</SelectOption>
             <SelectOption value="teleport">Teleport</SelectOption>
             <SelectOption value="habitat">Habitat</SelectOption>
+            <SelectOption value="military">Military</SelectOption>
           </SelectOptions>
         </Select>
       </TableCell>
@@ -55,6 +56,26 @@ const FacilityModuleGeneralEditor: React.FC<{ index: number }> = ({
               valueAsNumber: true,
             })}
             defaultValue={facilityModule.storage}
+          />
+        )}
+      </TableCell>
+      <TableCell>
+        {facilityModule.type === "military" && (
+          <input
+            {...register(`facilityModules.${index}.damage.value`, {
+              valueAsNumber: true,
+            })}
+            defaultValue={facilityModule.damage?.value}
+          />
+        )}
+      </TableCell>
+      <TableCell>
+        {facilityModule.type === "military" && (
+          <input
+            {...register(`facilityModules.${index}.damage.range`, {
+              valueAsNumber: true,
+            })}
+            defaultValue={facilityModule.damage?.range}
           />
         )}
       </TableCell>
@@ -72,6 +93,8 @@ export const GeneralEditor: React.FC<{
       <col style={{ width: "250px" }} />
       <col style={{ width: "200px" }} />
       <col style={{ width: "150px" }} />
+      <col style={{ width: "100px" }} />
+      <col style={{ width: "100px" }} />
       <col />
     </colgroup>
     <thead>
@@ -81,6 +104,8 @@ export const GeneralEditor: React.FC<{
         <TableHeader>Slug</TableHeader>
         <TableHeader>Type</TableHeader>
         <TableHeader>Storage</TableHeader>
+        <TableHeader>Damage</TableHeader>
+        <TableHeader>Range</TableHeader>
       </tr>
     </thead>
     <tbody>

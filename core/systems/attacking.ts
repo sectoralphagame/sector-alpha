@@ -3,28 +3,31 @@ import { changeHp } from "@core/components/hitpoints";
 import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
 import { Cooldowns } from "@core/utils/cooldowns";
+import { findInAncestors } from "@core/utils/findInAncestors";
 import { distance } from "mathjs";
 import { regenCooldown } from "./hitpointsRegenerating";
 import { Query } from "./query";
 import { System } from "./system";
 
 export function isInDistance(
-  entity: RequireComponent<"damage" | "position">,
+  entity: RequireComponent<"damage">,
   target: RequireComponent<"position">
 ): boolean {
   return (
-    distance(entity.cp.position.coord, target.cp.position.coord) <=
-    entity.cp.damage.range
+    distance(
+      findInAncestors(entity, "position").cp.position.coord,
+      target.cp.position.coord
+    ) <= entity.cp.damage.range
   );
 }
 
 export class AttackingSystem extends System {
   cooldowns: Cooldowns<"exec">;
-  query: Query<"damage" | "position">;
+  query: Query<"damage">;
 
   constructor(sim: Sim) {
     super(sim);
-    this.query = new Query(sim, ["damage", "position"]);
+    this.query = new Query(sim, ["damage"]);
     this.cooldowns = new Cooldowns("exec");
   }
 
@@ -61,7 +64,7 @@ export class AttackingSystem extends System {
                 followOutsideSector: false,
                 ordersForSector: 0,
                 origin: "auto",
-                targetId: entity.id,
+                targetId: findInAncestors(entity, "position").id,
               });
             }
           }

@@ -198,5 +198,15 @@
     "time": 0,
     "build": { "cost": {}, "time": 0 },
     "storage": 1000
+  },
+  {
+    "name": "Small Defense Module",
+    "type": "military",
+    "pac": {},
+    "slug": "smallDefense",
+    "time": 0,
+    "build": { "cost": {}, "time": 0 },
+    "crew": "",
+    "damage": { "value": 2, "range": 3 }
   }
 ]

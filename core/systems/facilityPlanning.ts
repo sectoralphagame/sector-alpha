@@ -104,6 +104,13 @@ export class FacilityPlanningSystem extends System {
         );
         addFacilityModule(facility, facilityModule.create(this.sim, facility));
       }
+
+      if (Math.random() < 0.2) {
+        addFacilityModule(
+          facility,
+          facilityModules.smallDefense.create(this.sim, facility)
+        );
+      }
     });
   };
 
@@ -139,6 +146,12 @@ export class FacilityPlanningSystem extends System {
           facility,
           facilityModules.habitat.create(this.sim, facility)
         );
+        if (Math.random() < 0.2) {
+          addFacilityModule(
+            facility,
+            facilityModules.smallDefense.create(this.sim, facility)
+          );
+        }
       });
   };
 
@@ -231,6 +244,12 @@ export class FacilityPlanningSystem extends System {
         facilityModules.containerSmall.create(this.sim, facility)
       );
       addFacilityModule(facility, facilityModule.create(this.sim, facility));
+      if (Math.random() < 0.2) {
+        addFacilityModule(
+          facility,
+          facilityModules.smallDefense.create(this.sim, facility)
+        );
+      }
     }
 
     console.log(`Faction ${faction.cp.name.slug}`);

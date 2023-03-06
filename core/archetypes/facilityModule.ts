@@ -1,5 +1,6 @@
 import type { Commodity } from "@core/economy/commodity";
 import { fromEntries, pipe, map } from "@fxts/core";
+import type { Damage } from "@core/components/damage";
 import { Entity } from "../entity";
 import type { PAC } from "../components/production";
 import { createProduction } from "../components/production";
@@ -37,12 +38,17 @@ export interface HabitatFacilityModuleInput extends FacilityModuleCommonInput {
   crew: number;
   type: "habitat";
 }
+export interface MilitaryFacilityModuleInput extends FacilityModuleCommonInput {
+  damage: Omit<Damage, "name">;
+  type: "military";
+}
 export type FacilityModuleInput =
   | ProductionFacilityModuleInput
   | StorageFacilityModuleInput
   | ShipyardFacilityModuleInput
   | TeleportFacilityModuleInput
-  | HabitatFacilityModuleInput;
+  | HabitatFacilityModuleInput
+  | MilitaryFacilityModuleInput;
 
 export type FacilityModule = RequireComponent<"parent" | "name">;
 
@@ -61,7 +67,8 @@ export function createFacilityModule(
     .addComponent({
       name: "name",
       value: input.name,
-    });
+    })
+    .addTag("facilityModule");
   if (input.type === "production" || input.type === "habitat") {
     entity.addComponent(createProduction(input.time, input.pac));
   } else if (input.type === "storage") {
@@ -73,6 +80,12 @@ export function createFacilityModule(
     entity.addComponent({
       name: "teleport",
       destinationId: null,
+    });
+  } else if (input.type === "military") {
+    entity.addComponent({
+      ...input.damage,
+      name: "damage",
+      targetId: null,
     });
   }
 
