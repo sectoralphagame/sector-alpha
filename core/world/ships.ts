@@ -20,8 +20,14 @@ export interface ShipBuildInput {
 
 export interface ShipInput extends ShipDriveProps {
   build: ShipBuildInput;
-  damage: number;
-  range: number;
+  damage: {
+    value: number;
+    range: number;
+  };
+  hitpoints: {
+    hp: { value: number; regen: number };
+    shield: { value: number; regen: number };
+  };
   name: string;
   slug: string;
   storage: number;

@@ -15,7 +15,12 @@
       "cost": { "electronics": 15, "hullPlates": 400, "fuel": 200 },
       "time": 60
     },
-    "role": "transport"
+    "role": "transport",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 90, "regen": 0.2 },
+      "shield": { "value": 30, "regen": 1 }
+    }
   },
   {
     "name": "Courier B",
@@ -33,7 +38,12 @@
       "cost": { "hullPlates": 430, "electronics": 17, "fuel": 220 },
       "time": 60
     },
-    "role": "transport"
+    "role": "transport",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 90, "regen": 0.2 },
+      "shield": { "value": 30, "regen": 1 }
+    }
   },
   {
     "name": "Freighter A",
@@ -51,7 +61,12 @@
       "cost": { "hullPlates": 3400, "electronics": 85, "fuel": 1200 },
       "time": 60
     },
-    "role": "transport"
+    "role": "transport",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 780, "regen": 0.2 },
+      "shield": { "value": 90, "regen": 2 }
+    }
   },
   {
     "name": "Freighter B",
@@ -69,7 +84,12 @@
       "cost": { "fuel": 3500, "hullPlates": 95, "electronics": 1100 },
       "time": 60
     },
-    "role": "transport"
+    "role": "transport",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 780, "regen": 0.2 },
+      "shield": { "value": 90, "regen": 2 }
+    }
   },
   {
     "name": "Large Freighter A",
@@ -87,7 +107,12 @@
       "cost": { "hullPlates": 14000, "electronics": 590, "fuel": 7600 },
       "time": 60
     },
-    "role": "transport"
+    "role": "transport",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 3900, "regen": 0.2 },
+      "shield": { "value": 300, "regen": 4 }
+    }
   },
   {
     "name": "Large Freighter B",
@@ -105,7 +130,12 @@
       "cost": { "hullPlates": 16500, "electronics": 640, "fuel": 6900 },
       "time": 60
     },
-    "role": "transport"
+    "role": "transport",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 3900, "regen": 0.2 },
+      "shield": { "value": 300, "regen": 4 }
+    }
   },
   {
     "name": "Miner A",
@@ -123,7 +153,12 @@
       "cost": { "hullPlates": 3000, "electronics": 130, "fuel": 850 },
       "time": 60
     },
-    "role": "mining"
+    "role": "mining",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 780, "regen": 0.2 },
+      "shield": { "value": 90, "regen": 1 }
+    }
   },
   {
     "name": "Miner B",
@@ -141,7 +176,12 @@
       "cost": { "hullPlates": 3100, "electronics": 110, "fuel": 800 },
       "time": 60
     },
-    "role": "mining"
+    "role": "mining",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 780, "regen": 0.2 },
+      "shield": { "value": 90, "regen": 1 }
+    }
   },
   {
     "acceleration": 0.13,
@@ -159,7 +199,12 @@
     "size": "medium",
     "storage": 210,
     "texture": "mMin",
-    "slug": "minerTau"
+    "slug": "minerTau",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 780, "regen": 0.2 },
+      "shield": { "value": 90, "regen": 1 }
+    }
   },
   {
     "acceleration": 0.05,
@@ -182,7 +227,12 @@
     "size": "large",
     "storage": 100,
     "texture": "lBuilder",
-    "slug": "facilityStarter"
+    "slug": "facilityStarter",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 3900, "regen": 0.2 },
+      "shield": { "value": 300, "regen": 4 }
+    }
   },
   {
     "acceleration": 0.06,
@@ -205,7 +255,12 @@
     "size": "large",
     "storage": 0,
     "texture": "lStorage",
-    "slug": "facilityBuilder"
+    "slug": "facilityBuilder",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 3900, "regen": 0.2 },
+      "shield": { "value": 300, "regen": 4 }
+    }
   },
   {
     "acceleration": 0.2,
@@ -218,7 +273,7 @@
         "electronics": 50
       }
     },
-    "damage": 1.5,
+    "damage": { "value": 3, "range": 2.2 },
     "range": 2,
     "mining": 0,
     "role": "military",
@@ -230,7 +285,11 @@
     "size": "small",
     "storage": 10,
     "texture": "sMil",
-    "slug": "fighter"
+    "slug": "fighter",
+    "hitpoints": {
+      "hp": { "value": 110, "regen": 0.2 },
+      "shield": { "value": 35, "regen": 1 }
+    }
   },
   {
     "acceleration": 0.15,
@@ -243,7 +302,7 @@
         "hullPlates": 8900
       }
     },
-    "damage": 4,
+    "damage": { "value": 13, "range": 2.7 },
     "range": 2.7,
     "mining": 0,
     "role": "military",
@@ -255,6 +314,10 @@
     "size": "medium",
     "storage": 80,
     "texture": "mMil",
-    "slug": "gunboat"
+    "slug": "gunboat",
+    "hitpoints": {
+      "hp": { "value": 540, "regen": 0.2 },
+      "shield": { "value": 120, "regen": 2.1 }
+    }
   }
 ]

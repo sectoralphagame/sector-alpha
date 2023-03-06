@@ -87,8 +87,21 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
     .addComponent({
       name: "hitpoints",
       g: { hp: null!, shield: null! },
-      hp: { max: 100, regen: 1, value: 100 },
-      shield: { max: 100, regen: 3, value: 100 },
+      hp: {
+        max: initial.hitpoints.hp.value,
+        regen: initial.hitpoints.hp.regen,
+        value: initial.hitpoints.hp.value,
+      },
+      shield: {
+        max: initial.hitpoints.shield.value,
+        regen: initial.hitpoints.shield.regen,
+        value: initial.hitpoints.shield.value,
+      },
+    })
+    .addComponent({
+      ...initial.damage,
+      name: "damage",
+      targetId: null,
     })
     .addTag("selection")
     .addTag("ship")
@@ -113,15 +126,6 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       name: "deployable",
       type: "builder",
       cancel: false,
-    });
-  }
-
-  if (initial.damage && initial.range) {
-    entity.addComponent({
-      name: "damage",
-      range: initial.range,
-      targetId: null,
-      value: initial.range,
     });
   }
 

@@ -4,6 +4,7 @@ import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
 import { Cooldowns } from "@core/utils/cooldowns";
 import { distance } from "mathjs";
+import { regenCooldown } from "./hitpointsRegenerating";
 import { Query } from "./query";
 import { System } from "./system";
 
@@ -46,6 +47,7 @@ export class AttackingSystem extends System {
 
           if (isInDistance(entity, target)) {
             changeHp(target, entity.cp.damage.value);
+            target.cooldowns.use(regenCooldown, 3);
             if (target.cp.drive) {
               stopCruise(target.cp.drive);
             }
