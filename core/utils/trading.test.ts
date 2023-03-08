@@ -22,6 +22,7 @@ import type { Commodity } from "../economy/commodity";
 import type { RequireComponent } from "../tsHelpers";
 import type { WithTrade } from "../economy/utils";
 import { commodityPrices } from "./perCommodity";
+import { changeRelations } from "../components/relations";
 
 describe("Trading module", () => {
   let sim: Sim;
@@ -110,6 +111,11 @@ describe("Trading module", () => {
       active: true,
     };
     const shipFaction = createFaction("Ship faction", sim);
+    changeRelations(
+      shipFaction,
+      sim.getOrThrow<Faction>(facility.cp.owner.id),
+      0
+    );
     changeBudgetMoney(shipFaction.cp.budget, 0);
     const ship = createShip(sim, {
       ...shipClasses[0],
@@ -120,7 +126,7 @@ describe("Trading module", () => {
     ship.cp.storage.max = 1000;
     addStorage(ship.cp.storage, "water", 100, true);
 
-    allocate(facility, {
+    const result = allocate(facility, {
       budget: shipFaction.id,
       commodity: "water",
       initiator: ship.id,
@@ -130,6 +136,7 @@ describe("Trading module", () => {
       type: "sell",
     });
 
+    expect(result).not.toBeNull();
     expect(shipFaction.cp.budget.allocations).toHaveLength(0);
     expect(facility.cp.budget.allocations).toHaveLength(1);
     expect(facility.cp.budget.allocations[0].id).toBe(10);
@@ -151,6 +158,11 @@ describe("Trading module", () => {
     createOffers(waterFacility);
 
     const shipFaction = createFaction("Ship faction", sim);
+    changeRelations(
+      shipFaction,
+      sim.getOrThrow<Faction>(facility.cp.owner.id),
+      0
+    );
     changeBudgetMoney(shipFaction.cp.budget, 1000);
     const ship = createShip(sim, {
       ...shipClasses[0],
@@ -271,7 +283,7 @@ describe("Trade flow", () => {
   beforeAll(() => {
     sim = new Sim();
     const player = createFaction("Player", sim);
-    player.addComponent({ name: "player" });
+    player.addTag("player");
     // Run path planning
     sim.systems[0].exec(0);
   });
@@ -300,6 +312,12 @@ describe("Trade flow", () => {
     waterFacility.cp.trade.offers.water.price = 90;
 
     const shipFaction = createFaction("Ship faction", sim);
+    changeRelations(shipFaction, sim.getOrThrow<Faction>(farm.cp.owner.id), 0);
+    changeRelations(
+      shipFaction,
+      sim.getOrThrow<Faction>(waterFacility.cp.owner.id),
+      0
+    );
     changeBudgetMoney(shipFaction.cp.budget, 1000000);
     const prevShipFactionBudget = shipFaction.cp.budget.available;
     const ship = createShip(sim, {
