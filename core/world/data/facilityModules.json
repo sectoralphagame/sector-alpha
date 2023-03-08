@@ -157,10 +157,9 @@
     "type": "production",
     "pac": {
       "electronics": { "consumes": 0, "produces": 600 },
-      "food": { "consumes": 600, "produces": 0 },
-      "silicon": { "consumes": 2000, "produces": 0 },
+      "silicon": { "consumes": 1800, "produces": 0 },
       "fuel": { "consumes": 600, "produces": 0 },
-      "gold": { "consumes": 1200, "produces": 0 }
+      "gold": { "consumes": 120, "produces": 0 }
     },
     "slug": "electronicsFactory",
     "time": 420,
@@ -170,8 +169,8 @@
     "name": "Drone Factory",
     "type": "production",
     "pac": {
-      "hullPlates": { "consumes": 96, "produces": 0 },
-      "electronics": { "consumes": 82, "produces": 0 },
+      "hullPlates": { "consumes": 240, "produces": 0 },
+      "electronics": { "consumes": 140, "produces": 0 },
       "drones": { "consumes": 0, "produces": 50 }
     },
     "slug": "droneFactory",

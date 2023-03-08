@@ -3,7 +3,7 @@ import shuffle from "lodash/shuffle";
 import type { Matrix } from "mathjs";
 import { add, matrix, random } from "mathjs";
 import type { Facility } from "../archetypes/facility";
-import { createFacility } from "../archetypes/facility";
+import { createFacilityName, createFacility } from "../archetypes/facility";
 import { facilityModules } from "../archetypes/facilityModule";
 import type { Faction } from "../archetypes/faction";
 import type { Sector } from "../archetypes/sector";
@@ -89,6 +89,7 @@ export class FacilityPlanningSystem extends System {
         ) as Matrix,
         sector,
       });
+      facility.cp.name.value = createFacilityName(facility, "Mining Complex");
       facility.addComponent(createCompoundProduction());
 
       for (
@@ -136,6 +137,7 @@ export class FacilityPlanningSystem extends System {
           sector,
         });
         setTexture(facility.cp.render, "fCiv");
+        facility.cp.name.value = createFacilityName(facility, "Habitat");
         facility.addComponent(createCompoundProduction());
 
         addFacilityModule(
@@ -234,6 +236,7 @@ export class FacilityPlanningSystem extends System {
           ) as Matrix,
           sector,
         });
+        facility.cp.name.value = createFacilityName(facility, "Factory");
         facility.addComponent(createCompoundProduction());
       }
 

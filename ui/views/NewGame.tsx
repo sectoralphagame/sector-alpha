@@ -5,6 +5,7 @@ import { getFixedWorld as world } from "@core/world";
 import { Slider } from "@kit/Slider";
 import { Button } from "@kit/Button";
 import Text from "@kit/Text";
+import settings from "@core/settings";
 import { useLocation } from "../context/Location";
 import styles from "./NewGame.scss";
 import { View } from "../components/View";
@@ -16,8 +17,6 @@ interface NewGameForm {
   factions: number;
   islands: number;
 }
-
-const targetTime = 3600 / 20;
 
 export const NewGame: React.FC = () => {
   const { register, handleSubmit, control } = useForm<NewGameForm>({
@@ -34,7 +33,7 @@ export const NewGame: React.FC = () => {
     (worker) => {
       worker.onmessage = (event: MessageEvent<HeadlessSimMsg>) => {
         if (event.data.type === "update") {
-          setProgress(event.data.time / targetTime);
+          setProgress(event.data.time / settings.bootTime);
         }
         if (event.data.type === "completed") {
           sim.current?.destroy();
@@ -56,7 +55,7 @@ export const NewGame: React.FC = () => {
     headlessSimWorker.current?.postMessage({
       type: "init",
       delta: 1,
-      targetTime,
+      targetTime: settings.bootTime,
       sim: sim.current!.serialize(),
     });
   });

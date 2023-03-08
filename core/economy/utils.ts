@@ -269,7 +269,7 @@ export function getCommodityCost(
     map((fm) =>
       pipe(
         Object.entries(fm.pac),
-        filter(([_, pac]) => pac.consumes),
+        filter(([_, pac]) => pac?.consumes),
         map(
           ([consumedCommodity, { consumes }]) =>
             (getCommodityCost(

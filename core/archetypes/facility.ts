@@ -39,6 +39,20 @@ export interface InitialFacilityInput {
   sector: Sector;
 }
 
+export function createFacilityName(
+  entity: RequireComponent<"position">,
+  label: string
+) {
+  const owner = entity.cp.owner?.id
+    ? entity.sim.getOrThrow<Faction>(entity.cp.owner.id)
+    : null;
+  const sector = entity.sim.getOrThrow<Sector>(entity.cp.position.sector);
+
+  return owner
+    ? [owner.cp.name.slug, sector.cp.name.value, label].join(" ")
+    : [sector.cp.name.value, label].join(" ");
+}
+
 export function createFacility(sim: Sim, initial: InitialFacilityInput) {
   const entity = new Entity(sim);
 
@@ -49,12 +63,6 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     .addComponent({
       name: "modules",
       ids: [],
-    })
-    .addComponent({
-      name: "name",
-      value: initial.owner?.cp.name.slug
-        ? `${initial.owner.cp.name.slug} Facility #${entity.id}`
-        : `Facility #${entity.id}`,
     })
     .addComponent({
       name: "position",
@@ -80,6 +88,13 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
       name: "hitpoints",
       g: { hp: null!, shield: null! },
       hp: { max: 100000, regen: 0, value: 100000 },
+    })
+    .addComponent({
+      name: "name",
+      value: createFacilityName(
+        entity.requireComponents(["position"]),
+        "Facility"
+      ),
     })
     .addTag("selection")
     .addTag("facility");

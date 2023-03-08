@@ -88,7 +88,7 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
         <TableCell>
           {formatInt(
             Object.entries(facilityModule.pac)
-              .filter(([_, pac]) => pac.produces)
+              .filter(([_, pac]) => pac?.produces)
               .reduce(
                 (acc, [commodity]) =>
                   acc + getCommodityCost(commodity as Commodity, allModules),
@@ -99,7 +99,7 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
         <TableCell>
           {formatInt(
             Object.entries(facilityModule.pac)
-              .filter(([_, pac]) => pac.produces)
+              .filter(([_, pac]) => pac?.produces)
               .reduce(
                 (acc, [commodity]) =>
                   acc +
@@ -111,7 +111,7 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
         <TableCell>
           {formatInt(
             Object.entries(facilityModule.pac)
-              .filter(([_, pac]) => pac.produces)
+              .filter(([_, pac]) => pac?.produces)
               .reduce(
                 (acc, [commodity]) =>
                   acc +

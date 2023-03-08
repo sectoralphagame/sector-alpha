@@ -34,7 +34,12 @@ export class SpottingSystem extends System {
       )
         return;
 
-      if (!entity.cp.owner) return;
+      if (
+        !entity.cp.owner ||
+        (entity.cp.orders.value[0].type === "patrol" &&
+          entity.cp.position.sector !== entity.cp.orders.value[0].sectorId)
+      )
+        return;
       const entityOwner = this.sim.getOrThrow<Faction>(entity.cp.owner.id);
 
       const cacheKey = [entity.cp.owner!.id, entity.cp.position.sector].join(

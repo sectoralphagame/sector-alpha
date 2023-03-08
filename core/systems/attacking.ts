@@ -1,5 +1,6 @@
 import { stopCruise } from "@core/components/drive";
 import { changeHp } from "@core/components/hitpoints";
+import settings from "@core/settings";
 import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
 import { Cooldowns } from "@core/utils/cooldowns";
@@ -32,6 +33,7 @@ export class AttackingSystem extends System {
   }
 
   exec = (delta: number): void => {
+    if (this.sim.getTime() < settings.bootTime) return;
     this.cooldowns.update(delta);
 
     if (this.cooldowns.canUse("exec")) {
