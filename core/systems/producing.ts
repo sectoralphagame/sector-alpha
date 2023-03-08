@@ -47,6 +47,8 @@ export function isAbleToProduce(
   storage: CommodityStorage
   // eslint-disable-next-line no-unused-vars
 ): boolean {
+  if (!facilityModule.cooldowns.canUse("production")) return false;
+
   const multiplier = facilityModule.cp.production.time / 3600;
   return every(
     (commodity) =>
@@ -85,7 +87,8 @@ export class ProducingSystem extends System {
     });
 
     this.sim.queries.productionByModules.get().forEach((facilityModule) => {
-      const storage = findInAncestors(facilityModule, "storage").cp.storage;
+      const facility = findInAncestors(facilityModule, "storage");
+      const storage = facility.cp.storage;
       if (!isAbleToProduce(facilityModule, storage)) {
         return;
       }

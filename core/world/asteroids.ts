@@ -24,10 +24,10 @@ const getSize = () => {
 
 const densities: Record<MineableCommodity, [number, number]> = {
   fuelium: [100, 600],
-  goldOre: [25, 125],
-  ore: [125, 1100],
-  ice: [25, 300],
-  silica: [50, 300],
+  goldOre: [250, 550],
+  ore: [250, 780],
+  ice: [80, 300],
+  silica: [120, 300],
 };
 const resourcesPerAsteroid: Record<MineableCommodity, [number, number]> = {
   fuelium: [200, 400],

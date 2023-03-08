@@ -2,6 +2,7 @@ import { groupBy } from "lodash";
 import { sum } from "mathjs";
 import type { Sector } from "../archetypes/sector";
 import type { Commodity } from "../economy/commodity";
+import { getSectorsInTeleportRange } from "../economy/utils";
 import type { RequireComponent } from "../tsHelpers";
 import { perCommodity } from "./perCommodity";
 
@@ -14,11 +15,21 @@ export interface SectorResources {
  * Get current mineable resources in sector
  */
 export function getSectorResources(
-  sector: Sector
+  sector: Sector,
+  neighbourhood: number
 ): Record<Commodity, SectorResources> {
+  const neighbors = getSectorsInTeleportRange(
+    sector,
+    neighbourhood,
+    sector.sim
+  ).filter((e) => e.cp.owner?.id !== sector.cp.owner?.id);
   const fields = sector.sim.queries.asteroidFields
     .get()
-    .filter((field) => field.cp.position.sector === sector.id);
+    .filter((field) =>
+      [sector.id, ...neighbors.map((e) => e.id)].includes(
+        field.cp.position.sector
+      )
+    );
   const fieldsByType = groupBy(fields, (field) => field.cp.asteroidSpawn.type);
 
   return perCommodity((commodity) => ({

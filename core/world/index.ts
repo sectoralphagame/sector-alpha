@@ -114,9 +114,16 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       );
     });
 
-    for (let i = 0; i < sectors.length * 2; i++) {
-      getRandomAsteroidField(sim);
-    }
+    mapData.sectors.forEach((sector) =>
+      Object.entries(sector.resources).forEach(([mineable, size]) =>
+        spawnAsteroidField(
+          sim,
+          mineable as MineableCommodity,
+          size,
+          getSector(sector.id)
+        )
+      )
+    );
 
     mapData.factions.forEach((factionData) => {
       const faction = createFaction(factionData.name, sim);
@@ -125,8 +132,8 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       faction.addComponent({
         name: "ai",
         type: factionData.type as AiType,
-        stockpiling: random(0.6, 1.2),
-        priceModifier: random(0.002, 0.02),
+        stockpiling: random(0.8, 1.2),
+        priceModifier: random(0.01, 0.03),
         patrols: factionData.patrols!,
       });
       faction.cp.color.value = factionData.color;
@@ -203,24 +210,6 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       sector: startingSector,
     });
     storageShip.cp.autoOrder!.default = "hold";
-
-    sim.queries.ai.get().forEach((faction) =>
-      ["ice", "fuelium"].forEach((commodity: MineableCommodity) => {
-        const ownedSectors = sectors.filter(
-          (sector) => sector.cp.owner?.id === faction.id
-        );
-
-        spawnAsteroidField(
-          sim,
-          commodity,
-          random(
-            7 + Math.sqrt(ownedSectors.length),
-            9 + Math.sqrt(ownedSectors.length)
-          ),
-          pickRandom(ownedSectors)
-        );
-      })
-    );
 
     resolve();
   });

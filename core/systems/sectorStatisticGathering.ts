@@ -14,7 +14,7 @@ export class SectorStatisticGatheringSystem extends System {
         this.sim.getTime();
 
       this.sim.queries.sectors.get().forEach((sector) => {
-        const resources = getSectorResources(sector);
+        const resources = getSectorResources(sector, 0);
 
         mapValues(sector.cp.sectorStats.availableResources, (v, commodity) =>
           v.push(resources[commodity].available)

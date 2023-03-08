@@ -1,37 +1,389 @@
 {
   "sectors": [
-    { "name": "Terra", "position": [0, 0], "id": "terra" },
-    { "name": "Luna", "position": [1, -1], "id": "luna" },
-    { "name": "Mars", "position": [1, -2], "id": "mars" },
-    { "name": "Saturn", "position": [2, -3], "id": "saturn" },
-    { "name": "Sedna", "position": [2, -4], "id": "sedna" },
-    { "name": "Gaia", "position": [-1, -1], "id": "gaia" },
-    { "name": "Arges", "position": [-2, 0], "id": "arges" },
-    { "name": "Pontus", "position": [-2, -1], "id": "pontus" },
-    { "name": "Sector Alpha", "position": [0, -3], "id": "sector-alpha" },
-    { "name": "Eris", "position": [-1, 2], "id": "eris" },
-    { "name": "Discordis c", "position": [0, 2], "id": "discordis-c" },
-    { "name": "Juno II", "position": [2, 0], "id": "juno-2" },
-    { "name": "Juno III", "position": [3, 0], "id": "juno-3" },
-    { "name": "Juno IV", "position": [2, 1], "id": "juno-4" },
-    { "name": "Therr", "position": [-1, 4], "id": "gj-229-1" },
-    { "name": "GJ 229 II", "position": [-1, 5], "id": "gj-229-2" },
-    { "name": "Teegarden's Star I", "position": [5, 0], "id": "teegarden-1" },
-    { "name": "Teegarden's Star II", "position": [5, -1], "id": "teegarden-2" },
-    { "name": "Tau Ceti e", "position": [4, -2], "id": "tau-ceti-e" },
-    { "name": "Tau Ceti f", "position": [3, -2], "id": "tau-ceti-f" },
-    { "name": "The Hive", "position": [4, -3], "id": "the-hive" },
-    { "name": "GJ 1002 I", "position": [6, -3], "id": "gj-1002-1" },
-    { "name": "GJ 1002 II", "position": [6, -4], "id": "gj-1002-2" },
-    { "name": "GJ 1002 III", "position": [6, -5], "id": "gj-1002-3" },
-    { "name": "Ross 128 I", "position": [-3, 2], "id": "ross-128-1" },
-    { "name": "Ross 128 II", "position": [-4, 2], "id": "ross-128-2" },
-    { "name": "Ross 128 III", "position": [-4, 3], "id": "ross-128-3" },
-    { "name": "Ross 128 IV", "position": [-4, 1], "id": "ross-128-4" },
-    { "name": "Wolf 1061 I", "position": [-4, -1], "id": "wolf-1061-1" },
-    { "name": "Wolf 1061 II", "position": [-3, -2], "id": "wolf-1061-2" },
-    { "name": "Wolf 1061 III", "position": [-2, -3], "id": "wolf-1061-3" },
-    { "name": "GJ 625", "position": [-5, -2], "id": "gj-625" }
+    {
+      "name": "Terra",
+      "position": [0, 0],
+      "id": "terra",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 6,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Luna",
+      "position": [1, -1],
+      "id": "luna",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 7,
+        "ice": 17,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Mars",
+      "position": [1, -2],
+      "id": "mars",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 15,
+        "silica": 13
+      }
+    },
+    {
+      "name": "Saturn",
+      "position": [2, -3],
+      "id": "saturn",
+      "resources": {
+        "fuelium": 10,
+        "goldOre": 5,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Sedna",
+      "position": [2, -4],
+      "id": "sedna",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 20,
+        "silica": 13
+      }
+    },
+    {
+      "name": "Gaia",
+      "position": [-1, -1],
+      "id": "gaia",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 8,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Arges",
+      "position": [-2, 0],
+      "id": "arges",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 10,
+        "silica": 10
+      }
+    },
+    {
+      "name": "Pontus",
+      "position": [-2, -1],
+      "id": "pontus",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 10,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Sector Alpha",
+      "position": [0, -3],
+      "id": "sector-alpha",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 5,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Eris",
+      "position": [-1, 2],
+      "id": "eris",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Discordis c",
+      "position": [0, 2],
+      "id": "discordis-c",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 10,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Juno II",
+      "position": [2, 0],
+      "id": "juno-2",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Juno III",
+      "position": [3, 0],
+      "id": "juno-3",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 8,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Juno IV",
+      "position": [2, 1],
+      "id": "juno-4",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 16,
+        "silica": 12
+      }
+    },
+    {
+      "name": "Therr",
+      "position": [-1, 4],
+      "id": "gj-229-1",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "GJ 229 II",
+      "position": [-1, 5],
+      "id": "gj-229-2",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Teegarden's Star I",
+      "position": [5, 0],
+      "id": "teegarden-1",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Teegarden's Star II",
+      "position": [5, -1],
+      "id": "teegarden-2",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 12,
+        "silica": 5
+      }
+    },
+    {
+      "name": "Tau Ceti e",
+      "position": [4, -2],
+      "id": "tau-ceti-e",
+      "resources": {
+        "fuelium": 12,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 14,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Tau Ceti f",
+      "position": [3, -2],
+      "id": "tau-ceti-f",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 8,
+        "ice": 8,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "The Hive",
+      "position": [4, -3],
+      "id": "the-hive",
+      "resources": {
+        "fuelium": 10,
+        "goldOre": 4,
+        "ice": 4,
+        "ore": 12,
+        "silica": 8
+      }
+    },
+    {
+      "name": "GJ 1002 I",
+      "position": [6, -3],
+      "id": "gj-1002-1",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "GJ 1002 II",
+      "position": [6, -4],
+      "id": "gj-1002-2",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "GJ 1002 III",
+      "position": [6, -5],
+      "id": "gj-1002-3",
+      "resources": {
+        "fuelium": 13,
+        "goldOre": 14,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Ross 128 I",
+      "position": [-3, 2],
+      "id": "ross-128-1",
+      "resources": {
+        "fuelium": 10,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Ross 128 II",
+      "position": [-4, 2],
+      "id": "ross-128-2",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Ross 128 III",
+      "position": [-4, 3],
+      "id": "ross-128-3",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 10,
+        "ore": 14,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Ross 128 IV",
+      "position": [-4, 1],
+      "id": "ross-128-4",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Wolf 1061 I",
+      "position": [-4, -1],
+      "id": "wolf-1061-1",
+      "resources": {
+        "fuelium": 12,
+        "goldOre": 3,
+        "ice": 0,
+        "ore": 0,
+        "silica": 7
+      }
+    },
+    {
+      "name": "Wolf 1061 II",
+      "position": [-3, -2],
+      "id": "wolf-1061-2",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 4,
+        "ore": 0,
+        "silica": 0
+      }
+    },
+    {
+      "name": "Wolf 1061 III",
+      "position": [-2, -3],
+      "id": "wolf-1061-3",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 4,
+        "ore": 9,
+        "silica": 6
+      }
+    },
+    {
+      "name": "GJ 625",
+      "position": [-5, -2],
+      "id": "gj-625",
+      "resources": {
+        "fuelium": 0,
+        "goldOre": 0,
+        "ice": 0,
+        "ore": 0,
+        "silica": 0
+      }
+    }
   ],
   "inactive": [],
   "links": [
@@ -85,12 +437,7 @@
       ],
       "color": "#6fc9f2",
       "type": "territorial",
-      "patrols": {
-        "formation": {
-          "fighters": 3
-        },
-        "perSector": 4
-      }
+      "patrols": { "formation": { "fighters": 3 }, "perSector": 4 }
     },
     {
       "name": "Alpha Centauri's Technocracy",
@@ -113,12 +460,7 @@
       ],
       "color": "#ffc34d",
       "type": "territorial",
-      "patrols": {
-        "formation": {
-          "fighters": 2
-        },
-        "perSector": 6
-      }
+      "patrols": { "formation": { "fighters": 2 }, "perSector": 6 }
     },
     {
       "name": "Tau",
@@ -127,12 +469,7 @@
       "blueprints": ["courierB", "freighterA", "largeFreighterB", "minerTau"],
       "color": "#9534eb",
       "type": "territorial",
-      "patrols": {
-        "formation": {
-          "fighters": 2
-        },
-        "perSector": 4
-      }
+      "patrols": { "formation": { "fighters": 2 }, "perSector": 4 }
     },
     {
       "name": "Federation of Free Worlds",
@@ -157,12 +494,7 @@
       ],
       "color": "#42f5e3",
       "type": "territorial",
-      "patrols": {
-        "formation": {
-          "fighters": 3
-        },
-        "perSector": 2
-      }
+      "patrols": { "formation": { "fighters": 3 }, "perSector": 2 }
     },
     {
       "name": "Alkali Mining Sindicate",
@@ -178,12 +510,7 @@
       ],
       "color": "#ff63e5",
       "type": "territorial",
-      "patrols": {
-        "formation": {
-          "fighters": 2
-        },
-        "perSector": 3
-      }
+      "patrols": { "formation": { "fighters": 2 }, "perSector": 3 }
     },
     {
       "name": "Pirates",
@@ -199,12 +526,7 @@
       ],
       "color": "#fcc7c5",
       "type": "pirate",
-      "patrols": {
-        "formation": {
-          "fighters": 2
-        },
-        "perSector": 6
-      }
+      "patrols": { "formation": { "fighters": 2 }, "perSector": 6 }
     },
     {
       "name": "Therr Traders",
@@ -220,12 +542,7 @@
       ],
       "color": "#f7fc5b",
       "type": "travelling",
-      "patrols": {
-        "formation": {
-          "fighters": 2
-        },
-        "perSector": 3
-      }
+      "patrols": { "formation": { "fighters": 2 }, "perSector": 3 }
     },
     {
       "name": "Player Faction",

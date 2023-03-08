@@ -51,7 +51,7 @@ export class FacilityPlanningSystem extends System {
   }
 
   planMiningFacilities = (sector: Sector, faction: Faction): void => {
-    const resources = getSectorResources(sector);
+    const resources = getSectorResources(sector, 1);
     const facilities = this.sim.queries.facilityWithProduction
       .get()
       .filter(

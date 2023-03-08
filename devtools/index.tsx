@@ -7,6 +7,7 @@ import { UniverseMap } from "./map";
 import styles from "./index.scss";
 import { FacilityModules } from "./facilityModules";
 import { Factions } from "./factions";
+import { Sectors } from "./Sectors";
 
 const DevToolsCard: React.FC<{
   link: string;
@@ -44,6 +45,11 @@ const DevToolsIndex: React.FC = () => (
         description="Manage factions and relations between them"
         link="/dev/factions"
       />
+      <DevToolsCard
+        name="Sectors"
+        description="Assign resources and owners to sectors"
+        link="/dev/sectors"
+      />
     </div>
   </div>
 );
@@ -55,6 +61,7 @@ export const DevTools: React.FC = () => (
       <Route path="map" element={<UniverseMap />} />
       <Route path="facility-modules" element={<FacilityModules />} />
       <Route path="factions" element={<Factions />} />
+      <Route path="sectors" element={<Sectors />} />
       <Route path="/" element={<DevToolsIndex />} />
     </Routes>
   </div>
