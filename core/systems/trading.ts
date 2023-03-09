@@ -283,14 +283,17 @@ export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
   const production = entityWithProduction.cp.compoundProduction;
 
   if (
-    production.pac[commodity].consumes === production.pac[commodity].produces &&
+    production.pac[commodity].produces === 0 &&
     production.pac[commodity].consumes === 0
   ) {
     return entity.cp.storage.availableWares[commodity];
   }
 
   if (getProductionSurplus(entityWithProduction, commodity) > 0) {
-    return stored[commodity] - production.pac[commodity].consumes * 2;
+    return Math.max(
+      stored[commodity] - production.pac[commodity].consumes * 2,
+      0
+    );
   }
 
   return stored[commodity] > quota ? 0 : Math.floor(stored[commodity] - quota);

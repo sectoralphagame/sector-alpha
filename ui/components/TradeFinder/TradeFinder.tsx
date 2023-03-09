@@ -48,7 +48,8 @@ export const TradeFinder: React.FC = () => {
             .get()
             .filter((entity) =>
               selectedCommodity
-                ? entity.cp.trade.offers[selectedCommodity].active
+                ? entity.cp.trade.offers[selectedCommodity].active &&
+                  entity.cp.trade.offers[selectedCommodity].quantity > 0
                 : true
             ),
           `components.trade.offers.${selectedCommodity}.price`
