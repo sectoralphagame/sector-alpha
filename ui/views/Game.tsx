@@ -10,6 +10,11 @@ import { useRerender } from "@ui/hooks/useRerender";
 import type { Commodity } from "@core/economy/commodity";
 import { addStorage } from "@core/components/storage";
 import { changeBudgetMoney } from "@core/components/budget";
+import { MapPanel } from "@ui/components/MapPanel";
+import {
+  MapPanelButton,
+  MapPanelTabContent,
+} from "@ui/components/MapPanel/MapPanelButton";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -146,7 +151,11 @@ export const Game: React.FC = () => {
       system creates own canvas here */}
       <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
         <PlayerMoney />
-        <MapView />
+        <MapPanel tabs={<MapPanelButton>Legend</MapPanelButton>}>
+          <MapPanelTabContent>
+            <MapView />
+          </MapPanelTabContent>
+        </MapPanel>
       </div>
     </div>
   );

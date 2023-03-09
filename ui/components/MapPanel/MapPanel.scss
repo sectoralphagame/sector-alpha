@@ -1,0 +1,39 @@
+.root {
+  display: flex;
+  top: var(--spacing-2);
+  position: absolute;
+  right: -1px;
+  margin: auto;
+  text-align: left;
+  width: fit-content;
+  background: var(--palette-background);
+  border: 1px solid var(--palette-default);
+  border-bottom-left-radius: 8px;
+  line-height: 1;
+  overflow: hidden;
+
+  .tabs {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .content {
+    background-color: var(--palette-background-active);
+    padding: var(--spacing-1);
+  }
+}
+
+.btn {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  color: var(--palette-default);
+  outline: none;
+  padding: var(--spacing-1);
+  background-color: var(--palette-background);
+
+  &Active,
+  &:hover {
+    background-color: var(--palette-background-active);
+  }
+}
