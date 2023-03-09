@@ -40,7 +40,7 @@ export function createTheme(scale: number): Theme {
     ) as Record<(typeof spacings)[number], string>,
     palette: {
       background: "#000000",
-      "background-active": "#1d1d1d",
+      "background-active": "#171717",
       default: "#FFFFFF",
       text: fromPairs(
         texts.map((v) => [v, Color.hsl(0, 0, 100 - (v - 1) * 20).hex()])

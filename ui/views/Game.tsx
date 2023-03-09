@@ -15,6 +15,7 @@ import {
   MapPanelButton,
   MapPanelTabContent,
 } from "@ui/components/MapPanel/MapPanelButton";
+import { TradeFinder } from "@ui/components/TradeFinder";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -151,7 +152,17 @@ export const Game: React.FC = () => {
       system creates own canvas here */}
       <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
         <PlayerMoney />
-        <MapPanel tabs={<MapPanelButton>Legend</MapPanelButton>}>
+        <MapPanel
+          tabs={
+            <>
+              <MapPanelButton>Trade</MapPanelButton>
+              <MapPanelButton>Legend</MapPanelButton>
+            </>
+          }
+        >
+          <MapPanelTabContent>
+            <TradeFinder />
+          </MapPanelTabContent>
           <MapPanelTabContent>
             <MapView />
           </MapPanelTabContent>
