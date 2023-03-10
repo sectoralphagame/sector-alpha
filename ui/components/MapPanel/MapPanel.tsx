@@ -3,11 +3,16 @@ import React from "react";
 import styles from "./MapPanel.scss";
 
 export interface MapPanelProps {
+  initialExpanded?: boolean;
   tabs: React.ReactNode;
 }
 
-export const MapPanel: React.FC<MapPanelProps> = ({ tabs, children }) => {
-  const [expanded, setExpanded] = React.useState(false);
+export const MapPanel: React.FC<MapPanelProps> = ({
+  initialExpanded,
+  tabs,
+  children,
+}) => {
+  const [expanded, setExpanded] = React.useState(initialExpanded);
 
   return (
     <Tab.Group vertical>

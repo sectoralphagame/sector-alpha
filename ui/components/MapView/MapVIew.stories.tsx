@@ -5,6 +5,7 @@ import { PureEntity } from "@core/entity";
 import type { MapViewComponentProps } from "./MapViewComponent";
 import { MapViewComponent } from "./MapViewComponent";
 import { MapPanel } from "../MapPanel";
+import { MapPanelButton, MapPanelTabContent } from "../MapPanel/MapPanelButton";
 
 export default {
   title: "Map Panel / Legend",
@@ -17,8 +18,10 @@ export default {
 const Template: StoryFn<typeof MapViewComponent> = (args) => (
   <div id="root">
     <Styles>
-      <MapPanel tabs={null}>
-        <MapViewComponent {...args} />
+      <MapPanel initialExpanded tabs={<MapPanelButton>Legend</MapPanelButton>}>
+        <MapPanelTabContent>
+          <MapViewComponent {...args} />
+        </MapPanelTabContent>
       </MapPanel>
     </Styles>
   </div>
