@@ -61,12 +61,18 @@ export interface TradeWithMostProfit {
  * profitable trade
  */
 export function getTradeWithMostProfit(
-  from: Marker,
+  from: Marker | Sector,
   sectorDistance: number,
   notAllowedFactions: number[]
 ): TradeWithMostProfit | null {
   const facilitiesInRange = getSectorsInTeleportRange(
-    asSector(from.sim.getOrThrow(from.cp.position.sector)!),
+    asSector(
+      from.cp.hecsPosition
+        ? from
+        : from.sim.getOrThrow(
+            from.requireComponents(["position"]).cp.position.sector
+          )!
+    ),
     sectorDistance,
     from.sim
   ).flatMap((sector) =>

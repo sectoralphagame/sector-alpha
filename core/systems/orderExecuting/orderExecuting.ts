@@ -131,7 +131,7 @@ function cleanupChildren(entity: Entity): void {
     if (ship.cp.commander.id === entity.id) {
       ship.removeComponent("commander");
       ship.cp.orders.value = [];
-      ship.cp.autoOrder.default = "hold";
+      ship.cp.autoOrder.default = { type: "hold" };
     }
   });
 

@@ -11,7 +11,7 @@ import type { Sector } from "./sector";
 import { createDocks } from "../components/dockable";
 import type { Faction } from "./faction";
 
-export const commanderRange = 4;
+export const commanderRange = 2;
 
 export const facilityComponents = [
   "budget",

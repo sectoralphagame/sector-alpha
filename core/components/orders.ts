@@ -65,6 +65,10 @@ export interface BaseOrder {
   interrupt?: boolean;
 }
 
+export interface HoldOrder extends BaseOrder {
+  type: "hold";
+}
+
 export interface AttackOrder extends BaseOrder {
   type: "attack";
   targetId: number;
@@ -92,21 +96,26 @@ export interface EscortOrder extends BaseOrder {
   ordersForSector: number;
 }
 
+export interface MineOrder extends BaseOrder {
+  type: "mine";
+  sectorId?: number;
+}
+
+export interface TradeOrder extends BaseOrder {
+  type: "trade";
+  sectorId?: number;
+}
+
 export type Order =
   | ({
-      type:
-        | "mine"
-        | "trade"
-        | "hold"
-        | "move"
-        | "dock"
-        | "deployFacility"
-        | "deployBuilder";
+      type: "hold" | "move" | "dock" | "deployFacility" | "deployBuilder";
     } & BaseOrder)
   | AttackOrder
   | FollowOrder
   | PatrolOrder
-  | EscortOrder;
+  | EscortOrder
+  | MineOrder
+  | TradeOrder;
 
 export function tradeAction(action: Omit<TradeAction, "type">): TradeAction {
   if (action.offer.quantity <= 0) {

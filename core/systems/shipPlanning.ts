@@ -436,7 +436,10 @@ export class ShipPlanningSystem extends System {
                 },
               ];
               if (ship.cp.autoOrder) {
-                ship.cp.autoOrder.default = "escort";
+                ship.cp.autoOrder.default = {
+                  type: "escort",
+                  targetId: commander.id,
+                };
               }
               ship.addComponent({ name: "commander", id: commander.id });
             }

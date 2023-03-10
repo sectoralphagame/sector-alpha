@@ -46,10 +46,10 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       name: "autoOrder",
       default:
         initial.role === "mining"
-          ? "mine"
+          ? { type: "mine", sectorId: initial.sector.id }
           : initial.role === "transport"
-          ? "trade"
-          : "hold",
+          ? { type: "trade", sectorId: initial.sector.id }
+          : { type: "hold" },
     })
     .addComponent(
       createDrive(

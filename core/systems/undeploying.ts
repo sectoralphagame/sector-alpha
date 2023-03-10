@@ -27,7 +27,7 @@ const handlers: Partial<
     builder
       .addComponent({
         name: "autoOrder",
-        default: "hold",
+        default: { type: "hold" },
       })
       .addComponent({ name: "orders", value: [] })
       .removeComponent("budget")

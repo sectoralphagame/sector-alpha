@@ -101,7 +101,7 @@ export function createQueries(sim: Sim) {
   return {
     ai: new Query(sim, [...factionComponents, "ai"]),
     asteroidFields: new Query(sim, asteroidFieldComponents),
-    autoOrderable: new Query(sim, ["autoOrder", "orders"]),
+    autoOrderable: new Query(sim, ["autoOrder", "orders", "position"]),
     budget: new Query(sim, ["budget"]),
     builders: new Query(sim, ["builder", "storage", "trade", "docks"]),
     children: new Query(sim, ["parent"]),

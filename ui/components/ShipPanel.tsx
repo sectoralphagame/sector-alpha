@@ -39,7 +39,9 @@ const ShipPanel: React.FC<{ entity: Ship }> = ({ entity: ship }) => {
       <hr />
       {ship.hasComponents(["autoOrder"]) && (
         <>
-          <AutoOrder entity={ship.requireComponents(["autoOrder"])} />
+          <AutoOrder
+            entity={ship.requireComponents(["autoOrder", "position"])}
+          />
           <hr />
         </>
       )}

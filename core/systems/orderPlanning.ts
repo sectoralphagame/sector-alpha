@@ -8,8 +8,10 @@ import { asteroidField } from "../archetypes/asteroidField";
 import { commanderRange, facility } from "../archetypes/facility";
 import type { Marker } from "../archetypes/marker";
 import { createMarker } from "../archetypes/marker";
+import type { Sector } from "../archetypes/sector";
 import { sector as asSector, sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
+import type { TradeOrder } from "../components/orders";
 import { mineAction } from "../components/orders";
 import { getAvailableSpace } from "../components/storage";
 import { mineableCommodities } from "../economy/commodity";
@@ -103,7 +105,9 @@ function idleMovement(entity: RequireComponent<"position" | "orders">) {
 function autoTrade(entity: Trading, sectorDistance: number) {
   let makingTrade = false;
   const trade = getTradeWithMostProfit(
-    entity,
+    entity.sim.getOrThrow<Sector>(
+      (entity.cp.autoOrder.default as TradeOrder).sectorId!
+    ),
     sectorDistance,
     Object.entries(
       entity.sim.getOrThrow<Faction>(entity.cp.owner.id).cp.relations.values
@@ -274,9 +278,9 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
   }
 
   if (!entity.hasComponents(["commander"])) {
-    switch (entity.cp.autoOrder.default) {
+    switch (entity.cp.autoOrder.default.type) {
       case "trade":
-        autoTrade(entity.requireComponents(tradingComponents), 6);
+        autoTrade(entity.requireComponents(tradingComponents), 4);
         break;
       default:
         holdPosition();
@@ -284,7 +288,7 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
     return;
   }
 
-  switch (entity.cp.autoOrder.default) {
+  switch (entity.cp.autoOrder.default.type) {
     case "mine":
       autoMineForCommander(
         entity.requireComponents([

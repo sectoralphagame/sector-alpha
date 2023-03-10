@@ -48,7 +48,7 @@ function getRandomWorld(
       owner: player,
       sector: sectorAlpha,
     });
-    playerShip.cp.autoOrder!.default = "hold";
+    playerShip.cp.autoOrder!.default = { type: "hold" };
     playerShip.addComponent({
       name: "damage",
       range: 10,
@@ -187,7 +187,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       owner: player,
       sector: startingSector,
     });
-    playerShip.cp.autoOrder!.default = "hold";
+    playerShip.cp.autoOrder!.default = { type: "hold" };
 
     const builderShip = createShip(sim, {
       ...pickRandom(shipClasses.filter(({ role }) => role === "building")),
@@ -198,7 +198,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       owner: player,
       sector: startingSector,
     });
-    builderShip.cp.autoOrder!.default = "hold";
+    builderShip.cp.autoOrder!.default = { type: "hold" };
 
     const storageShip = createShip(sim, {
       ...pickRandom(shipClasses.filter(({ role }) => role === "storage")),
@@ -209,7 +209,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       owner: player,
       sector: startingSector,
     });
-    storageShip.cp.autoOrder!.default = "hold";
+    storageShip.cp.autoOrder!.default = { type: "hold" };
 
     resolve();
   });
