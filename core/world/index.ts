@@ -132,8 +132,8 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       faction.addComponent({
         name: "ai",
         type: factionData.type as AiType,
-        stockpiling: random(0.8, 1.2),
-        priceModifier: random(0.01, 0.03),
+        stockpiling: random(1.2, 1.6),
+        priceModifier: random(0.02, 0.08),
         patrols: factionData.patrols!,
       });
       faction.cp.color.value = factionData.color;

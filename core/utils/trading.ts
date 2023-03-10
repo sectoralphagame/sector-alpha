@@ -6,6 +6,7 @@ import {
   relationThresholds,
 } from "@core/components/relations";
 import type { Faction } from "@core/archetypes/faction";
+import type { Entity } from "@core/entity";
 import type { Action, TradeAction } from "../components/orders";
 import { tradeAction } from "../components/orders";
 import type { TransactionInput } from "../components/trade";
@@ -166,6 +167,22 @@ export function acceptTrade(
   }
 }
 
+export function createTradeId(
+  entity: Entity,
+  offer: Omit<TransactionInput, "allocations">
+) {
+  return `${entity.id}:${offer.initiator}:${
+    offer.type
+  }:${entity.sim.getTime()}`;
+}
+
+export function parseTradeId(tradeId: string) {
+  const [, entity, initiator, type, time] = tradeId.match(
+    /([0-9]+):([0-9]+):(buy|sell):([0-9]+)/
+  )!;
+  return { entity, initiator, type, time };
+}
+
 /**
  * Allocates resources necessary to finish trade before it is actually done
  */
@@ -176,9 +193,7 @@ export function allocate(
   if (isTradeAccepted(entity, offer)) {
     entity.cp.trade.offers[offer.commodity].quantity -= offer.quantity;
 
-    const tradeId = `${entity.id}:${offer.initiator}:${
-      offer.type
-    }:${entity.sim.getTime()}`;
+    const tradeId = createTradeId(entity, offer);
 
     if (offer.type === "buy") {
       return {

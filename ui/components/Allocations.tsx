@@ -5,6 +5,7 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
+import { parseTradeId } from "@core/utils/trading";
 
 export interface AllocationsProps {
   entity: RequireComponent<"storage">;
@@ -19,8 +20,16 @@ export const Allocations: React.FC<AllocationsProps> = ({ entity }) => (
       ) : (
         entity.cp.storage.allocations.map((allocation) => (
           <div key={allocation.id}>
-            Transaction #{allocation.id}:{" "}
-            {allocation.type === "incoming" ? "buying" : "selling"}{" "}
+            <b>
+              {
+                entity.sim
+                  .getOrThrow(
+                    Number(parseTradeId(allocation.meta.tradeId).initiator)
+                  )
+                  .requireComponents(["name"]).cp.name.value
+              }
+            </b>
+            : {allocation.type === "incoming" ? "buying" : "selling"}{" "}
             {Object.entries(allocation.amount)
               .filter(([, amount]) => amount > 0)
               .map(([commodity, amount]) => `${amount}x ${commodity}`)
