@@ -126,6 +126,17 @@ function cleanupOrders(entity: Entity): void {
   });
 }
 
+function cleanupDocks(entity: Entity): void {
+  if (entity.cp.dockable?.dockedIn) {
+    const dockedIn = entity.sim
+      .getOrThrow(entity.cp.dockable?.dockedIn)
+      .requireComponents(["docks"]);
+    dockedIn.cp.docks.docked = dockedIn.cp.docks.docked.filter(
+      (id) => id !== entity.id
+    );
+  }
+}
+
 function cleanupChildren(entity: Entity): void {
   entity.sim.queries.commendables.get().forEach((ship) => {
     if (ship.cp.commander.id === entity.id) {
@@ -171,6 +182,7 @@ export class OrderExecutingSystem extends System {
       "OrderExecutingSystem-children",
       cleanupChildren
     );
+    this.sim.hooks.removeEntity.tap("OrderExecutingSystem-docks", cleanupDocks);
   }
 
   exec = () => {
