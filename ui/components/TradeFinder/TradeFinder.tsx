@@ -13,6 +13,7 @@ import locationIcon from "@assets/ui/location.svg";
 import { useLocalStorage } from "@ui/hooks/useLocalStorage";
 import sortBy from "lodash/sortBy";
 import clsx from "clsx";
+import { relationThresholds } from "@core/components/relations";
 import { useSim } from "../../atoms";
 import styles from "./TradeFinder.scss";
 
@@ -46,11 +47,13 @@ export const TradeFinder: React.FC = () => {
         {sortBy(
           sim.queries.trading
             .get()
-            .filter((entity) =>
-              selectedCommodity
-                ? entity.cp.trade.offers[selectedCommodity].active &&
-                  entity.cp.trade.offers[selectedCommodity].quantity > 0
-                : true
+            .filter(
+              (entity) =>
+                entity.cp.trade.offers[selectedCommodity].active &&
+                entity.cp.trade.offers[selectedCommodity].quantity > 0 &&
+                sim.queries.player.get()[0].cp.relations.values[
+                  entity.cp.owner.id
+                ] > relationThresholds.trade
             ),
           `components.trade.offers.${selectedCommodity}.price`
         ).map((entity) => (

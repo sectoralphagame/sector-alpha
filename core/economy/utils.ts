@@ -133,8 +133,9 @@ export function getTradeWithMostProfit(
     return null;
   }
 
-  const commodityWithMostProfit = maxBy(profits, "profit")!
-    .commodity as Commodity;
+  const commodityWithMostProfit = pickRandom(
+    sortBy(profits, "profit").reverse().slice(0, 3)
+  ).commodity;
 
   return {
     buyer:

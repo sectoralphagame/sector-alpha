@@ -2,6 +2,7 @@ import { sum } from "mathjs";
 import sortBy from "lodash/sortBy";
 import type { ShipyardQueueItem } from "@core/components/shipyard";
 import type { DockSize } from "@core/components/dockable";
+import { relationThresholds } from "@core/components/relations";
 import type { InitialShipInput } from "../archetypes/ship";
 import { createShip } from "../archetypes/ship";
 import { mineableCommodities } from "../economy/commodity";
@@ -174,9 +175,45 @@ export class ShipPlanningSystem extends System {
         };
       });
 
+  getTravellingTradersRequests = (faction: Faction): ShipRequest[] => {
+    if (faction.cp.ai?.type === "travelling") {
+      return this.sim.queries.shipyards
+        .get()
+        .filter(
+          (shipyard) =>
+            faction.cp.relations.values[shipyard.cp.owner.id] >
+            relationThresholds.trade
+        )
+        .map((shipyard) =>
+          this.sim.getOrThrow<Sector>(shipyard.cp.position.sector)
+        )
+        .map((sector) => {
+          const sectorTraders = this.sim.queries.autoOrderable
+            .get()
+            .filter(
+              (ship) =>
+                ship.cp.owner?.id === faction.id &&
+                ship.cp.autoOrder.default.type === "trade" &&
+                ship.cp.autoOrder.default.sectorId === sector.id
+            ).length;
+
+          return {
+            trading: sectorTraders - 5,
+            sector,
+            fighters: 0,
+            mining: 0,
+            patrols: 0,
+          };
+        });
+    }
+
+    return [];
+  };
+
   getShipRequests = (faction: Faction): ShipRequest[] => [
     ...this.getFacilityShipRequests(faction),
     ...this.getPatrolRequests(faction),
+    ...this.getTravellingTradersRequests(faction),
   ];
 
   assignTraders = (
@@ -186,7 +223,7 @@ export class ShipPlanningSystem extends System {
     shipyard: RequireComponent<"shipyard" | "position">
   ) => {
     const spareTraders: Entity[] = shipRequests
-      .filter((request) => request.trading > 0)
+      .filter((request) => request.trading > 0 && request.facility)
       .flatMap(({ facility, trading }) =>
         this.sim.queries.commendables
           .get()
@@ -206,6 +243,7 @@ export class ShipPlanningSystem extends System {
         .filter(
           (ship) =>
             ship.cp.owner?.id === faction.id &&
+            !ship.cp.autoOrder &&
             !ship.cp.commander &&
             ship.tags.has("role:transport")
         )
@@ -216,7 +254,7 @@ export class ShipPlanningSystem extends System {
     );
 
     shipRequests
-      .filter(({ trading }) => trading < 0)
+      .filter(({ trading, facility }) => trading < 0 && facility)
       .forEach(({ facility, trading }) => {
         for (let i = 0; i < -trading; i++) {
           if (spareTraders.length > 0 && facility) {
@@ -225,6 +263,34 @@ export class ShipPlanningSystem extends System {
               name: "commander",
               id: facility.id,
             });
+          } else if (shipRequestInShipyards.length > 0) {
+            shipRequestInShipyards.pop();
+          } else {
+            requestShip(faction, shipyard, "transport", this.sim.getTime() > 0);
+          }
+        }
+      });
+
+    shipRequests
+      .filter(({ trading, sector }) => trading < 0 && sector)
+      .forEach(({ sector, trading }) => {
+        for (let i = 0; i < -trading; i++) {
+          if (spareTraders.length > 0) {
+            const ship = spareTraders.pop()!;
+            if (ship.cp.autoOrder) {
+              ship.cp.autoOrder.default = {
+                type: "trade",
+                sectorId: sector!.id,
+              };
+            } else {
+              ship.addComponent({
+                name: "autoOrder",
+                default: {
+                  type: "trade",
+                  sectorId: sector!.id,
+                },
+              });
+            }
           } else if (shipRequestInShipyards.length > 0) {
             shipRequestInShipyards.pop();
           } else {
