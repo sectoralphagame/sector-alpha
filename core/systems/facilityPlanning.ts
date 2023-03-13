@@ -1,3 +1,4 @@
+import type { RequireComponent } from "@core/tsHelpers";
 import { discriminate } from "@core/utils/maps";
 import shuffle from "lodash/shuffle";
 import type { Matrix } from "mathjs";
@@ -25,6 +26,7 @@ import {
   getResourceUsage,
   getSectorResources,
 } from "../utils/resources";
+import { settleStorageQuota } from "./storageQuotaPlanning";
 import { System } from "./system";
 
 function isAbleToBuild(
@@ -40,6 +42,19 @@ function isAbleToBuild(
           (consumes + resourceUsageInFacilities[commodity]) >
         stockpiling
   );
+}
+
+export function addStartingCommodities(facility: RequireComponent<"storage">) {
+  settleStorageQuota(facility);
+  commoditiesArray.forEach((commodity) => {
+    if (facility.cp.storage.quota[commodity]) {
+      addStorage(
+        facility!.cp.storage,
+        commodity,
+        Math.floor(facility.cp.storage.quota[commodity] * random(0.4, 0.7))
+      );
+    }
+  });
 }
 
 export class FacilityPlanningSystem extends System {
@@ -112,6 +127,7 @@ export class FacilityPlanningSystem extends System {
           facilityModules.smallDefense.create(this.sim, facility)
         );
       }
+      addStartingCommodities(facility);
     });
   };
 
@@ -154,6 +170,8 @@ export class FacilityPlanningSystem extends System {
             facilityModules.smallDefense.create(this.sim, facility)
           );
         }
+
+        addStartingCommodities(facility);
       });
   };
 
@@ -173,15 +191,17 @@ export class FacilityPlanningSystem extends System {
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const productionModule = factoryModules.find(
-        (facilityModule) =>
-          facilityModule.pac &&
-          isAbleToBuild(
-            facilityModule.pac,
-            resourcesProducedByFacilities,
-            resourceUsageInFacilities,
-            faction.cp.ai!.stockpiling
-          )
+      const productionModule = pickRandom(
+        factoryModules.filter(
+          (facilityModule) =>
+            facilityModule.pac &&
+            isAbleToBuild(
+              facilityModule.pac,
+              resourcesProducedByFacilities,
+              resourceUsageInFacilities,
+              faction.cp.ai!.stockpiling
+            )
+        )
       );
       if (!productionModule) break;
       modulesToBuild.push(productionModule);
@@ -208,11 +228,7 @@ export class FacilityPlanningSystem extends System {
         facility.cp.modules.ids.length > 16
       ) {
         if (facility && this.sim.getTime() === 0) {
-          commoditiesArray.forEach((commodity) => {
-            if (facility!.cp.compoundProduction!.pac[commodity].consumes) {
-              addStorage(facility!.cp.storage, commodity, 500);
-            }
-          });
+          addStartingCommodities(facility);
         }
 
         const sector = pickRandom(

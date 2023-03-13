@@ -1,3 +1,4 @@
+import { addStartingCommodities } from "@core/systems/facilityPlanning";
 import { add, matrix, random } from "mathjs";
 import type { Faction } from "../archetypes/faction";
 import { createFaction } from "../archetypes/faction";
@@ -79,7 +80,7 @@ export function populateSectors(sim: Sim, sectors: Sector[], faction: Faction) {
   const sectorWithShipyard = pickRandom(sectors);
   if (!sectorWithShipyard) return;
 
-  createShipyard(
+  const shipyard = createShipyard(
     {
       owner: faction,
       sector: sectorWithShipyard,
@@ -96,6 +97,7 @@ export function populateSectors(sim: Sim, sectors: Sector[], faction: Faction) {
     },
     sim
   );
+  addStartingCommodities(shipyard);
 }
 
 export const createFactions = (
