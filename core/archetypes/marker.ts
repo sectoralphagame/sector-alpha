@@ -34,7 +34,7 @@ export function createMarker(sim: Sim, { value, sector, owner }: MarkerInput) {
       sector,
       moved: false,
     })
-    .addComponent({ name: "destroyAfterUsage", owner });
+    .addComponent({ name: "disposable", owner });
 
   return entity as Marker;
 }

@@ -154,8 +154,8 @@ function cleanupChildren(entity: Entity): void {
 }
 
 function cleanupDestroyable(entity: Entity): void {
-  entity.sim.queries.destroyAfterUsage.get().forEach((marker) => {
-    if (marker.cp.destroyAfterUsage.owner === entity.id) {
+  entity.sim.queries.disposable.get().forEach((marker) => {
+    if (marker.cp.disposable.owner === entity.id) {
       marker.unregister();
     }
   });
@@ -192,7 +192,7 @@ export class OrderExecutingSystem extends System {
     );
     this.sim.hooks.removeEntity.tap("OrderExecutingSystem-docks", cleanupDocks);
     this.sim.hooks.removeEntity.tap(
-      "OrderExecutingSystem-destroyAfterUsage",
+      "OrderExecutingSystem-disposable",
       cleanupDestroyable
     );
   }

@@ -15,9 +15,17 @@ export class DisposableUnregisteringSystem extends System {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 120);
 
-      this.sim.queries.destroyAfterUsage.get().forEach((entity) => {
-        const owner = this.sim.get(entity.cp.destroyAfterUsage.owner)
-        if (!owner || !owner.cp.orders?.value.some(order=>order.actions.some(action=>action.type==="move" && action.targetId===entity.id))) {
+      this.sim.queries.disposable.get().forEach((entity) => {
+        const owner = this.sim.get(entity.cp.disposable.owner);
+        if (
+          !owner ||
+          !owner.cp.orders?.value.some((order) =>
+            order.actions.some(
+              (action) =>
+                action.type === "move" && action.targetId === entity.id
+            )
+          )
+        ) {
           entity.unregister();
         }
       });

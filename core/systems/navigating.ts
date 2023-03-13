@@ -100,7 +100,7 @@ function setDrive(entity: Driveable, delta: number) {
   if (drive.mode !== "flyby" && norm(path) < 0.1) {
     drive.currentSpeed = 0;
     drive.targetReached = true;
-    if (targetEntity.cp.destroyAfterUsage) {
+    if (targetEntity.cp.disposable) {
       targetEntity.unregister();
     }
     return;
@@ -148,7 +148,7 @@ function setDrive(entity: Driveable, delta: number) {
     if (distance <= drive.minimalDistance) {
       drive.currentSpeed = 0;
       drive.targetReached = true;
-      if (targetEntity.cp.destroyAfterUsage) {
+      if (targetEntity.cp.disposable) {
         targetEntity.unregister();
       }
     }
