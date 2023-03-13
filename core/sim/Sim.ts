@@ -21,6 +21,7 @@ import { AttackingSystem } from "@core/systems/attacking";
 import { SpottingSystem } from "@core/systems/spotting";
 import { HitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating";
 import { MilitaryModuleSpottingSystem } from "@core/systems/militaryModuleSpotting";
+import { DisposableUnregisteringSystem } from "@core/systems/disposableUnregistering";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -133,6 +134,7 @@ export class Sim extends BaseSim {
       SpottingSystem,
       MilitaryModuleSpottingSystem,
       HitpointsRegeneratingSystem,
+      DisposableUnregisteringSystem,
       DeadUnregisteringSystem,
     ].map((S) => new S(this));
 

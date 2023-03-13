@@ -18,11 +18,12 @@ export function marker(entity: Entity): Marker {
 }
 
 export interface MarkerInput {
+  owner: number;
   value: Matrix;
   sector: number;
 }
 
-export function createMarker(sim: Sim, { value, sector }: MarkerInput) {
+export function createMarker(sim: Sim, { value, sector, owner }: MarkerInput) {
   const entity = new Entity(sim);
 
   entity
@@ -33,7 +34,7 @@ export function createMarker(sim: Sim, { value, sector }: MarkerInput) {
       sector,
       moved: false,
     })
-    .addTag("destroyAfterUsage");
+    .addComponent({ name: "destroyAfterUsage", owner });
 
   return entity as Marker;
 }

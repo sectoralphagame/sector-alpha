@@ -26,6 +26,7 @@ export function patrolOrder(
             random(-sectorSize / 20, sectorSize / 20),
           ])
         ),
+        owner: entity.id,
       })
     );
   }

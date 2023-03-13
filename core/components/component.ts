@@ -37,6 +37,7 @@ import type { Relations } from "./relations";
 import type { HitPoints } from "./hitpoints";
 import type { Damage } from "./damage";
 import type { Model } from "./model";
+import type { DestroyAfterUsage } from "./destroyAfterUsage";
 
 export interface CoreComponents {
   ai: Ai;
@@ -51,6 +52,7 @@ export interface CoreComponents {
   compoundProduction: CompoundProduction;
   damage: Damage;
   deployable: Deployable;
+  destroyAfterUsage: DestroyAfterUsage;
   dockable: Dockable;
   docks: Docks;
   drive: Drive;

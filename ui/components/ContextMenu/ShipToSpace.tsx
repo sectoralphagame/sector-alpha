@@ -49,6 +49,7 @@ export const ShipToSpace: React.FC = () => {
         createMarker(sim, {
           sector: menu.sector!.id,
           value: matrix(menu.worldPosition),
+          owner: entity.id,
         })
       ),
     });
@@ -78,6 +79,7 @@ export const ShipToSpace: React.FC = () => {
           createMarker(sim, {
             sector: menu.sector!.id,
             value: matrix(menu.worldPosition),
+            owner: entity.id,
           })
         ),
         {

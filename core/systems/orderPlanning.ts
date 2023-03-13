@@ -90,10 +90,12 @@ function idleMovement(entity: RequireComponent<"position" | "orders">) {
                 commander.cp.position.coord,
                 matrix([random(-1, 1), random(-1, 1)])
               ),
+              owner: entity.id,
             }
           : {
               sector: entity.cp.position.sector,
               value: getRandomPositionInBounds(entity),
+              owner: entity.id,
             }
       ),
       { onlyManeuver: true }

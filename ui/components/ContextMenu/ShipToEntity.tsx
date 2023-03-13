@@ -51,6 +51,7 @@ export const ShipToEntity: React.FC = () => {
           createMarker(sim, {
             sector: menu.sector!.id,
             value: matrix(menu.worldPosition),
+            owner: entity.id,
           })
         ),
         { type: "dock", targetId: actionable.id },
@@ -87,6 +88,7 @@ export const ShipToEntity: React.FC = () => {
               actionable.cp.position.coord,
               matrix([random(-1, 1), random(-1, 1)])
             ),
+            owner: entity.id,
           })
         ),
         {

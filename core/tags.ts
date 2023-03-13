@@ -3,7 +3,6 @@ import { shipRoles } from "./world/ships";
 
 const tags = [
   "player",
-  "destroyAfterUsage",
   "selection",
   "ship",
   "facility",
