@@ -7,6 +7,7 @@ import { commodities } from "@core/economy/commodity";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import { Checkbox } from "@kit/Checkbox";
+import { useLocalStorage } from "@ui/hooks/useLocalStorage";
 import styles from "./SectorPrices.scss";
 
 const baseColor = Color.rgb(151, 255, 125);
@@ -23,10 +24,10 @@ const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
         .map(([commodity]) => commodity),
     [entity.cp.sectorStats.prices.fuelium.buy.length]
   );
-  const [displayedResources, setDisplayedResources] = React.useState([
-    commodities.food,
-    commodities.fuel,
-  ] as string[]);
+  const [displayedResources, setDisplayedResources] = useLocalStorage(
+    "SectorPricesDisplayedResources",
+    [commodities.food, commodities.fuel] as string[]
+  );
 
   React.useEffect(() => {
     if (chart.current) {
@@ -121,10 +122,10 @@ const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
                 id={`display-${commodity}-toggle`}
                 checked={displayedResources.includes(commodity)}
                 onChange={() =>
-                  setDisplayedResources((prev) =>
-                    prev.includes(commodity)
-                      ? prev.filter((c) => c !== commodity)
-                      : [...prev, commodity]
+                  setDisplayedResources(
+                    displayedResources.includes(commodity)
+                      ? displayedResources.filter((c) => c !== commodity)
+                      : [...displayedResources, commodity]
                   )
                 }
               />

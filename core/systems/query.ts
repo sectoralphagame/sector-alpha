@@ -105,7 +105,7 @@ export function createQueries(sim: Sim) {
     budget: new Query(sim, ["budget"]),
     builders: new Query(sim, ["builder", "storage", "trade", "docks"]),
     children: new Query(sim, ["parent"]),
-    commendables: new Query(sim, ["commander", "orders", "autoOrder"]),
+    commendables: new Query(sim, ["commander", "orders", "autoOrder", "model"]),
     facilities: new Query(sim, ["modules", "position", "facilityModuleQueue"]),
     facilityWithProduction: new Query(sim, [
       "compoundProduction",
@@ -113,7 +113,7 @@ export function createQueries(sim: Sim) {
       "position",
     ]),
     mining: new Query(sim, ["mining", "storage"]),
-    orderable: new Query(sim, ["orders", "position"]),
+    orderable: new Query(sim, ["orders", "position", "model"]),
     player: new Query(sim, factionComponents, ["player"]),
     productionByModules: new Query(sim, ["production", "parent"]),
     renderable: new Query(sim, ["render", "position"]),

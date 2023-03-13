@@ -36,6 +36,7 @@ import type { Builder } from "./builder";
 import type { Relations } from "./relations";
 import type { HitPoints } from "./hitpoints";
 import type { Damage } from "./damage";
+import type { Model } from "./model";
 
 export interface CoreComponents {
   ai: Ai;
@@ -60,6 +61,7 @@ export interface CoreComponents {
   journal: Journal;
   minable: Minable;
   mining: Mining;
+  model: Model;
   modules: Modules;
   name: Name;
   orders: Orders;

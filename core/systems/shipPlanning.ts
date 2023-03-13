@@ -4,7 +4,7 @@ import type { ShipyardQueueItem } from "@core/components/shipyard";
 import type { DockSize } from "@core/components/dockable";
 import { relationThresholds } from "@core/components/relations";
 import type { InitialShipInput } from "../archetypes/ship";
-import { createShip } from "../archetypes/ship";
+import { createShipName, createShip } from "../archetypes/ship";
 import { mineableCommodities } from "../economy/commodity";
 import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
@@ -54,7 +54,7 @@ export function requestShip(
       position: shipyard.cp.position.coord.clone(),
       owner: faction,
       sector: asSector(shipyard.sim.getOrThrow(shipyard.cp.position.sector)),
-      name: `${faction.cp.name.slug!} ${bp.name}`,
+      name: bp.name,
     });
   }
 
@@ -222,7 +222,7 @@ export class ShipPlanningSystem extends System {
     requestsInShipyards: ShipyardQueueItem[],
     shipyard: RequireComponent<"shipyard" | "position">
   ) => {
-    const spareTraders: Entity[] = shipRequests
+    const spareTraders: RequireComponent<"model" | "orders">[] = shipRequests
       .filter((request) => request.trading > 0 && request.facility)
       .flatMap(({ facility, trading }) =>
         this.sim.queries.commendables
@@ -243,7 +243,9 @@ export class ShipPlanningSystem extends System {
         .filter(
           (ship) =>
             ship.cp.owner?.id === faction.id &&
-            !ship.cp.autoOrder &&
+            (ship.cp.autoOrder
+              ? ship.cp.autoOrder.default.type === "hold"
+              : true) &&
             !ship.cp.commander &&
             ship.tags.has("role:transport")
         )
@@ -259,10 +261,18 @@ export class ShipPlanningSystem extends System {
         for (let i = 0; i < -trading; i++) {
           if (spareTraders.length > 0 && facility) {
             const ship = spareTraders.pop()!;
-            ship.addComponent({
-              name: "commander",
-              id: facility.id,
-            });
+            ship
+              .addComponent({
+                name: "commander",
+                id: facility.id,
+              })
+              .addComponent({
+                name: "autoOrder",
+                default: {
+                  type: "trade",
+                },
+              });
+            ship.cp.name!.value = createShipName(ship);
           } else if (shipRequestInShipyards.length > 0) {
             shipRequestInShipyards.pop();
           } else {
@@ -277,20 +287,14 @@ export class ShipPlanningSystem extends System {
         for (let i = 0; i < -trading; i++) {
           if (spareTraders.length > 0) {
             const ship = spareTraders.pop()!;
-            if (ship.cp.autoOrder) {
-              ship.cp.autoOrder.default = {
+            ship.addComponent({
+              name: "autoOrder",
+              default: {
                 type: "trade",
                 sectorId: sector!.id,
-              };
-            } else {
-              ship.addComponent({
-                name: "autoOrder",
-                default: {
-                  type: "trade",
-                  sectorId: sector!.id,
-                },
-              });
-            }
+              },
+            });
+            ship.cp.name!.value = createShipName(ship, "Trader");
           } else if (shipRequestInShipyards.length > 0) {
             shipRequestInShipyards.pop();
           } else {

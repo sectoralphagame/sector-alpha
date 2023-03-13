@@ -69,11 +69,14 @@ export class Entity {
     component: CoreComponents[T]
   ): Entity {
     const componentName: CoreComponents[T]["name"] = component.name;
+    const exists = !!this.components[componentName];
     this.components[componentName] = component;
-    this.sim.hooks.addComponent.call({
-      entity: this,
-      component: component.name,
-    });
+    if (!exists) {
+      this.sim.hooks.addComponent.call({
+        entity: this,
+        component: component.name,
+      });
+    }
 
     return this;
   }

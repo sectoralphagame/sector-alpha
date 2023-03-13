@@ -23,6 +23,7 @@ export const shipComponents = [
   "render",
   "storage",
   "journal",
+  "model",
 ] as const;
 
 export type ShipComponent = (typeof shipComponents)[number];
@@ -38,6 +39,25 @@ export interface InitialShipInput extends ShipInput {
   sector: Sector;
 }
 
+export function createShipName(
+  entity: RequireComponent<"model">,
+  label?: string
+) {
+  const owner = entity.cp.owner?.id
+    ? entity.sim.getOrThrow<Faction>(entity.cp.owner.id)
+    : null;
+
+  return owner
+    ? [
+        owner.cp.name.slug === "PLA" ? undefined : owner.cp.name.slug,
+        label,
+        entity.cp.model.value,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    : [label, entity.cp.model.value].filter(Boolean).join(" ");
+}
+
 export function createShip(sim: Sim, initial: InitialShipInput): Ship {
   const entity = new Entity(sim);
 
@@ -47,8 +67,6 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       default:
         initial.role === "mining"
           ? { type: "mine", sectorId: initial.sector.id }
-          : initial.role === "transport"
-          ? { type: "trade", sectorId: initial.sector.id }
           : { type: "hold" },
     })
     .addComponent(
@@ -56,7 +74,6 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
         pick(initial, ["acceleration", "rotary", "cruise", "ttc", "maneuver"])
       )
     )
-    .addComponent({ name: "name", value: initial.name })
     .addComponent({
       name: "orders",
       value: [],
@@ -102,6 +119,14 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       ...initial.damage,
       name: "damage",
       targetId: null,
+    })
+    .addComponent({
+      name: "model",
+      value: initial.name,
+    })
+    .addComponent({
+      name: "name",
+      value: createShipName(entity.requireComponents(["model"])),
     })
     .addTag("selection")
     .addTag("ship")

@@ -35,9 +35,7 @@ export class ShipBuildingSystem extends System {
             owner: this.sim.getOrThrow<Faction>(
               shipyard.cp.shipyard.building.owner
             ),
-            name: `${this.sim.getOrThrow<Faction>(
-              shipyard.cp.shipyard.building.owner
-            ).cp.name.slug!} ${shipyard.cp.shipyard.building.blueprint.name}`,
+            name: shipyard.cp.shipyard.building.blueprint.name,
           });
           dockShip(ship, shipyard);
           shipyard.cp.journal.entries.push({

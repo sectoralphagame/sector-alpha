@@ -156,11 +156,6 @@ export function getFacilityWithMostProfit(
   minQuantity: number,
   sectorDistance: number
 ): WithTrade | null {
-  const distance = (f: WithTrade) =>
-    norm(
-      subtract(facility.cp.position.coord, f.cp.position.coord) as Matrix
-    ) as number;
-
   const faction = facility.sim.getOrThrow<Faction>(facility.cp.owner.id);
 
   const profit = (f: WithTrade) =>
@@ -202,14 +197,13 @@ export function getFacilityWithMostProfit(
     return null;
   }
 
-  return minBy(
+  return pickRandom(
     sortedByProfit
       .filter(
         (f, _, arr) =>
           !Number.isFinite(f.profit) || f.profit / arr[0].profit >= 0.95
       )
-      .map((f) => f.facility),
-    distance
+      .map((f) => f.facility)
   )!;
 }
 

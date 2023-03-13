@@ -133,7 +133,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
         name: "ai",
         type: factionData.type as AiType,
         stockpiling: random(1.2, 1.6),
-        priceModifier: random(0.02, 0.08),
+        priceModifier: random(0.1, 0.25),
         patrols: factionData.patrols!,
       });
       faction.cp.color.value = factionData.color;
