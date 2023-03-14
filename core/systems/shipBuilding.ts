@@ -9,7 +9,7 @@ import type { Sector } from "../archetypes/sector";
 import { hasSufficientStorage, removeStorage } from "../components/storage";
 import { dockShip } from "./orderExecuting/dock";
 
-const buildTimer = "shipBuild";
+export const shipBuildTimer = "shipBuild";
 
 export class ShipBuildingSystem extends System {
   cooldowns: Cooldowns<"exec">;
@@ -25,7 +25,7 @@ export class ShipBuildingSystem extends System {
       this.cooldowns.use("exec", 1);
 
       this.sim.queries.shipyards.get().forEach((shipyard) => {
-        if (!shipyard.cooldowns.canUse(buildTimer)) return;
+        if (!shipyard.cooldowns.canUse(shipBuildTimer)) return;
 
         if (shipyard.cp.shipyard.building) {
           const ship = createShip(this.sim, {
@@ -61,7 +61,10 @@ export class ShipBuildingSystem extends System {
             ([commodity, quantity]: [Commodity, number]) =>
               removeStorage(shipyard.cp.storage, commodity, quantity)
           );
-          shipyard.cooldowns.use(buildTimer, shipToBuild.blueprint.build.time);
+          shipyard.cooldowns.use(
+            shipBuildTimer,
+            shipToBuild.blueprint.build.time
+          );
           shipyard.cp.shipyard.queue.splice(0, 1);
           shipyard.cp.shipyard.building = shipToBuild;
         }

@@ -34,22 +34,12 @@ export function createFarm(input: InitialFacilityInput, sim: Sim) {
 export function createShipyard(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.shipyard.create(sim, facility));
-  addFacilityModule(
-    facility,
-    facilityModules.containerMedium.create(sim, facility)
-  );
-  addFacilityModule(
-    facility,
-    facilityModules.containerMedium.create(sim, facility)
-  );
-  addFacilityModule(
-    facility,
-    facilityModules.containerMedium.create(sim, facility)
-  );
-  addFacilityModule(
-    facility,
-    facilityModules.containerMedium.create(sim, facility)
-  );
+  for (let i = 0; i < 3; i++) {
+    addFacilityModule(
+      facility,
+      facilityModules.containerLarge.create(sim, facility)
+    );
+  }
 
   facility.addComponent({ name: "shipyard", queue: [], building: null });
   setTexture(facility.cp.render, "fShipyard");

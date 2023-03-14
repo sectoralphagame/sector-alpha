@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
 import type { ShipInput } from "@core/world/ships";
 import type { Commodity } from "@core/economy/commodity";
-import { commoditiesArray } from "@core/economy/commodity";
+import { commodityLabel, commoditiesArray } from "@core/economy/commodity";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
@@ -115,7 +115,7 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
                 )
                 .map((commodity: Commodity) => (
                   <React.Fragment key={commodity}>
-                    <span>{commodity}</span>
+                    <span>{commodityLabel[commodity]}</span>
                     <input
                       {...register(`ships.${index}.build.cost.${commodity}`, {
                         valueAsNumber: true,
@@ -152,7 +152,7 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
                         }
                         key={commodity}
                       >
-                        {commodity}
+                        {commodityLabel[commodity]}
                       </DropdownOption>
                     ))}
                 </DropdownOptions>

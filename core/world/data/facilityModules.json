@@ -109,7 +109,7 @@
     "name": "Fuelium Refinery",
     "type": "production",
     "pac": {
-      "fuel": { "consumes": 0, "produces": 2900 },
+      "fuel": { "consumes": 0, "produces": 5600 },
       "fuelium": { "consumes": 4800, "produces": 0 }
     },
     "slug": "fueliumRefinery",
@@ -207,5 +207,42 @@
     "build": { "cost": {}, "time": 0 },
     "crew": "",
     "damage": { "value": 2, "range": 3 }
+  },
+  {
+    "name": "Hydrogen Factory",
+    "type": "production",
+    "pac": {
+      "water": { "consumes": 1200, "produces": 0 },
+      "hydrogen": { "consumes": 0, "produces": 900 },
+      "fuel": { "consumes": 350, "produces": 0 }
+    },
+    "slug": "hydrogenFactory",
+    "time": 360,
+    "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Coolant Factory",
+    "type": "production",
+    "pac": {
+      "coolant": { "consumes": 0, "produces": 900 },
+      "fuel": { "consumes": 420, "produces": 0 },
+      "hydrogen": { "consumes": 750, "produces": 0 }
+    },
+    "slug": "coolantFactory",
+    "time": 420,
+    "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Engine Parts FActory",
+    "type": "production",
+    "pac": {
+      "coolant": { "consumes": 190, "produces": 0 },
+      "hullPlates": { "consumes": 200, "produces": 0 },
+      "fuel": { "consumes": 510, "produces": 0 },
+      "engineParts": { "consumes": 0, "produces": 160 }
+    },
+    "slug": "enginePartsFactory",
+    "time": 590,
+    "build": { "cost": {}, "time": 0 }
   }
 ]

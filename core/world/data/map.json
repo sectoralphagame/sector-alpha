@@ -41,7 +41,7 @@
       "position": [2, -3],
       "id": "saturn",
       "resources": {
-        "fuelium": 10,
+        "fuelium": 14,
         "goldOre": 5,
         "ice": 0,
         "ore": 0,
@@ -65,7 +65,7 @@
       "position": [-1, -1],
       "id": "gaia",
       "resources": {
-        "fuelium": 0,
+        "fuelium": 14,
         "goldOre": 0,
         "ice": 8,
         "ore": 0,
@@ -91,7 +91,7 @@
       "resources": {
         "fuelium": 0,
         "goldOre": 0,
-        "ice": 10,
+        "ice": 18,
         "ore": 0,
         "silica": 0
       }
@@ -151,7 +151,7 @@
       "resources": {
         "fuelium": 0,
         "goldOre": 0,
-        "ice": 8,
+        "ice": 18,
         "ore": 0,
         "silica": 0
       }
@@ -161,7 +161,7 @@
       "position": [2, 1],
       "id": "juno-4",
       "resources": {
-        "fuelium": 0,
+        "fuelium": 14,
         "goldOre": 0,
         "ice": 0,
         "ore": 16,
@@ -319,7 +319,7 @@
       "resources": {
         "fuelium": 0,
         "goldOre": 0,
-        "ice": 10,
+        "ice": 18,
         "ore": 14,
         "silica": 0
       }

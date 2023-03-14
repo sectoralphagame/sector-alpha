@@ -5,6 +5,7 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
+import { shipBuildTimer } from "@core/systems/shipBuilding";
 import styles from "./ShipBuildingQueue.scss";
 
 const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
@@ -19,6 +20,12 @@ const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
         <span>No ships in queue</span>
       ) : (
         <ul className={styles.list}>
+          {!!entity.cp.shipyard.building && (
+            <li className={styles.item}>
+              {entity.cp.shipyard.building.blueprint.name} (
+              {entity.cooldowns.timers[shipBuildTimer].toFixed(0)}s)
+            </li>
+          )}
           {entity.cp.shipyard.queue.map((queued, bpIndex) => (
             <li className={styles.item} key={bpIndex}>
               {queued.blueprint.name}

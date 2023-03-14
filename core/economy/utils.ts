@@ -260,7 +260,7 @@ export function getCommodityCost(
         silica: x3(17),
         fuelium: x3(25),
         goldOre: x3(32),
-      }[commodity]
+      }[commodity] ?? []
     );
   }
 
