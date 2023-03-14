@@ -13,6 +13,10 @@ const EntityName: React.FC<{ entity: RequireComponent<"name"> }> = ({
   const onSubmit = () => {
     entity.cp.name.value = getValues().name || "Unnamed Sector";
     reset();
+
+    if (entity.cp.renderGraphics) {
+      entity.cp.renderGraphics.redraw = true;
+    }
   };
 
   return (
