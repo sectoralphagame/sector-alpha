@@ -368,5 +368,33 @@
       "hp": { "value": 540, "regen": 0.2 },
       "shield": { "value": 120, "regen": 2.1 }
     }
+  },
+  {
+    "acceleration": 0.09,
+    "build": {
+      "time": 0,
+      "cost": {
+        "engineParts": 400,
+        "hullPlates": 14800,
+        "fuel": 8100,
+        "electronics": 710
+      }
+    },
+    "mining": 1.2,
+    "role": "mining",
+    "cruise": 1,
+    "maneuver": 0.09,
+    "rotary": 13,
+    "ttc": 10,
+    "name": "Large Miner A",
+    "size": "large",
+    "storage": 680,
+    "texture": "lMin",
+    "slug": "largeMinerA",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 830, "regen": 0.2 },
+      "shield": { "value": 310, "regen": 4.2 }
+    }
   }
 ]

@@ -433,7 +433,8 @@
         "largeFreighterA",
         "minerA",
         "fighter",
-        "gunboat"
+        "gunboat",
+        "largeMinerA"
       ],
       "color": "#6fc9f2",
       "type": "territorial",
@@ -456,7 +457,8 @@
         "largeFreighterB",
         "minerB",
         "fighter",
-        "gunboat"
+        "gunboat",
+        "largeMinerA"
       ],
       "color": "#ffc34d",
       "type": "territorial",
@@ -490,7 +492,8 @@
         "largeFreighterB",
         "minerB",
         "fighter",
-        "gunboat"
+        "gunboat",
+        "largeMinerA"
       ],
       "color": "#42f5e3",
       "type": "territorial",
@@ -506,7 +509,8 @@
         "largeFreighterB",
         "minerB",
         "fighter",
-        "gunboat"
+        "gunboat",
+        "largeMinerA"
       ],
       "color": "#ff63e5",
       "type": "territorial",
@@ -522,7 +526,8 @@
         "largeFreighterB",
         "minerA",
         "fighter",
-        "gunboat"
+        "gunboat",
+        "largeMinerA"
       ],
       "color": "#fcc7c5",
       "type": "pirate",
@@ -538,7 +543,8 @@
         "largeFreighterB",
         "minerA",
         "fighter",
-        "gunboat"
+        "gunboat",
+        "largeMinerA"
       ],
       "color": "#f7fc5b",
       "type": "travelling",

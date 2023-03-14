@@ -153,14 +153,6 @@ function cleanupChildren(entity: Entity): void {
   });
 }
 
-function cleanupDestroyable(entity: Entity): void {
-  entity.sim.queries.disposable.get().forEach((marker) => {
-    if (marker.cp.disposable.owner === entity.id) {
-      marker.unregister();
-    }
-  });
-}
-
 const actionFns: Partial<
   // eslint-disable-next-line no-unused-vars
   Record<Action["type"], (entity: Entity, order: Action) => boolean | void>
@@ -191,10 +183,6 @@ export class OrderExecutingSystem extends System {
       cleanupChildren
     );
     this.sim.hooks.removeEntity.tap("OrderExecutingSystem-docks", cleanupDocks);
-    this.sim.hooks.removeEntity.tap(
-      "OrderExecutingSystem-disposable",
-      cleanupDestroyable
-    );
   }
 
   exec = () => {

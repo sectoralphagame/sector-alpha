@@ -103,10 +103,6 @@ export class ShipPlanningSystem extends System {
         );
         const shipsForShipyards = facility.cp.shipyard ? 1 : 0;
 
-        const currentMiningSpeed: number = sum(
-          miners.map((miner) => miner.cp.mining.efficiency)
-        );
-
         const mining =
           Object.entries(production)
             .filter(
@@ -119,7 +115,7 @@ export class ShipPlanningSystem extends System {
             .reduce(
               (m, [, commodityProduction]) => m + commodityProduction,
               0
-            ) + currentMiningSpeed;
+            ) + miners.length;
 
         const shipsForProduction =
           Math.floor(
@@ -232,7 +228,7 @@ export class ShipPlanningSystem extends System {
               ship.cp.commander.id === facility?.id &&
               ship.tags.has("role:transport")
           )
-          .slice(0, trading)
+          .slice(0, -trading)
       );
     spareTraders.forEach((ship) => {
       ship.removeComponent("commander");
@@ -312,36 +308,16 @@ export class ShipPlanningSystem extends System {
   ) => {
     const spareMiners: Entity[] = shipRequests
       .filter((request) => request.mining >= 1)
-      .flatMap(({ facility, mining }) => {
-        const miners = sortBy(
-          this.sim.queries.commendables
-            .get()
-            .filter(
-              (ship) =>
-                ship.cp.commander.id === facility?.id &&
-                ship.tags.has("role:mining")
-            ),
-          (ship) => ship.cp.mining!.efficiency
-        );
-        const sliceIndex = miners.reduce(
-          ({ current, index }, ship, shipIndex) => {
-            if (
-              current < mining &&
-              ship.cp.mining!.efficiency <= mining - current
-            ) {
-              return {
-                index: shipIndex,
-                current: current + ship.cp.mining!.efficiency,
-              };
-            }
-
-            return { index, current };
-          },
-          { index: -1, current: 0 }
-        ).index;
-
-        return miners.slice(0, sliceIndex);
-      });
+      .flatMap(({ facility, mining }) =>
+        this.sim.queries.commendables
+          .get()
+          .filter(
+            (ship) =>
+              ship.cp.commander.id === facility?.id &&
+              ship.tags.has("role:mining")
+          )
+          .slice(0, -mining)
+      );
     spareMiners.forEach((ship) => {
       ship.removeComponent("commander");
     });
