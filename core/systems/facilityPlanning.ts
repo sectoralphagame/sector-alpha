@@ -106,6 +106,7 @@ export class FacilityPlanningSystem extends System {
       });
       facility.cp.name.value = createFacilityName(facility, "Mining Complex");
       facility.addComponent(createCompoundProduction());
+      facility.cp.render.texture = "fMin";
 
       for (
         let i = 0;
@@ -191,17 +192,15 @@ export class FacilityPlanningSystem extends System {
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const productionModule = pickRandom(
-        factoryModules.filter(
-          (facilityModule) =>
-            facilityModule.pac &&
-            isAbleToBuild(
-              facilityModule.pac,
-              resourcesProducedByFacilities,
-              resourceUsageInFacilities,
-              faction.cp.ai!.stockpiling
-            )
-        )
+      const productionModule = factoryModules.find(
+        (facilityModule) =>
+          facilityModule.pac &&
+          isAbleToBuild(
+            facilityModule.pac,
+            resourcesProducedByFacilities,
+            resourceUsageInFacilities,
+            faction.cp.ai!.stockpiling
+          )
       );
       if (!productionModule) break;
       modulesToBuild.push(productionModule);
@@ -225,7 +224,7 @@ export class FacilityPlanningSystem extends System {
       if (
         !facility ||
         Math.random() > 0.7 ||
-        facility.cp.modules.ids.length > 16
+        facility.cp.modules.ids.length > 6
       ) {
         if (facility && this.sim.getTime() === 0) {
           addStartingCommodities(facility);

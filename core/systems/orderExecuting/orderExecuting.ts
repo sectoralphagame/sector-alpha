@@ -106,6 +106,12 @@ function cleanupOrders(entity: Entity): void {
     return;
 
   entity.sim.queries.orderable.get().forEach((ship) => {
+    if (
+      ship.cp.autoOrder?.default.type === "escort" &&
+      ship.cp.autoOrder?.default.targetId === entity.id
+    ) {
+      ship.cp.autoOrder.default = { type: "hold" };
+    }
     ship.cp.orders.value.forEach((order, orderIndex) => {
       if (
         order.actions.some(

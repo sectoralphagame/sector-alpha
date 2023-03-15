@@ -5,6 +5,7 @@ import sCivTexture from "../../assets/s_civ.svg";
 import mCivTexture from "../../assets/m_civ.svg";
 import lCivTexture from "../../assets/l_civ.svg";
 import mMinTexture from "../../assets/m_min.svg";
+import fMinTexture from "../../assets/f_min.svg";
 import lMilTexture from "../../assets/l_mil.svg";
 import lMinTexture from "../../assets/l_min.svg";
 import mMilTexture from "../../assets/m_mil.svg";
@@ -19,20 +20,21 @@ import { isHeadless } from "../settings";
 
 export const textures = {
   asteroid: asteroidTexture,
-  sCiv: sCivTexture,
-  mCiv: mCivTexture,
-  lCiv: lCivTexture,
-  sMil: sMilTexture,
-  mMil: mMilTexture,
-  lMil: lMilTexture,
-  lMin: lMinTexture,
-  mMin: mMinTexture,
-  fTeleport: fTeleportTexture,
-  fShipyard: fShipyardTexture,
   fCiv: fCivTexture,
   fFactory: fFactoryTexture,
+  fMin: fMinTexture,
+  fShipyard: fShipyardTexture,
+  fTeleport: fTeleportTexture,
   lBuilder: lBuilderTexture,
+  lCiv: lCivTexture,
+  lMil: lMilTexture,
+  lMin: lMinTexture,
   lStorage: lStorageTexture,
+  mCiv: mCivTexture,
+  mMil: mMilTexture,
+  mMin: mMinTexture,
+  sCiv: sCivTexture,
+  sMil: sMilTexture,
 };
 export type Textures = typeof textures;
 export type Layer = "facility" | "ship" | "global" | "selection";

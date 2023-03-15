@@ -1,5 +1,3 @@
-import { sum } from "mathjs";
-import sortBy from "lodash/sortBy";
 import type { ShipyardQueueItem } from "@core/components/shipyard";
 import type { DockSize } from "@core/components/dockable";
 import { relationThresholds } from "@core/components/relations";
@@ -37,7 +35,13 @@ export function requestShip(
 ): Omit<InitialShipInput, "position" | "owner" | "sector"> | null {
   const bp = pickRandom(
     faction.cp.blueprints.ships.filter(
-      (ship) => ship.role === role && (size ? ship.size === size : true)
+      (ship) =>
+        ship.role === role &&
+        (size
+          ? ship.size === size
+          : ship.size !== "medium"
+          ? Math.random() > 0.5
+          : true)
     )
   );
 
