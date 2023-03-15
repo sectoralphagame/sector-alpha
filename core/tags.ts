@@ -7,6 +7,8 @@ const tags = [
   "ship",
   "facility",
   "facilityModule",
+  "asteroid",
+  "virtual",
   ...shipRoles.map<`role:${ShipRole}`>((role) => `role:${role}`),
 ] as const;
 

@@ -1,9 +1,9 @@
 export function limitMax(value: number, threshold: number): number {
-  return value > threshold ? threshold : value;
+  return Math.min(value, threshold);
 }
 
 export function limitMin(value: number, threshold: number): number {
-  return value < threshold ? threshold : value;
+  return Math.max(value, threshold);
 }
 
 export function limit(value: number, min: number, max: number): number {

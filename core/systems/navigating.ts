@@ -97,7 +97,7 @@ function setDrive(entity: Driveable, delta: number) {
     delta
   );
 
-  if (drive.mode !== "flyby" && norm(path) < 0.1) {
+  if (drive.mode !== "flyby" && distance < 0.1) {
     drive.currentSpeed = 0;
     drive.targetReached = true;
     if (targetEntity.cp.disposable) {

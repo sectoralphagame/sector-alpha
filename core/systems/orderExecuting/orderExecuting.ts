@@ -4,6 +4,7 @@ import { releaseStorageAllocation } from "@core/components/storage";
 import type { Allocation } from "@core/components/utils/allocations";
 import type { Action, Order } from "@core/components/orders";
 import type { Sim } from "@core/sim";
+import type { EntityTag } from "@core/tags";
 import { System } from "../system";
 import { dockOrder } from "./dock";
 import { mineAction } from "./mine";
@@ -99,6 +100,11 @@ function cleanupAllocations(entity: Entity): void {
 }
 
 function cleanupOrders(entity: Entity): void {
+  if (
+    (["asteroid", "virtual"] as EntityTag[]).some((tag) => entity.tags.has(tag))
+  )
+    return;
+
   entity.sim.queries.orderable.get().forEach((ship) => {
     ship.cp.orders.value.forEach((order, orderIndex) => {
       if (
@@ -127,6 +133,11 @@ function cleanupOrders(entity: Entity): void {
 }
 
 function cleanupDocks(entity: Entity): void {
+  if (
+    (["asteroid", "virtual"] as EntityTag[]).some((tag) => entity.tags.has(tag))
+  )
+    return;
+
   if (entity.cp.dockable?.dockedIn) {
     const dockedIn = entity.sim
       .getOrThrow(entity.cp.dockable?.dockedIn)
@@ -138,6 +149,11 @@ function cleanupDocks(entity: Entity): void {
 }
 
 function cleanupChildren(entity: Entity): void {
+  if (
+    (["asteroid", "virtual"] as EntityTag[]).some((tag) => entity.tags.has(tag))
+  )
+    return;
+
   entity.sim.queries.commendables.get().forEach((ship) => {
     if (ship.cp.commander.id === entity.id) {
       ship.removeComponent("commander");

@@ -55,7 +55,8 @@ export function createAsteroid(
       angle: 0,
       sector: parent.cp.position.sector,
       moved: false,
-    });
+    })
+    .addTag("asteroid");
   // .addComponent(
   //   createRender({
   //     color: Color(fieldColors[type]).rgbNumber(),

@@ -39,11 +39,8 @@ export class Query<T extends keyof CoreComponents> {
     });
 
     sim.hooks.removeComponent.tap("query", ({ component, entity }) => {
-      if (
-        this.entities &&
-        (this.requiredComponents as readonly string[]).includes(component)
-      ) {
-        this.entities = this.entities.filter((e) => e.id !== entity.id);
+      if (this.entities && this.requiredComponents.includes(component)) {
+        this.remove(entity);
       }
     });
 
@@ -58,22 +55,27 @@ export class Query<T extends keyof CoreComponents> {
       }
     });
 
-    sim.hooks.removeComponent.tap("query", ({ component, entity }) => {
-      if (
-        this.entities &&
-        this.requiredComponents.includes(component) &&
-        (this.requiredComponents as readonly string[]).includes(component)
-      ) {
-        this.entities = this.entities.filter((e) => e.id !== entity.id);
+    sim.hooks.removeTag.tap("query", ({ tag, entity }) => {
+      if (this.entities && this.requiredTags.includes(tag)) {
+        this.remove(entity);
       }
     });
 
     sim.hooks.removeEntity.tap("query", (entity: Entity) => {
       if (this.entities) {
-        this.entities = this.entities.filter((e) => e.id !== entity.id);
+        this.remove(entity);
       }
     });
   }
+
+  remove = (entity: Entity) => {
+    if (this.entities) {
+      const index = this.entities.indexOf(entity as any);
+      if (index !== -1) {
+        this.entities.splice(index, 1);
+      }
+    }
+  };
 
   get = (): QueryEntities<T> => {
     if (!this.entities) {

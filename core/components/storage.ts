@@ -1,6 +1,7 @@
 import { min, sum } from "mathjs";
 import map from "lodash/map";
 import toPairs from "lodash/toPairs";
+import { filter, pipe, map as fxtsMap, sum as fxtsSum } from "@fxts/core";
 import {
   InsufficientStorage,
   InsufficientStorageSpace,
@@ -18,6 +19,7 @@ import {
   releaseAllocation,
 } from "../components/utils/allocations";
 import type { Commodity } from "../economy/commodity";
+import { commoditiesArray } from "../economy/commodity";
 import type { BaseComponent } from "./component";
 
 export type StorageAllocationType = "incoming" | "outgoing";
@@ -46,29 +48,19 @@ export function hasSufficientStorage(
 }
 
 export function updateAvailableWares(storage: CommodityStorage) {
-  storage.availableWares = [
-    ...toPairs(storage.stored)
-      .map(([commodity, stored]) => ({
-        commodity,
-        stored,
-      }))
-      .flat(),
-    ...storage.allocations
-      .filter((allocation) => allocation.type === "outgoing")
-      .map((allocation) =>
-        toPairs(allocation.amount).map(([commodity, stored]) => ({
-          commodity,
-          stored: -stored,
-        }))
-      )
-      .flat(),
-  ].reduce(
-    (acc, val) => ({
-      ...acc,
-      [val.commodity]: acc[val.commodity] + val.stored,
-    }),
-    perCommodity(() => 0)
+  const outgoingAllocations = storage.allocations.filter(
+    (a) => a.type === "outgoing"
   );
+
+  commoditiesArray.forEach((commodity) => {
+    storage.availableWares[commodity] =
+      storage.stored[commodity] -
+      (pipe(
+        outgoingAllocations,
+        fxtsMap((a) => a.amount[commodity]),
+        fxtsSum
+      ) || 0);
+  });
 }
 
 export function getAvailableSpace(storage: CommodityStorage) {
@@ -92,10 +84,6 @@ export function hasSufficientStorageSpace(
   }
 
   return getAvailableSpace(storage) >= quantity;
-}
-
-export function onStorageChange(storage: CommodityStorage) {
-  updateAvailableWares(storage);
 }
 
 export function validateStorageAllocation(
