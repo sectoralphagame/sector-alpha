@@ -7,8 +7,11 @@ interface CollapsibleProps extends React.HTMLAttributes<HTMLDivElement> {
   defaultOpen?: boolean;
 }
 
-export const Collapsible: React.FC<CollapsibleProps> = (props) => (
-  <Disclosure {...props} as="div" className={styles.root} />
+export const Collapsible: React.FC<CollapsibleProps> = ({
+  className,
+  ...props
+}) => (
+  <Disclosure {...props} as="div" className={clsx(styles.root, className)} />
 );
 
 export const CollapsibleSummary: React.FC<

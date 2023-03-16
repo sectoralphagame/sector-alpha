@@ -17,6 +17,7 @@ const FacilityPanel: React.FC<{ entity: Facility }> = ({
       </>
     )}
     <Docks entity={facility} />
+    <hr />
   </div>
 );
 

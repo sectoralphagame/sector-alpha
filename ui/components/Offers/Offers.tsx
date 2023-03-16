@@ -53,8 +53,7 @@ export const Offers: React.FC<OffersProps> = ({ entity, onManage }) => {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Stored</th>
-              <th>Offer</th>
+              <th>Quantity</th>
               <th>Buy</th>
               <th>Sell</th>
             </tr>
@@ -66,13 +65,11 @@ export const Offers: React.FC<OffersProps> = ({ entity, onManage }) => {
                 <TableCell>-</TableCell>
                 <TableCell>-</TableCell>
                 <TableCell>-</TableCell>
-                <TableCell>-</TableCell>
               </tr>
             ) : (
               offered.map((data) => (
                 <tr key={data.commodity}>
                   <TableCell>{commodityLabel[data.commodity]}</TableCell>
-                  <TableCell>{data.stored}</TableCell>
                   <TableCell>{data.quantity}</TableCell>
                   <TableCell>
                     {data.type === "buy" ? data.price : "-"}
