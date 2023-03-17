@@ -45,6 +45,11 @@ export const Game: React.FC = () => {
       sim.unregisterSystem(system.current!);
     };
 
+    sim.hooks.removeEntity.tap("Game", (entity) => {
+      if (entity.id === selectedId) {
+        setSelectedEntity(undefined);
+      }
+    });
     sim.hooks.destroy.tap("Game", unmount);
 
     (window as any).cheats = {

@@ -30,7 +30,7 @@ export const Storage: React.FC<StorageProps> = ({ entity }) => {
         <ul className={styles.list}>
           {storedCommodities.length > 0
             ? storedCommodities.map((commodity) => (
-                <li className={styles.listItem}>
+                <li className={styles.listItem} key={commodity}>
                   {`${commodityLabel[commodity]} x${entity.cp.storage.availableWares[commodity]} (${entity.cp.storage.stored[commodity]})`}
                 </li>
               ))

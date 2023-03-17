@@ -70,10 +70,11 @@ export class Query<T extends keyof CoreComponents> {
 
   remove = (entity: Entity) => {
     if (this.entities) {
-      const index = this.entities.indexOf(entity as any);
-      if (index !== -1) {
-        this.entities.splice(index, 1);
-      }
+      // Using splice breaks iterating
+      // Example: Query holds array of 5 entities
+      // During forEach loop 3rd entity is removed
+      // Next iteration will take 5th entity, not 4th
+      this.entities = this.entities.filter((e) => e.id !== entity.id);
     }
   };
 

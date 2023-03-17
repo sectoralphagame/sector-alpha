@@ -47,7 +47,7 @@ export function requestShip(
 
   if (!bp) return null;
 
-  if (queue || Math.random() < 0.15) {
+  if (queue) {
     shipyard.cp.shipyard.queue.push({
       blueprint: bp,
       owner: faction.id,
@@ -526,7 +526,15 @@ export class ShipPlanningSystem extends System {
           this.sim.queries.shipyards
             .get()
             .find((s) => s.cp.owner.id === faction.id) ??
-          pickRandom(this.sim.queries.shipyards.get());
+          pickRandom(
+            this.sim.queries.shipyards
+              .get()
+              .filter(
+                (s) =>
+                  this.sim.getOrThrow<Faction>(s.cp.owner.id).cp.relations
+                    .values[faction.id] >= relationThresholds.shipyard
+              )
+          );
 
         this.assignTraders(
           faction,

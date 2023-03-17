@@ -70,6 +70,14 @@ export class ProducingSystem extends System {
   constructor(sim: Sim) {
     super(sim);
     this.cooldowns = new Cooldowns("exec");
+
+    this.sim.hooks.removeEntity.tap("ProducingSystem", (entity) => {
+      if (entity.cp.modules) {
+        entity.cp.modules.ids.forEach((id) =>
+          this.sim.getOrThrow(id).unregister()
+        );
+      }
+    });
   }
 
   exec = (delta: number): void => {
