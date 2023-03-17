@@ -21,7 +21,7 @@ export const Storage: React.FC<StorageProps> = ({ entity }) => {
   );
 
   return (
-    <Collapsible className={styles.root}>
+    <Collapsible className={styles.root} defaultOpen>
       <CollapsibleSummary>
         Cargo ({sum(Object.values(entity.cp.storage.stored))} /{" "}
         {entity.cp.storage.max})
