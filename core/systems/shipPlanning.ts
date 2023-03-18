@@ -105,7 +105,7 @@ export class ShipPlanningSystem extends System {
               0
             )
         );
-        const shipsForShipyards = facility.cp.shipyard ? 1 : 0;
+        const shipsForShipyards = facility.cp.shipyard ? 2 : 0;
 
         const mining =
           Object.entries(production)
@@ -117,7 +117,8 @@ export class ShipPlanningSystem extends System {
                 )
             )
             .reduce(
-              (m, [, commodityProduction]) => m + commodityProduction,
+              (m, [, commodityProduction]) =>
+                m - Math.max(-1, -commodityProduction / 4),
               0
             ) + miners.length;
 

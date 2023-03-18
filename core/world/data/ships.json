@@ -13,10 +13,10 @@
     "acceleration": 0.1,
     "build": {
       "cost": {
-        "electronics": 15,
-        "hullPlates": 400,
-        "fuel": 200,
-        "engineParts": 10
+        "electronics": 7,
+        "hullPlates": 200,
+        "fuel": 100,
+        "engineParts": 5
       },
       "time": 60
     },
@@ -41,10 +41,10 @@
     "acceleration": 0.1,
     "build": {
       "cost": {
-        "hullPlates": 430,
-        "electronics": 17,
-        "fuel": 220,
-        "engineParts": 12
+        "hullPlates": 215,
+        "electronics": 8,
+        "fuel": 110,
+        "engineParts": 6
       },
       "time": 60
     },
@@ -69,10 +69,10 @@
     "acceleration": 0.1,
     "build": {
       "cost": {
-        "hullPlates": 3400,
-        "electronics": 85,
-        "fuel": 1197,
-        "engineParts": 90
+        "hullPlates": 1700,
+        "electronics": 42,
+        "fuel": 598,
+        "engineParts": 45
       },
       "time": 60
     },
@@ -97,10 +97,10 @@
     "acceleration": 0.1,
     "build": {
       "cost": {
-        "fuel": 3500,
-        "hullPlates": 1100,
-        "electronics": 95,
-        "engineParts": 105
+        "fuel": 1750,
+        "hullPlates": 550,
+        "electronics": 47,
+        "engineParts": 52
       },
       "time": 60
     },
@@ -125,10 +125,10 @@
     "acceleration": 0.1,
     "build": {
       "cost": {
-        "hullPlates": 14000,
-        "electronics": 590,
-        "fuel": 7600,
-        "engineParts": 420
+        "hullPlates": 7000,
+        "electronics": 295,
+        "fuel": 3800,
+        "engineParts": 210
       },
       "time": 60
     },
@@ -153,10 +153,10 @@
     "acceleration": 0.1,
     "build": {
       "cost": {
-        "hullPlates": 16500,
-        "electronics": 640,
-        "fuel": 6900,
-        "engineParts": 580
+        "hullPlates": 8250,
+        "electronics": 320,
+        "fuel": 3450,
+        "engineParts": 290
       },
       "time": 60
     },
@@ -181,10 +181,10 @@
     "acceleration": 0.1,
     "build": {
       "cost": {
-        "hullPlates": 3000,
-        "electronics": 130,
-        "fuel": 850,
-        "engineParts": 75
+        "hullPlates": 1500,
+        "electronics": 65,
+        "fuel": 425,
+        "engineParts": 37
       },
       "time": 60
     },
@@ -209,10 +209,10 @@
     "acceleration": 0.1,
     "build": {
       "cost": {
-        "hullPlates": 3100,
-        "electronics": 110,
-        "fuel": 800,
-        "engineParts": 80
+        "hullPlates": 1550,
+        "electronics": 55,
+        "fuel": 400,
+        "engineParts": 40
       },
       "time": 60
     },
@@ -228,10 +228,10 @@
     "build": {
       "time": 190,
       "cost": {
-        "hullPlates": 11400,
-        "electronics": 290,
-        "fuel": 4000,
-        "engineParts": 90
+        "hullPlates": 5700,
+        "electronics": 145,
+        "fuel": 2000,
+        "engineParts": 45
       }
     },
     "mining": 1.7,
@@ -256,11 +256,11 @@
     "build": {
       "time": 0,
       "cost": {
-        "drones": 10,
-        "electronics": 2100,
-        "hullPlates": 51000,
-        "fuel": 12000,
-        "engineParts": 380
+        "drones": 5,
+        "electronics": 1050,
+        "hullPlates": 25500,
+        "fuel": 6000,
+        "engineParts": 190
       }
     },
     "mining": 0,
@@ -285,11 +285,11 @@
     "build": {
       "time": 0,
       "cost": {
-        "drones": 7,
-        "electronics": 1500,
-        "hullPlates": 33000,
-        "fuel": 8000,
-        "engineParts": 410
+        "drones": 3,
+        "electronics": 750,
+        "hullPlates": 16500,
+        "fuel": 4000,
+        "engineParts": 205
       }
     },
     "mining": 0,
@@ -314,11 +314,11 @@
     "build": {
       "time": 70,
       "cost": {
-        "drones": 1,
-        "fuel": 700,
-        "hullPlates": 1400,
-        "electronics": 50,
-        "engineParts": 20
+        "drones": 0,
+        "fuel": 350,
+        "hullPlates": 700,
+        "electronics": 25,
+        "engineParts": 10
       }
     },
     "damage": { "value": 3, "range": 2.2 },
@@ -344,11 +344,11 @@
     "build": {
       "time": 0,
       "cost": {
-        "drones": 50,
-        "electronics": 1000,
-        "fuel": 2600,
-        "hullPlates": 8900,
-        "engineParts": 125
+        "drones": 25,
+        "electronics": 500,
+        "fuel": 1300,
+        "hullPlates": 4450,
+        "engineParts": 62
       }
     },
     "damage": { "value": 13, "range": 2.7 },
@@ -374,13 +374,13 @@
     "build": {
       "time": 0,
       "cost": {
-        "engineParts": 400,
-        "hullPlates": 14800,
-        "fuel": 8100,
-        "electronics": 710
+        "engineParts": 200,
+        "hullPlates": 7400,
+        "fuel": 4050,
+        "electronics": 355
       }
     },
-    "mining": 2.2,
+    "mining": 1.6,
     "role": "mining",
     "cruise": 1,
     "maneuver": 0.09,

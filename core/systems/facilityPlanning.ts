@@ -111,8 +111,9 @@ export class FacilityPlanningSystem extends System {
       for (
         let i = 0;
         i <
-        resources[commodity].max /
-          ((10000 * facilityModule.pac![commodity]!.consumes) / 3600);
+          resources[commodity].max /
+            ((10000 * facilityModule.pac![commodity]!.consumes) / 3600) &&
+        i < 8;
         i++
       ) {
         addFacilityModule(
