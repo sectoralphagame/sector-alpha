@@ -225,7 +225,10 @@ export class OrderExecutingSystem extends System {
           order.actions.shift();
           if (order.actions.length === 0 && isCompleted(entity, order)) {
             onCompleted(entity, order);
-            entity.cp.orders.value.shift();
+            // After deploying facility it loses orders component
+            if (entity.cp.orders) {
+              entity.cp.orders.value.shift();
+            }
           }
         } else if (order.interrupt) {
           order.interrupt = false;

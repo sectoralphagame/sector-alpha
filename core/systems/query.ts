@@ -31,7 +31,7 @@ export class Query<T extends keyof CoreComponents> {
       if (
         this.entities &&
         this.requiredComponents.includes(component) &&
-        entity.hasComponents(this.requiredComponents) &&
+        this.canBeAdded(entity) &&
         !this.entities.find((e) => e === entity)
       ) {
         this.entities.push(entity as RequireComponent<T>);
@@ -48,7 +48,7 @@ export class Query<T extends keyof CoreComponents> {
       if (
         this.entities &&
         this.requiredTags.includes(tag) &&
-        entity.hasTags(this.requiredTags) &&
+        this.canBeAdded(entity) &&
         !this.entities.find((e) => e === entity)
       ) {
         this.entities.push(entity as RequireComponent<T>);
@@ -67,6 +67,10 @@ export class Query<T extends keyof CoreComponents> {
       }
     });
   }
+
+  canBeAdded = (entity: Entity) =>
+    entity.hasComponents(this.requiredComponents) &&
+    entity.hasTags(this.requiredTags);
 
   remove = (entity: Entity) => {
     if (this.entities) {

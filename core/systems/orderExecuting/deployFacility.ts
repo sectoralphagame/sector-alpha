@@ -24,6 +24,7 @@ export function deployFacilityAction(entity: Ship): boolean {
     [
       "autoOrder",
       "commander",
+      "damage",
       "deployable",
       "dockable",
       "docks",
@@ -37,6 +38,8 @@ export function deployFacilityAction(entity: Ship): boolean {
   ).reduce((ship, component) => ship.removeComponent(component), entity);
 
   entity
+    .removeTag("ship")
+    .removeTag("role:building")
     .addComponent(createBudget())
     .addComponent(createDocks({ large: 1, medium: 3, small: 3 }))
     .addComponent({
@@ -51,7 +54,8 @@ export function deployFacilityAction(entity: Ship): boolean {
     .addComponent(createTrade())
     .addComponent({ name: "facilityModuleQueue", building: null, queue: [] })
     .addComponent({ name: "journal", entries: [] })
-    .addComponent(render);
+    .addComponent(render)
+    .addTag("facility");
 
   const facilityEnt = facility(entity);
 
