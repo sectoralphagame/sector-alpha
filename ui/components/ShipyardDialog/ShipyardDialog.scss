@@ -1,0 +1,93 @@
+$columnHeight: 364px;
+
+.root {
+  display: grid;
+  grid-template-columns: 200px 1fr 300px;
+  gap: var(--spacing-4);
+}
+
+.blueprints {
+  height: $columnHeight;
+  overflow-y: scroll;
+
+  &Item {
+    border-color: var(--palette-border);
+    border-radius: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    text-transform: none;
+    width: 100%;
+    text-align: left;
+    height: 48px;
+
+    &Active {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+  }
+}
+
+.build {
+  position: relative;
+
+  &Time {
+    margin-top: var(--spacing-4);
+  }
+  &Cost {
+    line-height: 1.6;
+  }
+  &Container {
+    height: $columnHeight;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  &Total {
+    margin-bottom: var(--spacing-1);
+  }
+}
+
+.order {
+  height: $columnHeight;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.queue {
+  flex-grow: 1;
+  overflow-y: scroll;
+  position: relative;
+  top: -4px;
+
+  &Item {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--palette-border);
+    }
+
+    &Remove {
+      position: relative;
+      top: 2px;
+      margin-left: var(--spacing-0-5);
+    }
+  }
+  &Accept {
+    width: 100%;
+  }
+}
+
+.input {
+  width: 48px;
+  border: none;
+  text-align: right;
+  background: none;
+  color: var(--palette-text-1);
+  outline: none;
+}
+
+.sectionHeader {
+  font-size: 1.2rem;
+  margin-top: 0;
+}

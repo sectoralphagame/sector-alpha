@@ -4,3 +4,24 @@
 .item {
   display: block;
 }
+.buyBtn {
+  display: inline-flex;
+  align-items: center;
+  background-color: transparent;
+  cursor: pointer;
+  border: none;
+  appearance: none;
+  color: var(--palette-text-1);
+
+  svg {
+    margin-left: var(--spacing-1);
+    width: 1rem;
+    height: 1rem;
+    transform: rotate(180deg);
+  }
+}
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

@@ -16,8 +16,12 @@ export const Collapsible: React.FC<CollapsibleProps> = ({
 
 export const CollapsibleSummary: React.FC<
   React.HTMLAttributes<HTMLDivElement>
-> = (props) => (
-  <Disclosure.Button {...props} as="div" className={styles.header} />
+> = ({ className, ...props }) => (
+  <Disclosure.Button
+    {...props}
+    as="div"
+    className={clsx(className, styles.header)}
+  />
 );
 
 export const CollapsibleContent: React.FC<

@@ -53,13 +53,15 @@ export function updateAvailableWares(storage: CommodityStorage) {
   );
 
   commoditiesArray.forEach((commodity) => {
-    storage.availableWares[commodity] =
+    storage.availableWares[commodity] = Math.max(
+      0,
       storage.stored[commodity] -
-      (pipe(
-        outgoingAllocations,
-        fxtsMap((a) => a.amount[commodity]),
-        fxtsSum
-      ) || 0);
+        (pipe(
+          outgoingAllocations,
+          fxtsMap((a) => a.amount[commodity]),
+          fxtsSum
+        ) || 0)
+    );
   });
 }
 

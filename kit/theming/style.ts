@@ -23,6 +23,7 @@ export interface Theme {
   };
   typography: {
     button: string;
+    caption: string;
     label: string;
     default: string;
     header: string;
@@ -53,6 +54,7 @@ export function createTheme(scale: number): Theme {
     },
     typography: {
       button: `${baseFontSize * 0.875}px`,
+      caption: `${baseFontSize * 0.75}px`,
       label: `${baseFontSize * 0.875}px`,
       default: `${baseFontSize}px`,
       header: `${Math.ceil(baseFontSize * 1.3 ** 2)}px`,
