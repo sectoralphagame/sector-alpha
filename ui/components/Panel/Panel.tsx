@@ -105,9 +105,17 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
           sim.start();
         }}
         onSpeed={() => {
-          sim.setSpeed(10);
+          sim.setSpeed(5);
           sim.start();
         }}
+        onTurbo={
+          process.env.NODE_ENV === "development"
+            ? () => {
+                sim.setSpeed(50);
+                sim.start();
+              }
+            : undefined
+        }
       >
         {!isCollapsed &&
           (entity ? (

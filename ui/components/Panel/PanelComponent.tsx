@@ -17,6 +17,7 @@ export interface PanelComponentProps {
   onPause: () => void;
   onPlay: () => void;
   onSpeed: () => void;
+  onTurbo?: () => void;
   onFocus: (() => void) | undefined;
 }
 
@@ -27,6 +28,7 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
   onPause,
   onPlay,
   onSpeed,
+  onTurbo,
   onFocus,
   children,
 }) => (
@@ -59,6 +61,11 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
       <IconButton onClick={onSpeed}>
         <SVG src={ffIcon} />
       </IconButton>
+      {!!onTurbo && (
+        <IconButton className={styles.turbo} onClick={onTurbo}>
+          <SVG src={ffIcon} />
+        </IconButton>
+      )}
       {!!onFocus && (
         <IconButton onClick={onFocus}>
           <SVG src={locationIcon} />
