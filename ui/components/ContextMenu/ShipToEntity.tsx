@@ -84,10 +84,7 @@ export const ShipToEntity: React.FC = () => {
           entity,
           createMarker(entity.sim, {
             sector: actionable.cp.position.sector,
-            value: add(
-              actionable.cp.position.coord,
-              matrix([random(-1, 1), random(-1, 1)])
-            ),
+            value: actionable.cp.position.coord,
             owner: entity.id,
           })
         ),
@@ -109,6 +106,27 @@ export const ShipToEntity: React.FC = () => {
       actions: [],
       ordersForSector: 0,
       followOutsideSector: true,
+    });
+  };
+
+  const onCollect = () => {
+    entity.cp.orders!.value.push({
+      origin: "manual",
+      type: "collect",
+      actions: [
+        ...moveToActions(
+          entity,
+          createMarker(entity.sim, {
+            sector: actionable.cp.position.sector,
+            value: actionable.cp.position.coord,
+            owner: entity.id,
+          })
+        ),
+        {
+          type: "collect",
+          targetId: actionable.id,
+        },
+      ],
     });
   };
 
@@ -140,6 +158,10 @@ export const ShipToEntity: React.FC = () => {
       {entity.hasComponents(["damage"]) &&
         actionable.hasComponents(["hitpoints"]) && (
           <DropdownOption onClick={onAttack}>Attack</DropdownOption>
+        )}
+      {entity.hasComponents(["storage"]) &&
+        actionable.hasComponents(["simpleCommodityStorage"]) && (
+          <DropdownOption onClick={onCollect}>Collect</DropdownOption>
         )}
     </>
   );

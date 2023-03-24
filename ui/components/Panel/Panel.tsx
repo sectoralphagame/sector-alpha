@@ -35,6 +35,7 @@ import { Allocations } from "../Allocations";
 import { FacilityTradeManager } from "../FacilityTradeManager";
 import { Storage } from "../Storage/Storage";
 import { ShipyardDialog } from "../ShipyardDialog";
+import { SimpleStorage } from "../Storage";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -180,8 +181,17 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                     )}
                   </>
                 )}
+                {entity.hasComponents(["simpleCommodityStorage"]) && (
+                  <>
+                    <SimpleStorage
+                      entity={entity.requireComponents([
+                        "simpleCommodityStorage",
+                      ])}
+                    />
+                    <hr />
+                  </>
+                )}
                 <Subordinates entity={entity} />
-                <hr />
                 {entity.hasComponents(["deployable"]) && (
                   <Undeploy
                     deployable={entity.requireComponents(["deployable"])}

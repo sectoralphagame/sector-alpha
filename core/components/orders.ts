@@ -49,6 +49,11 @@ export interface BuilderDeployAction {
   targetId: number;
 }
 
+export interface CollectAction {
+  type: "collect";
+  targetId: number;
+}
+
 export type Action =
   | AttackAction
   | MoveAction
@@ -58,7 +63,8 @@ export type Action =
   | TeleportAction
   | DockAction
   | FacilityDeployAction
-  | BuilderDeployAction;
+  | BuilderDeployAction
+  | CollectAction;
 export interface BaseOrder {
   origin: "auto" | "manual";
   actions: Action[];
@@ -108,7 +114,13 @@ export interface TradeOrder extends BaseOrder {
 
 export type Order =
   | ({
-      type: "hold" | "move" | "dock" | "deployFacility" | "deployBuilder";
+      type:
+        | "hold"
+        | "move"
+        | "dock"
+        | "deployFacility"
+        | "deployBuilder"
+        | "collect";
     } & BaseOrder)
   | AttackOrder
   | FollowOrder

@@ -18,6 +18,7 @@ const minScale = 0.05;
 const maxScale = 20;
 
 const layerScaleThresholds: Partial<Record<Layer, number>> = {
+  collectible: 0.15,
   facility: 0.065,
   ship: 0.1,
 };
@@ -126,11 +127,13 @@ export class RenderingSystem extends SystemWithHooks {
       ship: new PIXI.Container(),
       global: new PIXI.Container(),
       selection: new PIXI.Container(),
+      collectible: new PIXI.Container(),
     };
 
     this.layers.global.zIndex = 0;
-    this.layers.facility.zIndex = 1;
-    this.layers.ship.zIndex = 2;
+    this.layers.collectible.zIndex = 1;
+    this.layers.facility.zIndex = 2;
+    this.layers.ship.zIndex = 3;
     this.layers.selection.zIndex = 100;
 
     Object.values(this.layers).forEach((layer) =>

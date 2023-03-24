@@ -25,6 +25,7 @@ import {
   isAttackOrderCompleted,
 } from "./attack";
 import { patrolOrder } from "./patrol";
+import { collectAction } from "./collect";
 
 const orderFns: Partial<
   Record<
@@ -118,7 +119,8 @@ function cleanupOrders(entity: Entity): void {
           (action) =>
             (action.type === "dock" ||
               action.type === "deployBuilder" ||
-              action.type === "trade") &&
+              action.type === "trade" ||
+              action.type === "collect") &&
             action.targetId === entity.id
         ) ||
         ((order.type === "follow" ||
@@ -187,6 +189,7 @@ const actionFns: Partial<
   dock: dockOrder,
   deployFacility: deployFacilityAction,
   deployBuilder: deployBuilderAction,
+  collect: collectAction,
 };
 
 export class OrderExecutingSystem extends System {

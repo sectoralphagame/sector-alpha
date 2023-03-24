@@ -34,6 +34,8 @@ export class Entity {
   @Type(() => Set)
   tags: Set<EntityTag>;
   @Expose()
+  createdAt: number;
+  @Expose()
   id: number;
   sim: Sim;
   deleted: boolean = false;
@@ -41,6 +43,7 @@ export class Entity {
   constructor(sim?: Sim) {
     if (sim) {
       this.sim = sim;
+      this.createdAt = sim.getTime();
       sim.registerEntity(this);
     }
 

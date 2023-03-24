@@ -1,7 +1,7 @@
 import type { Budget } from "./budget";
 import type { Owner } from "./owner";
 import type { Trade } from "./trade";
-import type { CommodityStorage } from "./storage";
+import type { CommodityStorage, SimpleCommodityStorage } from "./storage";
 import type { Position } from "./position";
 import type { CompoundProduction, Production } from "./production";
 import type { Parent } from "./parent";
@@ -77,6 +77,7 @@ export interface CoreComponents {
   sectorStats: SectorStats;
   selectionManager: SelectionManager;
   shipyard: Shipyard;
+  simpleCommodityStorage: SimpleCommodityStorage;
   storage: CommodityStorage;
   storageBonus: StorageBonus;
   systemManager: SystemManager;

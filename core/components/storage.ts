@@ -239,3 +239,9 @@ export function createCommodityStorage(max?: number): CommodityStorage {
 
   return storage;
 }
+
+export interface SimpleCommodityStorage
+  extends BaseComponent<"simpleCommodityStorage"> {
+  commodity: Commodity;
+  stored: number;
+}

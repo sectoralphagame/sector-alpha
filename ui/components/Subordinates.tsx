@@ -13,25 +13,30 @@ export interface SubordinatesProps {
 }
 
 export const Subordinates: React.FC<SubordinatesProps> = ({ entity }) => {
+  if (!entity.tags.has("ship") && !entity.tags.has("facility")) return null;
+
   const subordinates = entity.sim.queries.commendables
     .get()
     .filter((e) => e?.cp.commander?.id === entity.id)
     .map(asShip);
 
   return (
-    <Collapsible>
-      <CollapsibleSummary>Subordinates</CollapsibleSummary>
-      <CollapsibleContent>
-        {subordinates.length === 0 ? (
-          <div>No Subordinates</div>
-        ) : (
-          <EntityList
-            entities={subordinates.map((ship) =>
-              ship.requireComponents(["name"])
-            )}
-          />
-        )}
-      </CollapsibleContent>
-    </Collapsible>
+    <>
+      <Collapsible>
+        <CollapsibleSummary>Subordinates</CollapsibleSummary>
+        <CollapsibleContent>
+          {subordinates.length === 0 ? (
+            <div>No Subordinates</div>
+          ) : (
+            <EntityList
+              entities={subordinates.map((ship) =>
+                ship.requireComponents(["name"])
+              )}
+            />
+          )}
+        </CollapsibleContent>
+      </Collapsible>
+      <hr />
+    </>
   );
 };
