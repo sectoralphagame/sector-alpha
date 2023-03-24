@@ -9,7 +9,7 @@ import {
 import { IconButton } from "@kit/IconButton";
 import React from "react";
 import SVG from "react-inlinesvg";
-import locationIcon from "@assets/ui/location.svg";
+import redoIcon from "@assets/ui/redo.svg";
 import { useLocalStorage } from "@ui/hooks/useLocalStorage";
 import sortBy from "lodash/sortBy";
 import clsx from "clsx";
@@ -76,7 +76,7 @@ export const TradeFinder: React.FC = () => {
                   entity.id;
               }}
             >
-              <SVG src={locationIcon} />
+              <SVG src={redoIcon} />
             </IconButton>
           </div>
         ))}

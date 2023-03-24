@@ -1,7 +1,7 @@
 import React from "react";
 import SVG from "react-inlinesvg";
 import type { RequireComponent } from "@core/tsHelpers";
-import locationIcon from "@assets/ui/location.svg";
+import redoIcon from "@assets/ui/redo.svg";
 import { IconButton } from "@kit/IconButton";
 import { Table, TableCell } from "@kit/Table";
 import styles from "./EntityList.scss";
@@ -25,10 +25,9 @@ export const EntityList: React.FC<EntityListProps> = ({ entities }) => (
                   const { selectionManager } =
                     entity.sim.queries.settings.get()[0].cp;
                   selectionManager.id = entity.id;
-                  selectionManager.focused = true;
                 }}
               >
-                <SVG src={locationIcon} />
+                <SVG src={redoIcon} />
               </IconButton>
             </TableCell>
           )}

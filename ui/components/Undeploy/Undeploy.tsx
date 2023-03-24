@@ -2,7 +2,7 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import type { Entity } from "@core/entity";
 import type { RequireComponent } from "@core/tsHelpers";
-import locationIcon from "@assets/ui/location.svg";
+import redoIcon from "@assets/ui/redo.svg";
 import { IconButton } from "@kit/IconButton";
 import { Button } from "@kit/Button";
 import clsx from "clsx";
@@ -36,7 +36,7 @@ export const Undeploy: React.FC<UndeployProps> = ({ facility, deployable }) => {
                 selectionManager.focused = true;
               }}
             >
-              <SVG src={locationIcon} />
+              <SVG src={redoIcon} />
             </IconButton>
           </div>
         </div>

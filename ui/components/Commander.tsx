@@ -2,7 +2,7 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import type { Entity } from "@core/entity";
 import type { RequireComponent } from "@core/tsHelpers";
-import locationIcon from "@assets/ui/location.svg";
+import redoIcon from "@assets/ui/redo.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
 import { useSim } from "../atoms";
@@ -32,7 +32,7 @@ export const Commander: React.FC<CommanderProps> = ({ commander, ship }) => {
             selectionManager.focused = true;
           }}
         >
-          <SVG src={locationIcon} />
+          <SVG src={redoIcon} />
         </IconButton>
         {isOwned && (
           <IconButton
