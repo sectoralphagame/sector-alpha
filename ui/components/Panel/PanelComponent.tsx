@@ -42,8 +42,8 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
       })}
     >
       {isCollapsed ? (
-        <IconButton className={styles.rotate} onClick={onCollapseToggle}>
-          <SVG src={arrowLeftIcon} />
+        <IconButton onClick={onCollapseToggle}>
+          <SVG className={styles.rotate} src={arrowLeftIcon} />
         </IconButton>
       ) : (
         <IconButton onClick={onConfig}>
