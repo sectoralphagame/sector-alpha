@@ -46,8 +46,8 @@ export const NewGame: React.FC = () => {
   }, []);
 
   return (
-    <View showBack={false} title="Start new game">
-      {`Loading... ${(progress * 100).toFixed(0)}%`}
+    <View showBack={false} title="Starting new game...">
+      {`${(progress * 100).toFixed(0)}%`}
     </View>
   );
 };

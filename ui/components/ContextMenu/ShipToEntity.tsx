@@ -130,6 +130,16 @@ export const ShipToEntity: React.FC = () => {
     });
   };
 
+  const onEscort = () => {
+    entity.cp.orders!.value.push({
+      origin: "manual",
+      type: "escort",
+      targetId: actionable.id,
+      actions: [],
+      ordersForSector: 0,
+    });
+  };
+
   return (
     <>
       {actionable.hasComponents(["trade"]) &&
@@ -143,6 +153,10 @@ export const ShipToEntity: React.FC = () => {
       {actionable.hasComponents(["drive"]) && (
         <DropdownOption onClick={onFollow}>Follow</DropdownOption>
       )}
+      {actionable.hasComponents(["drive"]) &&
+        actionable.cp.owner?.id === entity.cp.owner?.id && (
+          <DropdownOption onClick={onEscort}>Escort</DropdownOption>
+        )}
       {entity.hasComponents(["storage"]) &&
         actionable.hasComponents(["trade", "name"]) &&
         isOwnedByPlayer(actionable) && (

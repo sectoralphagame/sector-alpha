@@ -370,6 +370,66 @@
     }
   },
   {
+    "acceleration": 0.27,
+    "build": {
+      "time": 70,
+      "cost": {
+        "drones": 1,
+        "fuel": 290,
+        "hullPlates": 560,
+        "electronics": 22,
+        "engineParts": 13
+      }
+    },
+    "damage": { "value": 2.2, "range": 1.9 },
+    "range": 2,
+    "mining": 0,
+    "role": "military",
+    "cruise": 2.1,
+    "maneuver": 0.69,
+    "rotary": 210,
+    "ttc": 0.3,
+    "name": "Stinger",
+    "size": "small",
+    "storage": 0,
+    "texture": "sMil",
+    "slug": "tauFighter",
+    "hitpoints": {
+      "hp": { "value": 95, "regen": 0.2 },
+      "shield": { "value": 45, "regen": 2.4 }
+    }
+  },
+  {
+    "acceleration": 0.18,
+    "build": {
+      "time": 0,
+      "cost": {
+        "drones": 18,
+        "electronics": 350,
+        "fuel": 1150,
+        "hullPlates": 3450,
+        "engineParts": 84
+      }
+    },
+    "damage": { "value": 9, "range": 2.45 },
+    "range": 2.7,
+    "mining": 0,
+    "role": "military",
+    "cruise": 1.4,
+    "maneuver": 0.22,
+    "rotary": 87,
+    "ttc": 2.3,
+    "name": "Hornet",
+    "size": "medium",
+    "storage": 0,
+    "texture": "mMil",
+    "slug": "tauFrigate",
+    "hitpoints": {
+      "hp": { "value": 390, "regen": 0.2 },
+      "shield": { "value": 155, "regen": 6.5 }
+    }
+  },
+  {
     "acceleration": 0.09,
     "build": {
       "time": 0,
