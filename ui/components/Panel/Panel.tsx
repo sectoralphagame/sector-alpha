@@ -11,6 +11,7 @@ import {
 import { sector, sectorComponents } from "@core/archetypes/sector";
 import { IconButton } from "@kit/IconButton";
 import { isOwnedByPlayer } from "@core/utils/misc";
+import { isDev } from "@core/settings";
 import FacilityPanel from "../FacilityPanel";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
@@ -109,7 +110,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
           sim.start();
         }}
         onTurbo={
-          process.env.NODE_ENV === "development"
+          isDev
             ? () => {
                 sim.setSpeed(50);
                 sim.start();
