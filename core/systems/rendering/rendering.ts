@@ -9,7 +9,7 @@ import {
 } from "../../components/renderGraphics";
 import type { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
-import { SystemWithHooks } from "../hooks";
+import { SystemWithHooks } from "../utils/hooks";
 import { clearFocus } from "../../components/selection";
 import type { Layer } from "../../components/render";
 import { destroy, setTexture } from "../../components/render";
