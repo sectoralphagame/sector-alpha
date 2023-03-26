@@ -1,6 +1,6 @@
 import type { Sim } from "@core/sim";
 import { Cooldowns } from "@core/utils/cooldowns";
-import { Query } from "./query";
+import { Query } from "./utils/query";
 import { System } from "./system";
 
 export const regenCooldown = "regen";

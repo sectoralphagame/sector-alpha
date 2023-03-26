@@ -7,7 +7,7 @@ import type { Facility } from "@core/archetypes/facility";
 import { System } from "../system";
 import type { Sim } from "../../sim";
 import { Cooldowns } from "../../utils/cooldowns";
-import { Query } from "../query";
+import { Query } from "../utils/query";
 
 export class MilitaryModuleSpottingSystem extends System {
   cooldowns: Cooldowns<"exec">;

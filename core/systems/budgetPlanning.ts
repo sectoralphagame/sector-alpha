@@ -5,7 +5,7 @@ import { getPlannedBudget } from "../economy/utils";
 import type { Sim } from "../sim";
 import { Cooldowns } from "../utils/cooldowns";
 import { limitMax } from "../utils/limit";
-import { Query } from "./query";
+import { Query } from "./utils/query";
 import { System } from "./system";
 
 function settleBudget(entity: WithTrade) {

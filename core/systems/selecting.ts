@@ -1,6 +1,6 @@
 import { clearFocus } from "../components/selection";
 import { isHeadless } from "../settings";
-import { SystemWithHooks } from "./hooks";
+import { SystemWithHooks } from "./utils/hooks";
 
 export class SelectingSystem extends SystemWithHooks {
   refresh = () => {

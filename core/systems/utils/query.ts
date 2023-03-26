@@ -1,14 +1,14 @@
 import { filter, map, pipe, toArray } from "@fxts/core";
 import type { EntityTag } from "@core/tags";
-import { asteroidFieldComponents } from "../archetypes/asteroidField";
-import { facilityComponents } from "../archetypes/facility";
-import { factionComponents } from "../archetypes/faction";
-import { sectorComponents } from "../archetypes/sector";
-import type { CoreComponents } from "../components/component";
-import type { Entity } from "../entity";
-import { tradeComponents } from "../economy/utils";
-import type { Sim } from "../sim";
-import type { RequireComponent } from "../tsHelpers";
+import { asteroidFieldComponents } from "../../archetypes/asteroidField";
+import { facilityComponents } from "../../archetypes/facility";
+import { factionComponents } from "../../archetypes/faction";
+import { sectorComponents } from "../../archetypes/sector";
+import type { CoreComponents } from "../../components/component";
+import type { Entity } from "../../entity";
+import { tradeComponents } from "../../economy/utils";
+import type { Sim } from "../../sim";
+import type { RequireComponent } from "../../tsHelpers";
 
 type QueryEntities<T extends keyof CoreComponents> = Array<RequireComponent<T>>;
 

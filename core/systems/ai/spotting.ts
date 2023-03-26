@@ -6,7 +6,7 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { System } from "../system";
 import type { Sim } from "../../sim";
 import { Cooldowns } from "../../utils/cooldowns";
-import { Query } from "../query";
+import { Query } from "../utils/query";
 
 export class SpottingSystem extends System {
   cooldowns: Cooldowns<"exec">;

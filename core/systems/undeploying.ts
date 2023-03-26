@@ -3,7 +3,7 @@ import type { DeployableType } from "@core/components/deployable";
 import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
 import { Cooldowns } from "@core/utils/cooldowns";
-import { Query } from "./query";
+import { Query } from "./utils/query";
 import { System } from "./system";
 
 const handlers: Partial<

@@ -1,4 +1,4 @@
-import { System } from "./system";
+import { System } from "../system";
 
 export abstract class SystemWithHooks extends System {
   private hooks: Record<number, any> = {};

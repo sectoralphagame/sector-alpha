@@ -3,7 +3,7 @@ import type { Commodity } from "@core/economy/commodity";
 import type { Sim } from "@core/sim";
 import type { Matrix } from "mathjs";
 import { add, random } from "mathjs";
-import { Query } from "./query";
+import { Query } from "./utils/query";
 import { System } from "./system";
 
 export class DeadUnregisteringSystem extends System {

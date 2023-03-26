@@ -8,7 +8,7 @@ import {
 } from "../components/drive";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
-import { Query } from "./query";
+import { Query } from "./utils/query";
 import { System } from "./system";
 
 type Driveable = RequireComponent<"drive" | "position">;

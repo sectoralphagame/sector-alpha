@@ -7,7 +7,7 @@ import { Cooldowns } from "@core/utils/cooldowns";
 import { findInAncestors } from "@core/utils/findInAncestors";
 import { distance } from "mathjs";
 import { regenCooldown } from "./hitpointsRegenerating";
-import { Query } from "./query";
+import { Query } from "./utils/query";
 import { System } from "./system";
 
 export function isInDistance(
