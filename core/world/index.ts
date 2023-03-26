@@ -2,7 +2,7 @@ import { createSector, sectorSize } from "@core/archetypes/sector";
 import { matrix, random } from "mathjs";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { AiType } from "@core/components/ai";
-import { requestShip } from "@core/systems/shipPlanning";
+import { requestShip } from "@core/systems/ai/shipPlanning";
 import { facilityModules } from "@core/archetypes/facilityModule";
 import { changeRelations } from "@core/components/relations";
 import { createFaction } from "../archetypes/faction";

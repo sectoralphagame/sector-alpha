@@ -8,7 +8,7 @@ import { getSubordinates } from "@core/utils/misc";
 import { filter, first, map, pipe, sortBy } from "@fxts/core";
 import { distance } from "mathjs";
 import { requestShip } from "./shipPlanning";
-import { System } from "./system";
+import { System } from "../system";
 
 const fightersInFleet = 9;
 

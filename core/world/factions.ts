@@ -1,4 +1,4 @@
-import { addStartingCommodities } from "@core/systems/facilityPlanning";
+import { addStartingCommodities } from "@core/systems/ai/facilityPlanning";
 import { add, matrix, random } from "mathjs";
 import type { Faction } from "../archetypes/faction";
 import { createFaction } from "../archetypes/faction";
@@ -8,7 +8,7 @@ import { setMoney } from "../components/budget";
 import type { DockSize } from "../components/dockable";
 import { hecsToCartesian } from "../components/hecsPosition";
 import type { Sim } from "../sim";
-import { requestShip } from "../systems/shipPlanning";
+import { requestShip } from "../systems/ai/shipPlanning";
 import { pickRandom, pickRandomWithIndex } from "../utils/generators";
 import { createShipyard } from "./facilities";
 import { shipClasses } from "./ships";

@@ -1,21 +1,21 @@
 import type { ShipyardQueueItem } from "@core/components/shipyard";
 import type { DockSize } from "@core/components/dockable";
 import { relationThresholds } from "@core/components/relations";
-import type { InitialShipInput } from "../archetypes/ship";
-import { createShipName, createShip } from "../archetypes/ship";
-import { mineableCommodities } from "../economy/commodity";
-import type { Sim } from "../sim";
-import { Cooldowns } from "../utils/cooldowns";
-import { pickRandom } from "../utils/generators";
-import { perCommodity } from "../utils/perCommodity";
-import type { ShipRole } from "../world/ships";
-import { System } from "./system";
-import type { Faction } from "../archetypes/faction";
-import type { Sector } from "../archetypes/sector";
-import { sector as asSector } from "../archetypes/sector";
-import type { Entity } from "../entity";
-import type { RequireComponent } from "../tsHelpers";
-import { notNull } from "../utils/maps";
+import type { InitialShipInput } from "../../archetypes/ship";
+import { createShipName, createShip } from "../../archetypes/ship";
+import { mineableCommodities } from "../../economy/commodity";
+import type { Sim } from "../../sim";
+import { Cooldowns } from "../../utils/cooldowns";
+import { pickRandom } from "../../utils/generators";
+import { perCommodity } from "../../utils/perCommodity";
+import type { ShipRole } from "../../world/ships";
+import { System } from "../system";
+import type { Faction } from "../../archetypes/faction";
+import type { Sector } from "../../archetypes/sector";
+import { sector as asSector } from "../../archetypes/sector";
+import type { Entity } from "../../entity";
+import type { RequireComponent } from "../../tsHelpers";
+import { notNull } from "../../utils/maps";
 
 interface ShipRequest {
   trading: number;

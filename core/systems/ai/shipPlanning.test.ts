@@ -1,9 +1,9 @@
 import { matrix } from "mathjs";
-import { createFacility } from "../archetypes/facility";
-import { createFaction } from "../archetypes/faction";
-import { createSector } from "../archetypes/sector";
-import { Sim } from "../sim/Sim";
-import { shipClasses } from "../world/ships";
+import { createFacility } from "../../archetypes/facility";
+import { createFaction } from "../../archetypes/faction";
+import { createSector } from "../../archetypes/sector";
+import { Sim } from "../../sim/Sim";
+import { shipClasses } from "../../world/ships";
 import { ShipPlanningSystem } from "./shipPlanning";
 
 describe("ShipPlanningSystem", () => {

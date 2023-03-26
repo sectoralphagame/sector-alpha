@@ -4,10 +4,10 @@ import { relationThresholds } from "@core/components/relations";
 import { distance } from "mathjs";
 import type { RequireComponent } from "@core/tsHelpers";
 import type { Facility } from "@core/archetypes/facility";
-import { System } from "./system";
-import type { Sim } from "../sim";
-import { Cooldowns } from "../utils/cooldowns";
-import { Query } from "./query";
+import { System } from "../system";
+import type { Sim } from "../../sim";
+import { Cooldowns } from "../../utils/cooldowns";
+import { Query } from "../query";
 
 export class MilitaryModuleSpottingSystem extends System {
   cooldowns: Cooldowns<"exec">;

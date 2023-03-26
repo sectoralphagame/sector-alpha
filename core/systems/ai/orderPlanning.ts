@@ -3,27 +3,27 @@ import { relationThresholds } from "@core/components/relations";
 import { minBy } from "lodash";
 import type { Matrix } from "mathjs";
 import { add, matrix, norm, random, subtract } from "mathjs";
-import { asteroid } from "../archetypes/asteroid";
-import { asteroidField } from "../archetypes/asteroidField";
-import { commanderRange, facility } from "../archetypes/facility";
-import type { Marker } from "../archetypes/marker";
-import { createMarker } from "../archetypes/marker";
-import type { Sector } from "../archetypes/sector";
-import { sector as asSector, sectorSize } from "../archetypes/sector";
-import { hecsToCartesian } from "../components/hecsPosition";
-import type { TradeOrder } from "../components/orders";
-import { mineAction } from "../components/orders";
-import { getAvailableSpace } from "../components/storage";
-import { mineableCommodities } from "../economy/commodity";
+import { asteroid } from "../../archetypes/asteroid";
+import { asteroidField } from "../../archetypes/asteroidField";
+import { commanderRange, facility } from "../../archetypes/facility";
+import type { Marker } from "../../archetypes/marker";
+import { createMarker } from "../../archetypes/marker";
+import type { Sector } from "../../archetypes/sector";
+import { sector as asSector, sectorSize } from "../../archetypes/sector";
+import { hecsToCartesian } from "../../components/hecsPosition";
+import type { TradeOrder } from "../../components/orders";
+import { mineAction } from "../../components/orders";
+import { getAvailableSpace } from "../../components/storage";
+import { mineableCommodities } from "../../economy/commodity";
 import {
   getSectorsInTeleportRange,
   getTradeWithMostProfit,
   tradeComponents,
-} from "../economy/utils";
-import type { Sim } from "../sim";
-import type { RequireComponent } from "../tsHelpers";
-import { Cooldowns } from "../utils/cooldowns";
-import { moveToActions } from "../utils/moving";
+} from "../../economy/utils";
+import type { Sim } from "../../sim";
+import type { RequireComponent } from "../../tsHelpers";
+import { Cooldowns } from "../../utils/cooldowns";
+import { moveToActions } from "../../utils/moving";
 import {
   autoBuyMostNeededByCommander,
   autoSellMostRedundantToCommander,
@@ -31,9 +31,9 @@ import {
   getNeededCommodities,
   returnToFacility,
   resellCommodity,
-} from "../utils/trading";
-import { holdPosition } from "./orderExecuting/misc";
-import { System } from "./system";
+} from "../../utils/trading";
+import { holdPosition } from "../orderExecuting/misc";
+import { System } from "../system";
 
 const tradingComponents = [
   "drive",

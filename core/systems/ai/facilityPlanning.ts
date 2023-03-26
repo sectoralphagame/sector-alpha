@@ -3,31 +3,31 @@ import { discriminate } from "@core/utils/maps";
 import shuffle from "lodash/shuffle";
 import type { Matrix } from "mathjs";
 import { add, matrix, random } from "mathjs";
-import type { Facility } from "../archetypes/facility";
-import { createFacilityName, createFacility } from "../archetypes/facility";
-import { facilityModules } from "../archetypes/facilityModule";
-import type { Faction } from "../archetypes/faction";
-import type { Sector } from "../archetypes/sector";
-import { sectorSize } from "../archetypes/sector";
-import { hecsToCartesian } from "../components/hecsPosition";
-import type { PAC } from "../components/production";
-import { createCompoundProduction } from "../components/production";
-import { setTexture } from "../components/render";
-import { addStorage } from "../components/storage";
-import type { Commodity } from "../economy/commodity";
-import { commoditiesArray, mineableCommodities } from "../economy/commodity";
-import type { Sim } from "../sim";
-import { Cooldowns } from "../utils/cooldowns";
-import { addFacilityModule } from "../utils/entityModules";
-import { pickRandom } from "../utils/generators";
-import { perCommodity } from "../utils/perCommodity";
+import type { Facility } from "../../archetypes/facility";
+import { createFacilityName, createFacility } from "../../archetypes/facility";
+import { facilityModules } from "../../archetypes/facilityModule";
+import type { Faction } from "../../archetypes/faction";
+import type { Sector } from "../../archetypes/sector";
+import { sectorSize } from "../../archetypes/sector";
+import { hecsToCartesian } from "../../components/hecsPosition";
+import type { PAC } from "../../components/production";
+import { createCompoundProduction } from "../../components/production";
+import { setTexture } from "../../components/render";
+import { addStorage } from "../../components/storage";
+import type { Commodity } from "../../economy/commodity";
+import { commoditiesArray, mineableCommodities } from "../../economy/commodity";
+import type { Sim } from "../../sim";
+import { Cooldowns } from "../../utils/cooldowns";
+import { addFacilityModule } from "../../utils/entityModules";
+import { pickRandom } from "../../utils/generators";
+import { perCommodity } from "../../utils/perCommodity";
 import {
   getResourceProduction,
   getResourceUsage,
   getSectorResources,
-} from "../utils/resources";
-import { settleStorageQuota } from "./storageQuotaPlanning";
-import { System } from "./system";
+} from "../../utils/resources";
+import { settleStorageQuota } from "../storageQuotaPlanning";
+import { System } from "../system";
 
 function isAbleToBuild(
   pac: Partial<PAC>,
