@@ -105,20 +105,21 @@ export const graphics: Graphics = {
       originPosition!.coord.get([1]) * 10
     );
 
-    orders.value.forEach((orderGroup) =>
-      orderGroup.actions.forEach((order) => {
+    orders.value.forEach((order) =>
+      order.actions.forEach((action) => {
         if (
-          order.type === "dock" ||
-          order.type === "teleport" ||
-          order.type === "move"
+          action.type === "dock" ||
+          action.type === "teleport" ||
+          action.type === "move" ||
+          action.type === "attack"
         ) {
-          const target = entity.sim.get(order.targetId);
+          const target = entity.sim.get(action.targetId);
           if (!target) return;
 
           const targetPosition = findInAncestors(target!, "position").cp
             .position;
 
-          if (order.type === "teleport") {
+          if (action.type === "teleport") {
             g.moveTo(
               targetPosition!.coord.get([0]) * 10,
               targetPosition!.coord.get([1]) * 10

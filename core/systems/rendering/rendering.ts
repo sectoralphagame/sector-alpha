@@ -399,10 +399,6 @@ export class RenderingSystem extends SystemWithHooks {
     );
     this.hook(this.viewport.scale.x, this.updateScaling);
 
-    this.updateViewport();
-    this.updateGraphics();
-    this.updateRenderables();
-
     if (this.selectionManger.cp.selectionManager.focused) {
       const entity = this.sim.getOrThrow(
         this.selectionManger.cp.selectionManager.id!
@@ -415,5 +411,11 @@ export class RenderingSystem extends SystemWithHooks {
         this.selectionManger.cp.selectionManager.focused = false;
       }
     }
+
+    setTimeout(() => {
+      this.updateViewport();
+      this.updateGraphics();
+      this.updateRenderables();
+    }, 0);
   };
 }

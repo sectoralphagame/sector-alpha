@@ -398,6 +398,7 @@ export class ShipPlanningSystem extends System {
             !ship.cp.commander &&
             ship.cp.dockable?.size === "medium" &&
             ship.tags.has("role:military") &&
+            !ship.tags.has("ai:attack-force") &&
             ship.cp.orders.value.length === 0
         )
     );
@@ -409,7 +410,7 @@ export class ShipPlanningSystem extends System {
     );
 
     shipRequests
-      .filter(({ sector }) => sector)
+      .filter(({ sector, patrols }) => sector && patrols < 0)
       .forEach(({ sector, patrols }) => {
         for (let i = 0; i < -patrols; i++) {
           if (spareFrigates.length > 0 && sector) {
@@ -444,6 +445,7 @@ export class ShipPlanningSystem extends System {
           !ship.cp.commander &&
           ship.cp.dockable?.size === "small" &&
           ship.tags.has("role:military") &&
+          !ship.tags.has("ai:attack-force") &&
           ship.cp.orders.value.length === 0
       );
 
@@ -454,7 +456,7 @@ export class ShipPlanningSystem extends System {
     );
 
     shipRequests
-      .filter(({ fighters }) => fighters)
+      .filter(({ fighters }) => fighters < 0)
       .forEach(({ fighters }) => {
         for (let i = 0; i < -fighters; i++) {
           if (spareFighters.length > 0) {
@@ -537,18 +539,8 @@ export class ShipPlanningSystem extends System {
               )
           );
 
-        this.assignTraders(
-          faction,
-          shipRequests,
-          requestsInShipyards,
-          shipyard
-        );
-        this.assignMiners(faction, shipRequests, requestsInShipyards, shipyard);
-        this.assignPatrols(
-          faction,
-          shipRequests,
-          requestsInShipyards,
-          shipyard
+        [this.assignTraders, this.assignMiners, this.assignPatrols].forEach(
+          (fn) => fn(faction, shipRequests, requestsInShipyards, shipyard)
         );
       });
     }

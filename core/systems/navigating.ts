@@ -1,5 +1,5 @@
 import type { Matrix } from "mathjs";
-import { norm, subtract } from "mathjs";
+import { random, norm, subtract } from "mathjs";
 import {
   clearTarget,
   defaultDriveLimit,
@@ -8,7 +8,6 @@ import {
 } from "../components/drive";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
-import { limitMax } from "../utils/limit";
 import { Query } from "./query";
 import { System } from "./system";
 
@@ -56,7 +55,7 @@ export function getDeltaAngle(
 const cruiseTimer = "cruise";
 
 function setDrive(entity: Driveable, delta: number) {
-  if (!entity.cp.drive.active) return;
+  if (!entity.cp.drive.active || delta === 0) return;
 
   const entityPosition = entity.cp.position;
   const drive = entity.cp.drive;
@@ -90,12 +89,10 @@ function setDrive(entity: Driveable, delta: number) {
 
   const distance = norm(path) as number;
   const angleOffset = Math.abs(targetAngle - entityAngle);
-  drive.currentRotary = getDeltaAngle(
-    targetAngle,
-    entityAngle,
-    drive.rotary,
-    delta
-  );
+  drive.currentRotary =
+    angleOffset > Math.PI * 0.85 && Math.random() > 0.3
+      ? 0
+      : getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
 
   if (drive.mode !== "flyby" && distance < 0.1) {
     drive.currentSpeed = 0;
@@ -172,13 +169,18 @@ function setDrive(entity: Driveable, delta: number) {
   const speedMultiplier =
     drive.mode === "flyby" || angleOffset < Math.PI / 8 ? 1 : 0;
   const deltaSpeedMultiplier =
-    drive.mode === "flyby" && angleOffset > Math.PI / 3 ? -0.3 : 1;
+    drive.mode === "flyby" && angleOffset > Math.PI / 3
+      ? random(-0.55, -0.1)
+      : 1;
   drive.currentSpeed =
     speedMultiplier *
-    limitMax(
-      drive.currentSpeed +
-        maxSpeed * drive.acceleration * delta * deltaSpeedMultiplier,
-      maxSpeedLimited
+    Math.max(
+      0,
+      Math.min(
+        drive.currentSpeed +
+          maxSpeed * drive.acceleration * delta * deltaSpeedMultiplier,
+        maxSpeedLimited
+      )
     );
 }
 

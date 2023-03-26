@@ -22,13 +22,29 @@ export function isInDistance(
   );
 }
 
+function shouldAttackBack(
+  attacker: RequireComponent<"damage" | "position">,
+  target: RequireComponent<"position">
+): boolean {
+  return (
+    !!target.cp.damage &&
+    target.tags.has("role:military") &&
+    (target.cp.orders?.value[0]?.type !== "attack" ||
+      (target.cp.orders.value[0].targetId !== attacker.id &&
+        !attacker.sim
+          .getOrThrow(target.cp.orders.value[0].targetId)
+          .tags.has("role:military") &&
+        isInDistance(target.requireComponents(["damage"]), attacker)))
+  );
+}
+
 export class AttackingSystem extends System {
   cooldowns: Cooldowns<"exec">;
-  query: Query<"damage">;
+  query: Query<"damage" | "position">;
 
   constructor(sim: Sim) {
     super(sim);
-    this.query = new Query(sim, ["damage"]);
+    this.query = new Query(sim, ["damage", "position"]);
     this.cooldowns = new Cooldowns("exec");
   }
 
@@ -56,18 +72,25 @@ export class AttackingSystem extends System {
             if (target.cp.drive) {
               stopCruise(target.cp.drive);
             }
-            if (
-              target.tags.has("role:military") &&
-              target.cp.orders?.value[0]?.type !== "attack"
-            ) {
-              target.cp.orders?.value.unshift({
-                type: "attack",
-                actions: [],
-                followOutsideSector: false,
-                ordersForSector: 0,
-                origin: "auto",
-                targetId: findInAncestors(entity, "position").id,
-              });
+            if (shouldAttackBack(entity, target)) {
+              if (target.cp.orders) {
+                if (target.cp.orders.value[0]) {
+                  target.cp.orders.value[0].interrupt = true;
+                }
+                target.cp.orders.value.splice(1, 0, {
+                  type: "attack",
+                  actions: [],
+                  followOutsideSector: false,
+                  ordersForSector: 0,
+                  origin: "auto",
+                  targetId: findInAncestors(entity, "position").id,
+                });
+              }
+            } else if (target.cp.damage && !target.tags.has("role:military")) {
+              target.cp.damage.targetId = findInAncestors(
+                entity,
+                "position"
+              ).id;
             }
           }
         }

@@ -134,7 +134,7 @@ export function getTradeWithMostProfit(
   }
 
   const commodityWithMostProfit = pickRandom(
-    sortBy(profits, "profit").reverse().slice(0, 3)
+    sortBy(profits, "profit").slice(-3)
   ).commodity;
 
   return {
@@ -179,7 +179,7 @@ export function getFacilityWithMostProfit(
       .filter(
         (f) =>
           (f.cp.owner.id === faction.id ||
-            faction.cp.relations.values[f.cp.owner.id] >
+            faction.cp.relations.values[f.cp.owner.id] >=
               relationThresholds.trade) &&
           f.components.trade.offers[commodity].active &&
           f.components.trade.offers[commodity].type !==

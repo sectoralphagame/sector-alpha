@@ -10,6 +10,7 @@ const tags = [
   "asteroid",
   "virtual",
   "collectible",
+  "ai:attack-force",
   ...shipRoles.map<`role:${ShipRole}`>((role) => `role:${role}`),
 ] as const;
 

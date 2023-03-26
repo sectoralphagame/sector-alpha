@@ -5,8 +5,9 @@ export interface Relations extends BaseComponent<"relations"> {
   values: Record<number, number>;
 }
 
+// -50 to +50
 export const relationThresholds = {
-  attack: -60,
+  attack: -35,
   trade: -20,
   shipyard: 0,
 } as const;

@@ -47,14 +47,15 @@ const tradingComponents = [
 type Trading = RequireComponent<(typeof tradingComponents)[number]>;
 
 function getRandomPositionInBounds(
-  entity: RequireComponent<"position">
+  entity: RequireComponent<"position">,
+  distance = 2
 ): Matrix {
   let position: Matrix;
 
   do {
     position = add(
       entity.cp.position.coord,
-      matrix([random(-2, 2), random(-2, 2)])
+      matrix([random(-distance, distance), random(-distance, distance)])
     );
   } while (
     norm(
@@ -114,8 +115,8 @@ function autoTrade(entity: Trading, sectorDistance: number) {
     Object.entries(
       entity.sim.getOrThrow<Faction>(entity.cp.owner.id).cp.relations.values
     )
-      .filter(([, value]) => value <= relationThresholds.trade)
-      .map(([id]) => id as unknown as number)
+      .filter(([, value]) => value < relationThresholds.trade)
+      .map(([id]) => Number(id))
   );
   if (trade) {
     makingTrade = resellCommodity(

@@ -26,6 +26,7 @@ import {
 } from "./attack";
 import { patrolOrder } from "./patrol";
 import { collectAction } from "./collect";
+import { escortOrder, escortOrderCompleted } from "./escort";
 
 const orderFns: Partial<
   Record<
@@ -55,9 +56,9 @@ const orderFns: Partial<
     onCompleted: followOrderCompleted,
   },
   escort: {
-    exec: followOrder,
+    exec: escortOrder,
     isCompleted: () => false,
-    onCompleted: followOrderCompleted,
+    onCompleted: escortOrderCompleted,
   },
   hold: {
     exec: holdAction,
@@ -113,8 +114,12 @@ function cleanupOrders(entity: Entity): void {
     ) {
       ship.cp.autoOrder.default = { type: "hold" };
     }
-    ship.cp.orders.value.forEach((order, orderIndex) => {
+    ship.cp.orders.value = ship.cp.orders.value.filter((order, orderIndex) => {
       if (
+        ((order.type === "follow" ||
+          order.type === "attack" ||
+          order.type === "escort") &&
+          order.targetId === entity.id) ||
         order.actions.some(
           (action) =>
             (action.type === "dock" ||
@@ -122,11 +127,7 @@ function cleanupOrders(entity: Entity): void {
               action.type === "trade" ||
               action.type === "collect") &&
             action.targetId === entity.id
-        ) ||
-        ((order.type === "follow" ||
-          order.type === "attack" ||
-          order.type === "escort") &&
-          order.targetId === entity.id)
+        )
       ) {
         if (orderIndex === 0) {
           orderFns[ship.cp.orders.value[0].type]?.onCompleted(
@@ -134,8 +135,11 @@ function cleanupOrders(entity: Entity): void {
             ship.cp.orders.value[0]
           );
         }
-        ship.cp.orders.value.splice(orderIndex, 1);
+
+        return false;
       }
+
+      return true;
     });
   });
 }
@@ -221,7 +225,7 @@ export class OrderExecutingSystem extends System {
         };
         exec(entity, order);
 
-        const actionFn = actionFns[order.actions[0].type] ?? holdPosition;
+        const actionFn = actionFns[order.actions[0]?.type] ?? holdPosition;
         const completed = actionFn(entity, order.actions[0]);
 
         if (completed) {

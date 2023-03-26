@@ -19,8 +19,11 @@ export function followOrder(
     : true;
 
   if (shouldRecreateOrders) {
-    group.actions = moveToActions(entity, target, { ignoreReached: true });
-    group.ordersForSector = target.cp.position.sector;
+    entity.cp.orders.value[0].actions = moveToActions(entity, target, {
+      ignoreReached: true,
+    });
+    (entity.cp.orders.value[0] as FollowOrder).ordersForSector =
+      target.cp.position.sector;
   }
 
   entity.cp.drive.mode = inTheSameSector ? "follow" : "goto";

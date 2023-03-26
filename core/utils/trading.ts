@@ -425,12 +425,13 @@ export function resellCommodity(
     allocations: null,
   };
 
-  // We sell, facility buys
+  // Entity buys from facility, facility sells
   const offerForBuyer = {
     ...offer,
     price: sellPrice,
     type: "sell" as "sell",
   };
+  // Entity sells to facility, facility buys
   const offerForSeller = {
     ...offer,
     price: buyPrice,
