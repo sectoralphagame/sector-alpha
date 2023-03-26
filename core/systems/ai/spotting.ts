@@ -3,10 +3,10 @@ import type { Faction } from "@core/archetypes/faction";
 import { relationThresholds } from "@core/components/relations";
 import { distance } from "mathjs";
 import type { RequireComponent } from "@core/tsHelpers";
-import { System } from "./system";
-import type { Sim } from "../sim";
-import { Cooldowns } from "../utils/cooldowns";
-import { Query } from "./query";
+import { System } from "../system";
+import type { Sim } from "../../sim";
+import { Cooldowns } from "../../utils/cooldowns";
+import { Query } from "../query";
 
 export class SpottingSystem extends System {
   cooldowns: Cooldowns<"exec">;

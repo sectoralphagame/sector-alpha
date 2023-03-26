@@ -18,7 +18,7 @@ import type { CoreComponents } from "@core/components/component";
 import type { EntityTag } from "@core/tags";
 import { DeadUnregisteringSystem } from "@core/systems/deadUnregistering";
 import { AttackingSystem } from "@core/systems/attacking";
-import { SpottingSystem } from "@core/systems/spotting";
+import { SpottingSystem } from "@core/systems/ai/spotting";
 import { HitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating";
 import { MilitaryModuleSpottingSystem } from "@core/systems/ai/militaryModuleSpotting";
 import { DisposableUnregisteringSystem } from "@core/systems/disposableUnregistering";
