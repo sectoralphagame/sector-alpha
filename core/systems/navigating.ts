@@ -90,7 +90,9 @@ function setDrive(entity: Driveable, delta: number) {
   const distance = norm(path) as number;
   const angleOffset = Math.abs(targetAngle - entityAngle);
   drive.currentRotary =
-    angleOffset > Math.PI * 0.85 && Math.random() > 0.3
+    drive.mode === "flyby" &&
+    angleOffset > Math.PI * 0.85 &&
+    Math.random() > 0.3
       ? 0
       : getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
 

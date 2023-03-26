@@ -1,4 +1,4 @@
-import { matrix } from "mathjs";
+import { distance, matrix } from "mathjs";
 import { createFaction } from "../archetypes/faction";
 import { createMarker } from "../archetypes/marker";
 import type { Sector } from "../archetypes/sector";
@@ -40,6 +40,7 @@ describe("Ship", () => {
       createMarker(sim, {
         sector: sector.id,
         value: matrix([0, 0]),
+        owner: 0,
       }).id
     );
 
@@ -57,6 +58,7 @@ describe("Ship", () => {
       createMarker(sim, {
         sector: sector.id,
         value: matrix([1, 10]),
+        owner: 0,
       }).id
     );
 
@@ -68,7 +70,11 @@ describe("Ship", () => {
 
   it("is able to make move order", () => {
     const orderExecutingSystem = new OrderExecutingSystem(sim);
-    const m = createMarker(sim, { sector: sector.id, value: matrix([1, 1]) });
+    const m = createMarker(sim, {
+      sector: sector.id,
+      value: matrix([1, 1]),
+      owner: 0,
+    });
     ship.cp.orders.value.push({
       origin: "manual",
       type: "move",
@@ -86,6 +92,7 @@ describe("Ship", () => {
       movingSystem.exec(1);
     }
 
+    expect(distance(ship.cp.position.coord, matrix([1, 1]))).toBeLessThan(0.01);
     expect(ship.cp.drive.targetReached).toBe(true);
   });
 });
