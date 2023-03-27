@@ -79,9 +79,12 @@ export class FacilityPlanningSystem extends System {
       sector.cp.hecsPosition.value,
       sectorSize / 10
     );
+    const factionBlueprints = Object.values(facilityModules).filter((f) =>
+      faction.cp.blueprints.facilityModules.find((fm) => fm.slug === f.slug)
+    );
 
     perCommodity((commodity) => {
-      const facilityModule = Object.values(facilityModules)
+      const facilityModule = factionBlueprints
         .filter(discriminate("type", "production"))
         .find((fm) => fm.pac?.[commodity]?.consumes);
       const canBeMined =
@@ -187,7 +190,10 @@ export class FacilityPlanningSystem extends System {
       .filter((facility) => facility.cp.owner?.id === faction.id);
     const resourceUsageInFacilities = getResourceUsage(facilities);
     const resourcesProducedByFacilities = getResourceProduction(facilities);
-    const factoryModules = Object.values(facilityModules).filter(
+    const factionBlueprints = Object.values(facilityModules).filter((f) =>
+      faction.cp.blueprints.facilityModules.find((fm) => fm.slug === f.slug)
+    );
+    const factoryModules = factionBlueprints.filter(
       discriminate("type", "production")
     );
 

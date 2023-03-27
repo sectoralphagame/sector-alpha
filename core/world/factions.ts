@@ -80,24 +80,28 @@ export function populateSectors(sim: Sim, sectors: Sector[], faction: Faction) {
   const sectorWithShipyard = pickRandom(sectors);
   if (!sectorWithShipyard) return;
 
-  const shipyard = createShipyard(
-    {
-      owner: faction,
-      sector: sectorWithShipyard,
-      position: add(
-        hecsToCartesian(
-          sectorWithShipyard.cp.hecsPosition.value,
-          sectorSize / 10
+  if (
+    faction.cp.blueprints.facilityModules.find((fm) => fm.slug === "shipyard")
+  ) {
+    const shipyard = createShipyard(
+      {
+        owner: faction,
+        sector: sectorWithShipyard,
+        position: add(
+          hecsToCartesian(
+            sectorWithShipyard.cp.hecsPosition.value,
+            sectorSize / 10
+          ),
+          matrix([
+            random(-sectorSize / 20, sectorSize / 20),
+            random(-sectorSize / 20, sectorSize / 20),
+          ])
         ),
-        matrix([
-          random(-sectorSize / 20, sectorSize / 20),
-          random(-sectorSize / 20, sectorSize / 20),
-        ])
-      ),
-    },
-    sim
-  );
-  addStartingCommodities(shipyard);
+      },
+      sim
+    );
+    addStartingCommodities(shipyard);
+  }
 }
 
 export const createFactions = (

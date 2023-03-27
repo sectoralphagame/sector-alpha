@@ -521,7 +521,13 @@
           "tauFighter",
           "tauFrigate"
         ],
-        "facilityModules": []
+        "facilityModules": [
+          "shipyard",
+          "containerMedium",
+          "containerSmall",
+          "containerLarge",
+          "habitat"
+        ]
       },
       "color": "#9534eb",
       "type": "territorial",
