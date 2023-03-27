@@ -514,19 +514,24 @@
       "sectors": ["the-hive", "tau-ceti-e", "tau-ceti-f"],
       "blueprints": {
         "ships": [
-          "courierB",
-          "freighterA",
-          "largeFreighterB",
           "minerTau",
           "tauFighter",
-          "tauFrigate"
+          "tauFrigate",
+          "tauCourier",
+          "tauFreighter"
         ],
         "facilityModules": [
           "shipyard",
           "containerMedium",
           "containerSmall",
           "containerLarge",
-          "habitat"
+          "habitat",
+          "hydrogenFactory",
+          "tauMetalFactory",
+          "refinery",
+          "fueliumRefinery",
+          "goldRefinery",
+          "waterProduction"
         ]
       },
       "color": "#9534eb",

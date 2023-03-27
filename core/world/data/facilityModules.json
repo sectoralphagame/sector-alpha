@@ -244,5 +244,18 @@
     "slug": "enginePartsFactory",
     "time": 590,
     "build": { "cost": {}, "time": 0 }
+  },
+  {
+    "name": "Tau-Metal Factory",
+    "type": "production",
+    "pac": {
+      "tauMetal": { "consumes": 0, "produces": 2500 },
+      "gold": { "consumes": 1000, "produces": 0 },
+      "fuel": { "consumes": 2400, "produces": 0 },
+      "metals": { "consumes": 2500, "produces": 0 }
+    },
+    "slug": "tauMetalFactory",
+    "time": 780,
+    "build": { "cost": { "tauMetal": 10400, "fuel": 1900 }, "time": 0 }
   }
 ]

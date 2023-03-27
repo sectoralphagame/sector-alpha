@@ -225,15 +225,7 @@
   },
   {
     "acceleration": 0.13,
-    "build": {
-      "time": 190,
-      "cost": {
-        "hullPlates": 5700,
-        "electronics": 145,
-        "fuel": 2000,
-        "engineParts": 45
-      }
-    },
+    "build": { "time": 190, "cost": { "fuel": 2900, "tauMetal": 700 } },
     "mining": 1.7,
     "role": "mining",
     "cruise": 5,
@@ -373,13 +365,7 @@
     "acceleration": 0.27,
     "build": {
       "time": 70,
-      "cost": {
-        "drones": 1,
-        "fuel": 290,
-        "hullPlates": 560,
-        "electronics": 22,
-        "engineParts": 13
-      }
+      "cost": { "fuel": 290, "tauMetal": 55, "hydrogen": 130 }
     },
     "damage": { "value": 2.2, "range": 1.9 },
     "range": 2,
@@ -402,14 +388,8 @@
   {
     "acceleration": 0.18,
     "build": {
-      "time": 0,
-      "cost": {
-        "drones": 18,
-        "electronics": 350,
-        "fuel": 1150,
-        "hullPlates": 3450,
-        "engineParts": 84
-      }
+      "time": 210,
+      "cost": { "fuel": 1150, "tauMetal": 590, "hydrogen": 350 }
     },
     "damage": { "value": 9, "range": 2.45 },
     "range": 2.7,
@@ -455,6 +435,49 @@
     "hitpoints": {
       "hp": { "value": 830, "regen": 0.2 },
       "shield": { "value": 310, "regen": 4.2 }
+    }
+  },
+  {
+    "acceleration": 0.1,
+    "build": { "time": 45, "cost": { "fuel": 120, "tauMetal": 35 } },
+    "mining": 0,
+    "role": "transport",
+    "cruise": 5,
+    "maneuver": 0.33,
+    "rotary": 68,
+    "ttc": 5,
+    "name": "Tau Courier",
+    "size": "small",
+    "storage": 11,
+    "texture": "sCiv",
+    "slug": "tauCourier",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 80, "regen": 0.2 },
+      "shield": { "value": 35, "regen": 1.2 }
+    }
+  },
+  {
+    "acceleration": 0.15,
+    "build": {
+      "time": 85,
+      "cost": { "fuel": 240, "hydrogen": 500, "tauMetal": 210 }
+    },
+    "mining": 0,
+    "role": "transport",
+    "cruise": 1.3,
+    "maneuver": 0.15,
+    "rotary": 43,
+    "ttc": 2.8,
+    "name": "Tau Freighter",
+    "size": "medium",
+    "storage": 190,
+    "texture": "mCiv",
+    "slug": "tauFreighter",
+    "damage": { "value": 1, "range": 2 },
+    "hitpoints": {
+      "hp": { "value": 990, "regen": 0.2 },
+      "shield": { "value": 45, "regen": 3 }
     }
   }
 ]

@@ -92,7 +92,9 @@ function setDrive(entity: Driveable, delta: number) {
   drive.currentRotary =
     drive.mode === "flyby" &&
     angleOffset > Math.PI * 0.85 &&
-    Math.random() > 0.3
+    (targetEntity.cp.damage
+      ? targetEntity.cp.damage.range < distance + 1
+      : Math.random() > 0.3)
       ? 0
       : getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
 

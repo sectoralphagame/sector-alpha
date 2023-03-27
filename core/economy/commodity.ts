@@ -17,6 +17,7 @@ export const commodities = {
   ore: "ore",
   silica: "silica",
   silicon: "silicon",
+  tauMetal: "tauMetal",
   water: "water",
 } as const;
 export type Commodity = Values<typeof commodities>;
@@ -51,5 +52,6 @@ export const commodityLabel: Record<Commodity, string> = {
   ore: "Ore",
   silica: "Silica",
   silicon: "Silicon",
+  tauMetal: "Tau-Metal",
   water: "Water",
 };
