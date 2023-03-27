@@ -10,7 +10,7 @@
   tbody tr:not(.noBorder):last-child {
     border-bottom: none;
   }
-  tbody input {
+  tbody input:not([type="checkbox"]) {
     &:focus {
       background: rgba(255, 255, 255, 0.2);
     }

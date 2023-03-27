@@ -12,3 +12,4 @@ export const rowExpanderToggled: string;
 export const color: string;
 export const colorInput: string;
 export const colorSwatch: string;
+export const blueprint: string;

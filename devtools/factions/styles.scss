@@ -47,3 +47,12 @@
     height: 32px;
   }
 }
+
+.blueprint {
+  display: grid;
+  grid-template-columns: 1fr 16px;
+
+  label {
+    cursor: pointer;
+  }
+}
