@@ -138,8 +138,11 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       });
       faction.cp.color.value = factionData.color;
       faction.cp.blueprints.ships = shipClasses.filter((s) =>
-        factionData.blueprints.includes(s.slug)
+        factionData.blueprints.ships.includes(s.slug)
       );
+      faction.cp.blueprints.facilityModules = Object.values(
+        facilityModules
+      ).filter((m) => factionData.blueprints.facilityModules.includes(m.slug));
       populateSectors(sim, factionData.sectors.map(getSector), faction);
 
       if (factionData.type === "travelling") {

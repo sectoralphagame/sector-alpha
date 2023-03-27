@@ -2,7 +2,7 @@ export interface FactionInput {
   name: string;
   slug: string;
   sectors: string[];
-  blueprints: string[];
+  blueprints: Record<"ships" | "facilityModules", string[]>;
   color: string;
   type: string;
 }

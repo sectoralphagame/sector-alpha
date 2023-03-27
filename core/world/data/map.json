@@ -427,15 +427,18 @@
       "name": "United Earth's Nations",
       "slug": "UEN",
       "sectors": ["terra", "luna", "mars", "saturn", "eris", "discordis-c"],
-      "blueprints": [
-        "courierA",
-        "freighterB",
-        "largeFreighterA",
-        "minerA",
-        "fighter",
-        "gunboat",
-        "largeMinerA"
-      ],
+      "blueprints": {
+        "ships": [
+          "courierA",
+          "freighterB",
+          "largeFreighterA",
+          "minerA",
+          "fighter",
+          "gunboat",
+          "largeMinerA"
+        ],
+        "facilityModules": ["waterProduction"]
+      },
       "color": "#6fc9f2",
       "type": "territorial",
       "patrols": { "formation": { "fighters": 3 }, "perSector": 4 }
@@ -451,15 +454,18 @@
         "ross-128-1",
         "ross-128-2"
       ],
-      "blueprints": [
-        "courierB",
-        "freighterA",
-        "largeFreighterB",
-        "minerB",
-        "fighter",
-        "gunboat",
-        "largeMinerA"
-      ],
+      "blueprints": {
+        "ships": [
+          "courierB",
+          "freighterA",
+          "largeFreighterB",
+          "minerB",
+          "fighter",
+          "gunboat",
+          "largeMinerA"
+        ],
+        "facilityModules": ["waterProduction"]
+      },
       "color": "#ffc34d",
       "type": "territorial",
       "patrols": { "formation": { "fighters": 2 }, "perSector": 6 }
@@ -468,14 +474,17 @@
       "name": "Tau",
       "slug": "TAU",
       "sectors": ["the-hive", "tau-ceti-e", "tau-ceti-f"],
-      "blueprints": [
-        "courierB",
-        "freighterA",
-        "largeFreighterB",
-        "minerTau",
-        "tauFighter",
-        "tauFrigate"
-      ],
+      "blueprints": {
+        "ships": [
+          "courierB",
+          "freighterA",
+          "largeFreighterB",
+          "minerTau",
+          "tauFighter",
+          "tauFrigate"
+        ],
+        "facilityModules": ["waterProduction"]
+      },
       "color": "#9534eb",
       "type": "territorial",
       "patrols": { "formation": { "fighters": 2 }, "perSector": 7 }
@@ -492,15 +501,18 @@
         "gj-1002-1",
         "gj-1002-2"
       ],
-      "blueprints": [
-        "courierB",
-        "freighterA",
-        "largeFreighterB",
-        "minerB",
-        "fighter",
-        "gunboat",
-        "largeMinerA"
-      ],
+      "blueprints": {
+        "ships": [
+          "courierB",
+          "freighterA",
+          "largeFreighterB",
+          "minerB",
+          "fighter",
+          "gunboat",
+          "largeMinerA"
+        ],
+        "facilityModules": ["waterProduction"]
+      },
       "color": "#42f5e3",
       "type": "territorial",
       "patrols": { "formation": { "fighters": 3 }, "perSector": 2 }
@@ -509,15 +521,18 @@
       "name": "Alkali Mining Sindicate",
       "slug": "AMS",
       "sectors": ["sedna", "gj-1002-3"],
-      "blueprints": [
-        "courierB",
-        "freighterA",
-        "largeFreighterB",
-        "minerB",
-        "fighter",
-        "gunboat",
-        "largeMinerA"
-      ],
+      "blueprints": {
+        "ships": [
+          "courierB",
+          "freighterA",
+          "largeFreighterB",
+          "minerB",
+          "fighter",
+          "gunboat",
+          "largeMinerA"
+        ],
+        "facilityModules": ["waterProduction"]
+      },
       "color": "#ff63e5",
       "type": "territorial",
       "patrols": { "formation": { "fighters": 2 }, "perSector": 3 }
@@ -526,15 +541,18 @@
       "name": "Pirates",
       "slug": "PIR",
       "sectors": ["wolf-1061-3", "gj-229-2", "gj-625"],
-      "blueprints": [
-        "courierB",
-        "freighterA",
-        "largeFreighterB",
-        "minerA",
-        "fighter",
-        "gunboat",
-        "largeMinerA"
-      ],
+      "blueprints": {
+        "ships": [
+          "courierB",
+          "freighterA",
+          "largeFreighterB",
+          "minerA",
+          "fighter",
+          "gunboat",
+          "largeMinerA"
+        ],
+        "facilityModules": ["waterProduction"]
+      },
       "color": "#fcc7c5",
       "type": "pirate",
       "patrols": { "formation": { "fighters": 2 }, "perSector": 6 }
@@ -543,22 +561,28 @@
       "name": "Therr Traders",
       "slug": "THT",
       "sectors": ["gj-229-1"],
-      "blueprints": [
-        "courierB",
-        "freighterA",
-        "largeFreighterB",
-        "minerA",
-        "fighter",
-        "gunboat",
-        "largeMinerA"
-      ],
+      "blueprints": {
+        "ships": [
+          "courierB",
+          "freighterA",
+          "largeFreighterB",
+          "minerA",
+          "fighter",
+          "gunboat",
+          "largeMinerA"
+        ],
+        "facilityModules": ["waterProduction"]
+      },
       "color": "#f7fc5b",
       "type": "travelling",
       "patrols": { "formation": { "fighters": 2 }, "perSector": 3 }
     },
     {
       "name": "Player Faction",
-      "blueprints": ["courierA"],
+      "blueprints": {
+        "ships": ["courierA"],
+        "facilityModules": ["waterProduction"]
+      },
       "color": "#97ff7d",
       "sectors": [],
       "slug": "PLA",
