@@ -122,7 +122,8 @@ function cleanupOrders(entity: Entity): void {
           order.targetId === entity.id) ||
         order.actions.some(
           (action) =>
-            (action.type === "dock" ||
+            (action.type === "attack" ||
+              action.type === "dock" ||
               action.type === "deployBuilder" ||
               action.type === "trade" ||
               action.type === "collect") &&
@@ -130,10 +131,7 @@ function cleanupOrders(entity: Entity): void {
         )
       ) {
         if (orderIndex === 0) {
-          orderFns[ship.cp.orders.value[0].type]?.onCompleted(
-            ship,
-            ship.cp.orders.value[0]
-          );
+          orderFns[order.type]?.onCompleted(ship, order);
         }
 
         return false;
@@ -169,6 +167,12 @@ function cleanupChildren(entity: Entity): void {
   entity.sim.queries.commendables.get().forEach((ship) => {
     if (ship.cp.commander.id === entity.id) {
       ship.removeComponent("commander");
+      if (ship.cp.orders.value.length > 0) {
+        orderFns[ship.cp.orders.value[0].type]?.onCompleted(
+          ship,
+          ship.cp.orders.value[0]
+        );
+      }
       ship.cp.orders.value = [];
       ship.cp.autoOrder.default = { type: "hold" };
     }

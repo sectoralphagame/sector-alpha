@@ -57,7 +57,6 @@ export class ShipReturningSystem extends System {
           first
         )!;
 
-        console.log("returning to home", ship.id, ship.cp.name?.value);
         ship.cp.orders.value.push({
           type: "move",
           actions: moveToActions(
