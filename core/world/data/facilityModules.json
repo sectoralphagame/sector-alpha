@@ -233,7 +233,7 @@
     "build": { "cost": {}, "time": 0 }
   },
   {
-    "name": "Engine Parts FActory",
+    "name": "Engine Parts Factory",
     "type": "production",
     "pac": {
       "coolant": { "consumes": 190, "produces": 0 },

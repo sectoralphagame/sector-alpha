@@ -437,7 +437,26 @@
           "gunboat",
           "largeMinerA"
         ],
-        "facilityModules": ["waterProduction"]
+        "facilityModules": [
+          "waterProduction",
+          "containerSmall",
+          "containerMedium",
+          "containerLarge",
+          "habitat",
+          "shipyard",
+          "farm",
+          "refinery",
+          "fueliumRefinery",
+          "hullPlatesFactory",
+          "goldRefinery",
+          "siliconPurification",
+          "electronicsFactory",
+          "droneFactory",
+          "smallDefense",
+          "hydrogenFactory",
+          "coolantFactory",
+          "enginePartsFactory"
+        ]
       },
       "color": "#6fc9f2",
       "type": "territorial",
@@ -464,7 +483,26 @@
           "gunboat",
           "largeMinerA"
         ],
-        "facilityModules": ["waterProduction"]
+        "facilityModules": [
+          "waterProduction",
+          "containerSmall",
+          "containerMedium",
+          "containerLarge",
+          "habitat",
+          "shipyard",
+          "farm",
+          "refinery",
+          "fueliumRefinery",
+          "hullPlatesFactory",
+          "goldRefinery",
+          "siliconPurification",
+          "electronicsFactory",
+          "droneFactory",
+          "smallDefense",
+          "hydrogenFactory",
+          "coolantFactory",
+          "enginePartsFactory"
+        ]
       },
       "color": "#ffc34d",
       "type": "territorial",
@@ -483,7 +521,7 @@
           "tauFighter",
           "tauFrigate"
         ],
-        "facilityModules": ["waterProduction"]
+        "facilityModules": []
       },
       "color": "#9534eb",
       "type": "territorial",
@@ -511,7 +549,26 @@
           "gunboat",
           "largeMinerA"
         ],
-        "facilityModules": ["waterProduction"]
+        "facilityModules": [
+          "waterProduction",
+          "containerSmall",
+          "containerMedium",
+          "containerLarge",
+          "habitat",
+          "shipyard",
+          "farm",
+          "refinery",
+          "fueliumRefinery",
+          "hullPlatesFactory",
+          "goldRefinery",
+          "siliconPurification",
+          "electronicsFactory",
+          "droneFactory",
+          "smallDefense",
+          "hydrogenFactory",
+          "coolantFactory",
+          "enginePartsFactory"
+        ]
       },
       "color": "#42f5e3",
       "type": "territorial",
@@ -531,7 +588,26 @@
           "gunboat",
           "largeMinerA"
         ],
-        "facilityModules": ["waterProduction"]
+        "facilityModules": [
+          "waterProduction",
+          "containerSmall",
+          "containerMedium",
+          "containerLarge",
+          "habitat",
+          "shipyard",
+          "farm",
+          "refinery",
+          "fueliumRefinery",
+          "hullPlatesFactory",
+          "goldRefinery",
+          "siliconPurification",
+          "electronicsFactory",
+          "droneFactory",
+          "smallDefense",
+          "hydrogenFactory",
+          "coolantFactory",
+          "enginePartsFactory"
+        ]
       },
       "color": "#ff63e5",
       "type": "territorial",
@@ -551,7 +627,25 @@
           "gunboat",
           "largeMinerA"
         ],
-        "facilityModules": ["waterProduction"]
+        "facilityModules": [
+          "waterProduction",
+          "containerSmall",
+          "containerMedium",
+          "containerLarge",
+          "habitat",
+          "farm",
+          "refinery",
+          "hullPlatesFactory",
+          "goldRefinery",
+          "siliconPurification",
+          "smallDefense",
+          "hydrogenFactory",
+          "coolantFactory",
+          "shipyard",
+          "fueliumRefinery",
+          "basic",
+          "electronicsFactory"
+        ]
       },
       "color": "#fcc7c5",
       "type": "pirate",
@@ -571,7 +665,22 @@
           "gunboat",
           "largeMinerA"
         ],
-        "facilityModules": ["waterProduction"]
+        "facilityModules": [
+          "waterProduction",
+          "containerSmall",
+          "containerMedium",
+          "containerLarge",
+          "habitat",
+          "shipyard",
+          "farm",
+          "refinery",
+          "hullPlatesFactory",
+          "goldRefinery",
+          "siliconPurification",
+          "smallDefense",
+          "hydrogenFactory",
+          "fueliumRefinery"
+        ]
       },
       "color": "#f7fc5b",
       "type": "travelling",
@@ -581,7 +690,7 @@
       "name": "Player Faction",
       "blueprints": {
         "ships": ["courierA"],
-        "facilityModules": ["waterProduction"]
+        "facilityModules": ["containerSmall"]
       },
       "color": "#97ff7d",
       "sectors": [],
@@ -590,33 +699,33 @@
     }
   ],
   "relations": [
-    { "factions": ["ACT", "UEN"], "value": -10 },
-    { "factions": ["TAU", "UEN"], "value": -50 },
+    { "factions": ["UEN", "ACT"], "value": -10 },
+    { "factions": ["UEN", "TAU"], "value": -50 },
     { "factions": ["ACT", "TAU"], "value": -50 },
-    { "factions": ["FFW", "UEN"], "value": 20 },
+    { "factions": ["UEN", "FFW"], "value": 20 },
     { "factions": ["ACT", "FFW"], "value": -10 },
-    { "factions": ["FFW", "TAU"], "value": -50 },
-    { "factions": ["AMS", "UEN"], "value": 20 },
-    { "factions": ["AMS", "ACT"], "value": -5 },
-    { "factions": ["AMS", "TAU"], "value": -50 },
-    { "factions": ["AMS", "FFW"], "value": 10 },
-    { "factions": ["PIR", "UEN"], "value": -25 },
+    { "factions": ["TAU", "FFW"], "value": -50 },
+    { "factions": ["UEN", "AMS"], "value": 20 },
+    { "factions": ["ACT", "AMS"], "value": -5 },
+    { "factions": ["TAU", "AMS"], "value": -50 },
+    { "factions": ["FFW", "AMS"], "value": 10 },
+    { "factions": ["UEN", "PIR"], "value": -25 },
     { "factions": ["ACT", "PIR"], "value": -50 },
-    { "factions": ["PIR", "TAU"], "value": -50 },
+    { "factions": ["TAU", "PIR"], "value": -50 },
     { "factions": ["FFW", "PIR"], "value": -25 },
     { "factions": ["AMS", "PIR"], "value": -30 },
-    { "factions": ["THT", "UEN"], "value": 10 },
+    { "factions": ["UEN", "THT"], "value": 10 },
     { "factions": ["ACT", "THT"], "value": 10 },
     { "factions": ["TAU", "THT"], "value": -50 },
     { "factions": ["FFW", "THT"], "value": 10 },
     { "factions": ["AMS", "THT"], "value": -25 },
     { "factions": ["PIR", "THT"], "value": -5 },
-    { "factions": ["PLA", "UEN"], "value": 0 },
+    { "factions": ["UEN", "PLA"], "value": 0 },
     { "factions": ["ACT", "PLA"], "value": 0 },
-    { "factions": ["PLA", "TAU"], "value": -50 },
+    { "factions": ["TAU", "PLA"], "value": -50 },
     { "factions": ["FFW", "PLA"], "value": 0 },
     { "factions": ["AMS", "PLA"], "value": 0 },
     { "factions": ["PIR", "PLA"], "value": 0 },
-    { "factions": ["PLA", "THT"], "value": 0 }
+    { "factions": ["THT", "PLA"], "value": 0 }
   ]
 }
