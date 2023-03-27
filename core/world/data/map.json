@@ -585,7 +585,7 @@
     { "factions": ["ACT", "THT"], "value": 10 },
     { "factions": ["TAU", "THT"], "value": -50 },
     { "factions": ["FFW", "THT"], "value": 10 },
-    { "factions": ["AMS", "THT"], "value": 5 },
+    { "factions": ["AMS", "THT"], "value": -25 },
     { "factions": ["PIR", "THT"], "value": -5 },
     { "factions": ["PLA", "UEN"], "value": 0 },
     { "factions": ["ACT", "PLA"], "value": 0 },
