@@ -54,6 +54,61 @@ export function getDeltaAngle(
 
 const cruiseTimer = "cruise";
 
+function setFlybyDrive(entity: Driveable, delta: number) {
+  const drive = entity.cp.drive;
+  const entityPosition = entity.cp.position;
+  const targetEntity = entity.sim.get(drive.target!)!;
+  const targetPosition = targetEntity.cp.position!;
+
+  const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
+
+  const entityAngle = normalizeAngle(
+    // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
+    entityPosition.angle - Math.PI / 2
+  );
+  const targetAngle = Math.atan2(path.get([1]), path.get([0]));
+
+  const distance = norm(path) as number;
+  const angleOffset = Math.abs(normalizeAngle(targetAngle - entityAngle));
+  const isInRange = (targetEntity.cp.damage?.range ?? 0) + 0.2 > distance;
+
+  drive.currentRotary =
+    angleOffset > Math.PI * 0.85 && (isInRange || Math.random() > 0.3)
+      ? 0
+      : getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
+
+  const canCruise =
+    distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
+    angleOffset < Math.PI / 12 &&
+    drive.limit > drive.maneuver;
+
+  entity.cp.drive.limit = defaultDriveLimit;
+  if (
+    (targetEntity.cp.drive?.currentSpeed ?? 0) > drive.maneuver ||
+    distance > drive.maneuver * drive.ttc
+  ) {
+    if (canCruise && drive.state === "maneuver") {
+      entity.cooldowns.use(cruiseTimer, drive.ttc);
+      startCruise(drive);
+    }
+  } else if (drive.state !== "maneuver") {
+    stopCruise(drive);
+  }
+
+  const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
+  const maxSpeedLimited = Math.min(drive.limit ?? defaultDriveLimit, maxSpeed);
+  const deltaSpeedMultiplier =
+    angleOffset > Math.PI / 3 ? random(0.1, 0.55) : 1;
+  drive.currentSpeed = Math.max(
+    0,
+    Math.min(
+      drive.currentSpeed +
+        maxSpeed * drive.acceleration * delta * deltaSpeedMultiplier,
+      maxSpeedLimited
+    )
+  );
+}
+
 function setDrive(entity: Driveable, delta: number) {
   if (!entity.cp.drive.active || delta === 0) return;
 
@@ -79,6 +134,10 @@ function setDrive(entity: Driveable, delta: number) {
     return;
   }
 
+  if (drive.mode === "flyby") {
+    return setFlybyDrive(entity, delta);
+  }
+
   const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
 
   const entityAngle = normalizeAngle(
@@ -89,16 +148,15 @@ function setDrive(entity: Driveable, delta: number) {
 
   const distance = norm(path) as number;
   const angleOffset = Math.abs(targetAngle - entityAngle);
-  drive.currentRotary =
-    drive.mode === "flyby" &&
-    angleOffset > Math.PI * 0.85 &&
-    (targetEntity.cp.damage
-      ? targetEntity.cp.damage.range < distance + 1
-      : Math.random() > 0.3)
-      ? 0
-      : getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
 
-  if (drive.mode !== "flyby" && distance < 0.1) {
+  drive.currentRotary = getDeltaAngle(
+    targetAngle,
+    entityAngle,
+    drive.rotary,
+    delta
+  );
+
+  if (distance < 0.1) {
     drive.currentSpeed = 0;
     drive.targetReached = true;
     if (targetEntity.cp.disposable) {
@@ -130,19 +188,6 @@ function setDrive(entity: Driveable, delta: number) {
     } else {
       entity.cp.drive.limit = defaultDriveLimit;
     }
-  } else if (drive.mode === "flyby") {
-    entity.cp.drive.limit = defaultDriveLimit;
-    if (
-      (targetEntity.cp.drive?.currentSpeed ?? 0) > drive.maneuver ||
-      distance > drive.maneuver * drive.ttc
-    ) {
-      if (canCruise && drive.state === "maneuver") {
-        entity.cooldowns.use(cruiseTimer, drive.ttc);
-        startCruise(drive);
-      }
-    } else if (drive.state !== "maneuver") {
-      stopCruise(drive);
-    }
   } else {
     entity.cp.drive.limit = defaultDriveLimit;
 
@@ -169,20 +214,15 @@ function setDrive(entity: Driveable, delta: number) {
   }
 
   const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
-  const maxSpeedLimited = Math.min(drive.limit ?? Infinity, maxSpeed);
-  const speedMultiplier =
-    drive.mode === "flyby" || angleOffset < Math.PI / 8 ? 1 : 0;
-  const deltaSpeedMultiplier =
-    drive.mode === "flyby" && angleOffset > Math.PI / 3
-      ? random(-0.55, -0.1)
-      : 1;
+  const maxSpeedLimited = Math.min(drive.limit ?? defaultDriveLimit, maxSpeed);
+  const speedMultiplier = angleOffset < Math.PI / 8 ? 1 : 0;
+
   drive.currentSpeed =
     speedMultiplier *
     Math.max(
       0,
       Math.min(
-        drive.currentSpeed +
-          maxSpeed * drive.acceleration * delta * deltaSpeedMultiplier,
+        drive.currentSpeed + maxSpeed * drive.acceleration * delta,
         maxSpeedLimited
       )
     );
