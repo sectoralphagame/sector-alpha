@@ -38,63 +38,56 @@ function shouldAttackBack(
   );
 }
 
+const cdKey = "attack";
+
 export class AttackingSystem extends System {
-  cooldowns: Cooldowns<"exec">;
   query: Query<"damage" | "position">;
 
   constructor(sim: Sim) {
     super(sim);
     this.query = new Query(sim, ["damage", "position"]);
-    this.cooldowns = new Cooldowns("exec");
   }
 
   exec = (delta: number): void => {
     if (this.sim.getTime() < settings.bootTime) return;
-    this.cooldowns.update(delta);
 
-    if (this.cooldowns.canUse("exec")) {
-      this.cooldowns.use("exec", 1);
+    this.query.get().forEach((entity) => {
+      if (entity.cp.damage.targetId && entity.cooldowns.canUse(cdKey)) {
+        if (!this.sim.entities.has(entity.cp.damage.targetId)) {
+          entity.cp.damage.targetId = null;
+          return;
+        }
 
-      this.query.get().forEach((entity) => {
-        if (entity.cp.damage.targetId) {
-          if (!this.sim.entities.has(entity.cp.damage.targetId)) {
-            entity.cp.damage.targetId = null;
-            return;
+        const target = this.sim
+          .getOrThrow(entity.cp.damage.targetId)
+          .requireComponents(["position", "hitpoints"]);
+
+        if (isInDistance(entity, target)) {
+          entity.cooldowns.use(cdKey, entity.cp.damage.cooldown);
+          changeHp(target, entity.cp.damage.value);
+          target.cooldowns.use(regenCooldown, 3);
+          if (target.cp.drive) {
+            stopCruise(target.cp.drive);
           }
-
-          const target = this.sim
-            .getOrThrow(entity.cp.damage.targetId)
-            .requireComponents(["position", "hitpoints"]);
-
-          if (isInDistance(entity, target)) {
-            changeHp(target, entity.cp.damage.value);
-            target.cooldowns.use(regenCooldown, 3);
-            if (target.cp.drive) {
-              stopCruise(target.cp.drive);
-            }
-            if (shouldAttackBack(entity, target)) {
-              if (target.cp.orders) {
-                if (target.cp.orders.value[0]) {
-                  target.cp.orders.value[0].interrupt = true;
-                }
-                target.cp.orders.value.splice(1, 0, {
-                  type: "attack",
-                  actions: [],
-                  followOutsideSector: false,
-                  ordersForSector: 0,
-                  origin: "auto",
-                  targetId: findInAncestors(entity, "position").id,
-                });
+          if (shouldAttackBack(entity, target)) {
+            if (target.cp.orders) {
+              if (target.cp.orders.value[0]) {
+                target.cp.orders.value[0].interrupt = true;
               }
-            } else if (target.cp.damage && !target.tags.has("role:military")) {
-              target.cp.damage.targetId = findInAncestors(
-                entity,
-                "position"
-              ).id;
+              target.cp.orders.value.splice(1, 0, {
+                type: "attack",
+                actions: [],
+                followOutsideSector: false,
+                ordersForSector: 0,
+                origin: "auto",
+                targetId: findInAncestors(entity, "position").id,
+              });
             }
+          } else if (target.cp.damage && !target.tags.has("role:military")) {
+            target.cp.damage.targetId = findInAncestors(entity, "position").id;
           }
         }
-      });
-    }
+      }
+    });
   };
 }

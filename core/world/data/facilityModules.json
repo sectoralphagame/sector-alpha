@@ -206,7 +206,7 @@
     "time": 0,
     "build": { "cost": {}, "time": 0 },
     "crew": "",
-    "damage": { "value": 2, "range": 3 }
+    "damage": { "value": 2, "range": 3, "cooldown": 0.7 }
   },
   {
     "name": "Hydrogen Factory",

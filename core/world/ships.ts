@@ -21,6 +21,7 @@ export interface ShipBuildInput {
 export interface ShipInput extends ShipDriveProps {
   build: ShipBuildInput;
   damage: {
+    cooldown: number;
     value: number;
     range: number;
   };

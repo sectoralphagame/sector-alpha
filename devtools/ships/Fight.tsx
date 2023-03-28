@@ -1,15 +1,8 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import type { ShipInput } from "@core/world/ships";
-import { shipRoles } from "@core/world/ships";
-import type { Textures } from "@core/components/render";
-import { textures } from "@core/components/render";
-import type { DockSize } from "@core/components/dockable";
-import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { useThrottledFormState } from "@devtools/utils";
 import { Table, TableCell, TableHeader } from "../components/Table";
-import styles from "./styles.scss";
 import type { FormData } from "./utils";
 
 const ShipFightEditor: React.FC<{ index: number }> = ({ index }) => {
@@ -35,6 +28,14 @@ const ShipFightEditor: React.FC<{ index: number }> = ({ index }) => {
             valueAsNumber: true,
           })}
           defaultValue={getValues().ships[index].damage?.value}
+        />
+      </TableCell>
+      <TableCell>
+        <input
+          {...register(`ships.${index}.damage.cooldown`, {
+            valueAsNumber: true,
+          })}
+          defaultValue={getValues().ships[index].damage?.cooldown}
         />
       </TableCell>
       <TableCell>
@@ -92,6 +93,7 @@ export const FightEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
       <col style={{ width: "100px" }} />
       <col style={{ width: "100px" }} />
       <col style={{ width: "100px" }} />
+      <col style={{ width: "100px" }} />
       <col />
     </colgroup>
     <thead>
@@ -99,6 +101,7 @@ export const FightEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
         {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
         <th colSpan={2} />
         <TableHeader>Attack</TableHeader>
+        <TableHeader>Cooldown</TableHeader>
         <TableHeader>Range</TableHeader>
         <TableHeader>HP Max</TableHeader>
         <TableHeader>Regen</TableHeader>

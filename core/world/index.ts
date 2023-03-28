@@ -49,12 +49,6 @@ function getRandomWorld(
       sector: sectorAlpha,
     });
     playerShip.cp.autoOrder!.default = { type: "hold" };
-    playerShip.addComponent({
-      name: "damage",
-      range: 10,
-      targetId: null,
-      value: 15,
-    });
 
     try {
       createFactions(sim, islands.slice(1), numberOfFactions);

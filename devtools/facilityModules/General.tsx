@@ -79,6 +79,16 @@ const FacilityModuleGeneralEditor: React.FC<{ index: number }> = ({
           />
         )}
       </TableCell>
+      <TableCell>
+        {facilityModule.type === "military" && (
+          <input
+            {...register(`facilityModules.${index}.damage.cooldown`, {
+              valueAsNumber: true,
+            })}
+            defaultValue={facilityModule.damage?.cooldown}
+          />
+        )}
+      </TableCell>
     </tr>
   );
 };
@@ -95,6 +105,7 @@ export const GeneralEditor: React.FC<{
       <col style={{ width: "150px" }} />
       <col style={{ width: "100px" }} />
       <col style={{ width: "100px" }} />
+      <col style={{ width: "100px" }} />
       <col />
     </colgroup>
     <thead>
@@ -106,6 +117,7 @@ export const GeneralEditor: React.FC<{
         <TableHeader>Storage</TableHeader>
         <TableHeader>Damage</TableHeader>
         <TableHeader>Range</TableHeader>
+        <TableHeader>Cooldown</TableHeader>
       </tr>
     </thead>
     <tbody>
