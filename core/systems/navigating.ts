@@ -135,7 +135,8 @@ function setDrive(entity: Driveable, delta: number) {
   }
 
   if (drive.mode === "flyby") {
-    return setFlybyDrive(entity, delta);
+    setFlybyDrive(entity, delta);
+    return;
   }
 
   const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
