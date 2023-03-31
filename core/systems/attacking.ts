@@ -3,12 +3,22 @@ import { changeHp } from "@core/components/hitpoints";
 import settings from "@core/settings";
 import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
-import { Cooldowns } from "@core/utils/cooldowns";
 import { findInAncestors } from "@core/utils/findInAncestors";
 import { distance } from "mathjs";
+import type { DockSize } from "@core/components/dockable";
 import { regenCooldown } from "./hitpointsRegenerating";
 import { Query } from "./utils/query";
 import { System } from "./system";
+
+const sizeMultipliers: Record<DockSize, [number, number, number]> = {
+  large: [0.1, -5, 10],
+  medium: [0.5, -1, 25],
+  small: [0.05, -10, 45],
+};
+export function getEvasionChance(speed: number, size: DockSize): number {
+  const [a, b, c] = sizeMultipliers[size];
+  return Math.max(0, ((b / speed) * 10 * a + c) / 100);
+}
 
 export function isInDistance(
   entity: RequireComponent<"damage">,
@@ -48,7 +58,7 @@ export class AttackingSystem extends System {
     this.query = new Query(sim, ["damage", "position"]);
   }
 
-  exec = (delta: number): void => {
+  exec = (): void => {
     if (this.sim.getTime() < settings.bootTime) return;
 
     this.query.get().forEach((entity) => {
@@ -64,28 +74,43 @@ export class AttackingSystem extends System {
 
         if (isInDistance(entity, target)) {
           entity.cooldowns.use(cdKey, entity.cp.damage.cooldown);
-          changeHp(target, entity.cp.damage.value);
-          target.cooldowns.use(regenCooldown, 3);
-          if (target.cp.drive) {
-            stopCruise(target.cp.drive);
-          }
-          if (shouldAttackBack(entity, target)) {
-            if (target.cp.orders) {
-              if (target.cp.orders.value[0]) {
-                target.cp.orders.value[0].interrupt = true;
-              }
-              target.cp.orders.value.splice(1, 0, {
-                type: "attack",
-                actions: [],
-                followOutsideSector: false,
-                ordersForSector: 0,
-                origin: "auto",
-                targetId: findInAncestors(entity, "position").id,
-              });
+          if (
+            !target.cp.drive ||
+            !target.cp.dockable ||
+            Math.random() >
+              getEvasionChance(
+                target.cp.drive.currentSpeed,
+                target.cp.dockable.size
+              )
+          ) {
+            changeHp(target, entity.cp.damage.value);
+
+            if (target.cp.drive) {
+              stopCruise(target.cp.drive);
             }
-          } else if (target.cp.damage && !target.tags.has("role:military")) {
-            target.cp.damage.targetId = findInAncestors(entity, "position").id;
+            if (shouldAttackBack(entity, target)) {
+              if (target.cp.orders) {
+                if (target.cp.orders.value[0]) {
+                  target.cp.orders.value[0].interrupt = true;
+                }
+                target.cp.orders.value.splice(1, 0, {
+                  type: "attack",
+                  actions: [],
+                  followOutsideSector: false,
+                  ordersForSector: 0,
+                  origin: "auto",
+                  targetId: findInAncestors(entity, "position").id,
+                });
+              }
+            } else if (target.cp.damage && !target.tags.has("role:military")) {
+              target.cp.damage.targetId = findInAncestors(
+                entity,
+                "position"
+              ).id;
+            }
           }
+
+          target.cooldowns.use(regenCooldown, 3);
         }
       }
     });
