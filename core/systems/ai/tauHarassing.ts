@@ -7,6 +7,7 @@ import { Cooldowns } from "@core/utils/cooldowns";
 import { getSubordinates } from "@core/utils/misc";
 import { filter, first, map, pipe, sortBy } from "@fxts/core";
 import { distance } from "mathjs";
+import { addSubordinate } from "@core/components/subordinates";
 import { requestShip } from "./shipPlanning";
 import { System } from "../system";
 
@@ -123,7 +124,7 @@ export class TauHarassingSystem extends System {
             targetId: commander.id,
           };
         }
-        ship.addComponent({ name: "commander", id: commander.id });
+        addSubordinate(commander, ship);
         fighters.push(ship);
       } else if (fightersInShipyards.length > 0) {
         fightersInShipyards.pop();

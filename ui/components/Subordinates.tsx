@@ -13,9 +13,11 @@ export interface SubordinatesProps {
 }
 
 export const Subordinates: React.FC<SubordinatesProps> = ({ entity }) => {
-  if (!entity.tags.has("ship") && !entity.tags.has("facility")) return null;
+  if (!entity.cp.subordinates) return null;
 
-  const subordinates = getSubordinates(entity);
+  const subordinates = getSubordinates(
+    entity.requireComponents(["subordinates"])
+  );
 
   return (
     <>

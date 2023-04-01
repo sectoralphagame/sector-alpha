@@ -5,6 +5,7 @@ import type { RequireComponent } from "@core/tsHelpers";
 import redoIcon from "@assets/ui/redo.svg";
 import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
+import { removeCommander } from "@core/components/commander";
 import { useSim } from "../atoms";
 import styles from "./Commander.scss";
 
@@ -38,7 +39,7 @@ export const Commander: React.FC<CommanderProps> = ({ commander, ship }) => {
           <IconButton
             className={styles.btn}
             onClick={() => {
-              ship.removeComponent("commander");
+              removeCommander(ship);
             }}
           >
             <SVG src={closeIcon} />

@@ -24,6 +24,7 @@ export const shipComponents = [
   "storage",
   "journal",
   "model",
+  "subordinates",
 ] as const;
 
 export type ShipComponent = (typeof shipComponents)[number];
@@ -128,6 +129,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       name: "name",
       value: createShipName(entity.requireComponents(["model"])),
     })
+    .addComponent({ name: "subordinates", ids: [] })
     .addTag("selection")
     .addTag("ship")
     .addTag(`role:${initial.role}`);

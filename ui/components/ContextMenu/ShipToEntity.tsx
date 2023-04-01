@@ -1,4 +1,4 @@
-import { add, matrix, random } from "mathjs";
+import { matrix } from "mathjs";
 import React from "react";
 import { createMarker } from "@core/archetypes/marker";
 import { getSelected, getSelectedSecondary } from "@core/components/selection";
@@ -6,6 +6,7 @@ import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
 import { relationThresholds } from "@core/components/relations";
 import { isOwnedByPlayer } from "@core/utils/misc";
+import { addSubordinate } from "@core/components/subordinates";
 import { useContextMenu, useGameDialog, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
@@ -71,10 +72,7 @@ export const ShipToEntity: React.FC = () => {
 
   const onWorkFor = () => {
     entity.cp.orders!.value = [];
-    entity.addComponent({
-      name: "commander",
-      id: actionable.id,
-    });
+    addSubordinate(entity.requireComponents(["subordinates"]), actionable);
   };
 
   const onBuild = () => {
@@ -157,7 +155,7 @@ export const ShipToEntity: React.FC = () => {
         actionable.cp.owner?.id === entity.cp.owner?.id && (
           <DropdownOption onClick={onEscort}>Escort</DropdownOption>
         )}
-      {entity.hasComponents(["storage"]) &&
+      {entity.hasComponents(["storage", "subordinates"]) &&
         actionable.hasComponents(["trade", "name"]) &&
         isOwnedByPlayer(actionable) && (
           <DropdownOption onClick={onWorkFor}>

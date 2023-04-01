@@ -1,6 +1,9 @@
 import type { ShipyardQueueItem } from "@core/components/shipyard";
 import type { DockSize } from "@core/components/dockable";
 import { relationThresholds } from "@core/components/relations";
+import { addSubordinate } from "@core/components/subordinates";
+import { removeCommander } from "@core/components/commander";
+import { getSubordinates } from "@core/utils/misc";
 import type { InitialShipInput } from "../../archetypes/ship";
 import { createShipName, createShip } from "../../archetypes/ship";
 import { mineableCommodities } from "../../economy/commodity";
@@ -20,7 +23,9 @@ import { notNull } from "../../utils/maps";
 interface ShipRequest {
   trading: number;
   mining: number;
-  facility?: RequireComponent<"position" | "facilityModuleQueue" | "modules">;
+  facility?: RequireComponent<
+    "position" | "facilityModuleQueue" | "modules" | "subordinates"
+  >;
   sector?: Sector;
   patrols: number;
   fighters: number;
@@ -81,9 +86,7 @@ export class ShipPlanningSystem extends System {
         const facilityModules = facility.cp.modules.ids.map(
           this.sim.getOrThrow
         );
-        const facilityShips = this.sim.queries.commendables
-          .get()
-          .filter((ship) => ship.cp.commander.id === facility.id);
+        const facilityShips = getSubordinates(facility);
         const miners = facilityShips
           .filter((ship) => ship.cp.mining)
           .map((miner) => miner.requireComponents(["commander", "mining"]));
@@ -143,7 +146,7 @@ export class ShipPlanningSystem extends System {
       .get()
       .filter((sector) => sector.cp.owner?.id === faction.id)
       .map((sector) => {
-        const sectorPatrols = this.sim.queries.orderable
+        const sectorPatrols = this.sim.queries.ships
           .get()
           .filter(
             (ship) =>
@@ -155,13 +158,9 @@ export class ShipPlanningSystem extends System {
               )
           );
         const sectorPatrolsFollowers = sectorPatrols.flatMap((ship) =>
-          this.sim.queries.commendables
-            .get()
-            .filter(
-              (commendable) =>
-                commendable.cp.commander.id === ship.id &&
-                commendable.cp.dockable?.size === "small"
-            )
+          getSubordinates(ship)
+            .filter((subordinate) => subordinate.tags.has("role:mining"))
+            .filter((subordinate) => subordinate.cp.dockable.size === "small")
         ).length;
 
         return {
@@ -226,17 +225,12 @@ export class ShipPlanningSystem extends System {
     const spareTraders: RequireComponent<"model" | "orders">[] = shipRequests
       .filter((request) => request.trading > 0 && request.facility)
       .flatMap(({ facility, trading }) =>
-        this.sim.queries.commendables
-          .get()
-          .filter(
-            (ship) =>
-              ship.cp.commander.id === facility?.id &&
-              ship.tags.has("role:transport")
-          )
+        getSubordinates(facility!)
+          .filter((ship) => ship.tags.has("role:transport"))
           .slice(0, -trading)
       );
     spareTraders.forEach((ship) => {
-      ship.removeComponent("commander");
+      removeCommander(ship.requireComponents(["commander"]));
     });
     spareTraders.push(
       ...this.sim.queries.orderable
@@ -262,17 +256,13 @@ export class ShipPlanningSystem extends System {
         for (let i = 0; i < -trading; i++) {
           if (spareTraders.length > 0 && facility) {
             const ship = spareTraders.pop()!;
-            ship
-              .addComponent({
-                name: "commander",
-                id: facility.id,
-              })
-              .addComponent({
-                name: "autoOrder",
-                default: {
-                  type: "trade",
-                },
-              });
+            addSubordinate(facility, ship);
+            ship.addComponent({
+              name: "autoOrder",
+              default: {
+                type: "trade",
+              },
+            });
             ship.cp.name!.value = createShipName(ship);
           } else if (shipRequestInShipyards.length > 0) {
             shipRequestInShipyards.pop();
@@ -313,18 +303,14 @@ export class ShipPlanningSystem extends System {
   ) => {
     const spareMiners: Entity[] = shipRequests
       .filter((request) => request.mining >= 1)
-      .flatMap(({ facility, mining }) =>
-        this.sim.queries.commendables
-          .get()
-          .filter(
-            (ship) =>
-              ship.cp.commander.id === facility?.id &&
-              ship.tags.has("role:mining")
-          )
-          .slice(0, -mining)
+      .flatMap(
+        ({ facility, mining }) =>
+          getSubordinates(facility!)
+            .filter((ship) => ship.tags.has("role:mining"))
+            .slice(0, -mining) ?? []
       );
     spareMiners.forEach((ship) => {
-      ship.removeComponent("commander");
+      removeCommander(ship.requireComponents(["commander"]));
     });
     spareMiners.push(
       ...this.sim.queries.mining
@@ -346,10 +332,7 @@ export class ShipPlanningSystem extends System {
       while (mining < 0) {
         if (spareMiners.length > 0 && facility) {
           const ship = spareMiners.pop()!;
-          ship.addComponent({
-            name: "commander",
-            id: facility.id,
-          });
+          addSubordinate(facility, ship);
           mining += ship.cp.mining!.efficiency;
         } else if (miningShipRequestInShipyards.length > 0) {
           mining += miningShipRequestInShipyards.pop()!.blueprint.mining;
@@ -461,7 +444,7 @@ export class ShipPlanningSystem extends System {
         for (let i = 0; i < -fighters; i++) {
           if (spareFighters.length > 0) {
             const ship = spareFighters.pop()!;
-            const commander = this.sim.queries.orderable
+            const commander = this.sim.queries.ships
               .get()
               .find(
                 (patrolLeader) =>
@@ -470,12 +453,8 @@ export class ShipPlanningSystem extends System {
                   patrolLeader.cp.orders.value.some(
                     (order) => order.type === "patrol"
                   ) &&
-                  this.sim.queries.commendables
-                    .get()
-                    .filter(
-                      (commendable) =>
-                        commendable.cp.commander.id === patrolLeader.id
-                    ).length < faction.cp.ai!.patrols.formation.fighters
+                  getSubordinates(patrolLeader).length <
+                    faction.cp.ai!.patrols.formation.fighters
               );
 
             if (commander) {
@@ -494,7 +473,7 @@ export class ShipPlanningSystem extends System {
                   targetId: commander.id,
                 };
               }
-              ship.addComponent({ name: "commander", id: commander.id });
+              addSubordinate(commander, ship);
             }
           } else if (fightersInShipyards.length > 0) {
             fightersInShipyards.pop();

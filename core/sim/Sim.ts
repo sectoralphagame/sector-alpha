@@ -154,8 +154,8 @@ export class Sim extends BaseSim {
   };
 
   unregisterEntity = (entity: Entity) => {
-    this.entities.delete(entity.id);
     this.hooks.removeEntity.call(entity);
+    this.entities.delete(entity.id);
   };
 
   registerSystem = (system: System) => {

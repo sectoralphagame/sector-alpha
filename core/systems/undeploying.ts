@@ -3,6 +3,7 @@ import type { DeployableType } from "@core/components/deployable";
 import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
 import { Cooldowns } from "@core/utils/cooldowns";
+import { removeSubordinate } from "@core/components/subordinates";
 import { Query } from "./utils/query";
 import { System } from "./system";
 
@@ -16,6 +17,7 @@ const handlers: Partial<
       "deployable",
       "storage",
       "storageBonus",
+      "subordinates",
     ]);
     const ownerBudget = builder.sim.get(builder.cp.owner.id)?.cp.budget;
     if (ownerBudget) {
@@ -23,6 +25,10 @@ const handlers: Partial<
     }
 
     builder.cp.storage.max -= builder.cp.storageBonus.value;
+
+    builder.cp.subordinates.ids.forEach((id) => {
+      removeSubordinate(builder, builder.sim.getOrThrow(id));
+    });
 
     builder
       .addComponent({
@@ -35,12 +41,6 @@ const handlers: Partial<
       .removeComponent("docks")
       .removeComponent("storageBonus")
       .removeComponent("builder");
-
-    builder.sim.queries.commendables.get().forEach((commendable) => {
-      if (commendable.cp.commander.id === builder.id) {
-        commendable.removeComponent("commander");
-      }
-    });
 
     builder.cp.deployable.cancel = false;
     builder.cp.deployable.active = false;

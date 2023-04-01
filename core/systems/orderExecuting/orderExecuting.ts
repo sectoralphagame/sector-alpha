@@ -5,6 +5,9 @@ import type { Allocation } from "@core/components/utils/allocations";
 import type { Action, Order } from "@core/components/orders";
 import type { Sim } from "@core/sim";
 import type { EntityTag } from "@core/tags";
+import { removeCommander } from "@core/components/commander";
+import type { RequireComponent } from "@core/tsHelpers";
+import { removeSubordinate } from "@core/components/subordinates";
 import { System } from "../system";
 import { dockOrder } from "./dock";
 import { mineAction } from "./mine";
@@ -159,24 +162,34 @@ function cleanupDocks(entity: Entity): void {
 }
 
 function cleanupChildren(entity: Entity): void {
+  entity.cp.subordinates?.ids.forEach((id) => {
+    const ship =
+      entity.sim.getOrThrow<
+        RequireComponent<"commander" | "orders" | "autoOrder">
+      >(id);
+
+    removeCommander(ship);
+    if (ship.cp.orders.value.length > 0) {
+      orderFns[ship.cp.orders.value[0].type]?.onCompleted(
+        ship,
+        ship.cp.orders.value[0]
+      );
+    }
+    ship.cp.orders.value = [];
+    ship.cp.autoOrder.default = { type: "hold" };
+  });
+
+  if (entity.cp.commander) {
+    removeSubordinate(
+      entity.sim.getOrThrow(entity.cp.commander.id),
+      entity.requireComponents(["commander"])
+    );
+  }
+
   if (
     (["asteroid", "virtual"] as EntityTag[]).some((tag) => entity.tags.has(tag))
   )
     return;
-
-  entity.sim.queries.commendables.get().forEach((ship) => {
-    if (ship.cp.commander.id === entity.id) {
-      ship.removeComponent("commander");
-      if (ship.cp.orders.value.length > 0) {
-        orderFns[ship.cp.orders.value[0].type]?.onCompleted(
-          ship,
-          ship.cp.orders.value[0]
-        );
-      }
-      ship.cp.orders.value = [];
-      ship.cp.autoOrder.default = { type: "hold" };
-    }
-  });
 
   entity.sim.queries.children.get().forEach((child) => {
     if (child.cp.parent.id === entity.id) {

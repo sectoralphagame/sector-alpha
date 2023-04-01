@@ -24,6 +24,7 @@ export const facilityComponents = [
   "storage",
   "trade",
   "facilityModuleQueue",
+  "subordinates",
 ] as const;
 
 export type FacilityComponent = (typeof facilityComponents)[number];
@@ -96,6 +97,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
         "Facility"
       ),
     })
+    .addComponent({ name: "subordinates", ids: [] })
     .addTag("selection")
     .addTag("facility");
 

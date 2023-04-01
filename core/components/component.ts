@@ -38,6 +38,7 @@ import type { HitPoints } from "./hitpoints";
 import type { Damage } from "./damage";
 import type { Model } from "./model";
 import type { Disposable } from "./disposable";
+import type { Subordinates } from "./subordinates";
 
 export interface CoreComponents {
   ai: Ai;
@@ -80,6 +81,7 @@ export interface CoreComponents {
   simpleCommodityStorage: SimpleCommodityStorage;
   storage: CommodityStorage;
   storageBonus: StorageBonus;
+  subordinates: Subordinates;
   systemManager: SystemManager;
   teleport: Teleport;
   trade: Trade;

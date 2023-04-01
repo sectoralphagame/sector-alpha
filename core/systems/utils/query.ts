@@ -1,5 +1,6 @@
 import { filter, map, pipe, toArray } from "@fxts/core";
 import type { EntityTag } from "@core/tags";
+import { shipComponents } from "@core/archetypes/ship";
 import { asteroidFieldComponents } from "../../archetypes/asteroidField";
 import { facilityComponents } from "../../archetypes/facility";
 import { factionComponents } from "../../archetypes/faction";
@@ -112,9 +113,13 @@ export function createQueries(sim: Sim) {
     budget: new Query(sim, ["budget"]),
     builders: new Query(sim, ["builder", "storage", "trade", "docks"]),
     children: new Query(sim, ["parent"]),
-    commendables: new Query(sim, ["commander", "orders", "autoOrder", "model"]),
     disposable: new Query(sim, ["disposable"]),
-    facilities: new Query(sim, ["modules", "position", "facilityModuleQueue"]),
+    facilities: new Query(sim, [
+      "modules",
+      "position",
+      "facilityModuleQueue",
+      "subordinates",
+    ]),
     facilityWithProduction: new Query(sim, [
       "compoundProduction",
       "modules",
@@ -133,6 +138,7 @@ export function createQueries(sim: Sim) {
       "systemManager",
       "inflationStats",
     ]),
+    ships: new Query(sim, shipComponents, ["ship"]),
     shipyards: new Query(sim, [...facilityComponents, "owner", "shipyard"]),
     standaloneProduction: new Query(sim, ["production", "storage"]),
     storage: new Query(sim, ["storage"]),
