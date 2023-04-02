@@ -213,6 +213,12 @@ function autoMineForCommander(
           sectorDistance,
           entity.sim
         )
+          .filter((sector) =>
+            sector.cp.owner
+              ? !entity.sim.getOrThrow<Faction>(sector.cp.owner.id).cp.ai
+                  ?.restrictions.mining
+              : true
+          )
           .map((sector) =>
             entity.sim.queries.asteroidFields
               .get()

@@ -460,7 +460,10 @@
       },
       "color": "#6fc9f2",
       "type": "territorial",
-      "patrols": { "formation": { "fighters": 3 }, "perSector": 4 }
+      "patrols": { "formation": { "fighters": 3 }, "perSector": 4 },
+      "restrictions": {
+        "mining": false
+      }
     },
     {
       "name": "Alpha Centauri's Technocracy",
@@ -506,7 +509,10 @@
       },
       "color": "#ffc34d",
       "type": "territorial",
-      "patrols": { "formation": { "fighters": 2 }, "perSector": 6 }
+      "patrols": { "formation": { "fighters": 2 }, "perSector": 6 },
+      "restrictions": {
+        "mining": false
+      }
     },
     {
       "name": "Tau",
@@ -536,7 +542,10 @@
       },
       "color": "#9534eb",
       "type": "territorial",
-      "patrols": { "formation": { "fighters": 2 }, "perSector": 7 }
+      "patrols": { "formation": { "fighters": 2 }, "perSector": 7 },
+      "restrictions": {
+        "mining": true
+      }
     },
     {
       "name": "Federation of Free Worlds",
@@ -583,7 +592,10 @@
       },
       "color": "#42f5e3",
       "type": "territorial",
-      "patrols": { "formation": { "fighters": 3 }, "perSector": 2 }
+      "patrols": { "formation": { "fighters": 3 }, "perSector": 2 },
+      "restrictions": {
+        "mining": false
+      }
     },
     {
       "name": "Alkali Mining Sindicate",
@@ -622,7 +634,10 @@
       },
       "color": "#ff63e5",
       "type": "territorial",
-      "patrols": { "formation": { "fighters": 2 }, "perSector": 3 }
+      "patrols": { "formation": { "fighters": 2 }, "perSector": 3 },
+      "restrictions": {
+        "mining": true
+      }
     },
     {
       "name": "Pirates",
@@ -660,7 +675,10 @@
       },
       "color": "#fcc7c5",
       "type": "pirate",
-      "patrols": { "formation": { "fighters": 2 }, "perSector": 6 }
+      "patrols": { "formation": { "fighters": 2 }, "perSector": 6 },
+      "restrictions": {
+        "mining": false
+      }
     },
     {
       "name": "Therr Traders",
@@ -695,7 +713,10 @@
       },
       "color": "#f7fc5b",
       "type": "travelling",
-      "patrols": { "formation": { "fighters": 2 }, "perSector": 3 }
+      "patrols": { "formation": { "fighters": 2 }, "perSector": 3 },
+      "restrictions": {
+        "mining": false
+      }
     },
     {
       "name": "Player Faction",

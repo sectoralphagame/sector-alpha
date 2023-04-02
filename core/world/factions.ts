@@ -27,6 +27,9 @@ function createTerritorialFaction(index: number, sim: Sim) {
       },
       perSector: 4,
     },
+    restrictions: {
+      mining: false,
+    },
   });
   setMoney(faction.cp.budget, 1e8);
   faction.cp.blueprints.ships = [
@@ -58,6 +61,9 @@ function createTradingFaction(index: number, sim: Sim) {
         fighters: 3,
       },
       perSector: 4,
+    },
+    restrictions: {
+      mining: false,
     },
   });
   setMoney(faction.cp.budget, 1e4);

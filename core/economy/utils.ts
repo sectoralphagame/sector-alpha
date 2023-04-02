@@ -1,5 +1,3 @@
-import type { Matrix } from "mathjs";
-import { norm, subtract } from "mathjs";
 import type { FacilityModuleInput } from "@core/archetypes/facilityModule";
 import { discriminate } from "@core/utils/maps";
 import sortBy from "lodash/sortBy";

@@ -21,4 +21,7 @@ export interface Ai extends BaseComponent<"ai"> {
     };
     perSector: number;
   };
+  restrictions: {
+    mining: boolean;
+  };
 }

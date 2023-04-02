@@ -52,11 +52,12 @@ export class SpottingSystem extends System {
           filter(
             (e) =>
               e.tags.has("ship") &&
-              entity.cp.owner &&
-              entityOwner &&
+              e.cp.owner.id !== entityOwner.id &&
               e.cp.position.sector === entity.cp.position.sector &&
-              entityOwner.cp.relations.values[e.cp.owner.id]! <
-                relationThresholds.attack
+              (entityOwner.cp.relations.values[e.cp.owner.id]! <
+                relationThresholds.attack ||
+                (entityOwner.cp.ai?.restrictions.mining &&
+                  e.cp.mining?.entityId))
           ),
           toArray
         );
