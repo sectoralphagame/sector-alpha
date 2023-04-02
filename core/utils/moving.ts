@@ -1,4 +1,4 @@
-import type { Marker } from "../archetypes/marker";
+import type { Waypoint } from "../archetypes/waypoint";
 import type { Action } from "../components/orders";
 import { findInAncestors } from "./findInAncestors";
 
@@ -6,8 +6,8 @@ import { findInAncestors } from "./findInAncestors";
  * Creates array of actions necessary to get to target entity
  */
 export function moveToActions(
-  origin: Marker,
-  target: Marker,
+  origin: Waypoint,
+  target: Waypoint,
   {
     onlyManeuver,
     ignoreReached,

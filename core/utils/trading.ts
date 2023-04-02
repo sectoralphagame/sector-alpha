@@ -37,7 +37,7 @@ import {
 import type { Sector } from "../archetypes/sector";
 import type { SectorPriceStats } from "../components/sectorStats";
 import { limitMax } from "./limit";
-import type { Marker } from "../archetypes/marker";
+import type { Waypoint } from "../archetypes/waypoint";
 
 const tradingCommanderComponents = [
   "budget",
@@ -351,7 +351,7 @@ export function tradeCommodity(
   >,
   offer: TransactionInput,
   target: WithTrade,
-  position?: Marker
+  position?: Waypoint
 ): Action[] | null {
   const allocations = allocate(target, offer);
   if (!allocations) {

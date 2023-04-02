@@ -1,6 +1,6 @@
 import { matrix } from "mathjs";
 import React from "react";
-import { createMarker } from "@core/archetypes/marker";
+import { createWaypoint } from "@core/archetypes/waypoint";
 import { getSelected, getSelectedSecondary } from "@core/components/selection";
 import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
@@ -49,7 +49,7 @@ export const ShipToEntity: React.FC = () => {
       actions: [
         ...moveToActions(
           entity,
-          createMarker(sim, {
+          createWaypoint(sim, {
             sector: menu.sector!.id,
             value: matrix(menu.worldPosition),
             owner: entity.id,
@@ -80,7 +80,7 @@ export const ShipToEntity: React.FC = () => {
       actions: [
         ...moveToActions(
           entity,
-          createMarker(entity.sim, {
+          createWaypoint(entity.sim, {
             sector: actionable.cp.position.sector,
             value: actionable.cp.position.coord,
             owner: entity.id,
@@ -114,7 +114,7 @@ export const ShipToEntity: React.FC = () => {
       actions: [
         ...moveToActions(
           entity,
-          createMarker(entity.sim, {
+          createWaypoint(entity.sim, {
             sector: actionable.cp.position.sector,
             value: actionable.cp.position.coord,
             owner: entity.id,

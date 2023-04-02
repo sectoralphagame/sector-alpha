@@ -6,8 +6,8 @@ import { add, matrix, norm, random, subtract } from "mathjs";
 import { asteroid } from "../../archetypes/asteroid";
 import { asteroidField } from "../../archetypes/asteroidField";
 import { commanderRange, facility } from "../../archetypes/facility";
-import type { Marker } from "../../archetypes/marker";
-import { createMarker } from "../../archetypes/marker";
+import type { Waypoint } from "../../archetypes/waypoint";
+import { createWaypoint } from "../../archetypes/waypoint";
 import type { Sector } from "../../archetypes/sector";
 import { sector as asSector, sectorSize } from "../../archetypes/sector";
 import { hecsToCartesian } from "../../components/hecsPosition";
@@ -76,13 +76,13 @@ function getRandomPositionInBounds(
 function idleMovement(entity: RequireComponent<"position" | "orders">) {
   const commander =
     entity.cp.commander &&
-    entity.sim.getOrThrow<Marker>(entity.cp.commander.id);
+    entity.sim.getOrThrow<Waypoint>(entity.cp.commander.id);
 
   entity.cp.orders.value.push({
     origin: "auto",
     actions: moveToActions(
       entity,
-      createMarker(
+      createWaypoint(
         entity.sim,
         commander
           ? {

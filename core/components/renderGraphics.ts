@@ -12,7 +12,7 @@ import type { Entity } from "../entity";
 import { hecsToCartesian } from "./hecsPosition";
 
 export type Graphics = Record<
-  "asteroidField" | "link" | "marker" | "sector" | "path" | "hexGrid",
+  "asteroidField" | "link" | "waypoint" | "sector" | "path" | "hexGrid",
   // eslint-disable-next-line no-unused-vars
   (opts: { g: PIXI.Graphics; entity: Entity; viewport: Viewport }) => void
 >;
@@ -144,7 +144,7 @@ export const graphics: Graphics = {
       })
     );
   },
-  marker: ({ g, entity }) => {
+  waypoint: ({ g, entity }) => {
     const { position } = entity.requireComponents(["position"]).cp;
     g.lineStyle({
       alpha: 0.3,

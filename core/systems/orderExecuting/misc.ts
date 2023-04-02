@@ -1,4 +1,4 @@
-import { marker } from "../../archetypes/marker";
+import { waypoint } from "../../archetypes/waypoint";
 import {
   clearTarget,
   defaultDriveLimit,
@@ -61,7 +61,7 @@ export function teleportAction(
   entity: RequireComponent<"position" | "orders">,
   order: TeleportAction
 ): boolean {
-  const destination = marker(entity.sim.getOrThrow(order.targetId));
+  const destination = waypoint(entity.sim.getOrThrow(order.targetId));
 
   entity.cp.position = {
     name: "position",

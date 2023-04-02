@@ -1,4 +1,4 @@
-import type { Marker } from "@core/archetypes/marker";
+import type { Waypoint } from "@core/archetypes/waypoint";
 import { clearTarget } from "@core/components/drive";
 import type { FollowOrder, MoveAction } from "@core/components/orders";
 import type { RequireComponent } from "@core/tsHelpers";
@@ -8,7 +8,7 @@ export function followOrder(
   entity: RequireComponent<"drive" | "position" | "orders">,
   group: FollowOrder
 ) {
-  const target = entity.sim.getOrThrow<Marker>(group.targetId);
+  const target = entity.sim.getOrThrow<Waypoint>(group.targetId);
   const moveOrders = group.actions.filter((o) => o.type === "move");
   const lastMoveOrder = moveOrders.at(-1) as MoveAction;
   const inTheSameSector =

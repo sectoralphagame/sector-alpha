@@ -1,7 +1,7 @@
 import { matrix, norm, subtract } from "mathjs";
 import React from "react";
 import type { AsteroidField } from "@core/archetypes/asteroidField";
-import { createMarker } from "@core/archetypes/marker";
+import { createWaypoint } from "@core/archetypes/waypoint";
 import { mineAction } from "@core/components/orders";
 import { getSelected } from "@core/components/selection";
 import { moveToActions } from "@core/utils/moving";
@@ -46,7 +46,7 @@ export const ShipToSpace: React.FC = () => {
       type: "move",
       actions: moveToActions(
         entity,
-        createMarker(sim, {
+        createWaypoint(sim, {
           sector: menu.sector!.id,
           value: matrix(menu.worldPosition),
           owner: entity.id,
@@ -76,7 +76,7 @@ export const ShipToSpace: React.FC = () => {
       actions: [
         ...moveToActions(
           entity,
-          createMarker(sim, {
+          createWaypoint(sim, {
             sector: menu.sector!.id,
             value: matrix(menu.worldPosition),
             owner: entity.id,

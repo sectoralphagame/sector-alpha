@@ -1,4 +1,4 @@
-import { createMarker } from "@core/archetypes/marker";
+import { createWaypoint } from "@core/archetypes/waypoint";
 import type { Sector } from "@core/archetypes/sector";
 import { sectorSize } from "@core/archetypes/sector";
 import { hecsToCartesian } from "@core/components/hecsPosition";
@@ -17,7 +17,7 @@ export function patrolOrder(
   if (order.actions.length === 0) {
     entity.cp.orders.value[0].actions = moveToActions(
       entity,
-      createMarker(entity.sim, {
+      createWaypoint(entity.sim, {
         sector: targetSector.id,
         value: add(
           hecsToCartesian(targetSector.cp.hecsPosition.value, sectorSize / 10),

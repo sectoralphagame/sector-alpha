@@ -1,5 +1,5 @@
 import type { Faction } from "@core/archetypes/faction";
-import { createMarker } from "@core/archetypes/marker";
+import { createWaypoint } from "@core/archetypes/waypoint";
 import { sectorSize } from "@core/archetypes/sector";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { Sim } from "@core/sim";
@@ -61,7 +61,7 @@ export class ShipReturningSystem extends System {
           type: "move",
           actions: moveToActions(
             ship,
-            createMarker(this.sim, {
+            createWaypoint(this.sim, {
               sector: closestSector.id,
               owner: ship.id,
               value: add(

@@ -24,7 +24,7 @@ import type { Asteroid } from "../archetypes/asteroid";
 import { asteroid } from "../archetypes/asteroid";
 import type { Sector } from "../archetypes/sector";
 import { sector as asSector } from "../archetypes/sector";
-import type { Marker } from "../archetypes/marker";
+import type { Waypoint } from "../archetypes/waypoint";
 import { perCommodity } from "../utils/perCommodity";
 import { pickRandom } from "../utils/generators";
 
@@ -61,7 +61,7 @@ export interface TradeWithMostProfit {
  * profitable trade
  */
 export function getTradeWithMostProfit(
-  from: Marker | Sector,
+  from: Waypoint | Sector,
   sectorDistance: number,
   notAllowedFactions: number[]
 ): TradeWithMostProfit | null {
