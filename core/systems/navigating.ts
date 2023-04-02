@@ -1,5 +1,5 @@
 import type { Matrix } from "mathjs";
-import { random, norm, subtract } from "mathjs";
+import { add, matrix, random, norm, subtract } from "mathjs";
 import {
   clearTarget,
   defaultDriveLimit,
@@ -36,6 +36,34 @@ function _normalizeAngle(value: number, start: number, end: number): number {
 }
 function normalizeAngle(value: number): number {
   return _normalizeAngle(value, -Math.PI, Math.PI);
+}
+
+function getFormationPlace(
+  commander: RequireComponent<"subordinates" | "position">,
+  entity: RequireComponent<"position">
+): Matrix {
+  const subordinates = commander.cp.subordinates.ids;
+  const subordinateIndex = subordinates.findIndex(
+    (subordinateId) => subordinateId === entity.id
+  );
+  const subordinatesCount = subordinates.length;
+  const angle = commander.cp.position.angle;
+  const distance = 0.1;
+  const basePosition = matrix([
+    (subordinateIndex - (subordinatesCount - 1) / 2) * 0.3,
+    distance,
+  ]);
+
+  const x = basePosition.get([0]);
+  const y = basePosition.get([1]);
+
+  return add(
+    matrix([
+      x * Math.cos(angle) - y * Math.sin(angle),
+      x * Math.sin(angle) + y * Math.cos(angle),
+    ]),
+    commander.cp.position.coord
+  );
 }
 
 export function getDeltaAngle(
@@ -126,8 +154,14 @@ function setDrive(entity: Driveable, delta: number) {
     hold(entity);
     return;
   }
-  const targetPosition = targetEntity.cp.position!;
-  const isInSector = targetPosition.sector === entityPosition.sector;
+  const targetPosition =
+    entity.cp.commander?.id === targetEntity.id
+      ? getFormationPlace(
+          targetEntity.requireComponents(["subordinates", "position"]),
+          entity
+        )
+      : targetEntity.cp.position!.coord;
+  const isInSector = targetEntity.cp.position!.sector === entityPosition.sector;
 
   if (!isInSector) {
     hold(entity);
@@ -139,7 +173,7 @@ function setDrive(entity: Driveable, delta: number) {
     return;
   }
 
-  const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
+  const path = subtract(targetPosition, entityPosition.coord) as Matrix;
 
   const entityAngle = normalizeAngle(
     // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
