@@ -86,7 +86,7 @@ export class TauHarassingSystem extends System {
       return null;
     }
 
-    const spareFighters = this.sim.queries.orderable
+    const spareFighters = this.sim.queries.ships
       .get()
       .filter(
         (ship) =>
@@ -108,7 +108,7 @@ export class TauHarassingSystem extends System {
 
     for (let i = 0; i < fightersInFleet - fighters.length; i++) {
       if (spareFighters.length > 0) {
-        const ship = asShip(spareFighters.pop()!);
+        const ship = spareFighters.pop()!;
         ship.cp.orders!.value = [
           {
             type: "escort",
