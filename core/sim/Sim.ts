@@ -199,6 +199,11 @@ export class Sim extends BaseSim {
       .addComponent({
         name: "inflationStats",
         basketPrices: [],
+      })
+      .addComponent({
+        name: "camera",
+        zoom: 1,
+        position: [0, 0],
       });
   };
 

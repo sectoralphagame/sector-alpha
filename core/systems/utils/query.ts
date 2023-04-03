@@ -137,6 +137,7 @@ export function createQueries(sim: Sim) {
       "selectionManager",
       "systemManager",
       "inflationStats",
+      "camera",
     ]),
     ships: new Query(sim, shipComponents, ["ship"]),
     shipyards: new Query(sim, [...facilityComponents, "owner", "shipyard"]),

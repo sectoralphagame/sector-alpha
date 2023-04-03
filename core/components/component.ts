@@ -1,3 +1,4 @@
+import type { Camera } from "./camera";
 import type { Budget } from "./budget";
 import type { Owner } from "./owner";
 import type { Trade } from "./trade";
@@ -47,6 +48,7 @@ export interface CoreComponents {
   blueprints: Blueprints;
   budget: Budget;
   builder: Builder;
+  camera: Camera;
   children: Children;
   color: Color;
   commander: Commander;

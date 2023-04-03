@@ -78,7 +78,7 @@ function drawHpBars(entity: RequireComponent<"render">) {
 
 export class RenderingSystem extends SystemWithHooks {
   rendering: true;
-  selectionManger: RequireComponent<"selectionManager">;
+  settingsManager: RequireComponent<"selectionManager" | "camera">;
   viewport: Viewport;
   app: PIXI.Application;
   initialized = false;
@@ -92,7 +92,7 @@ export class RenderingSystem extends SystemWithHooks {
 
   init = () => {
     this.cooldowns = new Cooldowns("graphics");
-    this.selectionManger = this.sim.queries.settings.get()[0];
+    this.settingsManager = this.sim.queries.settings.get()[0];
     this.toolbar = document.querySelector("#toolbar")!;
     const root = document.querySelector("#root")!;
     const canvasRoot = document.querySelector(
@@ -144,7 +144,7 @@ export class RenderingSystem extends SystemWithHooks {
     this.viewport.clampZoom({ minScale, maxScale });
     this.viewport.on("drag-start", () => {
       this.toolbar.style.pointerEvents = "none";
-      this.selectionManger.cp.selectionManager.focused = false;
+      this.settingsManager.cp.selectionManager.focused = false;
       this.viewport.plugins.remove("follow");
       this.dragging = true;
     });
@@ -155,7 +155,7 @@ export class RenderingSystem extends SystemWithHooks {
     this.viewport.on("mouseup", (event) => {
       this.toolbar.style.pointerEvents = "unset";
       if (event.target === event.currentTarget && !this.dragging) {
-        clearFocus(this.selectionManger.cp.selectionManager);
+        clearFocus(this.settingsManager.cp.selectionManager);
       }
     });
 
@@ -182,11 +182,11 @@ export class RenderingSystem extends SystemWithHooks {
       if (entity.cp.renderGraphics) {
         entity.cp.renderGraphics.g.destroy();
       }
-      if (entity.id === this.selectionManger.cp.selectionManager.id) {
-        this.selectionManger.cp.selectionManager.id = null;
+      if (entity.id === this.settingsManager.cp.selectionManager.id) {
+        this.settingsManager.cp.selectionManager.id = null;
       }
-      if (entity.id === this.selectionManger.cp.selectionManager.secondaryId) {
-        this.selectionManger.cp.selectionManager.secondaryId = null;
+      if (entity.id === this.settingsManager.cp.selectionManager.secondaryId) {
+        this.settingsManager.cp.selectionManager.secondaryId = null;
       }
     });
 
@@ -210,6 +210,12 @@ export class RenderingSystem extends SystemWithHooks {
         entity.cp.renderGraphics.initialized = false;
       }
     });
+
+    this.viewport.scale.set(this.settingsManager.cp.camera.zoom);
+    this.viewport.moveCenter(
+      this.settingsManager.cp.camera.position[0],
+      this.settingsManager.cp.camera.position[1]
+    );
 
     this.initialized = true;
   };
@@ -251,9 +257,9 @@ export class RenderingSystem extends SystemWithHooks {
           entityRender.sprite.on("pointerdown", (event) => {
             // Right click
             if (event.data.originalEvent.which === 3) {
-              this.selectionManger.cp.selectionManager.secondaryId = entity.id;
+              this.settingsManager.cp.selectionManager.secondaryId = entity.id;
             } else if (event.data.originalEvent.which === 1) {
-              this.selectionManger.cp.selectionManager.id = entity.id;
+              this.settingsManager.cp.selectionManager.id = entity.id;
             }
           });
           entityRender.sprite.cursor = "pointer";
@@ -281,7 +287,7 @@ export class RenderingSystem extends SystemWithHooks {
   };
 
   updateSelection = (previousValue: number) => {
-    this.selectionManger.cp.selectionManager.focused = false;
+    this.settingsManager.cp.selectionManager.focused = false;
     this.viewport.plugins.remove("follow");
     const previousSelected = this.sim.get(previousValue);
     if (previousSelected?.cp.renderGraphics?.draw === "path") {
@@ -292,7 +298,7 @@ export class RenderingSystem extends SystemWithHooks {
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
       const selected =
-        entity.id === this.selectionManger.cp.selectionManager.id;
+        entity.id === this.settingsManager.cp.selectionManager.id;
 
       if (selected && entityRender.sprite.tint === entityRender.color) {
         entityRender.sprite.tint = Color(entityRender.sprite.tint)
@@ -315,7 +321,7 @@ export class RenderingSystem extends SystemWithHooks {
 
   updateEntityScaling = (entity: RequireComponent<"render">) => {
     const entityRender = entity.cp.render;
-    const selected = entity.id === this.selectionManger.cp.selectionManager.id;
+    const selected = entity.id === this.settingsManager.cp.selectionManager.id;
     const scale = this.viewport.scale.x;
 
     entityRender.sprite.scale.set(
@@ -362,7 +368,7 @@ export class RenderingSystem extends SystemWithHooks {
           this.viewport.center.y + keymap[key].y / this.viewport.scale.x
         );
 
-        this.selectionManger.cp.selectionManager.focused = false;
+        this.settingsManager.cp.selectionManager.focused = false;
         this.viewport.plugins.remove("follow");
       }
 
@@ -370,6 +376,12 @@ export class RenderingSystem extends SystemWithHooks {
         this.viewport.zoom(keymap[key].scale / this.viewport.scale.x, true);
       }
     });
+
+    this.settingsManager.cp.camera.zoom = this.viewport.scale.x;
+    this.settingsManager.cp.camera.position = [
+      this.viewport.center.x,
+      this.viewport.center.y,
+    ];
   };
 
   toggleGrid = () => {
@@ -391,24 +403,24 @@ export class RenderingSystem extends SystemWithHooks {
       return;
     }
     this.cooldowns.update(delta);
-    this.selectionManger = this.sim.queries.settings.get()[0];
+    this.settingsManager = this.sim.queries.settings.get()[0];
 
     this.hook(
-      this.selectionManger.cp.selectionManager.id,
+      this.settingsManager.cp.selectionManager.id,
       this.updateSelection
     );
     this.hook(this.viewport.scale.x, this.updateScaling);
 
-    if (this.selectionManger.cp.selectionManager.focused) {
+    if (this.settingsManager.cp.selectionManager.focused) {
       const entity = this.sim.getOrThrow(
-        this.selectionManger.cp.selectionManager.id!
+        this.settingsManager.cp.selectionManager.id!
       );
       if (entity.hasComponents(["render"])) {
         this.viewport.follow(
           entity.requireComponents(["render"]).cp.render.sprite
         );
       } else {
-        this.selectionManger.cp.selectionManager.focused = false;
+        this.settingsManager.cp.selectionManager.focused = false;
       }
     }
 
