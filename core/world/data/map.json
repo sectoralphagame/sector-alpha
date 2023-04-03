@@ -420,7 +420,13 @@
     { "sectors": ["terra", "gaia"], "type": "gate" },
     { "sectors": ["terra", "juno-2"], "type": "gate" },
     { "sectors": ["wolf-1061-1", "gj-625"], "type": "gate" },
-    { "sectors": ["sedna", "gj-1002-3"], "type": "gate" }
+    { "sectors": ["sedna", "gj-1002-3"], "type": "gate" },
+    {
+      "sectors": ["sedna", "wolf-1061-3"],
+      "type": "gate",
+      "draw": ["vertical", "horizontal"]
+    },
+    { "sectors": ["ross-128-4", "wolf-1061-1"], "type": "gate" }
   ],
   "factions": [
     {
@@ -461,9 +467,8 @@
       "color": "#6fc9f2",
       "type": "territorial",
       "patrols": { "formation": { "fighters": 3 }, "perSector": 4 },
-      "restrictions": {
-        "mining": false
-      }
+      "restrictions": { "mining": false },
+      "home": "terra"
     },
     {
       "name": "Alpha Centauri's Technocracy",
@@ -510,9 +515,8 @@
       "color": "#ffc34d",
       "type": "territorial",
       "patrols": { "formation": { "fighters": 2 }, "perSector": 6 },
-      "restrictions": {
-        "mining": false
-      }
+      "restrictions": { "mining": false },
+      "home": "gaia"
     },
     {
       "name": "Tau",
@@ -543,9 +547,8 @@
       "color": "#9534eb",
       "type": "territorial",
       "patrols": { "formation": { "fighters": 2 }, "perSector": 7 },
-      "restrictions": {
-        "mining": true
-      }
+      "restrictions": { "mining": true },
+      "home": "the-hive"
     },
     {
       "name": "Federation of Free Worlds",
@@ -593,14 +596,13 @@
       "color": "#42f5e3",
       "type": "territorial",
       "patrols": { "formation": { "fighters": 3 }, "perSector": 2 },
-      "restrictions": {
-        "mining": false
-      }
+      "restrictions": { "mining": false },
+      "home": "juno-4"
     },
     {
       "name": "Alkali Mining Sindicate",
       "slug": "AMS",
-      "sectors": ["sedna", "gj-1002-3"],
+      "sectors": ["sedna", "gj-1002-3", "wolf-1061-3"],
       "blueprints": {
         "ships": [
           "courierB",
@@ -635,14 +637,13 @@
       "color": "#ff63e5",
       "type": "territorial",
       "patrols": { "formation": { "fighters": 2 }, "perSector": 3 },
-      "restrictions": {
-        "mining": true
-      }
+      "restrictions": { "mining": true },
+      "home": "sedna"
     },
     {
-      "name": "Pirates",
-      "slug": "PIR",
-      "sectors": ["wolf-1061-3", "gj-229-2", "gj-625"],
+      "name": "Garbage Fleet",
+      "slug": "GBF",
+      "sectors": ["wolf-1061-1", "gj-229-2", "gj-625"],
       "blueprints": {
         "ships": [
           "courierB",
@@ -673,12 +674,11 @@
           "electronicsFactory"
         ]
       },
-      "color": "#fcc7c5",
+      "color": "#ff983d",
       "type": "pirate",
       "patrols": { "formation": { "fighters": 2 }, "perSector": 6 },
-      "restrictions": {
-        "mining": false
-      }
+      "restrictions": { "mining": false },
+      "home": "gj-625"
     },
     {
       "name": "Therr Traders",
@@ -714,9 +714,8 @@
       "color": "#f7fc5b",
       "type": "travelling",
       "patrols": { "formation": { "fighters": 2 }, "perSector": 3 },
-      "restrictions": {
-        "mining": false
-      }
+      "restrictions": { "mining": false },
+      "home": "gj-229-1"
     },
     {
       "name": "Player Faction",
@@ -727,7 +726,8 @@
       "color": "#97ff7d",
       "sectors": [],
       "slug": "PLA",
-      "type": "territorial"
+      "type": "territorial",
+      "home": null
     }
   ],
   "relations": [
@@ -741,23 +741,23 @@
     { "factions": ["ACT", "AMS"], "value": -5 },
     { "factions": ["TAU", "AMS"], "value": -50 },
     { "factions": ["FFW", "AMS"], "value": 10 },
-    { "factions": ["UEN", "PIR"], "value": -25 },
-    { "factions": ["ACT", "PIR"], "value": -50 },
-    { "factions": ["TAU", "PIR"], "value": -50 },
-    { "factions": ["FFW", "PIR"], "value": -25 },
-    { "factions": ["AMS", "PIR"], "value": -30 },
+    { "factions": ["UEN", "GBF"], "value": -25 },
+    { "factions": ["ACT", "GBF"], "value": -50 },
+    { "factions": ["TAU", "GBF"], "value": -50 },
+    { "factions": ["FFW", "GBF"], "value": -25 },
+    { "factions": ["AMS", "GBF"], "value": -30 },
     { "factions": ["UEN", "THT"], "value": 10 },
     { "factions": ["ACT", "THT"], "value": 10 },
     { "factions": ["TAU", "THT"], "value": -50 },
     { "factions": ["FFW", "THT"], "value": 10 },
     { "factions": ["AMS", "THT"], "value": -25 },
-    { "factions": ["PIR", "THT"], "value": -5 },
+    { "factions": ["GBF", "THT"], "value": -5 },
     { "factions": ["UEN", "PLA"], "value": 0 },
     { "factions": ["ACT", "PLA"], "value": 0 },
     { "factions": ["TAU", "PLA"], "value": -50 },
     { "factions": ["FFW", "PLA"], "value": 0 },
     { "factions": ["AMS", "PLA"], "value": 0 },
-    { "factions": ["PIR", "PLA"], "value": 0 },
+    { "factions": ["GBF", "PLA"], "value": 0 },
     { "factions": ["THT", "PLA"], "value": 0 }
   ]
 }

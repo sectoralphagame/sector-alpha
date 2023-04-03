@@ -5,6 +5,7 @@ export type WithTeleport = RequireComponent<"teleport">;
 
 export interface Teleport extends BaseComponent<"teleport"> {
   destinationId: number | null;
+  draw?: "horizontal" | "vertical";
 }
 
 export function linkTeleportModules(a: WithTeleport, b: WithTeleport) {

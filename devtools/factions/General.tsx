@@ -5,6 +5,7 @@ import { useThrottledFormState } from "@devtools/utils";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import type { FactionInput, FormData } from "./utils";
 import styles from "./styles.scss";
+import mapData from "../../core/world/data/map.json";
 
 const factionTypeLabels = {
   territorial: "Territorial",
@@ -69,6 +70,25 @@ const FactionGeneralEditor: React.FC<{ index: number }> = ({ index }) => {
           />
         </div>
       </TableCell>
+      <TableCell>
+        <Select
+          value={faction.home ?? "none"}
+          onChange={(value) =>
+            setValue(`factions.${index}.home`, value === "none" ? null : value)
+          }
+        >
+          <SelectButton>
+            {mapData.sectors.find((sector) => sector.id === faction.home)
+              ?.name ?? "None"}
+          </SelectButton>
+          <SelectOptions>
+            {mapData.sectors.map((sector) => (
+              <SelectOption value={sector.id}>{sector.name}</SelectOption>
+            ))}
+            <SelectOption value="none">None</SelectOption>
+          </SelectOptions>
+        </Select>
+      </TableCell>
     </tr>
   );
 };
@@ -83,6 +103,7 @@ export const GeneralEditor: React.FC<{
       <col style={{ width: "80px" }} />
       <col style={{ width: "200px" }} />
       <col style={{ width: "132px" }} />
+      <col style={{ width: "180px" }} />
       <col />
     </colgroup>
     <thead>
@@ -92,6 +113,7 @@ export const GeneralEditor: React.FC<{
         <TableHeader>Slug</TableHeader>
         <TableHeader>Type</TableHeader>
         <TableHeader align="right">Color</TableHeader>
+        <TableHeader>Home Sector</TableHeader>
       </tr>
     </thead>
     <tbody>

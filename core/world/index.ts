@@ -100,12 +100,17 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       if (!s1 || !s2) {
         return;
       }
-      createLink(
+      const [telA, telB] = createLink(
         sim,
         [s1, s2],
         // link.position
         undefined
       );
+
+      if (link.draw) {
+        telA.cp.teleport.draw = link.draw[0] as "horizontal" | "vertical";
+        telB.cp.teleport.draw = link.draw[1] as "horizontal" | "vertical";
+      }
     });
 
     mapData.sectors.forEach((sector) =>
@@ -130,6 +135,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
         priceModifier: random(0.1, 0.25),
         patrols: factionData.patrols!,
         restrictions: factionData.restrictions!,
+        home: factionData.home ? getSector(factionData.home).id : 0,
       });
       faction.cp.color.value = factionData.color;
       faction.cp.blueprints.ships = shipClasses.filter((s) =>

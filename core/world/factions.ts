@@ -30,6 +30,7 @@ function createTerritorialFaction(index: number, sim: Sim) {
     restrictions: {
       mining: false,
     },
+    home: 0,
   });
   setMoney(faction.cp.budget, 1e8);
   faction.cp.blueprints.ships = [
@@ -65,6 +66,7 @@ function createTradingFaction(index: number, sim: Sim) {
     restrictions: {
       mining: false,
     },
+    home: 0,
   });
   setMoney(faction.cp.budget, 1e4);
   faction.cp.blueprints.ships = (
@@ -83,12 +85,12 @@ export function populateSectors(sim: Sim, sectors: Sector[], faction: Faction) {
     sector.addComponent({ name: "owner", id: faction.id })
   );
 
-  const sectorWithShipyard = pickRandom(sectors);
-  if (!sectorWithShipyard) return;
-
   if (
+    faction.cp.ai?.home &&
     faction.cp.blueprints.facilityModules.find((fm) => fm.slug === "shipyard")
   ) {
+    const sectorWithShipyard = sim.getOrThrow<Sector>(faction.cp.ai.home);
+
     const shipyard = createShipyard(
       {
         owner: faction,

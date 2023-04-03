@@ -24,4 +24,6 @@ export interface Ai extends BaseComponent<"ai"> {
   restrictions: {
     mining: boolean;
   };
+  // ID of the sector where the faction has its home base
+  home: number;
 }

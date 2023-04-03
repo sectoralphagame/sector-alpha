@@ -2,7 +2,7 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { discriminate } from "@core/utils/maps";
 import shuffle from "lodash/shuffle";
 import type { Matrix } from "mathjs";
-import { add, matrix, random } from "mathjs";
+import { distance, add, matrix, random } from "mathjs";
 import type { Facility } from "../../archetypes/facility";
 import { createFacilityName, createFacility } from "../../archetypes/facility";
 import { facilityModules } from "../../archetypes/facilityModule";
@@ -57,6 +57,33 @@ export function addStartingCommodities(facility: RequireComponent<"storage">) {
   });
 }
 
+function getSectorPosition(sector: Sector): Matrix {
+  const sectorPosition = hecsToCartesian(
+    sector.cp.hecsPosition.value,
+    sectorSize / 10
+  );
+
+  let position: Matrix;
+  let isNearAnyFacility: boolean;
+
+  do {
+    position = add(
+      sectorPosition,
+      matrix([
+        random(-sectorSize / 20, sectorSize / 20),
+        random(-sectorSize / 20, sectorSize / 20),
+      ])
+    );
+
+    isNearAnyFacility = sector.sim.queries.facilities
+      .get()
+      .filter((facility) => facility.cp.position.sector === sector.id)
+      .some((facility) => distance(facility.cp.position.coord, position) < 10);
+  } while (isNearAnyFacility);
+
+  return position;
+}
+
 export class FacilityPlanningSystem extends System {
   cooldowns: Cooldowns<"plan">;
 
@@ -75,10 +102,6 @@ export class FacilityPlanningSystem extends System {
           facility.cp.position.sector === sector.id
       );
     const resourceUsageInFacilities = getResourceUsage(facilities);
-    const sectorPosition = hecsToCartesian(
-      sector.cp.hecsPosition.value,
-      sectorSize / 10
-    );
     const factionBlueprints = Object.values(facilityModules).filter((f) =>
       faction.cp.blueprints.facilityModules.find((fm) => fm.slug === f.slug)
     );
@@ -98,13 +121,7 @@ export class FacilityPlanningSystem extends System {
 
       const facility = createFacility(this.sim, {
         owner: faction,
-        position: add(
-          sectorPosition,
-          matrix([
-            random(-sectorSize / 20, sectorSize / 20),
-            random(-sectorSize / 20, sectorSize / 20),
-          ])
-        ) as Matrix,
+        position: getSectorPosition(sector),
         sector,
       });
       facility.cp.name.value = createFacilityName(facility, "Mining Complex");

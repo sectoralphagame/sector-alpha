@@ -60,6 +60,9 @@ export const graphics: Graphics = {
       entity.sim.getOrThrow(teleport.destinationId!),
       "position"
     ).cp.position;
+    const targetTeleport = entity.sim
+      .getOrThrow(teleport.destinationId!)
+      .requireComponents(["teleport"]).cp.teleport;
     g.lineStyle({
       alpha: 0.3,
       width: 5,
@@ -69,7 +72,38 @@ export const graphics: Graphics = {
       originPosition!.coord.get([0]) * 10,
       originPosition!.coord.get([1]) * 10
     );
-    if (
+    if (teleport.draw) {
+      g.bezierCurveTo(
+        ...((teleport.draw === "horizontal"
+          ? [
+              (originPosition!.coord.get([0]) +
+                targetPosition!.coord.get([0])) *
+                5,
+              originPosition!.coord.get([1]) * 10,
+            ]
+          : [
+              originPosition!.coord.get([0]) * 10,
+              (targetPosition!.coord.get([1]) +
+                originPosition!.coord.get([1])) *
+                5,
+            ]) as [number, number]),
+        ...((targetTeleport.draw === "horizontal"
+          ? [
+              (originPosition!.coord.get([0]) +
+                targetPosition!.coord.get([0])) *
+                5,
+              targetPosition!.coord.get([1]) * 10,
+            ]
+          : [
+              targetPosition!.coord.get([0]) * 10,
+              (targetPosition!.coord.get([1]) +
+                originPosition!.coord.get([1])) *
+                5,
+            ]) as [number, number]),
+        targetPosition!.coord.get([0]) * 10,
+        targetPosition!.coord.get([1]) * 10
+      );
+    } else if (
       Math.abs(
         targetPosition!.coord.get([0]) - originPosition!.coord.get([0])
       ) >

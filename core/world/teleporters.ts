@@ -59,4 +59,6 @@ export function createLink(sim: Sim, sectors: Sector[], position?: number[][]) {
   telA.addComponent(createRenderGraphics("link"));
 
   linkTeleportModules(telA, telB);
+
+  return [telA, telB];
 }

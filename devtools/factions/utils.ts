@@ -5,6 +5,7 @@ export interface FactionInput {
   blueprints: Record<"ships" | "facilityModules", string[]>;
   color: string;
   type: string;
+  home: string | null;
 }
 
 export interface RelationInput {
