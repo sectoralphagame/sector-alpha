@@ -51,11 +51,17 @@ export function isAttackOrderCompleted(
     : target.cp.position.sector !== entity.cp.position.sector;
 }
 
-export function attackOrderCompleted(
+export function attackActionCleanup(
   entity: RequireComponent<"drive" | "position" | "orders" | "damage">
-) {
+): void {
   clearTarget(entity.cp.drive);
   entity.cp.drive.limit = Infinity;
   entity.cp.drive.minimalDistance = 0.01;
   entity.cp.damage.targetId = null;
+}
+
+export function attackOrderCompleted(
+  entity: RequireComponent<"drive" | "position" | "orders" | "damage">
+) {
+  attackActionCleanup(entity);
 }

@@ -9,6 +9,13 @@ import type { MoveAction, TeleportAction } from "../../components/orders";
 import { show } from "../../components/render";
 import type { RequireComponent } from "../../tsHelpers";
 
+export function moveActionCleanup(
+  entity: RequireComponent<"drive" | "orders">
+): void {
+  clearTarget(entity.cp.drive);
+  entity.cp.drive.limit = defaultDriveLimit;
+}
+
 export function moveAction(
   entity: RequireComponent<"drive" | "orders">,
   order: MoveAction
@@ -34,8 +41,7 @@ export function moveAction(
   const reached = entity.cp.drive.targetReached;
 
   if (reached) {
-    clearTarget(entity.cp.drive);
-    entity.cp.drive.limit = defaultDriveLimit;
+    moveActionCleanup(entity);
   }
 
   return reached;

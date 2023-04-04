@@ -17,12 +17,14 @@ import {
   holdAction,
   holdPosition,
   moveAction,
+  moveActionCleanup,
   teleportAction,
 } from "./misc";
-import { tradeOrder } from "./trade";
+import { tradeActionCleanup, tradeOrder } from "./trade";
 import { deployFacilityAction } from "./deployFacility";
 import { deployBuilderAction } from "./deployBuilder";
 import {
+  attackActionCleanup,
   attackOrder,
   attackOrderCompleted,
   isAttackOrderCompleted,
@@ -212,6 +214,26 @@ const actionFns: Partial<
   deployBuilder: deployBuilderAction,
   collect: collectAction,
 };
+
+const actionCleanupFns: Partial<
+  // eslint-disable-next-line no-unused-vars
+  Record<Action["type"], (entity: Entity, order: Action) => boolean | void>
+> = {
+  attack: attackActionCleanup,
+  trade: tradeActionCleanup,
+  move: moveActionCleanup,
+};
+
+export function removeOrder(
+  entity: RequireComponent<"orders">,
+  orderIndex: number
+) {
+  const order = entity.cp.orders.value[orderIndex];
+  order.actions.forEach((action) =>
+    actionCleanupFns[action.type]?.(entity, action)
+  );
+  entity.cp.orders.value.splice(orderIndex, 1);
+}
 
 export class OrderExecutingSystem extends System {
   constructor(sim: Sim) {

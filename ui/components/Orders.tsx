@@ -17,6 +17,7 @@ import {
 } from "@kit/Collapsible";
 import { IconButton } from "@kit/IconButton";
 import { isOwnedByPlayer } from "@core/utils/misc";
+import { removeOrder } from "@core/systems/orderExecuting/orderExecuting";
 import styles from "./Orders.scss";
 
 function getOrderDescription(ship: Ship, order: Action) {
@@ -112,7 +113,7 @@ const Orders: React.FC<{ ship: Ship }> = ({ ship }) => {
                 <IconButton
                   onClick={(event) => {
                     event.stopPropagation();
-                    ship.cp.orders.value.splice(orderIndex, 1);
+                    removeOrder(ship, orderIndex);
                   }}
                 >
                   <SVG src={closeIcon} />
