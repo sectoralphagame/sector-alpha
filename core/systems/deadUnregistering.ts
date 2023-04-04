@@ -6,6 +6,8 @@ import { add, random } from "mathjs";
 import { Query } from "./utils/query";
 import { System } from "./system";
 
+const collectibleSize = 50;
+
 export class DeadUnregisteringSystem extends System {
   query: Query<"hitpoints">;
 
@@ -21,19 +23,25 @@ export class DeadUnregisteringSystem extends System {
           Object.entries(entity.cp.storage.stored).forEach(
             ([commodity, quantity]) => {
               if (quantity > 0) {
-                createCollectible(this.sim, {
-                  position: {
-                    coord: add(entity.cp.position!.coord, [
-                      random(-0.25, 0.25),
-                      random(-0.25, 0.25),
-                    ]) as Matrix,
-                    sector: entity.cp.position!.sector,
-                  },
-                  storage: {
-                    commodity: commodity as Commodity,
-                    stored: quantity,
-                  },
-                });
+                for (
+                  let i = Math.floor(quantity * random(0.2, 0.6));
+                  i > 0;
+                  i -= collectibleSize
+                ) {
+                  createCollectible(this.sim, {
+                    position: {
+                      coord: add(entity.cp.position!.coord, [
+                        random(-0.25, 0.25),
+                        random(-0.25, 0.25),
+                      ]) as Matrix,
+                      sector: entity.cp.position!.sector,
+                    },
+                    storage: {
+                      commodity: commodity as Commodity,
+                      stored: Math.min(quantity, collectibleSize),
+                    },
+                  });
+                }
               }
             }
           );
