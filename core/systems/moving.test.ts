@@ -1,6 +1,6 @@
 import { distance, matrix } from "mathjs";
 import { createFaction } from "../archetypes/faction";
-import { createMarker } from "../archetypes/marker";
+import { createWaypoint } from "../archetypes/waypoint";
 import type { Sector } from "../archetypes/sector";
 import { createSector } from "../archetypes/sector";
 import type { Ship } from "../archetypes/ship";
@@ -37,7 +37,7 @@ describe("Ship", () => {
     ship.cp.position.angle = Math.PI;
     setTarget(
       ship.cp.drive,
-      createMarker(sim, {
+      createWaypoint(sim, {
         sector: sector.id,
         value: matrix([0, 0]),
         owner: 0,
@@ -55,7 +55,7 @@ describe("Ship", () => {
   it("is not able to go to target position if travel is too short", () => {
     setTarget(
       ship.cp.drive,
-      createMarker(sim, {
+      createWaypoint(sim, {
         sector: sector.id,
         value: matrix([1, 10]),
         owner: 0,
@@ -70,7 +70,7 @@ describe("Ship", () => {
 
   it("is able to make move order", () => {
     const orderExecutingSystem = new OrderExecutingSystem(sim);
-    const m = createMarker(sim, {
+    const m = createWaypoint(sim, {
       sector: sector.id,
       value: matrix([1, 1]),
       owner: 0,

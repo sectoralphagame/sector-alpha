@@ -1,5 +1,5 @@
 import { releaseBudgetAllocation } from "@core/components/budget";
-import type { TradeAction, TradeOrder } from "../../components/orders";
+import type { TradeAction } from "../../components/orders";
 import { releaseStorageAllocation, transfer } from "../../components/storage";
 import { NotDockedError } from "../../errors";
 import type { RequireComponent } from "../../tsHelpers";
@@ -86,10 +86,11 @@ export function tradeActionCleanup(
       "position",
       "journal",
     ]);
-  const budget = order.offer.budget
-    ? entity.sim.getOrThrow(order.offer.budget).requireComponents(["budget"]).cp
-        .budget
-    : null;
+  const budget =
+    order.offer.budget !== null
+      ? entity.sim.getOrThrow(order.offer.budget).requireComponents(["budget"])
+          .cp.budget
+      : null;
 
   if (order.offer.type === "sell") {
     if (order.offer.allocations?.buyer?.storage) {
