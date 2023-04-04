@@ -334,7 +334,7 @@
   {
     "acceleration": 0.15,
     "build": {
-      "time": 0,
+      "time": 210,
       "cost": {
         "drones": 25,
         "electronics": 500,
@@ -364,8 +364,8 @@
   {
     "acceleration": 0.27,
     "build": {
-      "time": 70,
-      "cost": { "fuel": 290, "tauMetal": 55, "hydrogen": 130 }
+      "time": 45,
+      "cost": { "fuel": 290, "tauMetal": 45, "hydrogen": 130 }
     },
     "damage": { "value": 2.2, "range": 1.9, "cooldown": 1 },
     "range": 2,
@@ -388,8 +388,8 @@
   {
     "acceleration": 0.18,
     "build": {
-      "time": 210,
-      "cost": { "fuel": 1150, "tauMetal": 590, "hydrogen": 350 }
+      "time": 180,
+      "cost": { "fuel": 920, "tauMetal": 460, "hydrogen": 350 }
     },
     "damage": { "value": 9, "range": 2.45, "cooldown": 1 },
     "range": 2.7,
