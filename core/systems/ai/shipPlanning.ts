@@ -159,7 +159,7 @@ export class ShipPlanningSystem extends System {
           );
         const sectorPatrolsFollowers = sectorPatrols.flatMap((ship) =>
           getSubordinates(ship)
-            .filter((subordinate) => subordinate.tags.has("role:mining"))
+            .filter((subordinate) => subordinate.tags.has("role:military"))
             .filter((subordinate) => subordinate.cp.dockable.size === "small")
         ).length;
 
