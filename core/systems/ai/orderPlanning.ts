@@ -19,7 +19,6 @@ import { getAvailableSpace } from "../../components/storage";
 import type { Commodity } from "../../economy/commodity";
 import { mineableCommodities } from "../../economy/commodity";
 import {
-  getFacilityWithMostProfit,
   getSectorsInTeleportRange,
   getTradeWithMostProfit,
   sellCommodityWithMostProfit,
@@ -37,7 +36,6 @@ import {
   returnToFacility,
   resellCommodity,
   tradeCommodity,
-  allocate,
 } from "../../utils/trading";
 import { holdPosition } from "../orderExecuting/misc";
 import { System } from "../system";
@@ -260,7 +258,7 @@ function autoMineForCommander(
           entity.sim
         )
           .filter((sector) =>
-            sector.cp.owner
+            sector.cp.owner && sector.cp.owner.id !== entity.cp.owner.id
               ? !entity.sim.getOrThrow<Faction>(sector.cp.owner.id).cp.ai
                   ?.restrictions.mining
               : true
