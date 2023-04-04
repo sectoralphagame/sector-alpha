@@ -3,6 +3,8 @@ import { relationThresholds } from "@core/components/relations";
 import { minBy } from "lodash";
 import type { Matrix } from "mathjs";
 import { add, matrix, norm, random, subtract } from "mathjs";
+import { sum } from "@fxts/core";
+import type { TransactionInput } from "@core/components/trade";
 import { asteroid } from "../../archetypes/asteroid";
 import { asteroidField } from "../../archetypes/asteroidField";
 import { commanderRange, facility } from "../../archetypes/facility";
@@ -14,10 +16,13 @@ import { hecsToCartesian } from "../../components/hecsPosition";
 import type { TradeOrder } from "../../components/orders";
 import { mineAction } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
+import type { Commodity } from "../../economy/commodity";
 import { mineableCommodities } from "../../economy/commodity";
 import {
+  getFacilityWithMostProfit,
   getSectorsInTeleportRange,
   getTradeWithMostProfit,
+  sellCommodityWithMostProfit,
   tradeComponents,
 } from "../../economy/utils";
 import type { Sim } from "../../sim";
@@ -31,6 +36,8 @@ import {
   getNeededCommodities,
   returnToFacility,
   resellCommodity,
+  tradeCommodity,
+  allocate,
 } from "../../utils/trading";
 import { holdPosition } from "../orderExecuting/misc";
 import { System } from "../system";
@@ -107,24 +114,63 @@ function idleMovement(entity: RequireComponent<"position" | "orders">) {
 
 function autoTrade(entity: Trading, sectorDistance: number) {
   let makingTrade = false;
-  const trade = getTradeWithMostProfit(
-    entity.sim.getOrThrow<Sector>(
-      (entity.cp.autoOrder.default as TradeOrder).sectorId!
-    ),
-    sectorDistance,
-    Object.entries(
-      entity.sim.getOrThrow<Faction>(entity.cp.owner.id).cp.relations.values
-    )
-      .filter(([, value]) => value < relationThresholds.trade)
-      .map(([id]) => Number(id))
-  );
-  if (trade) {
-    makingTrade = resellCommodity(
+  const owner = entity.sim.getOrThrow<Faction>(entity.cp.owner.id);
+
+  if (sum(Object.values(entity.cp.storage.stored)) > 0) {
+    const commodityToSell = Object.entries(entity.cp.storage.stored).find(
+      ([, quantity]) => quantity > 0
+    )![0] as Commodity;
+
+    const buyer = sellCommodityWithMostProfit(
       entity,
-      trade.commodity,
-      trade.buyer,
-      trade.seller
+      commodityToSell,
+      1,
+      sectorDistance
     );
+
+    if (buyer) {
+      const offer: TransactionInput = {
+        budget: owner.id,
+        commodity: commodityToSell,
+        factionId: owner.id,
+        initiator: entity.id,
+        price: buyer.cp.trade.offers[commodityToSell].price,
+        quantity: Math.min(
+          buyer.cp.trade.offers[commodityToSell].quantity,
+          entity.cp.storage.availableWares[commodityToSell]
+        ),
+        type: "sell",
+        allocations: null,
+      };
+      const actions = tradeCommodity(entity, offer, buyer);
+
+      if (actions) {
+        entity.cp.orders.value.push({
+          origin: "auto",
+          type: "trade",
+          actions,
+        });
+        makingTrade = true;
+      }
+    }
+  } else {
+    const trade = getTradeWithMostProfit(
+      entity.sim.getOrThrow<Sector>(
+        (entity.cp.autoOrder.default as TradeOrder).sectorId!
+      ),
+      sectorDistance,
+      Object.entries(owner.cp.relations.values)
+        .filter(([, value]) => value < relationThresholds.trade)
+        .map(([id]) => Number(id))
+    );
+    if (trade) {
+      makingTrade = resellCommodity(
+        entity,
+        trade.commodity,
+        trade.buyer,
+        trade.seller
+      );
+    }
   }
 
   if (!makingTrade) {

@@ -148,6 +148,59 @@ export function getTradeWithMostProfit(
   };
 }
 
+export function sellCommodityWithMostProfit(
+  entity: RequireComponent<"position" | "owner">,
+  commodity: Commodity,
+  minQuantity: number,
+  sectorDistance: number
+): WithTrade | null {
+  const faction = entity.sim.getOrThrow<Faction>(entity.cp.owner.id);
+  const profit = (f: WithTrade) =>
+    f.cp.owner.id === faction.id
+      ? Infinity
+      : f.components.trade.offers[commodity].price;
+
+  const sortedByProfit = sortBy(
+    getSectorsInTeleportRange(
+      asSector(entity.sim.getOrThrow(entity.cp.position.sector)!),
+      sectorDistance,
+      entity.sim
+    )
+      .flatMap((sector) =>
+        entity.sim.queries.trading
+          .get()
+          .filter((f) => f.cp.position.sector === sector.id)
+      )
+      .filter(
+        (f) =>
+          (f.cp.owner.id === faction.id ||
+            faction.cp.relations.values[f.cp.owner.id] >=
+              relationThresholds.trade) &&
+          f.components.trade.offers[commodity].active &&
+          f.components.trade.offers[commodity].type === "buy" &&
+          f.components.trade.offers[commodity].quantity >= minQuantity
+      )
+      .map((f) => ({
+        facility: f,
+        profit: profit(f),
+      })),
+    "profit"
+  ).reverse();
+
+  if (!sortedByProfit[0] || sortedByProfit[0].profit <= 0) {
+    return null;
+  }
+
+  return pickRandom(
+    sortedByProfit
+      .filter(
+        (f, _, arr) =>
+          !Number.isFinite(f.profit) || f.profit / arr[0].profit >= 0.95
+      )
+      .map((f) => f.facility)
+  )!;
+}
+
 export function getFacilityWithMostProfit(
   facility: WithTrade,
   commodity: Commodity,

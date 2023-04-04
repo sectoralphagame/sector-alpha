@@ -1,7 +1,6 @@
 import { min, sum } from "mathjs";
 import map from "lodash/map";
-import toPairs from "lodash/toPairs";
-import { filter, pipe, map as fxtsMap, sum as fxtsSum } from "@fxts/core";
+import { pipe, map as fxtsMap, sum as fxtsSum } from "@fxts/core";
 import {
   InsufficientStorage,
   InsufficientStorageSpace,
