@@ -355,10 +355,10 @@ export class ShipPlanningSystem extends System {
     requestsInShipyards: ShipyardQueueItem[],
     shipyard: RequireComponent<"shipyard" | "position">
   ) => {
-    const spareFrigates: Entity[] = shipRequests
+    const spareFrigates = shipRequests
       .filter(({ patrols }) => patrols > 0)
       .flatMap(({ sector, patrols }) =>
-        this.sim.queries.orderable
+        this.sim.queries.ships
           .get()
           .filter(
             (ship) =>
@@ -373,7 +373,7 @@ export class ShipPlanningSystem extends System {
       );
 
     spareFrigates.push(
-      ...this.sim.queries.orderable
+      ...this.sim.queries.ships
         .get()
         .filter(
           (ship) =>
@@ -398,6 +398,9 @@ export class ShipPlanningSystem extends System {
         for (let i = 0; i < -patrols; i++) {
           if (spareFrigates.length > 0 && sector) {
             const ship = spareFrigates.pop()!;
+            if (faction.cp.name.slug !== "TAU") {
+              ship.cp.name.value = createShipName(ship, "Patrol Leader");
+            }
             ship.cp.orders!.value = [
               {
                 type: "patrol",
