@@ -13,7 +13,7 @@ import { createWaypoint } from "../../archetypes/waypoint";
 import type { Sector } from "../../archetypes/sector";
 import { sector as asSector, sectorSize } from "../../archetypes/sector";
 import { hecsToCartesian } from "../../components/hecsPosition";
-import type { TradeOrder } from "../../components/orders";
+import type { MineOrder, TradeOrder } from "../../components/orders";
 import { mineAction } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
 import type { Commodity } from "../../economy/commodity";
@@ -223,6 +223,72 @@ function autoTradeForCommander(
   }
 }
 
+function autoMine(
+  entity: RequireComponent<
+    | "drive"
+    | "dockable"
+    | "storage"
+    | "autoOrder"
+    | "orders"
+    | "position"
+    | "owner"
+  >,
+  sectorDistance: number
+) {
+  if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
+    autoTrade(entity, sectorDistance);
+  } else {
+    const field = minBy(
+      getSectorsInTeleportRange(
+        asSector(
+          entity.sim.getOrThrow(
+            (entity.cp.autoOrder.default as MineOrder).sectorId!
+          )
+        ),
+        sectorDistance,
+        entity.sim
+      )
+        .filter((sector) =>
+          sector.cp.owner && sector.cp.owner.id !== entity.cp.owner.id
+            ? !entity.sim.getOrThrow<Faction>(sector.cp.owner.id).cp.ai
+                ?.restrictions.mining
+            : true
+        )
+        .map((sector) =>
+          entity.sim.queries.asteroidFields
+            .get()
+            .filter((f) => f.cp.position!.sector === sector.id)
+        )
+        .flat()
+        .map(asteroidField)
+        .filter((e) =>
+          e.cp.children.entities
+            .map((child) => asteroid(entity.sim.getOrThrow(child)))
+            .some((a) => !a.cp.minable.minedById)
+        ),
+      (e) =>
+        norm(subtract(entity.cp.position.coord, e.cp.position.coord) as Matrix)
+    );
+
+    if (!field) {
+      idleMovement(entity);
+      return;
+    }
+
+    entity.cp.orders.value.push({
+      origin: "auto",
+      type: "mine",
+      actions: [
+        ...moveToActions(entity, field),
+        mineAction({
+          targetFieldId: field.id,
+          targetRockId: null,
+        }),
+      ],
+    });
+  }
+}
+
 function autoMineForCommander(
   entity: RequireComponent<
     | "drive"
@@ -334,6 +400,9 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
     switch (entity.cp.autoOrder.default.type) {
       case "trade":
         autoTrade(entity.requireComponents(tradingComponents), 4);
+        break;
+      case "mine":
+        autoMine(entity.requireComponents(tradingComponents), 4);
         break;
       default:
         holdPosition();
