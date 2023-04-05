@@ -182,9 +182,9 @@
     "build": {
       "cost": {
         "hullPlates": 1500,
-        "electronics": 65,
+        "electronics": 90,
         "fuel": 425,
-        "engineParts": 37
+        "engineParts": 110
       },
       "time": 60
     },
@@ -209,10 +209,10 @@
     "acceleration": 0.1,
     "build": {
       "cost": {
-        "hullPlates": 1550,
-        "electronics": 55,
-        "fuel": 400,
-        "engineParts": 40
+        "hullPlates": 1450,
+        "electronics": 80,
+        "fuel": 550,
+        "engineParts": 130
       },
       "time": 60
     },
