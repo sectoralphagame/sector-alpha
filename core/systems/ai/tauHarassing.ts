@@ -1,5 +1,5 @@
 import type { Ship } from "@core/archetypes/ship";
-import { ship as asShip, shipComponents } from "@core/archetypes/ship";
+import { shipComponents } from "@core/archetypes/ship";
 import { relationThresholds } from "@core/components/relations";
 import type { Entity } from "@core/entity";
 import type { Sim } from "@core/sim";
@@ -16,10 +16,16 @@ const fightersInFleet = 9;
 export class TauHarassingSystem extends System {
   cooldowns: Cooldowns<"exec">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("exec");
   }
+
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   getFleet = (): Ship | null => {
     const faction = this.sim.queries.ai

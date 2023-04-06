@@ -2,6 +2,7 @@ import React from "react";
 import { Sim } from "@core/sim";
 import { getFixedWorld as world } from "@core/world";
 import settings from "@core/settings";
+import { config } from "@core/sim/baseConfig";
 import { useLocation } from "../context/Location";
 import { View } from "../components/View";
 import { useWorker } from "../hooks/useWorker";
@@ -23,7 +24,7 @@ export const NewGame: React.FC = () => {
         }
         if (event.data.type === "completed") {
           sim.current?.destroy();
-          sim.current = Sim.load(event.data.data);
+          sim.current = Sim.load(config, event.data.data);
           setSim(sim.current);
           navigate("game");
         }
@@ -33,7 +34,7 @@ export const NewGame: React.FC = () => {
 
   React.useEffect(() => {
     sim.current?.destroy();
-    sim.current = new Sim();
+    sim.current = new Sim(config);
     sim.current.init();
     world(sim.current).then(() => {
       headlessSimWorker.current?.postMessage({

@@ -67,9 +67,13 @@ export function isAbleToProduce(
 export class ProducingSystem extends System {
   cooldowns: Cooldowns<"exec">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("exec");
+  }
+
+  apply = (sim: Sim): void => {
+    super.apply(sim);
 
     this.sim.hooks.removeEntity.tap("ProducingSystem", (entity) => {
       if (entity.cp.modules) {
@@ -78,7 +82,8 @@ export class ProducingSystem extends System {
         );
       }
     });
-  }
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

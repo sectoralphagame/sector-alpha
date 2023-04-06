@@ -15,10 +15,16 @@ const buildTimer = "facilityModuleBuild";
 export class FacilityBuildingSystem extends System {
   cooldowns: Cooldowns<"build" | "offers">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("build", "offers");
   }
+
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   createOffers = (): void =>
     this.sim.queries.builders.get().forEach((builder) => {

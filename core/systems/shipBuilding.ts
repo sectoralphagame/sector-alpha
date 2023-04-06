@@ -14,10 +14,16 @@ export const shipBuildTimer = "shipBuild";
 export class ShipBuildingSystem extends System {
   cooldowns: Cooldowns<"exec">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("exec");
   }
+
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

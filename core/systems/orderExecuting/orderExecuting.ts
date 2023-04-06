@@ -236,22 +236,21 @@ export function removeOrder(
 }
 
 export class OrderExecutingSystem extends System {
-  constructor(sim: Sim) {
-    super(sim);
-    this.sim.hooks.removeEntity.tap(
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
+    sim.hooks.removeEntity.tap(
       "OrderExecutingSystem-allocations",
       cleanupAllocations
     );
-    this.sim.hooks.removeEntity.tap(
-      "OrderExecutingSystem-orders",
-      cleanupOrders
-    );
-    this.sim.hooks.removeEntity.tap(
+    sim.hooks.removeEntity.tap("OrderExecutingSystem-orders", cleanupOrders);
+    sim.hooks.removeEntity.tap(
       "OrderExecutingSystem-children",
       cleanupChildren
     );
-    this.sim.hooks.removeEntity.tap("OrderExecutingSystem-docks", cleanupDocks);
-  }
+    sim.hooks.removeEntity.tap("OrderExecutingSystem-docks", cleanupDocks);
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = () => {
     this.sim.queries.orderable.get().forEach((entity) => {

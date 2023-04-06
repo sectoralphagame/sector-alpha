@@ -48,10 +48,16 @@ function spawn(field: AsteroidField, sim: Sim) {
 export class AsteroidSpawningSystem extends System {
   cooldowns: Cooldowns<"tick">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("tick");
   }
+
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

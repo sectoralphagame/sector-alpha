@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 import { Sim } from "@core/sim";
+import { config } from "@core/sim/baseConfig";
 
 export interface HeadlessSimUpdateMsg {
   type: "update";
@@ -22,7 +23,7 @@ export interface HeadlessSimInitMsg {
 export type HeadlessSimMsg = HeadlessSimUpdateMsg | HeadlessSimCompletedeMsg;
 
 self.onmessage = (event: MessageEvent<HeadlessSimInitMsg>) => {
-  const sim = Sim.load(event.data.sim);
+  const sim = Sim.load(config, event.data.sim);
 
   let cycles = 0;
   for (

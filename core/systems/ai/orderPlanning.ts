@@ -460,10 +460,16 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
 export class OrderPlanningSystem extends System {
   cooldowns: Cooldowns<"autoOrder">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("autoOrder");
   }
+
+  apply = (sim: Sim): void => {
+    super.apply(sim);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

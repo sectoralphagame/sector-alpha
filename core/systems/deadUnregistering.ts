@@ -11,10 +11,13 @@ const collectibleSize = 50;
 export class DeadUnregisteringSystem extends System {
   query: Query<"hitpoints">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
     this.query = new Query(sim, ["hitpoints"]);
-  }
+
+    sim.hooks.phase.cleanup.tap(this.constructor.name, this.exec);
+  };
 
   exec = (): void => {
     this.query.get().forEach((entity) => {

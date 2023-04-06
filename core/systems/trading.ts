@@ -341,10 +341,16 @@ export function createOffers(entity: WithTrade) {
 export class TradingSystem extends System {
   cooldowns: Cooldowns<"adjustPrices" | "createOffers">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("adjustPrices", "createOffers");
   }
+
+  apply = (sim: Sim): void => {
+    super.apply(sim);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

@@ -48,10 +48,13 @@ export class MovingSystem extends System {
   entities: Driveable[];
   query: Query<"drive" | "position">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  apply = (sim: Sim): void => {
+    super.apply(sim);
+
     this.query = new Query(sim, ["drive", "position"]);
-  }
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     if (delta > 0) {

@@ -12,11 +12,18 @@ export class SpottingSystem extends System {
   cooldowns: Cooldowns<"exec">;
   query: Query<"hitpoints" | "owner" | "position">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("exec");
-    this.query = new Query(sim, ["hitpoints", "owner", "position"]);
   }
+
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
+    this.query = new Query(sim, ["hitpoints", "owner", "position"]);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

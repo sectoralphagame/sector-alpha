@@ -87,10 +87,16 @@ function getSectorPosition(sector: Sector): Matrix {
 export class FacilityPlanningSystem extends System {
   cooldowns: Cooldowns<"plan">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("plan");
   }
+
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   planMiningFacilities = (sector: Sector, faction: Faction): void => {
     const resources = getSectorResources(sector, 1);

@@ -1,3 +1,4 @@
+import type { Sim } from "@core/sim";
 import { asteroidField } from "../archetypes/asteroidField";
 import { addStorage } from "../components/storage";
 import type { RequireComponent } from "../tsHelpers";
@@ -35,6 +36,11 @@ function mine(entity: WithMining, delta: number) {
 }
 
 export class MiningSystem extends System {
+  apply = (sim: Sim): void => {
+    super.apply(sim);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
   exec = (delta: number): void => {
     this.sim.queries.mining.get().forEach((entity) => mine(entity, delta));
   };

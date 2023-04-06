@@ -31,10 +31,16 @@ export function regen(sim: Sim) {
 export class PathPlanningSystem extends System {
   cooldowns: Cooldowns<"regen">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("regen");
   }
+
+  apply = (sim: Sim): void => {
+    super.apply(sim);
+
+    sim.hooks.phase.init.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

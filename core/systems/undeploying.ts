@@ -51,11 +51,18 @@ export class UndeployingSystem extends System {
   cooldowns: Cooldowns<"exec">;
   query: Query<"deployable">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("exec");
-    this.query = new Query(sim, ["deployable"]);
   }
+
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
+    this.query = new Query(sim, ["deployable"]);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

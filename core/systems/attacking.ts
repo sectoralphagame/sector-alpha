@@ -53,10 +53,13 @@ const cdKey = "attack";
 export class AttackingSystem extends System {
   query: Query<"damage" | "position">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
     this.query = new Query(sim, ["damage", "position"]);
-  }
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (): void => {
     if (this.sim.getTime() < settings.bootTime) return;

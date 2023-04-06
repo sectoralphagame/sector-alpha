@@ -38,11 +38,12 @@ export const Game: React.FC = () => {
     if (!sim) return () => undefined;
 
     sim.start();
-    system.current = new RenderingSystem(sim);
-    sim.registerSystem(system.current);
+    system.current = new RenderingSystem();
+    system.current.apply(sim);
 
     const unmount = () => {
-      sim.unregisterSystem(system.current!);
+      system.current?.destroy();
+      sim.stop();
     };
 
     sim.hooks.removeEntity.tap("Game", (entity) => {

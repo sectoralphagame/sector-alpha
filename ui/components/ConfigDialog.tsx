@@ -7,6 +7,7 @@ import { Dialog } from "@kit/Dialog";
 import { Button } from "@kit/Button";
 import { Input } from "@kit/Input";
 import { IconButton } from "@kit/IconButton";
+import { config } from "@core/sim/baseConfig";
 import { useLocation } from "../context/Location";
 import styles from "./ConfigDialog.scss";
 import { Saves } from "./Saves";
@@ -97,7 +98,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             saves={saves}
             onClick={async (id) => {
               sim.destroy();
-              setSim(Sim.load(saves.find((s) => s.id === id)!.data));
+              setSim(Sim.load(config, saves.find((s) => s.id === id)!.data));
               onClose();
             }}
             onDelete={async (id) => {

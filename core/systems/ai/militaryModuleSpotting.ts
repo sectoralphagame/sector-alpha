@@ -16,14 +16,21 @@ export class MilitaryModuleSpottingSystem extends System {
     modules: Query<"parent" | "damage">;
   };
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("exec");
+  }
+
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
     this.queries = {
       enemies: new Query(sim, ["hitpoints", "owner", "position"]),
       modules: new Query(sim, ["parent", "damage"], ["facilityModule"]),
     };
-  }
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

@@ -1,6 +1,7 @@
 import React from "react";
 import { Sim } from "@core/sim";
 import type { Save } from "@core/db";
+import { config } from "@core/sim/baseConfig";
 import { useLocation } from "../context/Location";
 import { Saves } from "../components/Saves";
 import { View } from "../components/View";
@@ -22,7 +23,10 @@ export const LoadGame: React.FC = () => {
           <Saves
             saves={saves}
             onClick={async (id) => {
-              const sim = Sim.load(saves.find((s) => s.id === id)!.data);
+              const sim = Sim.load(
+                config,
+                saves.find((s) => s.id === id)!.data
+              );
               setSim(sim);
               navigate("game");
             }}

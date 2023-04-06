@@ -9,45 +9,16 @@ import { SyncHook } from "tapable";
 
 import isPlainObject from "lodash/isPlainObject";
 import { filter, map, pipe, toArray } from "@fxts/core";
-import { NavigatingSystem } from "@core/systems/navigating";
-import { OutOfBoundsCheckingSystem } from "@core/systems/reporting/outOfBoundsChecking";
-import { FacilityBuildingSystem } from "@core/systems/facilityBuilding";
-import { UndeployingSystem } from "@core/systems/undeploying";
 import { isHeadless } from "@core/settings";
 import type { CoreComponents } from "@core/components/component";
 import type { EntityTag } from "@core/tags";
-import { DeadUnregisteringSystem } from "@core/systems/deadUnregistering";
-import { AttackingSystem } from "@core/systems/attacking";
-import { SpottingSystem } from "@core/systems/ai/spotting";
-import { HitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating";
-import { MilitaryModuleSpottingSystem } from "@core/systems/ai/militaryModuleSpotting";
-import { DisposableUnregisteringSystem } from "@core/systems/disposableUnregistering";
-import { TauHarassingSystem } from "@core/systems/ai/tauHarassing";
-import { ShipReturningSystem } from "@core/systems/ai/shipReturning";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
-import { BudgetPlanningSystem } from "../systems/budgetPlanning";
-import { ProducingSystem } from "../systems/producing";
-import { StorageQuotaPlanningSystem } from "../systems/storageQuotaPlanning";
-import { TradingSystem } from "../systems/trading";
-import { SelectingSystem } from "../systems/selecting";
-import { OrderPlanningSystem } from "../systems/ai/orderPlanning";
-import { MovingSystem } from "../systems/moving";
-import { MiningSystem } from "../systems/mining";
 import type { Queries } from "../systems/utils/query";
 import { createQueries } from "../systems/utils/query";
-import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
-import { PathPlanningSystem } from "../systems/pathPlanning";
-import { CooldownUpdatingSystem } from "../systems/cooldowns";
 import { MissingEntityError } from "../errors";
 import { openDb } from "../db";
-import { AsteroidSpawningSystem } from "../systems/asteroidSpawning";
-import { FacilityPlanningSystem } from "../systems/ai/facilityPlanning";
-import { SectorStatisticGatheringSystem } from "../systems/sectorStatisticGathering";
-import { ShipPlanningSystem } from "../systems/ai/shipPlanning";
-import { InflationStatisticGatheringSystem } from "../systems/inflationStatisticGathering";
-import { ShipBuildingSystem } from "../systems/shipBuilding";
 
 function reviveMathjs(value: any) {
   if (isPlainObject(value)) {
@@ -66,9 +37,8 @@ function reviveMathjs(value: any) {
   return value;
 }
 
-interface Queues {
-  systemsToAdd: System[];
-  systemsToRemove: System[];
+export interface SimConfig {
+  systems: System[];
 }
 
 @Exclude()
@@ -85,18 +55,18 @@ export class Sim extends BaseSim {
     removeTag: SyncHook<{ entity: Entity; tag: EntityTag }>;
     removeEntity: SyncHook<Entity>;
     destroy: SyncHook<void>;
+
+    phase: Record<"init" | "update" | "render" | "cleanup", SyncHook<number>>;
   };
 
   @Expose()
   @Type(() => Entity)
   entities: Map<number, Entity>;
-  systems: System[];
   queries: Queries;
   paths: Record<string, Record<string, Path>>;
-  queues: Queues = { systemsToAdd: [], systemsToRemove: [] };
   diagnostics = false;
 
-  constructor() {
+  constructor({ systems }: SimConfig = { systems: [] }) {
     super();
 
     this.entities = new Map();
@@ -107,40 +77,17 @@ export class Sim extends BaseSim {
       removeTag: new SyncHook(["removeTag"]),
       removeEntity: new SyncHook(["removeEntity"]),
       destroy: new SyncHook(["destroy"]),
+      phase: {
+        init: new SyncHook(["init"]),
+        update: new SyncHook(["update"]),
+        render: new SyncHook(["render"]),
+        cleanup: new SyncHook(["cleanup"]),
+      },
     };
 
     this.queries = createQueries(this);
 
-    this.systems = [
-      PathPlanningSystem,
-      CooldownUpdatingSystem,
-      ProducingSystem,
-      StorageQuotaPlanningSystem,
-      TradingSystem,
-      BudgetPlanningSystem,
-      SelectingSystem,
-      OrderPlanningSystem,
-      NavigatingSystem,
-      MovingSystem,
-      MiningSystem,
-      OrderExecutingSystem,
-      AsteroidSpawningSystem,
-      FacilityPlanningSystem,
-      ShipPlanningSystem,
-      SectorStatisticGatheringSystem,
-      InflationStatisticGatheringSystem,
-      ShipBuildingSystem,
-      FacilityBuildingSystem,
-      UndeployingSystem,
-      AttackingSystem,
-      SpottingSystem,
-      MilitaryModuleSpottingSystem,
-      HitpointsRegeneratingSystem,
-      TauHarassingSystem,
-      ShipReturningSystem,
-      DisposableUnregisteringSystem,
-      DeadUnregisteringSystem,
-    ].map((S) => new S(this));
+    systems.forEach((system) => system.apply(this));
 
     if (!isHeadless) {
       window.cheats = {};
@@ -158,27 +105,12 @@ export class Sim extends BaseSim {
     this.entities.delete(entity.id);
   };
 
-  registerSystem = (system: System) => {
-    this.queues.systemsToAdd.push(system);
-  };
-
-  unregisterSystem = (system: System) => {
-    this.queues.systemsToRemove.push(system);
-  };
-
   next = (delta: number) => {
-    this.systems.forEach((s) => s.exec(delta));
-    if (this.queues.systemsToRemove.length > 0) {
-      this.systems = this.systems.filter(
-        (system) => !this.queues.systemsToRemove.includes(system)
-      );
-      this.queues.systemsToRemove.forEach((system) => system.destroy());
-      this.queues.systemsToRemove = [];
-    }
-    if (this.queues.systemsToAdd.length > 0) {
-      this.systems.push(...this.queues.systemsToAdd);
-      this.queues.systemsToAdd = [];
-    }
+    this.hooks.phase.init.call(delta);
+    this.hooks.phase.update.call(delta);
+    this.hooks.phase.render.call(delta);
+    this.hooks.phase.cleanup.call(delta);
+
     this.updateTimer(delta);
   };
 
@@ -249,7 +181,6 @@ export class Sim extends BaseSim {
 
   destroy = () => {
     this.stop();
-    this.systems.forEach((system) => system.destroy());
     this.hooks.destroy.call();
     if (!isHeadless) {
       window.selected = undefined!;
@@ -274,19 +205,6 @@ export class Sim extends BaseSim {
     return tx.done;
   };
 
-  toggleDiagnostics = () => {
-    const diagnosticsSystems = [OutOfBoundsCheckingSystem];
-    if (this.diagnostics) {
-      this.diagnostics = false;
-      this.systems = this.systems.filter((system) =>
-        diagnosticsSystems.every((DS) => !(system instanceof DS))
-      );
-    } else {
-      this.diagnostics = true;
-      this.systems.push(...diagnosticsSystems.map((DS) => new DS(this)));
-    }
-  };
-
   static async deleteSave(id: number) {
     const db = await openDb();
 
@@ -300,9 +218,10 @@ export class Sim extends BaseSim {
     return tx.done;
   }
 
-  static load(data: string) {
+  static load(config: SimConfig, data: string) {
     const save = JSON.parse(data);
     const sim = plainToInstance(Sim, save);
+    config.systems.forEach((system) => system.apply(sim));
     Object.values(sim.queries).forEach((query) => query.reset());
     const entityMap = new Map();
 

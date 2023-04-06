@@ -73,10 +73,16 @@ export function requestShip(
 export class ShipPlanningSystem extends System {
   cooldowns: Cooldowns<"plan">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("plan");
   }
+
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   getFacilityShipRequests = (faction: Faction): ShipRequest[] =>
     this.sim.queries.facilities

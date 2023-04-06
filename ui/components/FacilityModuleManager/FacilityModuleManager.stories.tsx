@@ -22,7 +22,7 @@ const Template: StoryFn<typeof FacilityModuleManagerComponent> = (args) => (
   </div>
 );
 
-const s = new Sim();
+const s = new Sim({ systems: [] });
 
 export const Default = Template.bind({});
 Default.args = {

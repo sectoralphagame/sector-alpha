@@ -9,11 +9,18 @@ export class HitpointsRegeneratingSystem extends System {
   cooldowns: Cooldowns<"exec">;
   query: Query<"hitpoints">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("exec");
-    this.query = new Query(sim, ["hitpoints"]);
   }
+
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
+    this.query = new Query(sim, ["hitpoints"]);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

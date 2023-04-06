@@ -52,10 +52,16 @@ export function settleStorageQuota(entity: RequireComponent<"storage">) {
 export class StorageQuotaPlanningSystem extends System {
   cooldowns: Cooldowns<"settle">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("settle");
   }
+
+  apply = (sim: Sim): void => {
+    super.apply(sim);
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

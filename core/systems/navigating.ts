@@ -267,10 +267,13 @@ export class NavigatingSystem extends System {
   entities: Driveable[];
   query: Query<"drive" | "position">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  apply = (sim: Sim): void => {
+    super.apply(sim);
+
     this.query = new Query(sim, ["drive", "position"]);
-  }
+
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.query.get().forEach((entity) => setDrive(entity, delta));

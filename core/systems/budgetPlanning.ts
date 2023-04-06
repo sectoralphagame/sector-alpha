@@ -32,11 +32,17 @@ export class BudgetPlanningSystem extends System {
   cooldowns: Cooldowns<"settle">;
   query: Query<"budget" | "owner" | "trade">;
 
-  constructor(sim: Sim) {
-    super(sim);
+  constructor() {
+    super();
     this.cooldowns = new Cooldowns("settle");
-    this.query = new Query(sim, ["budget", "owner", "trade"]);
   }
+
+  apply = (sim: Sim): void => {
+    super.apply(sim);
+
+    this.query = new Query(sim, ["budget", "owner", "trade"]);
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
 
   exec = (delta: number): void => {
     this.cooldowns.update(delta);

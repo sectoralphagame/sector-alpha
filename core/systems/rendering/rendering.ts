@@ -3,6 +3,7 @@ import { Viewport } from "pixi-viewport";
 import Color from "color";
 import { Entity } from "@core/entity";
 import { Graphics } from "pixi.js";
+import type { Sim } from "@core/sim";
 import {
   createRenderGraphics,
   drawGraphics,
@@ -89,6 +90,12 @@ export class RenderingSystem extends SystemWithHooks {
   toolbar: HTMLDivElement;
   grid: RequireComponent<"renderGraphics"> | null = null;
   layers: Record<Layer, PIXI.Container>;
+
+  apply = (sim: Sim) => {
+    super.apply(sim);
+
+    sim.hooks.phase.render.tap(this.constructor.name, this.exec);
+  };
 
   init = () => {
     this.cooldowns = new Cooldowns("graphics");

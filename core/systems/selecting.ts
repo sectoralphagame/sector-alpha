@@ -1,3 +1,4 @@
+import type { Sim } from "@core/sim";
 import { clearFocus } from "../components/selection";
 import { isHeadless } from "../settings";
 import { SystemWithHooks } from "./utils/hooks";
@@ -14,6 +15,11 @@ export class SelectingSystem extends SystemWithHooks {
     } else {
       clearFocus(manager.cp.selectionManager);
     }
+  };
+
+  apply = (sim: Sim): void => {
+    super.apply(sim);
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
   exec = (delta: number): void => {
