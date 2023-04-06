@@ -29,7 +29,7 @@ import { TradingSystem } from "@core/systems/trading";
 import { UndeployingSystem } from "@core/systems/undeploying";
 import type { SimConfig } from "./Sim";
 
-export const config: SimConfig = {
+export const createBaseConfig = (): SimConfig => ({
   systems: [
     new PathPlanningSystem(),
     new CooldownUpdatingSystem(),
@@ -60,4 +60,4 @@ export const config: SimConfig = {
     new DisposableUnregisteringSystem(),
     new DeadUnregisteringSystem(),
   ],
-};
+});

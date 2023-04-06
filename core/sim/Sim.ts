@@ -183,7 +183,9 @@ export class Sim extends BaseSim {
     this.stop();
     this.hooks.destroy.call();
     if (!isHeadless) {
+      window.sim = undefined!;
       window.selected = undefined!;
+      window.cheats = undefined!;
     }
   };
 

@@ -24,10 +24,11 @@ import { ContextMenu } from "../components/ContextMenu";
 import { PlayerMoney } from "../components/PlayerMoney";
 
 export const Game: React.FC = () => {
-  const [sim] = useSim();
+  const [sim, setSim] = useSim();
   const system = React.useRef<RenderingSystem>();
   const canvasRoot = React.useRef<HTMLDivElement>(null);
   const [menu, setMenu] = useContextMenu();
+  const [dialog, setDialog] = useGameDialog();
 
   const selectedId = sim?.queries.settings.get()[0]!.cp.selectionManager.id;
   const [selectedEntity, setSelectedEntity] = React.useState<
@@ -42,8 +43,8 @@ export const Game: React.FC = () => {
     system.current.apply(sim);
 
     const unmount = () => {
-      system.current?.destroy();
-      sim.stop();
+      setDialog(null);
+      setSim(undefined!);
     };
 
     sim.hooks.removeEntity.tap("Game", (entity) => {
@@ -117,7 +118,6 @@ export const Game: React.FC = () => {
     }
   }, [menu.active]);
 
-  const [dialog, setDialog] = useGameDialog();
   React.useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (event.code === "Escape") {

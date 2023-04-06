@@ -7,7 +7,7 @@ import { Dialog } from "@kit/Dialog";
 import { Button } from "@kit/Button";
 import { Input } from "@kit/Input";
 import { IconButton } from "@kit/IconButton";
-import { config } from "@core/sim/baseConfig";
+import { createBaseConfig } from "@core/sim/baseConfig";
 import { useLocation } from "../context/Location";
 import styles from "./ConfigDialog.scss";
 import { Saves } from "./Saves";
@@ -44,13 +44,16 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
     setView("default");
   }, [open]);
 
-  const saveNew: React.FormEventHandler = React.useCallback((event) => {
-    event.preventDefault();
-    if (input.current!.value) {
-      sim.save(input.current!.value);
-      onClose();
-    }
-  }, []);
+  const saveNew: React.FormEventHandler = React.useCallback(
+    (event) => {
+      event.preventDefault();
+      if (input.current!.value) {
+        sim.save(input.current!.value);
+        onClose();
+      }
+    },
+    [sim]
+  );
 
   return (
     <Dialog open={open} onClose={onClose} title="Configuration">
@@ -98,7 +101,12 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             saves={saves}
             onClick={async (id) => {
               sim.destroy();
-              setSim(Sim.load(config, saves.find((s) => s.id === id)!.data));
+              setSim(
+                Sim.load(
+                  createBaseConfig(),
+                  saves.find((s) => s.id === id)!.data
+                )
+              );
               onClose();
             }}
             onDelete={async (id) => {

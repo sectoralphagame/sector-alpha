@@ -227,11 +227,11 @@ export class RenderingSystem extends SystemWithHooks {
     this.initialized = true;
   };
 
-  destroy(): void {
+  destroy = (): void => {
     this.resizeObserver.disconnect();
     this.viewport.destroy();
     this.app.destroy(true);
-  }
+  };
 
   updateGraphics = () => {
     this.sim.queries.renderableGraphics.get().forEach((entity) => {

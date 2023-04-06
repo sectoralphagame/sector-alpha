@@ -81,7 +81,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
     if (dialog?.type === "config") {
       sim.stop();
     }
-  }, [dialog]);
+  }, [dialog, sim]);
 
   const playerOwned = entity ? isOwnedByPlayer(entity) : false;
 
