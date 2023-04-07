@@ -61,10 +61,14 @@ export const ShipyardDialog: React.FC<ModalProps> = ({ open, onClose }) => {
         }
 
         shipyard.cp.shipyard!.queue.push(
-          ...order.map((o) => ({
-            blueprint: o,
-            owner: ownFaction.id,
-          }))
+          ...order.flatMap((o) =>
+            Array(o.quantity)
+              .fill(0)
+              .map(() => ({
+                blueprint: o,
+                owner: ownFaction.id,
+              }))
+          )
         );
       }}
     />
