@@ -255,34 +255,34 @@ export function dumpCargo(
   update?: boolean
 ): Collectible[] {
   const collectibles: Collectible[] = [];
-  Object.entries(entity.cp.storage.stored).forEach(([commodity, quantity]) => {
-    if (quantity > 0) {
-      for (
-        let i = Math.floor(quantity * random(0.2, 0.6));
-        i > 0;
-        i -= collectibleSize
-      ) {
-        const q = Math.min(quantity, collectibleSize);
+  Object.entries(
+    update ? entity.cp.storage.availableWares : entity.cp.storage.stored
+  ).forEach(([commodity, quantity]) => {
+    for (
+      let i = update ? quantity : Math.floor(quantity * random(0.2, 0.6));
+      i > 0;
+      i -= collectibleSize
+    ) {
+      const q = Math.min(i, collectibleSize);
 
-        collectibles.push(
-          createCollectible(entity.sim, {
-            position: {
-              coord: add(entity.cp.position!.coord, [
-                random(-0.25, 0.25),
-                random(-0.25, 0.25),
-              ]) as Matrix,
-              sector: entity.cp.position!.sector,
-            },
-            storage: {
-              commodity: commodity as Commodity,
-              stored: q,
-            },
-          })
-        );
+      collectibles.push(
+        createCollectible(entity.sim, {
+          position: {
+            coord: add(entity.cp.position!.coord, [
+              random(-0.25, 0.25),
+              random(-0.25, 0.25),
+            ]) as Matrix,
+            sector: entity.cp.position!.sector,
+          },
+          storage: {
+            commodity: commodity as Commodity,
+            stored: q,
+          },
+        })
+      );
 
-        if (update) {
-          removeStorage(entity.cp.storage, commodity as Commodity, q);
-        }
+      if (update) {
+        removeStorage(entity.cp.storage, commodity as Commodity, q);
       }
     }
   });
