@@ -1,4 +1,5 @@
 import { createBudget } from "@core/components/budget";
+import { removeCommander } from "@core/components/commander";
 import type { CoreComponents } from "@core/components/component";
 import { createDocks } from "@core/components/dockable";
 import type { BuilderDeployAction } from "@core/components/orders";
@@ -9,6 +10,10 @@ export function deployBuilderAction(
   entity: RequireComponent<"deployable" | "storage">,
   order: BuilderDeployAction
 ): boolean {
+  if (entity.cp.commander) {
+    removeCommander(entity.requireComponents(["commander"]));
+  }
+
   (["autoOrder", "orders"] as Array<keyof CoreComponents>).reduce(
     (ship, component) => ship.removeComponent(component),
     entity

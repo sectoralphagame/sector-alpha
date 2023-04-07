@@ -72,7 +72,7 @@ export const ShipToEntity: React.FC = () => {
 
   const onWorkFor = () => {
     entity.cp.orders!.value = [];
-    addSubordinate(entity.requireComponents(["subordinates"]), actionable);
+    addSubordinate(actionable.requireComponents(["subordinates"]), entity);
   };
 
   const onBuild = () => {
@@ -155,8 +155,8 @@ export const ShipToEntity: React.FC = () => {
         actionable.cp.owner?.id === entity.cp.owner?.id && (
           <DropdownOption onClick={onEscort}>Escort</DropdownOption>
         )}
-      {entity.hasComponents(["storage", "subordinates"]) &&
-        actionable.hasComponents(["trade", "name"]) &&
+      {entity.hasComponents(["storage"]) &&
+        actionable.hasComponents(["trade", "name", "subordinates"]) &&
         isOwnedByPlayer(actionable) && (
           <DropdownOption onClick={onWorkFor}>
             Work for {actionable.cp.name!.value}
