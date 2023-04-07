@@ -10,7 +10,8 @@
     "test": "jest",
     "lint": "npx eslint \"@(core|ui|kit|devtools)/**/*.@(tsx|ts|jsx|js)\" --fix ; npx prettier --check \"@(core|ui|kit|devtools)/**/*.@(tsx|ts|jsx|js)\" --write",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "gen-spritesheet": "node ./scripts/createSpritesheet.js"
   },
   "author": "Dominik Żegleń",
   "license": "ISC",
@@ -128,6 +129,8 @@
     "react-router-dom": "^6.3.0",
     "recoil": "^0.7.5",
     "reflect-metadata": "^0.1.13",
+    "sharp": "^0.32.0",
+    "spritesmith": "^3.4.1",
     "tapable": "^2.2.1"
   }
 }

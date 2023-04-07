@@ -1,43 +1,10 @@
 import * as PIXI from "pixi.js";
-import asteroidTexture from "@assets/icons/asteroid.svg";
-import sCivTexture from "@assets/icons/s_civ.svg";
-import mCivTexture from "@assets/icons/m_civ.svg";
-import lCivTexture from "@assets/icons/l_civ.svg";
-import mMinTexture from "@assets/icons/m_min.svg";
-import fMinTexture from "@assets/icons/f_min.svg";
-import lMilTexture from "@assets/icons/l_mil.svg";
-import lMinTexture from "@assets/icons/l_min.svg";
-import mMilTexture from "@assets/icons/m_mil.svg";
-import sMilTexture from "@assets/icons/s_mil.svg";
-import fTeleportTexture from "@assets/icons/f_teleport.svg";
-import fCivTexture from "@assets/icons/f_civ.svg";
-import fFactoryTexture from "@assets/icons/f_factory.svg";
-import fShipyardTexture from "@assets/icons/f_shipyard.svg";
-import lBuilderTexture from "@assets/icons/l_bld.svg";
-import boxTexture from "@assets/icons/box.svg";
-import lStorageTexture from "@assets/icons/l_stg.svg";
+import spritesheetImage from "@assets/icons/spritesheet.png";
+import spritesheetData from "@assets/icons/spritesheet.json";
 import type { BaseComponent } from "./component";
 import { isHeadless } from "../settings";
 
-export const textures = {
-  asteroid: asteroidTexture,
-  box: boxTexture,
-  fCiv: fCivTexture,
-  fFactory: fFactoryTexture,
-  fMin: fMinTexture,
-  fShipyard: fShipyardTexture,
-  fTeleport: fTeleportTexture,
-  lBuilder: lBuilderTexture,
-  lCiv: lCivTexture,
-  lMil: lMilTexture,
-  lMin: lMinTexture,
-  lStorage: lStorageTexture,
-  mCiv: mCivTexture,
-  mMil: mMilTexture,
-  mMin: mMinTexture,
-  sCiv: sCivTexture,
-  sMil: sMilTexture,
-};
+export const textures = spritesheetData.frames;
 export type Textures = typeof textures;
 export type Layer =
   | "facility"
@@ -63,17 +30,20 @@ export class Render implements BaseComponent<"render"> {
   name: "render" = "render";
 }
 
+const spritesheet = !isHeadless
+  ? new PIXI.Spritesheet(
+      PIXI.BaseTexture.from(spritesheetImage),
+      spritesheetData
+    )
+  : null;
+spritesheet?.parse(() => {
+  console.log("Spritesheet parsed");
+});
+
 export function setTexture(render: Render, texture: keyof Textures) {
   render.texture = texture;
   if (!isHeadless) {
-    render.sprite = new PIXI.Sprite(
-      PIXI.Texture.from(textures[texture], {
-        resolution: 2,
-        resourceOptions: {
-          scale: 2,
-        },
-      })
-    );
+    render.sprite = new PIXI.Sprite(spritesheet!.textures[texture]);
     render.sprite.anchor.set(0.5, 0.5);
   }
 }

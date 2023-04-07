@@ -8,6 +8,7 @@ import { textures } from "@core/components/render";
 import type { DockSize } from "@core/components/dockable";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { useThrottledFormState } from "@devtools/utils";
+import icons from "@assets/icons";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
 import type { FormData } from "./utils";
@@ -77,7 +78,7 @@ const ShipGeneralEditor: React.FC<{ index: number }> = ({ index }) => {
               )}
               <SVG
                 className={styles.texturePreview}
-                src={textures[getValues().ships[index].texture]}
+                src={icons[getValues().ships[index].texture]}
               />
             </div>
           </SelectButton>

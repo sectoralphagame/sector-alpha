@@ -264,7 +264,7 @@
     "name": "Facility Starter",
     "size": "large",
     "storage": 100,
-    "texture": "lBuilder",
+    "texture": "lBld",
     "slug": "facilityStarter",
     "damage": { "value": 1, "range": 2, "cooldown": 1 },
     "hitpoints": {
@@ -293,7 +293,7 @@
     "name": "Facility Builder",
     "size": "large",
     "storage": 0,
-    "texture": "lStorage",
+    "texture": "lStg",
     "slug": "facilityBuilder",
     "damage": { "value": 1, "range": 2, "cooldown": 1 },
     "hitpoints": {
