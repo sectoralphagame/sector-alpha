@@ -1,5 +1,6 @@
 .*
 !.gitignore
+!.gitkeep
 !.github
 !.eslintrc.js
 !.prettierrc
