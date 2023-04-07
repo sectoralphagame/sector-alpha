@@ -129,12 +129,13 @@ export const ShipToEntity: React.FC = () => {
   };
 
   const onEscort = () => {
-    entity.cp.orders!.value.push({
-      origin: "manual",
-      type: "escort",
-      targetId: actionable.id,
-      actions: [],
-      ordersForSector: 0,
+    addSubordinate(actionable.requireComponents(["subordinates"]), entity);
+    entity.addComponent({
+      name: "autoOrder",
+      default: {
+        type: "escort",
+        targetId: actionable.id,
+      },
     });
   };
 
@@ -151,7 +152,7 @@ export const ShipToEntity: React.FC = () => {
       {actionable.hasComponents(["drive"]) && (
         <DropdownOption onClick={onFollow}>Follow</DropdownOption>
       )}
-      {actionable.hasComponents(["drive"]) &&
+      {actionable.hasComponents(["drive", "subordinates"]) &&
         actionable.cp.owner?.id === entity.cp.owner?.id && (
           <DropdownOption onClick={onEscort}>Escort</DropdownOption>
         )}
