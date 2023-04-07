@@ -1,0 +1,35 @@
+.root {
+  display: flex;
+  gap: var(--spacing-2);
+  height: 242px;
+  position: relative;
+}
+
+.bar {
+  background-color: currentColor;
+  display: block;
+  width: 12px;
+  position: absolute;
+  left: 6px;
+
+  &Container {
+    position: relative;
+    width: 30px;
+  }
+
+  &Horizontal {
+    height: 2px;
+    background-color: #333333;
+    top: 99px;
+    position: absolute;
+    width: 100%;
+  }
+}
+
+.label {
+  display: inline-block;
+  position: relative;
+  top: 210px;
+  text-align: center;
+  width: 100%;
+}

@@ -16,6 +16,7 @@ import {
   MapPanelTabContent,
 } from "@ui/components/MapPanel/MapPanelButton";
 import { TradeFinder } from "@ui/components/TradeFinder";
+import { Relations } from "@ui/components/Relations/Relations";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -163,6 +164,7 @@ export const Game: React.FC = () => {
             <>
               <MapPanelButton>Trade</MapPanelButton>
               <MapPanelButton>Legend</MapPanelButton>
+              <MapPanelButton>Relations</MapPanelButton>
             </>
           }
         >
@@ -171,6 +173,9 @@ export const Game: React.FC = () => {
           </MapPanelTabContent>
           <MapPanelTabContent>
             <MapView />
+          </MapPanelTabContent>
+          <MapPanelTabContent>
+            <Relations />
           </MapPanelTabContent>
         </MapPanel>
       </div>
