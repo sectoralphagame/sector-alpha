@@ -1,10 +1,9 @@
 import * as PIXI from "pixi.js";
-import spritesheetImage from "@assets/icons/spritesheet.png";
-import spritesheetData from "@assets/icons/spritesheet.json";
+import { manifest } from "@assets/icons";
 import type { BaseComponent } from "./component";
 import { isHeadless } from "../settings";
 
-export const textures = spritesheetData.frames;
+export const textures = manifest.frames;
 export type Textures = typeof textures;
 export type Layer =
   | "facility"
@@ -30,20 +29,21 @@ export class Render implements BaseComponent<"render"> {
   name: "render" = "render";
 }
 
-const spritesheet = !isHeadless
-  ? new PIXI.Spritesheet(
-      PIXI.BaseTexture.from(spritesheetImage),
-      spritesheetData
-    )
-  : null;
-spritesheet?.parse(() => {
-  console.log("Spritesheet parsed");
-});
+let spritesheet: PIXI.Spritesheet;
+if (!isHeadless) {
+  spritesheet = new PIXI.Spritesheet(
+    PIXI.BaseTexture.from(manifest.meta.image),
+    manifest
+  );
+  spritesheet.parse(() => {
+    console.log("Spritesheet parsed");
+  });
+}
 
 export function setTexture(render: Render, texture: keyof Textures) {
   render.texture = texture;
   if (!isHeadless) {
-    render.sprite = new PIXI.Sprite(spritesheet!.textures[texture]);
+    render.sprite = new PIXI.Sprite(spritesheet.textures[texture]);
     render.sprite.anchor.set(0.5, 0.5);
   }
 }

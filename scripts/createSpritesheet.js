@@ -31,35 +31,32 @@ Promise.all(
     const ws = fs.createWriteStream("./assets/icons/spritesheet.png");
     ws.write(result.image, "binary");
 
-    fs.writeFileSync(
-      "./assets/icons/spritesheet.json",
-      JSON.stringify({
-        frames: Object.entries(result.coordinates)
-          .map(([src, { x, y, width, height }]) => [
-            src,
-            {
-              frame: { x, y, w: width, h: height },
-              src: src.replace(/(.*)\.png/, "$1.svg"),
-            },
-          ])
-          .reduce(
-            (acc, [src, coords]) => ({
-              ...acc,
-              [_.camelCase(src.replace(/\.\/assets\/icons\/(.+)\.png/, "$1"))]:
-                coords,
-            }),
-            {}
-          ),
-        meta: {
-          image: "assets/icons/spritesheet.png",
-          format: "RGBA8888",
-          size: { w: result.properties.width, h: result.properties.height },
-          scale: "4",
-        },
-        properties: result.properties,
-      })
-    );
-
+    const manifest = JSON.stringify({
+      frames: Object.entries(result.coordinates)
+        .map(([src, { x, y, width, height }]) => [
+          src,
+          {
+            frame: { x, y, w: width, h: height },
+            src: src.replace(/(.*)\.png/, "$1.svg"),
+          },
+        ])
+        .reduce(
+          (acc, [src, coords]) => ({
+            ...acc,
+            [_.camelCase(src.replace(/\.\/assets\/icons\/(.+)\.png/, "$1"))]:
+              coords,
+          }),
+          {}
+        ),
+      meta: {
+        image: "spritesheet",
+        format: "RGBA8888",
+        size: { w: result.properties.width, h: result.properties.height },
+        scale: "4",
+      },
+      properties: result.properties,
+      // eslint-disable-next-line quotes
+    }).replace(/"image":"spritesheet"/, '"image":spritesheet');
     const icons = Object.keys(result.coordinates).map((src) =>
       src.replace(/\.\/assets\/icons\/(.+)\.png/, "$1")
     );
@@ -68,11 +65,13 @@ Promise.all(
       `/* eslint-disable */\n/* prettier-ignore */\n\n${icons
         .map(
           (fileName) =>
-            `import ${_.camelCase(
-              fileName
-            )} from "@assets/icons/${fileName}.svg";`
+            `import ${_.camelCase(fileName)} from "./${fileName}.svg";`
         )
-        .join("\n")}\n\nexport default {${icons.map(_.camelCase).join(",")}};`
+        .join(
+          "\n"
+        )}\nimport spritesheet from "./spritesheet.png";\n\nexport const manifest = ${manifest} as const;\n\nexport {${icons
+        .map(_.camelCase)
+        .join(",")}};`
     );
 
     files.forEach((fileName) => fs.rmSync(fileName));
