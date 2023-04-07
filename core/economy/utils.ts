@@ -148,19 +148,19 @@ export function getTradeWithMostProfit(
   };
 }
 
-export function sellCommodityWithMostProfit(
+export function getBuyersForCommodityInRange(
   entity: RequireComponent<"position" | "owner">,
   commodity: Commodity,
   minQuantity: number,
   sectorDistance: number
-): WithTrade | null {
+) {
   const faction = entity.sim.getOrThrow<Faction>(entity.cp.owner.id);
   const profit = (f: WithTrade) =>
     f.cp.owner.id === faction.id
       ? Infinity
       : f.components.trade.offers[commodity].price;
 
-  const sortedByProfit = sortBy(
+  return sortBy(
     getSectorsInTeleportRange(
       asSector(entity.sim.getOrThrow(entity.cp.position.sector)!),
       sectorDistance,
@@ -186,13 +186,27 @@ export function sellCommodityWithMostProfit(
       })),
     "profit"
   ).reverse();
+}
 
-  if (!sortedByProfit[0] || sortedByProfit[0].profit <= 0) {
+export function sellCommodityWithMostProfit(
+  entity: RequireComponent<"position" | "owner">,
+  commodity: Commodity,
+  minQuantity: number,
+  sectorDistance: number
+): WithTrade | null {
+  const buyers = getBuyersForCommodityInRange(
+    entity,
+    commodity,
+    minQuantity,
+    sectorDistance
+  );
+
+  if (!buyers[0] || buyers[0].profit <= 0) {
     return null;
   }
 
   return pickRandom(
-    sortedByProfit
+    buyers
       .filter(
         (f, _, arr) =>
           !Number.isFinite(f.profit) || f.profit / arr[0].profit >= 0.95

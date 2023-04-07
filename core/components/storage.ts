@@ -1,6 +1,10 @@
-import { min, sum } from "mathjs";
+import type { Matrix } from "mathjs";
+import { add, min, random, sum } from "mathjs";
 import map from "lodash/map";
 import { pipe, map as fxtsMap, sum as fxtsSum } from "@fxts/core";
+import type { RequireComponent } from "@core/tsHelpers";
+import type { Collectible } from "@core/archetypes/collectible";
+import { createCollectible } from "@core/archetypes/collectible";
 import {
   InsufficientStorage,
   InsufficientStorageSpace,
@@ -243,4 +247,45 @@ export interface SimpleCommodityStorage
   extends BaseComponent<"simpleCommodityStorage"> {
   commodity: Commodity;
   stored: number;
+}
+
+export const collectibleSize = 50;
+export function dumpCargo(
+  entity: RequireComponent<"storage">,
+  update?: boolean
+): Collectible[] {
+  const collectibles: Collectible[] = [];
+  Object.entries(entity.cp.storage.stored).forEach(([commodity, quantity]) => {
+    if (quantity > 0) {
+      for (
+        let i = Math.floor(quantity * random(0.2, 0.6));
+        i > 0;
+        i -= collectibleSize
+      ) {
+        const q = Math.min(quantity, collectibleSize);
+
+        collectibles.push(
+          createCollectible(entity.sim, {
+            position: {
+              coord: add(entity.cp.position!.coord, [
+                random(-0.25, 0.25),
+                random(-0.25, 0.25),
+              ]) as Matrix,
+              sector: entity.cp.position!.sector,
+            },
+            storage: {
+              commodity: commodity as Commodity,
+              stored: q,
+            },
+          })
+        );
+
+        if (update) {
+          removeStorage(entity.cp.storage, commodity as Commodity, q);
+        }
+      }
+    }
+  });
+
+  return collectibles;
 }

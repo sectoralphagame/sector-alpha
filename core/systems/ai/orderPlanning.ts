@@ -15,7 +15,7 @@ import { sector as asSector, sectorSize } from "../../archetypes/sector";
 import { hecsToCartesian } from "../../components/hecsPosition";
 import type { MineOrder, TradeOrder } from "../../components/orders";
 import { mineAction } from "../../components/orders";
-import { getAvailableSpace } from "../../components/storage";
+import { dumpCargo, getAvailableSpace } from "../../components/storage";
 import type { Commodity } from "../../economy/commodity";
 import { mineableCommodities } from "../../economy/commodity";
 import {
@@ -149,6 +149,8 @@ function autoTrade(entity: Trading, sectorDistance: number) {
           actions,
         });
         makingTrade = true;
+      } else {
+        dumpCargo(entity, true);
       }
     }
   } else {
@@ -306,8 +308,20 @@ function autoMineForCommander(
   if (!commander.cp.compoundProduction) return;
 
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
-    returnToFacility(entity);
-    idleMovement(entity);
+    if (
+      Object.keys(entity.cp.storage.availableWares).some(
+        (commodity: Commodity) =>
+          entity.cp.storage.availableWares[commodity] > 0 &&
+          commander.cp.trade.offers[commodity].active &&
+          commander.cp.trade.offers[commodity].type === "buy" &&
+          commander.cp.trade.offers[commodity].quantity > 0
+      )
+    ) {
+      returnToFacility(entity);
+      idleMovement(entity);
+    } else {
+      autoTrade(entity, sectorDistance);
+    }
   } else {
     const needed = getNeededCommodities(
       commander.requireComponents([...tradeComponents, "compoundProduction"])

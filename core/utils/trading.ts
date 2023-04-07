@@ -171,9 +171,9 @@ export function createTradeId(
   entity: Entity,
   offer: Omit<TransactionInput, "allocations">
 ) {
-  return `${entity.id}:${offer.initiator}:${
-    offer.type
-  }:${entity.sim.getTime()}`;
+  return [entity.id, offer.initiator, offer.type, entity.sim.getTime()].join(
+    ":"
+  );
 }
 
 export function parseTradeId(tradeId: string) {

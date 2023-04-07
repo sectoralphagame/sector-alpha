@@ -102,7 +102,7 @@
       "id": "sector-alpha",
       "resources": {
         "fuelium": 0,
-        "goldOre": 5,
+        "goldOre": 8,
         "ice": 0,
         "ore": 0,
         "silica": 0
@@ -246,7 +246,7 @@
       "id": "the-hive",
       "resources": {
         "fuelium": 10,
-        "goldOre": 4,
+        "goldOre": 7,
         "ice": 4,
         "ore": 12,
         "silica": 8
@@ -342,10 +342,10 @@
       "id": "wolf-1061-1",
       "resources": {
         "fuelium": 12,
-        "goldOre": 3,
+        "goldOre": 6,
         "ice": 0,
         "ore": 0,
-        "silica": 7
+        "silica": 9
       }
     },
     {
@@ -369,7 +369,7 @@
         "goldOre": 0,
         "ice": 4,
         "ore": 9,
-        "silica": 6
+        "silica": 8
       }
     },
     {

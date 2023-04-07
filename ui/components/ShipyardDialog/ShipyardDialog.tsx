@@ -2,6 +2,7 @@ import type { Facility } from "@core/archetypes/facility";
 import { facilityModules } from "@core/archetypes/facilityModule";
 import type { Faction } from "@core/archetypes/faction";
 import { transferMoney } from "@core/components/budget";
+import { changeRelations } from "@core/components/relations";
 import type { Commodity } from "@core/economy/commodity";
 import { getCommodityCost } from "@core/economy/utils";
 import { max } from "@fxts/core";
@@ -49,11 +50,14 @@ export const ShipyardDialog: React.FC<ModalProps> = ({ open, onClose }) => {
       onClose={onClose}
       onBuild={(order) => {
         if (ownFaction !== shipyardFaction) {
+          const amount = sum(order.map((item) => item.cost * item.quantity));
+
           transferMoney(
             ownFaction.cp.budget,
-            sum(order.map((item) => item.cost * item.quantity)),
+            amount,
             shipyardFaction.cp.budget
           );
+          changeRelations(ownFaction, shipyardFaction, amount / 1e6);
         }
 
         shipyard.cp.shipyard!.queue.push(

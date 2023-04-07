@@ -13,7 +13,7 @@ export const Relations: React.FC = () => {
 
     return {
       slug: faction.cp.name.slug!,
-      relation,
+      relation: Math.floor(relation),
       color: faction.cp.color.value,
     };
   });

@@ -41,7 +41,7 @@ export function createCollectible(
     .addComponent(
       createRender({
         color: 0xffffff,
-        defaultScale: 0.025,
+        defaultScale: 0.32,
         texture: "box",
         layer: "collectible",
       })
