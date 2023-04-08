@@ -13,7 +13,6 @@ import { dockOrder } from "./dock";
 import { mineAction } from "./mine";
 import { followOrderCompleted, followOrder } from "./follow";
 import {
-  attackAction,
   holdAction,
   holdPosition,
   moveAction,
@@ -24,6 +23,7 @@ import { tradeActionCleanup, tradeOrder } from "./trade";
 import { deployFacilityAction } from "./deployFacility";
 import { deployBuilderAction } from "./deployBuilder";
 import {
+  attackAction,
   attackActionCleanup,
   attackOrder,
   attackOrderCompleted,

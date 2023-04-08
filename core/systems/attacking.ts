@@ -33,30 +33,32 @@ export function isInDistance(
 }
 
 function shouldAttackBack(
-  attacker: RequireComponent<"damage" | "position">,
+  attacker: RequireComponent<"damage">,
   target: RequireComponent<"position">
 ): boolean {
+  const attackerOrParent = findInAncestors(attacker, "position");
+
   return (
     !!target.cp.damage &&
     target.tags.has("role:military") &&
     (target.cp.orders?.value[0]?.type !== "attack" ||
-      (target.cp.orders.value[0].targetId !== attacker.id &&
+      (target.cp.orders.value[0].targetId !== attackerOrParent.id &&
         !attacker.sim
           .getOrThrow(target.cp.orders.value[0].targetId)
           .tags.has("role:military") &&
-        isInDistance(target.requireComponents(["damage"]), attacker)))
+        isInDistance(target.requireComponents(["damage"]), attackerOrParent)))
   );
 }
 
 const cdKey = "attack";
 
 export class AttackingSystem extends System {
-  query: Query<"damage" | "position">;
+  query: Query<"damage">;
 
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    this.query = new Query(sim, ["damage", "position"]);
+    this.query = new Query(sim, ["damage"]);
 
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };

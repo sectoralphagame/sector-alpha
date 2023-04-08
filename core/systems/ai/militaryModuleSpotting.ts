@@ -4,10 +4,13 @@ import { relationThresholds } from "@core/components/relations";
 import { distance } from "mathjs";
 import type { RequireComponent } from "@core/tsHelpers";
 import type { Facility } from "@core/archetypes/facility";
+import { facilityComponents } from "@core/archetypes/facility";
+import { pickRandom } from "@core/utils/generators";
 import { System } from "../system";
 import type { Sim } from "../../sim";
 import { Cooldowns } from "../../utils/cooldowns";
 import { Query } from "../utils/query";
+import { SpottingSystem } from "./spotting";
 
 export class MilitaryModuleSpottingSystem extends System {
   cooldowns: Cooldowns<"exec">;
@@ -45,41 +48,16 @@ export class MilitaryModuleSpottingSystem extends System {
       const facility = this.sim.getOrThrow<Facility>(entity.cp.parent.id);
       if (!facility.cp.owner) return;
 
-      const entityPosition = facility.cp.position;
-      const entityOwner = this.sim.getOrThrow<Faction>(facility.cp.owner.id);
-
-      const cacheKey = [entityOwner.id, entityPosition.sector].join(":");
-      const enemies =
-        cache[cacheKey] ??
-        pipe(
+      const enemy = pickRandom(
+        SpottingSystem.getEnemies(
           this.queries.enemies.get(),
-          filter(
-            (e) =>
-              e.tags.has("ship") &&
-              entityOwner &&
-              e.cp.position.sector === entityPosition.sector &&
-              entityOwner.cp.relations.values[e.cp.owner.id]! <
-                relationThresholds.attack
-          ),
-          toArray
-        );
-      if (!cache[cacheKey]) {
-        cache[cacheKey] = enemies;
-      }
-      const closestEnemy = pipe(
-        enemies,
-        map((e) => ({
-          entity: e,
-          distance: distance(
-            e.cp.position.coord,
-            entityPosition.coord
-          ) as number,
-        })),
-        reduce((acc, e) => (acc.distance > e.distance ? e : acc))
+          cache,
+          facility.requireComponents([...facilityComponents, "owner"])
+        ).slice(0, 3)
       );
 
-      if (closestEnemy?.distance <= entity.cp.damage.range) {
-        entity.cp.damage.targetId = closestEnemy.entity.id;
+      if (enemy?.distance <= entity.cp.damage.range) {
+        entity.cp.damage.targetId = enemy.entity.id;
       }
     });
 

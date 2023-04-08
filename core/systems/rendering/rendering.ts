@@ -15,7 +15,7 @@ import { clearFocus } from "../../components/selection";
 import type { Layer } from "../../components/render";
 import { destroy, setTexture } from "../../components/render";
 
-const minScale = 0.05;
+const minScale = 0.025;
 const maxScale = 20;
 
 const layerScaleThresholds: Partial<Record<Layer, number>> = {

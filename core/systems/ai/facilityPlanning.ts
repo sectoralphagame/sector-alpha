@@ -149,12 +149,10 @@ export class FacilityPlanningSystem extends System {
         addFacilityModule(facility, facilityModule.create(this.sim, facility));
       }
 
-      if (Math.random() < 0.2) {
-        addFacilityModule(
-          facility,
-          facilityModules.smallDefense.create(this.sim, facility)
-        );
-      }
+      addFacilityModule(
+        facility,
+        facilityModules.smallDefense.create(this.sim, facility)
+      );
       addStartingCommodities(facility);
     });
   };
@@ -200,6 +198,10 @@ export class FacilityPlanningSystem extends System {
         }
 
         addStartingCommodities(facility);
+        addFacilityModule(
+          facility,
+          facilityModules.smallDefense.create(this.sim, facility)
+        );
       });
   };
 
@@ -283,6 +285,10 @@ export class FacilityPlanningSystem extends System {
         });
         facility.cp.name.value = createFacilityName(facility, "Factory");
         facility.addComponent(createCompoundProduction());
+        addFacilityModule(
+          facility,
+          facilityModules.smallDefense.create(this.sim, facility)
+        );
       }
 
       const facilityModule = buildQueue.pop()!;
@@ -292,12 +298,6 @@ export class FacilityPlanningSystem extends System {
         facilityModules.containerSmall.create(this.sim, facility)
       );
       addFacilityModule(facility, facilityModule.create(this.sim, facility));
-      if (Math.random() < 0.2) {
-        addFacilityModule(
-          facility,
-          facilityModules.smallDefense.create(this.sim, facility)
-        );
-      }
     }
 
     console.log(`Faction ${faction.cp.name.slug}`);
