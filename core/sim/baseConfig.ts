@@ -8,6 +8,7 @@ import { TauHarassingSystem } from "@core/systems/ai/tauHarassing";
 import { AsteroidSpawningSystem } from "@core/systems/asteroidSpawning";
 import { AttackingSystem } from "@core/systems/attacking";
 import { BudgetPlanningSystem } from "@core/systems/budgetPlanning";
+import { CollectibleUnregisteringSystem } from "@core/systems/collectibleUnregistering";
 import { CooldownUpdatingSystem } from "@core/systems/cooldowns";
 import { DeadUnregisteringSystem } from "@core/systems/deadUnregistering";
 import { DisposableUnregisteringSystem } from "@core/systems/disposableUnregistering";
@@ -59,5 +60,6 @@ export const createBaseConfig = (): SimConfig => ({
     new ShipReturningSystem(),
     new DisposableUnregisteringSystem(),
     new DeadUnregisteringSystem(),
+    new CollectibleUnregisteringSystem(),
   ],
 });

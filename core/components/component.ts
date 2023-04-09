@@ -40,6 +40,7 @@ import type { Damage } from "./damage";
 import type { Model } from "./model";
 import type { Disposable } from "./disposable";
 import type { Subordinates } from "./subordinates";
+import type { CreationDate } from "./creationDate";
 
 export interface CoreComponents {
   ai: Ai;
@@ -53,6 +54,7 @@ export interface CoreComponents {
   color: Color;
   commander: Commander;
   compoundProduction: CompoundProduction;
+  creationDate: CreationDate;
   damage: Damage;
   deployable: Deployable;
   disposable: Disposable;

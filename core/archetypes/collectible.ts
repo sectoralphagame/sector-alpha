@@ -7,6 +7,7 @@ import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 
 export const collectibleComponents = [
+  "creationDate",
   "position",
   "render",
   "simpleCommodityStorage",
@@ -46,6 +47,10 @@ export function createCollectible(
         layer: "collectible",
       })
     )
+    .addComponent({
+      name: "creationDate",
+      date: sim.getTime(),
+    })
     .addTag("collectible")
     .addTag("selection");
 
