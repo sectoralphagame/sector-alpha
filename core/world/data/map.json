@@ -441,6 +441,8 @@
           "minerA",
           "fighter",
           "gunboat",
+          "facilityStarter",
+          "facilityBuilder",
           "largeMinerA"
         ],
         "facilityModules": [
@@ -489,6 +491,8 @@
           "minerB",
           "fighter",
           "gunboat",
+          "facilityStarter",
+          "facilityBuilder",
           "largeMinerA"
         ],
         "facilityModules": [
@@ -570,6 +574,8 @@
           "minerB",
           "fighter",
           "gunboat",
+          "facilityStarter",
+          "facilityBuilder",
           "largeMinerA"
         ],
         "facilityModules": [
@@ -611,6 +617,8 @@
           "minerB",
           "fighter",
           "gunboat",
+          "facilityStarter",
+          "facilityBuilder",
           "largeMinerA"
         ],
         "facilityModules": [
@@ -652,6 +660,8 @@
           "minerA",
           "fighter",
           "gunboat",
+          "facilityStarter",
+          "facilityBuilder",
           "largeMinerA"
         ],
         "facilityModules": [
@@ -692,6 +702,8 @@
           "minerA",
           "fighter",
           "gunboat",
+          "facilityStarter",
+          "facilityBuilder",
           "largeMinerA"
         ],
         "facilityModules": [
