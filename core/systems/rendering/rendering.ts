@@ -15,13 +15,13 @@ import { clearFocus } from "../../components/selection";
 import type { Layer } from "../../components/render";
 import { destroy, setTexture } from "../../components/render";
 
-const minScale = 0.025;
-const maxScale = 20;
+const minScale = 0.08;
+const maxScale = 40;
 
 const layerScaleThresholds: Partial<Record<Layer, number>> = {
-  collectible: 0.15,
-  facility: 0.065,
-  ship: 0.1,
+  collectible: 0.6,
+  facility: 0.13,
+  ship: 0.4,
 };
 
 function drawHpBars(entity: RequireComponent<"render">) {
