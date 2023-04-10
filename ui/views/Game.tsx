@@ -17,6 +17,7 @@ import {
 } from "@ui/components/MapPanel/MapPanelButton";
 import { TradeFinder } from "@ui/components/TradeFinder";
 import { Relations } from "@ui/components/Relations/Relations";
+import { Overlay } from "@ui/components/Overlay/Overlay";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -136,24 +137,6 @@ export const Game: React.FC = () => {
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div>
-      <Panel entity={selectedEntity} />
-      {menu.active && !!menu.sector && (
-        <ClickAwayListener
-          mouseEvent="mousedown"
-          onClickAway={() => setMenu({ ...menu, active: false })}
-        >
-          <div
-            className={styles.menu}
-            style={{ top: menu.position[1], left: menu.position[0] }}
-          >
-            <Dropdown onClick={() => setMenu({ ...menu, active: false })}>
-              <DropdownOptions static>
-                <ContextMenu />
-              </DropdownOptions>
-            </Dropdown>
-          </div>
-        </ClickAwayListener>
-      )}
       {/* This div is managed by react so each render would override
       any changes made by pixi, like cursor property. That's why rendering
       system creates own canvas here */}
@@ -179,6 +162,25 @@ export const Game: React.FC = () => {
           </MapPanelTabContent>
         </MapPanel>
       </div>
+      <Panel entity={selectedEntity} />
+      {menu.active && !!menu.sector && (
+        <ClickAwayListener
+          mouseEvent="mousedown"
+          onClickAway={() => setMenu({ ...menu, active: false })}
+        >
+          <div
+            className={styles.menu}
+            style={{ top: menu.position[1], left: menu.position[0] }}
+          >
+            <Dropdown onClick={() => setMenu({ ...menu, active: false })}>
+              <DropdownOptions static>
+                <ContextMenu />
+              </DropdownOptions>
+            </Dropdown>
+          </div>
+        </ClickAwayListener>
+      )}
+      <Overlay active />
     </div>
   );
 };

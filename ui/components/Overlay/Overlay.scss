@@ -1,0 +1,12 @@
+.root {
+  background-color: #000000;
+  transition: opacity 300ms, transform 0s;
+  height: 100vh;
+  width: 100vw;
+  opacity: 0;
+}
+
+.active {
+  opacity: 1;
+  transform: translateY(-100vh);
+}
