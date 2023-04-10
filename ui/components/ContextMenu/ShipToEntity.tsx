@@ -1,5 +1,6 @@
 import { matrix } from "mathjs";
 import React from "react";
+import type { Waypoint } from "@core/archetypes/waypoint";
 import { createWaypoint } from "@core/archetypes/waypoint";
 import { getSelected, getSelectedSecondary } from "@core/components/selection";
 import { moveToActions } from "@core/utils/moving";
@@ -7,6 +8,7 @@ import { DropdownOption } from "@kit/Dropdown";
 import { relationThresholds } from "@core/components/relations";
 import { isOwnedByPlayer } from "@core/utils/misc";
 import { addSubordinate } from "@core/components/subordinates";
+import { findInAncestors } from "@core/utils/findInAncestors";
 import { useContextMenu, useGameDialog, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
@@ -138,6 +140,31 @@ export const ShipToEntity: React.FC = () => {
       },
     });
   };
+
+  const teleportModule = actionable.cp.modules?.ids
+    .map(sim.getOrThrow)
+    .find((e) => e.hasComponents(["teleport"]));
+
+  const onTeleport = () => {
+    entity.cp.orders.value.push({
+      origin: "manual",
+      actions: moveToActions(
+        entity,
+        findInAncestors(
+          sim.getOrThrow(
+            teleportModule!.requireComponents(["teleport"]).cp.teleport
+              .destinationId!
+          ),
+          "position"
+        )
+      ),
+      type: "move",
+    });
+  };
+
+  if (teleportModule) {
+    return <DropdownOption onClick={onTeleport}>Jump</DropdownOption>;
+  }
 
   return (
     <>
