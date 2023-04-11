@@ -65,5 +65,6 @@ module.exports = {
     ],
     "import/no-cycle": ["error", { maxDepth: Infinity }],
     "@typescript-eslint/consistent-type-imports": "error",
+    "no-shadow": ["error", { allow: ["_"] }],
   },
 };

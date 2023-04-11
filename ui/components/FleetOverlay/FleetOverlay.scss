@@ -1,0 +1,49 @@
+.root {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+}
+
+.fleet {
+  &Commander {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-1);
+  }
+  &Expand {
+    transform: rotate(-90deg);
+    margin-left: calc(2.5 * var(--spacing-1));
+  }
+  &Expanded {
+    transform: rotate(0deg);
+  }
+}
+
+.hr {
+  margin: var(--spacing-4) 0;
+}
+
+.ship {
+  appearance: none;
+  background: none;
+  border: none;
+  margin-left: calc(5 * var(--spacing-1));
+  text-align: left;
+  color: var(--palette-text);
+  cursor: pointer;
+  padding: 3px 0;
+  width: fill-available;
+  width: -webkit-fill-available;
+
+  &Active {
+    background-color: var(--palette-background-active);
+  }
+
+  &NoMargin {
+    margin-left: 0;
+  }
+
+  &Order {
+    float: right;
+    text-align: right;
+  }
+}

@@ -16,5 +16,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--spacing-2);
+
+  & > * {
+    position: relative;
+
+    &:not(:last-child):after {
+      height: 1rem;
+      width: 1px;
+      position: absolute;
+      top: 0;
+      right: calc(var(--spacing-1) * -1);
+      background-color: var(--palette-default);
+      display: block;
+      content: "";
+    }
+  }
+}
+
+.money {
   pointer-events: none;
 }

@@ -1,12 +1,20 @@
 .root {
   background-color: #000000;
-  transition: opacity 300ms, transform 0s;
+  transition: opacity 200ms, transform 0s;
+  transition-delay: transform 200ms;
   height: 100vh;
   width: 100vw;
   opacity: 0;
+  padding: var(--spacing-4);
+  transform: translateY(0);
 }
 
 .active {
   opacity: 1;
+  transform: translateY(-100vh);
+}
+
+.closing {
+  opacity: 0;
   transform: translateY(-100vh);
 }

@@ -1,6 +1,5 @@
 import { matrix } from "mathjs";
 import React from "react";
-import type { Waypoint } from "@core/archetypes/waypoint";
 import { createWaypoint } from "@core/archetypes/waypoint";
 import { getSelected, getSelectedSecondary } from "@core/components/selection";
 import { moveToActions } from "@core/utils/moving";

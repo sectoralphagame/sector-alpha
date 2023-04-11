@@ -18,10 +18,16 @@ import {
 import { TradeFinder } from "@ui/components/TradeFinder";
 import { Relations } from "@ui/components/Relations/Relations";
 import { Overlay } from "@ui/components/Overlay/Overlay";
+import { FleetOverlay } from "@ui/components/FleetOverlay/FleetOverlay";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
-import { useContextMenu, useGameDialog, useSim } from "../atoms";
+import {
+  useContextMenu,
+  useGameDialog,
+  useGameOverlay,
+  useSim,
+} from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
 import { PlayerMoney } from "../components/PlayerMoney";
 
@@ -31,6 +37,7 @@ export const Game: React.FC = () => {
   const canvasRoot = React.useRef<HTMLDivElement>(null);
   const [menu, setMenu] = useContextMenu();
   const [dialog, setDialog] = useGameDialog();
+  const [overlay, setOverlay] = useGameOverlay();
 
   const selectedId = sim?.queries.settings.get()[0]!.cp.selectionManager.id;
   const [selectedEntity, setSelectedEntity] = React.useState<
@@ -163,6 +170,9 @@ export const Game: React.FC = () => {
         </MapPanel>
       </div>
       <Panel entity={selectedEntity} />
+      <Overlay open={!!overlay} onClose={() => setOverlay(null)}>
+        <FleetOverlay />
+      </Overlay>
       {menu.active && !!menu.sector && (
         <ClickAwayListener
           mouseEvent="mousedown"
@@ -180,7 +190,6 @@ export const Game: React.FC = () => {
           </div>
         </ClickAwayListener>
       )}
-      <Overlay active />
     </div>
   );
 };

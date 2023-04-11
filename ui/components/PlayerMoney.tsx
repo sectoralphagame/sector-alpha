@@ -1,11 +1,15 @@
+import { IconButton } from "@kit/IconButton";
 import React from "react";
-import { useSim } from "../atoms";
+import SVG from "react-inlinesvg";
+import fleetIcon from "@assets/ui/fleet.svg";
+import { useGameOverlay, useSim } from "../atoms";
 import { useRerender } from "../hooks/useRerender";
 import styles from "./PlayerMoney.scss";
 
 export const PlayerMoney: React.FC = () => {
   const [sim] = useSim();
   const [player, setPlayer] = React.useState(sim.queries.player.get()[0]);
+  const [, setOverlay] = useGameOverlay();
 
   useRerender(1000);
 
@@ -20,7 +24,12 @@ export const PlayerMoney: React.FC = () => {
 
   return (
     <div id="money" className={styles.root}>
-      {player.cp.budget!.available.toFixed(0)} UTT
+      <span className={styles.money}>
+        {player.cp.budget!.available.toFixed(0)} UTT
+      </span>
+      <IconButton variant="naked" onClick={() => setOverlay("fleet")}>
+        <SVG src={fleetIcon} />
+      </IconButton>
     </div>
   );
 };

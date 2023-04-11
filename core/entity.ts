@@ -122,11 +122,17 @@ export class Entity {
   }
 }
 
+let pureEntityCounter = 0;
 export class PureEntity {
   components = new EntityComponents() as Partial<CoreComponents>;
   cooldowns = new Cooldowns<string>();
   tags: Set<string>;
   id: number;
+
+  constructor() {
+    this.id = pureEntityCounter;
+    pureEntityCounter++;
+  }
 
   get cp(): Partial<CoreComponents> {
     return this.components;

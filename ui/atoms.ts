@@ -41,3 +41,11 @@ export const gameDialog = atom<GameDialogProps>({
   default: null,
 });
 export const useGameDialog = () => useRecoilState(gameDialog);
+
+export type GameOverlayProps = "fleet" | null;
+
+export const gameOverlay = atom<GameOverlayProps>({
+  key: "gameOverlay",
+  default: null,
+});
+export const useGameOverlay = () => useRecoilState(gameOverlay);
