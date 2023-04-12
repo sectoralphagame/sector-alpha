@@ -4,7 +4,6 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import chevronIcon from "@assets/ui/chevron_down.svg";
 import clsx from "clsx";
-import { useContextMenu } from "@ui/atoms";
 import styles from "./FleetOverlay.scss";
 
 type Ship = RequireComponent<"name" | "autoOrder">;
@@ -17,8 +16,11 @@ export interface FleetOverlayComponentProps {
   fleets: Fleet[];
   unassigned: Ship[];
   selected: number | undefined;
+  onContextMenu: (
+    _id: number,
+    _event: React.MouseEvent<HTMLButtonElement>
+  ) => void;
   onSelect: (_id: number) => void;
-  onTarget: (_id: number) => void;
   onFocus: () => void;
 }
 
@@ -158,64 +160,44 @@ export const FleetOverlayComponent: React.FC<FleetOverlayComponentProps> = ({
   unassigned,
   selected,
   onSelect,
-  onTarget,
+  onContextMenu,
   onFocus,
-}) => {
-  const [, setMenu] = useContextMenu();
-  const onContextMenu = (
-    id: number,
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    event.preventDefault();
-    onTarget(id);
-    if (id !== selected) {
-      setMenu({
-        active: true,
-        position: [event.clientX, event.clientY],
-        worldPosition: undefined!,
-        sector: null,
-        overlay: true,
-      });
-    }
-  };
+}) => (
+  <div className={styles.root}>
+    <div>
+      <h1>Your Fleets</h1>
+      {fleets.length === 0
+        ? "You currently have no fleets"
+        : fleets.map((fleet) => (
+            <FleetComponent
+              key={fleet.commander.id}
+              fleet={fleet}
+              onSelect={onSelect}
+              selected={selected}
+              onFocus={onFocus}
+              onContextMenu={onContextMenu}
+            />
+          ))}
 
-  return (
-    <div className={styles.root}>
-      <div>
-        <h1>Your Fleets</h1>
-        {fleets.length === 0
-          ? "You currently have no fleets"
-          : fleets.map((fleet) => (
-              <FleetComponent
-                key={fleet.commander.id}
-                fleet={fleet}
-                onSelect={onSelect}
+      {unassigned.length > 0 && (
+        <>
+          <hr className={styles.hr} />
+          <h1>Unassigned Ships</h1>
+          <div>
+            {unassigned.map((ship) => (
+              <ShipButton
+                className={styles.shipNoMargin}
+                key={ship.id}
+                ship={ship}
                 selected={selected}
                 onFocus={onFocus}
+                onSelect={onSelect}
                 onContextMenu={onContextMenu}
               />
             ))}
-
-        {unassigned.length > 0 && (
-          <>
-            <hr className={styles.hr} />
-            <h1>Unassigned Ships</h1>
-            <div>
-              {unassigned.map((ship) => (
-                <ShipButton
-                  className={styles.shipNoMargin}
-                  key={ship.id}
-                  ship={ship}
-                  selected={selected}
-                  onFocus={onFocus}
-                  onSelect={onSelect}
-                  onContextMenu={onContextMenu}
-                />
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
-  );
-};
+  </div>
+);

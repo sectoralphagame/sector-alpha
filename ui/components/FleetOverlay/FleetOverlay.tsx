@@ -1,7 +1,7 @@
 import type { Ship } from "@core/archetypes/ship";
 import { getSelected } from "@core/components/selection";
 import { filter, map, pipe, toArray } from "@fxts/core";
-import { useGameOverlay, useSim } from "@ui/atoms";
+import { useContextMenu, useGameOverlay, useSim } from "@ui/atoms";
 import React from "react";
 import { FleetOverlayComponent } from "./FleetOverlayComponent";
 
@@ -11,6 +11,7 @@ export const FleetOverlay: React.FC = () => {
   const [selected, setSelectedState] = React.useState<number | undefined>(
     getSelected(sim)?.id
   );
+  const [, setMenu] = useContextMenu();
 
   const setSelected = (id: number) => {
     sim.queries.settings.get()[0].cp.selectionManager.id = id;
@@ -22,6 +23,22 @@ export const FleetOverlay: React.FC = () => {
   };
   const onTarget = (id: number) => {
     sim.queries.settings.get()[0].cp.selectionManager.secondaryId = id;
+  };
+  const onContextMenu = (
+    id: number,
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+    onTarget(id);
+    if (id !== selected) {
+      setMenu({
+        active: true,
+        position: [event.clientX, event.clientY],
+        worldPosition: undefined!,
+        sector: null,
+        overlay: true,
+      });
+    }
   };
 
   const player = sim.queries.player.get()[0]!;
@@ -65,6 +82,7 @@ export const FleetOverlay: React.FC = () => {
       fleets={fleets}
       unassigned={unassigned}
       selected={selected}
+      onContextMenu={onContextMenu}
       onSelect={setSelected}
       onFocus={onFocus}
       onTarget={onTarget}
