@@ -35,6 +35,7 @@ export function ship(entity: Entity): Ship {
 }
 
 export interface InitialShipInput extends ShipInput {
+  angle?: number;
   position: Matrix;
   owner: Faction;
   sector: Sector;
@@ -82,7 +83,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
     .addComponent({ name: "owner", id: initial.owner.id })
     .addComponent({
       name: "position",
-      angle: 0,
+      angle: initial.angle ?? 0,
       coord: initial.position,
       sector: initial.sector.id,
       moved: false,

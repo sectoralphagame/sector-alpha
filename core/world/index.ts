@@ -1,5 +1,5 @@
 import { createSector, sectorSize } from "@core/archetypes/sector";
-import { matrix, random } from "mathjs";
+import { add, matrix, random } from "mathjs";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { AiType } from "@core/components/ai";
 import { requestShip } from "@core/systems/ai/shipPlanning";
@@ -171,12 +171,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     player.addComponent(createBudget());
     player.addTag("player");
     changeBudgetMoney(player.cp.budget, 5000);
-    player.cp.name.slug = "PLA";
     const startingSector = getSector("sector-alpha");
-    player.cp.blueprints.facilityModules.push(
-      facilityModules.containerSmall,
-      facilityModules.farm
-    );
 
     const playerShip = createShip(sim, {
       ...pickRandom(
@@ -184,9 +179,10 @@ export function getFixedWorld(sim: Sim): Promise<void> {
           ({ role, size }) => role === "transport" && size === "small"
         )
       ),
-      position: hecsToCartesian(
-        startingSector.cp.hecsPosition.value,
-        sectorSize / 10
+      angle: random(-Math.PI, Math.PI),
+      position: add(
+        hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
+        matrix([random(-1, 1), random(-1, 1)])
       ),
       owner: player,
       sector: startingSector,
@@ -195,9 +191,10 @@ export function getFixedWorld(sim: Sim): Promise<void> {
 
     const builderShip = createShip(sim, {
       ...pickRandom(shipClasses.filter(({ role }) => role === "building")),
-      position: hecsToCartesian(
-        startingSector.cp.hecsPosition.value,
-        sectorSize / 10
+      angle: random(-Math.PI, Math.PI),
+      position: add(
+        hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
+        matrix([random(-1, 1), random(-1, 1)])
       ),
       owner: player,
       sector: startingSector,
@@ -206,9 +203,10 @@ export function getFixedWorld(sim: Sim): Promise<void> {
 
     const storageShip = createShip(sim, {
       ...pickRandom(shipClasses.filter(({ role }) => role === "storage")),
-      position: hecsToCartesian(
-        startingSector.cp.hecsPosition.value,
-        sectorSize / 10
+      angle: random(-Math.PI, Math.PI),
+      position: add(
+        hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
+        matrix([random(-1, 1), random(-1, 1)])
       ),
       owner: player,
       sector: startingSector,
