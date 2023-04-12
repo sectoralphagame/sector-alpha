@@ -85,7 +85,6 @@ export const FleetOverlay: React.FC = () => {
       onContextMenu={onContextMenu}
       onSelect={setSelected}
       onFocus={onFocus}
-      onTarget={onTarget}
     />
   );
 };
