@@ -132,6 +132,12 @@ export const Game: React.FC = () => {
       if (event.code === "Escape") {
         setDialog(dialog ? null : { type: "config" });
       }
+
+      if (event.target instanceof HTMLInputElement) return;
+
+      if (event.code === "KeyF") {
+        setOverlay((prev) => (prev === "fleet" ? null : "fleet"));
+      }
     };
 
     document.addEventListener("keydown", handler);
