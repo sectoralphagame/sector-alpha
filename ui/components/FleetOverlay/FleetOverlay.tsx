@@ -20,6 +20,9 @@ export const FleetOverlay: React.FC = () => {
     sim.queries.settings.get()[0].cp.selectionManager.focused = true;
     setOverlay(null);
   };
+  const onTarget = (id: number) => {
+    sim.queries.settings.get()[0].cp.selectionManager.secondaryId = id;
+  };
 
   const player = sim.queries.player.get()[0]!;
   const fleets = React.useMemo(
@@ -64,6 +67,7 @@ export const FleetOverlay: React.FC = () => {
       selected={selected}
       onSelect={setSelected}
       onFocus={onFocus}
+      onTarget={onTarget}
     />
   );
 };

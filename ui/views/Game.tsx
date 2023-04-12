@@ -173,7 +173,7 @@ export const Game: React.FC = () => {
       <Overlay open={!!overlay} onClose={() => setOverlay(null)}>
         <FleetOverlay />
       </Overlay>
-      {menu.active && !!menu.sector && (
+      {menu.active && (!!menu.sector || menu.overlay) && (
         <ClickAwayListener
           mouseEvent="mousedown"
           onClickAway={() => setMenu({ ...menu, active: false })}

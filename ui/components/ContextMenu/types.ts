@@ -5,4 +5,5 @@ export interface ContextMenu {
   position: number[];
   worldPosition: number[];
   sector: Sector | null;
+  overlay?: boolean;
 }
