@@ -162,6 +162,22 @@ export const FleetOverlayComponent: React.FC<FleetOverlayComponentProps> = ({
   onFocus,
 }) => {
   const [, setMenu] = useContextMenu();
+  const onContextMenu = (
+    id: number,
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+    onTarget(id);
+    if (id !== selected) {
+      setMenu({
+        active: true,
+        position: [event.clientX, event.clientY],
+        worldPosition: undefined!,
+        sector: null,
+        overlay: true,
+      });
+    }
+  };
 
   return (
     <div className={styles.root}>
@@ -176,16 +192,7 @@ export const FleetOverlayComponent: React.FC<FleetOverlayComponentProps> = ({
                 onSelect={onSelect}
                 selected={selected}
                 onFocus={onFocus}
-                onContextMenu={(id: number, event) => {
-                  event.preventDefault();
-                  onTarget(id);
-                  setMenu({
-                    active: true,
-                    position: [event.clientX, event.clientY],
-                    worldPosition: undefined!,
-                    sector: undefined!,
-                  });
-                }}
+                onContextMenu={onContextMenu}
               />
             ))}
 
@@ -202,17 +209,7 @@ export const FleetOverlayComponent: React.FC<FleetOverlayComponentProps> = ({
                   selected={selected}
                   onFocus={onFocus}
                   onSelect={onSelect}
-                  onContextMenu={(id, event) => {
-                    event.preventDefault();
-                    onTarget(id);
-                    setMenu({
-                      active: true,
-                      position: [event.clientX, event.clientY],
-                      worldPosition: undefined!,
-                      sector: null,
-                      overlay: true,
-                    });
-                  }}
+                  onContextMenu={onContextMenu}
                 />
               ))}
             </div>
