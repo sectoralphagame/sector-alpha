@@ -44,7 +44,10 @@ export function createTheme(scale: number): Theme {
       "background-active": "#1e1e1e",
       default: "#FFFFFF",
       text: fromPairs(
-        texts.map((v) => [v, Color.hsl(0, 0, (100 - (v - 1) * 20) * 0.9).hex()])
+        texts.map((v) => [
+          v,
+          Color.hsl(0, 0, (100 - (v - 1) * 20) * 0.85).hex(),
+        ])
       ) as Record<(typeof texts)[number], string>,
       disabled: Color.hsl(0, 0, 70).hex(),
       border: Color.hsl(0, 0, 60).hex(),
