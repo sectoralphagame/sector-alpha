@@ -41,6 +41,7 @@ import type { Model } from "./model";
 import type { Disposable } from "./disposable";
 import type { Subordinates } from "./subordinates";
 import type { CreationDate } from "./creationDate";
+import type { Missions } from "./missions";
 
 export interface CoreComponents {
   ai: Ai;
@@ -68,6 +69,7 @@ export interface CoreComponents {
   journal: Journal;
   minable: Minable;
   mining: Mining;
+  missions: Missions;
   model: Model;
   modules: Modules;
   name: Name;

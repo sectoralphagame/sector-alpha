@@ -16,6 +16,7 @@ import { FacilityBuildingSystem } from "@core/systems/facilityBuilding";
 import { HitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating";
 import { InflationStatisticGatheringSystem } from "@core/systems/inflationStatisticGathering";
 import { MiningSystem } from "@core/systems/mining";
+import { MissionGeneratingSystem } from "@core/systems/missionGenerating";
 import { MovingSystem } from "@core/systems/moving";
 import { NavigatingSystem } from "@core/systems/navigating";
 import { OrderExecutingSystem } from "@core/systems/orderExecuting/orderExecuting";
@@ -61,5 +62,6 @@ export const createBaseConfig = (): SimConfig => ({
     new DisposableUnregisteringSystem(),
     new DeadUnregisteringSystem(),
     new CollectibleUnregisteringSystem(),
+    new MissionGeneratingSystem(),
   ],
 });

@@ -169,6 +169,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     player.addTag("player");
     player.removeComponent("ai").removeComponent("budget");
     player.addComponent(createBudget());
+    player.addComponent({ name: "missions", value: [], offer: null });
     player.addTag("player");
     changeBudgetMoney(player.cp.budget, 5000);
     const startingSector = getSector("sector-alpha");

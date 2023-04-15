@@ -2,7 +2,14 @@ import clsx from "clsx";
 import React from "react";
 import styles from "./Text.scss";
 
-export type TextColor = "default" | "disabled";
+export type TextColor =
+  | "default"
+  | "disabled"
+  | "text-1"
+  | "text-2"
+  | "text-3"
+  | "text-4"
+  | "text-5";
 export type TextVariant = "default" | "h1" | "h2" | "caption";
 
 export interface TextProps extends React.HTMLAttributes<HTMLElement> {
@@ -35,6 +42,11 @@ const Text: React.FC<TextProps> = ({
         [styles.colorDefault]: color === "default",
         [styles.colorDisabled]: color === "disabled",
       })}
+      style={
+        [1, 2, 3, 4, 5].map((v) => `text-${v}`).includes(color)
+          ? { color: `var(--palette-text-${color.split("text-")[1]})` }
+          : {}
+      }
       {...props}
     />
   );

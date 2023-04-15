@@ -20,6 +20,7 @@ export interface Theme {
     warning: string;
     error: string;
     success: string;
+    active: string;
   };
   typography: {
     button: string;
@@ -30,6 +31,9 @@ export interface Theme {
     header2: string;
   };
 }
+
+const getColor = (v: number): string =>
+  Color.hsl(0, 0, (100 - (v - 1) * 20) * 0.85).hex();
 
 export function createTheme(scale: number): Theme {
   const baseFontSize = 14 * scale;
@@ -43,17 +47,16 @@ export function createTheme(scale: number): Theme {
       background: "#000000",
       "background-active": "#1e1e1e",
       default: "#FFFFFF",
-      text: fromPairs(
-        texts.map((v) => [
-          v,
-          Color.hsl(0, 0, (100 - (v - 1) * 20) * 0.85).hex(),
-        ])
-      ) as Record<(typeof texts)[number], string>,
-      disabled: Color.hsl(0, 0, 70).hex(),
+      text: fromPairs(texts.map((v) => [v, getColor(v)])) as Record<
+        (typeof texts)[number],
+        string
+      >,
+      disabled: getColor(4),
       border: Color.hsl(0, 0, 60).hex(),
       warning: "#ffe645",
       error: "#ff5b45",
       success: "#52fa6e",
+      active: "#9578ff",
     },
     typography: {
       button: `${baseFontSize * 0.875}px`,

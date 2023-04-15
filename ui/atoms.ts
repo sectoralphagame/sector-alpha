@@ -7,6 +7,7 @@ import type { FacilityModuleManagerProps } from "./components/FacilityModuleMana
 import type { FacilityMoneyManagerProps } from "./components/FacilityMoneyManager ";
 import type { FacilityTradeManagerProps } from "./components/FacilityTradeManager";
 import type { ShipyardDialogProps } from "./components/ShipyardDialog";
+import type { MissionDialogProps } from "./components/MissionDialog";
 
 export const sim = atom<Sim>({
   key: "sim",
@@ -34,6 +35,7 @@ export type GameDialogProps =
   | FacilityMoneyManagerProps
   | FacilityTradeManagerProps
   | ShipyardDialogProps
+  | MissionDialogProps
   | null;
 
 export const gameDialog = atom<GameDialogProps>({

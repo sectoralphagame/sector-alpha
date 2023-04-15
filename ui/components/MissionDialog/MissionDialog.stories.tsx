@@ -4,21 +4,21 @@ import { Styles } from "@kit/theming/style";
 import type { StoryFn } from "@storybook/react";
 import React from "react";
 
-import type { MissionDialogProps } from "./MissionDialog";
-import { MissionDialog } from "./MissionDialog";
+import type { MissionDialogComponentProps } from "./MissionDialogComponent";
+import { MissionDialogComponent } from "./MissionDialogComponent";
 
 export default {
   title: "Dialogs / Mission",
-  component: MissionDialog,
+  component: MissionDialogComponent,
   parameters: {
     layout: "fullscreen",
   },
 };
 
-const Template: StoryFn<MissionDialogProps> = (args) => (
+const Template: StoryFn<MissionDialogComponentProps> = (args) => (
   <div id="root">
     <Styles>
-      <MissionDialog {...args} />
+      <MissionDialogComponent {...args} />
     </Styles>
   </div>
 );

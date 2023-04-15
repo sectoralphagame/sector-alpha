@@ -10,7 +10,7 @@
 
   button {
     &:hover {
-      color: var(--palette-success);
+      color: var(--palette-active);
     }
     text-align: left;
     appearance: none;
@@ -18,7 +18,7 @@
     border: none;
     padding: 0;
     cursor: pointer;
-    color: var(--palette-text);
+    color: var(--palette-text-1);
     font-size: var(--typography-default);
     transition: 200ms;
   }

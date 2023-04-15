@@ -67,7 +67,7 @@ export const ShipyardDialogComponent: React.FC<
                 {!showCommodityCost && (
                   <>
                     <br />
-                    <Text color="disabled" variant="caption">
+                    <Text color="text-2" variant="caption">
                       {bp.cost} UTT
                     </Text>
                   </>

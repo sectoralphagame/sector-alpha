@@ -43,6 +43,7 @@ export const Game: React.FC = () => {
   const [selectedEntity, setSelectedEntity] = React.useState<
     Entity | undefined
   >(selectedId ? sim?.get(selectedId) : undefined);
+  const player = sim.queries.player.get()[0]!;
 
   React.useEffect(() => {
     if (!sim) return () => undefined;
@@ -73,8 +74,7 @@ export const Game: React.FC = () => {
       addMoney: (quantity: number, id?: number) => {
         const entity = id
           ? sim.getOrThrow(id)
-          : (window.selected as Entity | undefined) ??
-            sim.queries.player.get()[0]!;
+          : (window.selected as Entity | undefined) ?? player;
         changeBudgetMoney(entity.cp.budget!, quantity);
       },
     };
@@ -144,6 +144,12 @@ export const Game: React.FC = () => {
 
     return () => document.removeEventListener("keydown", handler);
   }, [setDialog]);
+
+  React.useEffect(() => {
+    if (player.cp.missions.offer) {
+      setDialog({ type: "missionOffer" });
+    }
+  }, [player.cp.missions.offer]);
 
   useRerender(250);
 

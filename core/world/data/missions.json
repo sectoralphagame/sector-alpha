@@ -1,0 +1,72 @@
+{
+  "patrol": [
+    {
+      "title": "Patrol",
+      "actorName": "Local Police",
+      "description": "We urgently need your fleet's assistance in patrolling {{sector}} for the next {{time}} due to a surge in crime. Can you provide support?",
+      "responses": [
+        {
+          "text": "Affirmative. My fleet will deploy to {{sector}} and conduct patrols as requested.",
+          "next": "Thank you, Commander. Your fleet's assistance will greatly aid us in addressing the surge in crime.",
+          "type": "accept"
+        },
+        {
+          "text": "Negative. My fleet is currently unavailable for patrols in {{sector}}.",
+          "next": "Understood, Commander. We will have to allocate other resources to address the situation in {{sector}}.",
+          "type": "decline"
+        }
+      ]
+    },
+    {
+      "title": "Patrol",
+      "actorName": "Local Police",
+      "description": "There is an ongoing situation involving a large protest in {{sector}} that requires heightened security measures. Can your fleet provide patrols for the next {{time}}?",
+      "responses": [
+        {
+          "text": "Roger that. My fleet will be on standby to deploy to {{sector}} and assist with the security measures.",
+          "next": "We appreciate your willingness to assist with the security measures in {{sector}}. Your fleet's support will be invaluable.",
+          "type": "accept"
+        },
+        {
+          "text": "I regret to inform you that my fleet is unable to provide patrols in {{sector}} at this time.",
+          "next": "Understood, Commander. We will have to explore other options to ensure the security of {{sector}}.",
+          "type": "decline"
+        }
+      ]
+    },
+    {
+      "title": "Patrol",
+      "actorName": "Local Police",
+      "description": "We have received multiple reports of illegal activities in {{sector}}, including drug trafficking and vandalism. Can your fleet provide patrols for the next {{time}} to address this issue?",
+      "responses": [
+        {
+          "text": "Affirmative. My fleet will be dispatched to {{sector}} immediately to investigate and address the illegal activities.",
+          "next": "Thank you for your prompt action, Commander. Your fleet's assistance will greatly help us in addressing the illegal activities in {{sector}}.",
+          "type": "accept"
+        },
+        {
+          "text": "I'm afraid my fleet is currently engaged in other operations and won't be able to provide patrols in {{sector}}.",
+          "next": "Understood, Commander. We will have to allocate other resources to address the illegal activities in {{sector}}.",
+          "type": "decline"
+        }
+      ]
+    },
+    {
+      "title": "Patrol",
+      "actorName": "Local Police",
+      "description": "{{sector}} is hosting a high-profile event with VIPs attending, and we have received credible threats of potential security breaches. Can your fleet provide additional patrols for the event's security for the next {{time}}?",
+      "responses": [
+        {
+          "text": "Copy that. My fleet will provide heightened security patrols in {{sector}} to ensure the safety of the event and its attendees.",
+          "next": "We are relieved to hear that your fleet will provide additional security for the high-profile event in {{sector}}. Your support is highly appreciated.",
+          "type": "accept"
+        },
+        {
+          "text": "Unfortunately, my fleet is unable to provide additional patrols for the event's security at this time.",
+          "next": "Understood, Commander. We will have to explore other options to ensure the security of the event in {{sector}}.",
+          "type": "decline"
+        }
+      ]
+    }
+  ]
+}

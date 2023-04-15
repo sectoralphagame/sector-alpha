@@ -37,6 +37,7 @@ import { FacilityTradeManager } from "../FacilityTradeManager";
 import { Storage } from "../Storage/Storage";
 import { ShipyardDialog } from "../ShipyardDialog";
 import { SimpleStorage } from "../Storage";
+import { MissionDialog } from "../MissionDialog";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -248,6 +249,10 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
       />
       <ShipyardDialog
         open={dialog?.type === "shipyard"}
+        onClose={closeDialog}
+      />
+      <MissionDialog
+        open={dialog?.type === "missionOffer"}
         onClose={closeDialog}
       />
     </>
