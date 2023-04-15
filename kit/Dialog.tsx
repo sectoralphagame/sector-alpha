@@ -30,7 +30,7 @@ export const Dialog: React.FC<DialogProps> = ({
     onRequestClose={onClose}
     style={{
       content: {
-        backgroundColor: "rgb(0 0 0)",
+        backgroundColor: "rgb(8, 8, 8)",
         top: "50%",
         left: "50%",
         right: "auto",
@@ -39,6 +39,7 @@ export const Dialog: React.FC<DialogProps> = ({
         width: width ?? "300px",
         marginRight: "-50%",
         transform: "translate(-50%, -50%)",
+        borderColor: "var(--palette-border)",
       },
       overlay: {
         backgroundColor: "rgb(0 0 0 / 85%)",

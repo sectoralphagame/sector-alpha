@@ -9,7 +9,7 @@
   max-width: 300px;
   width: fit-content;
   background: var(--palette-background);
-  border: 1px solid var(--palette-default);
+  border: 1px solid var(--palette-border);
   border-radius: 4px;
   line-height: 1;
   height: 32px;
@@ -27,7 +27,7 @@
       position: absolute;
       top: 0;
       right: calc(var(--spacing-1) * -1);
-      background-color: var(--palette-default);
+      background-color: var(--palette-border);
       display: block;
       content: "";
     }

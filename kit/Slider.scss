@@ -7,7 +7,7 @@
     position: relative;
   }
   &::-webkit-slider-runnable-track {
-    background: var(--palette-background);
+    background: transparent;
     padding: 0;
     height: 15px;
     margin: 0;
@@ -16,7 +16,7 @@
     background: var(--palette-default);
     content: "";
     position: absolute;
-    top: 6px;
+    top: 9px;
     left: 0;
     height: 3px;
     width: 100%;
@@ -29,7 +29,7 @@
     }
   }
   appearance: none;
-  background: var(--palette-background);
+  background: transparent;
   cursor: pointer;
   margin: 0;
   position: relative;

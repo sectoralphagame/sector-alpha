@@ -56,7 +56,7 @@ const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
       });
 
       const lineSeries = chart.current!.addLineSeries({
-        color: getVar("--palette-default"),
+        color: getVar("--palette-text-1"),
         title: "Inflation (10 minute period)",
         priceFormat: {
           type: "custom",

@@ -44,7 +44,7 @@ export function createTheme(scale: number): Theme {
       "background-active": "#1e1e1e",
       default: "#FFFFFF",
       text: fromPairs(
-        texts.map((v) => [v, Color.hsl(0, 0, 100 - (v - 1) * 20).hex()])
+        texts.map((v) => [v, Color.hsl(0, 0, (100 - (v - 1) * 20) * 0.9).hex()])
       ) as Record<(typeof texts)[number], string>,
       disabled: Color.hsl(0, 0, 70).hex(),
       border: Color.hsl(0, 0, 60).hex(),
@@ -81,6 +81,14 @@ export const Styles: React.FC = ({ children }) => {
   const cssVariables = React.useRef(
     document.querySelector("style[data-css-variables]")
   );
+
+  React.useEffect(() => {
+    const styleTag = document.createElement("style");
+    document.head.append(styleTag);
+    styleTag.innerHTML =
+      // eslint-disable-next-line quotes
+      '@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap");';
+  }, []);
 
   React.useEffect(() => {
     if (!cssVariables.current) {

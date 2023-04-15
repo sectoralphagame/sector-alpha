@@ -1,0 +1,25 @@
+.log {
+}
+
+.responses {
+  border-top: 1px solid var(--palette-border);
+
+  li {
+    margin-bottom: var(--spacing-2);
+  }
+
+  button {
+    &:hover {
+      color: var(--palette-success);
+    }
+    text-align: left;
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--palette-text);
+    font-size: var(--typography-default);
+    transition: 200ms;
+  }
+}
