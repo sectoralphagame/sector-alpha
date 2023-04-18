@@ -55,7 +55,7 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
 
   return (
     <Dialog {...dialogProps} title={mission.title} width="550px">
-      <div>
+      <div className={styles.log}>
         {log.map((l) => (
           <p>
             {l.actor !== "world" && (

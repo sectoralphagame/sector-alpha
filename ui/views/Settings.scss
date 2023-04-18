@@ -4,3 +4,12 @@
   }
   width: 100%;
 }
+
+.settings {
+  &Row {
+    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 120px;
+    margin-bottom: var(--spacing-1);
+  }
+}

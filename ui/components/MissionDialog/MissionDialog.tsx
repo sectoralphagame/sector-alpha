@@ -1,4 +1,5 @@
 import { useGameDialog, useSim } from "@ui/atoms";
+import { useGameSettings } from "@ui/hooks/useGameSettings";
 import React from "react";
 import type { ModalProps } from "../ConfigDialog";
 import { MissionDialogComponent } from "./MissionDialogComponent";
@@ -10,9 +11,10 @@ export interface MissionDialogProps {
 export const MissionDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const [sim] = useSim();
   const [dialog] = useGameDialog();
+  const [settings] = useGameSettings();
 
   React.useEffect(() => {
-    if (dialog?.type === "missionOffer") {
+    if (dialog?.type === "missionOffer" && settings.pauseOnMissionOffer) {
       sim.pause();
     }
   }, [dialog]);
@@ -26,7 +28,9 @@ export const MissionDialog: React.FC<ModalProps> = ({ open, onClose }) => {
       onClose={() => {
         onClose();
         sim.queries.player.get()[0]!.cp.missions.offer = null;
-        sim.setSpeed(1);
+        if (settings.pauseOnMissionOffer) {
+          sim.setSpeed(1);
+        }
       }}
     />
   );

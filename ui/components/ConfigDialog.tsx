@@ -8,10 +8,10 @@ import { Button } from "@kit/Button";
 import { Input } from "@kit/Input";
 import { IconButton } from "@kit/IconButton";
 import { createBaseConfig } from "@core/sim/baseConfig";
+import { Settings } from "@ui/views/Settings";
 import { useLocation } from "../context/Location";
 import styles from "./ConfigDialog.scss";
 import { Saves } from "./Saves";
-import useFullscreen from "../hooks/useFullscreen";
 import { useSim } from "../atoms";
 
 export interface ModalProps {
@@ -31,7 +31,6 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const [saves, setSaves] = React.useState<Save[]>();
   const input = React.useRef<HTMLInputElement>(null);
   const navigate = useLocation();
-  const { fullscreenEnabled, toggle: toggleFullscreen } = useFullscreen();
   const [sim, setSim] = useSim();
 
   React.useEffect(() => {
@@ -140,11 +139,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             ))}
         </div>
       ) : (
-        <div>
-          <Button className={styles.buttonContainer} onClick={toggleFullscreen}>
-            {fullscreenEnabled ? "Disable Fullscreen" : "Enable Fullscreen"}
-          </Button>
-        </div>
+        <Settings />
       )}
     </Dialog>
   );

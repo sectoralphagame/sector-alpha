@@ -6,12 +6,12 @@ import { Game } from "./views/Game";
 import { LoadGame } from "./views/Load";
 import { Main } from "./views/Main";
 import { NewGame } from "./views/NewGame";
-import { Settings } from "./views/Settings";
+import { SettingsView } from "./views/Settings";
 
 const viewComponents: Record<View, React.FC> = {
   game: Game,
   main: Main,
-  settings: Settings,
+  settings: SettingsView,
   load: LoadGame,
   new: NewGame,
 };
