@@ -5,6 +5,7 @@ import settings from "@core/settings";
 import Mustache from "mustache";
 import { randomInt } from "mathjs";
 import { relationThresholds } from "@core/components/relations";
+import { formatTime } from "@core/utils/format";
 import { System } from "./system";
 import missions from "../world/data/missions.json";
 
@@ -45,13 +46,16 @@ export class MissionGeneratingSystem extends System {
           .get()
           .filter((s) => s.cp.owner?.id === faction.id)
       );
-      const time = randomInt(1, 8) * 15;
+      const time = randomInt(1, 8) * 15 * 60;
+      const reward = randomInt(80, 130) * 1000;
+
       const template = pickRandom(missions.patrol);
       const transform = (text: string) =>
         Mustache.render(text, {
           faction: faction.cp.name.value,
           sector: sector.cp.name.value,
-          time: `${time} minutes`,
+          time: formatTime(time),
+          reward,
         });
 
       player.cp.missions.offer = {

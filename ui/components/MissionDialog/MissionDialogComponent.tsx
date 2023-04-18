@@ -56,8 +56,8 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
   return (
     <Dialog {...dialogProps} title={mission.title} width="550px">
       <div className={styles.log}>
-        {log.map((l) => (
-          <p>
+        {log.map((l, lIndex) => (
+          <p key={lIndex}>
             {l.actor !== "world" && (
               <b>{l.actor === "npc" ? l.name : "You"}: </b>
             )}
@@ -69,8 +69,8 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
       {availableResponses.length > 0 && (
         <div className={styles.responses}>
           <ol>
-            {availableResponses.map((r) => (
-              <li>
+            {availableResponses.map((r, rIndex) => (
+              <li key={rIndex}>
                 <button
                   type="button"
                   onClick={() => {

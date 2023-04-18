@@ -3,7 +3,7 @@
     {
       "title": "Patrol",
       "actorName": "Local Police",
-      "description": "We urgently need your fleet's assistance in patrolling {{sector}} for the next {{time}} due to a surge in crime. Can you provide support?",
+      "description": "We urgently need your fleet's assistance in patrolling {{sector}} for the next {{time}} due to a surge in crime. Your fleet will be rewarded with a payment of {{reward}} UTT upon successful completion of the patrols.",
       "responses": [
         {
           "text": "Affirmative. My fleet will deploy to {{sector}} and conduct patrols as requested.",
@@ -20,7 +20,7 @@
     {
       "title": "Patrol",
       "actorName": "Local Police",
-      "description": "There is an ongoing situation involving a large protest in {{sector}} that requires heightened security measures. Can your fleet provide patrols for the next {{time}}?",
+      "description": "There is an ongoing situation involving a large protest in {{sector}} that requires heightened security measures. Can your fleet provide patrols for the next {{time}}? Your fleet will be rewarded with a special commendation of the {{reward}} UTT from the local police department, along with a token of appreciation for your team's support in maintaining public order.",
       "responses": [
         {
           "text": "Roger that. My fleet will be on standby to deploy to {{sector}} and assist with the security measures.",
@@ -37,7 +37,7 @@
     {
       "title": "Patrol",
       "actorName": "Local Police",
-      "description": "We have received multiple reports of illegal activities in {{sector}}, including drug trafficking and vandalism. Can your fleet provide patrols for the next {{time}} to address this issue?",
+      "description": "We have received multiple reports of illegal activities in {{sector}}, including drug trafficking and vandalism. Can your fleet provide patrols for the next {{time}} to address this issue? Your fleet will be rewarded with {{reward}} UTT, as well as a letter of appreciation from the mayor's office for your team's efforts in combatting crime and safeguarding the community.",
       "responses": [
         {
           "text": "Affirmative. My fleet will be dispatched to {{sector}} immediately to investigate and address the illegal activities.",
@@ -54,7 +54,7 @@
     {
       "title": "Patrol",
       "actorName": "Local Police",
-      "description": "{{sector}} is hosting a high-profile event with VIPs attending, and we have received credible threats of potential security breaches. Can your fleet provide additional patrols for the event's security for the next {{time}}?",
+      "description": "{{sector}} is hosting a high-profile event with VIPs attending, and we have received credible threats of potential security breaches. Can your fleet provide additional patrols for the event's security for the next {{time}}? Your fleet will be rewarded with a premium compensation package of {{reward}} UTT, including a VIP invitation to the event's closing ceremony and a public acknowledgement of your team's vital role in ensuring a successful and secure event.",
       "responses": [
         {
           "text": "Copy that. My fleet will provide heightened security patrols in {{sector}} to ensure the safety of the event and its attendees.",
