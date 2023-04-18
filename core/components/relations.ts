@@ -9,6 +9,7 @@ export interface Relations extends BaseComponent<"relations"> {
 export const relationThresholds = {
   attack: -35,
   trade: -20,
+  mission: -10,
   shipyard: 0,
 } as const;
 
