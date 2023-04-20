@@ -40,7 +40,9 @@ const AutoOrder: React.FC<{
 
   const onSectorSelect = (id: string) =>
     setDefaultOrder(
-      defaultOrder.type === "mine" || defaultOrder.type === "trade"
+      defaultOrder.type === "mine" ||
+        defaultOrder.type === "trade" ||
+        defaultOrder.type === "patrol"
         ? {
             ...defaultOrder,
             sectorId: Number(id),
@@ -63,7 +65,12 @@ const AutoOrder: React.FC<{
         <SelectButton>{defaultOrder.type}</SelectButton>
         <SelectOptions>
           {(
-            ["hold", "mine", "trade"] as AutoOrderType["default"]["type"][]
+            [
+              "hold",
+              "mine",
+              "trade",
+              "patrol",
+            ] as AutoOrderType["default"]["type"][]
           ).map((type) => (
             <SelectOption key={type} value={type}>
               {type}
@@ -71,8 +78,10 @@ const AutoOrder: React.FC<{
           ))}
         </SelectOptions>
       </Select>
-      {(defaultOrder.type === "mine" || defaultOrder.type === "trade") &&
-        !entity.cp.commander && (
+      {(defaultOrder.type === "mine" ||
+        defaultOrder.type === "trade" ||
+        defaultOrder.type === "patrol") &&
+        (!entity.cp.commander || defaultOrder.type === "patrol") && (
           <Select
             className={styles.select}
             value={defaultOrder.sectorId?.toString() ?? ""}

@@ -1,5 +1,6 @@
 import type { Matrix } from "mathjs";
 import { add, matrix, random, norm, subtract } from "mathjs";
+import { normalizeAngle } from "@core/utils/misc";
 import {
   clearTarget,
   defaultDriveLimit,
@@ -25,17 +26,6 @@ function hold(entity: Driveable) {
       }
     }
   }
-}
-
-// eslint-disable-next-line no-underscore-dangle
-function _normalizeAngle(value: number, start: number, end: number): number {
-  const width = end - start;
-  const offsetValue = value - start;
-
-  return offsetValue - Math.floor(offsetValue / width) * width + start;
-}
-function normalizeAngle(value: number): number {
-  return _normalizeAngle(value, -Math.PI, Math.PI);
 }
 
 function getFormationPlace(

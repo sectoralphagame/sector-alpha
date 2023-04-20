@@ -8,6 +8,7 @@ import { relationThresholds } from "@core/components/relations";
 import { formatTime } from "@core/utils/format";
 import { System } from "./system";
 import missions from "../world/data/missions.json";
+import { patrolMission } from "./missionTracking/patrol";
 
 Mustache.escape = (text) => text;
 
@@ -44,7 +45,13 @@ export class MissionGeneratingSystem extends System {
       const sector = pickRandom(
         this.sim.queries.sectors
           .get()
-          .filter((s) => s.cp.owner?.id === faction.id)
+          .filter(
+            (s) =>
+              s.cp.owner?.id === faction.id &&
+              !player.cp.missions.value.some(
+                (mission) => mission.sectorId === s.id
+              )
+          )
       );
       const time = randomInt(1, 8) * 15 * 60;
       const reward = randomInt(80, 130) * 1000;
@@ -68,6 +75,15 @@ export class MissionGeneratingSystem extends System {
           actor: "player",
           type: r.type as "accept" | "decline" | "neutral",
         })),
+        data: patrolMission(
+          sector.id,
+          time,
+          [
+            { type: "money", amount: reward },
+            { type: "relation", amount: 1.5, factionId: faction.id },
+          ],
+          faction.id
+        ),
       };
     }
   };

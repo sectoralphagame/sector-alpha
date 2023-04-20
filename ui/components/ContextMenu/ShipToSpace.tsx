@@ -89,15 +89,6 @@ export const ShipToSpace: React.FC = () => {
     });
   };
 
-  const onPatrol = () => {
-    entity.cp.orders!.value.push({
-      origin: "manual",
-      type: "patrol",
-      actions: [],
-      sectorId: menu.sector!.id,
-    });
-  };
-
   return (
     <>
       <DropdownOption onClick={onMove}>Move</DropdownOption>
@@ -111,9 +102,6 @@ export const ShipToSpace: React.FC = () => {
         <DropdownOption onClick={onFacilityDeploy}>
           Deploy Facility
         </DropdownOption>
-      )}
-      {entity.cp.damage && (
-        <DropdownOption onClick={onPatrol}>Patrol Sector</DropdownOption>
       )}
     </>
   );

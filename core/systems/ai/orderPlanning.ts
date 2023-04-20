@@ -418,6 +418,15 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
       case "mine":
         autoMine(entity.requireComponents(tradingComponents), 4);
         break;
+      case "patrol":
+        entity.cp.orders.value = [
+          {
+            ...entity.cp.autoOrder.default,
+            actions: [],
+            origin: "auto",
+          },
+        ];
+        break;
       default:
         holdPosition();
     }

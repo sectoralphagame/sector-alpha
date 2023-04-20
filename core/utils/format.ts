@@ -1,6 +1,6 @@
 export function formatTime(time: number): string {
-  const hours = Math.floor(time / 360);
-  const minutes = Math.floor(time / 60);
+  const hours = Math.floor(time / 3600);
+  const minutes = Math.floor((time % 3600) / 60);
   const seconds = Math.floor(time % 60);
 
   let str = "";

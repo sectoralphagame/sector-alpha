@@ -1,22 +1,12 @@
 import type { Matrix } from "mathjs";
 import { add, matrix, multiply } from "mathjs";
+import { normalizeAngle } from "@core/utils/misc";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import { Query } from "./utils/query";
 import { System } from "./system";
 
 type Driveable = RequireComponent<"drive" | "position">;
-
-// eslint-disable-next-line no-underscore-dangle
-function _normalizeAngle(value: number, start: number, end: number): number {
-  const width = end - start;
-  const offsetValue = value - start;
-
-  return offsetValue - Math.floor(offsetValue / width) * width + start;
-}
-function normalizeAngle(value: number): number {
-  return _normalizeAngle(value, -Math.PI, Math.PI);
-}
 
 function move(entity: Driveable, delta: number) {
   const entityPosition = entity.cp.position;

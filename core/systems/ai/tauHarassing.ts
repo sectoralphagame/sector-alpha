@@ -41,18 +41,17 @@ export class TauHarassingSystem extends System {
       shipyard.cp.shipyard.building,
       ...shipyard.cp.shipyard.queue,
     ];
-    let commander = this.sim.queries.orderable
+    let commander = this.sim.queries.ships
       .get()
       .find(
         (entity) =>
           entity.cp.owner.id === faction.id &&
           entity.hasTags(["role:military", "ai:attack-force"]) &&
           entity.cp.dockable?.size === "medium"
-      )
-      ?.requireComponents(shipComponents);
+      );
 
     if (!commander) {
-      const spareFrigates: Entity[] = this.sim.queries.orderable
+      const spareFrigates: Entity[] = this.sim.queries.ships
         .get()
         .filter(
           (ship) =>
@@ -73,7 +72,7 @@ export class TauHarassingSystem extends System {
       if (spareFrigates.length > 0) {
         commander = spareFrigates
           .pop()!
-          .requireComponents(this.sim.queries.orderable.requiredComponents);
+          .requireComponents(this.sim.queries.ships.requiredComponents);
         commander.addTag("ai:attack-force");
       } else if (frigatesInShipyards.length > 0) {
         frigatesInShipyards.pop();

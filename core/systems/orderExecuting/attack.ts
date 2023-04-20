@@ -41,7 +41,9 @@ export function isAttackOrderCompleted(
     ? entity.sim.get<Waypoint>(entity.cp.damage.targetId)
     : null;
 
-  return !target || group.followOutsideSector
+  return !target
+    ? true
+    : group.followOutsideSector
     ? false
     : target.cp.position.sector !== entity.cp.position.sector;
 }

@@ -4,6 +4,7 @@ import type {
   EscortOrder,
   HoldOrder,
   MineOrder,
+  PatrolOrder,
   TradeOrder,
 } from "./orders";
 
@@ -12,5 +13,6 @@ export interface AutoOrder extends BaseComponent<"autoOrder"> {
     | Omit<MineOrder, keyof BaseOrder>
     | Omit<TradeOrder, keyof BaseOrder>
     | Omit<HoldOrder, keyof BaseOrder>
+    | Omit<PatrolOrder, keyof BaseOrder>
     | Omit<EscortOrder, keyof BaseOrder | "ordersForSector">;
 }

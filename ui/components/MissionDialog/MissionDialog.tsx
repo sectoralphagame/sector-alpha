@@ -25,6 +25,10 @@ export const MissionDialog: React.FC<ModalProps> = ({ open, onClose }) => {
     <MissionDialogComponent
       mission={sim.queries.player.get()[0]!.cp.missions.offer!}
       open={open}
+      onAccept={() => {
+        const player = sim.queries.player.get()[0]!;
+        player.cp.missions.value.push(player.cp.missions.offer!.data);
+      }}
       onClose={() => {
         onClose();
         sim.queries.player.get()[0]!.cp.missions.offer = null;

@@ -1,3 +1,4 @@
+import type { Mission } from "@core/components/missions";
 import { Button } from "@kit/Button";
 import type { DialogProps } from "@kit/Dialog";
 import { Dialog } from "@kit/Dialog";
@@ -28,14 +29,17 @@ export interface MissionOffer {
   title: string;
   description: string;
   responses: PlayerResponse[];
+  data: Mission;
 }
 
 export interface MissionDialogComponentProps extends DialogProps {
   mission: MissionOffer;
+  onAccept: () => void;
 }
 
 export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
   mission,
+  onAccept,
   ...dialogProps
 }) => {
   const [log, setLog] = React.useState<
@@ -80,6 +84,8 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
                       { actor: "npc", name: mission.actorName, text: r.next },
                     ]);
                     setResponses((prevResponses) => [...prevResponses, r]);
+
+                    if (r.type === "accept") onAccept();
                   }}
                 >
                   {r.type !== "neutral" && (
