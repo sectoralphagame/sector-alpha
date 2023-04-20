@@ -26,7 +26,7 @@ export interface RelationReward {
 }
 
 export function isRelationReward(reward: Reward): reward is RelationReward {
-  return reward.type === "relations";
+  return reward.type === "relation";
 }
 
 export function relationRewardHandler(reward: Mission, sim: Sim): void {
