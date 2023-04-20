@@ -1,10 +1,7 @@
 import React from "react";
 import type { Mission } from "@core/components/missions";
 import Text from "@kit/Text";
-import {
-  isMoneyReward,
-  isRelationReward,
-} from "@core/systems/missionTracking/rewards";
+import { isMoneyReward, isRelationReward } from "@core/systems/mission/rewards";
 import { Button } from "@kit/Button";
 import clsx from "clsx";
 import styles from "./MissionsOverlay.scss";

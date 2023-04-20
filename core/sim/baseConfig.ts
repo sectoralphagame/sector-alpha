@@ -16,13 +16,12 @@ import { FacilityBuildingSystem } from "@core/systems/facilityBuilding";
 import { HitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating";
 import { InflationStatisticGatheringSystem } from "@core/systems/inflationStatisticGathering";
 import { MiningSystem } from "@core/systems/mining";
-import { MissionGeneratingSystem } from "@core/systems/missionGenerating";
-import { MissionTrackingSystem } from "@core/systems/missionTracking";
-import { patrolMissionHandler } from "@core/systems/missionTracking/patrol";
+import { MissionSystem } from "@core/systems/mission";
+import { patrolMissionHandler } from "@core/systems/mission/patrol";
 import {
   moneyRewardHandler,
   relationRewardHandler,
-} from "@core/systems/missionTracking/rewards";
+} from "@core/systems/mission/rewards";
 import { MovingSystem } from "@core/systems/moving";
 import { NavigatingSystem } from "@core/systems/navigating";
 import { OrderExecutingSystem } from "@core/systems/orderExecuting/orderExecuting";
@@ -68,8 +67,7 @@ export const createBaseConfig = (): SimConfig => ({
     new DisposableUnregisteringSystem(),
     new DeadUnregisteringSystem(),
     new CollectibleUnregisteringSystem(),
-    new MissionGeneratingSystem(),
-    new MissionTrackingSystem(
+    new MissionSystem(
       {
         patrol: patrolMissionHandler,
       },
