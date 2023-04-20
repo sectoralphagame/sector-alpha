@@ -42,6 +42,7 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
   mission,
   onAccept,
   onDecline,
+  onClose,
   ...dialogProps
 }) => {
   const [log, setLog] = React.useState<
@@ -60,7 +61,17 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
       : mission.responses.filter((r) => !responses.includes(r));
 
   return (
-    <Dialog {...dialogProps} title={mission.title} width="550px">
+    <Dialog
+      {...dialogProps}
+      onClose={() => {
+        if (responses.at(-1)?.type !== "accept") {
+          onDecline();
+        }
+        onClose();
+      }}
+      title={mission.title}
+      width="550px"
+    >
       <div className={styles.log}>
         {log.map((l, lIndex) => (
           <p key={lIndex}>
@@ -103,7 +114,7 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
       )}
       <DialogActions>
         {responses.at(-1)?.type !== "neutral" && (
-          <Button onClick={dialogProps.onClose}>Close</Button>
+          <Button onClick={onClose}>Close</Button>
         )}
       </DialogActions>
     </Dialog>
