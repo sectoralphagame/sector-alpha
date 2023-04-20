@@ -113,7 +113,7 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
         </div>
       )}
       <DialogActions>
-        {responses.at(-1)?.type !== "neutral" && (
+        {responses.length > 0 && responses.at(-1)?.type !== "neutral" && (
           <Button onClick={onClose}>Close</Button>
         )}
       </DialogActions>
