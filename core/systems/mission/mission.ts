@@ -1,7 +1,4 @@
-import Mustache from "mustache";
 import type { Reward } from "@core/components/missions";
-import { relationThresholds } from "@core/components/relations";
-import settings from "@core/settings";
 import type { Sim } from "@core/sim";
 import { Cooldowns } from "@core/utils/cooldowns";
 import { pickRandom } from "@core/utils/generators";
@@ -9,10 +6,6 @@ import { randomInt } from "mathjs";
 import { formatTime } from "@core/utils/format";
 import { System } from "../system";
 import type { MissionHandler } from "./types";
-import missions from "../../world/data/missions.json";
-import { patrolMission } from "./patrol";
-
-Mustache.escape = (text) => text;
 
 type MissionHandlers = Record<string, MissionHandler>;
 
@@ -43,7 +36,7 @@ export class MissionSystem extends System {
 
   track = () => {
     if (!this.cooldowns.canUse("track")) return;
-    this.cooldowns.use("track", 1);
+    this.cooldowns.use("track", 1 + Math.random());
 
     const player = this.sim.queries.player.get()[0]!;
 
@@ -75,61 +68,15 @@ export class MissionSystem extends System {
 
     if (
       player.cp.missions.value.length < 3 &&
-      this.sim.getTime() > 5 * 60 + settings.bootTime &&
+      this.sim.getTime() -
+        Math.max(
+          ...player.cp.missions.value.map((m) => m.accepted),
+          player.cp.missions.declined
+        ) >
+        5 * 60 &&
       player.cp.missions.offer === null
     ) {
-      const faction = pickRandom(
-        this.sim.queries.ai
-          .get()
-          .filter(
-            (f) =>
-              player.cp.relations.values[f.id] >= relationThresholds.mission
-          )
-      );
-      if (!faction) return;
-
-      const sector = pickRandom(
-        this.sim.queries.sectors
-          .get()
-          .filter(
-            (s) =>
-              s.cp.owner?.id === faction.id &&
-              !player.cp.missions.value.some(
-                (mission) => mission.sectorId === s.id
-              )
-          )
-      );
-      const time = randomInt(1, 8) * 15 * 60;
-      const reward = randomInt(80, 130) * 1000;
-
-      const template = pickRandom(missions.patrol);
-      const transform = (text: string) =>
-        Mustache.render(text, {
-          faction: faction.cp.name.value,
-          sector: sector.cp.name.value,
-          time: formatTime(time),
-          reward,
-        });
-
-      player.cp.missions.offer = {
-        title: transform(template.title),
-        prompt: transform(template.prompt),
-        actorName: "Local Police",
-        responses: template.responses.map((r) => ({
-          next: transform(r.next),
-          text: transform(r.text),
-          actor: "player",
-          type: r.type as "accept" | "decline" | "neutral",
-        })),
-        data: patrolMission(sector.id, time, faction.id, {
-          title: transform(template.title),
-          description: transform(template.description),
-          rewards: [
-            { type: "money", amount: reward },
-            { type: "relation", amount: 1.5, factionId: faction.id },
-          ],
-        }),
-      };
+      pickRandom(Object.values(this.handlers.mission)).generate(this.sim);
     }
   };
 

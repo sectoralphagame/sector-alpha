@@ -7,6 +7,10 @@ export type Reward = {
 };
 
 export interface MissionCommon {
+  /**
+   * Time at which the mission was accepted
+   */
+  accepted: number;
   title: string;
   description: string;
   rewards: Reward[];
@@ -17,6 +21,10 @@ export type Mission = MissionCommon & {
 };
 
 export interface Missions extends BaseComponent<"missions"> {
+  /**
+   * Time at which the last mission was declined
+   */
+  declined: number;
   offer: MissionOffer | null;
   value: Mission[];
 }

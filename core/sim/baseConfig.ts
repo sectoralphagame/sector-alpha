@@ -31,7 +31,6 @@ import { SectorStatisticGatheringSystem } from "@core/systems/sectorStatisticGat
 import { SelectingSystem } from "@core/systems/selecting";
 import { ShipBuildingSystem } from "@core/systems/shipBuilding";
 import { StorageQuotaPlanningSystem } from "@core/systems/storageQuotaPlanning";
-import { System } from "@core/systems/system";
 import { TradingSystem } from "@core/systems/trading";
 import { UndeployingSystem } from "@core/systems/undeploying";
 import type { SimConfig } from "./Sim";

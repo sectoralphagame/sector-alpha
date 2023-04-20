@@ -5,6 +5,7 @@ import type { AiType } from "@core/components/ai";
 import { requestShip } from "@core/systems/ai/shipPlanning";
 import { facilityModules } from "@core/archetypes/facilityModule";
 import { changeRelations } from "@core/components/relations";
+import settings from "@core/settings";
 import { createFaction } from "../archetypes/faction";
 import { createShip } from "../archetypes/ship";
 import { changeBudgetMoney, createBudget } from "../components/budget";
@@ -169,7 +170,12 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     player.addTag("player");
     player.removeComponent("ai").removeComponent("budget");
     player.addComponent(createBudget());
-    player.addComponent({ name: "missions", value: [], offer: null });
+    player.addComponent({
+      name: "missions",
+      value: [],
+      offer: null,
+      declined: settings.bootTime,
+    });
     player.addTag("player");
     changeBudgetMoney(player.cp.budget, 5000);
     const startingSector = getSector("sector-alpha");

@@ -35,11 +35,13 @@ export interface MissionOffer {
 export interface MissionDialogComponentProps extends DialogProps {
   mission: MissionOffer;
   onAccept: () => void;
+  onDecline: () => void;
 }
 
 export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
   mission,
   onAccept,
+  onDecline,
   ...dialogProps
 }) => {
   const [log, setLog] = React.useState<
@@ -86,6 +88,7 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
                     setResponses((prevResponses) => [...prevResponses, r]);
 
                     if (r.type === "accept") onAccept();
+                    if (r.type === "decline") onDecline();
                   }}
                 >
                   {r.type !== "neutral" && (

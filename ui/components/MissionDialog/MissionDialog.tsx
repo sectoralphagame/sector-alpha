@@ -29,6 +29,9 @@ export const MissionDialog: React.FC<ModalProps> = ({ open, onClose }) => {
         const player = sim.queries.player.get()[0]!;
         player.cp.missions.value.push(player.cp.missions.offer!.data);
       }}
+      onDecline={() => {
+        sim.queries.player.get()[0]!.cp.missions.declined = sim.getTime();
+      }}
       onClose={() => {
         onClose();
         sim.queries.player.get()[0]!.cp.missions.offer = null;
