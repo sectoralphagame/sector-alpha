@@ -6,9 +6,13 @@ export type Reward = {
   [key: string]: any;
 };
 
-export type Mission = {
-  type: string;
+export interface MissionCommon {
+  title: string;
+  description: string;
   rewards: Reward[];
+}
+export type Mission = MissionCommon & {
+  type: string;
   [key: string]: any;
 };
 

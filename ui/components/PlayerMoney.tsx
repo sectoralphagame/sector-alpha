@@ -2,6 +2,7 @@ import { IconButton } from "@kit/IconButton";
 import React from "react";
 import SVG from "react-inlinesvg";
 import fleetIcon from "@assets/ui/fleet.svg";
+import journalIcon from "@assets/ui/journal.svg";
 import { useGameOverlay, useSim } from "../atoms";
 import { useRerender } from "../hooks/useRerender";
 import styles from "./PlayerMoney.scss";
@@ -29,6 +30,9 @@ export const PlayerMoney: React.FC = () => {
       </span>
       <IconButton variant="naked" onClick={() => setOverlay("fleet")}>
         <SVG src={fleetIcon} />
+      </IconButton>
+      <IconButton variant="naked" onClick={() => setOverlay("missions")}>
+        <SVG src={journalIcon} />
       </IconButton>
     </div>
   );

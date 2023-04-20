@@ -1,0 +1,36 @@
+.grid {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: var(--spacing-4);
+}
+
+.divider {
+  margin: var(--spacing-4) 0;
+}
+
+.mission {
+  &Link {
+    &Active {
+      background-color: var(--palette-background-active);
+    }
+    &:hover {
+      color: var(--palette-active);
+      background-color: var(--palette-background-active);
+    }
+
+    border: 1px solid var(--palette-border);
+    cursor: pointer;
+    padding: var(--spacing-1);
+    transition: 200ms;
+  }
+}
+
+.rewards {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: var(--spacing-4);
+
+  & > div {
+    border-right: 1px solid var(--palette-border);
+  }
+}

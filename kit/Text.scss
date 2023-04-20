@@ -13,9 +13,29 @@
   font-size: var(--typography-header);
   margin-bottom: var(--spacing-2);
 }
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  &.root {
+    margin-bottom: var(--spacing-1);
+  }
+}
 .h2 {
   font-size: var(--typography-header2);
-  margin-bottom: var(--spacing-1);
+}
+.h3 {
+  font-size: var(--typography-header3);
+}
+.h4 {
+  font-size: var(--typography-header4);
+}
+.h5 {
+  font-size: var(--typography-header5);
+}
+.h6 {
+  font-size: var(--typography-header6);
 }
 .caption {
   font-size: var(--typography-caption);

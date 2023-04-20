@@ -68,7 +68,7 @@ export const createBaseConfig = (): SimConfig => ({
     new DisposableUnregisteringSystem(),
     new DeadUnregisteringSystem(),
     new CollectibleUnregisteringSystem(),
-    // new MissionGeneratingSystem(),
+    new MissionGeneratingSystem(),
     new MissionTrackingSystem(
       {
         patrol: patrolMissionHandler,

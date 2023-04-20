@@ -19,6 +19,7 @@ import { TradeFinder } from "@ui/components/TradeFinder";
 import { Relations } from "@ui/components/Relations/Relations";
 import { Overlay } from "@ui/components/Overlay/Overlay";
 import { FleetOverlay } from "@ui/components/FleetOverlay/FleetOverlay";
+import { MissionsOverlay } from "@ui/components/MissionsOverlay";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -138,6 +139,9 @@ export const Game: React.FC = () => {
       if (event.code === "KeyF") {
         setOverlay((prev) => (prev === "fleet" ? null : "fleet"));
       }
+      if (event.code === "KeyJ") {
+        setOverlay((prev) => (prev === "missions" ? null : "missions"));
+      }
     };
 
     document.addEventListener("keydown", handler);
@@ -184,6 +188,7 @@ export const Game: React.FC = () => {
       <Panel entity={selectedEntity} />
       <Overlay open={!!overlay} onClose={() => setOverlay(null)}>
         <FleetOverlay />
+        <MissionsOverlay />
       </Overlay>
       {menu.active && (!!menu.sector || menu.overlay) && (
         <ClickAwayListener

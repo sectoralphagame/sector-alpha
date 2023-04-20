@@ -1,4 +1,4 @@
-import type { Mission, Reward } from "@core/components/missions";
+import type { Mission, MissionCommon } from "@core/components/missions";
 import type { Sim } from "@core/sim";
 import type { MissionHandler } from "./types";
 
@@ -13,14 +13,14 @@ interface PatrolMission extends Mission {
 export const patrolMission = (
   sector: number,
   time: number,
-  rewards: Reward[],
-  faction: number
+  faction: number,
+  common: MissionCommon
 ): PatrolMission => ({
+  ...common,
   elapsed: 0,
   sector,
   time,
   type: "patrol",
-  rewards,
   faction,
 });
 

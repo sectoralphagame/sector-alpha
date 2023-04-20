@@ -27,7 +27,7 @@ interface WorldResponse {
 export interface MissionOffer {
   actorName: string;
   title: string;
-  description: string;
+  prompt: string;
   responses: PlayerResponse[];
   data: Mission;
 }
@@ -48,7 +48,7 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
     {
       actor: "npc",
       name: mission.actorName,
-      text: mission.description,
+      text: mission.prompt,
     },
   ]);
   const [responses, setResponses] = React.useState<PlayerResponse[]>([]);

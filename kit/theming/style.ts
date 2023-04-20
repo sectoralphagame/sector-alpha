@@ -29,6 +29,10 @@ export interface Theme {
     default: string;
     header: string;
     header2: string;
+    header3: string;
+    header4: string;
+    header5: string;
+    header6: string;
   };
 }
 
@@ -65,6 +69,10 @@ export function createTheme(scale: number): Theme {
       default: `${baseFontSize}px`,
       header: `${Math.ceil(baseFontSize * 1.3 ** 2)}px`,
       header2: `${Math.ceil(baseFontSize * 1.3)}px`,
+      header3: `${Math.ceil(baseFontSize * 1.2)}px`,
+      header4: `${Math.ceil(baseFontSize * 1.1)}px`,
+      header5: `${Math.ceil(baseFontSize * 1.1)}px`,
+      header6: `${Math.ceil(baseFontSize * 1.1)}px`,
     },
   };
 }

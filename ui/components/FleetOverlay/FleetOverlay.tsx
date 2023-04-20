@@ -7,7 +7,7 @@ import { FleetOverlayComponent } from "./FleetOverlayComponent";
 
 export const FleetOverlay: React.FC = () => {
   const [sim] = useSim();
-  const [, setOverlay] = useGameOverlay();
+  const [overlay, setOverlay] = useGameOverlay();
   const [selected, setSelectedState] = React.useState<number | undefined>(
     getSelected(sim)?.id
   );
@@ -76,6 +76,8 @@ export const FleetOverlay: React.FC = () => {
       ),
     [sim.queries.ships.get()]
   );
+
+  if (overlay !== "fleet") return null;
 
   return (
     <FleetOverlayComponent

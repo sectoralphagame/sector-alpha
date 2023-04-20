@@ -24,6 +24,10 @@ label {
   display: block;
 }
 
+hr {
+  border-color: var(--palette-border);
+}
+
 th {
   &[align="right"] {
     text-align: right;

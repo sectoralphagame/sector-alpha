@@ -66,8 +66,8 @@ export class MissionGeneratingSystem extends System {
         });
 
       player.cp.missions.offer = {
-        title: template.title,
-        description: transform(template.description),
+        title: transform(template.title),
+        prompt: transform(template.prompt),
         actorName: "Local Police",
         responses: template.responses.map((r) => ({
           next: transform(r.next),
@@ -75,15 +75,14 @@ export class MissionGeneratingSystem extends System {
           actor: "player",
           type: r.type as "accept" | "decline" | "neutral",
         })),
-        data: patrolMission(
-          sector.id,
-          time,
-          [
+        data: patrolMission(sector.id, time, faction.id, {
+          title: transform(template.title),
+          description: transform(template.description),
+          rewards: [
             { type: "money", amount: reward },
             { type: "relation", amount: 1.5, factionId: faction.id },
           ],
-          faction.id
-        ),
+        }),
       };
     }
   };
