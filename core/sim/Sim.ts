@@ -88,10 +88,6 @@ export class Sim extends BaseSim {
     this.queries = createQueries(this);
 
     systems.forEach((system) => system.apply(this));
-
-    if (!isHeadless) {
-      window.cheats = {};
-    }
   }
 
   registerEntity = (entity: Entity) => {

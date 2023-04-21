@@ -1,5 +1,6 @@
 import { ship } from "@core/archetypes/ship";
 import type { Entity } from "@core/entity";
+import { isHeadless } from "@core/settings";
 import type { RequireComponent } from "@core/tsHelpers";
 
 export function isOwnedByPlayer(entity: Entity): boolean {
@@ -21,4 +22,14 @@ function _normalizeAngle(value: number, start: number, end: number): number {
 }
 export function normalizeAngle(value: number): number {
   return _normalizeAngle(value, -Math.PI, Math.PI);
+}
+
+export function setCheat(key: string, fn: Function) {
+  if (!isHeadless) {
+    if (!window.cheats) {
+      window.cheats = {};
+    }
+
+    window.cheats[key] = fn;
+  }
 }

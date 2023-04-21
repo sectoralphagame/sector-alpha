@@ -4,6 +4,7 @@ import Color from "color";
 import { Entity } from "@core/entity";
 import { Graphics } from "pixi.js";
 import type { Sim } from "@core/sim";
+import { setCheat } from "@core/utils/misc";
 import {
   createRenderGraphics,
   drawGraphics,
@@ -205,7 +206,7 @@ export class RenderingSystem extends SystemWithHooks {
     });
     this.resizeObserver.observe(canvasRoot);
 
-    window.cheats.hexGrid = this.toggleGrid;
+    setCheat("hexGrid", this.toggleGrid);
 
     this.sim.entities.forEach((entity) => {
       if (entity.cp.render) {

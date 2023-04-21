@@ -20,6 +20,7 @@ import { Relations } from "@ui/components/Relations/Relations";
 import { Overlay } from "@ui/components/Overlay/Overlay";
 import { FleetOverlay } from "@ui/components/FleetOverlay/FleetOverlay";
 import { MissionsOverlay } from "@ui/components/MissionsOverlay";
+import { setCheat } from "@core/utils/misc";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -65,20 +66,21 @@ export const Game: React.FC = () => {
     });
     sim.hooks.destroy.tap("Game", unmount);
 
-    (window as any).cheats = {
-      addCommodity: (commodity: Commodity, quantity: number, id?: number) => {
+    setCheat(
+      "addCommodity",
+      (commodity: Commodity, quantity: number, id?: number) => {
         const entity = id ? sim.getOrThrow(id) : (window.selected as Entity);
         if (entity) {
           addStorage(entity.cp.storage!, commodity, quantity);
         }
-      },
-      addMoney: (quantity: number, id?: number) => {
-        const entity = id
-          ? sim.getOrThrow(id)
-          : (window.selected as Entity | undefined) ?? player;
-        changeBudgetMoney(entity.cp.budget!, quantity);
-      },
-    };
+      }
+    );
+    setCheat("addMoney", (quantity: number, id?: number) => {
+      const entity = id
+        ? sim.getOrThrow(id)
+        : (window.selected as Entity | undefined) ?? player;
+      changeBudgetMoney(entity.cp.budget!, quantity);
+    });
 
     window.sim = sim;
 

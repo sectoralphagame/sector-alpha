@@ -4,6 +4,8 @@ import { Cooldowns } from "@core/utils/cooldowns";
 import { pickRandom } from "@core/utils/generators";
 import { randomInt } from "mathjs";
 import { formatTime } from "@core/utils/format";
+import { isHeadless } from "@core/settings";
+import { setCheat } from "@core/utils/misc";
 import { System } from "../system";
 import type { MissionHandler } from "./types";
 
@@ -32,6 +34,8 @@ export class MissionSystem extends System {
     super.apply(sim);
 
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+
+    setCheat("generateMission", () => this.generate(true));
   }
 
   track = () => {
@@ -60,20 +64,21 @@ export class MissionSystem extends System {
     });
   };
 
-  generate = () => {
-    if (!this.cooldowns.canUse("generate")) return;
+  generate = (force: boolean) => {
+    if (!this.cooldowns.canUse("generate") && !force) return;
     this.cooldowns.use("generate", 1 + Math.random());
 
     const player = this.sim.queries.player.get()[0];
 
     if (
-      player.cp.missions.value.length < 3 &&
-      this.sim.getTime() -
-        Math.max(
-          ...player.cp.missions.value.map((m) => m.accepted),
-          player.cp.missions.declined
-        ) >
-        5 * 60 &&
+      ((player.cp.missions.value.length < 3 &&
+        this.sim.getTime() -
+          Math.max(
+            ...player.cp.missions.value.map((m) => m.accepted),
+            player.cp.missions.declined
+          ) >
+          5 * 60) ||
+        force) &&
       player.cp.missions.offer === null
     ) {
       pickRandom(Object.values(this.handlers.mission)).generate(this.sim);
@@ -83,7 +88,7 @@ export class MissionSystem extends System {
   exec = (delta: number) => {
     this.cooldowns.update(delta);
 
-    this.generate();
+    this.generate(false);
     this.track();
   };
 }
