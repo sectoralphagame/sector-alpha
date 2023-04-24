@@ -23,6 +23,23 @@ export const TradeFinder: React.FC = () => {
     "TradeFinder",
     "fuel"
   );
+  const sortedOffers = React.useMemo(
+    () =>
+      sortBy(
+        sim.queries.trading
+          .get()
+          .filter(
+            (entity) =>
+              entity.cp.trade.offers[selectedCommodity].active &&
+              entity.cp.trade.offers[selectedCommodity].quantity > 0 &&
+              sim.queries.player.get()[0].cp.relations.values[
+                entity.cp.owner.id
+              ] > relationThresholds.trade
+          ),
+        `components.trade.offers.${selectedCommodity}.price`
+      ),
+    [sim.queries.trading.get()]
+  );
 
   return (
     <>
@@ -44,42 +61,32 @@ export const TradeFinder: React.FC = () => {
         </DropdownOptions>
       </Dropdown>
       <div className={styles.facilities}>
-        {sortBy(
-          sim.queries.trading
-            .get()
-            .filter(
-              (entity) =>
-                entity.cp.trade.offers[selectedCommodity].active &&
-                entity.cp.trade.offers[selectedCommodity].quantity > 0 &&
-                sim.queries.player.get()[0].cp.relations.values[
-                  entity.cp.owner.id
-                ] > relationThresholds.trade
-            ),
-          `components.trade.offers.${selectedCommodity}.price`
-        ).map((entity) => (
-          <div className={styles.facilitiesItem} key={entity.id}>
-            <span>{entity.cp.name!.value}</span>
-            <span
-              className={clsx(
-                styles.facilitiesItemPrice,
-                entity.cp.trade.offers[selectedCommodity].type === "buy"
-                  ? styles.facilitiesItemPriceBuy
-                  : styles.facilitiesItemPriceSell
-              )}
-            >
-              {entity.cp.trade.offers[selectedCommodity].price} UTT
-            </span>
-            <IconButton
-              variant="naked"
-              onClick={() => {
-                sim.queries.settings.get()[0].cp.selectionManager.id =
-                  entity.id;
-              }}
-            >
-              <SVG src={redoIcon} />
-            </IconButton>
-          </div>
-        ))}
+        {sortedOffers.length === 0
+          ? "No offers on the market"
+          : sortedOffers.map((entity) => (
+              <div className={styles.facilitiesItem} key={entity.id}>
+                <span>{entity.cp.name!.value}</span>
+                <span
+                  className={clsx(
+                    styles.facilitiesItemPrice,
+                    entity.cp.trade.offers[selectedCommodity].type === "buy"
+                      ? styles.facilitiesItemPriceBuy
+                      : styles.facilitiesItemPriceSell
+                  )}
+                >
+                  {entity.cp.trade.offers[selectedCommodity].price} UTT
+                </span>
+                <IconButton
+                  variant="naked"
+                  onClick={() => {
+                    sim.queries.settings.get()[0].cp.selectionManager.id =
+                      entity.id;
+                  }}
+                >
+                  <SVG src={redoIcon} />
+                </IconButton>
+              </div>
+            ))}
       </div>
     </>
   );
