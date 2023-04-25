@@ -5,6 +5,7 @@ import { Entity } from "@core/entity";
 import { Graphics } from "pixi.js";
 import type { Sim } from "@core/sim";
 import { setCheat } from "@core/utils/misc";
+import { isHeadless } from "@core/settings";
 import {
   createRenderGraphics,
   drawGraphics,
@@ -15,6 +16,7 @@ import { SystemWithHooks } from "../utils/hooks";
 import { clearFocus } from "../../components/selection";
 import type { Layer } from "../../components/render";
 import { destroy, setTexture } from "../../components/render";
+import { SectorQuery } from "../utils/sectorQuery";
 
 const minScale = 0.08;
 const maxScale = 40;
@@ -91,10 +93,15 @@ export class RenderingSystem extends SystemWithHooks {
   toolbar: HTMLDivElement;
   grid: RequireComponent<"renderGraphics"> | null = null;
   layers: Record<Layer, PIXI.Container>;
+  sectorQuery: SectorQuery<"render">;
 
   apply = (sim: Sim) => {
     super.apply(sim);
+    if (!isHeadless) {
+      (window as any).rendering = this;
+    }
 
+    this.sectorQuery = new SectorQuery(sim, ["render"]);
     sim.hooks.phase.render.tap(this.constructor.name, this.exec);
   };
 

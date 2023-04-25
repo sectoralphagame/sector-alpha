@@ -2,6 +2,7 @@ import { filter, map, pipe, toArray } from "@fxts/core";
 import type { EntityTag } from "@core/tags";
 import { shipComponents } from "@core/archetypes/ship";
 import { collectibleComponents } from "@core/archetypes/collectible";
+import { SyncHook } from "tapable";
 import { asteroidFieldComponents } from "../../archetypes/asteroidField";
 import { facilityComponents } from "../../archetypes/facility";
 import { factionComponents } from "../../archetypes/faction";
@@ -16,6 +17,10 @@ type QueryEntities<T extends keyof CoreComponents> = Array<RequireComponent<T>>;
 
 export class Query<T extends keyof CoreComponents> {
   entities: QueryEntities<T> | undefined;
+  hooks: {
+    add: SyncHook<RequireComponent<T>>;
+    remove: SyncHook<number>;
+  };
   requiredComponents: readonly (keyof CoreComponents)[];
   requiredTags: readonly EntityTag[];
   sim: Sim;
@@ -28,6 +33,10 @@ export class Query<T extends keyof CoreComponents> {
     this.requiredComponents = requiredComponents;
     this.requiredTags = requiredTags;
     this.sim = sim;
+    this.hooks = {
+      add: new SyncHook(["entity"]),
+      remove: new SyncHook(["entityId"]),
+    };
 
     sim.hooks.addComponent.tap("query", ({ entity, component }) => {
       if (
@@ -36,7 +45,7 @@ export class Query<T extends keyof CoreComponents> {
         this.canBeAdded(entity) &&
         !this.entities.find((e) => e === entity)
       ) {
-        this.entities.push(entity as RequireComponent<T>);
+        this.add(entity as RequireComponent<T>);
       }
     });
 
@@ -53,7 +62,7 @@ export class Query<T extends keyof CoreComponents> {
         this.canBeAdded(entity) &&
         !this.entities.find((e) => e === entity)
       ) {
-        this.entities.push(entity as RequireComponent<T>);
+        this.add(entity as RequireComponent<T>);
       }
     });
 
@@ -74,6 +83,25 @@ export class Query<T extends keyof CoreComponents> {
     entity.hasComponents(this.requiredComponents) &&
     entity.hasTags(this.requiredTags);
 
+  init = () => {
+    this.entities = pipe(
+      this.sim.entities,
+      filter(
+        ([, e]) =>
+          e.hasComponents(this.requiredComponents) &&
+          e.hasTags(this.requiredTags)
+      ),
+      map(([, e]) => e),
+      toArray
+    ) as QueryEntities<T>;
+    this.entities.forEach((e) => this.hooks.add.call(e));
+  };
+
+  add = (entity: RequireComponent<T>) => {
+    this.entities!.push(entity);
+    this.hooks.add.call(entity);
+  };
+
   remove = (entity: Entity) => {
     if (this.entities) {
       // Using splice breaks iterating
@@ -81,24 +109,16 @@ export class Query<T extends keyof CoreComponents> {
       // During forEach loop 3rd entity is removed
       // Next iteration will take 5th entity, not 4th
       this.entities = this.entities.filter((e) => e.id !== entity.id);
+      this.hooks.remove.call(entity.id);
     }
   };
 
   get = (): QueryEntities<T> => {
     if (!this.entities) {
-      this.entities = pipe(
-        this.sim.entities,
-        filter(
-          ([, e]) =>
-            e.hasComponents(this.requiredComponents) &&
-            e.hasTags(this.requiredTags)
-        ),
-        map(([, e]) => e),
-        toArray
-      ) as QueryEntities<T>;
+      this.init();
     }
 
-    return this.entities;
+    return this.entities!;
   };
 
   reset = (): void => {

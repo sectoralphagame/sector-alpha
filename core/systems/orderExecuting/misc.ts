@@ -8,6 +8,7 @@ import {
 import type { MoveAction, TeleportAction } from "../../components/orders";
 import { show } from "../../components/render";
 import type { RequireComponent } from "../../tsHelpers";
+import { SectorQuery } from "../utils/sectorQuery";
 
 export function moveActionCleanup(
   entity: RequireComponent<"drive" | "orders">
@@ -60,6 +61,7 @@ export function teleportAction(
   order: TeleportAction
 ): boolean {
   const destination = waypoint(entity.sim.getOrThrow(order.targetId));
+  const prevSector = entity.cp.position.sector;
 
   entity.cp.position = {
     name: "position",
@@ -69,15 +71,21 @@ export function teleportAction(
     moved: true,
   };
 
-  entity.cp.docks?.docked.forEach((docked) => {
-    entity.sim.getOrThrow(docked).cp.position = {
+  entity.cp.docks?.docked.forEach((dockedId) => {
+    const docked =
+      entity.sim.getOrThrow<RequireComponent<"position">>(dockedId);
+
+    docked.cp.position = {
       name: "position",
       angle: entity.cp.position.angle,
       coord: destination.cp.position.coord,
       sector: destination.cp.position.sector,
       moved: true,
     };
+    SectorQuery.call(prevSector, destination.cp.position.sector, docked);
   });
+
+  SectorQuery.call(prevSector, destination.cp.position.sector, entity);
 
   return true;
 }
