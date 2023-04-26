@@ -6,9 +6,9 @@ import {
   stop,
 } from "../../components/drive";
 import type { MoveAction, TeleportAction } from "../../components/orders";
-import { show } from "../../components/render";
 import type { RequireComponent } from "../../tsHelpers";
 import { SectorQuery } from "../utils/sectorQuery";
+import { undockShip } from "./dock";
 
 export function moveActionCleanup(
   entity: RequireComponent<"drive" | "orders">
@@ -27,14 +27,7 @@ export function moveAction(
     : defaultDriveLimit;
 
   if (entity.cp.dockable?.dockedIn) {
-    const dock = entity.sim.entities
-      .get(entity.cp.dockable.dockedIn)!
-      .requireComponents(["docks"]);
-    dock.cp.docks.docked = dock.cp.docks.docked.filter((e) => e !== entity.id);
-    entity.cp.dockable.dockedIn = null;
-    if (entity.cp.render) {
-      show(entity.cp.render);
-    }
+    undockShip(entity.requireComponents(["drive", "position", "dockable"]));
   }
 
   if (order.ignoreReached) return false;

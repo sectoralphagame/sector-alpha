@@ -2,7 +2,7 @@ import type { WithDock } from "../../components/dockable";
 import { availableDocks } from "../../components/dockable";
 import { clearTarget, setTarget } from "../../components/drive";
 import type { DockAction } from "../../components/orders";
-import { hide } from "../../components/render";
+import { hide, show } from "../../components/render";
 import { DockSizeMismatchError } from "../../errors";
 import type { RequireComponent } from "../../tsHelpers";
 
@@ -12,10 +12,26 @@ export function dockShip(
 ) {
   dock.cp.docks.docked.push(ship.id);
   ship.cp.dockable.dockedIn = dock.id;
+  ship.cp.drive.active = false;
   clearTarget(ship.cp.drive);
 
   if (ship.cp.render) {
     hide(ship.cp.render);
+  }
+}
+
+export function undockShip(
+  ship: RequireComponent<"drive" | "dockable" | "position">
+) {
+  const dock = ship.sim
+    .getOrThrow(ship.cp.dockable.dockedIn!)
+    .requireComponents(["docks"]);
+  dock.cp.docks.docked = dock.cp.docks.docked.filter((e) => e !== ship.id);
+  ship.cp.dockable.dockedIn = null;
+  ship.cp.drive.active = true;
+
+  if (ship.cp.render) {
+    show(ship.cp.render);
   }
 }
 

@@ -7,6 +7,8 @@ import { System } from "./system";
 type Driveable = RequireComponent<"drive" | "position">;
 
 function move(entity: Driveable, delta: number) {
+  if (!entity.cp.drive.active) return;
+
   const entityPosition = entity.cp.position;
   const drive = entity.cp.drive;
 
