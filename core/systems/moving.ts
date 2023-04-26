@@ -1,5 +1,3 @@
-import type { Matrix } from "mathjs";
-import { add, matrix, multiply } from "mathjs";
 import { normalizeAngle } from "@core/utils/misc";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
@@ -16,11 +14,15 @@ function move(entity: Driveable, delta: number) {
     // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
     entityPosition.angle - Math.PI / 2
   );
-  const moveVec = matrix([Math.cos(entityAngle), Math.sin(entityAngle)]);
-  const dPos = multiply(moveVec, drive.currentSpeed * delta) as Matrix;
+  const moveVec = [Math.cos(entityAngle), Math.sin(entityAngle)];
+  const dPos = [
+    moveVec[0] * drive.currentSpeed * delta,
+    moveVec[1] * drive.currentSpeed * delta,
+  ];
   const dAngle = drive.currentRotary;
 
-  entityPosition.coord = add(entityPosition.coord, dPos);
+  entityPosition.coord.set([0], entityPosition.coord.get([0]) + dPos[0]);
+  entityPosition.coord.set([1], entityPosition.coord.get([1]) + dPos[1]);
   entityPosition.angle += dAngle;
   entityPosition.moved = true;
 
@@ -29,7 +31,7 @@ function move(entity: Driveable, delta: number) {
       .get(docked)!
       .requireComponents(["position"]).cp.position;
 
-    dockedPosition.coord = matrix(entityPosition.coord);
+    dockedPosition.coord = entityPosition.coord.clone();
     dockedPosition.angle += dAngle;
   });
 }

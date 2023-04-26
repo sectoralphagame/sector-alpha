@@ -1,4 +1,3 @@
-import { clone } from "mathjs";
 import { createShip } from "../archetypes/ship";
 import type { Commodity } from "../economy/commodity";
 import type { Sim } from "../sim";
@@ -36,7 +35,7 @@ export class ShipBuildingSystem extends System {
         if (shipyard.cp.shipyard.building) {
           const ship = createShip(this.sim, {
             ...shipyard.cp.shipyard.building.blueprint,
-            position: clone(shipyard.cp.position.coord),
+            position: shipyard.cp.position.coord.clone(),
             sector: this.sim.getOrThrow<Sector>(shipyard.cp.position.sector),
             owner: this.sim.getOrThrow<Faction>(
               shipyard.cp.shipyard.building.owner
