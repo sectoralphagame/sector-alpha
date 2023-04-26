@@ -258,17 +258,17 @@ export class OrderExecutingSystem extends System {
         const order = entity.cp.orders.value[0];
         const { exec, isCompleted, onCompleted } = orderFns[order.type] ?? {
           exec: () => undefined,
-          isCompleted: () => true,
+          isCompleted: (_, orderGroup) => orderGroup.actions.length === 0,
           onCompleted: () => undefined,
         };
         exec(entity, order);
 
-        const actionFn = actionFns[order.actions[0]?.type] ?? holdPosition;
-        const completed = actionFn(entity, order.actions[0]);
+        const actionFn = actionFns[order.actions[0]?.type];
+        const completed = actionFn ? actionFn(entity, order.actions[0]) : true;
 
         if (completed) {
           order.actions.shift();
-          if (order.actions.length === 0 && isCompleted(entity, order)) {
+          if (isCompleted(entity, order)) {
             onCompleted(entity, order);
             // After deploying facility it loses orders component
             if (entity.cp.orders) {

@@ -31,14 +31,21 @@ export function attackOrder(
     ];
     group.ordersForSector = target.cp.position.sector;
   }
+
+  if (
+    !group.followOutsideSector &&
+    target.cp.position.sector !== entity.cp.position.sector
+  ) {
+    group.actions = [];
+  }
 }
 
 export function isAttackOrderCompleted(
   entity: RequireComponent<"drive" | "position" | "orders" | "damage">,
   group: AttackOrder
 ) {
-  const target = entity.cp.damage.targetId
-    ? entity.sim.get<Waypoint>(entity.cp.damage.targetId)
+  const target = group.targetId
+    ? entity.sim.get<Waypoint>(group.targetId)
     : null;
 
   return !target
