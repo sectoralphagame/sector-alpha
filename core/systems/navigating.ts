@@ -78,13 +78,16 @@ function setFlybyDrive(entity: Driveable, delta: number) {
   const targetEntity = entity.sim.get(drive.target!)!;
   const targetPosition = targetEntity.cp.position!;
 
-  const path = subtract(targetPosition.coord, entityPosition.coord) as Matrix;
+  const path = [
+    targetPosition.coord.get([0]) - entityPosition.coord.get([0]),
+    targetPosition.coord.get([1]) - entityPosition.coord.get([1]),
+  ];
 
   const entityAngle = normalizeAngle(
     // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
     entityPosition.angle - Math.PI / 2
   );
-  const targetAngle = Math.atan2(path.get([1]), path.get([0]));
+  const targetAngle = Math.atan2(path[1], path[0]);
 
   const distance = norm(path) as number;
   const angleOffset = Math.abs(normalizeAngle(targetAngle - entityAngle));
@@ -163,13 +166,16 @@ function setDrive(entity: Driveable, delta: number) {
     return;
   }
 
-  const path = subtract(targetPosition, entityPosition.coord) as Matrix;
+  const path = [
+    targetPosition.get([0]) - entityPosition.coord.get([0]),
+    targetPosition.get([1]) - entityPosition.coord.get([1]),
+  ];
 
   const entityAngle = normalizeAngle(
     // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
     entityPosition.angle - Math.PI / 2
   );
-  const targetAngle = Math.atan2(path.get([1]), path.get([0]));
+  const targetAngle = Math.atan2(path[1], path[0]);
 
   const distance = norm(path) as number;
   const angleOffset = Math.abs(targetAngle - entityAngle);
