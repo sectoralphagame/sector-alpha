@@ -27,7 +27,6 @@ import { NavigatingSystem } from "@core/systems/navigating";
 import { OrderExecutingSystem } from "@core/systems/orderExecuting/orderExecuting";
 import { PathPlanningSystem } from "@core/systems/pathPlanning";
 import { ProducingSystem } from "@core/systems/producing";
-import { AvgFrameReportingSystem } from "@core/systems/reporting/avgFrameReporting";
 import { SectorStatisticGatheringSystem } from "@core/systems/sectorStatisticGathering";
 import { SelectingSystem } from "@core/systems/selecting";
 import { ShipBuildingSystem } from "@core/systems/shipBuilding";
@@ -76,6 +75,5 @@ export const createBaseConfig = (): SimConfig => ({
         relation: relationRewardHandler,
       }
     ),
-    new AvgFrameReportingSystem(),
   ],
 });

@@ -12,11 +12,13 @@ import type { Entity } from "../../entity";
 import { tradeComponents } from "../../economy/utils";
 import type { Sim } from "../../sim";
 import type { RequireComponent } from "../../tsHelpers";
+import { SectorQuery } from "./sectorQuery";
 
-type QueryEntities<T extends keyof CoreComponents> = Array<RequireComponent<T>>;
+export type QueryEntities<T extends keyof CoreComponents> = Array<
+  RequireComponent<T>
+>;
 
-export class Query<T extends keyof CoreComponents> {
-  entities: QueryEntities<T> | undefined;
+export class BaseQuery<T extends keyof CoreComponents> {
   hooks: {
     add: SyncHook<RequireComponent<T>>;
     remove: SyncHook<number>;
@@ -40,42 +42,33 @@ export class Query<T extends keyof CoreComponents> {
 
     sim.hooks.addComponent.tap("query", ({ entity, component }) => {
       if (
-        this.entities &&
         this.requiredComponents.includes(component) &&
-        this.canBeAdded(entity) &&
-        !this.entities.find((e) => e === entity)
+        this.canBeAdded(entity)
       ) {
         this.add(entity as RequireComponent<T>);
       }
     });
 
     sim.hooks.removeComponent.tap("query", ({ component, entity }) => {
-      if (this.entities && this.requiredComponents.includes(component)) {
+      if (this.requiredComponents.includes(component)) {
         this.remove(entity);
       }
     });
 
     sim.hooks.addTag.tap("query", ({ entity, tag }) => {
-      if (
-        this.entities &&
-        this.requiredTags.includes(tag) &&
-        this.canBeAdded(entity) &&
-        !this.entities.find((e) => e === entity)
-      ) {
+      if (this.requiredTags.includes(tag) && this.canBeAdded(entity)) {
         this.add(entity as RequireComponent<T>);
       }
     });
 
     sim.hooks.removeTag.tap("query", ({ tag, entity }) => {
-      if (this.entities && this.requiredTags.includes(tag)) {
+      if (this.requiredTags.includes(tag)) {
         this.remove(entity);
       }
     });
 
     sim.hooks.removeEntity.tap("query", (entity: Entity) => {
-      if (this.entities) {
-        this.remove(entity);
-      }
+      this.remove(entity);
     });
   }
 
@@ -83,39 +76,70 @@ export class Query<T extends keyof CoreComponents> {
     entity.hasComponents(this.requiredComponents) &&
     entity.hasTags(this.requiredTags);
 
-  init = () => {
-    this.entities = pipe(
+  collect = (): QueryEntities<T> => {
+    const entities = pipe(
       this.sim.entities,
       filter(
         ([, e]) =>
           e.hasComponents(this.requiredComponents) &&
           e.hasTags(this.requiredTags)
       ),
-      map(([, e]) => e),
+      map(([, e]) => e as RequireComponent<T>),
       toArray
-    ) as QueryEntities<T>;
-    this.entities.forEach((e) => this.hooks.add.call(e));
+    );
+
+    entities.forEach((e) => this.hooks.add.call(e));
+
+    return entities;
   };
 
-  add = (entity: RequireComponent<T>) => {
-    this.entities!.push(entity);
+  private add = (entity: RequireComponent<T>) => {
     this.hooks.add.call(entity);
   };
 
-  remove = (entity: Entity) => {
-    if (this.entities) {
-      // Using splice breaks iterating
-      // Example: Query holds array of 5 entities
-      // During forEach loop 3rd entity is removed
-      // Next iteration will take 5th entity, not 4th
-      this.entities = this.entities.filter((e) => e.id !== entity.id);
-      this.hooks.remove.call(entity.id);
-    }
+  private remove = (entity: Entity) => {
+    this.hooks.remove.call(entity.id);
   };
+}
+
+export class Query<T extends keyof CoreComponents> extends BaseQuery<T> {
+  entities: QueryEntities<T> | undefined;
+  hooks: {
+    add: SyncHook<RequireComponent<T>>;
+    remove: SyncHook<number>;
+  };
+  requiredComponents: readonly (keyof CoreComponents)[];
+  requiredTags: readonly EntityTag[];
+  sim: Sim;
+
+  constructor(
+    sim: Sim,
+    requiredComponents: readonly T[],
+    requiredTags: readonly EntityTag[] = []
+  ) {
+    super(sim, requiredComponents, requiredTags);
+
+    this.hooks.add.tap(this.constructor.name, (entity: RequireComponent<T>) => {
+      if (!this.entities) {
+        this.entities = [entity];
+      } else {
+        this.entities!.push(entity);
+      }
+    });
+    this.hooks.remove.tap(this.constructor.name, (entityId: number) => {
+      if (this.entities) {
+        // Using splice breaks iterating
+        // Example: Query holds array of 5 entities
+        // During forEach loop 3rd entity is removed
+        // Next iteration will take 5th entity, not 4th
+        this.entities = this.entities.filter((e) => e.id !== entityId);
+      }
+    });
+  }
 
   get = (): QueryEntities<T> => {
     if (!this.entities) {
-      this.init();
+      this.entities = this.collect();
     }
 
     return this.entities!;
@@ -168,6 +192,9 @@ export function createQueries(sim: Sim) {
     storageAndTrading: new Query(sim, ["storage", "trade"]),
     teleports: new Query(sim, ["teleport"]),
     trading: new Query(sim, tradeComponents),
+    bySectors: {
+      trading: new SectorQuery(sim, tradeComponents),
+    },
   } as const;
 }
 

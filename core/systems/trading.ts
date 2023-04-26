@@ -61,12 +61,8 @@ export function getAveragePrice(
       getSectorsInTeleportRange(sim.getOrThrow<Sector>(sectorId), jumps, sim),
       flatMap((sector) =>
         pipe(
-          sim.queries.trading.get(),
-          filter(
-            (e) =>
-              e.cp.position?.sector === sector.id &&
-              e.cp.trade?.offers[commodity].active
-          ),
+          sim.queries.bySectors.trading.get(sector.id),
+          filter((e) => e.cp.trade?.offers[commodity].active),
           map((e) => e.cp.trade!.offers[commodity].price)
         )
       )

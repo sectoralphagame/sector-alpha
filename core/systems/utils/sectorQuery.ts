@@ -3,7 +3,8 @@ import type { Sim } from "@core/sim";
 import type { EntityTag } from "@core/tags";
 import type { RequireComponent } from "@core/tsHelpers";
 import { SyncHook } from "tapable";
-import { Query } from "./query";
+import type { QueryEntities } from "./query";
+import { BaseQuery } from "./query";
 
 const hook = new SyncHook<[number, number, RequireComponent<"position">]>([
   "oldSector",
@@ -12,8 +13,8 @@ const hook = new SyncHook<[number, number, RequireComponent<"position">]>([
 ]);
 
 export class SectorQuery<T extends keyof CoreComponents> {
-  sectors: Map<number, ReturnType<Query<T | "position">["get"]>>;
-  query: Query<T | "position">;
+  sectors: Map<number, QueryEntities<T | "position">>;
+  query: BaseQuery<T | "position">;
 
   constructor(
     sim: Sim,
@@ -21,20 +22,18 @@ export class SectorQuery<T extends keyof CoreComponents> {
     requiredTags: readonly EntityTag[] = []
   ) {
     this.sectors = new Map();
-    this.query = new Query(
+    this.query = new BaseQuery(
       sim,
       [...requiredComponents, "position"],
       requiredTags
     );
 
-    this.query.hooks.add.tap("SectorQuery", (entity) => {
+    this.query.hooks.add.tap(this.constructor.name, (entity) => {
       this.add(entity.cp.position.sector, entity);
     });
-    this.query.hooks.remove.tap("SectorQuery", (entityId) => {
+    this.query.hooks.remove.tap(this.constructor.name, (entityId) => {
       this.remove(entityId);
     });
-
-    this.query.init();
   }
 
   changePosition = (
@@ -67,6 +66,17 @@ export class SectorQuery<T extends keyof CoreComponents> {
       }
     }
   };
+
+  get = (sectorId: number) => {
+    if (!this.sectors.get(sectorId)) {
+      this.sectors.set(sectorId, []);
+      this.query.collect();
+    }
+
+    return this.sectors.get(sectorId)!;
+  };
+
+  reset = () => this.sectors.clear();
 
   static call(
     oldSector: number,

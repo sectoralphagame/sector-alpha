@@ -74,13 +74,9 @@ export function getTradeWithMostProfit(
     sectorDistance,
     from.sim
   ).flatMap((sector) =>
-    from.sim.queries.trading
-      .get()
-      .filter(
-        (f) =>
-          f.cp.position.sector === sector.id &&
-          !notAllowedFactions.includes(f.cp.owner.id)
-      )
+    from.sim.queries.bySectors.trading
+      .get(sector.id)
+      .filter((f) => !notAllowedFactions.includes(f.cp.owner.id))
   );
 
   const bestOffers = perCommodity((commodity) => ({
@@ -166,11 +162,7 @@ export function getBuyersForCommodityInRange(
       sectorDistance,
       entity.sim
     )
-      .flatMap((sector) =>
-        entity.sim.queries.trading
-          .get()
-          .filter((f) => f.cp.position.sector === sector.id)
-      )
+      .flatMap((sector) => entity.sim.queries.bySectors.trading.get(sector.id))
       .filter(
         (f) =>
           (f.cp.owner.id === faction.id ||
@@ -237,9 +229,7 @@ export function getFacilityWithMostProfit(
       facility.sim
     )
       .flatMap((sector) =>
-        facility.sim.queries.trading
-          .get()
-          .filter((f) => f.cp.position.sector === sector.id)
+        facility.sim.queries.bySectors.trading.get(sector.id)
       )
       .filter(
         (f) =>

@@ -16,7 +16,7 @@ import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
 import type { Queries } from "../systems/utils/query";
-import { createQueries } from "../systems/utils/query";
+import { Query, createQueries } from "../systems/utils/query";
 import { MissingEntityError } from "../errors";
 import { openDb } from "../db";
 
@@ -226,7 +226,13 @@ export class Sim extends BaseSim {
     const save = JSON.parse(data);
     const sim = plainToInstance(Sim, save);
     config.systems.forEach((system) => system.apply(sim));
-    Object.values(sim.queries).forEach((query) => query.reset());
+    Object.values(sim.queries).forEach((queryOrNested) => {
+      if (queryOrNested instanceof Query) {
+        queryOrNested.reset();
+      } else {
+        Object.values(queryOrNested).forEach((query) => query.reset());
+      }
+    });
     const entityMap = new Map();
 
     sim.entities.forEach((entity) => {

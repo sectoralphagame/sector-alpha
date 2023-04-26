@@ -622,9 +622,7 @@ export function returnToFacility(
 }
 
 export function getSectorPrices(sector: Sector): SectorPriceStats {
-  const facilities = sector.sim.queries.trading
-    .get()
-    .filter((facility) => facility.cp.position.sector === sector.id);
+  const facilities = sector.sim.queries.bySectors.trading.get(sector.id);
 
   return perCommodity((commodity) => {
     const buyOffers = facilities

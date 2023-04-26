@@ -1,7 +1,3 @@
-import { filter, map, pipe, reduce, toArray } from "@fxts/core";
-import type { Faction } from "@core/archetypes/faction";
-import { relationThresholds } from "@core/components/relations";
-import { distance } from "mathjs";
 import type { RequireComponent } from "@core/tsHelpers";
 import type { Facility } from "@core/archetypes/facility";
 import { facilityComponents } from "@core/archetypes/facility";
@@ -11,11 +7,12 @@ import type { Sim } from "../../sim";
 import { Cooldowns } from "../../utils/cooldowns";
 import { Query } from "../utils/query";
 import { SpottingSystem } from "./spotting";
+import { SectorQuery } from "../utils/sectorQuery";
 
 export class MilitaryModuleSpottingSystem extends System {
   cooldowns: Cooldowns<"exec">;
   queries: {
-    enemies: Query<"hitpoints" | "owner" | "position">;
+    enemies: SectorQuery<"hitpoints" | "owner" | "position">;
     modules: Query<"parent" | "damage">;
   };
 
@@ -28,7 +25,7 @@ export class MilitaryModuleSpottingSystem extends System {
     super.apply(sim);
 
     this.queries = {
-      enemies: new Query(sim, ["hitpoints", "owner", "position"]),
+      enemies: new SectorQuery(sim, ["hitpoints", "owner", "position"]),
       modules: new Query(sim, ["parent", "damage"], ["facilityModule"]),
     };
 
@@ -50,7 +47,7 @@ export class MilitaryModuleSpottingSystem extends System {
 
       const enemy = pickRandom(
         SpottingSystem.getEnemies(
-          this.queries.enemies.get(),
+          this.queries.enemies.get(facility.cp.position.sector),
           cache,
           facility.requireComponents([...facilityComponents, "owner"])
         ).slice(0, 3)

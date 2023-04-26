@@ -7,7 +7,7 @@ import { pickRandom } from "@core/utils/generators";
 import { System } from "../system";
 import type { Sim } from "../../sim";
 import { Cooldowns } from "../../utils/cooldowns";
-import { Query } from "../utils/query";
+import { SectorQuery } from "../utils/sectorQuery";
 
 export type EnemyArrayCache = Record<
   string,
@@ -16,7 +16,7 @@ export type EnemyArrayCache = Record<
 
 export class SpottingSystem extends System {
   cooldowns: Cooldowns<"exec">;
-  query: Query<"hitpoints" | "owner" | "position">;
+  query: SectorQuery<"hitpoints" | "owner" | "position">;
 
   constructor() {
     super();
@@ -26,7 +26,7 @@ export class SpottingSystem extends System {
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    this.query = new Query(sim, ["hitpoints", "owner", "position"]);
+    this.query = new SectorQuery(sim, ["hitpoints", "owner", "position"]);
 
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
@@ -46,7 +46,6 @@ export class SpottingSystem extends System {
         filter(
           (e) =>
             e.cp.owner.id !== entityOwner.id &&
-            e.cp.position.sector === entity.cp.position.sector &&
             (entityOwner.cp.relations.values[e.cp.owner.id]! <
               relationThresholds.attack ||
               (entityOwner.cp.ai?.restrictions.mining && e.cp.mining?.entityId))
@@ -56,6 +55,7 @@ export class SpottingSystem extends System {
     if (!cache[cacheKey]) {
       cache[cacheKey] = enemies;
     }
+
     return pipe(
       enemies,
       map((e) => ({
@@ -91,7 +91,11 @@ export class SpottingSystem extends System {
         return;
 
       const enemy = pickRandom(
-        SpottingSystem.getEnemies(this.query.get(), cache, entity).slice(0, 3)
+        SpottingSystem.getEnemies(
+          this.query.get(entity.cp.position.sector),
+          cache,
+          entity
+        ).slice(0, 3)
       );
 
       if (enemy?.distance <= 8) {
