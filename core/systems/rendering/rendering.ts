@@ -183,8 +183,6 @@ export class RenderingSystem extends SystemWithHooks {
     });
 
     window.addEventListener("keyup", (event) => {
-      if (event.target !== document.body) return;
-
       if (this.keysPressed.includes(event.key)) {
         this.keysPressed = this.keysPressed.filter((key) => key !== event.key);
       }
