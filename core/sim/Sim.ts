@@ -56,7 +56,10 @@ export class Sim extends BaseSim {
     removeEntity: SyncHook<Entity>;
     destroy: SyncHook<void>;
 
-    phase: Record<"init" | "update" | "render" | "cleanup", SyncHook<number>>;
+    phase: Record<
+      "start" | "init" | "update" | "render" | "cleanup" | "end",
+      SyncHook<number>
+    >;
   };
 
   @Expose()
@@ -64,7 +67,6 @@ export class Sim extends BaseSim {
   entities: Map<number, Entity>;
   queries: Queries;
   paths: Record<string, Record<string, Path>>;
-  diagnostics = false;
 
   constructor({ systems }: SimConfig = { systems: [] }) {
     super();
@@ -78,10 +80,12 @@ export class Sim extends BaseSim {
       removeEntity: new SyncHook(["removeEntity"]),
       destroy: new SyncHook(["destroy"]),
       phase: {
-        init: new SyncHook(["init"]),
-        update: new SyncHook(["update"]),
-        render: new SyncHook(["render"]),
-        cleanup: new SyncHook(["cleanup"]),
+        start: new SyncHook(["delta"]),
+        init: new SyncHook(["delta"]),
+        update: new SyncHook(["delta"]),
+        render: new SyncHook(["delta"]),
+        cleanup: new SyncHook(["delta"]),
+        end: new SyncHook(["delta"]),
       },
     };
 
@@ -102,10 +106,12 @@ export class Sim extends BaseSim {
   };
 
   next = (delta: number) => {
+    this.hooks.phase.start.call(delta);
     this.hooks.phase.init.call(delta);
     this.hooks.phase.update.call(delta);
     this.hooks.phase.render.call(delta);
     this.hooks.phase.cleanup.call(delta);
+    this.hooks.phase.end.call(delta);
 
     this.updateTimer(delta);
   };
