@@ -1,3 +1,4 @@
+import { isDev } from "@core/settings";
 import { FacilityPlanningSystem } from "@core/systems/ai/facilityPlanning";
 import { MilitaryModuleSpottingSystem } from "@core/systems/ai/militaryModuleSpotting";
 import { OrderPlanningSystem } from "@core/systems/ai/orderPlanning";
@@ -36,46 +37,53 @@ import { TradingSystem } from "@core/systems/trading";
 import { UndeployingSystem } from "@core/systems/undeploying";
 import type { SimConfig } from "./Sim";
 
-export const createBaseConfig = (): SimConfig => ({
-  systems: [
-    new PathPlanningSystem(),
-    new CooldownUpdatingSystem(),
-    new ProducingSystem(),
-    new StorageQuotaPlanningSystem(),
-    new TradingSystem(),
-    new BudgetPlanningSystem(),
-    new SelectingSystem(),
-    new OrderPlanningSystem(),
-    new NavigatingSystem(),
-    new MovingSystem(),
-    new MiningSystem(),
-    new OrderExecutingSystem(),
-    new AsteroidSpawningSystem(),
-    new FacilityPlanningSystem(),
-    new ShipPlanningSystem(),
-    new SectorStatisticGatheringSystem(),
-    new InflationStatisticGatheringSystem(),
-    new ShipBuildingSystem(),
-    new FacilityBuildingSystem(),
-    new UndeployingSystem(),
-    new AttackingSystem(),
-    new SpottingSystem(),
-    new MilitaryModuleSpottingSystem(),
-    new HitpointsRegeneratingSystem(),
-    new TauHarassingSystem(),
-    new ShipReturningSystem(),
-    new DisposableUnregisteringSystem(),
-    new DeadUnregisteringSystem(),
-    new CollectibleUnregisteringSystem(),
-    new MissionSystem(
-      {
-        patrol: patrolMissionHandler,
-      },
-      {
-        money: moneyRewardHandler,
-        relation: relationRewardHandler,
-      }
-    ),
-    new AvgFrameReportingSystem(),
-  ],
-});
+export const createBaseConfig = (): SimConfig => {
+  const config: SimConfig = {
+    systems: [
+      new PathPlanningSystem(),
+      new CooldownUpdatingSystem(),
+      new ProducingSystem(),
+      new StorageQuotaPlanningSystem(),
+      new TradingSystem(),
+      new BudgetPlanningSystem(),
+      new SelectingSystem(),
+      new OrderPlanningSystem(),
+      new NavigatingSystem(),
+      new MovingSystem(),
+      new MiningSystem(),
+      new OrderExecutingSystem(),
+      new AsteroidSpawningSystem(),
+      new FacilityPlanningSystem(),
+      new ShipPlanningSystem(),
+      new SectorStatisticGatheringSystem(),
+      new InflationStatisticGatheringSystem(),
+      new ShipBuildingSystem(),
+      new FacilityBuildingSystem(),
+      new UndeployingSystem(),
+      new AttackingSystem(),
+      new SpottingSystem(),
+      new MilitaryModuleSpottingSystem(),
+      new HitpointsRegeneratingSystem(),
+      new TauHarassingSystem(),
+      new ShipReturningSystem(),
+      new DisposableUnregisteringSystem(),
+      new DeadUnregisteringSystem(),
+      new CollectibleUnregisteringSystem(),
+      new MissionSystem(
+        {
+          patrol: patrolMissionHandler,
+        },
+        {
+          money: moneyRewardHandler,
+          relation: relationRewardHandler,
+        }
+      ),
+    ],
+  };
+
+  if (isDev) {
+    config.systems.push(new AvgFrameReportingSystem());
+  }
+
+  return config;
+};
