@@ -16,8 +16,10 @@ describe("Trading system", () => {
   let facility: Facility;
 
   beforeEach(() => {
-    sim = new Sim();
-    system = new TradingSystem(sim);
+    system = new TradingSystem();
+    sim = new Sim({
+      systems: [system],
+    });
     facility = createFarm(
       {
         owner: createFaction("F", sim)
@@ -26,6 +28,9 @@ describe("Trading system", () => {
             priceModifier: 0.01,
             stockpiling: 1,
             type: "territorial",
+            home: 0,
+            patrols: { formation: { fighters: 0 }, perSector: 0 },
+            restrictions: { mining: false },
           })
           .requireComponents(factionComponents),
         position: matrix([0, 0]),

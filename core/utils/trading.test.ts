@@ -23,6 +23,8 @@ import type { RequireComponent } from "../tsHelpers";
 import type { WithTrade } from "../economy/utils";
 import { commodityPrices } from "./perCommodity";
 import { changeRelations } from "../components/relations";
+import { PathPlanningSystem } from "../systems/pathPlanning";
+import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
 
 describe("Trading module", () => {
   let sim: Sim;
@@ -30,9 +32,11 @@ describe("Trading module", () => {
   let sector: Sector;
 
   beforeEach(() => {
-    sim = new Sim();
+    sim = new Sim({
+      systems: [new PathPlanningSystem(), new OrderExecutingSystem()],
+    });
     // Run path planning
-    sim.systems[0].exec(0);
+    sim.hooks.phase.init.call(0);
 
     sector = createSector(sim, { name: "", position: matrix([0, 0, 0]) });
     facility = createFarm(
@@ -281,11 +285,19 @@ describe("Trade flow", () => {
   let sim: Sim;
 
   beforeAll(() => {
-    sim = new Sim();
-    const player = createFaction("Player", sim);
-    player.addTag("player");
+    sim = new Sim({
+      systems: [new PathPlanningSystem(), new OrderExecutingSystem()],
+    });
+    createFaction("Player", sim)
+      .addComponent({
+        name: "missions",
+        declined: 0,
+        offer: null,
+        value: [],
+      })
+      .addTag("player");
     // Run path planning
-    sim.systems[0].exec(0);
+    sim.hooks.phase.init.call(0);
   });
 
   it("between factions", () => {

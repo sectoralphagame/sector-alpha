@@ -1,5 +1,5 @@
 import type { Matrix } from "mathjs";
-import { add, matrix, random, norm, subtract } from "mathjs";
+import { add, matrix, random, norm } from "mathjs";
 import { normalizeAngle } from "@core/utils/misc";
 import {
   clearTarget,

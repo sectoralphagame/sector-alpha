@@ -16,13 +16,18 @@ describe("Ship", () => {
   let sim: Sim;
   let navigatingSystem: NavigatingSystem;
   let movingSystem: MovingSystem;
+  let orderExecutingSystem: OrderExecutingSystem;
   let ship: Ship;
   let sector: Sector;
 
   beforeEach(() => {
-    sim = new Sim();
-    movingSystem = new MovingSystem(sim);
-    navigatingSystem = new NavigatingSystem(sim);
+    movingSystem = new MovingSystem();
+    navigatingSystem = new NavigatingSystem();
+    orderExecutingSystem = new OrderExecutingSystem();
+
+    sim = new Sim({
+      systems: [movingSystem, navigatingSystem, orderExecutingSystem],
+    });
     sector = createSector(sim, { position: matrix([0, 0, 0]), name: "" });
     ship = createShip(sim, {
       ...shipClasses.find((s) => s.name === "Courier A")!,
@@ -44,7 +49,7 @@ describe("Ship", () => {
       }).id
     );
 
-    for (let index = 0; index < 7; index++) {
+    for (let index = 0; index < 6; index++) {
       navigatingSystem.exec(1);
       movingSystem.exec(1);
     }
@@ -69,7 +74,6 @@ describe("Ship", () => {
   });
 
   it("is able to make move order", () => {
-    const orderExecutingSystem = new OrderExecutingSystem(sim);
     const m = createWaypoint(sim, {
       sector: sector.id,
       value: matrix([1, 1]),

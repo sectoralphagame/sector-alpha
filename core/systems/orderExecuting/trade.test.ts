@@ -18,8 +18,10 @@ describe("Trade action cleanup", () => {
   const quantity = 10;
 
   beforeEach(() => {
-    sim = new Sim();
-    const pathPlanning = new PathPlanningSystem(sim);
+    const pathPlanning = new PathPlanningSystem();
+    sim = new Sim({
+      systems: [pathPlanning],
+    });
     pathPlanning.exec(0);
   });
 

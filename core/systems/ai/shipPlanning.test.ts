@@ -11,8 +11,10 @@ describe("ShipPlanningSystem", () => {
   let system: ShipPlanningSystem;
 
   beforeEach(() => {
-    sim = new Sim();
-    system = new ShipPlanningSystem(sim);
+    system = new ShipPlanningSystem();
+    sim = new Sim({
+      systems: [system],
+    });
   });
 
   it("should create proper patrol requests", () => {
@@ -23,6 +25,8 @@ describe("ShipPlanningSystem", () => {
       priceModifier: 0,
       stockpiling: 0,
       type: "territorial",
+      home: 0,
+      restrictions: { mining: false },
     });
     faction.cp.blueprints.ships = shipClasses;
     const sector = createSector(sim, {
