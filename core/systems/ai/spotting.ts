@@ -111,6 +111,6 @@ export class SpottingSystem extends System {
       }
     });
 
-    this.cooldowns.use("exec", 1.5);
+    this.cooldowns.use("exec", 1 + Math.random());
   };
 }

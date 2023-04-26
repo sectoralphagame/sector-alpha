@@ -8,6 +8,7 @@ import { Cooldowns } from "../../utils/cooldowns";
 import { Query } from "../utils/query";
 import { SpottingSystem } from "./spotting";
 import { SectorQuery } from "../utils/sectorQuery";
+import { isInDistance } from "../attacking";
 
 export class MilitaryModuleSpottingSystem extends System {
   cooldowns: Cooldowns<"exec">;
@@ -43,7 +44,13 @@ export class MilitaryModuleSpottingSystem extends System {
 
     this.queries.modules.get().forEach((entity) => {
       const facility = this.sim.getOrThrow<Facility>(entity.cp.parent.id);
-      if (!facility.cp.owner) return;
+      if (
+        !facility.cp.owner ||
+        (entity.cp.damage.targetId &&
+          this.sim.get(entity.cp.damage.targetId) &&
+          isInDistance(entity, this.sim.get(entity.cp.damage.targetId)!))
+      )
+        return;
 
       const enemy = pickRandom(
         SpottingSystem.getEnemies(
@@ -58,6 +65,6 @@ export class MilitaryModuleSpottingSystem extends System {
       }
     });
 
-    this.cooldowns.use("exec", 1.5);
+    this.cooldowns.use("exec", 1 + Math.random());
   };
 }
