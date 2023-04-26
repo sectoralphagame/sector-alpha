@@ -98,7 +98,7 @@ export class SpottingSystem extends System {
         ).slice(0, 3)
       );
 
-      if (enemy?.distance <= 8) {
+      if (enemy?.distance <= 10) {
         entity.cp.orders.value[0].interrupt = true;
         entity.cp.orders.value.splice(1, 0, {
           type: "attack",
