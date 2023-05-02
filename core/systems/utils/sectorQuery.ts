@@ -28,6 +28,7 @@ export class SectorQuery<T extends keyof CoreComponents> {
       requiredTags
     );
 
+    hook.tap(this.constructor.name, this.changePosition);
     this.query.hooks.add.tap(this.constructor.name, (entity) => {
       this.add(entity.cp.position.sector, entity);
     });
@@ -37,11 +38,11 @@ export class SectorQuery<T extends keyof CoreComponents> {
   }
 
   changePosition = (
-    entity: RequireComponent<T | "position">,
     oldSector: number,
-    newSector: number
+    newSector: number,
+    entity: RequireComponent<T | "position">
   ) => {
-    if (oldSector !== newSector) {
+    if (oldSector !== newSector && this.query.canBeAdded(entity)) {
       this.remove(entity.id, oldSector);
       this.add(newSector, entity);
     }
@@ -52,6 +53,8 @@ export class SectorQuery<T extends keyof CoreComponents> {
   };
 
   remove = (entityId: number, sector?: number) => {
+    if (sector && !this.sectors.get(sector)) return;
+
     if (sector) {
       this.sectors.set(
         sector,

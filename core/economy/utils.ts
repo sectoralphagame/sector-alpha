@@ -154,7 +154,7 @@ export function getBuyersForCommodityInRange(
   const profit = (f: WithTrade) =>
     f.cp.owner.id === faction.id
       ? Infinity
-      : f.components.trade.offers[commodity].price;
+      : f.cp.trade.offers[commodity].price;
 
   return sortBy(
     getSectorsInTeleportRange(
@@ -168,9 +168,9 @@ export function getBuyersForCommodityInRange(
           (f.cp.owner.id === faction.id ||
             faction.cp.relations.values[f.cp.owner.id] >=
               relationThresholds.trade) &&
-          f.components.trade.offers[commodity].active &&
-          f.components.trade.offers[commodity].type === "buy" &&
-          f.components.trade.offers[commodity].quantity >= minQuantity
+          f.cp.trade.offers[commodity].active &&
+          f.cp.trade.offers[commodity].type === "buy" &&
+          f.cp.trade.offers[commodity].quantity >= minQuantity
       )
       .map((f) => ({
         facility: f,
@@ -218,9 +218,9 @@ export function getFacilityWithMostProfit(
   const profit = (f: WithTrade) =>
     f.cp.owner.id === facility.cp.owner.id
       ? Infinity
-      : (facility.components.trade.offers[commodity].price -
-          f.components.trade.offers[commodity].price) *
-        (facility.components.trade.offers[commodity].type === "buy" ? 1 : -1);
+      : (facility.cp.trade.offers[commodity].price -
+          f.cp.trade.offers[commodity].price) *
+        (facility.cp.trade.offers[commodity].type === "buy" ? 1 : -1);
 
   const sortedByProfit = sortBy(
     getSectorsInTeleportRange(
@@ -236,10 +236,10 @@ export function getFacilityWithMostProfit(
           (f.cp.owner.id === faction.id ||
             faction.cp.relations.values[f.cp.owner.id] >=
               relationThresholds.trade) &&
-          f.components.trade.offers[commodity].active &&
-          f.components.trade.offers[commodity].type !==
-            facility.components.trade.offers[commodity].type &&
-          f.components.trade.offers[commodity].quantity >= minQuantity
+          f.cp.trade.offers[commodity].active &&
+          f.cp.trade.offers[commodity].type !==
+            facility.cp.trade.offers[commodity].type &&
+          f.cp.trade.offers[commodity].quantity >= minQuantity
       )
       .map((f) => ({
         facility: f,
@@ -266,12 +266,9 @@ export function getMineableAsteroid(
   field: AsteroidField
 ): Asteroid | undefined {
   return pickRandom(
-    field.components.children.entities
+    field.cp.children.entities
       .map((e) => asteroid(field.sim.getOrThrow(e)!))
-      .filter(
-        (a) =>
-          !a.components.minable.minedById && a.components.minable.resources > 0
-      )
+      .filter((a) => !a.cp.minable.minedById && a.cp.minable.resources > 0)
   );
 }
 
@@ -284,12 +281,12 @@ export function getPlannedBudget(entity: WithTrade): number {
   return commoditiesArray.reduce(
     (budget, commodity) =>
       budget +
-      (entity.components.trade.offers[commodity].type === "sell" ||
-      !entity.components.trade.offers[commodity].active
+      (entity.cp.trade.offers[commodity].type === "sell" ||
+      !entity.cp.trade.offers[commodity].active
         ? 0
         : entity.cp.storage.quota[commodity] -
           entity.cp.storage.stored[commodity]) *
-        entity.components.trade.offers[commodity].price,
+        entity.cp.trade.offers[commodity].price,
     0
   );
 }
