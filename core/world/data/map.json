@@ -388,7 +388,11 @@
   "inactive": [],
   "links": [
     { "sectors": ["terra", "luna"], "type": "accelerator" },
-    { "sectors": ["terra", "mars"], "type": "accelerator" },
+    {
+      "sectors": ["terra", "mars"],
+      "type": "accelerator",
+      "draw": ["vertical", "horizontal"]
+    },
     { "sectors": ["mars", "saturn"], "type": "accelerator" },
     { "sectors": ["saturn", "sedna"], "type": "accelerator" },
     { "sectors": ["gaia", "arges"], "type": "accelerator" },
