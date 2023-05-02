@@ -5,6 +5,7 @@ const tags = [
   "player",
   "selection",
   "ship",
+  "sector",
   "facility",
   "facilityModule",
   "asteroid",
