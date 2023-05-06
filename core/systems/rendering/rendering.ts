@@ -2,7 +2,6 @@ import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
 import { Entity } from "@core/entity";
-import { Graphics } from "pixi.js";
 import type { Sim } from "@core/sim";
 import { setCheat } from "@core/utils/misc";
 import { isHeadless } from "@core/settings";
@@ -17,6 +16,7 @@ import { clearFocus } from "../../components/selection";
 import type { Layer } from "../../components/render";
 import { destroy, setTexture } from "../../components/render";
 import { SectorQuery } from "../utils/sectorQuery";
+import { drawHpBars } from "./hpBars";
 
 const minScale = 0.08;
 const maxScale = 40;
@@ -26,59 +26,6 @@ const layerScaleThresholds: Partial<Record<Layer, number>> = {
   facility: 0.13,
   ship: 0.4,
 };
-
-function drawHpBars(entity: RequireComponent<"render">) {
-  if (entity.cp.hitpoints) {
-    if (!entity.cp.hitpoints.g) {
-      entity.cp.hitpoints.g = {} as any;
-    }
-    if (!entity.cp.hitpoints.g.hp) {
-      entity.cp.hitpoints.g.hp = new Graphics();
-      entity.cp.render.sprite.addChild(entity.cp.hitpoints.g.hp);
-    }
-
-    if (entity.cp.hitpoints.shield && !entity.cp.hitpoints.g.shield) {
-      entity.cp.hitpoints.g.shield = new Graphics();
-      entity.cp.render.sprite.addChild(entity.cp.hitpoints.g.shield);
-    }
-
-    entity.cp.hitpoints.g.hp.rotation = -entity.cp.render.sprite.rotation;
-    if (entity.cp.hitpoints.shield) {
-      entity.cp.hitpoints.g.shield.rotation = -entity.cp.render.sprite.rotation;
-    }
-
-    if (entity.cp.hitpoints.hit !== false) {
-      entity.cp.hitpoints.hit = false;
-
-      const hp = entity.cp.hitpoints.hp.value / entity.cp.hitpoints.hp.max;
-
-      if (hp >= 1) {
-        entity.cp.hitpoints.g.hp.visible = false;
-      } else {
-        entity.cp.hitpoints.g.hp.visible = true;
-        entity.cp.hitpoints.g.hp.clear();
-        entity.cp.hitpoints.g.hp
-          .beginFill(0x00ff00)
-          .drawRect(-25, -30, hp * 50, 9);
-      }
-
-      if (entity.cp.hitpoints.shield) {
-        const shield =
-          entity.cp.hitpoints.shield.value / entity.cp.hitpoints.shield.max;
-
-        if (shield >= 1) {
-          entity.cp.hitpoints.g.shield.visible = false;
-        } else {
-          entity.cp.hitpoints.g.shield.visible = true;
-          entity.cp.hitpoints.g.shield.clear();
-          entity.cp.hitpoints.g.shield
-            .beginFill(0x0000ff)
-            .drawRect(-25, -42, shield * 50, 9);
-        }
-      }
-    }
-  }
-}
 
 export class RenderingSystem extends SystemWithHooks {
   rendering: true;
@@ -267,13 +214,13 @@ export class RenderingSystem extends SystemWithHooks {
         this.viewport.addChild(entityRender.sprite);
         if (entity.tags.has("selection")) {
           entityRender.sprite.interactive = true;
-          entityRender.sprite.on("pointerdown", (event) => {
-            // Right click
-            if (event.data.originalEvent.which === 3) {
-              this.settingsManager.cp.selectionManager.secondaryId = entity.id;
-            } else if (event.data.originalEvent.which === 1) {
+          entityRender.sprite.addEventListener("pointerdown", (event) => {
+            if (event.button === 0) {
               this.settingsManager.cp.selectionManager.id = entity.id;
             }
+          });
+          entityRender.sprite.addEventListener("rightdown", () => {
+            this.settingsManager.cp.selectionManager.secondaryId = entity.id;
           });
           entityRender.sprite.cursor = "pointer";
           entityRender.sprite.tint = entityRender.color;
