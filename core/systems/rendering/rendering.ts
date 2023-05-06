@@ -132,7 +132,7 @@ export class RenderingSystem extends SystemWithHooks {
     this.viewport = new Viewport({
       screenWidth: root.clientWidth,
       screenHeight: window.innerHeight,
-      interaction: this.app.renderer.plugins.interaction,
+      events: this.app.renderer.events,
     });
 
     this.app.stage.addChild(this.viewport);

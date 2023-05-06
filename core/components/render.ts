@@ -35,7 +35,7 @@ if (!isHeadless) {
     PIXI.BaseTexture.from(manifest.meta.image),
     manifest
   );
-  spritesheet.parse(() => {});
+  spritesheet.parse();
 }
 
 export function setTexture(render: Render, texture: keyof Textures) {
