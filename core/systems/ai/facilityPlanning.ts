@@ -12,7 +12,6 @@ import { sectorSize } from "../../archetypes/sector";
 import { hecsToCartesian } from "../../components/hecsPosition";
 import type { PAC } from "../../components/production";
 import { createCompoundProduction } from "../../components/production";
-import { setTexture } from "../../components/render";
 import { addStorage } from "../../components/storage";
 import type { Commodity } from "../../economy/commodity";
 import { commoditiesArray, mineableCommodities } from "../../economy/commodity";
@@ -178,7 +177,7 @@ export class FacilityPlanningSystem extends System {
           ) as Matrix,
           sector,
         });
-        setTexture(facility.cp.render, "fCiv");
+        facility.cp.render.texture = "fCiv";
         facility.cp.name.value = createFacilityName(facility, "Habitat");
         facility.addComponent(createCompoundProduction());
 

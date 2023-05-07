@@ -4,16 +4,13 @@ import type { Ship } from "@core/archetypes/ship";
 import { createBudget } from "@core/components/budget";
 import type { CoreComponents } from "@core/components/component";
 import { createDocks } from "@core/components/dockable";
-import type { Render } from "@core/components/render";
-import { createRender, destroy } from "@core/components/render";
+import { createRender } from "@core/components/render";
 import { createCommodityStorage } from "@core/components/storage";
 import { createTrade } from "@core/components/trade";
 import { addFacilityModule } from "@core/utils/entityModules";
 
 export function deployFacilityAction(entity: Ship): boolean {
-  destroy(entity.cp.render);
-
-  const render: Render = createRender({
+  const render = createRender({
     ...entity.cp.render,
     defaultScale: 1,
     texture: "fFactory",

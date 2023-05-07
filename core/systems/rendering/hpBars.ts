@@ -1,24 +1,25 @@
 import type { RequireComponent } from "@core/tsHelpers";
+import type { Sprite } from "pixi.js";
 import { Graphics } from "pixi.js";
 
-export function drawHpBars(entity: RequireComponent<"render">) {
+export function drawHpBars(entity: RequireComponent<"render">, sprite: Sprite) {
   if (entity.cp.hitpoints) {
     if (!entity.cp.hitpoints.g) {
       entity.cp.hitpoints.g = {} as any;
     }
     if (!entity.cp.hitpoints.g.hp) {
       entity.cp.hitpoints.g.hp = new Graphics();
-      entity.cp.render.sprite.addChild(entity.cp.hitpoints.g.hp);
+      sprite.addChild(entity.cp.hitpoints.g.hp);
     }
 
     if (entity.cp.hitpoints.shield && !entity.cp.hitpoints.g.shield) {
       entity.cp.hitpoints.g.shield = new Graphics();
-      entity.cp.render.sprite.addChild(entity.cp.hitpoints.g.shield);
+      sprite.addChild(entity.cp.hitpoints.g.shield);
     }
 
-    entity.cp.hitpoints.g.hp.rotation = -entity.cp.render.sprite.rotation;
+    entity.cp.hitpoints.g.hp.rotation = -sprite.rotation;
     if (entity.cp.hitpoints.shield) {
-      entity.cp.hitpoints.g.shield.rotation = -entity.cp.render.sprite.rotation;
+      entity.cp.hitpoints.g.shield.rotation = -sprite.rotation;
     }
 
     if (entity.cp.hitpoints.hit !== false) {

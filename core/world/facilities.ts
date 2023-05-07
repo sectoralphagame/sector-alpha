@@ -4,7 +4,6 @@ import { facilityModules } from "../archetypes/facilityModule";
 import type { Sim } from "../sim";
 import { addFacilityModule } from "../utils/entityModules";
 import { addStorage } from "../components/storage";
-import { setTexture } from "../components/render";
 
 export function createRefineryFacility(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
@@ -42,7 +41,7 @@ export function createShipyard(input: InitialFacilityInput, sim: Sim) {
   }
 
   facility.addComponent({ name: "shipyard", queue: [], building: null });
-  setTexture(facility.cp.render, "fShipyard");
+  facility.cp.render.texture = "fShipyard";
   facility.cp.name.value = `${input.owner.cp.name.slug!} Shipyard`;
 
   return facility;
@@ -153,7 +152,7 @@ export function createElectronicsFacility(
 export function createTeleporter(input: InitialFacilityInput, sim: Sim) {
   const facility = createFacility(sim, input);
   addFacilityModule(facility, facilityModules.teleport.create(sim, facility));
-  setTexture(facility.cp.render, "fTeleport");
+  facility.cp.render.texture = "fTeleport";
 
   return facility;
 }

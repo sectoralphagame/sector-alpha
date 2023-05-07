@@ -2,6 +2,7 @@ import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Color from "color";
 import { Entity } from "@core/entity";
+import { manifest } from "@assets/icons";
 import type { Sim } from "@core/sim";
 import { setCheat } from "@core/utils/misc";
 import { isHeadless } from "@core/settings";
@@ -13,8 +14,7 @@ import type { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
 import { SystemWithHooks } from "../utils/hooks";
 import { clearFocus } from "../../components/selection";
-import type { Layer } from "../../components/render";
-import { destroy, setTexture } from "../../components/render";
+import type { Layer, Textures } from "../../components/render";
 import { SectorQuery } from "../utils/sectorQuery";
 import { drawHpBars } from "./hpBars";
 
@@ -26,6 +26,31 @@ const layerScaleThresholds: Partial<Record<Layer, number>> = {
   facility: 0.13,
   ship: 0.4,
 };
+
+let spritesheet: PIXI.Spritesheet;
+if (!isHeadless) {
+  spritesheet = new PIXI.Spritesheet(
+    PIXI.BaseTexture.from(manifest.meta.image),
+    manifest
+  );
+  spritesheet.parse();
+}
+
+export function getTexture(texture: keyof Textures) {
+  return spritesheet.textures[texture];
+}
+
+export function setTexture(
+  entity: RequireComponent<"render">,
+  sprite: PIXI.Sprite,
+  texture: keyof Textures
+) {
+  entity.cp.render.texture = texture;
+  if (!isHeadless) {
+    sprite.texture = getTexture(texture);
+    sprite.anchor.set(0.5, 0.5);
+  }
+}
 
 export class RenderingSystem extends SystemWithHooks {
   rendering: true;
@@ -41,6 +66,7 @@ export class RenderingSystem extends SystemWithHooks {
   grid: RequireComponent<"renderGraphics"> | null = null;
   layers: Record<Layer, PIXI.Container>;
   sectorQuery: SectorQuery<"render">;
+  sprites: Map<Entity, PIXI.Sprite> = new Map();
 
   apply = (sim: Sim) => {
     super.apply(sim);
@@ -135,9 +161,20 @@ export class RenderingSystem extends SystemWithHooks {
       }
     });
 
-    this.sim.hooks.removeEntity.tap("RenderingSystem", (entity: Entity) => {
+    this.sim.hooks.removeComponent.tap(
+      "RenderingSystem",
+      ({ entity, component }) => {
+        if (component === "render") {
+          this.sprites.get(entity)?.destroy();
+          this.sprites.delete(entity);
+        }
+      }
+    );
+
+    this.sim.hooks.removeEntity.tap("RenderingSystem", (entity) => {
       if (entity.cp.render) {
-        destroy(entity.cp.render);
+        this.sprites.get(entity)?.destroy();
+        this.sprites.delete(entity);
       }
       if (entity.cp.renderGraphics) {
         entity.cp.renderGraphics.g.destroy();
@@ -162,7 +199,6 @@ export class RenderingSystem extends SystemWithHooks {
 
     this.sim.entities.forEach((entity) => {
       if (entity.cp.render) {
-        setTexture(entity.cp.render, entity.cp.render.texture);
         entity.cp.render.initialized = false;
       }
       if (entity.cp.renderGraphics) {
@@ -209,22 +245,26 @@ export class RenderingSystem extends SystemWithHooks {
   updateRenderables = () => {
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
+      let sprite = this.sprites.get(entity);
 
       if (!entityRender.initialized) {
-        this.viewport.addChild(entityRender.sprite);
+        sprite = new PIXI.Sprite();
+        setTexture(entity, sprite, entityRender.texture);
+        this.sprites.set(entity, sprite);
+        this.viewport.addChild(sprite);
         if (entity.tags.has("selection")) {
-          entityRender.sprite.interactive = true;
-          entityRender.sprite.addEventListener("pointerdown", (event) => {
+          sprite.interactive = true;
+          sprite.addEventListener("pointerdown", (event) => {
             if (event.button === 0) {
               this.settingsManager.cp.selectionManager.id = entity.id;
             }
           });
-          entityRender.sprite.addEventListener("rightdown", () => {
+          sprite.addEventListener("rightdown", () => {
             this.settingsManager.cp.selectionManager.secondaryId = entity.id;
           });
-          entityRender.sprite.cursor = "pointer";
-          entityRender.sprite.tint = entityRender.color;
-          this.layers[entityRender.layer].addChild(entityRender.sprite);
+          sprite.cursor = "pointer";
+          sprite.tint = entityRender.color;
+          this.layers[entityRender.layer].addChild(sprite);
         }
 
         this.updateEntityScaling(entity);
@@ -232,16 +272,26 @@ export class RenderingSystem extends SystemWithHooks {
         entity.cp.position.moved = true;
       }
 
-      drawHpBars(entity);
+      drawHpBars(entity, sprite!);
 
       if (entity.cp.position.moved) {
         entity.cp.position.moved = false;
 
-        entityRender.sprite.position.set(
+        sprite!.position.set(
           entity.cp.position.coord.get([0]) * 10,
           entity.cp.position.coord.get([1]) * 10
         );
-        entityRender.sprite.rotation = entity.cp.position.angle;
+        sprite!.rotation = entity.cp.position.angle;
+      }
+
+      if (getTexture(entityRender.texture) !== sprite?.texture) {
+        setTexture(entity, sprite!, entityRender.texture);
+      }
+      if (entity.tags.has("selection") !== sprite?.interactive) {
+        sprite!.interactive = entity.tags.has("selection");
+      }
+      if (entityRender.visible !== sprite?.visible) {
+        sprite!.visible = entityRender.visible;
       }
     });
   };
@@ -257,23 +307,24 @@ export class RenderingSystem extends SystemWithHooks {
 
     this.sim.queries.renderable.get().forEach((entity) => {
       const entityRender = entity.cp.render;
+      const sprite = this.sprites.get(entity);
       const selected =
         entity.id === this.settingsManager.cp.selectionManager.id;
 
-      if (selected && entityRender.sprite.tint === entityRender.color) {
-        entityRender.sprite.tint = Color(entityRender.sprite.tint)
-          .lighten(0.23)
-          .rgbNumber();
-        entityRender.sprite.parent?.removeChild(entityRender.sprite);
-        this.layers.selection.addChild(entityRender.sprite);
+      if (!sprite) return;
+
+      if (selected && sprite.tint === entityRender.color) {
+        sprite.tint = Color(sprite.tint).lighten(0.23).rgbNumber();
+        sprite.parent?.removeChild(sprite);
+        this.layers.selection.addChild(sprite);
 
         if (entity.cp.orders) {
           entity.addComponent(createRenderGraphics("path"));
         }
-      } else if (!selected && entityRender.sprite.tint !== entityRender.color) {
-        entityRender.sprite.tint = entityRender.color;
-        entityRender.sprite.parent?.removeChild(entityRender.sprite);
-        this.layers[entityRender.layer].addChild(entityRender.sprite);
+      } else if (!selected && sprite.tint !== entityRender.color) {
+        sprite.tint = entityRender.color;
+        sprite.parent?.removeChild(sprite);
+        this.layers[entityRender.layer].addChild(sprite);
       }
     });
     this.updateScaling();
@@ -281,10 +332,13 @@ export class RenderingSystem extends SystemWithHooks {
 
   updateEntityScaling = (entity: RequireComponent<"render">) => {
     const entityRender = entity.cp.render;
+    const sprite = this.sprites.get(entity);
     const selected = entity.id === this.settingsManager.cp.selectionManager.id;
     const scale = this.viewport.scale.x;
 
-    entityRender.sprite.scale.set(
+    if (!sprite) return;
+
+    sprite.scale.set(
       (1 /
         (scale *
           (scale < (layerScaleThresholds[entityRender.layer] ?? 1) * 2
@@ -376,9 +430,7 @@ export class RenderingSystem extends SystemWithHooks {
         this.settingsManager.cp.selectionManager.id!
       );
       if (entity.hasComponents(["render"])) {
-        this.viewport.follow(
-          entity.requireComponents(["render"]).cp.render.sprite
-        );
+        this.viewport.follow(this.sprites.get(entity)!);
       } else {
         this.settingsManager.cp.selectionManager.focused = false;
       }
