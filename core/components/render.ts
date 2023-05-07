@@ -20,7 +20,6 @@ export interface RenderInput {
 export class Render implements BaseComponent<"render"> {
   color: number;
   defaultScale: number = 1;
-  initialized: boolean = false;
   texture: keyof Textures;
   layer: Layer;
   name: "render" = "render";
@@ -37,7 +36,6 @@ export function createRender({
   const component: Render = {
     color: color ?? 0xffffff,
     defaultScale,
-    initialized: false,
     name: "render",
     layer,
     texture,

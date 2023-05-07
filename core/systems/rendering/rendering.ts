@@ -102,6 +102,23 @@ export class RenderingSystem extends SystemWithHooks {
       backgroundColor: Color("#080808").rgbNumber(),
     });
 
+    this.initViewport(root, canvasRoot);
+    this.initLayers();
+    this.initListeners();
+
+    setCheat("hexGrid", this.toggleGrid);
+
+    this.sim.entities.forEach((entity) => {
+      if (entity.cp.renderGraphics) {
+        entity.cp.renderGraphics.g = new PIXI.Graphics();
+        entity.cp.renderGraphics.initialized = false;
+      }
+    });
+
+    this.initialized = true;
+  };
+
+  initViewport = (root: Element, canvasRoot: HTMLCanvasElement) => {
     this.viewport = new Viewport({
       screenWidth: root.clientWidth,
       screenHeight: window.innerHeight,
@@ -109,24 +126,6 @@ export class RenderingSystem extends SystemWithHooks {
     });
 
     this.app.stage.addChild(this.viewport);
-
-    this.layers = {
-      facility: new PIXI.Container(),
-      ship: new PIXI.Container(),
-      global: new PIXI.Container(),
-      selection: new PIXI.Container(),
-      collectible: new PIXI.Container(),
-    };
-
-    this.layers.global.zIndex = 0;
-    this.layers.collectible.zIndex = 1;
-    this.layers.facility.zIndex = 2;
-    this.layers.ship.zIndex = 3;
-    this.layers.selection.zIndex = 100;
-
-    Object.values(this.layers).forEach((layer) =>
-      this.viewport.addChild(layer)
-    );
 
     this.viewport.drag().pinch().wheel();
     this.viewport.clampZoom({ minScale, maxScale });
@@ -147,6 +146,42 @@ export class RenderingSystem extends SystemWithHooks {
       }
     });
 
+    this.viewport.sortableChildren = true;
+
+    this.resizeObserver = new ResizeObserver(() => {
+      this.app.resizeTo = canvasRoot;
+      this.viewport.resize(root.clientWidth, window.innerHeight);
+    });
+    this.resizeObserver.observe(canvasRoot);
+
+    this.viewport.scale.set(this.settingsManager.cp.camera.zoom);
+    this.viewport.moveCenter(
+      this.settingsManager.cp.camera.position[0],
+      this.settingsManager.cp.camera.position[1]
+    );
+  };
+
+  initLayers = () => {
+    this.layers = {
+      facility: new PIXI.Container(),
+      ship: new PIXI.Container(),
+      global: new PIXI.Container(),
+      selection: new PIXI.Container(),
+      collectible: new PIXI.Container(),
+    };
+
+    this.layers.global.zIndex = 0;
+    this.layers.collectible.zIndex = 1;
+    this.layers.facility.zIndex = 2;
+    this.layers.ship.zIndex = 3;
+    this.layers.selection.zIndex = 100;
+
+    Object.values(this.layers).forEach((layer) =>
+      this.viewport.addChild(layer)
+    );
+  };
+
+  initListeners = () => {
     window.addEventListener("keydown", (event) => {
       if (event.target !== document.body) return;
 
@@ -161,24 +196,13 @@ export class RenderingSystem extends SystemWithHooks {
       }
     });
 
-    this.sim.hooks.removeComponent.tap(
-      "RenderingSystem",
-      ({ entity, component }) => {
-        if (component === "render") {
-          this.sprites.get(entity)?.destroy();
-          this.sprites.delete(entity);
-        }
-      }
+    this.sim.hooks.removeComponent.tap("RenderingSystem", ({ entity }) =>
+      this.clearEntity(entity)
     );
 
     this.sim.hooks.removeEntity.tap("RenderingSystem", (entity) => {
-      if (entity.cp.render) {
-        this.sprites.get(entity)?.destroy();
-        this.sprites.delete(entity);
-      }
-      if (entity.cp.renderGraphics) {
-        entity.cp.renderGraphics.g.destroy();
-      }
+      this.clearEntity(entity);
+
       if (entity.id === this.settingsManager.cp.selectionManager.id) {
         this.settingsManager.cp.selectionManager.id = null;
       }
@@ -186,34 +210,14 @@ export class RenderingSystem extends SystemWithHooks {
         this.settingsManager.cp.selectionManager.secondaryId = null;
       }
     });
+  };
 
-    this.viewport.sortableChildren = true;
-
-    this.resizeObserver = new ResizeObserver(() => {
-      this.app.resizeTo = canvasRoot;
-      this.viewport.resize(root.clientWidth, window.innerHeight);
-    });
-    this.resizeObserver.observe(canvasRoot);
-
-    setCheat("hexGrid", this.toggleGrid);
-
-    this.sim.entities.forEach((entity) => {
-      if (entity.cp.render) {
-        entity.cp.render.initialized = false;
-      }
-      if (entity.cp.renderGraphics) {
-        entity.cp.renderGraphics.g = new PIXI.Graphics();
-        entity.cp.renderGraphics.initialized = false;
-      }
-    });
-
-    this.viewport.scale.set(this.settingsManager.cp.camera.zoom);
-    this.viewport.moveCenter(
-      this.settingsManager.cp.camera.position[0],
-      this.settingsManager.cp.camera.position[1]
-    );
-
-    this.initialized = true;
+  clearEntity = (entity: Entity) => {
+    this.sprites.get(entity)?.destroy();
+    this.sprites.delete(entity);
+    if (entity.cp.renderGraphics) {
+      entity.cp.renderGraphics.g.destroy();
+    }
   };
 
   destroy = (): void => {
@@ -247,7 +251,7 @@ export class RenderingSystem extends SystemWithHooks {
       const entityRender = entity.cp.render;
       let sprite = this.sprites.get(entity);
 
-      if (!entityRender.initialized) {
+      if (!sprite) {
         sprite = new PIXI.Sprite();
         setTexture(entity, sprite, entityRender.texture);
         this.sprites.set(entity, sprite);
@@ -268,11 +272,10 @@ export class RenderingSystem extends SystemWithHooks {
         }
 
         this.updateEntityScaling(entity);
-        entityRender.initialized = true;
         entity.cp.position.moved = true;
       }
 
-      drawHpBars(entity, sprite!);
+      drawHpBars(entity, sprite);
 
       if (entity.cp.position.moved) {
         entity.cp.position.moved = false;
