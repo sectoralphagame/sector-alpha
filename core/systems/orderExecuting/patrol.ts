@@ -5,7 +5,6 @@ import { hecsToCartesian } from "@core/components/hecsPosition";
 import { random } from "lodash";
 import type { Matrix } from "mathjs";
 import { add, matrix, multiply, randomInt, subtract } from "mathjs";
-import { normalizeAngle } from "@core/utils/misc";
 import type { PatrolOrder } from "../../components/orders";
 import type { RequireComponent } from "../../tsHelpers";
 import { moveToActions } from "../../utils/moving";

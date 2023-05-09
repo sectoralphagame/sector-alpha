@@ -1,6 +1,5 @@
 import React from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { useThrottledFormState } from "@devtools/utils";
 import SVG from "react-inlinesvg";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
@@ -15,7 +14,7 @@ import type { FactionInput, FormData } from "./utils";
 import styles from "./styles.scss";
 
 const FactionBlueprintsEditor: React.FC<{ index: number }> = ({ index }) => {
-  const { control, register, setValue, getValues } = useFormContext<FormData>();
+  const { control, register } = useFormContext<FormData>();
   const faction = useThrottledFormState<FactionInput>(
     `factions.${index.toString()}`
   );

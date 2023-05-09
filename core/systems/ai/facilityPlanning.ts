@@ -1,3 +1,4 @@
+import { isDev } from "@core/settings";
 import type { RequireComponent } from "@core/tsHelpers";
 import { discriminate } from "@core/utils/maps";
 import shuffle from "lodash/shuffle";
@@ -299,16 +300,20 @@ export class FacilityPlanningSystem extends System {
       addFacilityModule(facility, facilityModule.create(this.sim, facility));
     }
 
-    console.log(`Faction ${faction.cp.name.slug}`);
-    console.table(
-      perCommodity((commodity) => ({
-        produced: resourcesProducedByFacilities[commodity],
-        consumed: resourceUsageInFacilities[commodity],
-        balance:
-          resourcesProducedByFacilities[commodity] -
-          resourceUsageInFacilities[commodity],
-      }))
-    );
+    if (isDev) {
+      // eslint-disable-next-line no-console
+      console.log(`Faction ${faction.cp.name.slug}`);
+      // eslint-disable-next-line no-console
+      console.table(
+        perCommodity((commodity) => ({
+          produced: resourcesProducedByFacilities[commodity],
+          consumed: resourceUsageInFacilities[commodity],
+          balance:
+            resourcesProducedByFacilities[commodity] -
+            resourceUsageInFacilities[commodity],
+        }))
+      );
+    }
   };
 
   exec = (): void => {

@@ -29,6 +29,7 @@ export class BaseSim {
 
         if (delta > deltaThreshold) {
           delta = deltaThreshold;
+          // eslint-disable-next-line no-console
           console.warn("Throttling sim");
         }
         this.next(delta);

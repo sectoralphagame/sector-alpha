@@ -14,7 +14,6 @@ import { mineAction } from "./mine";
 import { followOrderCompleted, followOrder } from "./follow";
 import {
   holdAction,
-  holdPosition,
   moveAction,
   moveActionCleanup,
   teleportAction,

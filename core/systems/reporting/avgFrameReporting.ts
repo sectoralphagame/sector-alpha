@@ -18,6 +18,7 @@ export class AvgFrameReportingSystem extends System {
       this.iterations++;
 
       if (this.iterations === 60) {
+        // eslint-disable-next-line no-console
         console.log("Avg frame time: ", this.accumulator / 60);
         this.iterations = 0;
         this.accumulator = 0;

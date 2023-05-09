@@ -29,7 +29,9 @@ export class OutOfBoundsCheckingSystem extends System {
         }, [] as RequireComponent<"position">[]);
 
       if (outOfBoundsEntities.length > 0) {
+        // eslint-disable-next-line no-console
         console.warn(`${outOfBoundsEntities.length} entities out of bounds`);
+        // eslint-disable-next-line no-console
         console.log(outOfBoundsEntities);
       }
     }

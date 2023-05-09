@@ -1,5 +1,4 @@
 import type { Ship } from "@core/archetypes/ship";
-import { shipComponents } from "@core/archetypes/ship";
 import { relationThresholds } from "@core/components/relations";
 import type { Entity } from "@core/entity";
 import type { Sim } from "@core/sim";
@@ -8,6 +7,7 @@ import { getSubordinates } from "@core/utils/misc";
 import { filter, first, map, pipe, sortBy } from "@fxts/core";
 import { distance } from "mathjs";
 import { addSubordinate } from "@core/components/subordinates";
+import { isDev } from "@core/settings";
 import { requestShip } from "./shipPlanning";
 import { System } from "../system";
 
@@ -196,8 +196,11 @@ export class TauHarassingSystem extends System {
       origin: "auto",
       sectorId: invadedSector.id,
     });
-    console.log(
-      `${faction.cp.name.slug} are launching an attack on ${invadedSector.cp.name.value}`
-    );
+    if (isDev) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `${faction.cp.name.slug} are launching an attack on ${invadedSector.cp.name.value}`
+      );
+    }
   };
 }
