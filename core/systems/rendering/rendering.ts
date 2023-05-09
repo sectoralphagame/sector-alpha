@@ -130,12 +130,20 @@ export class RenderingSystem extends SystemWithHooks {
       this.dragging = true;
     });
     this.viewport.on("drag-end", () => {
-      this.dragging = false;
+      // Hack to prevent click events from firing after drag
+      setTimeout(() => {
+        this.dragging = false;
+      }, 10);
     });
 
-    this.viewport.on("mouseup", (event) => {
+    this.viewport.on("pointerup", (event) => {
       this.toolbar.style.pointerEvents = "unset";
-      if (event.target === event.currentTarget && !this.dragging) {
+      if (
+        event.target === event.currentTarget &&
+        !this.dragging &&
+        // Do not clear on right click
+        event.buttons !== 0
+      ) {
         clearFocus(this.settingsManager.cp.selectionManager);
       }
     });
