@@ -5,6 +5,7 @@
 !.eslintrc.js
 !.prettierrc
 !.storybook
+!.husky
 dist
 node_modules
 TODO

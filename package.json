@@ -11,7 +11,8 @@
     "lint": "npx eslint \"@(core|ui|kit|devtools)/**/*.@(tsx|ts|jsx|js)\" --fix ; npx prettier --check \"@(core|ui|kit|devtools)/**/*.@(tsx|ts|jsx|js)\" --write",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "gen-spritesheet": "node ./scripts/createSpritesheet.js"
+    "gen-spritesheet": "node ./scripts/createSpritesheet.js",
+    "prepare": "husky install"
   },
   "author": "Dominik Żegleń",
   "license": "ISC",
@@ -110,6 +111,7 @@
     "color": "^4.0.1",
     "colormap": "^2.3.2",
     "graphlib": "^2.1.8",
+    "husky": "^8.0.3",
     "idb": "^7.0.1",
     "lightweight-charts": "^3.8.0",
     "lodash": "^4.17.21",
