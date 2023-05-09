@@ -5,7 +5,6 @@ import { add, matrix } from "mathjs";
 import type { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
 import { sectorSize } from "../archetypes/sector";
-import type { RequireComponent } from "../tsHelpers";
 import { findInAncestors } from "../utils/findInAncestors";
 import type { BaseComponent } from "./component";
 import type { Entity } from "../entity";
@@ -266,8 +265,6 @@ export interface RenderGraphics<T extends keyof Graphics>
   draw: T;
   redraw: boolean;
   realTime: boolean;
-  g: PIXI.Graphics;
-  initialized: boolean;
 }
 
 export function createRenderGraphics<T extends keyof Graphics>(
@@ -277,26 +274,6 @@ export function createRenderGraphics<T extends keyof Graphics>(
     draw,
     redraw: ["path"].includes(draw),
     realTime: draw === "path",
-    initialized: false,
-    g: new PIXI.Graphics(),
     name: "renderGraphics",
   };
-}
-
-export function drawGraphics(
-  entity: RequireComponent<"renderGraphics">,
-  container: PIXI.Container
-) {
-  if (!entity.cp.renderGraphics.initialized) {
-    container.addChild(entity.cp.renderGraphics.g);
-    entity.cp.renderGraphics.initialized = true;
-  } else {
-    entity.cp.renderGraphics.g.children.forEach((c) => c.destroy());
-    entity.cp.renderGraphics.g.clear();
-  }
-  graphics[entity.cp.renderGraphics.draw]({
-    g: entity.cp.renderGraphics.g,
-    entity,
-    viewport: container,
-  });
 }

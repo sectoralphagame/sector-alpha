@@ -8,7 +8,7 @@ import { setCheat } from "@core/utils/misc";
 import { isHeadless } from "@core/settings";
 import {
   createRenderGraphics,
-  drawGraphics,
+  graphics,
 } from "../../components/renderGraphics";
 import type { RequireComponent } from "../../tsHelpers";
 import { Cooldowns } from "../../utils/cooldowns";
@@ -67,6 +67,7 @@ export class RenderingSystem extends SystemWithHooks {
   layers: Record<Layer, PIXI.Container>;
   sectorQuery: SectorQuery<"render">;
   sprites: Map<Entity, PIXI.Sprite> = new Map();
+  graphics: Map<Entity, PIXI.Graphics> = new Map();
 
   apply = (sim: Sim) => {
     super.apply(sim);
@@ -107,13 +108,6 @@ export class RenderingSystem extends SystemWithHooks {
     this.initListeners();
 
     setCheat("hexGrid", this.toggleGrid);
-
-    this.sim.entities.forEach((entity) => {
-      if (entity.cp.renderGraphics) {
-        entity.cp.renderGraphics.g = new PIXI.Graphics();
-        entity.cp.renderGraphics.initialized = false;
-      }
-    });
 
     this.initialized = true;
   };
@@ -196,8 +190,14 @@ export class RenderingSystem extends SystemWithHooks {
       }
     });
 
-    this.sim.hooks.removeComponent.tap("RenderingSystem", ({ entity }) =>
-      this.clearEntity(entity)
+    this.sim.hooks.removeComponent.tap(
+      "RenderingSystem",
+      ({ entity, component }) =>
+        this.clearEntity(
+          entity,
+          component === "render",
+          component === "renderGraphics"
+        )
     );
 
     this.sim.hooks.removeEntity.tap("RenderingSystem", (entity) => {
@@ -212,11 +212,17 @@ export class RenderingSystem extends SystemWithHooks {
     });
   };
 
-  clearEntity = (entity: Entity) => {
-    this.sprites.get(entity)?.destroy();
-    this.sprites.delete(entity);
-    if (entity.cp.renderGraphics) {
-      entity.cp.renderGraphics.g.destroy();
+  clearEntity = (entity: Entity, render = true, renderGraphics = true) => {
+    if (render) {
+      this.sprites.get(entity)?.destroy();
+      this.sprites.delete(entity);
+    }
+    if (renderGraphics) {
+      const g = this.graphics.get(entity);
+      if (g && !g.destroyed) {
+        g.destroy();
+      }
+      this.graphics.delete(entity);
     }
   };
 
@@ -228,15 +234,25 @@ export class RenderingSystem extends SystemWithHooks {
 
   updateGraphics = () => {
     this.sim.queries.renderableGraphics.get().forEach((entity) => {
-      if (
-        entity.cp.renderGraphics.redraw ||
-        !entity.cp.renderGraphics.initialized
-      ) {
+      let g = this.graphics.get(entity);
+      if (entity.cp.renderGraphics.redraw || !g) {
         if (
           entity.cp.renderGraphics.realTime ||
           this.cooldowns.canUse("graphics")
         ) {
-          drawGraphics(entity, this.viewport);
+          if (!g) {
+            g = new PIXI.Graphics();
+            this.graphics.set(entity, g);
+            this.viewport.addChild(g);
+          } else {
+            g.children.forEach((c) => c.destroy());
+            g.clear();
+          }
+          graphics[entity.cp.renderGraphics.draw]({
+            g,
+            entity,
+            viewport: this.viewport,
+          });
         }
       }
     });
@@ -304,7 +320,6 @@ export class RenderingSystem extends SystemWithHooks {
     this.viewport.plugins.remove("follow");
     const previousSelected = this.sim.get(previousValue);
     if (previousSelected?.cp.renderGraphics?.draw === "path") {
-      previousSelected.cp.renderGraphics.g.destroy();
       previousSelected.removeComponent("renderGraphics");
     }
 
