@@ -4,6 +4,7 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import chevronIcon from "@assets/ui/chevron_down.svg";
 import clsx from "clsx";
+import Text from "@kit/Text";
 import styles from "./FleetOverlay.scss";
 
 type Ship = RequireComponent<"name" | "autoOrder">;
@@ -165,7 +166,9 @@ export const FleetOverlayComponent: React.FC<FleetOverlayComponentProps> = ({
 }) => (
   <div className={styles.root}>
     <div>
-      <h1>Your Fleets</h1>
+      <Text variant="h2" color="primary">
+        Active Fleets
+      </Text>
       {fleets.length === 0
         ? "You currently have no fleets"
         : fleets.map((fleet) => (
@@ -182,7 +185,9 @@ export const FleetOverlayComponent: React.FC<FleetOverlayComponentProps> = ({
       {unassigned.length > 0 && (
         <>
           <hr className={styles.hr} />
-          <h1>Unassigned Ships</h1>
+          <Text variant="h2" color="primary">
+            Unassigned Ships
+          </Text>
           <div>
             {unassigned.map((ship) => (
               <ShipButton

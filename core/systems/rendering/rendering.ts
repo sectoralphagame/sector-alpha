@@ -185,7 +185,11 @@ export class RenderingSystem extends SystemWithHooks {
 
   initListeners = () => {
     window.addEventListener("keydown", (event) => {
-      if (event.target !== document.body) return;
+      if (
+        event.target !== document.body ||
+        document.querySelector("#overlay")!.children.length > 0
+      )
+        return;
 
       if (!this.keysPressed.includes(event.key)) {
         this.keysPressed.push(event.key);

@@ -18,3 +18,10 @@
   opacity: 0;
   transform: translateY(-100vh);
 }
+
+.bar {
+  display: flex;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--palette-border);
+}

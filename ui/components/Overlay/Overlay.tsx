@@ -1,13 +1,17 @@
 import { Button } from "@kit/Button";
 import type { DialogProps } from "@kit/Dialog";
+import Text from "@kit/Text";
 import clsx from "clsx";
 import React from "react";
 import styles from "./Overlay.scss";
 
-export interface OverlayProps extends DialogProps {}
+export interface OverlayProps extends DialogProps {
+  title: string;
+}
 
 export const Overlay: React.FC<OverlayProps> = ({
   open,
+  title,
   onClose,
   children,
 }) => {
@@ -21,18 +25,23 @@ export const Overlay: React.FC<OverlayProps> = ({
   };
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       className={clsx(styles.root, {
         [styles.active]: open,
         [styles.closing]: closing,
       })}
+      id="overlay"
     >
       {open ? (
         <>
-          <div>
+          <div className={styles.bar}>
             <Button type="button" onClick={close}>
               Back
             </Button>
+            <Text variant="h1" color="primary">
+              {title}
+            </Text>
           </div>
           <div>{children}</div>
         </>

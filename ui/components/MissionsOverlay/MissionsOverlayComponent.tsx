@@ -18,7 +18,6 @@ export const MissionsOverlayComponent: React.FC<
 
   return (
     <div>
-      <h1>Your Missions</h1>
       <div className={styles.grid}>
         <div>
           {missions.length === 0

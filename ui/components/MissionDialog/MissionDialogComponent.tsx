@@ -3,6 +3,7 @@ import { Button } from "@kit/Button";
 import type { DialogProps } from "@kit/Dialog";
 import { Dialog } from "@kit/Dialog";
 import { DialogActions } from "@kit/DialogActions";
+import Text from "@kit/Text";
 import React from "react";
 import styles from "./MissionDialog.scss";
 
@@ -76,7 +77,12 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
         {log.map((l, lIndex) => (
           <p key={lIndex}>
             {l.actor !== "world" && (
-              <b>{l.actor === "npc" ? l.name : "You"}: </b>
+              <Text
+                color={l.actor === "player" ? "primary" : "default"}
+                component="b"
+              >
+                {l.actor === "npc" ? l.name : "You"}:{" "}
+              </Text>
             )}
             {l.text}
           </p>

@@ -9,7 +9,8 @@ export type TextColor =
   | "text-2"
   | "text-3"
   | "text-4"
-  | "text-5";
+  | "text-5"
+  | "primary";
 export type TextVariant =
   | "default"
   | "h1"
@@ -21,6 +22,7 @@ export type TextVariant =
   | "caption";
 
 export interface TextProps extends React.HTMLAttributes<HTMLElement> {
+  component?: React.ElementType;
   color?: TextColor;
   variant?: TextVariant;
 }
@@ -37,12 +39,13 @@ const Components: Record<TextVariant, React.ElementType> = {
 };
 
 const Text: React.FC<TextProps> = ({
+  component,
   color = "default",
   variant = "default",
   className,
   ...props
 }) => {
-  const Component = Components[variant];
+  const Component = component ?? Components[variant];
 
   return (
     <Component
@@ -57,6 +60,7 @@ const Text: React.FC<TextProps> = ({
         [styles.caption]: variant === "caption",
         [styles.colorDefault]: color === "default",
         [styles.colorDisabled]: color === "disabled",
+        [styles.colorPrimary]: color === "primary",
       })}
       style={
         [1, 2, 3, 4, 5].map((v) => `text-${v}`).includes(color)

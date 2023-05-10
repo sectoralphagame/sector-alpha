@@ -188,7 +188,17 @@ export const Game: React.FC = () => {
         </MapPanel>
       </div>
       <Panel entity={selectedEntity} />
-      <Overlay open={!!overlay} onClose={() => setOverlay(null)}>
+      <Overlay
+        open={!!overlay}
+        onClose={() => setOverlay(null)}
+        title={
+          overlay === "fleet"
+            ? "Fleet Management"
+            : overlay === "missions"
+            ? "Active Missions"
+            : ""
+        }
+      >
         <FleetOverlay />
         <MissionsOverlay />
       </Overlay>
