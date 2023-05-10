@@ -48,7 +48,7 @@ export function createTheme(scale: number): Theme {
       spacings.map((n) => [n, `${n * baseSpacing}px`])
     ) as Record<(typeof spacings)[number], string>,
     palette: {
-      background: "#000000",
+      background: "#080808",
       "background-active": "#1e1e1e",
       default: "#FFFFFF",
       text: fromPairs(texts.map((v) => [v, getColor(v)])) as Record<

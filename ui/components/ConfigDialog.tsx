@@ -55,7 +55,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   );
 
   return (
-    <Dialog open={open} onClose={onClose} title="Configuration">
+    <Dialog open={open} onClose={onClose} title="Configuration" width="500px">
       {view !== "default" && (
         <IconButton
           className={styles.backButton}
