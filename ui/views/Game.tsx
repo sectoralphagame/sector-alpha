@@ -133,7 +133,11 @@ export const Game: React.FC = () => {
   React.useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (event.code === "Escape") {
-        setDialog(dialog ? null : { type: "config" });
+        if (overlay) {
+          setOverlay(null);
+        } else {
+          setDialog(dialog ? null : { type: "config" });
+        }
       }
 
       if (event.target instanceof HTMLInputElement) return;
@@ -149,7 +153,7 @@ export const Game: React.FC = () => {
     document.addEventListener("keydown", handler);
 
     return () => document.removeEventListener("keydown", handler);
-  }, [setDialog]);
+  }, [setDialog, overlay]);
 
   React.useEffect(() => {
     if (player.cp.missions.offer) {
