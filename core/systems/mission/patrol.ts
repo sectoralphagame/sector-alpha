@@ -36,7 +36,7 @@ const isPatrolMission = (mission: Mission): mission is PatrolMission =>
   mission.type === "patrol";
 
 export const patrolMissionHandler: MissionHandler = {
-  generate: (sim: Sim) => {
+  generate: (sim) => {
     const player = sim.queries.player.get()[0];
     const faction = pickRandom(
       sim.queries.ai
@@ -45,7 +45,7 @@ export const patrolMissionHandler: MissionHandler = {
           (f) => player.cp.relations.values[f.id] >= relationThresholds.mission
         )
     );
-    if (!faction) return;
+    if (!faction) return null;
 
     const sector = pickRandom(
       sim.queries.sectors
@@ -70,7 +70,7 @@ export const patrolMissionHandler: MissionHandler = {
         reward,
       });
 
-    player.cp.missions.offer = {
+    return {
       title: transform(template.title),
       prompt: transform(template.prompt),
       actorName: "Local Police",

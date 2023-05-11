@@ -78,7 +78,9 @@ export class MissionSystem extends System {
         force) &&
       player.cp.missions.offer === null
     ) {
-      pickRandom(Object.values(this.handlers.mission)).generate(this.sim);
+      player.cp.missions.offer = pickRandom(
+        Object.values(this.handlers.mission)
+      ).generate(this.sim);
     }
   };
 
