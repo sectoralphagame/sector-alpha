@@ -91,7 +91,7 @@ function getProperties(
   });
 }
 
-export const Styles: React.FC = ({ children }) => {
+export const Styles: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [scale] = React.useState(1);
   const theme = React.useMemo(() => createTheme(scale), [scale]);
   const cssVariables = React.useRef(

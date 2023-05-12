@@ -3,6 +3,7 @@ import React from "react";
 import styles from "./MapPanel.scss";
 
 export interface MapPanelProps {
+  children: React.ReactNode;
   initialExpanded?: boolean;
   tabs: React.ReactNode;
 }

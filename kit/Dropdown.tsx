@@ -7,10 +7,9 @@ export const Dropdown: React.FC<React.HTMLProps<HTMLDivElement>> = ({
   className,
   ...props
 }) => <Menu {...props} as="div" className={clsx(styles.root, className)} />;
-export const DropdownButton: React.FC<{ className?: string }> = ({
-  className,
-  ...props
-}) => (
+export const DropdownButton: React.FC<
+  React.PropsWithChildren<{ className?: string }>
+> = ({ className, ...props }) => (
   <Menu.Button
     className={({ open }) =>
       clsx(className, styles.button, {
@@ -20,13 +19,15 @@ export const DropdownButton: React.FC<{ className?: string }> = ({
     {...props}
   />
 );
-export const DropdownOptions: React.FC<{ static?: boolean }> = (props) => (
-  <Menu.Items className={styles.dropdown} {...props} />
-);
-export const DropdownOption: React.FC<{
-  disabled?: boolean;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
-}> = ({ children, onClick, ...props }) => (
+export const DropdownOptions: React.FC<
+  React.PropsWithChildren<{ static?: boolean }>
+> = (props) => <Menu.Items className={styles.dropdown} {...props} />;
+export const DropdownOption: React.FC<
+  React.PropsWithChildren<{
+    disabled?: boolean;
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+  }>
+> = ({ children, onClick, ...props }) => (
   <Menu.Item {...props}>
     {({ active, disabled }) => (
       <button

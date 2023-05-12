@@ -12,6 +12,7 @@ try {
 } catch {}
 
 export interface DialogProps {
+  children?: React.ReactNode;
   open: boolean;
   title?: string;
   width?: string;
@@ -41,6 +42,7 @@ export const Dialog: React.FC<DialogProps> = ({
         transform: "translate(-50%, -50%)",
         borderColor: "var(--palette-border)",
         overflow: "unset",
+        userSelect: "none",
       },
       overlay: {
         backgroundColor: "rgb(0 0 0 / 85%)",

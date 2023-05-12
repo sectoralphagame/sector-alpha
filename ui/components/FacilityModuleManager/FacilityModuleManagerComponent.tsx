@@ -18,11 +18,9 @@ interface FacilityModuleManagerComponentProps extends ModalProps {
   onBuiltCancel: () => void;
 }
 
-const ModuleItem: React.FC<{ onClick: () => void; isActive: boolean }> = ({
-  children,
-  onClick,
-  isActive,
-}) => (
+const ModuleItem: React.FC<
+  React.PropsWithChildren<{ onClick: () => void; isActive: boolean }>
+> = ({ children, onClick, isActive }) => (
   <Button
     className={clsx(styles.blueprintsItem, {
       [styles.blueprintsItemActive]: isActive,

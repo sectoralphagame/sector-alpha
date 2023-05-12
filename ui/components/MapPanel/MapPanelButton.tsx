@@ -3,7 +3,9 @@ import React from "react";
 import { Tab } from "@headlessui/react";
 import styles from "./MapPanel.scss";
 
-export const MapPanelButton: React.FC = ({ children }) => (
+export const MapPanelButton: React.FC<React.PropsWithChildren<{}>> = ({
+  children,
+}) => (
   <Tab as={React.Fragment}>
     {({ selected }) => (
       <button

@@ -11,6 +11,7 @@ import { IconButton } from "@kit/IconButton";
 import styles from "./Panel.scss";
 
 export interface PanelComponentProps {
+  children: React.ReactNode;
   isCollapsed: boolean;
   onCollapseToggle: () => void;
   onConfig: () => void;

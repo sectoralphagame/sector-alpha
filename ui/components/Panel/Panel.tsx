@@ -44,7 +44,10 @@ export interface PanelProps {
   entity: Entity | undefined;
 }
 
-const JournalWrapper: React.FC<{ entity: Entity }> = ({ entity, children }) =>
+const JournalWrapper: React.FC<React.PropsWithChildren<{ entity: Entity }>> = ({
+  entity,
+  children,
+}) =>
   entity.hasComponents(["journal"]) ? (
     <TabGroup>
       <TabList className={styles.tab}>

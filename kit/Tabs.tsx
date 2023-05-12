@@ -3,12 +3,13 @@ import { Tab as HeadlessTab } from "@headlessui/react";
 import clsx from "clsx";
 import styles from "./Tabs.scss";
 
-export const TabList: React.FC<{ className?: string }> = ({
-  className,
-  ...props
-}) => <HeadlessTab.List className={clsx(className, styles.list)} {...props} />;
+export const TabList: React.FC<
+  React.PropsWithChildren<{ className?: string }>
+> = ({ className, ...props }) => (
+  <HeadlessTab.List className={clsx(className, styles.list)} {...props} />
+);
 
-export const Tab: React.FC<{ className?: string }> = ({
+export const Tab: React.FC<React.PropsWithChildren<{ className?: string }>> = ({
   className,
   ...props
 }) => (

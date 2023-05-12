@@ -7,6 +7,7 @@ import styles from "./View.scss";
 import { useLocation } from "../context/Location";
 
 export interface ViewProps {
+  children: React.ReactNode;
   showBack?: boolean;
   title: string;
 }
