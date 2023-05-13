@@ -18,6 +18,7 @@ import { HitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating
 import { InflationStatisticGatheringSystem } from "@core/systems/inflationStatisticGathering";
 import { MiningSystem } from "@core/systems/mining";
 import { MissionSystem } from "@core/systems/mission";
+import { destroyMissionHandler } from "@core/systems/mission/destroy";
 import { patrolMissionHandler } from "@core/systems/mission/patrol";
 import {
   moneyRewardHandler,
@@ -72,6 +73,7 @@ export const createBaseConfig = (): SimConfig => {
       new MissionSystem(
         {
           patrol: patrolMissionHandler,
+          destroy: destroyMissionHandler,
         },
         {
           money: moneyRewardHandler,

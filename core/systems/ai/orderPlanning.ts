@@ -424,6 +424,7 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
             ...entity.cp.autoOrder.default,
             actions: [],
             origin: "auto",
+            clockwise: Math.random() > 0.5,
           },
         ];
         break;

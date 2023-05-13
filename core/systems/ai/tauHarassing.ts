@@ -195,6 +195,7 @@ export class TauHarassingSystem extends System {
       actions: [],
       origin: "auto",
       sectorId: invadedSector.id,
+      clockwise: Math.random() > 0.5,
     });
     if (isDev) {
       // eslint-disable-next-line no-console

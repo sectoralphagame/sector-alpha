@@ -148,6 +148,10 @@ export const Game: React.FC = () => {
       if (event.code === "KeyJ") {
         setOverlay((prev) => (prev === "missions" ? null : "missions"));
       }
+      if (event.code === "KeyP") {
+        if (sim.speed === 0) sim.setSpeed(1);
+        else sim.pause();
+      }
     };
 
     document.addEventListener("keydown", handler);

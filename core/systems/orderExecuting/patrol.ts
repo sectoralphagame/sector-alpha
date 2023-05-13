@@ -26,7 +26,8 @@ export function patrolOrder(
     if (entity.cp.position.sector === targetSector.id) {
       const pos = subtract(entity.cp.position.coord, sectorPosition);
       const angle = Math.atan2(pos.get([1]), pos.get([0]));
-      const angleOffset = Math.PI / randomInt(4, 8);
+      const angleOffset =
+        (Math.PI / randomInt(4, 8)) * (order.clockwise ? 1 : -1);
 
       waypointPosition = matrix(
         add(

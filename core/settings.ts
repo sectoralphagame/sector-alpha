@@ -3,7 +3,7 @@ export const isHeadless =
 export const isDev = process.env.NODE_ENV === "development";
 
 const settings = {
-  bootTime: isDev ? 3600 / 20 : 3600 * 2,
+  bootTime: isDev ? 3600 / 20 : 3600,
   global: {
     targetFps: 60,
   },

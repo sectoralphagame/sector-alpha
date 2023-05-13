@@ -35,6 +35,14 @@ const AutoOrder: React.FC<{
       return setDefaultOrder({ type, targetId: 0 });
     }
 
+    if (type === "patrol") {
+      return setDefaultOrder({
+        type,
+        sectorId: entity.cp.position.sector,
+        clockwise: Math.random() > 0.5,
+      });
+    }
+
     return setDefaultOrder({ type, sectorId: entity.cp.position.sector });
   };
 

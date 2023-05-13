@@ -413,6 +413,7 @@ export class ShipPlanningSystem extends System {
                 origin: "auto",
                 sectorId: sector!.id,
                 actions: [],
+                clockwise: Math.random() > 0.5,
               },
             ];
           } else if (frigatesInShipyards.length > 0) {

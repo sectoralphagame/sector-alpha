@@ -93,6 +93,7 @@ export interface FollowOrder extends BaseOrder {
 export interface PatrolOrder extends BaseOrder {
   type: "patrol";
   sectorId: number;
+  clockwise: boolean;
 }
 
 export interface EscortOrder extends BaseOrder {

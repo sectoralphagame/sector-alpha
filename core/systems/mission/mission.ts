@@ -44,13 +44,13 @@ export class MissionSystem extends System {
     player.cp.missions.value.forEach((mission) => {
       this.handlers.mission[mission.type].update(mission, this.sim);
 
-      if (this.handlers.mission[mission.type].isFailed(mission)) {
+      if (this.handlers.mission[mission.type].isFailed(mission, this.sim)) {
         player.cp.missions.value = player.cp.missions.value.filter(
           (m) => m !== mission
         );
       }
 
-      if (this.handlers.mission[mission.type].isCompleted(mission)) {
+      if (this.handlers.mission[mission.type].isCompleted(mission, this.sim)) {
         mission.rewards.forEach((reward) => {
           this.handlers.rewards[reward.type](reward, this.sim);
         });

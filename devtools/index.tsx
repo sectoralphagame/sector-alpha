@@ -73,3 +73,5 @@ export const DevTools: React.FC = () => (
     </Routes>
   </div>
 );
+
+export default DevTools;

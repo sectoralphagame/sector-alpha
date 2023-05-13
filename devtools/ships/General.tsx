@@ -87,7 +87,7 @@ const ShipGeneralEditor: React.FC<{ index: number }> = ({ index }) => {
               <SelectOption key={key} value={key}>
                 <div className={styles.textureLabel}>
                   {key}
-                  <SVG className={styles.texturePreview} src={textures[key]} />
+                  <SVG className={styles.texturePreview} src={icons[key]} />
                 </div>
               </SelectOption>
             ))}

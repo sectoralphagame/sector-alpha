@@ -216,7 +216,7 @@ export class RenderingSystem extends SystemWithHooks {
       this.clearEntity(entity);
 
       if (entity.id === this.settingsManager.cp.selectionManager.id) {
-        this.settingsManager.cp.selectionManager.id = null;
+        clearFocus(this.settingsManager.cp.selectionManager);
       }
       if (entity.id === this.settingsManager.cp.selectionManager.secondaryId) {
         this.settingsManager.cp.selectionManager.secondaryId = null;

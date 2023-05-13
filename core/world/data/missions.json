@@ -72,5 +72,83 @@
         }
       ]
     }
+  ],
+  "destroyPirates": [
+    {
+      "title": "Pirate Suppression Operation",
+      "actorName": "Local Police",
+      "description": "The local police urgently requests your fleet's assistance in suppressing a notorious pirate group operating in {{sector}}. Their attacks on civilian vessels have become increasingly frequent and pose a significant threat to the sector's safety. Your fleet will be rewarded with {{reward}} UTT upon successful neutralization of the pirate ships.",
+      "prompt": "We urgently need your fleet's assistance in suppressing a notorious pirate group in {{sector}}. The pirate attacks on civilian vessels have become rampant, endangering the sector's safety. In exchange for your successful neutralization of the pirate ships, your fleet will be rewarded with {{reward}} UTT.",
+      "responses": [
+        {
+          "text": "Affirmative. My fleet will engage and neutralize the pirate ships in {{sector}}.",
+          "next": "Thank you, Commander. Your fleet's intervention will ensure the safety of our civilian vessels and restore peace in the sector.",
+          "type": "accept"
+        },
+        {
+          "text": "Negative. My fleet's current engagements prevent us from dealing with the pirate ships in {{sector}}.",
+          "next": "Understood, Commander. We will have to explore alternative measures to protect civilian vessels in {{sector}}.",
+          "type": "decline"
+        }
+      ],
+      "variant": "ships"
+    },
+    {
+      "title": "Pirate Infestation Eradication",
+      "actorName": "Local Police",
+      "description": "The local police urgently requests your fleet's assistance in eradicating a pirate infestation in {{sector}}. The pirate bases hidden in the sector have become a hub for illegal activities and threaten the safety of neighboring colonies. Your fleet will be rewarded with {{reward}} UTT upon successful elimination of the pirate bases.",
+      "prompt": "We urgently need your fleet's assistance in eradicating a pirate infestation in {{sector}}. These pirate bases have become a breeding ground for illegal activities, endangering neighboring colonies. In return for your successful elimination of the pirate bases, your fleet will receive a reward of {{reward}} UTT.",
+      "responses": [
+        {
+          "text": "Affirmative. My fleet will eliminate the pirate bases in {{sector}}.",
+          "next": "Thank you, Commander. With your fleet's intervention, we can put an end to the pirate infestation and ensure the safety of the colonies in the sector.",
+          "type": "accept"
+        },
+        {
+          "text": "Negative. My fleet's current priorities prevent us from dealing with the pirate bases in {{sector}}.",
+          "next": "Understood, Commander. We will have to devise alternate strategies to counter the pirate infestation in {{sector}}.",
+          "type": "decline"
+        }
+      ],
+      "variant": "ships"
+    },
+    {
+      "title": "Pirate Hideout Assault",
+      "actorName": "Local Police",
+      "description": "The local police urgently requests your fleet's assistance in launching an assault on a well-fortified pirate hideout located in {{sector}}. This hideout serves as their main base of operations, from where they plan and execute their criminal activities. Your fleet will be rewarded with {{reward}} UTT upon successful destruction of the pirate hideout.",
+      "prompt": "We urgently need your fleet's assistance in launching an assault on a heavily fortified pirate hideout in {{sector}}. This hideout is their central hub for criminal activities. Your successful destruction of the pirate hideout will be rewarded with {{reward}} UTT.",
+      "responses": [
+        {
+          "text": "Affirmative. My fleet will launch an assault on the pirate hideout in {{sector}}.",
+          "next": "Thank you, Commander. Your fleet's intervention will significantly weaken the pirates and disrupt their criminal operations in the sector.",
+          "type": "accept"
+        },
+        {
+          "text": "Negative. My fleet's current engagements prevent us from assaulting the pirate hideout in {{sector}}.",
+          "next": "Understood, Commander. We will have to devise alternative plans to dismantle the pirate hideout in {{sector}}.",
+          "type": "decline"
+        }
+      ],
+      "variant": "facilityRaid"
+    },
+    {
+      "title": "Pirate Kingpin Elimination",
+      "actorName": "Local Police",
+      "description": "The local police urgently requests your fleet's assistance in eliminating a notorious pirate kingpin operating in {{sector}}. This pirate leader commands a vast network of criminal activities and poses a grave threat to the security of the sector. Your fleet will be rewarded with {{reward}} UTT upon successful termination of the pirate kingpin.",
+      "prompt": "We urgently need your fleet's assistance in eliminating a notorious pirate kingpin operating in {{sector}}. This pirate leader is a significant threat to the sector's security. In return for your successful termination of the pirate kingpin, your fleet will receive a reward of {{reward}} UTT.",
+      "responses": [
+        {
+          "text": "Affirmative. My fleet will eliminate the pirate kingpin in {{sector}}.",
+          "next": "Thank you, Commander. With your fleet's intervention, we can dismantle the pirate kingpin's network and restore order to the sector.",
+          "type": "accept"
+        },
+        {
+          "text": "Negative. My fleet's current priorities prevent us from dealing with the pirate kingpin in {{sector}}.",
+          "next": "Understood, Commander. We will have to devise alternate strategies to neutralize the pirate kingpin's influence in {{sector}}.",
+          "type": "decline"
+        }
+      ],
+      "variant": "facilityRaid"
+    }
   ]
 }
