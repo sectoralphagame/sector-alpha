@@ -1,6 +1,8 @@
 import type { Matrix } from "mathjs";
 import Color from "color";
 import pick from "lodash/pick";
+import type { DockSize } from "@core/components/dockable";
+import { createDocks } from "@core/components/dockable";
 import { createDrive } from "../components/drive";
 import { Entity } from "../entity";
 import { createMining } from "../components/mining";
@@ -39,6 +41,7 @@ export interface InitialShipInput extends ShipInput {
   position: Matrix;
   owner: Faction;
   sector: Sector;
+  docks?: Record<DockSize, number>;
 }
 
 export function createShipName(
@@ -124,6 +127,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
     })
     .addComponent({
       name: "model",
+      slug: initial.slug,
       value: initial.name,
     })
     .addComponent({
@@ -155,6 +159,10 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       type: "builder",
       cancel: false,
     });
+  }
+
+  if (initial.docks) {
+    entity.addComponent(createDocks(initial.docks));
   }
 
   const shipEntity = ship(entity);

@@ -22,13 +22,14 @@ export function getEvasionChance(speed: number, size: DockSize): number {
 
 export function isInDistance(
   entity: RequireComponent<"damage">,
-  target: RequireComponent<"position">
+  target: RequireComponent<"position">,
+  r: number = entity.cp.damage.range
 ): boolean {
   return (
     distance(
       findInAncestors(entity, "position").cp.position.coord,
       target.cp.position.coord
-    ) <= entity.cp.damage.range
+    ) <= r
   );
 }
 

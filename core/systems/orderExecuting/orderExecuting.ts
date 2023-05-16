@@ -31,6 +31,7 @@ import {
 import { patrolOrder } from "./patrol";
 import { collectAction } from "./collect";
 import { escortOrder, escortOrderCompleted } from "./escort";
+import { pillageOrder } from "./pillage";
 
 const orderFns: Partial<
   Record<
@@ -51,6 +52,11 @@ const orderFns: Partial<
   },
   patrol: {
     exec: patrolOrder,
+    isCompleted: () => false,
+    onCompleted: () => undefined,
+  },
+  pillage: {
+    exec: pillageOrder,
     isCompleted: () => false,
     onCompleted: () => undefined,
   },

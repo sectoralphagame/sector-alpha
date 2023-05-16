@@ -53,4 +53,11 @@ export class Cooldowns<T extends string> {
   remove(name: string) {
     delete this.timers[name];
   }
+
+  doEvery(key: T, time: number, cb: () => void) {
+    if (this.canUse(key)) {
+      this.use(key, time);
+      cb();
+    }
+  }
 }

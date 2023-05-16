@@ -120,9 +120,7 @@ export class Query<T extends keyof CoreComponents> extends BaseQuery<T> {
     super(sim, requiredComponents, requiredTags);
 
     this.hooks.add.tap(this.constructor.name, (entity: RequireComponent<T>) => {
-      if (!this.entities) {
-        this.entities = [entity];
-      } else {
+      if (this.entities) {
         this.entities!.push(entity);
       }
     });

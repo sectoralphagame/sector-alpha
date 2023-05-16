@@ -28,6 +28,7 @@ import { MovingSystem } from "@core/systems/moving";
 import { NavigatingSystem } from "@core/systems/navigating";
 import { OrderExecutingSystem } from "@core/systems/orderExecuting/orderExecuting";
 import { PathPlanningSystem } from "@core/systems/pathPlanning";
+import { PirateSpawningSystem } from "@core/systems/pirateSpawning";
 import { ProducingSystem } from "@core/systems/producing";
 import { AvgFrameReportingSystem } from "@core/systems/reporting/avgFrameReporting";
 import { SectorStatisticGatheringSystem } from "@core/systems/sectorStatisticGathering";
@@ -80,6 +81,7 @@ export const createBaseConfig = (): SimConfig => {
           relation: relationRewardHandler,
         }
       ),
+      new PirateSpawningSystem(),
     ],
   };
 

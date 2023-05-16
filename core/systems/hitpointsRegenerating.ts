@@ -30,7 +30,8 @@ export class HitpointsRegeneratingSystem extends System {
     this.query.get().forEach((entity) => {
       if (!entity.cooldowns.canUse(regenCooldown)) return;
       entity.cp.hitpoints.hp.value = Math.min(
-        entity.cp.hitpoints.hp.value + entity.cp.hitpoints.hp.regen,
+        entity.cp.hitpoints.hp.value +
+          entity.cp.hitpoints.hp.regen * (entity.cp.dockable?.dockedIn ? 4 : 1),
         entity.cp.hitpoints.hp.max
       );
 

@@ -9,6 +9,8 @@ import type { Sim } from "../../sim";
 import { Cooldowns } from "../../utils/cooldowns";
 import { SectorQuery } from "../utils/sectorQuery";
 
+const spottingRadius = 6;
+
 export type EnemyArrayCache = Record<
   string,
   Array<RequireComponent<"hitpoints" | "owner" | "position">>
@@ -43,13 +45,24 @@ export class SpottingSystem extends System {
       cache[cacheKey] ??
       pipe(
         potentialEnemies,
-        filter(
-          (e) =>
+        filter((e) => {
+          const isMiningOnRestrictedArea =
+            entityOwner.cp.ai?.restrictions.mining && e.cp.mining?.entityId;
+          const isSubjectToPillaging =
+            entity.cp.orders?.value[0].type === "pillage" &&
+            entityOwner.cp.relations.values[e.cp.owner.id]! <= 0 &&
+            (e.tags.has("role:transport") || e.tags.has("role:mining")) &&
+            (e.cp.dockable?.size === "small" ||
+              e.cp.dockable?.size === "medium");
+          const isEnemy =
+            entityOwner.cp.relations.values[e.cp.owner.id]! <
+            relationThresholds.attack;
+
+          return (
             e.cp.owner.id !== entityOwner.id &&
-            (entityOwner.cp.relations.values[e.cp.owner.id]! <
-              relationThresholds.attack ||
-              (entityOwner.cp.ai?.restrictions.mining && e.cp.mining?.entityId))
-        ),
+            (isMiningOnRestrictedArea || isSubjectToPillaging || isEnemy)
+          );
+        }),
         toArray
       );
     if (!cache[cacheKey]) {
@@ -77,16 +90,18 @@ export class SpottingSystem extends System {
     const cache: EnemyArrayCache = {};
 
     this.sim.queries.orderable.get().forEach((entity) => {
+      const currentOrder = entity.cp.orders.value[0];
       if (
-        entity.cp.orders.value[0]?.type !== "patrol" &&
-        entity.cp.orders.value[0]?.type !== "escort"
+        currentOrder?.type !== "patrol" &&
+        currentOrder?.type !== "pillage" &&
+        currentOrder?.type !== "escort"
       )
         return;
 
       if (
         !entity.cp.owner ||
-        (entity.cp.orders.value[0].type === "patrol" &&
-          entity.cp.position.sector !== entity.cp.orders.value[0].sectorId)
+        ((currentOrder.type === "patrol" || currentOrder.type === "pillage") &&
+          entity.cp.position.sector !== currentOrder.sectorId)
       )
         return;
 
@@ -98,8 +113,8 @@ export class SpottingSystem extends System {
         ).slice(0, 3)
       );
 
-      if (enemy?.distance <= 10) {
-        entity.cp.orders.value[0].interrupt = true;
+      if (enemy?.distance <= spottingRadius) {
+        currentOrder.interrupt = true;
         entity.cp.orders.value.splice(1, 0, {
           type: "attack",
           ordersForSector: entity.cp.position.sector,
@@ -107,6 +122,8 @@ export class SpottingSystem extends System {
           targetId: enemy.entity.id,
           actions: [],
           followOutsideSector: false,
+          maxDistance:
+            currentOrder.type === "pillage" ? spottingRadius * 1.1 : undefined,
         });
       }
     });

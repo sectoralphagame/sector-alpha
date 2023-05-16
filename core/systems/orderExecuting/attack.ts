@@ -33,8 +33,9 @@ export function attackOrder(
   }
 
   if (
-    !group.followOutsideSector &&
-    target.cp.position.sector !== entity.cp.position.sector
+    (!group.followOutsideSector &&
+      target.cp.position.sector !== entity.cp.position.sector) ||
+    (group.maxDistance && !isInDistance(entity, target, group.maxDistance))
   ) {
     group.actions = [];
   }

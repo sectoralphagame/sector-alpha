@@ -87,7 +87,7 @@ export const destroyMissionHandler: MissionHandler = {
     );
 
     entities[0].cp.autoOrder.default = {
-      type: "patrol",
+      type: "pillage",
       sectorId: sector.id,
       clockwise: Math.random() > 0.5,
     };

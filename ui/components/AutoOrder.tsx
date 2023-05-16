@@ -35,7 +35,7 @@ const AutoOrder: React.FC<{
       return setDefaultOrder({ type, targetId: 0 });
     }
 
-    if (type === "patrol") {
+    if (type === "patrol" || type === "pillage") {
       return setDefaultOrder({
         type,
         sectorId: entity.cp.position.sector,

@@ -81,6 +81,7 @@ export interface AttackOrder extends BaseOrder {
   /** Used to prevent endless path recalculations */
   ordersForSector: number;
   followOutsideSector: boolean;
+  maxDistance?: number;
 }
 
 export interface FollowOrder extends BaseOrder {
@@ -92,6 +93,12 @@ export interface FollowOrder extends BaseOrder {
 
 export interface PatrolOrder extends BaseOrder {
   type: "patrol";
+  sectorId: number;
+  clockwise: boolean;
+}
+
+export interface PillageOrder extends BaseOrder {
+  type: "pillage";
   sectorId: number;
   clockwise: boolean;
 }
@@ -126,6 +133,7 @@ export type Order =
   | AttackOrder
   | FollowOrder
   | PatrolOrder
+  | PillageOrder
   | EscortOrder
   | MineOrder
   | TradeOrder;

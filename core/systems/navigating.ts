@@ -93,8 +93,13 @@ function setFlybyDrive(entity: Driveable, delta: number) {
   const angleOffset = Math.abs(normalizeAngle(targetAngle - entityAngle));
   const isInRange = (targetEntity.cp.damage?.range ?? 0) + 0.2 > distance;
 
+  const shieldsUp = entity.cp.hitpoints?.shield
+    ? entity.cp.hitpoints.shield.value / entity.cp.hitpoints.shield.max > 0.5
+    : true;
+
   drive.currentRotary =
-    angleOffset > Math.PI * 0.85 && (isInRange || Math.random() > 0.3)
+    angleOffset > Math.PI * 0.85 &&
+    (isInRange || !shieldsUp || Math.random() > 0.3)
       ? 0
       : getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
 

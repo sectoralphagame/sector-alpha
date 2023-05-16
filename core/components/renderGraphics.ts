@@ -10,8 +10,72 @@ import type { BaseComponent } from "./component";
 import type { Entity } from "../entity";
 import { hecsToCartesian } from "./hecsPosition";
 
+const path = ({
+  g,
+  entity,
+  viewport,
+}: {
+  g: PIXI.Graphics;
+  entity: Entity;
+  viewport: Viewport;
+}) => {
+  if (!entity.hasComponents(["orders"])) return;
+
+  const { orders } = entity.requireComponents(["orders"]).cp;
+  const originPosition = findInAncestors(entity, "position").cp.position;
+
+  g.moveTo(
+    originPosition!.coord.get([0]) * 10,
+    originPosition!.coord.get([1]) * 10
+  );
+
+  orders.value.forEach((order) =>
+    order.actions.forEach((action) => {
+      if (
+        action.type === "dock" ||
+        action.type === "teleport" ||
+        action.type === "move" ||
+        action.type === "attack"
+      ) {
+        const target = entity.sim.get(action.targetId);
+        if (!target) return;
+
+        const targetPosition = findInAncestors(target!, "position").cp.position;
+
+        if (action.type === "teleport") {
+          g.moveTo(
+            targetPosition!.coord.get([0]) * 10,
+            targetPosition!.coord.get([1]) * 10
+          );
+        } else {
+          g.lineStyle({
+            alpha: 0.3,
+            width: 3 / viewport.scale.x,
+            color: Color.hsl(0, 0, 70).rgbNumber(),
+          });
+          g.lineTo(
+            targetPosition!.coord.get([0]) * 10,
+            targetPosition!.coord.get([1]) * 10
+          );
+          g.drawCircle(
+            targetPosition!.coord.get([0]) * 10,
+            targetPosition!.coord.get([1]) * 10,
+            3 / viewport.scale.x
+          );
+        }
+      }
+    })
+  );
+};
+
 export type Graphics = Record<
-  "asteroidField" | "link" | "waypoint" | "sector" | "path" | "hexGrid",
+  | "asteroidField"
+  | "link"
+  | "waypoint"
+  | "sector"
+  | "path"
+  | "pathWithRange"
+  | "hexGrid",
   // eslint-disable-next-line no-unused-vars
   (opts: { g: PIXI.Graphics; entity: Entity; viewport: Viewport }) => void
 >;
@@ -127,55 +191,20 @@ export const graphics: Graphics = {
       );
     }
   },
-  path: ({ g, entity, viewport }) => {
-    if (!entity.hasComponents(["orders"])) return;
-
-    const { orders } = entity.requireComponents(["orders"]).cp;
-    const originPosition = findInAncestors(entity, "position").cp.position;
-
-    g.moveTo(
-      originPosition!.coord.get([0]) * 10,
-      originPosition!.coord.get([1]) * 10
-    );
-
-    orders.value.forEach((order) =>
-      order.actions.forEach((action) => {
-        if (
-          action.type === "dock" ||
-          action.type === "teleport" ||
-          action.type === "move" ||
-          action.type === "attack"
-        ) {
-          const target = entity.sim.get(action.targetId);
-          if (!target) return;
-
-          const targetPosition = findInAncestors(target!, "position").cp
-            .position;
-
-          if (action.type === "teleport") {
-            g.moveTo(
-              targetPosition!.coord.get([0]) * 10,
-              targetPosition!.coord.get([1]) * 10
-            );
-          } else {
-            g.lineStyle({
-              alpha: 0.3,
-              width: 3 / viewport.scale.x,
-              color: Color.hsl(0, 0, 70).rgbNumber(),
-            });
-            g.lineTo(
-              targetPosition!.coord.get([0]) * 10,
-              targetPosition!.coord.get([1]) * 10
-            );
-            g.drawCircle(
-              targetPosition!.coord.get([0]) * 10,
-              targetPosition!.coord.get([1]) * 10,
-              3 / viewport.scale.x
-            );
-          }
-        }
-      })
-    );
+  path,
+  pathWithRange: ({ g, entity, viewport }) => {
+    path({ g, entity, viewport });
+    if (entity.cp.damage) {
+      g.lineStyle({
+        width: 1,
+        color: 0xff0000,
+      });
+      g.drawCircle(
+        entity.cp.position!.coord.get([0]) * 10,
+        entity.cp.position!.coord.get([1]) * 10,
+        entity.cp.damage.range * 10
+      );
+    }
   },
   waypoint: ({ g, entity }) => {
     const { position } = entity.requireComponents(["position"]).cp;
@@ -183,8 +212,7 @@ export const graphics: Graphics = {
       alpha: 0.3,
       width: 1,
       color: 0xffffff,
-    });
-    g.drawCircle(
+    }).drawCircle(
       position!.coord.get([0]) * 10,
       position!.coord.get([1]) * 10,
       1
@@ -272,8 +300,8 @@ export function createRenderGraphics<T extends keyof Graphics>(
 ): RenderGraphics<T> {
   return {
     draw,
-    redraw: ["path"].includes(draw),
-    realTime: draw === "path",
+    redraw: ["path", "pathWithRange"].includes(draw),
+    realTime: ["path", "pathWithRange"].includes(draw),
     name: "renderGraphics",
   };
 }

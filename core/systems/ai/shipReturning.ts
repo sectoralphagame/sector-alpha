@@ -63,24 +63,26 @@ export class ShipReturningSystem extends System {
           first
         )!;
 
-        ship.cp.orders.value.push({
-          type: "move",
-          actions: moveToActions(
-            ship,
-            createWaypoint(this.sim, {
-              sector: closestSector.id,
-              owner: ship.id,
-              value: add(
-                hecsToCartesian(
-                  closestSector.cp.hecsPosition!.value,
-                  sectorSize / 10
-                ),
-                [random(-5, 5), random(-5, 5)]
-              ) as Matrix,
-            })
-          ),
-          origin: "auto",
-        });
+        if (closestSector) {
+          ship.cp.orders.value.push({
+            type: "move",
+            actions: moveToActions(
+              ship,
+              createWaypoint(this.sim, {
+                sector: closestSector.id,
+                owner: ship.id,
+                value: add(
+                  hecsToCartesian(
+                    closestSector.cp.hecsPosition!.value,
+                    sectorSize / 10
+                  ),
+                  [random(-5, 5), random(-5, 5)]
+                ) as Matrix,
+              })
+            ),
+            origin: "auto",
+          });
+        }
       })
     );
   };

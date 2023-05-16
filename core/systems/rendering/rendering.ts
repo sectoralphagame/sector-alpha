@@ -68,6 +68,7 @@ export class RenderingSystem extends SystemWithHooks {
   sectorQuery: SectorQuery<"render">;
   sprites: Map<Entity, PIXI.Sprite> = new Map();
   graphics: Map<Entity, PIXI.Graphics> = new Map();
+  displayRange: boolean;
 
   apply = (sim: Sim) => {
     super.apply(sim);
@@ -108,6 +109,9 @@ export class RenderingSystem extends SystemWithHooks {
     this.initListeners();
 
     setCheat("hexGrid", this.toggleGrid);
+    setCheat("displayRange", () => {
+      this.displayRange = !this.displayRange;
+    });
 
     this.initialized = true;
   };
@@ -295,10 +299,10 @@ export class RenderingSystem extends SystemWithHooks {
             this.settingsManager.cp.selectionManager.secondaryId = entity.id;
           });
           sprite.cursor = "pointer";
-          sprite.tint = entityRender.color;
-          this.layers[entityRender.layer].addChild(sprite);
         }
 
+        sprite.tint = entityRender.color;
+        this.layers[entityRender.layer].addChild(sprite);
         this.updateEntityScaling(entity);
         entity.cp.position.moved = true;
       }
@@ -331,8 +335,12 @@ export class RenderingSystem extends SystemWithHooks {
     this.settingsManager.cp.selectionManager.focused = false;
     this.viewport.plugins.remove("follow");
     const previousSelected = this.sim.get(previousValue);
-    if (previousSelected?.cp.renderGraphics?.draw === "path") {
-      previousSelected.removeComponent("renderGraphics");
+    if (
+      ["pathWithRange", "path"].includes(
+        previousSelected?.cp.renderGraphics?.draw
+      )
+    ) {
+      previousSelected!.removeComponent("renderGraphics");
     }
 
     this.sim.queries.renderable.get().forEach((entity) => {
@@ -349,7 +357,9 @@ export class RenderingSystem extends SystemWithHooks {
         this.layers.selection.addChild(sprite);
 
         if (entity.cp.orders) {
-          entity.addComponent(createRenderGraphics("path"));
+          entity.addComponent(
+            createRenderGraphics(this.displayRange ? "pathWithRange" : "path")
+          );
         }
       } else if (!selected && sprite.tint !== entityRender.color) {
         sprite.tint = entityRender.color;

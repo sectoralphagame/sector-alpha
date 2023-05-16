@@ -191,7 +191,7 @@ export class TauHarassingSystem extends System {
     )!;
 
     commander.cp.orders.value.push({
-      type: "patrol",
+      type: "pillage",
       actions: [],
       origin: "auto",
       sectorId: invadedSector.id,

@@ -88,6 +88,8 @@ function getOrderGroupDescription(order: Order, sim: Sim) {
       return `Escort ${sim.get(order.targetId)?.cp.name?.value ?? "target"}`;
     case "patrol":
       return `Patrol ${sim.get(order.sectorId)?.cp.name?.value ?? "sector"}`;
+    case "pillage":
+      return `Pillage ${sim.get(order.sectorId)?.cp.name?.value ?? "sector"}`;
     case "collect":
       return "Collect crate";
     default:
