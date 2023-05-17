@@ -105,6 +105,7 @@ export class AttackingSystem extends System {
               )
           ) {
             changeHp(target, entity.cp.damage.value);
+            const parentEntity = findInAncestors(entity, "position");
 
             if (target.cp.drive) {
               stopCruise(target.cp.drive);
@@ -113,11 +114,17 @@ export class AttackingSystem extends System {
               if (target.cp.orders) {
                 attack(target.requireComponents(["orders"]), entity);
               }
-            } else if (target.cp.damage && !target.tags.has("role:military")) {
-              target.cp.damage.targetId = findInAncestors(
-                entity,
-                "position"
-              ).id;
+            } else if (
+              target.cp.damage &&
+              !target.tags.has("role:military") &&
+              (!target.cp.damage.targetId ||
+                (this.sim.get(target.cp.damage.targetId) &&
+                  !isInDistance(
+                    target.requireComponents(["damage"]),
+                    this.sim.get(target.cp.damage.targetId)!
+                  )))
+            ) {
+              target.cp.damage.targetId = parentEntity.id;
             }
             target.cp.subordinates?.ids.forEach((subordinateId) => {
               const subordinate = this.sim
@@ -125,7 +132,7 @@ export class AttackingSystem extends System {
                 .requireComponents(["orders"]);
 
               if (subordinate.cp.orders.value[0]?.type === "escort") {
-                attack(subordinate, entity);
+                attack(subordinate, parentEntity);
               }
             });
           }

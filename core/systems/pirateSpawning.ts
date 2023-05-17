@@ -108,7 +108,23 @@ function spawnSquad(
     );
   }
 
-  const commander = pickRandom(squad);
+  if (
+    !squad.some((s) => s.cp.model.slug === "stingray") &&
+    Math.random() > 0.8
+  ) {
+    console.log("spawning frigate");
+    squad.push(
+      createShip(sim, {
+        ...shipClasses.find((sc) => sc.slug === "stingray")!,
+        owner: faction,
+        position: flagship.cp.position.coord.clone(),
+        sector,
+      })
+    );
+  }
+
+  const commander =
+    squad.find((s) => s.cp.model.slug === "stingray") ?? pickRandom(squad);
   squad.forEach((s) => {
     if (s !== commander) {
       addSubordinate(commander, s);
@@ -126,7 +142,7 @@ function spawnSquad(
   };
 
   if (isDev) {
-    console.log(`Launching ${squadSize} pirates in ${sector.cp.name.value}`);
+    console.log(`Launching ${squad.length} pirates in ${sector.cp.name.value}`);
   }
 }
 

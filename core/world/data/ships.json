@@ -520,5 +520,25 @@
       "shield": { "value": 430, "regen": 6 }
     },
     "docks": { "small": 6, "medium": 2, "large": 0 }
+  },
+  {
+    "acceleration": 0.18,
+    "build": { "time": 0, "cost": {} },
+    "mining": 0,
+    "role": "military",
+    "cruise": 1,
+    "maneuver": 0.19,
+    "rotary": 77,
+    "ttc": 2,
+    "name": "Stingray",
+    "size": "medium",
+    "storage": 65,
+    "texture": "mMil",
+    "slug": "stingray",
+    "damage": { "value": 11, "cooldown": 0.3, "range": 1.35 },
+    "hitpoints": {
+      "hp": { "value": 490, "regen": 0.2 },
+      "shield": { "value": 90, "regen": 5 }
+    }
   }
 ]
