@@ -6,6 +6,7 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { findInAncestors } from "@core/utils/findInAncestors";
 import { distance } from "mathjs";
 import type { DockSize } from "@core/components/dockable";
+import type { Entity } from "@core/entity";
 import { regenCooldown } from "./hitpointsRegenerating";
 import { Query } from "./utils/query";
 import { System } from "./system";
@@ -49,6 +50,20 @@ function shouldAttackBack(
           .tags.has("role:military") &&
         isInDistance(target.requireComponents(["damage"]), attackerOrParent)))
   );
+}
+
+function attack(attacker: RequireComponent<"orders">, target: Entity) {
+  if (attacker.cp.orders.value[0]) {
+    attacker.cp.orders.value[0].interrupt = true;
+  }
+  attacker.cp.orders.value.splice(1, 0, {
+    type: "attack",
+    actions: [],
+    followOutsideSector: false,
+    ordersForSector: 0,
+    origin: "auto",
+    targetId: findInAncestors(target, "position").id,
+  });
 }
 
 const cdKey = "attack";
@@ -96,17 +111,7 @@ export class AttackingSystem extends System {
             }
             if (shouldAttackBack(entity, target)) {
               if (target.cp.orders) {
-                if (target.cp.orders.value[0]) {
-                  target.cp.orders.value[0].interrupt = true;
-                }
-                target.cp.orders.value.splice(1, 0, {
-                  type: "attack",
-                  actions: [],
-                  followOutsideSector: false,
-                  ordersForSector: 0,
-                  origin: "auto",
-                  targetId: findInAncestors(entity, "position").id,
-                });
+                attack(target.requireComponents(["orders"]), entity);
               }
             } else if (target.cp.damage && !target.tags.has("role:military")) {
               target.cp.damage.targetId = findInAncestors(
@@ -114,6 +119,15 @@ export class AttackingSystem extends System {
                 "position"
               ).id;
             }
+            target.cp.subordinates?.ids.forEach((subordinateId) => {
+              const subordinate = this.sim
+                .getOrThrow(subordinateId)
+                .requireComponents(["orders"]);
+
+              if (subordinate.cp.orders.value[0]?.type === "escort") {
+                attack(subordinate, entity);
+              }
+            });
           }
 
           target.cooldowns.use(regenCooldown, 2);

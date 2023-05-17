@@ -40,7 +40,11 @@ export class SpottingSystem extends System {
   ) {
     const entityOwner = entity.sim.getOrThrow<Faction>(entity.cp.owner.id);
 
-    const cacheKey = [entity.cp.owner!.id, entity.cp.position.sector].join(":");
+    const cacheKey = [
+      entity.cp.owner!.id,
+      entity.cp.position.sector,
+      entity.cp.orders?.value[0].type === "pillage" ? "pillage" : "default",
+    ].join(":");
     const enemies =
       cache[cacheKey] ??
       pipe(
