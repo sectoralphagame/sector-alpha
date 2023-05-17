@@ -4,6 +4,7 @@ import type { Matrix } from "mathjs";
 import { add, matrix } from "mathjs";
 import type { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
+import { spottingRadius } from "@core/systems/ai/spotting";
 import { sectorSize } from "../archetypes/sector";
 import { findInAncestors } from "../utils/findInAncestors";
 import type { BaseComponent } from "./component";
@@ -196,14 +197,23 @@ export const graphics: Graphics = {
     path({ g, entity, viewport });
     if (entity.cp.damage) {
       g.lineStyle({
-        width: 1,
+        width: 0.3,
         color: 0xff0000,
-      });
-      g.drawCircle(
-        entity.cp.position!.coord.get([0]) * 10,
-        entity.cp.position!.coord.get([1]) * 10,
-        entity.cp.damage.range * 10
-      );
+      })
+        .drawCircle(
+          entity.cp.position!.coord.get([0]) * 10,
+          entity.cp.position!.coord.get([1]) * 10,
+          entity.cp.damage.range * 10
+        )
+        .lineStyle({
+          width: 0.2,
+          color: 0x0000ff,
+        })
+        .drawCircle(
+          entity.cp.position!.coord.get([0]) * 10,
+          entity.cp.position!.coord.get([1]) * 10,
+          spottingRadius * 10
+        );
     }
   },
   waypoint: ({ g, entity }) => {

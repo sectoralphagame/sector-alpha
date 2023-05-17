@@ -163,6 +163,7 @@ export class PirateSpawningSystem extends System {
         .filter(
           (s) =>
             s.cp.owner?.id === this.faction.id &&
+            !s.cp.commander &&
             s.cp.subordinates.ids.length > 0
         )
         .map((s) => ({
@@ -177,6 +178,7 @@ export class PirateSpawningSystem extends System {
           (s) =>
             s.cp.owner?.id === this.faction.id &&
             !s.cp.commander &&
+            s.cp.orders.value.length === 0 &&
             s.cp.model.slug !== "seahorse"
         );
       const flagships = this.query

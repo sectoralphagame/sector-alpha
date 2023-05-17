@@ -9,7 +9,7 @@ import type { Sim } from "../../sim";
 import { Cooldowns } from "../../utils/cooldowns";
 import { SectorQuery } from "../utils/sectorQuery";
 
-const spottingRadius = 6;
+export const spottingRadius = 6;
 
 export type EnemyArrayCache = Record<
   string,

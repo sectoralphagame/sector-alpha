@@ -116,7 +116,7 @@ export class AttackingSystem extends System {
             }
           }
 
-          target.cooldowns.use(regenCooldown, 3);
+          target.cooldowns.use(regenCooldown, 2);
         }
       }
     });
