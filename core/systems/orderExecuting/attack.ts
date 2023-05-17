@@ -53,7 +53,8 @@ export function isAttackOrderCompleted(
     ? true
     : group.followOutsideSector
     ? false
-    : target.cp.position.sector !== entity.cp.position.sector;
+    : target.cp.position.sector !== entity.cp.position.sector ||
+      (!!group.maxDistance && !isInDistance(entity, target, group.maxDistance));
 }
 
 export function attackAction(

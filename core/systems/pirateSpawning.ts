@@ -49,7 +49,7 @@ function returnToFlagship(unassigned: Ship[], flagships: Ship[]) {
 }
 
 function spawnFlagship(sim: Sim, faction: Faction, flagships: Ship[]) {
-  if (flagships.length > 3) return;
+  if (flagships.length > 6) return;
 
   const tau = sim.queries.ai.get().find((f) => f.cp.name.slug === "TAU")!;
   const sector = pickRandom(
@@ -87,17 +87,17 @@ function spawnSquad(
   flagships: Ship[],
   unassigned: Ship[]
 ) {
-  if (!flagships.length || squads.length > 8) return;
+  if (!flagships.length || squads.length > 13) return;
 
   const flagship = pickRandom(flagships);
   const unassignedInSector = unassigned.filter(
     (s) => s.cp.position.sector === flagship.cp.position.sector
   );
   const squadSize = randomInt(2, 4);
-
   const squad = unassignedInSector.slice(0, squadSize);
+  const currentSquadSize = squad.length;
   const sector = sim.getOrThrow<Sector>(flagship.cp.position.sector);
-  for (let index = 0; index < squadSize - squad.length; index++) {
+  for (let index = 0; index < squadSize - currentSquadSize; index++) {
     squad.push(
       createShip(sim, {
         ...shipClasses.find((sc) => sc.slug === "roach")!,
@@ -191,7 +191,7 @@ export class PirateSpawningSystem extends System {
       this.cooldowns.doEvery("spawnFlagship", 15 * 60, () =>
         spawnFlagship(this.sim, this.faction, flagships)
       );
-      this.cooldowns.doEvery("spawnSquad", 5 * 60, () =>
+      this.cooldowns.doEvery("spawnSquad", 3 * 60, () =>
         spawnSquad(this.sim, this.faction, squads, flagships, unassigned)
       );
       this.cooldowns.doEvery("return", 1, () =>
