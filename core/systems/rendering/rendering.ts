@@ -457,11 +457,11 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
     }
     this.settingsManager = this.sim.queries.settings.get()[0];
 
-    this.hook(
+    this.onChange(
       this.settingsManager.cp.selectionManager.id,
       this.updateSelection
     );
-    this.hook(this.viewport.scale.x, this.updateScaling);
+    this.onChange(this.viewport.scale.x, this.updateScaling);
 
     if (this.settingsManager.cp.selectionManager.focused) {
       const entity = this.sim.getOrThrow(
