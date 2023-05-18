@@ -19,7 +19,7 @@ import { Query } from "./utils/query";
 function returnToFlagship(unassigned: Ship[], flagships: Ship[]) {
   if (unassigned.length && flagships.length) {
     unassigned.forEach((ship) => {
-      if (ship.cp.orders.value.length) return;
+      if (ship.cp.orders.value.length || ship.cp.dockable.dockedIn) return;
 
       const closestFlagship = flagships.reduce((prev, cur) => {
         if (ship.cp.position.sector === cur.cp.position.sector) return cur;
@@ -112,7 +112,6 @@ function spawnSquad(
     !squad.some((s) => s.cp.model.slug === "stingray") &&
     Math.random() > 0.8
   ) {
-    console.log("spawning frigate");
     squad.push(
       createShip(sim, {
         ...shipClasses.find((sc) => sc.slug === "stingray")!,
