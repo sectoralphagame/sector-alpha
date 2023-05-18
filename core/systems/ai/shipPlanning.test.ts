@@ -45,7 +45,7 @@ describe("ShipPlanningSystem", () => {
     expect(system.getPatrolRequests(faction)[0].patrols).toBe(-2);
     expect(system.getPatrolRequests(faction)[0].fighters).toBe(-4);
 
-    system.exec(0);
+    system.exec();
     expect(shipyard.cp.shipyard!.queue).toHaveLength(0);
     // 3 Freighters for shipyard
     // 2 Frigates
@@ -55,7 +55,8 @@ describe("ShipPlanningSystem", () => {
     expect(system.getPatrolRequests(faction)[0].fighters).toBe(-4);
 
     sim.timeOffset = 100;
-    system.exec(100);
+    system.cooldowns.update(100);
+    system.exec();
     expect(shipyard.cp.shipyard!.queue).toHaveLength(0);
     expect(sim.entities.size).toBe(12);
     expect(system.getPatrolRequests(faction)[0].patrols).toBe(0);

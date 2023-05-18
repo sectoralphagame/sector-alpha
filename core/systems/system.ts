@@ -5,7 +5,7 @@ import type { Sim } from "../sim";
  * Base class to extend new systems. Use `-ingSystem` postfix in system names.
  */
 export abstract class System<T extends string | never = never> {
-  protected cooldowns: Cooldowns<T>;
+  public cooldowns: Cooldowns<T>;
   protected sim: Sim;
 
   constructor() {
