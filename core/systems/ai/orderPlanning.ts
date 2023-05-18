@@ -26,7 +26,6 @@ import {
 } from "../../economy/utils";
 import type { Sim } from "../../sim";
 import type { RequireComponent } from "../../tsHelpers";
-import { Cooldowns } from "../../utils/cooldowns";
 import { moveToActions } from "../../utils/moving";
 import {
   autoBuyMostNeededByCommander,
@@ -482,25 +481,16 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
   }
 }
 
-export class OrderPlanningSystem extends System {
-  cooldowns: Cooldowns<"autoOrder">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("autoOrder");
-  }
-
+export class OrderPlanningSystem extends System<"exec"> {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
-
-    if (this.cooldowns.canUse("autoOrder")) {
-      this.cooldowns.use("autoOrder", 3);
+  exec = (): void => {
+    if (this.cooldowns.canUse("exec")) {
+      this.cooldowns.use("exec", 3);
       this.sim.queries.autoOrderable.get().forEach(autoOrder);
     }
   };

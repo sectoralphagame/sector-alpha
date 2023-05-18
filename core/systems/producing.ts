@@ -10,7 +10,6 @@ import type { Commodity } from "../economy/commodity";
 import { commodities } from "../economy/commodity";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
-import { Cooldowns } from "../utils/cooldowns";
 import { findInAncestors } from "../utils/findInAncestors";
 import { limitMax } from "../utils/limit";
 import { perCommodity } from "../utils/perCommodity";
@@ -64,14 +63,7 @@ export function isAbleToProduce(
   );
 }
 
-export class ProducingSystem extends System {
-  cooldowns: Cooldowns<"exec">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("exec");
-  }
-
+export class ProducingSystem extends System<"exec"> {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
@@ -85,8 +77,7 @@ export class ProducingSystem extends System {
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
+  exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
 
     this.sim.queries.standaloneProduction.get().forEach((entity) => {

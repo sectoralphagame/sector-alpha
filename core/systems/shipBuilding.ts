@@ -1,7 +1,6 @@
 import { createShip } from "../archetypes/ship";
 import type { Commodity } from "../economy/commodity";
 import type { Sim } from "../sim";
-import { Cooldowns } from "../utils/cooldowns";
 import { System } from "./system";
 import type { Faction } from "../archetypes/faction";
 import type { Sector } from "../archetypes/sector";
@@ -10,22 +9,14 @@ import { dockShip } from "./orderExecuting/dock";
 
 export const shipBuildTimer = "shipBuild";
 
-export class ShipBuildingSystem extends System {
-  cooldowns: Cooldowns<"exec">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("exec");
-  }
-
+export class ShipBuildingSystem extends System<"exec"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
+  exec = (): void => {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 1);
 

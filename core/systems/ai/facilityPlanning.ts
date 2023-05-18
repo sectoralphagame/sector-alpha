@@ -17,7 +17,6 @@ import { addStorage } from "../../components/storage";
 import type { Commodity } from "../../economy/commodity";
 import { commoditiesArray, mineableCommodities } from "../../economy/commodity";
 import type { Sim } from "../../sim";
-import { Cooldowns } from "../../utils/cooldowns";
 import { addFacilityModule } from "../../utils/entityModules";
 import { pickRandom } from "../../utils/generators";
 import { perCommodity } from "../../utils/perCommodity";
@@ -84,14 +83,7 @@ function getSectorPosition(sector: Sector): Matrix {
   return position;
 }
 
-export class FacilityPlanningSystem extends System {
-  cooldowns: Cooldowns<"plan">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("plan");
-  }
-
+export class FacilityPlanningSystem extends System<"plan"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 

@@ -1,6 +1,5 @@
 import type { Reward } from "@core/components/missions";
 import type { Sim } from "@core/sim";
-import { Cooldowns } from "@core/utils/cooldowns";
 import { pickRandom } from "@core/utils/generators";
 import { setCheat } from "@core/utils/misc";
 import { System } from "../system";
@@ -8,8 +7,7 @@ import type { MissionHandler } from "./types";
 
 type MissionHandlers = Record<string, MissionHandler>;
 
-export class MissionSystem extends System {
-  cooldowns: Cooldowns<"generate" | "track">;
+export class MissionSystem extends System<"generate" | "track"> {
   handlers: {
     mission: MissionHandlers;
     rewards: Record<string, (_reward: Reward, _sim: Sim) => void>;
@@ -20,7 +18,6 @@ export class MissionSystem extends System {
     rewardHandlers: Record<string, (_reward: Reward, _sim: Sim) => void>
   ) {
     super();
-    this.cooldowns = new Cooldowns("generate", "track");
     this.handlers = {
       mission: missionHandlers,
       rewards: rewardHandlers,
@@ -84,9 +81,7 @@ export class MissionSystem extends System {
     }
   };
 
-  exec = (delta: number) => {
-    this.cooldowns.update(delta);
-
+  exec = () => {
     this.generate(false);
     this.track();
   };

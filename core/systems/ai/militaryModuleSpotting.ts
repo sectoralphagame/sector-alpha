@@ -4,23 +4,16 @@ import { facilityComponents } from "@core/archetypes/facility";
 import { pickRandom } from "@core/utils/generators";
 import { System } from "../system";
 import type { Sim } from "../../sim";
-import { Cooldowns } from "../../utils/cooldowns";
 import { Query } from "../utils/query";
 import { SpottingSystem } from "./spotting";
 import { SectorQuery } from "../utils/sectorQuery";
 import { isInDistance } from "../attacking";
 
-export class MilitaryModuleSpottingSystem extends System {
-  cooldowns: Cooldowns<"exec">;
+export class MilitaryModuleSpottingSystem extends System<"exec"> {
   queries: {
     enemies: SectorQuery<"hitpoints" | "owner" | "position">;
     modules: Query<"parent" | "damage">;
   };
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("exec");
-  }
 
   apply = (sim: Sim) => {
     super.apply(sim);
@@ -33,8 +26,7 @@ export class MilitaryModuleSpottingSystem extends System {
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
+  exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
 
     const cache: Record<

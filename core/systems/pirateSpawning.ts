@@ -7,7 +7,6 @@ import { hecsToCartesian } from "@core/components/hecsPosition";
 import { addSubordinate } from "@core/components/subordinates";
 import { isDev } from "@core/settings";
 import type { Sim } from "@core/sim";
-import { Cooldowns } from "@core/utils/cooldowns";
 import { pickRandom } from "@core/utils/generators";
 import { moveToActions } from "@core/utils/moving";
 import { shipClasses } from "@core/world/ships";
@@ -63,6 +62,7 @@ function spawnFlagship(sim: Sim, faction: Faction, flagships: Ship[]) {
   );
 
   if (isDev) {
+    // eslint-disable-next-line no-console
     console.log(`Spawning pirate flagship in ${sector.cp.name.value}`);
   }
 
@@ -141,19 +141,16 @@ function spawnSquad(
   };
 
   if (isDev) {
+    // eslint-disable-next-line no-console
     console.log(`Launching ${squad.length} pirates in ${sector.cp.name.value}`);
   }
 }
 
-export class PirateSpawningSystem extends System {
-  cooldowns: Cooldowns<"return" | "spawnFlagship" | "spawnSquad">;
+export class PirateSpawningSystem extends System<
+  "return" | "spawnFlagship" | "spawnSquad"
+> {
   faction: Faction;
   query: Query<ShipComponent>;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("return", "spawnFlagship", "spawnSquad");
-  }
 
   apply = (sim: Sim) => {
     super.apply(sim);

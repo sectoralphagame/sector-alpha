@@ -9,7 +9,6 @@ import type { WithTrade } from "../economy/utils";
 import { getSectorsInTeleportRange } from "../economy/utils";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
-import { Cooldowns } from "../utils/cooldowns";
 import { limit } from "../utils/limit";
 import { commodityPrices, perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
@@ -334,23 +333,14 @@ export function createOffers(entity: WithTrade) {
  *
  * @link https://ianparberry.com/pubs/econ.pdf
  */
-export class TradingSystem extends System {
-  cooldowns: Cooldowns<"adjustPrices" | "createOffers">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("adjustPrices", "createOffers");
-  }
-
+export class TradingSystem extends System<"adjustPrices" | "createOffers"> {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
-
+  exec = (): void => {
     if (this.cooldowns.canUse("adjustPrices")) {
       this.cooldowns.use("adjustPrices", 900);
       this.sim.queries.trading.get().forEach(adjustPrices);

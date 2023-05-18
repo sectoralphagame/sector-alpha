@@ -6,7 +6,6 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { pickRandom } from "@core/utils/generators";
 import { System } from "../system";
 import type { Sim } from "../../sim";
-import { Cooldowns } from "../../utils/cooldowns";
 import { SectorQuery } from "../utils/sectorQuery";
 
 export const spottingRadius = 6;
@@ -16,14 +15,8 @@ export type EnemyArrayCache = Record<
   Array<RequireComponent<"hitpoints" | "owner" | "position">>
 >;
 
-export class SpottingSystem extends System {
-  cooldowns: Cooldowns<"exec">;
+export class SpottingSystem extends System<"exec"> {
   query: SectorQuery<"hitpoints" | "owner" | "position">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("exec");
-  }
 
   apply = (sim: Sim) => {
     super.apply(sim);
@@ -87,8 +80,7 @@ export class SpottingSystem extends System {
     );
   }
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
+  exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
 
     const cache: EnemyArrayCache = {};

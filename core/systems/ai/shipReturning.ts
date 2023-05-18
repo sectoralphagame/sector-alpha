@@ -3,7 +3,6 @@ import { createWaypoint } from "@core/archetypes/waypoint";
 import { sectorSize } from "@core/archetypes/sector";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { Sim } from "@core/sim";
-import { Cooldowns } from "@core/utils/cooldowns";
 import { moveToActions } from "@core/utils/moving";
 import { each, filter, first, map, pipe, sortBy } from "@fxts/core";
 import type { Matrix } from "mathjs";
@@ -13,22 +12,14 @@ import { System } from "../system";
 /**
  * Return crafts left without orders to owned sectors
  */
-export class ShipReturningSystem extends System {
-  cooldowns: Cooldowns<"exec">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("exec");
-  }
-
+export class ShipReturningSystem extends System<"exec"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
+  exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
     this.cooldowns.use("exec", 3);
 

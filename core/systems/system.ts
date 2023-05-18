@@ -1,10 +1,16 @@
+import { Cooldowns } from "@core/utils/cooldowns";
 import type { Sim } from "../sim";
 
 /**
  * Base class to extend new systems. Use `-ingSystem` postfix in system names.
  */
-export abstract class System {
+export abstract class System<T extends string | never = never> {
+  protected cooldowns: Cooldowns<T>;
   protected sim: Sim;
+
+  constructor() {
+    this.cooldowns = new Cooldowns<T>();
+  }
 
   // eslint-disable-next-line class-methods-use-this
   destroy() {}
@@ -12,6 +18,7 @@ export abstract class System {
   apply(sim: Sim) {
     this.sim = sim;
 
+    sim.hooks.phase.start.tap(this.constructor.name, this.cooldowns.update);
     sim.hooks.destroy.tap(this.constructor.name, this.destroy);
   }
 }

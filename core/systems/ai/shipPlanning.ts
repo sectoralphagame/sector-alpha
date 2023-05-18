@@ -8,7 +8,6 @@ import type { InitialShipInput } from "../../archetypes/ship";
 import { createShipName, createShip } from "../../archetypes/ship";
 import { mineableCommodities } from "../../economy/commodity";
 import type { Sim } from "../../sim";
-import { Cooldowns } from "../../utils/cooldowns";
 import { pickRandom } from "../../utils/generators";
 import { perCommodity } from "../../utils/perCommodity";
 import type { ShipRole } from "../../world/ships";
@@ -70,14 +69,7 @@ export function requestShip(
   return bp;
 }
 
-export class ShipPlanningSystem extends System {
-  cooldowns: Cooldowns<"plan">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("plan");
-  }
-
+export class ShipPlanningSystem extends System<"plan"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
@@ -500,8 +492,7 @@ export class ShipPlanningSystem extends System {
       });
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
+  exec = (): void => {
     if (this.cooldowns.canUse("plan")) {
       this.cooldowns.use("plan", 60);
 

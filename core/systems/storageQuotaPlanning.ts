@@ -5,7 +5,6 @@ import type { Commodity } from "../economy/commodity";
 import { commoditiesArray } from "../economy/commodity";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
-import { Cooldowns } from "../utils/cooldowns";
 import { System } from "./system";
 
 function getShipyardQuota(
@@ -49,23 +48,14 @@ export function settleStorageQuota(entity: RequireComponent<"storage">) {
   });
 }
 
-export class StorageQuotaPlanningSystem extends System {
-  cooldowns: Cooldowns<"settle">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("settle");
-  }
-
+export class StorageQuotaPlanningSystem extends System<"settle"> {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
-
+  exec = (): void => {
     if (this.cooldowns.canUse("settle")) {
       this.cooldowns.use("settle", 20);
       this.sim.queries.storageAndTrading.get().forEach(settleStorageQuota);

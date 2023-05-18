@@ -11,7 +11,7 @@ import {
   graphics,
 } from "../../components/renderGraphics";
 import type { RequireComponent } from "../../tsHelpers";
-import { Cooldowns } from "../../utils/cooldowns";
+import type { Cooldowns } from "../../utils/cooldowns";
 import { SystemWithHooks } from "../utils/hooks";
 import { clearFocus } from "../../components/selection";
 import type { Layer, Textures } from "../../components/render";
@@ -52,7 +52,7 @@ export function setTexture(
   }
 }
 
-export class RenderingSystem extends SystemWithHooks {
+export class RenderingSystem extends SystemWithHooks<"graphics"> {
   rendering: true;
   settingsManager: RequireComponent<"selectionManager" | "camera">;
   viewport: Viewport;
@@ -81,7 +81,6 @@ export class RenderingSystem extends SystemWithHooks {
   };
 
   init = () => {
-    this.cooldowns = new Cooldowns("graphics");
     this.settingsManager = this.sim.queries.settings.get()[0];
     this.toolbar = document.querySelector("#toolbar")!;
     const root = document.querySelector("#root")!;
@@ -456,7 +455,6 @@ export class RenderingSystem extends SystemWithHooks {
       this.init();
       return;
     }
-    this.cooldowns.update(delta);
     this.settingsManager = this.sim.queries.settings.get()[0];
 
     this.hook(

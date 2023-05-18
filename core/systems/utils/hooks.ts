@@ -1,6 +1,8 @@
 import { System } from "../system";
 
-export abstract class SystemWithHooks extends System {
+export abstract class SystemWithHooks<
+  TCooldowns extends string | never = never
+> extends System<TCooldowns> {
   private hooks: Record<number, any> = {};
   private hookCounter: number = 0;
 

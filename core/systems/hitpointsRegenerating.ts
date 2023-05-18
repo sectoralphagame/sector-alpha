@@ -1,18 +1,11 @@
 import type { Sim } from "@core/sim";
-import { Cooldowns } from "@core/utils/cooldowns";
 import { Query } from "./utils/query";
 import { System } from "./system";
 
 export const regenCooldown = "regen";
 
-export class HitpointsRegeneratingSystem extends System {
-  cooldowns: Cooldowns<"exec">;
+export class HitpointsRegeneratingSystem extends System<"exec"> {
   query: Query<"hitpoints">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("exec");
-  }
 
   apply = (sim: Sim) => {
     super.apply(sim);
@@ -22,8 +15,7 @@ export class HitpointsRegeneratingSystem extends System {
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
+  exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
 
     this.cooldowns.use("exec", 1);

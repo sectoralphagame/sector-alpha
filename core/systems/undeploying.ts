@@ -2,7 +2,6 @@ import { changeBudgetMoney } from "@core/components/budget";
 import type { DeployableType } from "@core/components/deployable";
 import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
-import { Cooldowns } from "@core/utils/cooldowns";
 import { removeSubordinate } from "@core/components/subordinates";
 import { Query } from "./utils/query";
 import { System } from "./system";
@@ -47,14 +46,8 @@ const handlers: Partial<
   },
 };
 
-export class UndeployingSystem extends System {
-  cooldowns: Cooldowns<"exec">;
+export class UndeployingSystem extends System<"exec"> {
   query: Query<"deployable">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("exec");
-  }
 
   apply = (sim: Sim) => {
     super.apply(sim);
@@ -64,9 +57,7 @@ export class UndeployingSystem extends System {
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
-
+  exec = (): void => {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 1);
       this.query.get().forEach((entity) => {

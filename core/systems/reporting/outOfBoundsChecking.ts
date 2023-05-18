@@ -1,16 +1,17 @@
 import type { Sector } from "@core/archetypes/sector";
 import { worldToHecs } from "@core/components/hecsPosition";
+import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
-import { Cooldowns } from "@core/utils/cooldowns";
 import { deepEqual } from "mathjs";
 import { System } from "../system";
 
-export class OutOfBoundsCheckingSystem extends System {
-  cooldowns = new Cooldowns("exec");
+export class OutOfBoundsCheckingSystem extends System<"exec"> {
+  apply = (sim: Sim) => {
+    super.apply(sim);
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
-
+    sim.hooks.phase.start.tap(this.constructor.name, this.exec);
+  };
+  exec = (): void => {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", this.sim.speed);
       const outOfBoundsEntities = this.sim.queries.renderable

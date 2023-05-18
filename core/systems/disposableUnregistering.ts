@@ -1,15 +1,7 @@
 import type { Sim } from "@core/sim";
-import { Cooldowns } from "@core/utils/cooldowns";
 import { System } from "./system";
 
-export class DisposableUnregisteringSystem extends System {
-  cooldowns: Cooldowns<"exec">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("exec");
-  }
-
+export class DisposableUnregisteringSystem extends System<"exec"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 

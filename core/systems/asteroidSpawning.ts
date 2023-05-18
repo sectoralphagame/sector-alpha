@@ -4,7 +4,6 @@ import { asteroid, createAsteroid } from "../archetypes/asteroid";
 import { System } from "./system";
 import type { AsteroidField } from "../archetypes/asteroidField";
 import type { Sim } from "../sim";
-import { Cooldowns } from "../utils/cooldowns";
 import { limitMax } from "../utils/limit";
 
 export function getFieldMax(entity: AsteroidField): number {
@@ -45,23 +44,15 @@ function spawn(field: AsteroidField, sim: Sim) {
   );
 }
 
-export class AsteroidSpawningSystem extends System {
-  cooldowns: Cooldowns<"tick">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("tick");
-  }
-
+export class AsteroidSpawningSystem extends System<"exec"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
-    if (!this.cooldowns.canUse("tick")) return;
+  exec = (): void => {
+    if (!this.cooldowns.canUse("exec")) return;
 
     this.sim.queries.asteroidFields.get().forEach((entity) => {
       if (this.sim.getTime() < 10) {
@@ -77,6 +68,6 @@ export class AsteroidSpawningSystem extends System {
       }
     });
 
-    this.cooldowns.use("tick", 600);
+    this.cooldowns.use("exec", 600);
   };
 }

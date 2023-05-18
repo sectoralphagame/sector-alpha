@@ -6,20 +6,12 @@ import { filter, map, pipe, sum } from "@fxts/core";
 import { addFacilityModule } from "@core/utils/entityModules";
 import type { Commodity } from "../economy/commodity";
 import type { Sim } from "../sim";
-import { Cooldowns } from "../utils/cooldowns";
 import { System } from "./system";
 import { hasSufficientStorage, removeStorage } from "../components/storage";
 
 const buildTimer = "facilityModuleBuild";
 
-export class FacilityBuildingSystem extends System {
-  cooldowns: Cooldowns<"build" | "offers">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("build", "offers");
-  }
-
+export class FacilityBuildingSystem extends System<"build" | "offers"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
@@ -113,7 +105,6 @@ export class FacilityBuildingSystem extends System {
     });
 
   exec = (delta: number): void => {
-    this.cooldowns.update(delta);
     if (this.cooldowns.canUse("build")) {
       this.cooldowns.use("build", 1);
       this.build(delta);

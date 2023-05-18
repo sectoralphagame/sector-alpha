@@ -2,7 +2,6 @@ import type { Ship } from "@core/archetypes/ship";
 import { relationThresholds } from "@core/components/relations";
 import type { Entity } from "@core/entity";
 import type { Sim } from "@core/sim";
-import { Cooldowns } from "@core/utils/cooldowns";
 import { getSubordinates } from "@core/utils/misc";
 import { filter, first, map, pipe, sortBy } from "@fxts/core";
 import { distance } from "mathjs";
@@ -13,14 +12,7 @@ import { System } from "../system";
 
 const fightersInFleet = 9;
 
-export class TauHarassingSystem extends System {
-  cooldowns: Cooldowns<"exec">;
-
-  constructor() {
-    super();
-    this.cooldowns = new Cooldowns("exec");
-  }
-
+export class TauHarassingSystem extends System<"exec"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
@@ -158,8 +150,7 @@ export class TauHarassingSystem extends System {
     return null;
   };
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
+  exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
     this.cooldowns.use("exec", 30);
 
