@@ -1,4 +1,5 @@
 .notification {
+  background-color: var(--palette-background);
   align-items: center;
   display: flex;
   border: 1px solid var(--palette-border);
@@ -23,7 +24,8 @@
     position: absolute;
   }
 
-  &:hover {
+  &:hover,
+  &:focus {
     transform: translateX(0);
   }
 
@@ -59,8 +61,21 @@
   }
 
   &Icon {
-    margin-left: 16px;
+    margin-left: 8px;
     width: 32px;
     height: 32px;
   }
+}
+
+.container {
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 8px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  position: absolute;
+  bottom: 300px;
+  height: 400px;
+  right: 0;
 }

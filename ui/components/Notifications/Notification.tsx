@@ -9,24 +9,28 @@ export interface NotificationProps {
   message: string;
   type: "success" | "warning" | "error";
   icon: "question" | "exclamation";
+  onClick: () => void;
 }
 
 export const Notification: React.FC<NotificationProps> = ({
   icon,
   message,
   type,
+  onClick,
 }) => (
-  <div
+  <button
     className={clsx(styles.notification, {
       [styles.notificationSuccess]: type === "success",
       [styles.notificationWarning]: type === "warning",
       [styles.notificationError]: type === "error",
     })}
+    onClick={onClick}
+    type="button"
   >
     <SVG
       src={icon === "exclamation" ? exclamationIcon : questionIcon}
       className={styles.notificationIcon}
     />
     <p className={styles.notificationMessage}>{message}</p>
-  </div>
+  </button>
 );

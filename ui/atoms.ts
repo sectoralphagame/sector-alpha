@@ -8,6 +8,8 @@ import type { FacilityMoneyManagerProps } from "./components/FacilityMoneyManage
 import type { FacilityTradeManagerProps } from "./components/FacilityTradeManager";
 import type { ShipyardDialogProps } from "./components/ShipyardDialog";
 import type { MissionDialogProps } from "./components/MissionDialog";
+import type { NotificationProps } from "./components/Notifications";
+import type { Notification } from "./components/Notifications/types";
 
 export const sim = atom<Sim>({
   key: "sim",
@@ -51,3 +53,32 @@ export const gameOverlay = atom<GameOverlayProps>({
   default: null,
 });
 export const useGameOverlay = () => useRecoilState(gameOverlay);
+
+export const notificationsAtom = atom<Notification[]>({
+  key: "notiifications",
+  default: [],
+});
+export const useNotifications = () => {
+  const [notifications, setNotifications] = useRecoilState(notificationsAtom);
+
+  const removeNotification = (id: number) => {
+    setNotifications(notifications.filter((n) => n.id !== id));
+  };
+
+  const addNotification = (
+    notification: NotificationProps & {
+      expires?: number;
+    }
+  ) => {
+    const id = Date.now();
+    setNotifications((prevNotifications) => [
+      ...prevNotifications,
+      { ...notification, id },
+    ]);
+    if (notification.expires) {
+      setTimeout(() => removeNotification(id), notification.expires);
+    }
+  };
+
+  return { notifications, addNotification, removeNotification };
+};

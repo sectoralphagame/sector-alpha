@@ -2,6 +2,7 @@ import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { Notification } from "./Notification";
+import { NotificationContainer } from "./NotificationContainer";
 
 export default {
   title: "Components / Notification",
@@ -14,15 +15,9 @@ export default {
 const Template: StoryFn<typeof Notification> = (args) => (
   <div id="root">
     <Styles>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          padding: "48px 0",
-        }}
-      >
+      <NotificationContainer>
         <Notification {...args} />
-      </div>
+      </NotificationContainer>
     </Styles>
   </div>
 );

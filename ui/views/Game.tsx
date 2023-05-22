@@ -21,6 +21,7 @@ import { Overlay } from "@ui/components/Overlay/Overlay";
 import { FleetOverlay } from "@ui/components/FleetOverlay/FleetOverlay";
 import { MissionsOverlay } from "@ui/components/MissionsOverlay";
 import { setCheat } from "@core/utils/misc";
+import { Notifications } from "@ui/components/Notifications";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -28,6 +29,7 @@ import {
   useContextMenu,
   useGameDialog,
   useGameOverlay,
+  useNotifications,
   useSim,
 } from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
@@ -40,6 +42,7 @@ export const Game: React.FC = () => {
   const [menu, setMenu] = useContextMenu();
   const [dialog, setDialog] = useGameDialog();
   const [overlay, setOverlay] = useGameOverlay();
+  const { addNotification } = useNotifications();
 
   const selectedId = sim?.queries.settings.get()[0]!.cp.selectionManager.id;
   const [selectedEntity, setSelectedEntity] = React.useState<
@@ -161,7 +164,12 @@ export const Game: React.FC = () => {
 
   React.useEffect(() => {
     if (player.cp.missions.offer) {
-      setDialog({ type: "missionOffer" });
+      addNotification({
+        icon: "question",
+        message: "New mission offer",
+        type: "warning",
+        onClick: () => setDialog({ type: "missionOffer" }),
+      });
     }
   }, [player.cp.missions.offer]);
 
@@ -210,6 +218,7 @@ export const Game: React.FC = () => {
         <FleetOverlay />
         <MissionsOverlay />
       </Overlay>
+      <Notifications />
       {menu.active && (!!menu.sector || menu.overlay) && (
         <ClickAwayListener
           mouseEvent="mousedown"
