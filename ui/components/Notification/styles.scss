@@ -1,0 +1,66 @@
+.notification {
+  align-items: center;
+  display: flex;
+  border: 1px solid var(--palette-border);
+  border-right: none;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  overflow: hidden;
+
+  height: 56px;
+  transform: translateX(calc(100% - 56px));
+  transition: 200ms;
+  position: relative;
+  cursor: pointer;
+
+  &::before {
+    content: "";
+    display: block;
+    width: 3px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+  }
+
+  &:hover {
+    transform: translateX(0);
+  }
+
+  &Success {
+    color: var(--palette-success);
+
+    &::before {
+      background-color: var(--palette-success);
+    }
+  }
+  &Error {
+    color: var(--palette-error);
+
+    &::before {
+      background-color: var(--palette-error);
+    }
+  }
+  &Warning {
+    color: var(--palette-warning);
+
+    &::before {
+      background-color: var(--palette-warning);
+    }
+  }
+
+  &Message {
+    white-space: nowrap;
+    text-overflow: clip;
+    margin: 0;
+    margin-left: 16px;
+    color: var(--palette-text-1);
+    padding-right: 16px;
+  }
+
+  &Icon {
+    margin-left: 16px;
+    width: 32px;
+    height: 32px;
+  }
+}
