@@ -40,20 +40,20 @@ export function createLink(sim: Sim, sectors: Sector[], position?: number[][]) {
     } else {
       linkPosition = matrix(position[sectorIndex]);
     }
+    const facility = createTeleporter(
+      {
+        owner: undefined!,
+        position: linkPosition,
+        sector,
+      },
+      sim
+    );
 
     const teleporter = sim
-      .getOrThrow(
-        createTeleporter(
-          {
-            owner: undefined!,
-            position: linkPosition,
-            sector,
-          },
-          sim
-        ).cp.modules.ids[0]
-      )
+      .getOrThrow(facility.cp.modules.ids[0])
       .requireComponents(["teleport"]);
 
+    facility.removeTag("selection");
     return teleporter;
   });
   telA.addComponent(createRenderGraphics("link"));
