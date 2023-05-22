@@ -8,13 +8,14 @@ export const Notifications: React.FC = () => {
 
   return (
     <NotificationContainer>
-      {notifications.map(({ id, onClick, ...props }) => (
+      {notifications.map(({ id, onClick, dismissable, ...props }) => (
         <Notification
           key={id}
           onClick={() => {
             onClick();
             removeNotification(id);
           }}
+          {...(dismissable ? { dismiss: () => removeNotification(id) } : {})}
           {...props}
         />
       ))}

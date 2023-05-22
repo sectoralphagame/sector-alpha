@@ -7,4 +7,5 @@ export const notificationError: string;
 export const notificationWarning: string;
 export const notificationMessage: string;
 export const notificationIcon: string;
+export const notificationDismiss: string;
 export const container: string;

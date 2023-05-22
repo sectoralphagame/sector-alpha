@@ -1,6 +1,7 @@
 import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
+import { action } from "@storybook/addon-actions";
 import { Notification } from "./Notification";
 import { NotificationContainer } from "./NotificationContainer";
 
@@ -24,5 +25,15 @@ const Template: StoryFn<typeof Notification> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
+  type: "success",
+  icon: "exclamation",
   message: "This is a notification",
+};
+
+export const Dismissable = Template.bind({});
+Dismissable.args = {
+  type: "success",
+  icon: "exclamation",
+  message: "This is a notification",
+  dismiss: action("dismiss"),
 };

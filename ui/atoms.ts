@@ -66,8 +66,9 @@ export const useNotifications = () => {
   };
 
   const addNotification = (
-    notification: NotificationProps & {
+    notification: Omit<NotificationProps, "dismiss"> & {
       expires?: number;
+      dismissable?: boolean;
     }
   ) => {
     const id = Date.now();
