@@ -17,4 +17,12 @@ interface Window {
   } | null;
   dev: boolean;
   cheats: Record<string, any>;
+  notify: (_notification: {
+    dismissable?: boolean;
+    expires?: number;
+    icon: "question" | "exclamation";
+    message: string;
+    type: "success" | "warning" | "error";
+    onClick: () => void;
+  }) => void;
 }

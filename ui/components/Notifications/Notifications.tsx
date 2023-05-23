@@ -4,7 +4,11 @@ import { Notification } from "./Notification";
 import { NotificationContainer } from "./NotificationContainer";
 
 export const Notifications: React.FC = () => {
-  const { notifications, removeNotification } = useNotifications();
+  const { notifications, addNotification, removeNotification } =
+    useNotifications();
+  if (!window.SA_notify) {
+    window.SA_notify = addNotification;
+  }
 
   return (
     <NotificationContainer>

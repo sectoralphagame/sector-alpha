@@ -6,14 +6,7 @@ import closeIcon from "@assets/ui/close.svg";
 import SVG from "react-inlinesvg";
 import { IconButton } from "@kit/IconButton";
 import styles from "./styles.scss";
-
-export interface NotificationProps {
-  message: string;
-  type: "success" | "warning" | "error";
-  icon: "question" | "exclamation";
-  onClick: () => void;
-  dismiss?: () => void;
-}
+import type { NotificationProps } from "./types";
 
 export const Notification: React.FC<NotificationProps> = ({
   icon,
