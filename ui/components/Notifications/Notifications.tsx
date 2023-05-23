@@ -6,8 +6,8 @@ import { NotificationContainer } from "./NotificationContainer";
 export const Notifications: React.FC = () => {
   const { notifications, addNotification, removeNotification } =
     useNotifications();
-  if (!window.SA_notify) {
-    window.SA_notify = addNotification;
+  if (!window.notify) {
+    window.notify = addNotification;
   }
 
   return (
