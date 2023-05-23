@@ -204,6 +204,7 @@ export const Game: React.FC = () => {
         </MapPanel>
       </div>
       <Panel entity={selectedEntity} />
+      <Notifications />
       <Overlay
         open={!!overlay}
         onClose={() => setOverlay(null)}
@@ -218,7 +219,6 @@ export const Game: React.FC = () => {
         <FleetOverlay />
         <MissionsOverlay />
       </Overlay>
-      <Notifications />
       {menu.active && (!!menu.sector || menu.overlay) && (
         <ClickAwayListener
           mouseEvent="mousedown"
