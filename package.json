@@ -140,7 +140,7 @@
       "eslint --fix",
       "prettier --write"
     ],
-    "*.scss": [
+    "*.{json,scss}": [
       "prettier --write"
     ]
   }
