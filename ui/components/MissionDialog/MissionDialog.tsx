@@ -27,7 +27,10 @@ export const MissionDialog: React.FC<ModalProps> = ({ open, onClose }) => {
       open={open}
       onAccept={() => {
         const player = sim.queries.player.get()[0]!;
-        player.cp.missions.value.push(player.cp.missions.offer!.data);
+        player.cp.missions.value.push({
+          ...player.cp.missions.offer!.data,
+          accepted: sim.getTime(),
+        });
       }}
       onDecline={() => {
         sim.queries.player.get()[0]!.cp.missions.declined = sim.getTime();
