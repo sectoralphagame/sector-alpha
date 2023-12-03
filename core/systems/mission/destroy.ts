@@ -4,7 +4,7 @@ import { relationThresholds } from "@core/components/relations";
 import { pickRandom } from "@core/utils/generators";
 import type { Matrix } from "mathjs";
 import { add, random, randomInt } from "mathjs";
-import { map, pipe, repeat, toArray } from "@fxts/core";
+import { first, map, pipe, repeat, toArray } from "@fxts/core";
 import { createShip } from "@core/archetypes/ship";
 import { shipClasses } from "@core/world/ships";
 import { hecsToCartesian } from "@core/components/hecsPosition";
@@ -37,7 +37,7 @@ const isDestroyMission = (mission: Mission): mission is DestroyMission =>
 
 export const destroyMissionHandler: MissionHandler = {
   generate: (sim) => {
-    const player = sim.queries.player.get()[0];
+    const player = first(sim.queries.player.getIt())!;
     const faction = pickRandom(
       sim.queries.ai
         .get()

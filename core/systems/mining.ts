@@ -42,6 +42,8 @@ export class MiningSystem extends System {
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
   exec = (delta: number): void => {
-    this.sim.queries.mining.get().forEach((entity) => mine(entity, delta));
+    for (const entity of this.sim.queries.mining.getIt()) {
+      mine(entity, delta);
+    }
   };
 }

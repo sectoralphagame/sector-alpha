@@ -343,12 +343,16 @@ export class TradingSystem extends System<"adjustPrices" | "createOffers"> {
   exec = (): void => {
     if (this.cooldowns.canUse("adjustPrices")) {
       this.cooldowns.use("adjustPrices", 900);
-      this.sim.queries.trading.get().forEach(adjustPrices);
+      for (const entity of this.sim.queries.trading.getIt()) {
+        adjustPrices(entity);
+      }
     }
 
     if (this.cooldowns.canUse("createOffers")) {
       this.cooldowns.use("createOffers", 1);
-      this.sim.queries.trading.get().forEach(createOffers);
+      for (const entity of this.sim.queries.trading.getIt()) {
+        createOffers(entity);
+      }
     }
   };
 }

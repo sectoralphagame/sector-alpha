@@ -27,6 +27,7 @@ export class SectorQuery<T extends keyof CoreComponents> {
       [...requiredComponents, "position"],
       requiredTags
     );
+    this.query.enableHooks();
 
     hook.tap(this.constructor.name, this.changePosition);
     this.query.hooks.add.tap(this.constructor.name, (entity) => {
@@ -70,7 +71,20 @@ export class SectorQuery<T extends keyof CoreComponents> {
     }
   };
 
-  get = (sectorId: number) => {
+  // get = (sectorId: number): QueryEntities<T> =>
+  //   this.sim.filter(
+  //     (entity) =>
+  //       this.canBeAdded(entity) && entity.cp.position!.sector === sectorId
+  //   ) as any;
+
+  // getIt = (sectorId: number): IterableIterator<RequireComponent<T>> =>
+  //   filter(
+  //     (entity) =>
+  //       this.canBeAdded(entity) && entity.cp.position!.sector === sectorId,
+  //     this.sim.entities.values()
+  //   ) as any;
+
+  get = (sectorId: number): QueryEntities<T> => {
     if (!this.sectors.get(sectorId)) {
       this.sectors.set(sectorId, []);
       this.query.collect();
@@ -79,7 +93,9 @@ export class SectorQuery<T extends keyof CoreComponents> {
     return this.sectors.get(sectorId)!;
   };
 
-  reset = () => this.sectors.clear();
+  reset = () => {
+    this.sectors.clear();
+  };
 
   static call(
     oldSector: number,

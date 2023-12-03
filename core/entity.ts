@@ -9,6 +9,7 @@ import { MissingComponentError } from "./errors";
 import { Cooldowns } from "./utils/cooldowns";
 import type { CoreComponents } from "./components/component";
 import type { EntityTag } from "./tags";
+import { componentMask } from "./components/masks";
 
 export class EntityComponents {
   toJSON() {
@@ -27,6 +28,7 @@ export class EntityComponents {
 export class Entity {
   @Expose()
   components = new EntityComponents() as Partial<CoreComponents>;
+  componentsMask = BigInt(0);
   @Expose()
   @Type(() => Cooldowns)
   cooldowns = new Cooldowns<string>();
@@ -73,7 +75,11 @@ export class Entity {
   ): Entity {
     const componentName: CoreComponents[T]["name"] = component.name;
     const exists = !!this.components[componentName];
-    this.components[componentName] = component;
+    this.components[componentName] = {
+      ...component,
+      mask: componentMask[componentName],
+    };
+    this.componentsMask |= componentMask[componentName];
     if (!exists) {
       this.sim.hooks.addComponent.call({
         entity: this,
@@ -85,6 +91,7 @@ export class Entity {
   }
 
   removeComponent(name: keyof CoreComponents): Entity {
+    this.componentsMask &= ~componentMask[name];
     delete this.components[name];
     this.sim.hooks.removeComponent.call({ entity: this, component: name });
 

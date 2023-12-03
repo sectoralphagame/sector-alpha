@@ -80,7 +80,7 @@ export class ProducingSystem extends System<"exec"> {
   exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
 
-    this.sim.queries.standaloneProduction.get().forEach((entity) => {
+    for (const entity of this.sim.queries.standaloneProduction.getIt()) {
       if (!isAbleToProduce(entity, entity.cp.storage)) {
         return;
       }
@@ -88,9 +88,9 @@ export class ProducingSystem extends System<"exec"> {
       entity.cooldowns.use("production", entity.cp.production.time);
 
       produce(entity.cp.production, entity.cp.storage);
-    });
+    }
 
-    this.sim.queries.productionByModules.get().forEach((facilityModule) => {
+    for (const facilityModule of this.sim.queries.productionByModules.getIt()) {
       const facility = findInAncestors(facilityModule, "storage");
       const storage = facility.cp.storage;
       if (!isAbleToProduce(facilityModule, storage)) {
@@ -103,7 +103,8 @@ export class ProducingSystem extends System<"exec"> {
       );
 
       produce(facilityModule.cp.production, storage);
-    });
+    }
+
     this.cooldowns.use("exec", 2);
   };
 }

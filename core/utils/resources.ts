@@ -1,3 +1,4 @@
+import { filter, pipe, toArray } from "@fxts/core";
 import { groupBy } from "lodash";
 import { sum } from "mathjs";
 import type { Sector } from "../archetypes/sector";
@@ -18,18 +19,20 @@ export function getSectorResources(
   sector: Sector,
   neighbourhood: number
 ): Record<Commodity, SectorResources> {
-  const neighbors = getSectorsInTeleportRange(
-    sector,
-    neighbourhood,
-    sector.sim
-  ).filter((e) => e.cp.owner?.id !== sector.cp.owner?.id);
-  const fields = sector.sim.queries.asteroidFields
-    .get()
-    .filter((field) =>
+  const neighbors = pipe(
+    getSectorsInTeleportRange(sector, neighbourhood, sector.sim),
+    filter((e) => e.cp.owner?.id !== sector.cp.owner?.id),
+    toArray
+  );
+  const fields = pipe(
+    sector.sim.queries.asteroidFields.getIt(),
+    filter((field) =>
       [sector.id, ...neighbors.map((e) => e.id)].includes(
         field.cp.position.sector
       )
-    );
+    ),
+    toArray
+  );
   const fieldsByType = groupBy(fields, (field) => field.cp.asteroidSpawn.type);
 
   return perCommodity((commodity) => ({

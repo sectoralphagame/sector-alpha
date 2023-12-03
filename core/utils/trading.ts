@@ -1,6 +1,6 @@
 import merge from "lodash/merge";
 import { mean } from "mathjs";
-import { filter, map, pipe, sortBy, toArray } from "@fxts/core";
+import { filter, first, map, pipe, sortBy, toArray } from "@fxts/core";
 import {
   changeRelations,
   relationThresholds,
@@ -156,7 +156,7 @@ export function acceptTrade(
       time: entityWithOffer.sim.getTime(),
     });
 
-    const player = entityWithOffer.sim.queries.player.get()[0];
+    const player = first(entityWithOffer.sim.queries.player.getIt())!;
     if ([input.factionId, entityWithOffer.cp.owner.id].includes(player.id)) {
       changeRelations(
         player,

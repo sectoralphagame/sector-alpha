@@ -13,7 +13,7 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 120);
 
-      this.sim.queries.disposable.get().forEach((entity) => {
+      for (const entity of this.sim.queries.disposable.getIt()) {
         const owner = this.sim.get(entity.cp.disposable.owner);
         if (
           !owner ||
@@ -26,7 +26,7 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
         ) {
           entity.unregister();
         }
-      });
+      }
     }
   };
 }

@@ -1,3 +1,4 @@
+import { first } from "@fxts/core";
 import { sum } from "mathjs";
 import { commodities } from "../economy/commodity";
 import { System } from "./system";
@@ -26,19 +27,20 @@ export class InflationStatisticGatheringSystem extends System {
   exec = (): void => {
     if (
       this.sim.getTime() -
-        this.sim.queries.settings.get()[0].cp.systemManager
+        first(this.sim.queries.settings.getIt())!.cp.systemManager
           .lastInflationStatUpdate >
       10 * 60
     ) {
-      this.sim.queries.settings.get()[0].cp.systemManager.lastInflationStatUpdate =
-        this.sim.getTime();
+      first(
+        this.sim.queries.settings.getIt()
+      )!.cp.systemManager.lastInflationStatUpdate = this.sim.getTime();
 
       const basket = basketCommodities.reduce(
         (acc, commodity) => ({ ...acc, [commodity]: [] }),
         {} as Record<BasketCommodities, number[]>
       );
 
-      this.sim.queries.trading.get().forEach((trader) => {
+      for (const trader of this.sim.queries.trading.getIt()) {
         basketCommodities.forEach((commodity) => {
           if (
             trader.cp.trade.offers[commodity].active &&
@@ -47,7 +49,7 @@ export class InflationStatisticGatheringSystem extends System {
             basket[commodity].push(trader.cp.trade.offers[commodity].price);
           }
         });
-      });
+      }
 
       const basketPrice = basketCommodities.reduce(
         (acc, commodity) =>

@@ -1,8 +1,9 @@
-import { filter, map, pipe, toArray } from "@fxts/core";
+import { filter } from "@fxts/core";
 import type { EntityTag } from "@core/tags";
 import { shipComponents } from "@core/archetypes/ship";
 import { collectibleComponents } from "@core/archetypes/collectible";
 import { SyncHook } from "tapable";
+import { componentMask } from "@core/components/masks";
 import { asteroidFieldComponents } from "../../archetypes/asteroidField";
 import { facilityComponents } from "../../archetypes/facility";
 import { factionComponents } from "../../archetypes/faction";
@@ -24,6 +25,7 @@ export class BaseQuery<T extends keyof CoreComponents> {
     remove: SyncHook<number>;
   };
   requiredComponents: readonly (keyof CoreComponents)[];
+  requiredComponentsMask: bigint;
   requiredTags: readonly EntityTag[];
   sim: Sim;
 
@@ -35,12 +37,20 @@ export class BaseQuery<T extends keyof CoreComponents> {
     this.requiredComponents = requiredComponents;
     this.requiredTags = requiredTags;
     this.sim = sim;
+
+    this.requiredComponentsMask = requiredComponents.reduce(
+      (mask, name) => mask | componentMask[name],
+      BigInt(0)
+    );
+  }
+
+  enableHooks = () => {
     this.hooks = {
       add: new SyncHook(["entity"]),
       remove: new SyncHook(["entityId"]),
     };
 
-    sim.hooks.addComponent.tap("query", ({ entity, component }) => {
+    this.sim.hooks.addComponent.tap("query", ({ entity, component }) => {
       if (
         this.requiredComponents.includes(component) &&
         this.canBeAdded(entity)
@@ -49,48 +59,38 @@ export class BaseQuery<T extends keyof CoreComponents> {
       }
     });
 
-    sim.hooks.removeComponent.tap("query", ({ component, entity }) => {
+    this.sim.hooks.removeComponent.tap("query", ({ component, entity }) => {
       if (this.requiredComponents.includes(component)) {
         this.remove(entity);
       }
     });
 
-    sim.hooks.addTag.tap("query", ({ entity, tag }) => {
+    this.sim.hooks.addTag.tap("query", ({ entity, tag }) => {
       if (this.requiredTags.includes(tag) && this.canBeAdded(entity)) {
         this.add(entity as RequireComponent<T>);
       }
     });
 
-    sim.hooks.removeTag.tap("query", ({ tag, entity }) => {
+    this.sim.hooks.removeTag.tap("query", ({ tag, entity }) => {
       if (this.requiredTags.includes(tag)) {
         this.remove(entity);
       }
     });
 
-    sim.hooks.removeEntity.tap("query", (entity: Entity) => {
+    this.sim.hooks.removeEntity.tap("query", (entity: Entity) => {
       this.remove(entity);
     });
-  }
+  };
 
   canBeAdded = (entity: Entity) =>
-    entity.hasComponents(this.requiredComponents) &&
-    entity.hasTags(this.requiredTags);
+    // entity.hasComponents(this.requiredComponents) &&
+    (entity.componentsMask & this.requiredComponentsMask) ===
+      this.requiredComponentsMask && entity.hasTags(this.requiredTags);
 
-  collect = (): QueryEntities<T> => {
-    const entities = pipe(
-      this.sim.entities,
-      filter(
-        ([, e]) =>
-          e.hasComponents(this.requiredComponents) &&
-          e.hasTags(this.requiredTags)
-      ),
-      map(([, e]) => e as RequireComponent<T>),
-      toArray
-    );
-
-    entities.forEach((e) => this.hooks.add.call(e));
-
-    return entities;
+  collect = () => {
+    for (const entity of filter(this.canBeAdded, this.sim.entities.values())) {
+      this.hooks.add.call(entity as RequireComponent<T>);
+    }
   };
 
   private add = (entity: RequireComponent<T>) => {
@@ -103,13 +103,6 @@ export class BaseQuery<T extends keyof CoreComponents> {
 }
 
 export class Query<T extends keyof CoreComponents> extends BaseQuery<T> {
-  entities: QueryEntities<T> | undefined;
-  hooks: {
-    add: SyncHook<RequireComponent<T>>;
-    remove: SyncHook<number>;
-  };
-  requiredComponents: readonly (keyof CoreComponents)[];
-  requiredTags: readonly EntityTag[];
   sim: Sim;
 
   constructor(
@@ -118,34 +111,16 @@ export class Query<T extends keyof CoreComponents> extends BaseQuery<T> {
     requiredTags: readonly EntityTag[] = []
   ) {
     super(sim, requiredComponents, requiredTags);
-
-    this.hooks.add.tap(this.constructor.name, (entity: RequireComponent<T>) => {
-      if (this.entities) {
-        this.entities!.push(entity);
-      }
-    });
-    this.hooks.remove.tap(this.constructor.name, (entityId: number) => {
-      if (this.entities) {
-        // Using splice breaks iterating
-        // Example: Query holds array of 5 entities
-        // During forEach loop 3rd entity is removed
-        // Next iteration will take 5th entity, not 4th
-        this.entities = this.entities.filter((e) => e.id !== entityId);
-      }
-    });
   }
 
-  get = (): QueryEntities<T> => {
-    if (!this.entities) {
-      this.entities = this.collect();
-    }
+  get = (): QueryEntities<T> =>
+    this.sim.filter(this.canBeAdded) as QueryEntities<T>;
 
-    return this.entities!;
-  };
+  getIt = (): IterableIterator<RequireComponent<T>> =>
+    filter(this.canBeAdded, this.sim.entities.values()) as any;
 
-  reset = (): void => {
-    this.entities = undefined;
-  };
+  // eslint-disable-next-line class-methods-use-this
+  reset = (): void => {};
 }
 
 export function createQueries(sim: Sim) {

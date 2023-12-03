@@ -6,11 +6,11 @@ import { System } from "./system";
 export function regen(sim: Sim) {
   const graph = new Graph({ directed: false });
 
-  sim.queries.teleports.get().forEach((t) => {
+  for (const t of sim.queries.teleports.getIt()) {
     graph.setNode(findInAncestors(t, "position").cp.position.sector.toString());
-  });
+  }
 
-  sim.queries.teleports.get().forEach((t) => {
+  for (const t of sim.queries.teleports.getIt()) {
     graph.setEdge(
       findInAncestors(t, "position").cp.position.sector.toString(),
       findInAncestors(
@@ -18,7 +18,7 @@ export function regen(sim: Sim) {
         "position"
       ).cp.position.sector.toString()
     );
-  });
+  }
 
   sim.paths = alg.dijkstraAll(
     graph,

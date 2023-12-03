@@ -10,6 +10,9 @@ import {
   toArray,
   average,
   sum as fxtsSum,
+  flatMap,
+  sortBy as fxtsSortBy,
+  reverse,
 } from "@fxts/core";
 import type { Faction } from "@core/archetypes/faction";
 import { relationThresholds } from "@core/components/relations";
@@ -41,11 +44,14 @@ export function getSectorsInTeleportRange(
   origin: Sector,
   jumps: number,
   sim: Sim
-): Sector[] {
+): IterableIterator<Sector> {
   const ids = Object.entries(sim.paths[origin.id.toString()] ?? {})
     .filter(([, path]) => path.distance <= jumps)
     .map(([id]) => parseInt(id, 10));
-  return sim.queries.sectors.get().filter((sector) => ids.includes(sector.id));
+  return filter(
+    (sector) => ids.includes(sector.id),
+    sim.queries.sectors.getIt()
+  );
 }
 
 export interface TradeWithMostProfit {
@@ -63,7 +69,7 @@ export function getTradeWithMostProfit(
   sectorDistance: number,
   notAllowedFactions: number[]
 ): TradeWithMostProfit | null {
-  const facilitiesInRange = getSectorsInTeleportRange(
+  const sectorsInTeleportRange = getSectorsInTeleportRange(
     asSector(
       from.cp.hecsPosition
         ? from
@@ -73,10 +79,17 @@ export function getTradeWithMostProfit(
     ),
     sectorDistance,
     from.sim
-  ).flatMap((sector) =>
-    from.sim.queries.bySectors.trading
-      .get(sector.id)
-      .filter((f) => !notAllowedFactions.includes(f.cp.owner.id))
+  );
+
+  const facilitiesInRange = pipe(
+    sectorsInTeleportRange,
+    flatMap((sector) =>
+      pipe(
+        from.sim.queries.bySectors.trading.get(sector.id),
+        filter((f) => !notAllowedFactions.includes(f.cp.owner.id)),
+        toArray
+      )
+    )
   );
 
   const bestOffers = perCommodity((commodity) => ({
@@ -156,28 +169,30 @@ export function getBuyersForCommodityInRange(
       ? Infinity
       : f.cp.trade.offers[commodity].price;
 
-  return sortBy(
+  return pipe(
     getSectorsInTeleportRange(
       asSector(entity.sim.getOrThrow(entity.cp.position.sector)!),
       sectorDistance,
       entity.sim
-    )
-      .flatMap((sector) => entity.sim.queries.bySectors.trading.get(sector.id))
-      .filter(
-        (f) =>
-          (f.cp.owner.id === faction.id ||
-            faction.cp.relations.values[f.cp.owner.id] >=
-              relationThresholds.trade) &&
-          f.cp.trade.offers[commodity].active &&
-          f.cp.trade.offers[commodity].type === "buy" &&
-          f.cp.trade.offers[commodity].quantity >= minQuantity
-      )
-      .map((f) => ({
-        facility: f,
-        profit: profit(f),
-      })),
-    "profit"
-  ).reverse();
+    ),
+    flatMap((sector) => entity.sim.queries.bySectors.trading.get(sector.id)),
+    filter(
+      (f) =>
+        (f.cp.owner.id === faction.id ||
+          faction.cp.relations.values[f.cp.owner.id] >=
+            relationThresholds.trade) &&
+        f.cp.trade.offers[commodity].active &&
+        f.cp.trade.offers[commodity].type === "buy" &&
+        f.cp.trade.offers[commodity].quantity >= minQuantity
+    ),
+    map((f) => ({
+      facility: f,
+      profit: profit(f),
+    })),
+    fxtsSortBy((v) => v.profit),
+    reverse,
+    toArray
+  );
 }
 
 export function sellCommodityWithMostProfit(
@@ -222,31 +237,31 @@ export function getFacilityWithMostProfit(
           f.cp.trade.offers[commodity].price) *
         (facility.cp.trade.offers[commodity].type === "buy" ? 1 : -1);
 
-  const sortedByProfit = sortBy(
+  const sortedByProfit = pipe(
     getSectorsInTeleportRange(
       asSector(facility.sim.getOrThrow(facility.cp.position.sector)!),
       sectorDistance,
       facility.sim
-    )
-      .flatMap((sector) =>
-        facility.sim.queries.bySectors.trading.get(sector.id)
-      )
-      .filter(
-        (f) =>
-          (f.cp.owner.id === faction.id ||
-            faction.cp.relations.values[f.cp.owner.id] >=
-              relationThresholds.trade) &&
-          f.cp.trade.offers[commodity].active &&
-          f.cp.trade.offers[commodity].type !==
-            facility.cp.trade.offers[commodity].type &&
-          f.cp.trade.offers[commodity].quantity >= minQuantity
-      )
-      .map((f) => ({
-        facility: f,
-        profit: profit(f),
-      })),
-    "profit"
-  ).reverse();
+    ),
+    flatMap((sector) => facility.sim.queries.bySectors.trading.get(sector.id)),
+    filter(
+      (f) =>
+        (f.cp.owner.id === faction.id ||
+          faction.cp.relations.values[f.cp.owner.id] >=
+            relationThresholds.trade) &&
+        f.cp.trade.offers[commodity].active &&
+        f.cp.trade.offers[commodity].type !==
+          facility.cp.trade.offers[commodity].type &&
+        f.cp.trade.offers[commodity].quantity >= minQuantity
+    ),
+    map((f) => ({
+      facility: f,
+      profit: profit(f),
+    })),
+    fxtsSortBy((v) => v.profit),
+    reverse,
+    toArray
+  );
 
   if (!sortedByProfit[0] || sortedByProfit[0].profit <= 0) {
     return null;

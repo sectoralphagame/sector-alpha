@@ -5,6 +5,7 @@ import type { Sim } from "@core/sim";
 import { pickRandom } from "@core/utils/generators";
 import { randomInt } from "mathjs";
 import { formatTime } from "@core/utils/format";
+import { filter, first, pipe, toArray } from "@fxts/core";
 import type { MissionHandler } from "./types";
 import missions from "../../world/data/missions.json";
 
@@ -37,13 +38,14 @@ const isPatrolMission = (mission: Mission): mission is PatrolMission =>
 
 export const patrolMissionHandler: MissionHandler = {
   generate: (sim) => {
-    const player = sim.queries.player.get()[0];
-    const faction = pickRandom(
-      sim.queries.ai
-        .get()
-        .filter(
-          (f) => player.cp.relations.values[f.id] >= relationThresholds.mission
-        )
+    const player = first(sim.queries.player.getIt())!;
+    const faction = pipe(
+      sim.queries.ai.getIt(),
+      filter(
+        (f) => player.cp.relations.values[f.id] >= relationThresholds.mission
+      ),
+      toArray,
+      pickRandom
     );
     if (!faction) return null;
 
@@ -106,7 +108,7 @@ export const patrolMissionHandler: MissionHandler = {
       .get()
       .some(
         (ship) =>
-          ship.cp.owner?.id === sim.queries.player.get()[0]!.id &&
+          ship.cp.owner?.id === first(sim.queries.player.getIt())!.id &&
           ship.cp.autoOrder?.default.type === "patrol" &&
           ship.cp.autoOrder.default.sectorId === mission.sector
       );

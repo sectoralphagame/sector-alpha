@@ -1,4 +1,5 @@
 import { matrix } from "mathjs";
+import { toArray } from "@fxts/core";
 import { facilityModules } from "../archetypes/facilityModule";
 import type { Faction } from "../archetypes/faction";
 import { createFaction } from "../archetypes/faction";
@@ -69,9 +70,17 @@ describe("getSectorsInTeleportRange", () => {
 
     regen(sim);
 
-    expect(getSectorsInTeleportRange(sectors[0], 0, sim)).toHaveLength(1);
-    expect(getSectorsInTeleportRange(sectors[0], 1, sim)).toHaveLength(2);
-    expect(getSectorsInTeleportRange(sectors[0], 2, sim)).toHaveLength(3);
-    expect(getSectorsInTeleportRange(sectors[1], 1, sim)).toHaveLength(3);
+    expect(toArray(getSectorsInTeleportRange(sectors[0], 0, sim))).toHaveLength(
+      1
+    );
+    expect(toArray(getSectorsInTeleportRange(sectors[0], 1, sim))).toHaveLength(
+      2
+    );
+    expect(toArray(getSectorsInTeleportRange(sectors[0], 2, sim))).toHaveLength(
+      3
+    );
+    expect(toArray(getSectorsInTeleportRange(sectors[1], 1, sim))).toHaveLength(
+      3
+    );
   });
 });

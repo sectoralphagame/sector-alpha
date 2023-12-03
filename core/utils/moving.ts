@@ -1,3 +1,4 @@
+import { find } from "@fxts/core";
 import type { Waypoint } from "../archetypes/waypoint";
 import type { Action } from "../components/orders";
 import { findInAncestors } from "./findInAncestors";
@@ -22,16 +23,15 @@ export function moveToActions(
 
   let s = origin.cp.position.sector.toString();
   while (s !== targetSector) {
-    const teleport = origin.sim.queries.teleports
-      .get()
-      .find(
-        (t) =>
-          findInAncestors(t, "position").cp.position.sector.toString() === s &&
-          findInAncestors(
-            origin.sim.getOrThrow(t.cp.teleport.destinationId!),
-            "position"
-          ).cp.position.sector.toString() === paths[s.toString()].predecessor
-      );
+    const teleport = find(
+      (t) =>
+        findInAncestors(t, "position").cp.position.sector.toString() === s &&
+        findInAncestors(
+          origin.sim.getOrThrow(t.cp.teleport.destinationId!),
+          "position"
+        ).cp.position.sector.toString() === paths[s.toString()].predecessor,
+      origin.sim.queries.teleports.getIt()
+    );
 
     if (!teleport) {
       return actions;

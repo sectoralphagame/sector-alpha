@@ -15,13 +15,13 @@ export class DeadUnregisteringSystem extends System {
   };
 
   exec = (): void => {
-    this.query.get().forEach((entity) => {
+    for (const entity of this.query.getIt()) {
       if (entity.cp.hitpoints.hp.value <= 0) {
         if (entity.cp.storage) {
           dumpCargo(entity.requireComponents(["storage"]));
         }
         entity.unregister();
       }
-    });
+    }
   };
 }

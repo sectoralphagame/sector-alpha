@@ -3,7 +3,7 @@ import { relationThresholds } from "@core/components/relations";
 import { minBy } from "lodash";
 import type { Matrix } from "mathjs";
 import { add, matrix, norm, random, subtract } from "mathjs";
-import { sum } from "@fxts/core";
+import { filter, flatMap, map, pipe, sum, toArray } from "@fxts/core";
 import type { TransactionInput } from "@core/components/trade";
 import { asteroid } from "../../archetypes/asteroid";
 import { asteroidField } from "../../archetypes/asteroidField";
@@ -239,36 +239,39 @@ function autoMine(
   if (getAvailableSpace(entity.cp.storage) !== entity.cp.storage.max) {
     autoTrade(entity, sectorDistance);
   } else {
-    const field = minBy(
-      getSectorsInTeleportRange(
-        asSector(
-          entity.sim.getOrThrow(
-            (entity.cp.autoOrder.default as MineOrder).sectorId!
-          )
-        ),
-        sectorDistance,
-        entity.sim
-      )
-        .filter((sector) =>
-          sector.cp.owner && sector.cp.owner.id !== entity.cp.owner.id
-            ? !entity.sim.getOrThrow<Faction>(sector.cp.owner.id).cp.ai
-                ?.restrictions.mining
-            : true
+    const sectorsInRange = getSectorsInTeleportRange(
+      asSector(
+        entity.sim.getOrThrow(
+          (entity.cp.autoOrder.default as MineOrder).sectorId!
         )
-        .map((sector) =>
-          entity.sim.queries.asteroidFields
-            .get()
-            .filter((f) => f.cp.position!.sector === sector.id)
-        )
-        .flat()
-        .map(asteroidField)
-        .filter((e) =>
-          e.cp.children.entities
-            .map((child) => asteroid(entity.sim.getOrThrow(child)))
-            .some((a) => !a.cp.minable.minedById)
-        ),
-      (e) =>
-        norm(subtract(entity.cp.position.coord, e.cp.position.coord) as Matrix)
+      ),
+      sectorDistance,
+      entity.sim
+    );
+
+    const eligibleFields = pipe(
+      sectorsInRange,
+      filter((sector) =>
+        sector.cp.owner && sector.cp.owner.id !== entity.cp.owner.id
+          ? !entity.sim.getOrThrow<Faction>(sector.cp.owner.id).cp.ai
+              ?.restrictions.mining
+          : true
+      ),
+      flatMap((sector) =>
+        entity.sim.queries.asteroidFields
+          .get()
+          .filter((f) => f.cp.position!.sector === sector.id)
+      ),
+      map(asteroidField),
+      filter((e) =>
+        e.cp.children.entities
+          .map((child) => asteroid(entity.sim.getOrThrow(child)))
+          .some((a) => !a.cp.minable.minedById)
+      ),
+      toArray
+    );
+    const field = minBy(eligibleFields, (e) =>
+      norm(subtract(entity.cp.position.coord, e.cp.position.coord) as Matrix)
     );
 
     if (!field) {
@@ -330,36 +333,36 @@ function autoMineForCommander(
     );
 
     if (mineable) {
-      const field = minBy(
-        getSectorsInTeleportRange(
-          asSector(entity.sim.getOrThrow(entity.cp.position.sector)),
-          sectorDistance,
-          entity.sim
-        )
-          .filter((sector) =>
-            sector.cp.owner && sector.cp.owner.id !== entity.cp.owner.id
-              ? !entity.sim.getOrThrow<Faction>(sector.cp.owner.id).cp.ai
-                  ?.restrictions.mining
-              : true
-          )
-          .map((sector) =>
-            entity.sim.queries.asteroidFields
-              .get()
-              .filter((f) => f.cp.position!.sector === sector.id)
-          )
-          .flat()
-          .map(asteroidField)
-          .filter(
-            (e) =>
-              e.cp.asteroidSpawn.type === mineable &&
-              e.cp.children.entities
-                .map((child) => asteroid(entity.sim.getOrThrow(child)))
-                .some((a) => !a.cp.minable.minedById)
-          ),
-        (e) =>
-          norm(
-            subtract(entity.cp.position.coord, e.cp.position.coord) as Matrix
-          )
+      const sectorsInTeleportRange = getSectorsInTeleportRange(
+        asSector(entity.sim.getOrThrow(entity.cp.position.sector)),
+        sectorDistance,
+        entity.sim
+      );
+      const asteroidFields = entity.sim.queries.asteroidFields.get();
+
+      const eligibleFields = pipe(
+        sectorsInTeleportRange,
+        filter((sector) =>
+          sector.cp.owner && sector.cp.owner.id !== entity.cp.owner.id
+            ? !entity.sim.getOrThrow<Faction>(sector.cp.owner.id).cp.ai
+                ?.restrictions.mining
+            : true
+        ),
+        flatMap((sector) =>
+          asteroidFields.filter((f) => f.cp.position!.sector === sector.id)
+        ),
+        map(asteroidField),
+        filter(
+          (e) =>
+            e.cp.asteroidSpawn.type === mineable &&
+            e.cp.children.entities
+              .map((child) => asteroid(entity.sim.getOrThrow(child)))
+              .some((a) => !a.cp.minable.minedById)
+        ),
+        toArray
+      );
+      const field = minBy(eligibleFields, (e) =>
+        norm(subtract(entity.cp.position.coord, e.cp.position.coord) as Matrix)
       );
 
       if (!field) {
@@ -491,7 +494,9 @@ export class OrderPlanningSystem extends System<"exec"> {
   exec = (): void => {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 3);
-      this.sim.queries.autoOrderable.get().forEach(autoOrder);
+      for (const entity of this.sim.queries.autoOrderable.getIt()) {
+        autoOrder(entity);
+      }
     }
   };
 }

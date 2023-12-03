@@ -1,4 +1,5 @@
 import type { Entity } from "@core/entity";
+import { first } from "@fxts/core";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import type { BaseComponent } from "./component";
@@ -20,13 +21,15 @@ export function clearFocus(manager: SelectionManager) {
 }
 
 export function getSelected(sim: Sim): Entity | undefined {
-  return sim.get<Entity>(sim.queries.settings.get()[0].cp.selectionManager.id!);
+  return sim.get<Entity>(
+    first(sim.queries.settings.getIt())!.cp.selectionManager.id!
+  );
 }
 
 export function getSelectedSecondary(
   sim: Sim
 ): RequireComponent<"position"> | undefined {
   return sim.get<RequireComponent<"position">>(
-    sim.queries.settings.get()[0].cp.selectionManager.secondaryId!
+    first(sim.queries.settings.getIt())!.cp.selectionManager.secondaryId!
   );
 }

@@ -6,7 +6,7 @@ export class AvgFrameReportingSystem extends System {
   start = 0;
   iterations = 0;
   accumulator = 0;
-  reporting = false;
+  reporting = true;
 
   apply(sim: Sim): void {
     super.apply(sim);

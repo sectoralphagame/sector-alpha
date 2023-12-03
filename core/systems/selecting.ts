@@ -1,4 +1,5 @@
 import type { Sim } from "@core/sim";
+import { first } from "@fxts/core";
 import { clearFocus } from "../components/selection";
 import { isHeadless } from "../settings";
 import { SystemWithHooks } from "./utils/hooks";
@@ -8,7 +9,7 @@ export class SelectingSystem extends SystemWithHooks {
     if (isHeadless) {
       return;
     }
-    const manager = this.sim.queries.settings.get()[0];
+    const manager = first(this.sim.queries.settings.getIt())!;
 
     if (manager.cp.selectionManager.id) {
       window.selected = this.sim.getOrThrow(manager.cp.selectionManager.id!);
@@ -25,7 +26,7 @@ export class SelectingSystem extends SystemWithHooks {
   exec = (delta: number): void => {
     super.exec(delta);
     this.onChange(
-      this.sim.queries.settings.get()[0].cp.selectionManager.id,
+      first(this.sim.queries.settings.getIt())!.cp.selectionManager.id,
       this.refresh
     );
   };

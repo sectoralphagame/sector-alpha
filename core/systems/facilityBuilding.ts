@@ -2,7 +2,7 @@ import { createFacilityModule } from "@core/archetypes/facilityModule";
 import { commodityPrices, perCommodity } from "@core/utils/perCommodity";
 import type { Facility } from "@core/archetypes/facility";
 import type { TradeOffer } from "@core/components/trade";
-import { filter, map, pipe, sum } from "@fxts/core";
+import { filter, find, map, pipe, sum } from "@fxts/core";
 import { addFacilityModule } from "@core/utils/entityModules";
 import type { Commodity } from "../economy/commodity";
 import type { Sim } from "../sim";
@@ -18,8 +18,8 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  createOffers = (): void =>
-    this.sim.queries.builders.get().forEach((builder) => {
+  createOffers = (): void => {
+    for (const builder of this.sim.queries.builders.getIt()) {
       const facility = this.sim.getOrThrow<Facility>(
         builder.cp.builder.targetId
       );
@@ -54,10 +54,11 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
           type: "sell",
         };
       });
-    });
+    }
+  };
 
-  build = (_delta: number): void =>
-    this.sim.queries.facilities.get().forEach((facility) => {
+  build = (_delta: number): void => {
+    for (const facility of this.sim.queries.facilities.getIt()) {
       if (!facility.cooldowns.canUse(buildTimer)) {
         facility.cp.facilityModuleQueue.building!.progress =
           1 -
@@ -67,9 +68,10 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
         return;
       }
 
-      const builder = this.sim.queries.builders
-        .get()
-        .find((b) => b.cp.builder.targetId === facility.id);
+      const builder = find(
+        (b) => b.cp.builder.targetId === facility.id,
+        this.sim.queries.builders.getIt()
+      );
       if (!builder) return;
 
       if (facility.cp.facilityModuleQueue.building) {
@@ -102,7 +104,8 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
           progress: 0,
         };
       }
-    });
+    }
+  };
 
   exec = (delta: number): void => {
     if (this.cooldowns.canUse("build")) {

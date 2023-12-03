@@ -3,6 +3,7 @@ import { changeBudgetMoney } from "@core/components/budget";
 import type { Mission, Reward } from "@core/components/missions";
 import { changeRelations } from "@core/components/relations";
 import type { Sim } from "@core/sim";
+import { first } from "@fxts/core";
 
 export interface MoneyReward {
   type: "money";
@@ -16,7 +17,10 @@ export function isMoneyReward(reward: Reward): reward is MoneyReward {
 export function moneyRewardHandler(reward: Mission, sim: Sim): void {
   if (!isMoneyReward(reward)) throw new Error("Reward is not a money reward");
 
-  changeBudgetMoney(sim.queries.player.get()[0]!.cp.budget, reward.amount);
+  changeBudgetMoney(
+    first(sim.queries.player.getIt())!.cp.budget,
+    reward.amount
+  );
 }
 
 export interface RelationReward {
@@ -34,7 +38,7 @@ export function relationRewardHandler(reward: Mission, sim: Sim): void {
     throw new Error("Reward is not a relation reward");
 
   changeRelations(
-    sim.queries.player.get()[0],
+    first(sim.queries.player.getIt())!,
     sim.getOrThrow<Faction>(reward.factionId),
     reward.amount
   );

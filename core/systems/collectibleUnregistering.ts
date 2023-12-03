@@ -9,10 +9,10 @@ export class CollectibleUnregisteringSystem extends System {
   };
 
   exec = (): void => {
-    this.sim.queries.collectibles.get().forEach((entity) => {
+    for (const entity of this.sim.queries.collectibles.getIt()) {
       if (entity.cp.creationDate.date + 3600 < this.sim.getTime()) {
         entity.unregister();
       }
-    });
+    }
   };
 }

@@ -5,6 +5,7 @@ import { add, matrix } from "mathjs";
 import type { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
 import { spottingRadius } from "@core/systems/ai/spotting";
+import { first } from "@fxts/core";
 import { sectorSize } from "../archetypes/sector";
 import { findInAncestors } from "../utils/findInAncestors";
 import type { BaseComponent } from "./component";
@@ -259,7 +260,8 @@ export const graphics: Graphics = {
     textGraphics.position.set(textPos.get([0]), textPos.get([1]));
     textGraphics.interactive = true;
     textGraphics.on("pointerdown", () => {
-      entity.sim.queries.settings.get()[0].cp.selectionManager.id = entity.id;
+      first(entity.sim.queries.settings.getIt())!.cp.selectionManager.id =
+        entity.id;
     });
     textGraphics.cursor = "pointer";
     g.addChild(textGraphics);

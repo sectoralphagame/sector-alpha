@@ -85,7 +85,7 @@ export class SpottingSystem extends System<"exec"> {
 
     const cache: EnemyArrayCache = {};
 
-    this.sim.queries.orderable.get().forEach((entity) => {
+    for (const entity of this.sim.queries.orderable.getIt()) {
       const currentOrder = entity.cp.orders.value[0];
       if (
         currentOrder?.type !== "patrol" &&
@@ -122,7 +122,7 @@ export class SpottingSystem extends System<"exec"> {
             currentOrder.type === "pillage" ? spottingRadius * 1.1 : undefined,
         });
       }
-    });
+    }
 
     this.cooldowns.use("exec", 1 + Math.random());
   };

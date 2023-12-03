@@ -20,7 +20,7 @@ export class ShipBuildingSystem extends System<"exec"> {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 1);
 
-      this.sim.queries.shipyards.get().forEach((shipyard) => {
+      for (const shipyard of this.sim.queries.shipyards.getIt()) {
         if (!shipyard.cooldowns.canUse(shipBuildTimer)) return;
 
         if (shipyard.cp.shipyard.building) {
@@ -64,7 +64,7 @@ export class ShipBuildingSystem extends System<"exec"> {
           shipyard.cp.shipyard.queue.splice(0, 1);
           shipyard.cp.shipyard.building = shipToBuild;
         }
-      });
+      }
     }
   };
 }

@@ -8,10 +8,11 @@ import type { Path } from "graphlib";
 import { SyncHook } from "tapable";
 
 import isPlainObject from "lodash/isPlainObject";
-import { filter, map, pipe, toArray } from "@fxts/core";
+import { filter, pipe, toArray } from "@fxts/core";
 import { isHeadless } from "@core/settings";
 import type { CoreComponents } from "@core/components/component";
 import type { EntityTag } from "@core/tags";
+import { componentMask } from "@core/components/masks";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -152,12 +153,7 @@ export class Sim extends BaseSim {
 
   // eslint-disable-next-line no-unused-vars
   filter = (cb: (entity: Entity) => boolean): Entity[] =>
-    pipe(
-      this.entities,
-      filter(([, entity]) => cb(entity)),
-      map(([, e]) => e),
-      toArray
-    );
+    pipe(this.entities.values(), filter(cb), toArray);
 
   /**
    * Get entity or `undefined`, depending on entity's existence
@@ -243,6 +239,10 @@ export class Sim extends BaseSim {
       entity.components = Object.assign(
         new EntityComponents(),
         entity.components
+      );
+      entity.componentsMask = Object.keys(entity.components).reduce(
+        (mask, cp) => mask | componentMask[cp],
+        BigInt(0)
       );
       entity.tags = new Set(entity.tags);
     });

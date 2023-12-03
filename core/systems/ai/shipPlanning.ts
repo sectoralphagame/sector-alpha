@@ -4,6 +4,7 @@ import { relationThresholds } from "@core/components/relations";
 import { addSubordinate } from "@core/components/subordinates";
 import { removeCommander } from "@core/components/commander";
 import { getSubordinates } from "@core/utils/misc";
+import { filter, map, pipe, toArray } from "@fxts/core";
 import type { InitialShipInput } from "../../archetypes/ship";
 import { createShipName, createShip } from "../../archetypes/ship";
 import { mineableCommodities } from "../../economy/commodity";
@@ -77,10 +78,10 @@ export class ShipPlanningSystem extends System<"plan"> {
   };
 
   getFacilityShipRequests = (faction: Faction): ShipRequest[] =>
-    this.sim.queries.facilities
-      .get()
-      .filter((facility) => facility.cp.owner?.id === faction.id)
-      .map((facility) => {
+    pipe(
+      this.sim.queries.facilities.getIt(),
+      filter((facility) => facility.cp.owner?.id === faction.id),
+      map((facility) => {
         const facilityModules = facility.cp.modules.ids.map(
           this.sim.getOrThrow
         );
@@ -137,7 +138,9 @@ export class ShipPlanningSystem extends System<"plan"> {
           traders.length - (shipsForProduction + shipsForShipyards);
 
         return { facility, mining, trading, patrols: 0, fighters: 0 };
-      });
+      }),
+      toArray
+    );
 
   getPatrolRequests = (faction: Faction): ShipRequest[] =>
     this.sim.queries.sectors

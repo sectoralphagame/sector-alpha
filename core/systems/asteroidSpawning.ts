@@ -54,7 +54,7 @@ export class AsteroidSpawningSystem extends System<"exec"> {
   exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
 
-    this.sim.queries.asteroidFields.get().forEach((entity) => {
+    for (const entity of this.sim.queries.asteroidFields.getIt()) {
       if (this.sim.getTime() < 10) {
         while (shouldSpawnAsteroid(entity)) {
           spawn(entity, this.sim);
@@ -66,7 +66,7 @@ export class AsteroidSpawningSystem extends System<"exec"> {
           toSpawn -= spawn(entity, this.sim).cp.minable.resources;
         }
       }
-    });
+    }
 
     this.cooldowns.use("exec", 600);
   };

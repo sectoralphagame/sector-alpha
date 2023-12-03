@@ -10,6 +10,7 @@ import type { Sim } from "@core/sim";
 import { pickRandom } from "@core/utils/generators";
 import { moveToActions } from "@core/utils/moving";
 import { shipClasses } from "@core/world/ships";
+import { filter, find, map, pipe, toArray } from "@fxts/core";
 import type { Matrix } from "mathjs";
 import { add, distance, randomInt } from "mathjs";
 import { System } from "./system";
@@ -50,7 +51,7 @@ function returnToFlagship(unassigned: Ship[], flagships: Ship[]) {
 function spawnFlagship(sim: Sim, faction: Faction, flagships: Ship[]) {
   if (flagships.length > 6) return;
 
-  const tau = sim.queries.ai.get().find((f) => f.cp.name.slug === "TAU")!;
+  const tau = find((f) => f.cp.name.slug === "TAU", sim.queries.ai.getIt())!;
   const sector = pickRandom(
     sim.queries.sectors
       .get()
@@ -152,6 +153,58 @@ export class PirateSpawningSystem extends System<
   faction: Faction;
   query: Query<ShipComponent>;
 
+  exec = (delta: number): void => {
+    this.cooldowns.update(delta);
+
+    const squads = pipe(
+      this.query.getIt(),
+      filter(
+        (s) =>
+          s.cp.owner?.id === this.faction.id &&
+          !s.cp.commander &&
+          s.cp.subordinates.ids.length > 0
+      ),
+      map((s) => ({
+        commander: s,
+        subordinates: s.cp.subordinates.ids.map((id) =>
+          this.sim.getOrThrow<Ship>(id)
+        ),
+      }))
+    );
+
+    const unassigned = filter(
+      (s) =>
+        s.cp.owner?.id === this.faction.id &&
+        !s.cp.commander &&
+        s.cp.orders.value.length === 0 &&
+        s.cp.model.slug !== "seahorse",
+      this.query.getIt()
+    );
+    const flagships = filter(
+      (s) =>
+        s.cp.owner?.id === this.faction.id &&
+        !s.cp.commander &&
+        s.cp.model.slug === "seahorse",
+      this.query.getIt()
+    );
+
+    this.cooldowns.doEvery("spawnFlagship", 15 * 60, () =>
+      spawnFlagship(this.sim, this.faction, toArray(flagships))
+    );
+    this.cooldowns.doEvery("spawnSquad", 3 * 60, () =>
+      spawnSquad(
+        this.sim,
+        this.faction,
+        toArray(squads),
+        toArray(flagships),
+        toArray(unassigned)
+      )
+    );
+    this.cooldowns.doEvery("return", 1, () =>
+      returnToFlagship(toArray(unassigned), toArray(flagships))
+    );
+  };
+
   apply = (sim: Sim) => {
     super.apply(sim);
 
@@ -167,50 +220,6 @@ export class PirateSpawningSystem extends System<
       }
     });
 
-    sim.hooks.phase.update.tap(this.constructor.name, (delta) => {
-      this.cooldowns.update(delta);
-
-      const squads = this.query
-        .get()
-        .filter(
-          (s) =>
-            s.cp.owner?.id === this.faction.id &&
-            !s.cp.commander &&
-            s.cp.subordinates.ids.length > 0
-        )
-        .map((s) => ({
-          commander: s,
-          subordinates: s.cp.subordinates.ids.map((id) =>
-            this.sim.getOrThrow<Ship>(id)
-          ),
-        }));
-      const unassigned = this.query
-        .get()
-        .filter(
-          (s) =>
-            s.cp.owner?.id === this.faction.id &&
-            !s.cp.commander &&
-            s.cp.orders.value.length === 0 &&
-            s.cp.model.slug !== "seahorse"
-        );
-      const flagships = this.query
-        .get()
-        .filter(
-          (s) =>
-            s.cp.owner?.id === this.faction.id &&
-            !s.cp.commander &&
-            s.cp.model.slug === "seahorse"
-        );
-
-      this.cooldowns.doEvery("spawnFlagship", 15 * 60, () =>
-        spawnFlagship(this.sim, this.faction, flagships)
-      );
-      this.cooldowns.doEvery("spawnSquad", 3 * 60, () =>
-        spawnSquad(this.sim, this.faction, squads, flagships, unassigned)
-      );
-      this.cooldowns.doEvery("return", 1, () =>
-        returnToFlagship(unassigned, flagships)
-      );
-    });
+    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 }

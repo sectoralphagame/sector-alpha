@@ -6,6 +6,7 @@ import { manifest } from "@assets/icons";
 import type { Sim } from "@core/sim";
 import { setCheat } from "@core/utils/misc";
 import { isHeadless } from "@core/settings";
+import { first } from "@fxts/core";
 import {
   createRenderGraphics,
   graphics,
@@ -81,7 +82,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   };
 
   init = () => {
-    this.settingsManager = this.sim.queries.settings.get()[0];
+    this.settingsManager = first(this.sim.queries.settings.getIt())!;
     this.toolbar = document.querySelector("#toolbar")!;
     const root = document.querySelector("#root")!;
     const canvasRoot = document.querySelector(
@@ -248,7 +249,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   };
 
   updateGraphics = () => {
-    this.sim.queries.renderableGraphics.get().forEach((entity) => {
+    for (const entity of this.sim.queries.renderableGraphics.getIt()) {
       let g = this.graphics.get(entity);
       if (entity.cp.renderGraphics.redraw || !g) {
         if (
@@ -270,7 +271,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
           });
         }
       }
-    });
+    }
 
     if (this.cooldowns.canUse("graphics")) {
       this.cooldowns.use("graphics", this.sim.speed);
@@ -278,7 +279,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   };
 
   updateRenderables = () => {
-    this.sim.queries.renderable.get().forEach((entity) => {
+    for (const entity of this.sim.queries.renderable.getIt()) {
       const entityRender = entity.cp.render;
       let sprite = this.sprites.get(entity);
 
@@ -327,7 +328,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
       if (entityRender.visible !== sprite?.visible) {
         sprite!.visible = entityRender.visible;
       }
-    });
+    }
   };
 
   updateSelection = (previousValue: number) => {
@@ -342,7 +343,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
       previousSelected!.removeComponent("renderGraphics");
     }
 
-    this.sim.queries.renderable.get().forEach((entity) => {
+    for (const entity of this.sim.queries.renderable.getIt()) {
       const entityRender = entity.cp.render;
       const sprite = this.sprites.get(entity);
       const selected =
@@ -365,7 +366,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
         sprite.parent?.removeChild(sprite);
         this.layers[entityRender.layer].addChild(sprite);
       }
-    });
+    }
     this.updateScaling();
   };
 
@@ -389,7 +390,10 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   };
 
   updateScaling = () => {
-    this.sim.queries.renderable.get().forEach(this.updateEntityScaling);
+    for (const entity of this.sim.queries.renderable.getIt()) {
+      this.updateEntityScaling(entity);
+    }
+
     Object.entries(this.layers).forEach(([name, layer]) => {
       layer.visible =
         (layerScaleThresholds[name] ?? 0) <= this.viewport.scale.x;
@@ -455,7 +459,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
       this.init();
       return;
     }
-    this.settingsManager = this.sim.queries.settings.get()[0];
+    this.settingsManager = first(this.sim.queries.settings.getIt())!;
 
     this.onChange(
       this.settingsManager.cp.selectionManager.id,

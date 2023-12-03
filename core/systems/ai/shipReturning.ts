@@ -24,7 +24,7 @@ export class ShipReturningSystem extends System<"exec"> {
     this.cooldowns.use("exec", 3);
 
     pipe(
-      this.sim.queries.orderable.get(),
+      this.sim.queries.orderable.getIt(),
       filter(
         (ship) =>
           ship.cp.orders.value.length === 0 &&
@@ -40,7 +40,7 @@ export class ShipReturningSystem extends System<"exec"> {
       ),
       each((ship) => {
         const closestSector = pipe(
-          this.sim.queries.sectors.get(),
+          this.sim.queries.sectors.getIt(),
           filter((s) => s.cp.owner?.id === ship.cp.owner.id),
           map((s) => ({
             sector: s,

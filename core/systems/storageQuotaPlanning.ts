@@ -58,7 +58,9 @@ export class StorageQuotaPlanningSystem extends System<"settle"> {
   exec = (): void => {
     if (this.cooldowns.canUse("settle")) {
       this.cooldowns.use("settle", 20);
-      this.sim.queries.storageAndTrading.get().forEach(settleStorageQuota);
+      for (const entity of this.sim.queries.storageAndTrading.getIt()) {
+        settleStorageQuota(entity);
+      }
     }
   };
 }

@@ -277,6 +277,8 @@ export class NavigatingSystem extends System {
   };
 
   exec = (delta: number): void => {
-    this.query.get().forEach((entity) => setDrive(entity, delta));
+    for (const entity of this.query.getIt()) {
+      setDrive(entity, delta);
+    }
   };
 }
