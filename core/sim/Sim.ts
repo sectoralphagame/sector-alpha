@@ -219,7 +219,11 @@ export class Sim extends BaseSim {
   }
 
   static load(config: SimConfig, data: string) {
-    const save = JSON.parse(data);
+    const save = JSON.parse(data, (k, v) =>
+      typeof k === "string" && k.startsWith("BigInt:")
+        ? BigInt(k.split("BigInt:")[1])
+        : v
+    );
     const sim = plainToInstance(Sim, save);
     config.systems.forEach((system) => system.apply(sim));
     Object.values(sim.queries).forEach((queryOrNested) => {
@@ -270,3 +274,9 @@ export class Sim extends BaseSim {
     };
   }
 }
+
+// BigInt serialization monkeypatch
+// eslint-disable-next-line func-names
+(BigInt.prototype as any).toJSON = function () {
+  return `BigInt:${this.toString()}`;
+};
