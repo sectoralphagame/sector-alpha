@@ -82,7 +82,7 @@ export class AttackingSystem extends System {
   exec = (): void => {
     if (this.sim.getTime() < settings.bootTime) return;
 
-    this.query.get().forEach((entity) => {
+    for (const entity of this.query.getIt()) {
       if (entity.cp.damage.targetId && entity.cooldowns.canUse(cdKey)) {
         if (!this.sim.entities.has(entity.cp.damage.targetId)) {
           entity.cp.damage.targetId = null;
@@ -140,6 +140,6 @@ export class AttackingSystem extends System {
           target.cooldowns.use(regenCooldown, 2);
         }
       }
-    });
+    }
   };
 }

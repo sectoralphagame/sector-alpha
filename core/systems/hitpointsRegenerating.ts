@@ -19,7 +19,7 @@ export class HitpointsRegeneratingSystem extends System<"exec"> {
     if (!this.cooldowns.canUse("exec")) return;
 
     this.cooldowns.use("exec", 1);
-    this.query.get().forEach((entity) => {
+    for (const entity of this.query.getIt()) {
       if (!entity.cooldowns.canUse(regenCooldown)) return;
       entity.cp.hitpoints.hp.value = Math.min(
         entity.cp.hitpoints.hp.value +
@@ -35,6 +35,6 @@ export class HitpointsRegeneratingSystem extends System<"exec"> {
       }
 
       entity.cp.hitpoints.hit = true;
-    });
+    }
   };
 }
