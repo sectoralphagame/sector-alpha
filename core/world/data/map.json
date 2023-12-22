@@ -737,7 +737,27 @@
       "name": "Player Faction",
       "blueprints": {
         "ships": ["courierA"],
-        "facilityModules": ["containerSmall"]
+        "facilityModules": [
+          "waterProduction",
+          "containerSmall",
+          "containerMedium",
+          "shipyard",
+          "habitat",
+          "containerLarge",
+          "farm",
+          "refinery",
+          "fueliumRefinery",
+          "hullPlatesFactory",
+          "goldRefinery",
+          "siliconPurification",
+          "electronicsFactory",
+          "droneFactory",
+          "teleport",
+          "smallDefense",
+          "hydrogenFactory",
+          "coolantFactory",
+          "enginePartsFactory"
+        ]
       },
       "color": "#97ff7d",
       "sectors": [],
