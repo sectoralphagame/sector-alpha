@@ -4,7 +4,6 @@
   }
 }
 .input {
-  margin-right: var(--spacing-1);
   width: 70px;
 }
 .row {
@@ -12,4 +11,7 @@
   & th {
     text-align: right;
   }
+}
+.max {
+  margin: 0 calc(var(--spacing-1) / 2);
 }

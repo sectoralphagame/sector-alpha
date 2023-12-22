@@ -51,7 +51,12 @@ export const ShipyardDialogComponent: React.FC<
   const totalCost: number = sum(queue.map((bp) => bp.quantity * bp.cost));
 
   return (
-    <Dialog title="Buy ships" open={open} onClose={onClose} width="800px">
+    <Dialog
+      title={showCommodityCost ? "Build ships" : "Buy ships"}
+      open={open}
+      onClose={onClose}
+      width="800px"
+    >
       <div className={styles.root}>
         <div>
           <h4 className={styles.sectionHeader}>Available ships</h4>
