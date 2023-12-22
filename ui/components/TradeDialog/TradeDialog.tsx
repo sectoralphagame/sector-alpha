@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import type { WithTrade } from "@core/economy/utils";
 import type { Commodity } from "@core/economy/commodity";
 import { commoditiesArray } from "@core/economy/commodity";
@@ -20,7 +20,7 @@ export interface TradeDialogProps {
 export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const [sim] = useSim();
   const [dialog] = useGameDialog();
-  const { getValues } = useForm();
+  const form = useForm();
 
   if (dialog?.type !== "trade") return null;
 
@@ -51,71 +51,73 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
     canBuy(commodity) ? "buy" : canSell(commodity) ? "sell" : null;
 
   return (
-    <TradeDialogComponent open={open} onClose={onClose}>
-      {commoditiesArray
-        .filter((commodity) => offers[commodity].active)
-        .map((commodity) => {
-          const action = getAction(commodity);
-          const max =
-            action === "buy"
-              ? Math.min(
-                  offers[commodity].quantity,
-                  getAvailableSpace(initiator.cp.storage)
-                )
-              : Math.min(
-                  offers[commodity].quantity,
-                  initiator.cp.storage.availableWares[commodity]
-                );
+    <FormProvider {...form}>
+      <TradeDialogComponent open={open} onClose={onClose}>
+        {commoditiesArray
+          .filter((commodity) => offers[commodity].active)
+          .map((commodity) => {
+            const action = getAction(commodity);
+            const max =
+              action === "buy"
+                ? Math.min(
+                    offers[commodity].quantity,
+                    getAvailableSpace(initiator.cp.storage)
+                  )
+                : Math.min(
+                    offers[commodity].quantity,
+                    initiator.cp.storage.availableWares[commodity]
+                  );
 
-          return (
-            <TradeDialogLine
-              key={commodity}
-              availableQuantity={offers[commodity].quantity}
-              buyDisabled={isBuyOfferDisabled(commodity)}
-              commodity={commodity}
-              max={max}
-              offerType={offers[commodity].type}
-              onAction={
-                action
-                  ? () => {
-                      const quantity = getValues()[commodity];
+            return (
+              <TradeDialogLine
+                key={commodity}
+                availableQuantity={offers[commodity].quantity}
+                buyDisabled={isBuyOfferDisabled(commodity)}
+                commodity={commodity}
+                max={max}
+                offerType={offers[commodity].type}
+                onAction={
+                  action
+                    ? () => {
+                        const quantity = form.getValues()[commodity];
 
-                      if (!(quantity > 0 && quantity <= max)) {
-                        return;
+                        if (!(quantity > 0 && quantity <= max)) {
+                          return;
+                        }
+
+                        const orders = tradeCommodity(
+                          initiator,
+                          {
+                            allocations: null,
+                            budget: sim.queries.player.get()[0].id,
+                            commodity,
+                            factionId: sim.queries.player.get()[0].id,
+                            initiator: initiator.id,
+                            price: offers[commodity].price,
+                            quantity,
+                            type: action,
+                          },
+                          target
+                        );
+
+                        if (orders) {
+                          initiator.cp.orders.value.push({
+                            origin: "manual",
+                            type: "trade",
+                            actions: orders,
+                          });
+                        }
+                        onClose();
                       }
-
-                      const orders = tradeCommodity(
-                        initiator,
-                        {
-                          allocations: null,
-                          budget: sim.queries.player.get()[0].id,
-                          commodity,
-                          factionId: sim.queries.player.get()[0].id,
-                          initiator: initiator.id,
-                          price: offers[commodity].price,
-                          quantity,
-                          type: action,
-                        },
-                        target
-                      );
-
-                      if (orders) {
-                        initiator.cp.orders.value.push({
-                          origin: "manual",
-                          type: "trade",
-                          actions: orders,
-                        });
-                      }
-                      onClose();
-                    }
-                  : undefined
-              }
-              price={offers[commodity].price}
-              sellDisabled={isSellOfferDisabled(commodity)}
-            />
-          );
-        })}
-    </TradeDialogComponent>
+                    : undefined
+                }
+                price={offers[commodity].price}
+                sellDisabled={isSellOfferDisabled(commodity)}
+              />
+            );
+          })}
+      </TradeDialogComponent>
+    </FormProvider>
   );
 };
 TradeDialog.displayName = "TradeDialog";
