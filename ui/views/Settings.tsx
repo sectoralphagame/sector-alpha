@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@kit/Button";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
+import { Slider } from "@kit/Slider";
 import styles from "./Settings.scss";
 import useFullscreen from "../hooks/useFullscreen";
 import { View } from "../components/View";
@@ -34,6 +35,21 @@ export const Settings: React.FC = () => {
             <SelectOption value="false">Disabled</SelectOption>
           </SelectOptions>
         </Select>
+      </div>
+      <div className={styles.settingsRow}>
+        <div>UI icon scale</div>
+        <Slider
+          value={settings.scale}
+          onChange={(event) =>
+            setSettings((prevSettings) => ({
+              ...prevSettings,
+              scale: Number(event.target.value),
+            }))
+          }
+          max={2}
+          min={0.5}
+          step={0.1}
+        />
       </div>
     </div>
   );

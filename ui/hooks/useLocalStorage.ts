@@ -2,9 +2,7 @@
 
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
-import { SyncHook } from "tapable";
-
-const hook = new SyncHook<string>(["localStorageUpdate"]);
+import { storageHook as hook } from "@core/hooks";
 
 export function useLocalStorage<T>(
   key: string,

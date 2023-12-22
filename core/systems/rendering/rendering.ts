@@ -7,6 +7,7 @@ import type { Sim } from "@core/sim";
 import { setCheat } from "@core/utils/misc";
 import { isHeadless } from "@core/settings";
 import { first } from "@fxts/core";
+import { storageHook } from "@core/hooks";
 import {
   createRenderGraphics,
   graphics,
@@ -70,6 +71,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   sprites: Map<Entity, PIXI.Sprite> = new Map();
   graphics: Map<Entity, PIXI.Graphics> = new Map();
   displayRange: boolean;
+  scale = 1;
 
   apply = (sim: Sim) => {
     super.apply(sim);
@@ -114,6 +116,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
     });
 
     this.initialized = true;
+    storageHook.tap("RenderingSystem", this.onSettingsChange);
   };
 
   initViewport = (root: Element, canvasRoot: HTMLCanvasElement) => {
@@ -243,6 +246,10 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   };
 
   destroy = (): void => {
+    const index = storageHook.taps.findIndex(
+      (tap) => tap.fn === this.onSettingsChange
+    );
+    storageHook.taps.splice(index, 1);
     this.resizeObserver.disconnect();
     this.viewport.destroy();
     this.app.destroy(true);
@@ -385,7 +392,8 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
             ? 2
             : 1))) *
         entityRender.defaultScale *
-        (selected ? 1.5 : 1)
+        (selected ? 1.5 : 1) *
+        this.scale
     );
   };
 
@@ -483,5 +491,12 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
       this.updateGraphics();
       this.updateRenderables();
     }, 0);
+  };
+
+  onSettingsChange = (key: string) => {
+    if (key === "gameSettings") {
+      this.scale = JSON.parse(window.localStorage.getItem(key)!).scale;
+      this.updateScaling();
+    }
   };
 }
