@@ -196,6 +196,22 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     });
     playerShip.cp.autoOrder!.default = { type: "hold" };
 
+    const playerMiningShip = createShip(sim, {
+      ...pickRandom(
+        shipClasses.filter(
+          ({ role, size }) => role === "mining" && size === "medium"
+        )
+      ),
+      angle: random(-Math.PI, Math.PI),
+      position: add(
+        hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
+        matrix([random(-1, 1), random(-1, 1)])
+      ),
+      owner: player,
+      sector: startingSector,
+    });
+    playerMiningShip.cp.autoOrder!.default = { type: "hold" };
+
     const builderShip = createShip(sim, {
       ...pickRandom(shipClasses.filter(({ role }) => role === "building")),
       angle: random(-Math.PI, Math.PI),
