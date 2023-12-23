@@ -71,7 +71,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   sprites: Map<Entity, PIXI.Sprite> = new Map();
   graphics: Map<Entity, PIXI.Graphics> = new Map();
   displayRange: boolean;
-  scale = 1;
+  scale: number;
 
   apply = (sim: Sim) => {
     super.apply(sim);
@@ -116,6 +116,9 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
     });
 
     this.initialized = true;
+    this.scale = window.localStorage.getItem("gameSettings")
+      ? JSON.parse(window.localStorage.getItem("gameSettings")!).scale
+      : 1;
     storageHook.tap("RenderingSystem", this.onSettingsChange);
   };
 

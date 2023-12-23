@@ -17,19 +17,19 @@ export interface RenderInput {
   layer: Layer;
 }
 
-export class Render implements BaseComponent<"render"> {
+export interface Render extends BaseComponent<"render"> {
   color: number;
-  defaultScale: number = 1;
+  defaultScale: number;
   texture: keyof Textures;
   layer: Layer;
-  name: "render" = "render";
+  name: "render";
   visible: boolean;
   interactive: boolean;
 }
 
 export function createRender({
   color,
-  defaultScale,
+  defaultScale = 1,
   texture,
   layer,
 }: RenderInput): Render {
