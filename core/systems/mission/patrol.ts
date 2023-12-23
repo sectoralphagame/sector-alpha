@@ -5,7 +5,7 @@ import type { Sim } from "@core/sim";
 import { pickRandom } from "@core/utils/generators";
 import { randomInt } from "mathjs";
 import { formatTime } from "@core/utils/format";
-import { filter, first, pipe, toArray } from "@fxts/core";
+import { filter, first, pipe, some, toArray } from "@fxts/core";
 import type { MissionHandler } from "./types";
 import missions from "../../world/data/missions.json";
 
@@ -104,14 +104,15 @@ export const patrolMissionHandler: MissionHandler = {
     if (!isPatrolMission(mission))
       throw new Error("Mission is not a patrol mission");
 
-    const isPatrolling = sim.queries.ships
-      .get()
-      .some(
-        (ship) =>
-          ship.cp.owner?.id === first(sim.queries.player.getIt())!.id &&
-          ship.cp.autoOrder?.default.type === "patrol" &&
-          ship.cp.autoOrder.default.sectorId === mission.sector
-      );
+    const player = first(sim.queries.player.getIt())!;
+
+    const isPatrolling = some(
+      (ship) =>
+        ship.cp.owner?.id === player.id &&
+        ship.cp.autoOrder?.default.type === "patrol" &&
+        ship.cp.autoOrder.default.sectorId === mission.sector,
+      sim.queries.ships.getIt()
+    );
     if (isPatrolling) mission.elapsed += 1;
   },
 };

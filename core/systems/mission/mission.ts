@@ -2,6 +2,7 @@ import type { Reward } from "@core/components/missions";
 import type { Sim } from "@core/sim";
 import { pickRandom } from "@core/utils/generators";
 import { setCheat } from "@core/utils/misc";
+import { first } from "@fxts/core";
 import { System } from "../system";
 import type { MissionHandler } from "./types";
 
@@ -36,7 +37,7 @@ export class MissionSystem extends System<"generate" | "track"> {
     if (!this.cooldowns.canUse("track")) return;
     this.cooldowns.use("track", 1 + Math.random());
 
-    const player = this.sim.queries.player.get()[0]!;
+    const player = first(this.sim.queries.player.getIt())!;
 
     player.cp.missions.value.forEach((mission) => {
       this.handlers.mission[mission.type].update(mission, this.sim);
