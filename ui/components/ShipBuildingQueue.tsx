@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import React from "react";
 import type { RequireComponent } from "@core/tsHelpers";
 import {
@@ -17,11 +18,13 @@ import styles from "./ShipBuildingQueue.scss";
 const getQueueItemOwner = (
   entity: RequireComponent<"shipyard">,
   queueItem: ShipyardQueueItem
-): string => {
-  const owner = queueItem.owner
-    ? entity.sim.getOrThrow<Faction>(queueItem.owner)
-    : false;
-  return owner && owner.cp.name.slug ? owner.cp.name.slug : "???";
+): ReactNode => {
+  const owner = entity.sim.getOrThrow<Faction>(queueItem.owner);
+  return (
+    <span style={{ color: owner.cp.color.value }}>
+      {owner.cp.name.slug ? owner.cp.name.slug : "???"}
+    </span>
+  );
 };
 
 const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
