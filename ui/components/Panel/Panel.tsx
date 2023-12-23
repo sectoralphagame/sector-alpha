@@ -31,7 +31,7 @@ import styles from "./Panel.scss";
 import { Offers } from "../Offers";
 import { Undeploy } from "../Undeploy";
 import { Subordinates } from "../Subordinates";
-import { FacilityMoneyManager } from "../FacilityMoneyManager ";
+import { FacilityMoneyManager } from "../FacilityMoneyManager";
 import { Allocations } from "../Allocations";
 import { FacilityTradeManager } from "../FacilityTradeManager";
 import { Storage } from "../Storage/Storage";

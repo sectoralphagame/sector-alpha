@@ -4,7 +4,7 @@ import type { ConfigDialogProps } from "./components/ConfigDialog";
 import type { ContextMenu } from "./components/ContextMenu/types";
 import type { TradeDialogProps } from "./components/TradeDialog";
 import type { FacilityModuleManagerProps } from "./components/FacilityModuleManager";
-import type { FacilityMoneyManagerProps } from "./components/FacilityMoneyManager ";
+import type { FacilityMoneyManagerProps } from "./components/FacilityMoneyManager";
 import type { FacilityTradeManagerProps } from "./components/FacilityTradeManager";
 import type { ShipyardDialogProps } from "./components/ShipyardDialog";
 import type { MissionDialogProps } from "./components/MissionDialog";
