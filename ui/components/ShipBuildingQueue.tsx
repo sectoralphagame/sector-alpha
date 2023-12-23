@@ -10,7 +10,19 @@ import { useGameDialog, useSim } from "@ui/atoms";
 import { relationThresholds } from "@core/components/relations";
 import redoIcon from "@assets/ui/redo.svg";
 import SVG from "react-inlinesvg";
+import type { Faction } from "@core/archetypes/faction";
+import type { ShipyardQueueItem } from "@core/components/shipyard";
 import styles from "./ShipBuildingQueue.scss";
+
+const getQueueItemOwner = (
+  entity: RequireComponent<"shipyard">,
+  queueItem: ShipyardQueueItem
+): string => {
+  const owner = queueItem.owner
+    ? entity.sim.getOrThrow<Faction>(queueItem.owner)
+    : false;
+  return owner && owner.cp.name.slug ? owner.cp.name.slug : "???";
+};
 
 const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
   entity,
@@ -47,12 +59,13 @@ const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
             {!!entity.cp.shipyard.building && (
               <li className={styles.item}>
                 {entity.cp.shipyard.building.blueprint.name} (
-                {entity.cooldowns.timers[shipBuildTimer].toFixed(0)}s)
+                {entity.cooldowns.timers[shipBuildTimer].toFixed(0)}s) (
+                {getQueueItemOwner(entity, entity.cp.shipyard.queue[0])})
               </li>
             )}
             {entity.cp.shipyard.queue.map((queued, bpIndex) => (
               <li className={styles.item} key={bpIndex}>
-                {queued.blueprint.name}
+                {queued.blueprint.name} ({getQueueItemOwner(entity, queued)})
               </li>
             ))}
           </ul>
