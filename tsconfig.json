@@ -10,12 +10,20 @@
     "jsx": "react",
     "strictNullChecks": true,
     "paths": {
-      "@assets/*": ["./assets/*"],
-      "@core/*": ["./core/*"],
-      "@devtools/*": ["./devtools/*"],
-      "@kit/*": ["./kit/*"],
-      "@ui/*": ["./ui/*"]
+      "@assets/*": ["assets/*"],
+      "@core/*": ["core/*"],
+      "@devtools/*": ["devtools/*"],
+      "@kit/*": ["kit/*"],
+      "@ui/*": ["ui/*"]
     }
   },
-  "exclude": ["**/*.test.*"]
+  "exclude": ["**/*.test.*"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "transpileOnly": true,
+    "files": true,
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  }
 }

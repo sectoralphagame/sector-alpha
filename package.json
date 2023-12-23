@@ -12,6 +12,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "gen-spritesheet": "node ./scripts/createSpritesheet.js",
+    "gen-save": "node -r ts-node/register ./scripts/createSave.ts",
     "prepare": "husky install"
   },
   "author": "Dominik Żegleń",
@@ -62,6 +63,8 @@
     "storybook": "^7.0.0-beta.45",
     "string-replace-loader": "^3.1.0",
     "style-loader": "^3.3.1",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "typescript": "^4.5.2",
     "webpack": "^5.58.2",
