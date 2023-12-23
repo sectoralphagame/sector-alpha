@@ -263,11 +263,6 @@ function autoMine(
           .filter((f) => f.cp.position!.sector === sector.id)
       ),
       map(asteroidField),
-      filter((e) =>
-        e.cp.children.entities
-          .map((child) => asteroid(entity.sim.getOrThrow(child)))
-          .some((a) => !a.cp.minable.minedById)
-      ),
       toArray
     );
     const field = minBy(eligibleFields, (e) =>

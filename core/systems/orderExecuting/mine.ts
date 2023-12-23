@@ -1,6 +1,6 @@
 import { stop } from "@core/components/drive";
 import { asteroid } from "../../archetypes/asteroid";
-import { asteroidField } from "../../archetypes/asteroidField";
+import { asteroidField, spawn } from "../../archetypes/asteroidField";
 import type { MineAction } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
 import { getMineableAsteroid } from "../../economy/utils";
@@ -21,9 +21,13 @@ export function mineAction(
     (targetRock.cp.minable!.minedById !== null &&
       targetRock.cp.minable!.minedById !== entity.id)
   ) {
-    const rock = getMineableAsteroid(targetField);
+    let rock = getMineableAsteroid(targetField);
     if (!rock) {
-      return true;
+      if (targetField.cp.asteroidSpawn.amount > 0) {
+        rock = spawn(targetField);
+      } else {
+        return true;
+      }
     }
     order.targetRockId = rock.id;
     entity.cp.orders!.value[0].actions.unshift(...moveToActions(entity, rock));

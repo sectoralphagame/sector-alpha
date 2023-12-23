@@ -20,7 +20,7 @@ export class HitpointsRegeneratingSystem extends System<"exec"> {
 
     this.cooldowns.use("exec", 1);
     for (const entity of this.query.getIt()) {
-      if (!entity.cooldowns.canUse(regenCooldown)) return;
+      if (!entity.cooldowns.canUse(regenCooldown)) continue;
       entity.cp.hitpoints.hp.value = Math.min(
         entity.cp.hitpoints.hp.value +
           entity.cp.hitpoints.hp.regen * (entity.cp.dockable?.dockedIn ? 4 : 1),

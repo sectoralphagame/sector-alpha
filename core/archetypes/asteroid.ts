@@ -55,15 +55,6 @@ export function createAsteroid(
       moved: false,
     })
     .addTag("asteroid");
-  // .addComponent(
-  //   createRender({
-  //     color: Color(fieldColors[type]).rgbNumber(),
-  //     defaultScale: 0.6,
-  //     maxZ: 3,
-  //     texture: "asteroid",
-  //     zIndex: 0,
-  //   })
-  // );
 
   parent.components.children.entities.push(entity.id);
 

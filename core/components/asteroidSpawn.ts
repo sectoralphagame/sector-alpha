@@ -6,4 +6,5 @@ export interface AsteroidSpawn extends BaseComponent<"asteroidSpawn"> {
   asteroidResources: Record<"min" | "max", number>;
   density: number;
   size: number;
+  amount: number;
 }

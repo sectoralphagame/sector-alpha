@@ -82,7 +82,7 @@ export class ProducingSystem extends System<"exec"> {
 
     for (const entity of this.sim.queries.standaloneProduction.getIt()) {
       if (!isAbleToProduce(entity, entity.cp.storage)) {
-        return;
+        continue;
       }
 
       entity.cooldowns.use("production", entity.cp.production.time);
@@ -94,7 +94,7 @@ export class ProducingSystem extends System<"exec"> {
       const facility = findInAncestors(facilityModule, "storage");
       const storage = facility.cp.storage;
       if (!isAbleToProduce(facilityModule, storage)) {
-        return;
+        continue;
       }
 
       facilityModule.cooldowns.use(

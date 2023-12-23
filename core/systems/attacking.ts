@@ -86,7 +86,7 @@ export class AttackingSystem extends System {
       if (entity.cp.damage.targetId && entity.cooldowns.canUse(cdKey)) {
         if (!this.sim.entities.has(entity.cp.damage.targetId)) {
           entity.cp.damage.targetId = null;
-          return;
+          continue;
         }
 
         const target = this.sim

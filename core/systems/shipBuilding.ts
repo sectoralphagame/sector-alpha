@@ -21,7 +21,7 @@ export class ShipBuildingSystem extends System<"exec"> {
       this.cooldowns.use("exec", 1);
 
       for (const shipyard of this.sim.queries.shipyards.getIt()) {
-        if (!shipyard.cooldowns.canUse(shipBuildTimer)) return;
+        if (!shipyard.cooldowns.canUse(shipBuildTimer)) continue;
 
         if (shipyard.cp.shipyard.building) {
           const ship = createShip(this.sim, {
@@ -44,7 +44,7 @@ export class ShipBuildingSystem extends System<"exec"> {
           shipyard.cp.shipyard.building = null;
         }
 
-        if (shipyard.cp.shipyard.queue.length === 0) return;
+        if (shipyard.cp.shipyard.queue.length === 0) continue;
         const shipToBuild = shipyard.cp.shipyard.queue[0];
 
         if (

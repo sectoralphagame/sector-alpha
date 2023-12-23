@@ -1,26 +1,11 @@
 import type { Matrix } from "mathjs";
 import { add, matrix, random } from "mathjs";
 import type { MineableCommodity } from "../economy/commodity";
-import { mineableCommodities } from "../economy/commodity";
 import { createAsteroidField } from "../archetypes/asteroidField";
 import type { Sim } from "../sim";
 import type { Sector } from "../archetypes/sector";
 import { sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
-import { pickRandom } from "../utils/generators";
-
-const getSize = () => {
-  const r = Math.random();
-
-  if (r < 0.05) {
-    return random(10, 14);
-  }
-  if (r < 0.75) {
-    return random(1, 4);
-  }
-
-  return random(5, 9);
-};
 
 const densities: Record<MineableCommodity, [number, number]> = {
   fuelium: [100, 600],
@@ -71,16 +56,4 @@ export function spawnAsteroidField(
     size,
     type: commodity,
   });
-}
-
-export function getRandomAsteroidField(sim: Sim) {
-  const sectors = sim.queries.sectors.get();
-  const mineable =
-    mineableCommodities[
-      Object.keys(mineableCommodities)[
-        Math.floor(Object.keys(mineableCommodities).length * Math.random())
-      ]
-    ];
-
-  spawnAsteroidField(sim, mineable, getSize(), pickRandom(sectors));
 }

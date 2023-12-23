@@ -92,14 +92,14 @@ export class SpottingSystem extends System<"exec"> {
         currentOrder?.type !== "pillage" &&
         currentOrder?.type !== "escort"
       )
-        return;
+        continue;
 
       if (
         !entity.cp.owner ||
         ((currentOrder.type === "patrol" || currentOrder.type === "pillage") &&
           entity.cp.position.sector !== currentOrder.sectorId)
       )
-        return;
+        continue;
 
       const enemy = pickRandom(
         SpottingSystem.getEnemies(
