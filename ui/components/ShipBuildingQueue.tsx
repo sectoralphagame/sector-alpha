@@ -61,14 +61,14 @@ const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
           <ul className={styles.list}>
             {!!entity.cp.shipyard.building && (
               <li className={styles.item}>
+                {getQueueItemOwner(entity, entity.cp.shipyard.queue[0])}{" "}
                 {entity.cp.shipyard.building.blueprint.name} (
-                {entity.cooldowns.timers[shipBuildTimer].toFixed(0)}s) (
-                {getQueueItemOwner(entity, entity.cp.shipyard.queue[0])})
+                {entity.cooldowns.timers[shipBuildTimer].toFixed(0)}s)
               </li>
             )}
             {entity.cp.shipyard.queue.map((queued, bpIndex) => (
               <li className={styles.item} key={bpIndex}>
-                {queued.blueprint.name} ({getQueueItemOwner(entity, queued)})
+                {getQueueItemOwner(entity, queued)} {queued.blueprint.name}
               </li>
             ))}
           </ul>
