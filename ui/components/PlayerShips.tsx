@@ -4,14 +4,16 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
+import { first } from "@fxts/core";
 import { useSim } from "../atoms";
 import { EntityList } from "./EntityList";
 
 export const PlayerShips: React.FC = () => {
   const [sim] = useSim();
+  const player = first(sim.queries.player.getIt())!;
   const ships = sim.queries.orderable
     .get()
-    .filter((ship) => ship.cp.owner?.id === sim.queries.player.get()[0].id);
+    .filter((ship) => ship.cp.owner?.id === player.id);
 
   return (
     <Collapsible>
