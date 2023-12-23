@@ -58,6 +58,8 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
   };
 
   build = (_delta: number): void => {
+    const builders = this.sim.queries.builders.get();
+
     for (const facility of this.sim.queries.facilities.getIt()) {
       if (!facility.cooldowns.canUse(buildTimer)) {
         facility.cp.facilityModuleQueue.building!.progress =
@@ -65,14 +67,14 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
           facility.cooldowns.timers[buildTimer] /
             facility.cp.facilityModuleQueue.building!.blueprint.build.time;
 
-        return;
+        continue;
       }
 
       const builder = find(
         (b) => b.cp.builder.targetId === facility.id,
-        this.sim.queries.builders.getIt()
+        builders
       );
-      if (!builder) return;
+      if (!builder) continue;
 
       if (facility.cp.facilityModuleQueue.building) {
         const facilityModule = createFacilityModule(this.sim, {
@@ -85,7 +87,7 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
         );
         facility.cp.facilityModuleQueue.building = null;
       }
-      if (facility.cp.facilityModuleQueue.queue.length === 0) return;
+      if (facility.cp.facilityModuleQueue.queue.length === 0) continue;
       const moduleToBuild = facility.cp.facilityModuleQueue.queue[0];
       if (
         Object.entries(moduleToBuild.blueprint.build.cost).every(
