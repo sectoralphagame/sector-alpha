@@ -4,7 +4,6 @@ import { useFormContext } from "react-hook-form";
 import type { ShipInput } from "@core/world/ships";
 import { shipRoles } from "@core/world/ships";
 import type { Textures } from "@core/components/render";
-import { textures } from "@core/components/render";
 import type { DockSize } from "@core/components/dockable";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { useThrottledFormState } from "@devtools/utils";
@@ -12,6 +11,8 @@ import * as icons from "@assets/icons";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
 import type { FormData } from "./utils";
+
+const textures = icons.manifest.frames;
 
 const ShipGeneralEditor: React.FC<{ index: number }> = ({ index }) => {
   const { register, getValues, setValue } = useFormContext<FormData>();

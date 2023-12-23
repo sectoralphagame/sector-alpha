@@ -55,7 +55,6 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       Object.entries(sector.resources)
         .filter(([, size]) => size > 0)
         .forEach(([mineable, size]) => {
-          console.log("spawning asteroid field", mineable, size, sector.name);
           spawnAsteroidField(
             sim,
             mineable as MineableCommodity,
