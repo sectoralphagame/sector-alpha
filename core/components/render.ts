@@ -1,8 +1,7 @@
-import { manifest } from "@assets/icons";
+import type { manifest } from "@assets/icons";
 import type { BaseComponent } from "./component";
 
-export const textures = manifest.frames;
-export type Textures = typeof textures;
+export type Textures = (typeof manifest)["frames"];
 export type Layer =
   | "facility"
   | "ship"

@@ -26,11 +26,8 @@ self.onmessage = (event: MessageEvent<HeadlessSimInitMsg>) => {
   const sim = Sim.load(createBaseConfig(), event.data.sim);
 
   let cycles = 0;
-  for (
-    let i = sim.getTime();
-    i < event.data.targetTime;
-    i += event.data.delta
-  ) {
+
+  while (sim.getTime() < event.data.targetTime) {
     sim.next(event.data.delta);
 
     cycles++;
