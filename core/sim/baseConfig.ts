@@ -46,7 +46,6 @@ export const bootstrapSystems = [
   new StorageQuotaPlanningSystem(),
   new TradingSystem(),
   new BudgetPlanningSystem(),
-  new SelectingSystem(),
   new OrderPlanningSystem(),
   new NavigatingSystem(),
   new MovingSystem(),
@@ -67,6 +66,7 @@ export const createBaseConfig = (): SimConfig => {
   const config: SimConfig = {
     systems: [
       ...bootstrapSystems,
+      new SelectingSystem(),
       new UndeployingSystem(),
       new AttackingSystem(),
       new SpottingSystem(),

@@ -80,7 +80,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
     }
 
     this.sectorQuery = new SectorQuery(sim, ["render"]);
-    sim.hooks.phase.render.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.render.tap("RenderingSystem", this.exec);
   };
 
   init = () => {
