@@ -16,7 +16,7 @@ export const PlayerShips: React.FC = () => {
     .filter((ship) => ship.cp.owner?.id === player.id);
 
   return (
-    <Collapsible>
+    <Collapsible defaultOpen>
       <CollapsibleSummary>Owned Ships</CollapsibleSummary>
       <CollapsibleContent>
         {ships.length === 0 ? (

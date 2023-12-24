@@ -67,6 +67,7 @@ const JournalWrapper: React.FC<React.PropsWithChildren<{ entity: Entity }>> = ({
 
 export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
   const [isCollapsed, setCollapsed] = React.useState(!expanded);
+
   const [dialog, setDialog] = useGameDialog();
   const toggleCollapse = React.useCallback(() => setCollapsed((c) => !c), []);
 
@@ -104,6 +105,9 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
               }
             : undefined
         }
+        onPlayerAssets={() => {
+          sim.queries.settings.get()[0].cp.selectionManager.id = null;
+        }}
         onPause={sim?.pause}
         onPlay={() => {
           sim.setSpeed(1);

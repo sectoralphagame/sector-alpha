@@ -7,6 +7,7 @@ import locationIcon from "@assets/ui/location.svg";
 import configIcon from "@assets/ui/config.svg";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import playIcon from "@assets/ui/play.svg";
+import assetsIcon from "@assets/ui/assets.svg";
 import { IconButton } from "@kit/IconButton";
 import styles from "./Panel.scss";
 
@@ -15,6 +16,7 @@ export interface PanelComponentProps {
   isCollapsed: boolean;
   onCollapseToggle: () => void;
   onConfig: () => void;
+  onPlayerAssets: () => void;
   onPause: () => void;
   onPlay: () => void;
   onSpeed: () => void;
@@ -26,6 +28,7 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
   isCollapsed,
   onCollapseToggle,
   onConfig,
+  onPlayerAssets,
   onPause,
   onPlay,
   onSpeed,
@@ -53,6 +56,9 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
           <SVG src={configIcon} />
         </IconButton>
       )}
+      <IconButton onClick={onPlayerAssets}>
+        <SVG src={assetsIcon} />
+      </IconButton>
       <IconButton onClick={onPause}>
         <SVG src={pauseIcon} />
       </IconButton>
