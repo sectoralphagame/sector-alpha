@@ -13,6 +13,7 @@ import { isHeadless } from "@core/settings";
 import type { CoreComponents } from "@core/components/component";
 import type { EntityTag } from "@core/tags";
 import { componentMask } from "@core/components/masks";
+import LZString from "lz-string";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -190,7 +191,7 @@ export class Sim extends BaseSim {
   serialize = () => JSON.stringify(this, replacer);
 
   save = async (name: string, id?: number) => {
-    const data = this.serialize();
+    const data = LZString.compress(this.serialize());
     const db = await openDb();
 
     const tx = db.transaction("saves", "readwrite");
