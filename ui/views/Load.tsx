@@ -2,6 +2,7 @@ import React from "react";
 import { Sim } from "@core/sim";
 import type { Save } from "@core/db";
 import { createBaseConfig } from "@core/sim/baseConfig";
+import LZString from "lz-string";
 import { useLocation } from "../context/Location";
 import { Saves } from "../components/Saves";
 import { View } from "../components/View";
@@ -25,7 +26,7 @@ export const LoadGame: React.FC = () => {
             onClick={async (id) => {
               const sim = Sim.load(
                 createBaseConfig(),
-                saves.find((s) => s.id === id)!.data
+                LZString.decompress(saves.find((s) => s.id === id)!.data)
               );
               setSim(sim);
               navigate("game");
