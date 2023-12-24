@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import React from "react";
 import type { RequireComponent } from "@core/tsHelpers";
 import {
@@ -12,20 +11,29 @@ import { relationThresholds } from "@core/components/relations";
 import redoIcon from "@assets/ui/redo.svg";
 import SVG from "react-inlinesvg";
 import type { Faction } from "@core/archetypes/faction";
-import type { ShipyardQueueItem } from "@core/components/shipyard";
 import styles from "./ShipBuildingQueue.scss";
 
-const getQueueItemOwner = (
-  entity: RequireComponent<"shipyard">,
-  queueItem: ShipyardQueueItem
-): ReactNode => {
-  const owner = entity.sim.getOrThrow<Faction>(queueItem.owner);
+const TagFromFactionId: React.FC<{ factionId: number }> = ({ factionId }) => {
+  const [sim] = useSim();
+  const owner = sim.getOrThrow<Faction>(factionId);
   return (
     <span style={{ color: owner.cp.color.value }}>
       {owner.cp.name.slug ? owner.cp.name.slug : "???"}
     </span>
   );
 };
+
+const QueueItem: React.FC<{
+  name: string;
+  ownerId: number;
+  timeLeft?: number;
+  keyIndex?: number;
+}> = ({ name, ownerId, timeLeft, keyIndex }) => (
+  <li className={styles.item} key={keyIndex}>
+    <TagFromFactionId factionId={ownerId} /> {name}{" "}
+    {timeLeft && <>({timeLeft.toFixed(0)}s)</>}
+  </li>
+);
 
 const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
   entity,
@@ -60,16 +68,18 @@ const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
         ) : (
           <ul className={styles.list}>
             {!!entity.cp.shipyard.building && (
-              <li className={styles.item}>
-                {getQueueItemOwner(entity, entity.cp.shipyard.queue[0])}{" "}
-                {entity.cp.shipyard.building.blueprint.name} (
-                {entity.cooldowns.timers[shipBuildTimer].toFixed(0)}s)
-              </li>
+              <QueueItem
+                name={entity.cp.shipyard.building.blueprint.name}
+                ownerId={entity.cp.shipyard.building.owner}
+                timeLeft={entity.cooldowns.timers[shipBuildTimer]}
+              />
             )}
-            {entity.cp.shipyard.queue.map((queued, bpIndex) => (
-              <li className={styles.item} key={bpIndex}>
-                {getQueueItemOwner(entity, queued)} {queued.blueprint.name}
-              </li>
+            {entity.cp.shipyard.queue.map((queued, key) => (
+              <QueueItem
+                name={queued.blueprint.name}
+                key={key}
+                ownerId={queued.owner}
+              />
             ))}
           </ul>
         )}
