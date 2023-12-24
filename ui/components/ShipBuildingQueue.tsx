@@ -10,7 +10,30 @@ import { useGameDialog, useSim } from "@ui/atoms";
 import { relationThresholds } from "@core/components/relations";
 import redoIcon from "@assets/ui/redo.svg";
 import SVG from "react-inlinesvg";
+import type { Faction } from "@core/archetypes/faction";
 import styles from "./ShipBuildingQueue.scss";
+
+const TagFromFactionId: React.FC<{ factionId: number }> = ({ factionId }) => {
+  const [sim] = useSim();
+  const owner = sim.getOrThrow<Faction>(factionId);
+  return (
+    <span style={{ color: owner.cp.color.value }}>
+      {owner.cp.name.slug ? owner.cp.name.slug : "???"}
+    </span>
+  );
+};
+
+const QueueItem: React.FC<{
+  name: string;
+  ownerId: number;
+  timeLeft?: number;
+  keyIndex?: number;
+}> = ({ name, ownerId, timeLeft, keyIndex }) => (
+  <li className={styles.item} key={keyIndex}>
+    <TagFromFactionId factionId={ownerId} /> {name}{" "}
+    {timeLeft && <>({timeLeft.toFixed(0)}s)</>}
+  </li>
+);
 
 const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
   entity,
@@ -45,15 +68,18 @@ const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
         ) : (
           <ul className={styles.list}>
             {!!entity.cp.shipyard.building && (
-              <li className={styles.item}>
-                {entity.cp.shipyard.building.blueprint.name} (
-                {entity.cooldowns.timers[shipBuildTimer].toFixed(0)}s)
-              </li>
+              <QueueItem
+                name={entity.cp.shipyard.building.blueprint.name}
+                ownerId={entity.cp.shipyard.building.owner}
+                timeLeft={entity.cooldowns.timers[shipBuildTimer]}
+              />
             )}
-            {entity.cp.shipyard.queue.map((queued, bpIndex) => (
-              <li className={styles.item} key={bpIndex}>
-                {queued.blueprint.name}
-              </li>
+            {entity.cp.shipyard.queue.map((queued, key) => (
+              <QueueItem
+                name={queued.blueprint.name}
+                key={key}
+                ownerId={queued.owner}
+              />
             ))}
           </ul>
         )}
