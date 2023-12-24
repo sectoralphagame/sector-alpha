@@ -22,7 +22,7 @@ export type QueryEntities<T extends keyof CoreComponents> = Array<
 export class BaseQuery<T extends keyof CoreComponents> {
   hooks: {
     add: SyncHook<RequireComponent<T>>;
-    remove: SyncHook<number>;
+    remove: SyncHook<[number, Entity]>;
   };
   requiredComponents: readonly (keyof CoreComponents)[];
   requiredComponentsMask: bigint;
@@ -47,7 +47,7 @@ export class BaseQuery<T extends keyof CoreComponents> {
   enableHooks = () => {
     this.hooks = {
       add: new SyncHook(["entity"]),
-      remove: new SyncHook(["entityId"]),
+      remove: new SyncHook(["entityId", "entity"]),
     };
 
     this.sim.hooks.addComponent.tap("query", ({ entity, component }) => {
@@ -83,62 +83,106 @@ export class BaseQuery<T extends keyof CoreComponents> {
   };
 
   canBeAdded = (entity: Entity) =>
-    // entity.hasComponents(this.requiredComponents) &&
     (entity.componentsMask & this.requiredComponentsMask) ===
       this.requiredComponentsMask && entity.hasTags(this.requiredTags);
 
   collect = () => {
     for (const entity of filter(this.canBeAdded, this.sim.entities.values())) {
-      this.hooks.add.call(entity as RequireComponent<T>);
+      this.add(entity as RequireComponent<T>);
     }
   };
 
-  private add = (entity: RequireComponent<T>) => {
+  add = (entity: RequireComponent<T>) => {
     this.hooks.add.call(entity);
   };
 
-  private remove = (entity: Entity) => {
-    this.hooks.remove.call(entity.id);
+  remove = (entity: Entity) => {
+    this.hooks.remove.call(entity.id, entity);
   };
 }
 
 export class Query<T extends keyof CoreComponents> extends BaseQuery<T> {
+  cache: boolean;
+  entities: Set<RequireComponent<T>> | null;
   sim: Sim;
 
   constructor(
     sim: Sim,
     requiredComponents: readonly T[],
-    requiredTags: readonly EntityTag[] = []
+    requiredTags: readonly EntityTag[] = [],
+    cache = false
   ) {
     super(sim, requiredComponents, requiredTags);
+    if (cache) {
+      this.enableCache();
+    }
   }
 
-  get = (): QueryEntities<T> =>
-    this.sim.filter(this.canBeAdded) as QueryEntities<T>;
+  enableCache = () => {
+    this.cache = true;
+    this.enableHooks();
+    this.hooks.add.tap("query", (entity) => {
+      if (this.entities) {
+        this.entities.add(entity);
+      }
+    });
+    this.hooks.remove.tap("query", (_id, entity) => {
+      if (this.entities) {
+        this.entities.delete(entity as RequireComponent<T>);
+      }
+    });
+  };
 
-  getIt = (): IterableIterator<RequireComponent<T>> =>
-    filter(this.canBeAdded, this.sim.entities.values()) as any;
+  get = (): QueryEntities<T> => {
+    if (this.cache) {
+      if (!this.entities) {
+        this.entities = new Set();
+        this.collect();
+      }
 
-  // eslint-disable-next-line class-methods-use-this
-  reset = (): void => {};
+      return [...this.entities];
+    }
+
+    return this.sim.filter(this.canBeAdded) as QueryEntities<T>;
+  };
+
+  getIt = (): IterableIterator<RequireComponent<T>> => {
+    if (this.cache) {
+      if (!this.entities) {
+        this.entities = new Set();
+        this.collect();
+      }
+
+      return this.entities.values();
+    }
+
+    return filter(this.canBeAdded, this.sim.entities.values()) as any;
+  };
+
+  reset = (): void => {
+    if (!this.cache || !this.entities) return;
+
+    this.entities.clear();
+    this.collect();
+  };
 }
 
 export function createQueries(sim: Sim) {
   return {
     ai: new Query(sim, [...factionComponents, "ai"]),
-    asteroidFields: new Query(sim, asteroidFieldComponents),
+    asteroidFields: new Query(sim, asteroidFieldComponents, [], true),
     autoOrderable: new Query(sim, ["autoOrder", "orders", "position"]),
-    budget: new Query(sim, ["budget"]),
+    budget: new Query(sim, ["budget"], [], true),
     builders: new Query(sim, ["builder", "storage", "trade", "docks"]),
     children: new Query(sim, ["parent"]),
     collectibles: new Query(sim, collectibleComponents, ["collectible"]),
     disposable: new Query(sim, ["disposable"]),
-    facilities: new Query(sim, [
-      "modules",
-      "position",
-      "facilityModuleQueue",
-      "subordinates",
-    ]),
+    facilities: new Query(
+      sim,
+      ["modules", "position", "facilityModuleQueue", "subordinates"],
+      [],
+      true
+    ),
     facilityWithProduction: new Query(sim, [
       "compoundProduction",
       "modules",
@@ -150,7 +194,7 @@ export function createQueries(sim: Sim) {
     productionByModules: new Query(sim, ["production", "parent"]),
     renderable: new Query(sim, ["render", "position"]),
     renderableGraphics: new Query(sim, ["renderGraphics"]),
-    sectors: new Query(sim, sectorComponents),
+    sectors: new Query(sim, sectorComponents, [], true),
     selectable: new Query(sim, ["render", "position"], ["selection"]),
     settings: new Query(sim, [
       "selectionManager",
@@ -159,11 +203,16 @@ export function createQueries(sim: Sim) {
       "camera",
     ]),
     ships: new Query(sim, shipComponents, ["ship"]),
-    shipyards: new Query(sim, [...facilityComponents, "owner", "shipyard"]),
+    shipyards: new Query(
+      sim,
+      [...facilityComponents, "owner", "shipyard"],
+      [],
+      true
+    ),
     standaloneProduction: new Query(sim, ["production", "storage"]),
     storage: new Query(sim, ["storage"]),
     storageAndTrading: new Query(sim, ["storage", "trade"]),
-    teleports: new Query(sim, ["teleport"]),
+    teleports: new Query(sim, ["teleport"], [], true),
     trading: new Query(sim, tradeComponents),
     bySectors: {
       trading: new SectorQuery(sim, tradeComponents),

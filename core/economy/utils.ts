@@ -13,6 +13,7 @@ import {
   flatMap,
   sortBy as fxtsSortBy,
   reverse,
+  take,
 } from "@fxts/core";
 import type { Faction } from "@core/archetypes/faction";
 import { relationThresholds } from "@core/components/relations";
@@ -48,10 +49,7 @@ export function getSectorsInTeleportRange(
   const ids = Object.entries(sim.paths[origin.id.toString()] ?? {})
     .filter(([, path]) => path.distance <= jumps)
     .map(([id]) => parseInt(id, 10));
-  return filter(
-    (sector) => ids.includes(sector.id),
-    sim.queries.sectors.getIt()
-  );
+  return map((id) => sim.getOrThrow<Sector>(id), ids);
 }
 
 export interface TradeWithMostProfit {
@@ -260,6 +258,7 @@ export function getFacilityWithMostProfit(
     })),
     fxtsSortBy((v) => v.profit),
     reverse,
+    take(3),
     toArray
   );
 
@@ -267,14 +266,7 @@ export function getFacilityWithMostProfit(
     return null;
   }
 
-  return pickRandom(
-    sortedByProfit
-      .filter(
-        (f, _, arr) =>
-          !Number.isFinite(f.profit) || f.profit / arr[0].profit >= 0.95
-      )
-      .map((f) => f.facility)
-  )!;
+  return pickRandom(sortedByProfit).facility;
 }
 
 export function getMineableAsteroid(
