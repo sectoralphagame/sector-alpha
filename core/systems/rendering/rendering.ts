@@ -323,8 +323,8 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
         entity.cp.position.moved = false;
 
         sprite!.position.set(
-          entity.cp.position.coord.get([0]) * 10,
-          entity.cp.position.coord.get([1]) * 10
+          entity.cp.position.coord[0] * 10,
+          entity.cp.position.coord[1] * 10
         );
         sprite!.rotation = entity.cp.position.angle;
       }

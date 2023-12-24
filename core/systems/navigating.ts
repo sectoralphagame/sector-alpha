@@ -1,6 +1,6 @@
-import type { Matrix } from "mathjs";
-import { add, matrix, random, norm } from "mathjs";
+import { random, norm } from "mathjs";
 import { normalizeAngle } from "@core/utils/misc";
+import type { Position2D } from "@core/components/position";
 import {
   clearTarget,
   defaultDriveLimit,
@@ -31,7 +31,7 @@ function hold(entity: Driveable) {
 function getFormationPlace(
   commander: RequireComponent<"subordinates" | "position">,
   entity: RequireComponent<"position">
-): Matrix {
+): Position2D {
   const subordinates = commander.cp.subordinates.ids;
   const subordinateIndex = subordinates.findIndex(
     (subordinateId) => subordinateId === entity.id
@@ -39,21 +39,14 @@ function getFormationPlace(
   const subordinatesCount = subordinates.length;
   const angle = commander.cp.position.angle;
   const distance = 0.1;
-  const basePosition = matrix([
-    (subordinateIndex - (subordinatesCount - 1) / 2) * 0.3,
-    distance,
-  ]);
 
-  const x = basePosition.get([0]);
-  const y = basePosition.get([1]);
+  const x = (subordinateIndex - (subordinatesCount - 1) / 2) * 0.3;
+  const y = distance;
 
-  return add(
-    matrix([
-      x * Math.cos(angle) - y * Math.sin(angle),
-      x * Math.sin(angle) + y * Math.cos(angle),
-    ]),
-    commander.cp.position.coord
-  );
+  return [
+    x * Math.cos(angle) - y * Math.sin(angle) + commander.cp.position.coord[0],
+    x * Math.sin(angle) + y * Math.cos(angle) + commander.cp.position.coord[1],
+  ];
 }
 
 export function getDeltaAngle(
@@ -79,8 +72,8 @@ function setFlybyDrive(entity: Driveable, delta: number) {
   const targetPosition = targetEntity.cp.position!;
 
   const path = [
-    targetPosition.coord.get([0]) - entityPosition.coord.get([0]),
-    targetPosition.coord.get([1]) - entityPosition.coord.get([1]),
+    targetPosition.coord[0] - entityPosition.coord[0],
+    targetPosition.coord[1] - entityPosition.coord[1],
   ];
 
   const entityAngle = normalizeAngle(
@@ -172,8 +165,8 @@ function setDrive(entity: Driveable, delta: number) {
   }
 
   const path = [
-    targetPosition.get([0]) - entityPosition.coord.get([0]),
-    targetPosition.get([1]) - entityPosition.coord.get([1]),
+    targetPosition[0] - entityPosition.coord[0],
+    targetPosition[1] - entityPosition.coord[1],
   ];
 
   const entityAngle = normalizeAngle(

@@ -1,4 +1,3 @@
-import { matrix } from "mathjs";
 import React from "react";
 import { createWaypoint } from "@core/archetypes/waypoint";
 import { getSelected, getSelectedSecondary } from "@core/components/selection";
@@ -8,6 +7,7 @@ import { relationThresholds } from "@core/components/relations";
 import { isOwnedByPlayer } from "@core/utils/misc";
 import { addSubordinate } from "@core/components/subordinates";
 import { findInAncestors } from "@core/utils/findInAncestors";
+import type { Position2D } from "@core/components/position";
 import { useContextMenu, useGameDialog, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
@@ -52,7 +52,7 @@ export const ShipToEntity: React.FC = () => {
           entity,
           createWaypoint(sim, {
             sector: menu.sector!.id,
-            value: matrix(menu.worldPosition),
+            value: menu.worldPosition as Position2D,
             owner: entity.id,
           })
         ),

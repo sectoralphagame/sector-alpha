@@ -1,4 +1,3 @@
-import type { Matrix } from "mathjs";
 import { add, min, random, sum } from "mathjs";
 import map from "lodash/map";
 import { pipe, map as fxtsMap, sum as fxtsSum } from "@fxts/core";
@@ -271,7 +270,7 @@ export function dumpCargo(
             coord: add(entity.cp.position!.coord, [
               random(-0.25, 0.25),
               random(-0.25, 0.25),
-            ]) as Matrix,
+            ]),
             sector: entity.cp.position!.sector,
           },
           storage: {

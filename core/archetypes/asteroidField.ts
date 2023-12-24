@@ -1,5 +1,5 @@
-import type { Matrix } from "mathjs";
-import { add, matrix, randomInt, random } from "mathjs";
+import { randomInt, random } from "mathjs";
+import type { Position2D } from "@core/components/position";
 import type { AsteroidSpawn } from "../components/asteroidSpawn";
 import { Entity } from "../entity";
 import { createRenderGraphics } from "../components/renderGraphics";
@@ -44,13 +44,10 @@ export function spawn(field: AsteroidField) {
   const asteroid = createAsteroid(
     sim,
     field,
-    add(
-      field.cp.position.coord,
-      matrix([
-        asteroidDistance * Math.cos(asteroidAngle),
-        asteroidDistance * Math.sin(asteroidAngle),
-      ])
-    ) as Matrix,
+    [
+      asteroidDistance * Math.cos(asteroidAngle) + field.cp.position.coord[0],
+      asteroidDistance * Math.sin(asteroidAngle) + field.cp.position.coord[1],
+    ],
     amount
   );
   field.cp.children.entities.push(asteroid.id);
@@ -60,7 +57,7 @@ export function spawn(field: AsteroidField) {
 
 export function createAsteroidField(
   sim: Sim,
-  position: Matrix,
+  position: Position2D,
   sector: Sector,
   data: Omit<AsteroidSpawn, "name" | "amount">
 ) {

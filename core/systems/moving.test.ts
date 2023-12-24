@@ -31,7 +31,7 @@ describe("Ship", () => {
     sector = createSector(sim, { position: matrix([0, 0, 0]), name: "" });
     ship = createShip(sim, {
       ...shipClasses.find((s) => s.name === "Courier A")!,
-      position: matrix([1, 0]),
+      position: [1, 0],
       owner: createFaction("F", sim),
       sector,
     });
@@ -44,7 +44,7 @@ describe("Ship", () => {
       ship.cp.drive,
       createWaypoint(sim, {
         sector: sector.id,
-        value: matrix([0, 0]),
+        value: [0, 0],
         owner: 0,
       }).id
     );
@@ -62,7 +62,7 @@ describe("Ship", () => {
       ship.cp.drive,
       createWaypoint(sim, {
         sector: sector.id,
-        value: matrix([1, 10]),
+        value: [1, 10],
         owner: 0,
       }).id
     );
@@ -76,7 +76,7 @@ describe("Ship", () => {
   it("is able to make move order", () => {
     const m = createWaypoint(sim, {
       sector: sector.id,
-      value: matrix([1, 1]),
+      value: [1, 1],
       owner: 0,
     });
     ship.cp.orders.value.push({
@@ -96,7 +96,7 @@ describe("Ship", () => {
       movingSystem.exec(1);
     }
 
-    expect(distance(ship.cp.position.coord, matrix([1, 1]))).toBeLessThan(0.01);
+    expect(distance(ship.cp.position.coord, [1, 1])).toBeLessThan(0.01);
     expect(ship.cp.drive.targetReached).toBe(true);
   });
 });

@@ -113,7 +113,10 @@ export const Game: React.FC = () => {
           sim.queries.sectors
             .get()
             .find((s) =>
-              deepEqual(s.cp.hecsPosition.value, worldToHecs(worldPosition))
+              deepEqual(
+                s.cp.hecsPosition.value,
+                worldToHecs([worldPosition[0], worldPosition[1]])
+              )
             ) ?? null,
       });
     };

@@ -1,7 +1,6 @@
 import { fieldColors } from "@core/archetypes/asteroid";
 import Color from "color";
-import type { Matrix } from "mathjs";
-import { add, matrix } from "mathjs";
+import { add } from "mathjs";
 import type { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
 import { spottingRadius } from "@core/systems/ai/spotting";
@@ -26,10 +25,7 @@ const path = ({
   const { orders } = entity.requireComponents(["orders"]).cp;
   const originPosition = findInAncestors(entity, "position").cp.position;
 
-  g.moveTo(
-    originPosition!.coord.get([0]) * 10,
-    originPosition!.coord.get([1]) * 10
-  );
+  g.moveTo(originPosition!.coord[0] * 10, originPosition!.coord[1] * 10);
 
   orders.value.forEach((order) =>
     order.actions.forEach((action) => {
@@ -46,8 +42,8 @@ const path = ({
 
         if (action.type === "teleport") {
           g.moveTo(
-            targetPosition!.coord.get([0]) * 10,
-            targetPosition!.coord.get([1]) * 10
+            targetPosition!.coord[0] * 10,
+            targetPosition!.coord[1] * 10
           );
         } else {
           g.lineStyle({
@@ -56,12 +52,12 @@ const path = ({
             color: Color.hsl(0, 0, 70).rgbNumber(),
           });
           g.lineTo(
-            targetPosition!.coord.get([0]) * 10,
-            targetPosition!.coord.get([1]) * 10
+            targetPosition!.coord[0] * 10,
+            targetPosition!.coord[1] * 10
           );
           g.drawCircle(
-            targetPosition!.coord.get([0]) * 10,
-            targetPosition!.coord.get([1]) * 10,
+            targetPosition!.coord[0] * 10,
+            targetPosition!.coord[1] * 10,
             3 / viewport.scale.x
           );
         }
@@ -93,8 +89,8 @@ export const graphics: Graphics = {
       color: Color(fieldColors[asteroidSpawn!.type]).rgbNumber(),
     })
       .drawCircle(
-        position!.coord.get([0]) * 10,
-        position!.coord.get([1]) * 10,
+        position!.coord[0] * 10,
+        position!.coord[1] * 10,
         asteroidSpawn!.size * 10
       )
       .lineStyle({
@@ -103,8 +99,8 @@ export const graphics: Graphics = {
         color: Color(fieldColors[asteroidSpawn!.type]).rgbNumber(),
       })
       .drawCircle(
-        position!.coord.get([0]) * 10,
-        position!.coord.get([1]) * 10,
+        position!.coord[0] * 10,
+        position!.coord[1] * 10,
         asteroidSpawn!.size * 10 - 2
       )
       .lineStyle({
@@ -113,8 +109,8 @@ export const graphics: Graphics = {
         color: Color(fieldColors[asteroidSpawn!.type]).rgbNumber(),
       })
       .drawCircle(
-        position!.coord.get([0]) * 10,
-        position!.coord.get([1]) * 10,
+        position!.coord[0] * 10,
+        position!.coord[1] * 10,
         asteroidSpawn!.size * 10 - 4
       );
   },
@@ -133,63 +129,50 @@ export const graphics: Graphics = {
       width: 5,
       color: Color.hsl(0, 0, 70).rgbNumber(),
     });
-    g.moveTo(
-      originPosition!.coord.get([0]) * 10,
-      originPosition!.coord.get([1]) * 10
-    );
+    g.moveTo(originPosition!.coord[0] * 10, originPosition!.coord[1] * 10);
     if (teleport.draw) {
       g.bezierCurveTo(
         ...((teleport.draw === "horizontal"
           ? [
-              (originPosition!.coord.get([0]) +
-                targetPosition!.coord.get([0])) *
-                5,
-              originPosition!.coord.get([1]) * 10,
+              (originPosition!.coord[0] + targetPosition!.coord[0]) * 5,
+              originPosition!.coord[1] * 10,
             ]
           : [
-              originPosition!.coord.get([0]) * 10,
-              (targetPosition!.coord.get([1]) +
-                originPosition!.coord.get([1])) *
-                5,
+              originPosition!.coord[0] * 10,
+              (targetPosition!.coord[1] + originPosition!.coord[1]) * 5,
             ]) as [number, number]),
         ...((targetTeleport.draw === "horizontal"
           ? [
-              (originPosition!.coord.get([0]) +
-                targetPosition!.coord.get([0])) *
-                5,
-              targetPosition!.coord.get([1]) * 10,
+              (originPosition!.coord[0] + targetPosition!.coord[0]) * 5,
+              targetPosition!.coord[1] * 10,
             ]
           : [
-              targetPosition!.coord.get([0]) * 10,
-              (targetPosition!.coord.get([1]) +
-                originPosition!.coord.get([1])) *
-                5,
+              targetPosition!.coord[0] * 10,
+              (targetPosition!.coord[1] + originPosition!.coord[1]) * 5,
             ]) as [number, number]),
-        targetPosition!.coord.get([0]) * 10,
-        targetPosition!.coord.get([1]) * 10
+        targetPosition!.coord[0] * 10,
+        targetPosition!.coord[1] * 10
       );
     } else if (
-      Math.abs(
-        targetPosition!.coord.get([0]) - originPosition!.coord.get([0])
-      ) >
-      Math.abs(targetPosition!.coord.get([1]) - originPosition!.coord.get([1]))
+      Math.abs(targetPosition!.coord[0] - originPosition!.coord[0]) >
+      Math.abs(targetPosition!.coord[1] - originPosition!.coord[1])
     ) {
       g.bezierCurveTo(
-        (originPosition!.coord.get([0]) + targetPosition!.coord.get([0])) * 5,
-        originPosition!.coord.get([1]) * 10,
-        (originPosition!.coord.get([0]) + targetPosition!.coord.get([0])) * 5,
-        targetPosition!.coord.get([1]) * 10,
-        targetPosition!.coord.get([0]) * 10,
-        targetPosition!.coord.get([1]) * 10
+        (originPosition!.coord[0] + targetPosition!.coord[0]) * 5,
+        originPosition!.coord[1] * 10,
+        (originPosition!.coord[0] + targetPosition!.coord[0]) * 5,
+        targetPosition!.coord[1] * 10,
+        targetPosition!.coord[0] * 10,
+        targetPosition!.coord[1] * 10
       );
     } else {
       g.bezierCurveTo(
-        originPosition!.coord.get([0]) * 10,
-        (targetPosition!.coord.get([1]) + originPosition!.coord.get([1])) * 5,
-        targetPosition!.coord.get([0]) * 10,
-        (targetPosition!.coord.get([1]) + originPosition!.coord.get([1])) * 5,
-        targetPosition!.coord.get([0]) * 10,
-        targetPosition!.coord.get([1]) * 10
+        originPosition!.coord[0] * 10,
+        (targetPosition!.coord[1] + originPosition!.coord[1]) * 5,
+        targetPosition!.coord[0] * 10,
+        (targetPosition!.coord[1] + originPosition!.coord[1]) * 5,
+        targetPosition!.coord[0] * 10,
+        targetPosition!.coord[1] * 10
       );
     }
   },
@@ -202,8 +185,8 @@ export const graphics: Graphics = {
         color: 0xff0000,
       })
         .drawCircle(
-          entity.cp.position!.coord.get([0]) * 10,
-          entity.cp.position!.coord.get([1]) * 10,
+          entity.cp.position!.coord[0] * 10,
+          entity.cp.position!.coord[1] * 10,
           entity.cp.damage.range * 10
         )
         .lineStyle({
@@ -211,8 +194,8 @@ export const graphics: Graphics = {
           color: 0x0000ff,
         })
         .drawCircle(
-          entity.cp.position!.coord.get([0]) * 10,
-          entity.cp.position!.coord.get([1]) * 10,
+          entity.cp.position!.coord[0] * 10,
+          entity.cp.position!.coord[1] * 10,
           spottingRadius * 10
         );
     }
@@ -223,11 +206,7 @@ export const graphics: Graphics = {
       alpha: 0.3,
       width: 1,
       color: 0xffffff,
-    }).drawCircle(
-      position!.coord.get([0]) * 10,
-      position!.coord.get([1]) * 10,
-      1
-    );
+    }).drawCircle(position!.coord[0] * 10, position!.coord[1] * 10, 1);
   },
   sector: ({ g, entity }) => {
     const { name, hecsPosition } = entity.requireComponents([
@@ -243,21 +222,15 @@ export const graphics: Graphics = {
         : 0x3a3a3a,
       width: 5,
     });
-    g.drawRegularPolygon!(
-      pos.get([0]),
-      pos.get([1]),
-      sectorSize - 2.5,
-      6,
-      Math.PI / 6
-    );
+    g.drawRegularPolygon!(pos[0], pos[1], sectorSize - 2.5, 6, Math.PI / 6);
     const textGraphics = new PIXI.Text(name.value, {
       fill: 0x404040,
       fontFamily: "Space Mono",
     });
     textGraphics.resolution = 7;
-    const textPos = add(pos, matrix([0, 90 - sectorSize])) as Matrix;
+    const textPos = add(pos, [0, 90 - sectorSize]);
     textGraphics.anchor.set(0.5, 0.5);
-    textGraphics.position.set(textPos.get([0]), textPos.get([1]));
+    textGraphics.position.set(textPos[0], textPos[1]);
     textGraphics.interactive = true;
     textGraphics.on("pointerdown", () => {
       first(entity.sim.queries.settings.getIt())!.cp.selectionManager.id =
@@ -269,19 +242,16 @@ export const graphics: Graphics = {
   hexGrid: ({ g }) => {
     for (let q = -10; q < 11; q++) {
       for (let r = -10; r < 11; r++) {
-        const sectorPos = hecsToCartesian(matrix([q, r, -q - r]), sectorSize);
+        const sectorPos = hecsToCartesian([q, r, -q - r], sectorSize);
 
         const coordG = new PIXI.Text([q, r].join(","), {
           fill: 0x404040,
           fontFamily: "Space Mono",
         });
         coordG.resolution = 8;
-        const coordPos = add(
-          sectorPos,
-          matrix([sectorSize / 3, (sectorSize * 3) / 4])
-        ) as Matrix;
+        const coordPos = add(sectorPos, [sectorSize / 3, (sectorSize * 3) / 4]);
         coordG.anchor.set(0.5, 0.5);
-        coordG.position.set(coordPos.get([0]), coordPos.get([1]));
+        coordG.position.set(coordPos[0], coordPos[1]);
         g.addChild(coordG);
 
         g.lineStyle({
@@ -289,8 +259,8 @@ export const graphics: Graphics = {
           width: 1,
         });
         g.drawRegularPolygon!(
-          sectorPos.get([0]),
-          sectorPos.get([1]),
+          sectorPos[0],
+          sectorPos[1],
           sectorSize - 2.5,
           6,
           Math.PI / 6

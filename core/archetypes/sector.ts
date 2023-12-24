@@ -1,5 +1,5 @@
-import type { Matrix } from "mathjs";
 import mapValues from "lodash/mapValues";
+import type { PositionHex } from "@core/components/hecsPosition";
 import { Entity } from "../entity";
 import { createRenderGraphics } from "../components/renderGraphics";
 import { MissingComponentError } from "../errors";
@@ -28,7 +28,7 @@ export function sector(entity: Entity): Sector {
 }
 
 export interface InitialSectorInput {
-  position: Matrix;
+  position: PositionHex;
   name: string;
 }
 

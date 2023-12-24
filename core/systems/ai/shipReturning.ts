@@ -5,8 +5,8 @@ import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { Sim } from "@core/sim";
 import { moveToActions } from "@core/utils/moving";
 import { each, filter, first, map, pipe, sortBy } from "@fxts/core";
-import type { Matrix } from "mathjs";
 import { add, random } from "mathjs";
+import type { Position2D } from "@core/components/position";
 import { System } from "../system";
 
 /**
@@ -68,7 +68,7 @@ export class ShipReturningSystem extends System<"exec"> {
                     sectorSize / 10
                   ),
                   [random(-5, 5), random(-5, 5)]
-                ) as Matrix,
+                ) as Position2D,
               })
             ),
             origin: "auto",

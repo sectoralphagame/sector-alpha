@@ -1,72 +1,78 @@
-import type { Matrix } from "mathjs";
 import { add, matrix, multiply, subtract, sum } from "mathjs";
 import { sectorSize } from "../archetypes/sector";
 import type { BaseComponent } from "./component";
+import type { Position2D } from "./position";
 
 export const transforms = {
-  s: matrix([0, 1, -1]),
-  se: matrix([1, 0, -1]),
-  ne: matrix([1, -1, 0]),
-  n: matrix([0, -1, 1]),
-  nw: matrix([-1, 0, 1]),
-  sw: matrix([-1, 1, 0]),
+  s: [0, 1, -1],
+  se: [1, 0, -1],
+  ne: [1, -1, 0],
+  n: [0, -1, 1],
+  nw: [-1, 0, 1],
+  sw: [-1, 1, 0],
 };
+
+export type PositionAxial = [number, number];
+export type PositionHex = [number, number, number];
 
 export interface HECSPosition extends BaseComponent<"hecsPosition"> {
   /**
    * Cube coordinates as [q, r, s]
    * https://www.redblobgames.com/grids/hexagons/#coordinates-cube
    */
-  value: Matrix;
+  value: PositionHex;
 }
 
-export function axialToCube(axial: Matrix): Matrix {
-  return matrix([
-    ...(axial.toArray() as number[]),
-    -(axial.get([0]) + axial.get([1])),
-  ]);
+export function axialToCube(axial: PositionAxial): PositionHex {
+  return [...axial, -(axial[0] + axial[1])];
 }
 
 export function hecsMove(
-  position: Matrix,
+  position: PositionHex,
   direction: keyof typeof transforms
-): Matrix {
-  return add(position, transforms[direction]) as Matrix;
+): PositionHex {
+  return add(position, transforms[direction]) as PositionHex;
 }
 
-export function hecsDistance(a: Matrix, b: Matrix): number {
-  return sum((subtract(a, b) as Matrix).map(Math.abs)) / 2;
+export function hecsDistance(a: PositionHex, b: PositionHex): number {
+  return sum((subtract(a, b) as PositionHex).map(Math.abs)) / 2;
 }
 
-export function hecsRound(position: Matrix): Matrix {
-  const rounded = position.map(Math.round);
-  const diff = (subtract(position, rounded) as Matrix).map(Math.abs);
+export function hecsRound(position: PositionHex): PositionHex {
+  const rounded = position.map(Math.round) as PositionHex;
+  const diff = subtract(position, rounded).map(Math.abs) as PositionHex;
 
-  if (diff.get([0]) > diff.get([1]) && diff.get([0]) > diff.get([2])) {
-    rounded.set([0], -rounded.get([1]) - rounded.get([2]));
-  } else if (diff.get([1]) > diff.get([2])) {
-    rounded.set([1], -rounded.get([0]) - rounded.get([2]));
+  if (diff[0] > diff[1] && diff[0] > diff[2]) {
+    rounded[0] = -rounded[1] - rounded[2];
+  } else if (diff[1] > diff[2]) {
+    rounded[1] = -rounded[0] - rounded[2];
   } else {
-    rounded.set([2], -rounded.get([0]) - rounded.get([1]));
+    rounded[2] = -rounded[0] - rounded[1];
   }
 
   return rounded;
 }
 
-export function hecsToCartesian(position: Matrix, scale: number): Matrix {
+export function hecsToCartesian(
+  position: PositionHex,
+  scale: number
+): PositionHex {
   return multiply(
     multiply(
       matrix([
         [3 / 2, 0],
         [Math.sqrt(3) / 2, Math.sqrt(3)],
       ]),
-      position.clone().resize([2])
+      matrix(position).resize([2])
     ),
     scale
-  );
+  ).toArray() as PositionHex;
 }
 
-export function cartesianToHecs(position: Matrix, scale: number): Matrix {
+export function cartesianToHecs(
+  position: Position2D,
+  scale: number
+): PositionHex {
   return axialToCube(
     multiply(
       multiply(
@@ -74,13 +80,13 @@ export function cartesianToHecs(position: Matrix, scale: number): Matrix {
           [2 / 3, 0],
           [-1 / 3, Math.sqrt(3) / 3],
         ]),
-        position.clone().resize([2])
+        matrix(position).clone().resize([2])
       ),
       scale
-    )
+    ).toArray() as PositionAxial
   );
 }
 
-export function worldToHecs(coords: number[]): Matrix {
-  return hecsRound(cartesianToHecs(matrix(coords), 10 / sectorSize));
+export function worldToHecs(coords: Position2D): PositionHex {
+  return hecsRound(cartesianToHecs(coords, 10 / sectorSize));
 }

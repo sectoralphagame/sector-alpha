@@ -1,4 +1,4 @@
-import type { Matrix } from "mathjs";
+import type { Position2D } from "@core/components/position";
 import { Entity } from "../entity";
 import { MissingComponentError } from "../errors";
 import type { Sim } from "../sim";
@@ -19,7 +19,7 @@ export function waypoint(entity: Entity): Waypoint {
 
 export interface WaypointInput {
   owner: number;
-  value: Matrix;
+  value: Position2D;
   sector: number;
 }
 
