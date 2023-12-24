@@ -59,7 +59,7 @@ export function teleportAction(
   entity.cp.position = {
     name: "position",
     angle: entity.cp.position.angle,
-    coord: destination.cp.position.coord.clone(),
+    coord: [...destination.cp.position.coord],
     sector: destination.cp.position.sector,
     moved: true,
   };
@@ -71,7 +71,7 @@ export function teleportAction(
     docked.cp.position = {
       name: "position",
       angle: entity.cp.position.angle,
-      coord: destination.cp.position.coord.clone(),
+      coord: [...destination.cp.position.coord],
       sector: destination.cp.position.sector,
       moved: true,
     };

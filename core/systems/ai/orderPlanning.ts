@@ -1,10 +1,10 @@
 import type { Faction } from "@core/archetypes/faction";
 import { relationThresholds } from "@core/components/relations";
 import { minBy } from "lodash";
-import type { Matrix } from "mathjs";
-import { add, matrix, norm, random, subtract } from "mathjs";
+import { add, norm, random, subtract } from "mathjs";
 import { filter, flatMap, map, pipe, sum, toArray } from "@fxts/core";
 import type { TransactionInput } from "@core/components/trade";
+import type { Position2D } from "@core/components/position";
 import { asteroid } from "../../archetypes/asteroid";
 import { asteroidField } from "../../archetypes/asteroidField";
 import { commanderRange, facility } from "../../archetypes/facility";
@@ -53,14 +53,14 @@ type Trading = RequireComponent<(typeof tradingComponents)[number]>;
 function getRandomPositionInBounds(
   entity: RequireComponent<"position">,
   distance = 2
-): Matrix {
-  let position: Matrix;
+): Position2D {
+  let position: Position2D;
 
   do {
-    position = add(
-      entity.cp.position.coord,
-      matrix([random(-distance, distance), random(-distance, distance)])
-    );
+    position = add(entity.cp.position.coord, [
+      random(-distance, distance),
+      random(-distance, distance),
+    ]);
   } while (
     norm(
       subtract(
@@ -70,7 +70,7 @@ function getRandomPositionInBounds(
           sectorSize / 10
         ),
         position
-      )
+      ) as Position2D
     ) > sectorSize
   );
 
@@ -91,10 +91,10 @@ function idleMovement(entity: RequireComponent<"position" | "orders">) {
         commander
           ? {
               sector: commander.cp.position.sector,
-              value: add(
-                commander.cp.position.coord,
-                matrix([random(-1, 1), random(-1, 1)])
-              ),
+              value: add(commander.cp.position.coord, [
+                random(-1, 1),
+                random(-1, 1),
+              ]) as Position2D,
               owner: entity.id,
             }
           : {
@@ -266,7 +266,9 @@ function autoMine(
       toArray
     );
     const field = minBy(eligibleFields, (e) =>
-      norm(subtract(entity.cp.position.coord, e.cp.position.coord) as Matrix)
+      norm(
+        subtract(entity.cp.position.coord, e.cp.position.coord) as Position2D
+      )
     );
 
     if (!field) {
@@ -357,7 +359,9 @@ function autoMineForCommander(
         toArray
       );
       const field = minBy(eligibleFields, (e) =>
-        norm(subtract(entity.cp.position.coord, e.cp.position.coord) as Matrix)
+        norm(
+          subtract(entity.cp.position.coord, e.cp.position.coord) as Position2D
+        )
       );
 
       if (!field) {

@@ -1,4 +1,4 @@
-import { matrix, norm, subtract } from "mathjs";
+import { norm, subtract } from "mathjs";
 import React from "react";
 import type { AsteroidField } from "@core/archetypes/asteroidField";
 import { createWaypoint } from "@core/archetypes/waypoint";
@@ -7,6 +7,7 @@ import { getSelected } from "@core/components/selection";
 import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
 import { isOwnedByPlayer } from "@core/utils/misc";
+import type { Position2D } from "@core/components/position";
 import { useContextMenu, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
@@ -32,9 +33,8 @@ export const ShipToSpace: React.FC = () => {
         .get()
         .filter(
           (field) =>
-            norm(
-              subtract(field.cp.position.coord, matrix(menu.worldPosition))
-            ) < field.cp.asteroidSpawn.size
+            norm(subtract(field.cp.position.coord, menu.worldPosition)) <
+            field.cp.asteroidSpawn.size
         )
     : [];
 
@@ -48,7 +48,7 @@ export const ShipToSpace: React.FC = () => {
         entity,
         createWaypoint(sim, {
           sector: menu.sector!.id,
-          value: matrix(menu.worldPosition),
+          value: menu.worldPosition as Position2D,
           owner: entity.id,
         })
       ),
@@ -78,7 +78,7 @@ export const ShipToSpace: React.FC = () => {
           entity,
           createWaypoint(sim, {
             sector: menu.sector!.id,
-            value: matrix(menu.worldPosition),
+            value: menu.worldPosition as Position2D,
             owner: entity.id,
           })
         ),

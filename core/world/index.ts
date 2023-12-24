@@ -1,11 +1,12 @@
 import { createSector, sectorSize } from "@core/archetypes/sector";
-import { add, matrix, random } from "mathjs";
+import { add, random } from "mathjs";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { AiType } from "@core/components/ai";
 import { requestShip } from "@core/systems/ai/shipPlanning";
 import { facilityModules } from "@core/archetypes/facilityModule";
 import { changeRelations } from "@core/components/relations";
 import settings from "@core/settings";
+import type { Position2D } from "@core/components/position";
 import { createFaction } from "../archetypes/faction";
 import { createShip } from "../archetypes/ship";
 import { changeBudgetMoney, createBudget } from "../components/budget";
@@ -23,10 +24,10 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     const sectors = mapData.sectors.map((data) =>
       createSector(sim, {
         ...data,
-        position: matrix([
-          ...data.position,
+        position: [
+          ...(data.position as Position2D),
           -(data.position[0] + data.position[1]),
-        ]),
+        ],
       })
     );
     const getSector = (id: string) =>
@@ -124,8 +125,8 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       angle: random(-Math.PI, Math.PI),
       position: add(
         hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
-        matrix([random(-1, 1), random(-1, 1)])
-      ),
+        [random(-1, 1), random(-1, 1)]
+      ) as Position2D,
       owner: player,
       sector: startingSector,
     });
@@ -136,8 +137,8 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       angle: random(-Math.PI, Math.PI),
       position: add(
         hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
-        matrix([random(-1, 1), random(-1, 1)])
-      ),
+        [random(-1, 1), random(-1, 1)]
+      ) as Position2D,
       owner: player,
       sector: startingSector,
     });
@@ -148,8 +149,8 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       angle: random(-Math.PI, Math.PI),
       position: add(
         hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
-        matrix([random(-1, 1), random(-1, 1)])
-      ),
+        [random(-1, 1), random(-1, 1)]
+      ) as Position2D,
       owner: player,
       sector: startingSector,
     });
@@ -160,8 +161,8 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       angle: random(-Math.PI, Math.PI),
       position: add(
         hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
-        matrix([random(-1, 1), random(-1, 1)])
-      ),
+        [random(-1, 1), random(-1, 1)]
+      ) as Position2D,
       owner: player,
       sector: startingSector,
     });

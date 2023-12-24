@@ -1,5 +1,6 @@
+import type { Position2D } from "@core/components/position";
 import { addStartingCommodities } from "@core/systems/ai/facilityPlanning";
-import { add, matrix, random } from "mathjs";
+import { add, random } from "mathjs";
 import type { Faction } from "../archetypes/faction";
 import { createFaction } from "../archetypes/faction";
 import type { Sector } from "../archetypes/sector";
@@ -100,11 +101,11 @@ export function populateSectors(sim: Sim, sectors: Sector[], faction: Faction) {
             sectorWithShipyard.cp.hecsPosition.value,
             sectorSize / 10
           ),
-          matrix([
+          [
             random(-sectorSize / 20, sectorSize / 20),
             random(-sectorSize / 20, sectorSize / 20),
-          ])
-        ),
+          ]
+        ) as Position2D,
       },
       sim
     );

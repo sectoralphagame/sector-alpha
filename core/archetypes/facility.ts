@@ -1,5 +1,5 @@
 import Color from "color";
-import type { Matrix } from "mathjs";
+import type { Position2D } from "@core/components/position";
 import { createBudget } from "../components/budget";
 import { Entity } from "../entity";
 import { createRender } from "../components/render";
@@ -35,7 +35,7 @@ export function facility(entity: Entity): Facility {
 }
 
 export interface InitialFacilityInput {
-  position: Matrix;
+  position: Position2D;
   owner: Faction;
   sector: Sector;
 }

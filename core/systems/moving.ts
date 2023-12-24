@@ -23,8 +23,8 @@ function move(entity: Driveable, delta: number) {
   ];
   const dAngle = drive.currentRotary;
 
-  entityPosition.coord.set([0], entityPosition.coord.get([0]) + dPos[0]);
-  entityPosition.coord.set([1], entityPosition.coord.get([1]) + dPos[1]);
+  entityPosition.coord[0] += dPos[0];
+  entityPosition.coord[1] += dPos[1];
   entityPosition.angle += dAngle;
   entityPosition.moved = true;
 
@@ -33,7 +33,7 @@ function move(entity: Driveable, delta: number) {
       .get(docked)!
       .requireComponents(["position"]).cp.position;
 
-    dockedPosition.coord = entityPosition.coord.clone();
+    dockedPosition.coord = [...entityPosition.coord];
     dockedPosition.angle += dAngle;
   });
 }

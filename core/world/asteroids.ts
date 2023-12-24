@@ -1,5 +1,5 @@
-import type { Matrix } from "mathjs";
-import { add, matrix, random } from "mathjs";
+import { add, random } from "mathjs";
+import type { Position2D } from "@core/components/position";
 import type { MineableCommodity } from "../economy/commodity";
 import { createAsteroidField } from "../archetypes/asteroidField";
 import type { Sim } from "../sim";
@@ -40,12 +40,12 @@ export function spawnAsteroidField(
     a: random(-Math.PI, Math.PI),
   };
   const position = add(
-    matrix([
+    [
       polarPosition.r * Math.cos(polarPosition.a),
       polarPosition.r * Math.sin(polarPosition.a),
-    ]),
+    ],
     sectorCenterPosition
-  ) as Matrix;
+  ) as Position2D;
 
   createAsteroidField(sim, position, sector, {
     asteroidResources: {

@@ -2,7 +2,6 @@ import Mustache from "mustache";
 import type { Mission, MissionCommon } from "@core/components/missions";
 import { relationThresholds } from "@core/components/relations";
 import { pickRandom } from "@core/utils/generators";
-import type { Matrix } from "mathjs";
 import { add, random, randomInt } from "mathjs";
 import { first, map, pipe, repeat, toArray } from "@fxts/core";
 import { createShip } from "@core/archetypes/ship";
@@ -10,6 +9,7 @@ import { shipClasses } from "@core/world/ships";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import { addSubordinate } from "@core/components/subordinates";
 import { sectorSize } from "@core/archetypes/sector";
+import type { Position2D } from "@core/components/position";
 import missions from "../../world/data/missions.json";
 import type { MissionHandler } from "./types";
 
@@ -78,7 +78,7 @@ export const destroyMissionHandler: MissionHandler = {
           position: add(spawnPoint, [
             randomInt(-0.3, 0.3),
             randomInt(-0.3, 0.3),
-          ]) as Matrix,
+          ]) as Position2D,
           sector,
         })
       ),

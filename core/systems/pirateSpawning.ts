@@ -4,6 +4,7 @@ import { sectorSize } from "@core/archetypes/sector";
 import type { Ship, ShipComponent } from "@core/archetypes/ship";
 import { createShip, shipComponents } from "@core/archetypes/ship";
 import { hecsToCartesian } from "@core/components/hecsPosition";
+import type { Position2D } from "@core/components/position";
 import { addSubordinate } from "@core/components/subordinates";
 import { isDev } from "@core/settings";
 import type { Sim } from "@core/sim";
@@ -11,7 +12,6 @@ import { pickRandom } from "@core/utils/generators";
 import { moveToActions } from "@core/utils/moving";
 import { shipClasses } from "@core/world/ships";
 import { filter, find, map, pipe, toArray } from "@fxts/core";
-import type { Matrix } from "mathjs";
 import { add, distance, randomInt } from "mathjs";
 import { System } from "./system";
 import { Query } from "./utils/query";
@@ -77,7 +77,7 @@ function spawnFlagship(sim: Sim, faction: Faction, flagships: Ship[]) {
     position: add(
       hecsToCartesian(sector.cp.hecsPosition.value, sectorSize / 10),
       [Math.cos(angle) * r, Math.sin(angle) * r]
-    ) as Matrix,
+    ) as Position2D,
   });
 }
 
@@ -103,7 +103,7 @@ function spawnSquad(
       createShip(sim, {
         ...shipClasses.find((sc) => sc.slug === "roach")!,
         owner: faction,
-        position: flagship.cp.position.coord.clone(),
+        position: [...flagship.cp.position.coord],
         sector,
       })
     );
@@ -117,7 +117,7 @@ function spawnSquad(
       createShip(sim, {
         ...shipClasses.find((sc) => sc.slug === "stingray")!,
         owner: faction,
-        position: flagship.cp.position.coord.clone(),
+        position: [...flagship.cp.position.coord],
         sector,
       })
     );

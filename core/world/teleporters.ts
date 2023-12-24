@@ -1,5 +1,5 @@
-import type { Matrix } from "mathjs";
-import { add, matrix, random, subtract } from "mathjs";
+import type { Position2D } from "@core/components/position";
+import { random, subtract } from "mathjs";
 import type { Sector } from "../archetypes/sector";
 import { sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
@@ -8,7 +8,11 @@ import { linkTeleportModules } from "../components/teleport";
 import type { Sim } from "../sim";
 import { createTeleporter } from "./facilities";
 
-export function createLink(sim: Sim, sectors: Sector[], position?: number[][]) {
+export function createLink(
+  sim: Sim,
+  sectors: Sector[],
+  position?: Position2D[]
+) {
   const positionA = hecsToCartesian(
     sectors[0].cp.hecsPosition.value,
     sectorSize / 10
@@ -19,10 +23,10 @@ export function createLink(sim: Sim, sectors: Sector[], position?: number[][]) {
   );
 
   const diff = subtract(positionB, positionA);
-  const angle = Math.atan2(diff.get([1]), diff.get([0]));
+  const angle = Math.atan2(diff[1], diff[0]);
 
   const [telA, telB] = sectors.map((sector, sectorIndex) => {
-    let linkPosition: Matrix;
+    let linkPosition: Position2D;
     if (!position?.[sectorIndex]) {
       const sectorPosition = hecsToCartesian(
         sector.cp.hecsPosition.value,
@@ -33,12 +37,12 @@ export function createLink(sim: Sim, sectors: Sector[], position?: number[][]) {
         random(-Math.PI / 6, Math.PI / 6);
       const r = random(20, 35);
 
-      linkPosition = add(
-        sectorPosition,
-        matrix([r * Math.cos(a), r * Math.sin(a)])
-      ) as Matrix;
+      linkPosition = [
+        r * Math.cos(a) + sectorPosition[0],
+        r * Math.sin(a) + sectorPosition[1],
+      ];
     } else {
-      linkPosition = matrix(position[sectorIndex]);
+      linkPosition = position[sectorIndex];
     }
     const facility = createTeleporter(
       {

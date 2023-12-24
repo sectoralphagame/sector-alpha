@@ -1,9 +1,9 @@
+import type { Position2D } from "@core/components/position";
 import { isDev } from "@core/settings";
 import type { RequireComponent } from "@core/tsHelpers";
 import { discriminate } from "@core/utils/maps";
 import shuffle from "lodash/shuffle";
-import type { Matrix } from "mathjs";
-import { distance, add, matrix, random } from "mathjs";
+import { distance, add, random } from "mathjs";
 import type { Facility } from "../../archetypes/facility";
 import { createFacilityName, createFacility } from "../../archetypes/facility";
 import { facilityModules } from "../../archetypes/facilityModule";
@@ -56,23 +56,20 @@ export function addStartingCommodities(facility: RequireComponent<"storage">) {
   });
 }
 
-function getSectorPosition(sector: Sector): Matrix {
+function getSectorPosition(sector: Sector): Position2D {
   const sectorPosition = hecsToCartesian(
     sector.cp.hecsPosition.value,
     sectorSize / 10
   );
 
-  let position: Matrix;
+  let position: Position2D;
   let isNearAnyFacility: boolean;
 
   do {
-    position = add(
-      sectorPosition,
-      matrix([
-        random(-sectorSize / 20, sectorSize / 20),
-        random(-sectorSize / 20, sectorSize / 20),
-      ])
-    );
+    position = add(sectorPosition, [
+      random(-sectorSize / 20, sectorSize / 20),
+      random(-sectorSize / 20, sectorSize / 20),
+    ]) as Position2D;
 
     isNearAnyFacility = sector.sim.queries.facilities
       .get()
@@ -161,13 +158,10 @@ export class FacilityPlanningSystem extends System<"plan"> {
 
         const facility = createFacility(this.sim, {
           owner: faction,
-          position: add(
-            sectorPosition,
-            matrix([
-              random(-sectorSize / 20, sectorSize / 20),
-              random(-sectorSize / 20, sectorSize / 20),
-            ])
-          ) as Matrix,
+          position: add(sectorPosition, [
+            random(-sectorSize / 20, sectorSize / 20),
+            random(-sectorSize / 20, sectorSize / 20),
+          ]) as Position2D,
           sector,
         });
         facility.cp.render.texture = "fCiv";
@@ -266,13 +260,10 @@ export class FacilityPlanningSystem extends System<"plan"> {
 
         facility = createFacility(this.sim, {
           owner: faction,
-          position: add(
-            sectorPosition,
-            matrix([
-              random(-sectorSize / 20, sectorSize / 20),
-              random(-sectorSize / 20, sectorSize / 20),
-            ])
-          ) as Matrix,
+          position: add(sectorPosition, [
+            random(-sectorSize / 20, sectorSize / 20),
+            random(-sectorSize / 20, sectorSize / 20),
+          ]) as Position2D,
           sector,
         });
         facility.cp.name.value = createFacilityName(facility, "Factory");

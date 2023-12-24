@@ -1,8 +1,8 @@
-import type { Matrix } from "mathjs";
 import Color from "color";
 import pick from "lodash/pick";
 import type { DockSize } from "@core/components/dockable";
 import { createDocks } from "@core/components/dockable";
+import type { Position2D } from "@core/components/position";
 import { createDrive } from "../components/drive";
 import { Entity } from "../entity";
 import { createMining } from "../components/mining";
@@ -38,7 +38,7 @@ export function ship(entity: Entity): Ship {
 
 export interface InitialShipInput extends ShipInput {
   angle?: number;
-  position: Matrix;
+  position: Position2D;
   owner: Faction;
   sector: Sector;
   docks?: Record<DockSize, number>;
