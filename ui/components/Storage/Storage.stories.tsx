@@ -24,6 +24,7 @@ const Template: StoryFn<typeof Storage> = (args) => (
         onCollapseToggle={action("onCollapseToggle")}
         onConfig={action("onConfig")}
         onFocus={action("onFocus")}
+        onPlayerAssets={action("onPlayerAssets")}
         onPause={action("onPause")}
         onPlay={action("onPlay")}
         onSpeed={action("onSpeed")}
