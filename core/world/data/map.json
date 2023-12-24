@@ -447,7 +447,8 @@
           "gunboat",
           "facilityStarter",
           "facilityBuilder",
-          "largeMinerA"
+          "largeMinerA",
+          "smallMinerA"
         ],
         "facilityModules": [
           "waterProduction",
@@ -497,7 +498,8 @@
           "gunboat",
           "facilityStarter",
           "facilityBuilder",
-          "largeMinerA"
+          "largeMinerA",
+          "smallMinerA"
         ],
         "facilityModules": [
           "waterProduction",
@@ -580,7 +582,8 @@
           "gunboat",
           "facilityStarter",
           "facilityBuilder",
-          "largeMinerA"
+          "largeMinerA",
+          "smallMinerA"
         ],
         "facilityModules": [
           "waterProduction",
@@ -623,7 +626,8 @@
           "gunboat",
           "facilityStarter",
           "facilityBuilder",
-          "largeMinerA"
+          "largeMinerA",
+          "smallMinerA"
         ],
         "facilityModules": [
           "waterProduction",
@@ -666,7 +670,8 @@
           "gunboat",
           "facilityStarter",
           "facilityBuilder",
-          "largeMinerA"
+          "largeMinerA",
+          "smallMinerA"
         ],
         "facilityModules": [
           "waterProduction",
@@ -708,7 +713,8 @@
           "gunboat",
           "facilityStarter",
           "facilityBuilder",
-          "largeMinerA"
+          "largeMinerA",
+          "smallMinerA"
         ],
         "facilityModules": [
           "waterProduction",
@@ -736,7 +742,7 @@
     {
       "name": "Player Faction",
       "blueprints": {
-        "ships": ["courierA"],
+        "ships": ["courierA", "smallMinerA"],
         "facilityModules": [
           "waterProduction",
           "containerSmall",
@@ -777,41 +783,41 @@
     }
   ],
   "relations": [
-    { "factions": ["ACT", "UEN"], "value": -10 },
-    { "factions": ["TAU", "UEN"], "value": -50 },
+    { "factions": ["UEN", "ACT"], "value": -10 },
+    { "factions": ["UEN", "TAU"], "value": -50 },
     { "factions": ["ACT", "TAU"], "value": -50 },
-    { "factions": ["FFW", "UEN"], "value": 20 },
+    { "factions": ["UEN", "FFW"], "value": 20 },
     { "factions": ["ACT", "FFW"], "value": -10 },
-    { "factions": ["FFW", "TAU"], "value": -50 },
-    { "factions": ["AMS", "UEN"], "value": 20 },
-    { "factions": ["AMS", "ACT"], "value": -5 },
-    { "factions": ["AMS", "TAU"], "value": -50 },
-    { "factions": ["AMS", "FFW"], "value": 10 },
-    { "factions": ["GBF", "UEN"], "value": -25 },
+    { "factions": ["TAU", "FFW"], "value": -50 },
+    { "factions": ["UEN", "AMS"], "value": 20 },
+    { "factions": ["ACT", "AMS"], "value": -5 },
+    { "factions": ["TAU", "AMS"], "value": -50 },
+    { "factions": ["FFW", "AMS"], "value": 10 },
+    { "factions": ["UEN", "GBF"], "value": -25 },
     { "factions": ["ACT", "GBF"], "value": -50 },
-    { "factions": ["GBF", "TAU"], "value": -50 },
+    { "factions": ["TAU", "GBF"], "value": -50 },
     { "factions": ["FFW", "GBF"], "value": -25 },
     { "factions": ["AMS", "GBF"], "value": -30 },
-    { "factions": ["THT", "UEN"], "value": 10 },
+    { "factions": ["UEN", "THT"], "value": 10 },
     { "factions": ["ACT", "THT"], "value": 10 },
     { "factions": ["TAU", "THT"], "value": -50 },
     { "factions": ["FFW", "THT"], "value": 10 },
     { "factions": ["AMS", "THT"], "value": -25 },
     { "factions": ["GBF", "THT"], "value": -5 },
-    { "factions": ["PLA", "UEN"], "value": 0 },
+    { "factions": ["UEN", "PLA"], "value": 0 },
     { "factions": ["ACT", "PLA"], "value": 0 },
-    { "factions": ["PLA", "TAU"], "value": -50 },
+    { "factions": ["TAU", "PLA"], "value": -50 },
     { "factions": ["FFW", "PLA"], "value": 0 },
     { "factions": ["AMS", "PLA"], "value": 0 },
     { "factions": ["GBF", "PLA"], "value": 0 },
-    { "factions": ["PLA", "THT"], "value": 0 },
-    { "factions": ["PIR", "UEN"], "value": -40 },
+    { "factions": ["THT", "PLA"], "value": 0 },
+    { "factions": ["UEN", "PIR"], "value": -40 },
     { "factions": ["ACT", "PIR"], "value": -40 },
-    { "factions": ["PIR", "TAU"], "value": -40 },
+    { "factions": ["TAU", "PIR"], "value": -40 },
     { "factions": ["FFW", "PIR"], "value": -40 },
     { "factions": ["AMS", "PIR"], "value": -40 },
     { "factions": ["GBF", "PIR"], "value": -40 },
-    { "factions": ["PIR", "THT"], "value": -40 },
-    { "factions": ["PIR", "PLA"], "value": -40 }
+    { "factions": ["THT", "PIR"], "value": -40 },
+    { "factions": ["PLA", "PIR"], "value": -40 }
   ]
 }

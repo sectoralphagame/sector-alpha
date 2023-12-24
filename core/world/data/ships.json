@@ -540,5 +540,33 @@
       "hp": { "value": 490, "regen": 0.2 },
       "shield": { "value": 90, "regen": 5 }
     }
+  },
+  {
+    "acceleration": 0.09,
+    "build": {
+      "time": 85,
+      "cost": {
+        "electronics": 11,
+        "hullPlates": 225,
+        "fuel": 90,
+        "engineParts": 6
+      }
+    },
+    "mining": 1,
+    "role": "mining",
+    "cruise": 5.2,
+    "maneuver": 0.28,
+    "rotary": 92,
+    "ttc": 8,
+    "name": "Slate",
+    "size": "small",
+    "storage": 32,
+    "texture": "sMin",
+    "slug": "smallMinerA",
+    "damage": { "value": 1, "cooldown": 0.3, "range": 0.95 },
+    "hitpoints": {
+      "hp": { "value": 95, "regen": 0.15 },
+      "shield": { "value": 30, "regen": 1.9 }
+    }
   }
 ]
