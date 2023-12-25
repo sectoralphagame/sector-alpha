@@ -187,6 +187,7 @@ export const Game: React.FC = () => {
       system creates own canvas here */}
       <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
         <PlayerMoney />
+        <SimControl />
         <MapPanel
           tabs={
             <>
@@ -223,7 +224,6 @@ export const Game: React.FC = () => {
         <FleetOverlay />
         <MissionsOverlay />
       </Overlay>
-      <SimControl />
       {menu.active && (!!menu.sector || menu.overlay) && (
         <ClickAwayListener
           mouseEvent="mousedown"

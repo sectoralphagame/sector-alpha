@@ -4,33 +4,7 @@
   position: absolute;
   right: var(--spacing-2);
   margin: auto;
-  text-align: center;
   max-width: 300px;
-  width: fit-content;
-  background: var(--palette-background);
-  border: 1px solid var(--palette-border);
-  border-radius: 4px;
-  line-height: 1;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-2);
-
-  & > * {
-    position: relative;
-
-    &:not(:last-child):after {
-      height: 1rem;
-      width: 1px;
-      position: absolute;
-      top: 0;
-      right: calc(var(--spacing-1) * -1);
-      background-color: var(--palette-border);
-      display: block;
-      content: "";
-    }
-  }
 }
 
 .turbo {

@@ -7,6 +7,7 @@ import pauseIcon from "@assets/ui/pause.svg";
 import { useSim } from "@ui/atoms";
 import { useRerender } from "@ui/hooks/useRerender";
 import { isDev } from "@core/settings";
+import Stack from "@kit/Stack";
 import styles from "./styles.scss";
 
 export interface SimControlComponentProps {
@@ -22,7 +23,7 @@ export const SimControlComponent: React.FC<SimControlComponentProps> = ({
   onSpeed,
   onTurbo,
 }) => (
-  <div id="money" className={styles.root}>
+  <Stack id="money" className={styles.root}>
     <IconButton variant="naked" onClick={onPause}>
       <SVG src={pauseIcon} />
     </IconButton>
@@ -37,7 +38,7 @@ export const SimControlComponent: React.FC<SimControlComponentProps> = ({
         <SVG src={ffIcon} />
       </IconButton>
     )}
-  </div>
+  </Stack>
 );
 
 export const SimControl: React.FC = () => {
