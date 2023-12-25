@@ -3,6 +3,7 @@ import { Sim } from "@core/sim";
 import type { Save } from "@core/db";
 import { createBaseConfig } from "@core/sim/baseConfig";
 import LZString from "lz-string";
+import { regen } from "@core/systems/pathPlanning";
 import { useLocation } from "../context/Location";
 import { Saves } from "../components/Saves";
 import { View } from "../components/View";
@@ -29,6 +30,7 @@ export const LoadGame: React.FC = () => {
                 LZString.decompress(saves.find((s) => s.id === id)!.data)
               );
               setSim(sim);
+              regen(sim);
               navigate("game");
             }}
             onDelete={async (id) => {
