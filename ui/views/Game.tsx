@@ -22,6 +22,7 @@ import { FleetOverlay } from "@ui/components/FleetOverlay/FleetOverlay";
 import { MissionsOverlay } from "@ui/components/MissionsOverlay";
 import { setCheat } from "@core/utils/misc";
 import { Notifications } from "@ui/components/Notifications";
+import { SimControl } from "@ui/components/SimControl/SimControl";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -222,6 +223,7 @@ export const Game: React.FC = () => {
         <FleetOverlay />
         <MissionsOverlay />
       </Overlay>
+      <SimControl />
       {menu.active && (!!menu.sector || menu.overlay) && (
         <ClickAwayListener
           mouseEvent="mousedown"
