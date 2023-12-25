@@ -1,0 +1,16 @@
+.root {
+  bottom: var(--spacing-4);
+  padding: var(--spacing-1);
+  position: absolute;
+  right: var(--spacing-2);
+  margin: auto;
+  max-width: 300px;
+}
+
+.turbo {
+  color: var(--palette-error);
+}
+
+.money {
+  pointer-events: none;
+}

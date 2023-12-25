@@ -1,13 +1,10 @@
 import React from "react";
 import SVG from "react-inlinesvg";
 import clsx from "clsx";
-import ffIcon from "@assets/ui/ff.svg";
-import pauseIcon from "@assets/ui/pause.svg";
 import locationIcon from "@assets/ui/location.svg";
 import configIcon from "@assets/ui/config.svg";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
-import playIcon from "@assets/ui/play.svg";
-import assetsIcon from "@assets/ui/assets.svg";
+import journalIcon from "@assets/ui/journal.svg";
 import { IconButton } from "@kit/IconButton";
 import styles from "./Panel.scss";
 
@@ -17,10 +14,6 @@ export interface PanelComponentProps {
   onCollapseToggle: () => void;
   onConfig: () => void;
   onPlayerAssets: () => void;
-  onPause: () => void;
-  onPlay: () => void;
-  onSpeed: () => void;
-  onTurbo?: () => void;
   onFocus: (() => void) | undefined;
 }
 
@@ -29,10 +22,6 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
   onCollapseToggle,
   onConfig,
   onPlayerAssets,
-  onPause,
-  onPlay,
-  onSpeed,
-  onTurbo,
   onFocus,
   children,
 }) => (
@@ -57,22 +46,8 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
         </IconButton>
       )}
       <IconButton onClick={onPlayerAssets}>
-        <SVG src={assetsIcon} />
+        <SVG src={journalIcon} />
       </IconButton>
-      <IconButton onClick={onPause}>
-        <SVG src={pauseIcon} />
-      </IconButton>
-      <IconButton onClick={onPlay}>
-        <SVG src={playIcon} />
-      </IconButton>
-      <IconButton onClick={onSpeed}>
-        <SVG src={ffIcon} />
-      </IconButton>
-      {!!onTurbo && (
-        <IconButton className={styles.turbo} onClick={onTurbo}>
-          <SVG src={ffIcon} />
-        </IconButton>
-      )}
       {!!onFocus && (
         <IconButton onClick={onFocus}>
           <SVG src={locationIcon} />

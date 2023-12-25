@@ -25,10 +25,7 @@ const Template: StoryFn<typeof Offers> = (args) => (
         onCollapseToggle={action("onCollapseToggle")}
         onConfig={action("onConfig")}
         onFocus={action("onFocus")}
-        onPause={action("onPause")}
         onPlayerAssets={action("onPlayerAssets")}
-        onPlay={action("onPlay")}
-        onSpeed={action("onSpeed")}
       >
         <Offers {...args} />
         <hr />

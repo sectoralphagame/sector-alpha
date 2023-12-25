@@ -25,9 +25,6 @@ const Template: StoryFn<typeof Storage> = (args) => (
         onConfig={action("onConfig")}
         onFocus={action("onFocus")}
         onPlayerAssets={action("onPlayerAssets")}
-        onPause={action("onPause")}
-        onPlay={action("onPlay")}
-        onSpeed={action("onSpeed")}
       >
         <Storage {...args} />
         <hr />

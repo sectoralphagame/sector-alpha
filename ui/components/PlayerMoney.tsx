@@ -3,6 +3,7 @@ import React from "react";
 import SVG from "react-inlinesvg";
 import fleetIcon from "@assets/ui/fleet.svg";
 import journalIcon from "@assets/ui/journal.svg";
+import Stack from "@kit/Stack";
 import { useGameOverlay, useSim } from "../atoms";
 import { useRerender } from "../hooks/useRerender";
 import styles from "./PlayerMoney.scss";
@@ -24,7 +25,7 @@ export const PlayerMoney: React.FC = () => {
   }, []);
 
   return (
-    <div id="money" className={styles.root}>
+    <Stack id="money" className={styles.root}>
       <span className={styles.money}>
         {player.cp.budget!.available.toFixed(0)} UTT
       </span>
@@ -34,7 +35,7 @@ export const PlayerMoney: React.FC = () => {
       <IconButton variant="naked" onClick={() => setOverlay("missions")}>
         <SVG src={journalIcon} />
       </IconButton>
-    </div>
+    </Stack>
   );
 };
 
