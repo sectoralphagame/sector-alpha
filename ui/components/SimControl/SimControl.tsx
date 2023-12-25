@@ -5,7 +5,6 @@ import ffIcon from "@assets/ui/ff.svg";
 import playIcon from "@assets/ui/play.svg";
 import pauseIcon from "@assets/ui/pause.svg";
 import { useSim } from "@ui/atoms";
-import { useRerender } from "@ui/hooks/useRerender";
 import { isDev } from "@core/settings";
 import Stack from "@kit/Stack";
 import styles from "./styles.scss";
@@ -43,8 +42,6 @@ export const SimControlComponent: React.FC<SimControlComponentProps> = ({
 
 export const SimControl: React.FC = () => {
   const [sim] = useSim();
-
-  useRerender(1000);
 
   return (
     <SimControlComponent

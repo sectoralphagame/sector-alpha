@@ -177,7 +177,7 @@ export const Game: React.FC = () => {
     }
   }, [player.cp.missions.offer]);
 
-  useRerender(250);
+  useRerender(500);
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
