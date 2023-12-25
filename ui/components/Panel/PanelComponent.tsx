@@ -4,7 +4,7 @@ import clsx from "clsx";
 import locationIcon from "@assets/ui/location.svg";
 import configIcon from "@assets/ui/config.svg";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
-import assetsIcon from "@assets/ui/assets.svg";
+import journalIcon from "@assets/ui/journal.svg";
 import { IconButton } from "@kit/IconButton";
 import styles from "./Panel.scss";
 
@@ -46,7 +46,7 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
         </IconButton>
       )}
       <IconButton onClick={onPlayerAssets}>
-        <SVG src={assetsIcon} />
+        <SVG src={journalIcon} />
       </IconButton>
       {!!onFocus && (
         <IconButton onClick={onFocus}>
