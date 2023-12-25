@@ -63,8 +63,9 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   resizeObserver: ResizeObserver;
   cooldowns: Cooldowns<"graphics">;
   dragging: boolean = false;
-  keysPressed: string[] = [];
+  keysPressed = new Set<string>();
   toolbar: HTMLDivElement;
+  overlay: HTMLDivElement;
   grid: RequireComponent<"renderGraphics"> | null = null;
   layers: Record<Layer, PIXI.Container>;
   sectorQuery: SectorQuery<"render">;
@@ -86,6 +87,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   init = () => {
     this.settingsManager = first(this.sim.queries.settings.getIt())!;
     this.toolbar = document.querySelector("#toolbar")!;
+    this.overlay = document.querySelector("#overlay")!;
     const root = document.querySelector("#root")!;
     const canvasRoot = document.querySelector(
       "#canvasRoot"
@@ -134,7 +136,9 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
     this.viewport.drag().pinch().wheel();
     this.viewport.clampZoom({ minScale, maxScale });
     this.viewport.on("drag-start", () => {
-      this.toolbar.style.pointerEvents = "none";
+      if (this.toolbar) {
+        this.toolbar.style.pointerEvents = "none";
+      }
       this.settingsManager.cp.selectionManager.focused = false;
       this.viewport.plugins.remove("follow");
       this.dragging = true;
@@ -147,7 +151,9 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
     });
 
     this.viewport.on("pointerup", (event) => {
-      this.toolbar.style.pointerEvents = "unset";
+      if (this.toolbar) {
+        this.toolbar.style.pointerEvents = "unset";
+      }
       if (
         event.target === event.currentTarget &&
         !this.dragging &&
@@ -195,21 +201,14 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
 
   initListeners = () => {
     window.addEventListener("keydown", (event) => {
-      if (
-        event.target !== document.body ||
-        document.querySelector("#overlay")!.children.length > 0
-      )
+      if (event.target !== document.body || this.overlay?.children.length > 0)
         return;
 
-      if (!this.keysPressed.includes(event.key)) {
-        this.keysPressed.push(event.key);
-      }
+      this.keysPressed.add(event.key);
     });
 
     window.addEventListener("keyup", (event) => {
-      if (this.keysPressed.includes(event.key)) {
-        this.keysPressed = this.keysPressed.filter((key) => key !== event.key);
-      }
+      this.keysPressed.delete(event.key);
     });
 
     this.sim.hooks.removeComponent.tap(
