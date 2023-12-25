@@ -1,9 +1,14 @@
 * {
   box-sizing: border-box;
   font-family: Space Mono, monospace;
+  scrollbar-width: none;
 
   :focus-visible {
     outline: 0;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
   }
 }
 
