@@ -34,3 +34,25 @@
     border-right: 1px solid var(--palette-border);
   }
 }
+
+.references {
+  margin: var(--spacing-4) 0;
+
+  button {
+    appearance: none;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--palette-text-1);
+    padding: 0;
+    display: block;
+
+    &:hover {
+      color: var(--palette-active);
+    }
+  }
+}
+
+.progress {
+  margin: var(--spacing-4) 0;
+}

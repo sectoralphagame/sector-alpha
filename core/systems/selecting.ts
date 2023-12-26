@@ -1,20 +1,24 @@
 import type { Sim } from "@core/sim";
+import type { RequireComponent } from "@core/tsHelpers";
 import { first } from "@fxts/core";
 import { clearFocus } from "../components/selection";
 import { isHeadless } from "../settings";
 import { SystemWithHooks } from "./utils/hooks";
 
 export class SelectingSystem extends SystemWithHooks {
+  manager: RequireComponent<"selectionManager">;
+
   refresh = () => {
     if (isHeadless) {
       return;
     }
-    const manager = first(this.sim.queries.settings.getIt())!;
 
-    if (manager.cp.selectionManager.id) {
-      window.selected = this.sim.getOrThrow(manager.cp.selectionManager.id!);
+    if (this.manager.cp.selectionManager.id) {
+      window.selected = this.sim.getOrThrow(
+        this.manager.cp.selectionManager.id!
+      );
     } else {
-      clearFocus(manager.cp.selectionManager);
+      clearFocus(this.manager.cp.selectionManager);
     }
   };
 
@@ -26,9 +30,7 @@ export class SelectingSystem extends SystemWithHooks {
 
   exec = (delta: number): void => {
     super.exec(delta);
-    this.onChange(
-      first(this.sim.queries.settings.getIt())!.cp.selectionManager.id,
-      this.refresh
-    );
+    this.manager = first(this.sim.queries.settings.getIt())!;
+    this.onChange(this.manager.cp.selectionManager.id, this.refresh);
   };
 }

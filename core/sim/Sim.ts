@@ -3,11 +3,10 @@ import pick from "lodash/pick";
 import { Exclude, Expose, Type, plainToInstance } from "class-transformer";
 // For some reason replacer is not exported in types
 // @ts-expect-error
-import { reviver, replacer } from "mathjs";
+import { replacer } from "mathjs";
 import type { Path } from "graphlib";
 import { SyncHook } from "tapable";
 
-import isPlainObject from "lodash/isPlainObject";
 import { filter, pipe, toArray } from "@fxts/core";
 import { isHeadless } from "@core/settings";
 import type { CoreComponents } from "@core/components/component";
@@ -21,23 +20,6 @@ import type { Queries } from "../systems/utils/query";
 import { Query, createQueries } from "../systems/utils/query";
 import { MissingEntityError } from "../errors";
 import { openDb } from "../db";
-
-function reviveMathjs(value: any) {
-  if (isPlainObject(value)) {
-    if (value.mathjs) {
-      // According to types, reviver expects no arguments which isn't true
-      // @ts-expect-error
-      return reviver("", value);
-    }
-
-    return Object.keys(value).reduce(
-      (acc, key) => ({ ...acc, [key]: reviveMathjs(value[key]) }),
-      {}
-    );
-  }
-
-  return value;
-}
 
 export interface SimConfig {
   systems: System[];
@@ -240,7 +222,6 @@ export class Sim extends BaseSim {
       entityMap.set(entity.id, entity);
       entity.sim = sim;
 
-      entity.components = reviveMathjs(entity.components);
       entity.components = Object.assign(
         new EntityComponents(),
         entity.components
