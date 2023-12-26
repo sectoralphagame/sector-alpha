@@ -5,14 +5,14 @@ import { add, norm, random, subtract } from "mathjs";
 import { filter, flatMap, map, pipe, sum, toArray } from "@fxts/core";
 import type { TransactionInput } from "@core/components/trade";
 import type { Position2D } from "@core/components/position";
+import { getRandomPositionInBounds } from "@core/utils/misc";
 import { asteroid } from "../../archetypes/asteroid";
 import { asteroidField } from "../../archetypes/asteroidField";
 import { commanderRange, facility } from "../../archetypes/facility";
 import type { Waypoint } from "../../archetypes/waypoint";
 import { createWaypoint } from "../../archetypes/waypoint";
 import type { Sector } from "../../archetypes/sector";
-import { sector as asSector, sectorSize } from "../../archetypes/sector";
-import { hecsToCartesian } from "../../components/hecsPosition";
+import { sector as asSector } from "../../archetypes/sector";
 import type { MineOrder, TradeOrder } from "../../components/orders";
 import { mineAction } from "../../components/orders";
 import { dumpCargo, getAvailableSpace } from "../../components/storage";
@@ -49,33 +49,6 @@ const tradingComponents = [
   "dockable",
 ] as const;
 type Trading = RequireComponent<(typeof tradingComponents)[number]>;
-
-function getRandomPositionInBounds(
-  entity: RequireComponent<"position">,
-  distance = 2
-): Position2D {
-  let position: Position2D;
-
-  do {
-    position = add(entity.cp.position.coord, [
-      random(-distance, distance),
-      random(-distance, distance),
-    ]);
-  } while (
-    norm(
-      subtract(
-        hecsToCartesian(
-          entity.sim.getOrThrow(entity.cp.position.sector).cp.hecsPosition!
-            .value,
-          sectorSize / 10
-        ),
-        position
-      ) as Position2D
-    ) > sectorSize
-  );
-
-  return position;
-}
 
 function idleMovement(entity: RequireComponent<"position" | "orders">) {
   const commander =

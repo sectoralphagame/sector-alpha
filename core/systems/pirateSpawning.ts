@@ -3,6 +3,7 @@ import type { Sector } from "@core/archetypes/sector";
 import { sectorSize } from "@core/archetypes/sector";
 import type { Ship, ShipComponent } from "@core/archetypes/ship";
 import { createShip, shipComponents } from "@core/archetypes/ship";
+import { createWaypoint } from "@core/archetypes/waypoint";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { Position2D } from "@core/components/position";
 import { addSubordinate } from "@core/components/subordinates";
@@ -12,9 +13,12 @@ import { pickRandom } from "@core/utils/generators";
 import { moveToActions } from "@core/utils/moving";
 import { shipClasses } from "@core/world/ships";
 import { filter, find, map, pipe, toArray } from "@fxts/core";
-import { add, distance, randomInt } from "mathjs";
+import { add, distance, random, randomInt } from "mathjs";
 import { System } from "./system";
 import { Query } from "./utils/query";
+
+const flagshipDistanceFromSectorCenter =
+  ((1 + Math.random() / 5) * sectorSize) / 15;
 
 function returnToFlagship(unassigned: Ship[], flagships: Ship[]) {
   if (unassigned.length && flagships.length) {
@@ -68,7 +72,6 @@ function spawnFlagship(sim: Sim, faction: Faction, flagships: Ship[]) {
   }
 
   const angle = Math.random() * 2 * Math.PI;
-  const r = ((1 + Math.random() / 5) * sectorSize) / 15;
   createShip(sim, {
     ...shipClasses.find((sc) => sc.slug === "seahorse")!,
     owner: faction,
@@ -76,7 +79,10 @@ function spawnFlagship(sim: Sim, faction: Faction, flagships: Ship[]) {
     angle: Math.random() * 2 * Math.PI,
     position: add(
       hecsToCartesian(sector.cp.hecsPosition.value, sectorSize / 10),
-      [Math.cos(angle) * r, Math.sin(angle) * r]
+      [
+        Math.cos(angle) * flagshipDistanceFromSectorCenter,
+        Math.sin(angle) * flagshipDistanceFromSectorCenter,
+      ]
     ) as Position2D,
   });
 }
@@ -153,11 +159,47 @@ export class PirateSpawningSystem extends System<
   faction: Faction;
   query: Query<ShipComponent>;
 
-  exec = (delta: number): void => {
-    this.cooldowns.update(delta);
+  moveFlagship = (flagships: Ship[]) => {
+    const shipToMove = pickRandom(
+      flagships.filter((s) => s.cp.orders.value.length === 0)
+    );
+
+    if (!shipToMove) return;
+
+    const sectorPosition = hecsToCartesian(
+      this.sim.getOrThrow<Sector>(shipToMove.cp.position.sector).cp.hecsPosition
+        .value,
+      sectorSize / 10
+    );
+    const angle = Math.atan2(
+      shipToMove.cp.position.coord[1] - sectorPosition[1],
+      shipToMove.cp.position.coord[0] - sectorPosition[0]
+    );
+    const dAngle =
+      (random(8, 20) * (Math.random() > 0.5 ? 1 : -1) * 2 * Math.PI) / 360;
+
+    shipToMove.cp.orders.value.push({
+      type: "move",
+      actions: moveToActions(
+        shipToMove,
+        createWaypoint(this.sim, {
+          sector: shipToMove.cp.position.sector,
+          value: add(sectorPosition, [
+            flagshipDistanceFromSectorCenter * Math.cos(angle + dAngle),
+            flagshipDistanceFromSectorCenter * Math.sin(angle + dAngle),
+          ]) as Position2D,
+          owner: shipToMove.id,
+        })
+      ),
+      origin: "auto",
+    });
+  };
+
+  exec = (): void => {
+    const ships = this.query.get();
 
     const squads = pipe(
-      this.query.getIt(),
+      ships,
       filter(
         (s) =>
           s.cp.owner?.id === this.faction.id &&
@@ -178,15 +220,22 @@ export class PirateSpawningSystem extends System<
         !s.cp.commander &&
         s.cp.orders.value.length === 0 &&
         s.cp.model.slug !== "seahorse",
-      this.query.getIt()
+      ships
     );
-    const flagships = filter(
-      (s) =>
-        s.cp.owner?.id === this.faction.id &&
-        !s.cp.commander &&
-        s.cp.model.slug === "seahorse",
-      this.query.getIt()
+    const flagships = pipe(
+      ships,
+      filter(
+        (s) =>
+          s.cp.owner?.id === this.faction.id &&
+          !s.cp.commander &&
+          s.cp.model.slug === "seahorse"
+      ),
+      toArray
     );
+
+    if (Math.random() < 0.02) {
+      this.moveFlagship(flagships);
+    }
 
     this.cooldowns.doEvery("spawnFlagship", 15 * 60, () =>
       spawnFlagship(this.sim, this.faction, toArray(flagships))
@@ -196,7 +245,7 @@ export class PirateSpawningSystem extends System<
         this.sim,
         this.faction,
         toArray(squads),
-        toArray(flagships),
+        flagships,
         toArray(unassigned)
       )
     );

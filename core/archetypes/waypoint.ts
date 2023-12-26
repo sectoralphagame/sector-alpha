@@ -18,6 +18,9 @@ export function waypoint(entity: Entity): Waypoint {
 }
 
 export interface WaypointInput {
+  /**
+   * ID of the entity that owns this waypoint, eg. a ship that created it
+   */
   owner: number;
   value: Position2D;
   sector: number;
