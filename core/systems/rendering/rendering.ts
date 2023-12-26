@@ -133,7 +133,9 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
 
     this.app.stage.addChild(this.viewport);
 
-    this.viewport.drag().pinch().wheel();
+    this.viewport.drag().pinch().wheel().decelerate({
+      friction: 0.95,
+    });
     this.viewport.clampZoom({ minScale, maxScale });
     this.viewport.on("drag-start", () => {
       if (this.toolbar) {
