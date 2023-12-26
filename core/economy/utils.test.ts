@@ -1,4 +1,3 @@
-import { matrix } from "mathjs";
 import { toArray } from "@fxts/core";
 import { facilityModules } from "../archetypes/facilityModule";
 import type { Faction } from "../archetypes/faction";
@@ -46,9 +45,9 @@ describe("getSectorsInTeleportRange", () => {
   beforeEach(() => {
     sim = new Sim();
     sectors = [
-      createSector(sim, { position: matrix([0, 0, 0]), name: "s1" }),
-      createSector(sim, { position: matrix([1, 0, 0]), name: "s2" }),
-      createSector(sim, { position: matrix([2, 0, 0]), name: "s3" }),
+      createSector(sim, { position: [0, 0, 0], name: "s1" }),
+      createSector(sim, { position: [1, 0, 0], name: "s2" }),
+      createSector(sim, { position: [2, 0, 0], name: "s3" }),
     ];
   });
 

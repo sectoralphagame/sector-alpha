@@ -62,7 +62,7 @@ export function hecsRound(position: PositionHex): PositionHex {
 export function hecsToCartesian(
   position: PositionHex,
   scale: number
-): PositionHex {
+): Position2D {
   if (position.length !== 3) throw new Error("Invalid position");
 
   return multiply(
@@ -74,7 +74,7 @@ export function hecsToCartesian(
       matrix(position).clone().resize([2])
     ),
     scale
-  ).toArray() as PositionHex;
+  ).toArray() as Position2D;
 }
 
 export function cartesianToHecs(
