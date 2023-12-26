@@ -16,9 +16,11 @@ const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {
     React.useState<HTMLElement | null>(null);
   const availableMineables = React.useMemo(
     () =>
-      Object.entries(getSectorResources(entity, 0)).filter(
-        ([, { max }]) => max > 0
-      ),
+      entity.sim.paths
+        ? Object.entries(getSectorResources(entity, 0)).filter(
+            ([, { max }]) => max > 0
+          )
+        : [],
     [entity]
   );
   const [displayedResources, setDisplayedResources] = React.useState(

@@ -483,6 +483,8 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
       );
       if (entity.hasComponents(["render"])) {
         this.viewport.follow(this.sprites.get(entity)!);
+      } else if (entity.hasComponents(["renderGraphics"])) {
+        this.viewport.follow(this.graphics.get(entity)!);
       } else {
         this.settingsManager.cp.selectionManager.focused = false;
       }

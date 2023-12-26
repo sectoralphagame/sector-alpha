@@ -6,16 +6,16 @@ import { pickRandom } from "@core/utils/generators";
 import { randomInt } from "mathjs";
 import { formatTime } from "@core/utils/format";
 import { filter, first, pipe, some, toArray } from "@fxts/core";
+import type { Sector } from "@core/archetypes/sector";
 import type { MissionHandler } from "./types";
 import missions from "../../world/data/missions.json";
+import { getRelationFactor } from "./utils";
 
 Mustache.escape = (text) => text;
 
 interface PatrolMission extends Mission {
-  elapsed: number;
   type: "patrol";
   sector: number;
-  time: number;
   faction: number;
 }
 
@@ -26,9 +26,7 @@ export const patrolMission = (
   common: MissionCommon
 ): PatrolMission => ({
   ...common,
-  elapsed: 0,
   sector,
-  time,
   type: "patrol",
   faction,
 });
@@ -60,8 +58,8 @@ export const patrolMissionHandler: MissionHandler = {
             )
         )
     );
-    const time = randomInt(1, 8) * 15 * 60;
-    const reward = randomInt(80, 130) * 1000;
+    const time = randomInt(1, 4) * 5 * 60;
+    const reward = Math.round((time * getRelationFactor(faction) * 1000) / 60);
 
     const template = pickRandom(missions.patrol);
     const transform = (text: string) =>
@@ -88,17 +86,30 @@ export const patrolMissionHandler: MissionHandler = {
         description: transform(template.description),
         rewards: [
           { type: "money", amount: reward },
-          { type: "relation", amount: 1.5, factionId: faction.id },
+          // Add 1 relation point for every 10 minutes of patrol
+          { type: "relation", amount: time / (10 * 60), factionId: faction.id },
         ],
+        references: [{ id: sector.id, name: sector.cp.name.value }],
+        progress: {
+          current: 0,
+          max: time,
+        },
       }),
     };
   },
-  isFailed: () => false,
+  isFailed: (mission: Mission, sim: Sim) => {
+    if (!isPatrolMission(mission))
+      throw new Error("Mission is not a patrol mission");
+
+    return (
+      sim.getOrThrow<Sector>(mission.sector).cp.owner?.id !== mission.faction
+    );
+  },
   isCompleted: (mission: Mission) => {
     if (!isPatrolMission(mission))
       throw new Error("Mission is not a patrol mission");
 
-    return mission.elapsed >= mission.time;
+    return mission.progress.current >= mission.progress.max;
   },
   update: (mission: Mission, sim: Sim) => {
     if (!isPatrolMission(mission))
@@ -113,6 +124,8 @@ export const patrolMissionHandler: MissionHandler = {
         ship.cp.autoOrder.default.sectorId === mission.sector,
       sim.queries.ships.getIt()
     );
-    if (isPatrolling) mission.elapsed += 1;
+    if (isPatrolling) mission.progress.current += 1;
   },
+  formatProgress: (mission: Mission) =>
+    `${formatTime(mission.progress.max - mission.progress.current)} left`,
 };

@@ -196,12 +196,12 @@ export function createQueries(sim: Sim) {
     renderableGraphics: new Query(sim, ["renderGraphics"]),
     sectors: new Query(sim, sectorComponents, [], true),
     selectable: new Query(sim, ["render", "position"], ["selection"]),
-    settings: new Query(sim, [
-      "selectionManager",
-      "systemManager",
-      "inflationStats",
-      "camera",
-    ]),
+    settings: new Query(
+      sim,
+      ["selectionManager", "systemManager", "inflationStats", "camera"],
+      [],
+      true
+    ),
     ships: new Query(sim, shipComponents, ["ship"]),
     shipyards: new Query(
       sim,

@@ -36,6 +36,14 @@ Default.args = {
         { type: "money", amount: 122000 },
         { type: "relation", amount: 1.5, factionId: 377 },
       ],
+      references: [
+        { id: 16, name: "GJ 229 II" },
+        { id: 123, name: "PIR Roach" },
+      ],
+      progress: {
+        current: 2,
+        max: 15,
+      },
       elapsed: 0,
       sector: 16,
       time: 1800,
@@ -46,11 +54,16 @@ Default.args = {
       accepted: 0,
       title: "Patrol Request for High-Profile Event Security",
       description:
-        " Local Police requests your fleet's assistance in providing additional patrols for heightened security during a high-profile event in Therr with VIPs attending. Your fleet will be rewarded with a premium compensation package of 101000 UTT, including a VIP invitation to the event's closing ceremony and a public acknowledgement of your team's vital role in ensuring a successful and secure event.",
+        "Local Police requests your fleet's assistance in providing additional patrols for heightened security during a high-profile event in Therr with VIPs attending. Your fleet will be rewarded with a premium compensation package of 101000 UTT, including a VIP invitation to the event's closing ceremony and a public acknowledgement of your team's vital role in ensuring a successful and secure event.",
       rewards: [
         { type: "money", amount: 101000 },
         { type: "relation", amount: 1.5, factionId: 385 },
       ],
+      references: [{ id: 15, name: "Therr" }],
+      progress: {
+        current: 10,
+        max: 15,
+      },
       elapsed: 0,
       sector: 15,
       time: 1800,
@@ -66,6 +79,11 @@ Default.args = {
         { type: "money", amount: 92000 },
         { type: "relation", amount: 1.5, factionId: 337 },
       ],
+      progress: {
+        current: 12,
+        max: 15,
+      },
+      references: [{ id: 11, name: "Discordis c" }],
       elapsed: 0,
       sector: 11,
       time: 5400,
@@ -74,10 +92,12 @@ Default.args = {
     },
   ],
   onMissionCancel: action("onMissionCancel"),
+  onReferenceClick: action("onReferenceClick"),
 } as MissionsOverlayComponentProps;
 
 export const NoMissions = Template.bind({});
 NoMissions.args = {
   missions: [],
   onMissionCancel: action("onMissionCancel"),
+  onReferenceClick: action("onReferenceClick"),
 } as MissionsOverlayComponentProps;

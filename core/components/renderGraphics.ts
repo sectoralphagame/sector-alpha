@@ -206,7 +206,8 @@ export const graphics: Graphics = {
       alpha: 0.3,
       width: 1,
       color: 0xffffff,
-    }).drawCircle(position!.coord[0] * 10, position!.coord[1] * 10, 1);
+    }).drawCircle(0, 0, 1);
+    g.position.set(position!.coord[0] * 10, position!.coord[1] * 10);
   },
   sector: ({ g, entity }) => {
     const { name, hecsPosition } = entity.requireComponents([
@@ -222,13 +223,13 @@ export const graphics: Graphics = {
         : 0x3a3a3a,
       width: 5,
     });
-    g.drawRegularPolygon!(pos[0], pos[1], sectorSize - 2.5, 6, Math.PI / 6);
+    g.drawRegularPolygon!(0, 0, sectorSize - 2.5, 6, Math.PI / 6);
     const textGraphics = new PIXI.Text(name.value, {
       fill: 0x404040,
       fontFamily: "Space Mono",
     });
     textGraphics.resolution = 7;
-    const textPos = add(pos, [0, 90 - sectorSize]);
+    const textPos = [0, 90 - sectorSize];
     textGraphics.anchor.set(0.5, 0.5);
     textGraphics.position.set(textPos[0], textPos[1]);
     textGraphics.interactive = true;
@@ -237,6 +238,7 @@ export const graphics: Graphics = {
         entity.id;
     });
     textGraphics.cursor = "pointer";
+    g.position.set(pos[0], pos[1]);
     g.addChild(textGraphics);
   },
   hexGrid: ({ g }) => {

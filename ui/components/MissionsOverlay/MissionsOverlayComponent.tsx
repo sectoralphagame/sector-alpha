@@ -9,11 +9,12 @@ import styles from "./MissionsOverlay.scss";
 export interface MissionsOverlayComponentProps {
   missions: Mission[];
   onMissionCancel: (_missionIndex: number) => void;
+  onReferenceClick: (_id: number) => void;
 }
 
 export const MissionsOverlayComponent: React.FC<
   MissionsOverlayComponentProps
-> = ({ missions, onMissionCancel }) => {
+> = ({ missions, onMissionCancel, onReferenceClick }) => {
   const [selected, setSelected] = React.useState(0);
 
   return (
@@ -38,6 +39,24 @@ export const MissionsOverlayComponent: React.FC<
           <div>
             <Text variant="h3">{missions[selected].title}</Text>
             <Text>{missions[selected].description}</Text>
+            {!!missions[selected].progress.label && (
+              <div className={styles.progress}>
+                <Text variant="h6">Progress</Text>
+                <Text>{missions[selected].progress.label}</Text>
+              </div>
+            )}
+            <div className={styles.references}>
+              <Text variant="h6">References</Text>
+              {missions[selected].references.map(({ id, name }) => (
+                <button
+                  type="button"
+                  key={id}
+                  onClick={() => onReferenceClick(id)}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
             <hr className={styles.divider} />
             <div className={styles.rewards}>
               <div>

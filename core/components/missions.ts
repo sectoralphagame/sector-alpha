@@ -14,6 +14,15 @@ export interface MissionCommon {
   title: string;
   description: string;
   rewards: Reward[];
+  /**
+   * Ids and names of the entities that are referenced by this mission
+   */
+  references: Array<{ id: number; name: string }>;
+  progress: {
+    current: number;
+    max: number;
+    label?: string;
+  };
 }
 export type Mission = MissionCommon & {
   type: string;

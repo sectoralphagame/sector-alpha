@@ -41,6 +41,8 @@ export class MissionSystem extends System<"generate" | "track"> {
 
     player.cp.missions.value.forEach((mission) => {
       this.handlers.mission[mission.type].update(mission, this.sim);
+      mission.progress.label =
+        this.handlers.mission[mission.type].formatProgress(mission);
 
       if (this.handlers.mission[mission.type].isFailed(mission, this.sim)) {
         player.cp.missions.value = player.cp.missions.value.filter(

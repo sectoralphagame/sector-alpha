@@ -10,8 +10,10 @@ import { hecsToCartesian } from "@core/components/hecsPosition";
 import { addSubordinate } from "@core/components/subordinates";
 import { sectorSize } from "@core/archetypes/sector";
 import type { Position2D } from "@core/components/position";
+import type { Sim } from "@core/sim";
 import missions from "../../world/data/missions.json";
 import type { MissionHandler } from "./types";
+import { getRelationFactor } from "./utils";
 
 Mustache.escape = (text) => text;
 
@@ -99,10 +101,12 @@ export const destroyMissionHandler: MissionHandler = {
       };
     });
 
-    const reward =
+    const reward = Math.round(
       (entities.length * randomInt(25, 35) +
         (withFacility ? randomInt(800, 1200) : 0)) *
-      1000;
+        1000 *
+        getRelationFactor(faction)
+    );
 
     const template = pickRandom(
       missions[`destroy${variant}`].filter(
@@ -137,6 +141,14 @@ export const destroyMissionHandler: MissionHandler = {
             { type: "money", amount: reward },
             { type: "relation", amount: random(1, 2), factionId: faction.id },
           ],
+          references: [
+            { id: sector.id, name: sector.cp.name.value },
+            ...entities.map((e) => ({ id: e.id, name: e.cp.name.value })),
+          ],
+          progress: {
+            current: 0,
+            max: entities.length,
+          },
         }
       ),
     };
@@ -148,5 +160,16 @@ export const destroyMissionHandler: MissionHandler = {
 
     return mission.entities.every((id) => !sim.get(id));
   },
-  update: () => {},
+  update: (mission: Mission, sim: Sim) => {
+    if (!isDestroyMission(mission))
+      throw new Error("Mission is not a destroy mission");
+
+    const destroyed = mission.entities.filter((id) => !sim.get(id));
+    mission.progress.current -= destroyed.length;
+    mission.references = mission.references.filter(
+      (r) => !destroyed.includes(r.id)
+    );
+  },
+  formatProgress: (mission: Mission) =>
+    `${mission.progress.current} / ${mission.progress.max} destroyed`,
 };

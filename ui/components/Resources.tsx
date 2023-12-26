@@ -4,6 +4,8 @@ import { getSectorResources } from "@core/utils/resources";
 import { Table, TableCell } from "@kit/Table";
 
 const Resources: React.FC<{ entity: Sector }> = ({ entity }) => {
+  if (!entity.sim.paths) return null;
+
   const fieldsByType = getSectorResources(entity, 0);
   if (!fieldsByType) return null;
 

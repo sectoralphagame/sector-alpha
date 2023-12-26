@@ -6,3 +6,5 @@ export const divider: string;
 export const missionLink: string;
 export const missionLinkActive: string;
 export const rewards: string;
+export const references: string;
+export const progress: string;

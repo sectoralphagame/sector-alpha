@@ -7,4 +7,5 @@ export interface MissionHandler {
   isFailed: (_mission: Mission, _sim: Sim) => boolean;
   generate: (_sim: Sim) => MissionOffer | null;
   update: (_mission: Mission, _sim: Sim) => void;
+  formatProgress: (_mission: Mission) => string;
 }
