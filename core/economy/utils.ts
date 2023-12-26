@@ -87,7 +87,8 @@ export function getTradeWithMostProfit(
         filter((f) => !notAllowedFactions.includes(f.cp.owner.id)),
         toArray
       )
-    )
+    ),
+    toArray
   );
 
   const bestOffers = perCommodity((commodity) => ({
