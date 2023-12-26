@@ -19,8 +19,8 @@ export class AvgFrameReportingSystem extends System {
       this.start = performance.now();
     });
 
-    sim.hooks.phase.end.tap(this.constructor.name, () => {
-      if (!this.reporting) return;
+    sim.hooks.phase.end.tap(this.constructor.name, (delta) => {
+      if (!this.reporting || delta === 0) return;
 
       this.accumulator += performance.now() - this.start;
       this.iterations++;
