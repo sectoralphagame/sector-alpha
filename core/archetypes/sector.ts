@@ -34,7 +34,6 @@ export interface InitialSectorInput {
 
 export function createSector(sim: Sim, { position, name }: InitialSectorInput) {
   const entity = new Entity(sim);
-
   entity
     .addComponent({
       name: "hecsPosition",

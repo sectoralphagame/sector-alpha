@@ -24,21 +24,27 @@ export interface HECSPosition extends BaseComponent<"hecsPosition"> {
 }
 
 export function axialToCube(axial: PositionAxial): PositionHex {
-  return [...axial, -(axial[0] + axial[1])];
+  return [...axial, -axial[0] - axial[1]];
 }
 
 export function hecsMove(
   position: PositionHex,
   direction: keyof typeof transforms
 ): PositionHex {
+  if (position.length !== 3) throw new Error("Invalid position");
+
   return add(position, transforms[direction]) as PositionHex;
 }
 
 export function hecsDistance(a: PositionHex, b: PositionHex): number {
+  if (a.length !== 3 || b.length !== 3) throw new Error("Invalid position");
+
   return sum((subtract(a, b) as PositionHex).map(Math.abs)) / 2;
 }
 
 export function hecsRound(position: PositionHex): PositionHex {
+  if (position.length !== 3) throw new Error("Invalid position");
+
   const rounded = position.map(Math.round) as PositionHex;
   const diff = subtract(position, rounded).map(Math.abs) as PositionHex;
 
@@ -57,13 +63,15 @@ export function hecsToCartesian(
   position: PositionHex,
   scale: number
 ): PositionHex {
+  if (position.length !== 3) throw new Error("Invalid position");
+
   return multiply(
     multiply(
       matrix([
         [3 / 2, 0],
         [Math.sqrt(3) / 2, Math.sqrt(3)],
       ]),
-      matrix(position).resize([2])
+      matrix(position).clone().resize([2])
     ),
     scale
   ).toArray() as PositionHex;

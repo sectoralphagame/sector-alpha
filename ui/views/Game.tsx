@@ -106,20 +106,18 @@ export const Game: React.FC = () => {
         event.offsetY
       );
       const worldPosition = [worldX / 10, worldY / 10];
-      setMenu({
+      const sectors = sim.queries.sectors.get();
+      const data = {
         active: true,
         position: [event.clientX, event.clientY],
         worldPosition,
         sector:
-          sim.queries.sectors
-            .get()
-            .find((s) =>
-              deepEqual(
-                s.cp.hecsPosition.value,
-                worldToHecs([worldPosition[0], worldPosition[1]])
-              )
-            ) ?? null,
-      });
+          sectors.find((s) => {
+            const ww = worldToHecs([worldPosition[0], worldPosition[1]]);
+            return deepEqual(s.cp.hecsPosition.value, ww);
+          }) ?? null,
+      };
+      setMenu(data);
     };
 
     if (canvasRoot.current) {
