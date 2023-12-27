@@ -79,7 +79,10 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
                 onAction={
                   action
                     ? () => {
-                        const quantity = form.getValues()[commodity];
+                        const quantity = parseInt(
+                          form.getValues()[commodity],
+                          10
+                        );
 
                         if (!(quantity > 0 && quantity <= max)) {
                           return;
