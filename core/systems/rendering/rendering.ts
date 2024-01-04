@@ -8,6 +8,9 @@ import { setCheat } from "@core/utils/misc";
 import { isHeadless } from "@core/settings";
 import { first } from "@fxts/core";
 import { storageHook } from "@core/hooks";
+import type { ContextMenuApi } from "@ui/atoms";
+import { worldToHecs } from "@core/components/hecsPosition";
+import { deepEqual } from "mathjs";
 import {
   createRenderGraphics,
   graphics,
@@ -73,6 +76,12 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   graphics: Map<Entity, PIXI.Graphics> = new Map();
   displayRange: boolean;
   scale: number;
+  contextMenuApi: ContextMenuApi;
+
+  constructor(contextMenuApi: ContextMenuApi) {
+    super();
+    this.contextMenuApi = contextMenuApi;
+  }
 
   apply = (sim: Sim) => {
     super.apply(sim);
@@ -133,7 +142,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
 
     this.app.stage.addChild(this.viewport);
 
-    this.viewport.drag().pinch().wheel().decelerate({
+    this.viewport.drag().wheel().decelerate({
       friction: 0.95,
     });
     this.viewport.clampZoom({ minScale, maxScale });
@@ -233,6 +242,36 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
         this.settingsManager.cp.selectionManager.secondaryId = null;
       }
     });
+
+    const onContextMenu = (event: MouseEvent) => {
+      event.preventDefault();
+
+      setTimeout(() => {
+        if (this.dragging) return;
+
+        const [, setMenu] = this.contextMenuApi;
+
+        const { x: worldX, y: worldY } = this.viewport.toWorld(
+          event.offsetX,
+          event.offsetY
+        );
+        const worldPosition = [worldX / 10, worldY / 10];
+        const sectors = this.sim.queries.sectors.get();
+        const data = {
+          active: true,
+          position: [event.clientX, event.clientY],
+          worldPosition,
+          sector:
+            sectors.find((s) => {
+              const ww = worldToHecs([worldPosition[0], worldPosition[1]]);
+              return deepEqual(s.cp.hecsPosition.value, ww);
+            }) ?? null,
+        };
+        setMenu(data);
+      }, 40);
+    };
+
+    window.addEventListener("contextmenu", onContextMenu);
   };
 
   clearEntity = (entity: Entity, render = true, renderGraphics = true) => {

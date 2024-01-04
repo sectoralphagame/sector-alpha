@@ -29,6 +29,7 @@ export const contextMenu = atom<ContextMenu>({
   dangerouslyAllowMutability: true,
 });
 export const useContextMenu = () => useRecoilState(contextMenu);
+export type ContextMenuApi = ReturnType<typeof useRecoilState<ContextMenu>>;
 
 export type GameDialogProps =
   | TradeDialogProps

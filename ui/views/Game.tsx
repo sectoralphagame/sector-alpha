@@ -1,8 +1,6 @@
 import React from "react";
 import ClickAwayListener from "react-click-away-listener";
-import { deepEqual } from "mathjs";
 import { RenderingSystem } from "@core/systems/rendering";
-import { worldToHecs } from "@core/components/hecsPosition";
 import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import type { Entity } from "@core/entity";
 import { MapView } from "@ui/components/MapView";
@@ -26,6 +24,7 @@ import { SimControl } from "@ui/components/SimControl/SimControl";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
+import type { GameOverlayProps } from "../atoms";
 import {
   useContextMenu,
   useGameDialog,
@@ -35,6 +34,15 @@ import {
 } from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
 import { PlayerMoney } from "../components/PlayerMoney";
+
+const overlayNames: Record<NonNullable<GameOverlayProps>, string> = {
+  fleet: "Fleet Management",
+  missions: "Active Missions",
+};
+const overlayKeyCodes: Record<string, NonNullable<GameOverlayProps>> = {
+  KeyF: "fleet",
+  KeyJ: "missions",
+};
 
 export const Game: React.FC = () => {
   const [sim, setSim] = useSim();
@@ -55,7 +63,8 @@ export const Game: React.FC = () => {
     if (!sim) return () => undefined;
 
     sim.start();
-    system.current = new RenderingSystem();
+
+    system.current = new RenderingSystem([menu, setMenu]);
     system.current.apply(sim);
 
     const unmount = () => {
@@ -97,38 +106,6 @@ export const Game: React.FC = () => {
     }
   });
 
-  // eslint-disable-next-line consistent-return
-  React.useEffect(() => {
-    const onContextMenu = (event: MouseEvent) => {
-      event.preventDefault();
-      const { x: worldX, y: worldY } = system.current!.viewport.toWorld(
-        event.offsetX,
-        event.offsetY
-      );
-      const worldPosition = [worldX / 10, worldY / 10];
-      const sectors = sim.queries.sectors.get();
-      const data = {
-        active: true,
-        position: [event.clientX, event.clientY],
-        worldPosition,
-        sector:
-          sectors.find((s) => {
-            const ww = worldToHecs([worldPosition[0], worldPosition[1]]);
-            return deepEqual(s.cp.hecsPosition.value, ww);
-          }) ?? null,
-      };
-      setMenu(data);
-    };
-
-    if (canvasRoot.current) {
-      canvasRoot.current!.addEventListener("contextmenu", onContextMenu);
-
-      return () => {
-        canvasRoot.current?.removeEventListener("contextmenu", onContextMenu);
-      };
-    }
-  }, [canvasRoot.current]);
-
   React.useEffect(() => {
     if (!menu.active) {
       sim.queries.settings.get()[0].cp.selectionManager.secondaryId = null;
@@ -147,13 +124,14 @@ export const Game: React.FC = () => {
 
       if (event.target instanceof HTMLInputElement) return;
 
-      if (event.code === "KeyF") {
-        setOverlay((prev) => (prev === "fleet" ? null : "fleet"));
+      if (event.code in overlayKeyCodes) {
+        setOverlay((prev) =>
+          prev === overlayKeyCodes[event.code]
+            ? null
+            : overlayKeyCodes[event.code]
+        );
       }
-      if (event.code === "KeyJ") {
-        setOverlay((prev) => (prev === "missions" ? null : "missions"));
-      }
-      if (event.code === "KeyP") {
+      if (event.code === "Space") {
         if (sim.speed === 0) sim.setSpeed(1);
         else sim.pause();
       }
@@ -211,13 +189,7 @@ export const Game: React.FC = () => {
       <Overlay
         open={!!overlay}
         onClose={() => setOverlay(null)}
-        title={
-          overlay === "fleet"
-            ? "Fleet Management"
-            : overlay === "missions"
-            ? "Active Missions"
-            : ""
-        }
+        title={overlay === null ? "" : overlayNames[overlay] ?? ""}
       >
         <FleetOverlay />
         <MissionsOverlay />
