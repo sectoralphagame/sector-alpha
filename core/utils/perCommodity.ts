@@ -8,15 +8,13 @@ export function perCommodity<T>(
   // eslint-disable-next-line no-unused-vars
   cb: (commodity: Commodity) => T
 ): Record<Commodity, T> {
-  return commoditiesArray
-    .map((commodity) => ({
-      commodity,
-      data: cb(commodity),
-    }))
-    .reduce(
-      (acc, v) => ({ ...acc, [v.commodity]: v.data }),
-      {} as Record<Commodity, T>
-    );
+  const ret = {} as Record<Commodity, T>;
+
+  for (const commodity of commoditiesArray) {
+    ret[commodity] = cb(commodity);
+  }
+
+  return ret;
 }
 
 export const commodityPrices = perCommodity((commodity) => ({
