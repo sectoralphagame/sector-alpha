@@ -7,9 +7,12 @@ import pauseIcon from "@assets/ui/pause.svg";
 import { useSim } from "@ui/atoms";
 import { isDev } from "@core/settings";
 import Stack from "@kit/Stack";
+import { getGameDate } from "@core/utils/misc";
+import Text from "@kit/Text";
 import styles from "./styles.scss";
 
 export interface SimControlComponentProps {
+  date: string;
   onPause: () => void;
   onPlay: () => void;
   onSpeed: () => void;
@@ -17,12 +20,14 @@ export interface SimControlComponentProps {
 }
 
 export const SimControlComponent: React.FC<SimControlComponentProps> = ({
+  date,
   onPause,
   onPlay,
   onSpeed,
   onTurbo,
 }) => (
-  <Stack id="money" className={styles.root}>
+  <Stack id="control" className={styles.root}>
+    <Text color="text-1">{date}</Text>
     <IconButton variant="naked" onClick={onPause}>
       <SVG src={pauseIcon} />
     </IconButton>
@@ -45,6 +50,7 @@ export const SimControl: React.FC = () => {
 
   return (
     <SimControlComponent
+      date={getGameDate(sim.getTime())}
       onPause={sim?.pause}
       onPlay={() => {
         sim.setSpeed(1);
