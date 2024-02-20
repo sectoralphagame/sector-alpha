@@ -18,27 +18,31 @@ import { System } from "./system";
 function produce(production: Production, storage: CommodityStorage) {
   const multiplier = production.time / 3600;
 
-  perCommodity((commodity) =>
-    removeStorage(
-      storage,
-      commodity,
-      Math.floor(production.pac[commodity].consumes * multiplier)
-    )
-  );
-  perCommodity((commodity) =>
-    addStorage(
-      storage,
-      commodity,
-      Math.floor(
-        limitMax(
-          storage.quota[commodity] -
-            production.pac[commodity].produces * multiplier,
-          production.pac[commodity].produces * multiplier
-        )
-      ),
-      false
-    )
-  );
+  perCommodity((commodity) => {
+    if (production.pac[commodity].consumes > 0) {
+      removeStorage(
+        storage,
+        commodity,
+        Math.floor(production.pac[commodity].consumes * multiplier)
+      );
+    }
+  });
+  perCommodity((commodity) => {
+    if (production.pac[commodity].produces > 0) {
+      addStorage(
+        storage,
+        commodity,
+        Math.floor(
+          limitMax(
+            storage.quota[commodity] -
+              production.pac[commodity].produces * multiplier,
+            production.pac[commodity].produces * multiplier
+          )
+        ),
+        false
+      );
+    }
+  });
 }
 
 export function isAbleToProduce(

@@ -65,3 +65,12 @@ export function getRandomPositionInBounds(
 
   return position;
 }
+
+export const gameHour = 3600000;
+export function getGameDate(timeOffset: number): string {
+  const date = new Date(
+    (timeOffset - 3600) * gameHour + +new Date("2519-01-01T00:00:00Z")
+  );
+
+  return `${date.getDate()}.${date.getMonth() + 1}.${date.getUTCFullYear()}`;
+}
