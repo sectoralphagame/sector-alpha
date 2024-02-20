@@ -3,7 +3,7 @@ import { ship } from "@core/archetypes/ship";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { Position2D } from "@core/components/position";
 import type { Entity } from "@core/entity";
-import { isHeadless } from "@core/settings";
+import settings, { isHeadless } from "@core/settings";
 import type { RequireComponent } from "@core/tsHelpers";
 import { first } from "@fxts/core";
 import { add, norm, random, subtract } from "mathjs";
@@ -66,11 +66,13 @@ export function getRandomPositionInBounds(
   return position;
 }
 
-export const gameHour = 3600000;
+export const gameHour = 1;
+export const gameDay = gameHour * 24;
+export const gameMonth = gameDay * 30;
+export const gameYear = gameMonth * 12;
 export function getGameDate(timeOffset: number): string {
-  const date = new Date(
-    (timeOffset - 3600) * gameHour + +new Date("2519-01-01T00:00:00Z")
-  );
-
-  return `${date.getDate()}.${date.getMonth() + 1}.${date.getUTCFullYear()}`;
+  const actual = timeOffset - settings.bootTime;
+  return `${1 + (Math.floor(actual / gameDay) % 30)}.${
+    1 + (Math.floor(actual / gameMonth) % 30)
+  }.${2519 + (Math.floor(actual / gameYear) % 12)}`;
 }
