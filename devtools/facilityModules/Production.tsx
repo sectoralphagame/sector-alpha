@@ -68,14 +68,6 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
         </TableCell>
         <TableCell colSpan={2}>Expand row to see details</TableCell>
         <TableCell>
-          {fm.type === "habitat" && (
-            <input
-              {...register(`facilityModules.${index}.crew`)}
-              defaultValue={fm.crew}
-            />
-          )}
-        </TableCell>
-        <TableCell>
           {formatInt(
             Object.entries(facilityModule.pac)
               .filter(([_, pac]) => pac?.produces)
@@ -187,40 +179,43 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
   );
 };
 
-export const ProductionEditor: React.FC<{
-  facilityModules: FacilityModuleInput[];
-}> = ({ facilityModules }) => (
-  <Table>
-    <colgroup>
-      <col style={{ width: "48px" }} />
-      <col style={{ width: "180px" }} />
-      <col style={{ width: "150px" }} />
-      <col style={{ width: "150px" }} />
-      <col style={{ width: "80px" }} />
-      <col style={{ width: "200px" }} />
-      <col style={{ width: "200px" }} />
-      <col style={{ width: "200px" }} />
-      <col />
-    </colgroup>
-    <thead>
-      <tr>
-        {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-        <th colSpan={2} />
-        <TableHeader>Consumption</TableHeader>
-        <TableHeader>Production</TableHeader>
-        <TableHeader>Crew</TableHeader>
-        <TableHeader>Average Cost [UTT]</TableHeader>
-        <TableHeader>Minimal Cost [UTT]</TableHeader>
-        <TableHeader>Maximal Cost [UTT]</TableHeader>
-      </tr>
-    </thead>
-    <tbody>
-      {Object.values(facilityModules).map((_, facilityModuleIndex) => (
-        <FacilityModuleProductionEditor
-          index={facilityModuleIndex}
-          key={facilityModuleIndex}
-        />
-      ))}
-    </tbody>
-  </Table>
-);
+export const ProductionEditor: React.FC = () => {
+  const facilityModules =
+    useThrottledFormState<FacilityModuleInput[]>("facilityModules");
+
+  return (
+    <Table>
+      <colgroup>
+        <col style={{ width: "48px" }} />
+        <col style={{ width: "250px" }} />
+        <col style={{ width: "150px" }} />
+        <col style={{ width: "150px" }} />
+        <col style={{ width: "150px" }} />
+        <col style={{ width: "200px" }} />
+        <col style={{ width: "200px" }} />
+        <col style={{ width: "200px" }} />
+        <col />
+      </colgroup>
+      <thead>
+        <tr>
+          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+          <th colSpan={2} />
+          <TableHeader>Consumption</TableHeader>
+          <TableHeader>Production</TableHeader>
+          <TableHeader>Crew</TableHeader>
+          <TableHeader>Average Cost [UTT]</TableHeader>
+          <TableHeader>Minimal Cost [UTT]</TableHeader>
+          <TableHeader>Maximal Cost [UTT]</TableHeader>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.values(facilityModules).map((_, facilityModuleIndex) => (
+          <FacilityModuleProductionEditor
+            index={facilityModuleIndex}
+            key={facilityModuleIndex}
+          />
+        ))}
+      </tbody>
+    </Table>
+  );
+};

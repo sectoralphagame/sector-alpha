@@ -17,13 +17,11 @@ import { JSONOutput } from "../components/JSONOutput";
 import { BuildEditor } from "./Build";
 import { GeneralEditor } from "./General";
 import { ProductionEditor } from "./Production";
+import { CrewEditor } from "./Crew";
 
 const Editor: React.FC<{}> = () => {
-  const { getValues, control } = useFormContext<FormData>();
+  const { control } = useFormContext<FormData>();
   const { append } = useFieldArray({ control, name: "facilityModules" });
-  const [facilityModules, setFacilityModules] = React.useState(
-    getValues().facilityModules
-  );
 
   return (
     <div className={styles.editorContainer}>
@@ -40,8 +38,10 @@ const Editor: React.FC<{}> = () => {
                   cost: {},
                   time: 0,
                 },
+                crew: {
+                  cost: 0,
+                },
               });
-              setFacilityModules(getValues().facilityModules);
             }}
           >
             + Add new Module
@@ -50,6 +50,7 @@ const Editor: React.FC<{}> = () => {
             <Tab>General</Tab>
             <Tab>Production</Tab>
             <Tab>Build</Tab>
+            <Tab>Crew</Tab>
           </TabList>
         </div>
 
@@ -58,13 +59,16 @@ const Editor: React.FC<{}> = () => {
         <div className={styles.editor}>
           <HeadlessTab.Panels>
             <HeadlessTab.Panel>
-              <GeneralEditor facilityModules={facilityModules} />
+              <GeneralEditor />
             </HeadlessTab.Panel>
             <HeadlessTab.Panel>
-              <ProductionEditor facilityModules={facilityModules} />
+              <ProductionEditor />
             </HeadlessTab.Panel>
             <HeadlessTab.Panel>
-              <BuildEditor facilityModules={facilityModules} />
+              <BuildEditor />
+            </HeadlessTab.Panel>
+            <HeadlessTab.Panel>
+              <CrewEditor />
             </HeadlessTab.Panel>
           </HeadlessTab.Panels>
         </div>

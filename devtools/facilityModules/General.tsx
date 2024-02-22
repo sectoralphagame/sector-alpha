@@ -1,18 +1,22 @@
 import React from "react";
-import { useFormContext } from "react-hook-form";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { useThrottledFormState } from "@devtools/utils";
 import type { FacilityModuleInput } from "@core/archetypes/facilityModule";
-import { Table, TableCell, TableHeader } from "../components/Table";
+import { IconButton } from "@kit/IconButton";
+import SVG from "react-inlinesvg";
+import closeIcon from "@assets/ui/close.svg";
 import type { FormData } from "./utils";
+import { Table, TableCell, TableHeader } from "../components/Table";
 
 const FacilityModuleGeneralEditor: React.FC<{ index: number }> = ({
   index,
 }) => {
-  const { register, setValue } = useFormContext<FormData>();
+  const { register, setValue, control } = useFormContext<FormData>();
   const facilityModule = useThrottledFormState<FacilityModuleInput>(
     `facilityModules.${index.toString()}`
   );
+  const { remove } = useFieldArray({ control, name: "facilityModules" });
 
   if (!facilityModule) {
     return null;
@@ -20,7 +24,11 @@ const FacilityModuleGeneralEditor: React.FC<{ index: number }> = ({
 
   return (
     <tr>
-      <TableCell />
+      <TableCell>
+        <IconButton onClick={() => remove(index)}>
+          <SVG src={closeIcon} />
+        </IconButton>
+      </TableCell>
       <TableCell>
         <input
           {...register(`facilityModules.${index}.name`)}
@@ -93,40 +101,43 @@ const FacilityModuleGeneralEditor: React.FC<{ index: number }> = ({
   );
 };
 
-export const GeneralEditor: React.FC<{
-  facilityModules: FacilityModuleInput[];
-}> = ({ facilityModules }) => (
-  <Table>
-    <colgroup>
-      <col style={{ width: "48px" }} />
-      <col style={{ width: "250px" }} />
-      <col style={{ width: "250px" }} />
-      <col style={{ width: "200px" }} />
-      <col style={{ width: "150px" }} />
-      <col style={{ width: "100px" }} />
-      <col style={{ width: "100px" }} />
-      <col style={{ width: "100px" }} />
-      <col />
-    </colgroup>
-    <thead>
-      <tr>
-        {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-        <th colSpan={2} />
-        <TableHeader>Slug</TableHeader>
-        <TableHeader>Type</TableHeader>
-        <TableHeader>Storage</TableHeader>
-        <TableHeader>Damage</TableHeader>
-        <TableHeader>Range</TableHeader>
-        <TableHeader>Cooldown</TableHeader>
-      </tr>
-    </thead>
-    <tbody>
-      {Object.values(facilityModules).map((_, facilityModuleIndex) => (
-        <FacilityModuleGeneralEditor
-          index={facilityModuleIndex}
-          key={facilityModuleIndex}
-        />
-      ))}
-    </tbody>
-  </Table>
-);
+export const GeneralEditor: React.FC = () => {
+  const facilityModules =
+    useThrottledFormState<FacilityModuleInput[]>("facilityModules");
+
+  return (
+    <Table>
+      <colgroup>
+        <col style={{ width: "48px" }} />
+        <col style={{ width: "250px" }} />
+        <col style={{ width: "250px" }} />
+        <col style={{ width: "200px" }} />
+        <col style={{ width: "150px" }} />
+        <col style={{ width: "100px" }} />
+        <col style={{ width: "100px" }} />
+        <col style={{ width: "100px" }} />
+        <col />
+      </colgroup>
+      <thead>
+        <tr>
+          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+          <th colSpan={2} />
+          <TableHeader>Slug</TableHeader>
+          <TableHeader>Type</TableHeader>
+          <TableHeader>Storage</TableHeader>
+          <TableHeader>Damage</TableHeader>
+          <TableHeader>Range</TableHeader>
+          <TableHeader>Cooldown</TableHeader>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.values(facilityModules).map((_, facilityModuleIndex) => (
+          <FacilityModuleGeneralEditor
+            index={facilityModuleIndex}
+            key={facilityModuleIndex}
+          />
+        ))}
+      </tbody>
+    </Table>
+  );
+};

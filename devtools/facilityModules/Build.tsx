@@ -178,40 +178,43 @@ const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
   );
 };
 
-export const BuildEditor: React.FC<{
-  facilityModules: FacilityModuleInput[];
-}> = ({ facilityModules }) => (
-  <Table>
-    <colgroup>
-      <col style={{ width: "48px" }} />
-      <col style={{ width: "250px" }} />
-      <col style={{ width: "150px" }} />
-      <col style={{ width: "250px" }} />
-      <col style={{ width: "200px" }} />
-      <col style={{ width: "200px" }} />
-      <col style={{ width: "200px" }} />
-      <col style={{ width: "200px" }} />
-      <col />
-    </colgroup>
-    <thead>
-      <tr>
-        {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-        <th colSpan={2} />
-        <TableHeader>Build [s]</TableHeader>
-        <TableHeader>Cost</TableHeader>
-        <TableHeader align="right">Average Cost [UTT]</TableHeader>
-        <TableHeader align="right">Minimal Cost [UTT]</TableHeader>
-        <TableHeader align="right">Maximal Cost [UTT]</TableHeader>
-        <TableHeader align="right">Required Storage</TableHeader>
-      </tr>
-    </thead>
-    <tbody>
-      {Object.values(facilityModules).map((_, facilityModuleIndex) => (
-        <FacilityModuleBuildEditor
-          index={facilityModuleIndex}
-          key={facilityModuleIndex}
-        />
-      ))}
-    </tbody>
-  </Table>
-);
+export const BuildEditor: React.FC = () => {
+  const facilityModules =
+    useThrottledFormState<FacilityModuleInput[]>("facilityModules");
+
+  return (
+    <Table>
+      <colgroup>
+        <col style={{ width: "48px" }} />
+        <col style={{ width: "250px" }} />
+        <col style={{ width: "150px" }} />
+        <col style={{ width: "250px" }} />
+        <col style={{ width: "200px" }} />
+        <col style={{ width: "200px" }} />
+        <col style={{ width: "200px" }} />
+        <col style={{ width: "200px" }} />
+        <col />
+      </colgroup>
+      <thead>
+        <tr>
+          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+          <th colSpan={2} />
+          <TableHeader>Build [s]</TableHeader>
+          <TableHeader>Cost</TableHeader>
+          <TableHeader align="right">Average Cost [UTT]</TableHeader>
+          <TableHeader align="right">Minimal Cost [UTT]</TableHeader>
+          <TableHeader align="right">Maximal Cost [UTT]</TableHeader>
+          <TableHeader align="right">Required Storage</TableHeader>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.values(facilityModules).map((_, facilityModuleIndex) => (
+          <FacilityModuleBuildEditor
+            index={facilityModuleIndex}
+            key={facilityModuleIndex}
+          />
+        ))}
+      </tbody>
+    </Table>
+  );
+};
