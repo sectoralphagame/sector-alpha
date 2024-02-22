@@ -66,16 +66,6 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
             defaultValue={fm.name}
           />
         </TableCell>
-        <TableCell>
-          <input
-            {...register(`facilityModules.${index}.time`, {
-              valueAsNumber: true,
-              min: 0,
-            })}
-            type="number"
-            defaultValue={fm.time}
-          />
-        </TableCell>
         <TableCell colSpan={2}>Expand row to see details</TableCell>
         <TableCell>
           {fm.type === "habitat" && (
@@ -203,7 +193,6 @@ export const ProductionEditor: React.FC<{
   <Table>
     <colgroup>
       <col style={{ width: "48px" }} />
-      <col style={{ width: "250px" }} />
       <col style={{ width: "180px" }} />
       <col style={{ width: "150px" }} />
       <col style={{ width: "150px" }} />
@@ -217,7 +206,6 @@ export const ProductionEditor: React.FC<{
       <tr>
         {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
         <th colSpan={2} />
-        <TableHeader>Cycle Duration [s]</TableHeader>
         <TableHeader>Consumption</TableHeader>
         <TableHeader>Production</TableHeader>
         <TableHeader>Crew</TableHeader>

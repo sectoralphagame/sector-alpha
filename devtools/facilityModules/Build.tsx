@@ -190,6 +190,7 @@ export const BuildEditor: React.FC<{
       <col style={{ width: "200px" }} />
       <col style={{ width: "200px" }} />
       <col style={{ width: "200px" }} />
+      <col style={{ width: "200px" }} />
       <col />
     </colgroup>
     <thead>

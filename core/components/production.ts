@@ -6,17 +6,17 @@ import type { BaseComponent } from "./component";
 
 export interface CommodityPAC {
   /**
-   * Hourly production
+   * Monthly production
    */
   produces: number;
   /**
-   * Hourly consumption
+   * Monthly consumption
    */
   consumes: number;
 }
 
 /**
- * Hourly production and consumption of commodities
+ * Monthly production and consumption of commodities
  */
 export type PAC = Record<Commodity, CommodityPAC>;
 
@@ -51,23 +51,12 @@ export function getRequiredStorage(production: BaseProduction): number {
 
 export interface Production
   extends BaseComponent<"production">,
-    BaseProduction {
-  pac: PAC;
+    BaseProduction {}
 
-  /**
-   * Duration of production cycle in seconds
-   */
-  time: number;
-}
-
-export function createProduction(
-  time: number,
-  pac: Partial<PAC> = {}
-): Production {
+export function createProduction(pac: Partial<PAC> = {}): Production {
   return {
     name: "production",
     pac: merge(cloneDeep(baseProductionAndConsumption), pac),
-    time,
   };
 }
 

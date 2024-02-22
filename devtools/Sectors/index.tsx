@@ -30,6 +30,7 @@ const Editor: React.FC<{}> = () => {
           <Button
             onClick={() => {
               append({
+                id: "",
                 name: "",
                 resources: fromEntries(
                   mineableCommoditiesArray.map(

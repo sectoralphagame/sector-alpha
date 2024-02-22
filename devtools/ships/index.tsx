@@ -42,6 +42,12 @@ const Editor: React.FC<{}> = () => {
                 size: "medium",
                 storage: 0,
                 texture: "mCiv",
+                damage: { cooldown: 0, range: 0, value: 0 },
+                hitpoints: {
+                  hp: { regen: 0, value: 0 },
+                  shield: { regen: 0, value: 0 },
+                },
+                slug: "",
               });
               setShips(getValues().ships);
             }}

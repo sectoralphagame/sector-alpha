@@ -1,3 +1,4 @@
+import { gameDay, gameMonth } from "@core/utils/misc";
 import { every } from "@fxts/core";
 import type { Production } from "../components/production";
 import type { CommodityStorage } from "../components/storage";
@@ -16,7 +17,7 @@ import { perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
 
 function produce(production: Production, storage: CommodityStorage) {
-  const multiplier = production.time / 3600;
+  const multiplier = gameDay / gameMonth;
 
   perCommodity((commodity) => {
     if (production.pac[commodity].consumes > 0) {
@@ -52,7 +53,7 @@ export function isAbleToProduce(
 ): boolean {
   if (!facilityModule.cooldowns.canUse("production")) return false;
 
-  const multiplier = facilityModule.cp.production.time / 3600;
+  const multiplier = gameDay / gameMonth;
   return every(
     (commodity) =>
       hasSufficientStorage(
@@ -89,7 +90,7 @@ export class ProducingSystem extends System<"exec"> {
         continue;
       }
 
-      entity.cooldowns.use("production", entity.cp.production.time);
+      entity.cooldowns.use("production", gameDay);
 
       produce(entity.cp.production, entity.cp.storage);
     }
@@ -101,14 +102,11 @@ export class ProducingSystem extends System<"exec"> {
         continue;
       }
 
-      facilityModule.cooldowns.use(
-        "production",
-        facilityModule.cp.production.time
-      );
+      facilityModule.cooldowns.use("production", gameDay);
 
       produce(facilityModule.cp.production, storage);
     }
 
-    this.cooldowns.use("exec", 2);
+    this.cooldowns.use("exec", gameDay);
   };
 }

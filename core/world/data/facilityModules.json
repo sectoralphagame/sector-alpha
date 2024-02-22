@@ -3,8 +3,8 @@
     "name": "Water Production",
     "slug": "waterProduction",
     "pac": {
-      "ice": { "consumes": 4800, "produces": 0 },
-      "water": { "consumes": 0, "produces": 2400 }
+      "ice": { "consumes": 1200, "produces": 0 },
+      "water": { "consumes": 0, "produces": 600 }
     },
     "time": 300,
     "type": "production",
@@ -62,8 +62,8 @@
     "name": "Habitation Dome",
     "type": "habitat",
     "pac": {
-      "food": { "consumes": 400, "produces": 0 },
-      "fuel": { "consumes": 700, "produces": 0 }
+      "food": { "consumes": 100, "produces": 0 },
+      "fuel": { "consumes": 175, "produces": 0 }
     },
     "slug": "habitat",
     "time": 900,
@@ -86,9 +86,9 @@
     "name": "Farm",
     "type": "production",
     "pac": {
-      "food": { "consumes": 0, "produces": 1300 },
-      "fuel": { "consumes": 350, "produces": 0 },
-      "water": { "consumes": 700, "produces": 0 }
+      "food": { "consumes": 0, "produces": 325 },
+      "fuel": { "consumes": 88, "produces": 0 },
+      "water": { "consumes": 175, "produces": 0 }
     },
     "slug": "farm",
     "time": 240,
@@ -98,8 +98,8 @@
     "name": "Refinery",
     "type": "production",
     "pac": {
-      "ore": { "consumes": 4000, "produces": 0 },
-      "metals": { "consumes": 0, "produces": 2000 }
+      "ore": { "consumes": 1000, "produces": 0 },
+      "metals": { "consumes": 0, "produces": 500 }
     },
     "slug": "refinery",
     "time": 330,
@@ -109,8 +109,8 @@
     "name": "Fuelium Refinery",
     "type": "production",
     "pac": {
-      "fuel": { "consumes": 0, "produces": 5600 },
-      "fuelium": { "consumes": 4800, "produces": 0 }
+      "fuel": { "consumes": 0, "produces": 1400 },
+      "fuelium": { "consumes": 1200, "produces": 0 }
     },
     "slug": "fueliumRefinery",
     "time": 359,
@@ -120,10 +120,10 @@
     "name": "Hull Plates Factory",
     "type": "production",
     "pac": {
-      "food": { "consumes": 130, "produces": 0 },
-      "fuel": { "consumes": 1300, "produces": 0 },
-      "metals": { "consumes": 1600, "produces": 0 },
-      "hullPlates": { "consumes": 0, "produces": 4600 }
+      "food": { "consumes": 33, "produces": 0 },
+      "fuel": { "consumes": 325, "produces": 0 },
+      "metals": { "consumes": 400, "produces": 0 },
+      "hullPlates": { "consumes": 0, "produces": 1150 }
     },
     "slug": "hullPlatesFactory",
     "time": 600,
@@ -133,9 +133,9 @@
     "name": "Gold Refinery",
     "type": "production",
     "pac": {
-      "goldOre": { "consumes": 4700, "produces": 0 },
-      "gold": { "consumes": 0, "produces": 620 },
-      "fuel": { "consumes": 550, "produces": 0 }
+      "goldOre": { "consumes": 1175, "produces": 0 },
+      "gold": { "consumes": 0, "produces": 155 },
+      "fuel": { "consumes": 138, "produces": 0 }
     },
     "slug": "goldRefinery",
     "time": 900,
@@ -145,8 +145,8 @@
     "name": "Silicon Purification",
     "type": "production",
     "pac": {
-      "silica": { "consumes": 3600, "produces": 0 },
-      "silicon": { "consumes": 0, "produces": 6000 }
+      "silica": { "consumes": 900, "produces": 0 },
+      "silicon": { "consumes": 0, "produces": 1500 }
     },
     "slug": "siliconPurification",
     "time": 360,
@@ -156,10 +156,10 @@
     "name": "Electronics Factory",
     "type": "production",
     "pac": {
-      "electronics": { "consumes": 0, "produces": 600 },
-      "silicon": { "consumes": 1800, "produces": 0 },
-      "fuel": { "consumes": 600, "produces": 0 },
-      "gold": { "consumes": 120, "produces": 0 }
+      "electronics": { "consumes": 0, "produces": 150 },
+      "silicon": { "consumes": 450, "produces": 0 },
+      "fuel": { "consumes": 150, "produces": 0 },
+      "gold": { "consumes": 30, "produces": 0 }
     },
     "slug": "electronicsFactory",
     "time": 420,
@@ -169,9 +169,9 @@
     "name": "Drone Factory",
     "type": "production",
     "pac": {
-      "hullPlates": { "consumes": 240, "produces": 0 },
-      "electronics": { "consumes": 140, "produces": 0 },
-      "drones": { "consumes": 0, "produces": 50 }
+      "hullPlates": { "consumes": 60, "produces": 0 },
+      "electronics": { "consumes": 35, "produces": 0 },
+      "drones": { "consumes": 0, "produces": 13 }
     },
     "slug": "droneFactory",
     "time": 960,
@@ -181,9 +181,9 @@
     "name": "Hyperspace Generator",
     "type": "teleport",
     "pac": {
-      "hullPlates": { "consumes": 96, "produces": 0 },
-      "electronics": { "consumes": 82, "produces": 0 },
-      "drones": { "consumes": 0, "produces": 50 }
+      "hullPlates": { "consumes": 24, "produces": 0 },
+      "electronics": { "consumes": 21, "produces": 0 },
+      "drones": { "consumes": 0, "produces": 13 }
     },
     "slug": "teleport",
     "time": 480,
@@ -212,9 +212,9 @@
     "name": "Hydrogen Factory",
     "type": "production",
     "pac": {
-      "water": { "consumes": 1200, "produces": 0 },
-      "hydrogen": { "consumes": 0, "produces": 900 },
-      "fuel": { "consumes": 350, "produces": 0 }
+      "water": { "consumes": 300, "produces": 0 },
+      "hydrogen": { "consumes": 0, "produces": 225 },
+      "fuel": { "consumes": 88, "produces": 0 }
     },
     "slug": "hydrogenFactory",
     "time": 360,
@@ -224,9 +224,9 @@
     "name": "Coolant Factory",
     "type": "production",
     "pac": {
-      "coolant": { "consumes": 0, "produces": 900 },
-      "fuel": { "consumes": 420, "produces": 0 },
-      "hydrogen": { "consumes": 750, "produces": 0 }
+      "coolant": { "consumes": 0, "produces": 225 },
+      "fuel": { "consumes": 105, "produces": 0 },
+      "hydrogen": { "consumes": 188, "produces": 0 }
     },
     "slug": "coolantFactory",
     "time": 420,
@@ -236,10 +236,10 @@
     "name": "Engine Parts Factory",
     "type": "production",
     "pac": {
-      "coolant": { "consumes": 190, "produces": 0 },
-      "hullPlates": { "consumes": 200, "produces": 0 },
-      "fuel": { "consumes": 510, "produces": 0 },
-      "engineParts": { "consumes": 0, "produces": 160 }
+      "coolant": { "consumes": 48, "produces": 0 },
+      "hullPlates": { "consumes": 50, "produces": 0 },
+      "fuel": { "consumes": 128, "produces": 0 },
+      "engineParts": { "consumes": 0, "produces": 40 }
     },
     "slug": "enginePartsFactory",
     "time": 590,
@@ -249,10 +249,10 @@
     "name": "Tau-Metal Factory",
     "type": "production",
     "pac": {
-      "tauMetal": { "consumes": 0, "produces": 2500 },
-      "gold": { "consumes": 1000, "produces": 0 },
-      "fuel": { "consumes": 2400, "produces": 0 },
-      "metals": { "consumes": 2500, "produces": 0 }
+      "tauMetal": { "consumes": 0, "produces": 625 },
+      "gold": { "consumes": 250, "produces": 0 },
+      "fuel": { "consumes": 600, "produces": 0 },
+      "metals": { "consumes": 625, "produces": 0 }
     },
     "slug": "tauMetalFactory",
     "time": 780,

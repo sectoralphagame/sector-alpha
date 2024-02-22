@@ -19,7 +19,6 @@ export interface FacilityModuleCommonInput {
 export interface ProductionFacilityModuleInput
   extends FacilityModuleCommonInput {
   pac: Partial<PAC>;
-  time: number;
   type: "production";
 }
 export interface StorageFacilityModuleInput extends FacilityModuleCommonInput {
@@ -70,7 +69,7 @@ export function createFacilityModule(
     })
     .addTag("facilityModule");
   if (input.type === "production" || input.type === "habitat") {
-    entity.addComponent(createProduction(input.time, input.pac));
+    entity.addComponent(createProduction(input.pac));
   } else if (input.type === "storage") {
     entity.addComponent({
       name: "storageBonus",

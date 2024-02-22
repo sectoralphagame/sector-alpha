@@ -36,7 +36,6 @@ const Editor: React.FC<{}> = () => {
                 type: "production",
                 pac: {},
                 slug: "",
-                time: 0,
                 build: {
                   cost: {},
                   time: 0,
@@ -56,17 +55,19 @@ const Editor: React.FC<{}> = () => {
 
         <hr className={styles.hr} />
 
-        <HeadlessTab.Panels>
-          <HeadlessTab.Panel>
-            <GeneralEditor facilityModules={facilityModules} />
-          </HeadlessTab.Panel>
-          <HeadlessTab.Panel>
-            <ProductionEditor facilityModules={facilityModules} />
-          </HeadlessTab.Panel>
-          <HeadlessTab.Panel>
-            <BuildEditor facilityModules={facilityModules} />
-          </HeadlessTab.Panel>
-        </HeadlessTab.Panels>
+        <div className={styles.editor}>
+          <HeadlessTab.Panels>
+            <HeadlessTab.Panel>
+              <GeneralEditor facilityModules={facilityModules} />
+            </HeadlessTab.Panel>
+            <HeadlessTab.Panel>
+              <ProductionEditor facilityModules={facilityModules} />
+            </HeadlessTab.Panel>
+            <HeadlessTab.Panel>
+              <BuildEditor facilityModules={facilityModules} />
+            </HeadlessTab.Panel>
+          </HeadlessTab.Panels>
+        </div>
       </HeadlessTab.Group>
     </div>
   );

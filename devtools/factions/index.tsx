@@ -33,6 +33,7 @@ const Editor: React.FC<{}> = () => {
           <Button
             onClick={() => {
               append({
+                home: "",
                 name: "",
                 blueprints: { facilityModules: [], ships: [] },
                 color: "#ffffff",
