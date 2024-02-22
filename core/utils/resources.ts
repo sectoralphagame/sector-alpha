@@ -1,3 +1,4 @@
+import { getFieldMax } from "@core/archetypes/asteroidField";
 import { filter, pipe, toArray } from "@fxts/core";
 import { groupBy } from "lodash";
 import { sum } from "mathjs";
@@ -38,19 +39,11 @@ export function getSectorResources(
   return perCommodity((commodity) => ({
     available:
       fieldsByType[commodity]
-        ?.map((field) => field.cp.children.entities)
-        .flat()
-        .map(sector.sim.getOrThrow)
-        .reduce(
-          (acc, a) =>
-            acc + a.requireComponents(["minable"]).cp.minable.resources,
-          0
-        ) ?? 0,
+        ?.map((field) => field.cp.asteroidSpawn.amount)
+        .reduce((acc, a) => acc + a, 0) ?? 0,
     max:
       fieldsByType[commodity]?.reduce(
-        (max, field) =>
-          max +
-          field.cp.asteroidSpawn.density * field.cp.asteroidSpawn.size ** 2,
+        (max, field) => max + getFieldMax(field.cp.asteroidSpawn),
         0
       ) ?? 0,
   }));

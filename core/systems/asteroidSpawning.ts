@@ -1,3 +1,4 @@
+import { gameDay } from "@core/utils/misc";
 import { System } from "./system";
 import { getFieldMax } from "../archetypes/asteroidField";
 import type { Sim } from "../sim";
@@ -21,7 +22,7 @@ export class AsteroidSpawningSystem extends System<"exec"> {
         );
       }
 
-      this.cooldowns.use("exec", 600);
+      this.cooldowns.use("exec", 20 * gameDay);
     }
   };
 }
