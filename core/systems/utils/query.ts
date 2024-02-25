@@ -179,7 +179,7 @@ export function createQueries(sim: Sim) {
     disposable: new Query(sim, ["disposable"]),
     facilities: new Query(
       sim,
-      ["modules", "position", "facilityModuleQueue", "subordinates"],
+      ["modules", "position", "facilityModuleQueue", "subordinates", "crew"],
       [],
       true
     ),
@@ -188,6 +188,7 @@ export function createQueries(sim: Sim) {
       "modules",
       "position",
     ]),
+    habitats: new Query(sim, ["parent", "facilityModuleBonus"]),
     mining: new Query(sim, ["mining", "storage"]),
     orderable: new Query(sim, ["orders", "position", "model", "owner"]),
     player: new Query(sim, [...factionComponents, "missions"], ["player"]),

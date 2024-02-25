@@ -58,7 +58,11 @@ export function deployFacilityAction(entity: Ship): boolean {
 
   addFacilityModule(
     facilityEnt,
-    facilityModules.basic.create(entity.sim, facilityEnt)
+    facilityModules.basicHabitat.create(entity.sim, facilityEnt)
+  );
+  addFacilityModule(
+    facilityEnt,
+    facilityModules.basicStorage.create(entity.sim, facilityEnt)
   );
 
   entity.cp.position.angle = 0;

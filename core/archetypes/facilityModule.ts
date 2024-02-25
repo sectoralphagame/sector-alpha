@@ -15,6 +15,9 @@ export interface FacilityModuleCommonInput {
     cost: Partial<Record<Commodity, number>>;
     time: number;
   };
+  crew: {
+    cost: number;
+  };
 }
 export interface ProductionFacilityModuleInput
   extends FacilityModuleCommonInput {
@@ -34,8 +37,14 @@ export interface TeleportFacilityModuleInput extends FacilityModuleCommonInput {
 export interface HabitatFacilityModuleInput extends FacilityModuleCommonInput {
   pac: Partial<PAC>;
   time: number;
-  crew: number;
+  crew: {
+    cost: 0;
+    capacity: number;
+  };
   type: "habitat";
+}
+export interface HubFacilityModuleInput extends FacilityModuleCommonInput {
+  type: "hub";
 }
 export interface MilitaryFacilityModuleInput extends FacilityModuleCommonInput {
   damage: Omit<Damage, "name">;
@@ -47,8 +56,10 @@ export type FacilityModuleInput =
   | ShipyardFacilityModuleInput
   | TeleportFacilityModuleInput
   | HabitatFacilityModuleInput
-  | MilitaryFacilityModuleInput;
+  | MilitaryFacilityModuleInput
+  | HubFacilityModuleInput;
 
+export type FacilityModuleType = FacilityModuleInput["type"];
 export type FacilityModule = RequireComponent<"parent" | "name">;
 
 export function createFacilityModule(
@@ -67,13 +78,21 @@ export function createFacilityModule(
       name: "name",
       value: input.name,
     })
-    .addTag("facilityModule");
+    .addTag("facilityModule")
+    .addTag(input.type);
   if (input.type === "production" || input.type === "habitat") {
     entity.addComponent(createProduction(input.pac));
+
+    if (input.type === "habitat") {
+      entity.addComponent({
+        name: "facilityModuleBonus",
+        workers: input.crew.capacity,
+      });
+    }
   } else if (input.type === "storage") {
     entity.addComponent({
-      name: "storageBonus",
-      value: input.storage,
+      name: "facilityModuleBonus",
+      storage: input.storage,
     });
   } else if (input.type === "teleport") {
     entity.addComponent({

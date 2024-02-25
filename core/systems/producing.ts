@@ -1,5 +1,6 @@
+import { maxMood, minMood } from "@core/components/crew";
 import { gameDay, gameMonth } from "@core/utils/misc";
-import { every } from "@fxts/core";
+import { every, sum } from "@fxts/core";
 import type { Production } from "../components/production";
 import type { CommodityStorage } from "../components/storage";
 import {
@@ -8,64 +9,35 @@ import {
   removeStorage,
 } from "../components/storage";
 import type { Commodity } from "../economy/commodity";
-import { commodities } from "../economy/commodity";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import { findInAncestors } from "../utils/findInAncestors";
-import { limitMax } from "../utils/limit";
 import { perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
 
-function produce(production: Production, storage: CommodityStorage) {
-  const multiplier = gameDay / gameMonth;
+function getMoodMultiplier(mood: number): number {
+  const maxPenalty = 0.5;
+  const maxBonus = 1.3;
 
-  perCommodity((commodity) => {
-    if (production.pac[commodity].consumes > 0) {
-      removeStorage(
-        storage,
-        commodity,
-        Math.floor(production.pac[commodity].consumes * multiplier)
-      );
-    }
-  });
-  perCommodity((commodity) => {
-    if (production.pac[commodity].produces > 0) {
-      addStorage(
-        storage,
-        commodity,
-        Math.floor(
-          limitMax(
-            storage.quota[commodity] -
-              production.pac[commodity].produces * multiplier,
-            production.pac[commodity].produces * multiplier
-          )
-        ),
-        false
-      );
-    }
-  });
+  const a = (maxBonus - maxPenalty) / (maxMood - minMood);
+  const b = maxPenalty - a * minMood;
+
+  return a * mood + b;
 }
 
-export function isAbleToProduce(
-  facilityModule: RequireComponent<"production">,
-  storage: CommodityStorage
-  // eslint-disable-next-line no-unused-vars
-): boolean {
-  if (!facilityModule.cooldowns.canUse("production")) return false;
+function getCrewMultiplier(
+  crewableWithModules: RequireComponent<"crew" | "modules">
+): number {
+  const requiredCrew = crewableWithModules.cp.modules.ids
+    .map((id) => crewableWithModules.sim.getOrThrow(id))
+    .filter((fm) => fm.cp.crewRequirement?.value)
+    .map((fm) => fm.cp.crewRequirement!.value)
+    .reduce((acc, val) => acc + val, 0);
+  if (crewableWithModules.cp.crew.workers.current < requiredCrew) {
+    return crewableWithModules.cp.crew.workers.current / requiredCrew;
+  }
 
-  const multiplier = gameDay / gameMonth;
-  return every(
-    (commodity) =>
-      hasSufficientStorage(
-        storage,
-        commodity,
-        facilityModule.cp.production.pac[commodity].consumes * multiplier
-      ) &&
-      (facilityModule.cp.production.pac[commodity].produces * multiplier
-        ? storage.availableWares[commodity] < storage.quota[commodity]
-        : true),
-    Object.values(commodities) as Commodity[]
-  );
+  return 1;
 }
 
 export class ProducingSystem extends System<"exec"> {
@@ -79,32 +51,112 @@ export class ProducingSystem extends System<"exec"> {
         );
       }
     });
+
+    // Execute every day at the start of the day
+    const offset =
+      Math.floor(sim.getTime() / gameDay) + 1 - sim.getTime() / gameDay;
+    this.cooldowns.use("exec", offset);
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+  };
+
+  static isAbleToProduce = (
+    facilityModule: RequireComponent<"production">,
+    storage: CommodityStorage
+    // eslint-disable-next-line no-unused-vars
+  ): boolean => {
+    if (
+      !(
+        facilityModule.cooldowns.canUse("production") &&
+        facilityModule.cp.production.active
+      )
+    )
+      return false;
+
+    const multiplier = gameDay / gameMonth;
+    return every(
+      (commodity) =>
+        hasSufficientStorage(
+          storage,
+          commodity,
+          facilityModule.cp.production.pac[commodity].consumes * multiplier
+        ) &&
+        (facilityModule.cp.production.pac[commodity].produces * multiplier
+          ? storage.availableWares[commodity] < storage.quota[commodity]
+          : true),
+      Object.keys(facilityModule.cp.production.pac) as Commodity[]
+    );
+  };
+
+  static produce = (
+    production: Production,
+    storage: CommodityStorage,
+    outputMultipliers: number[]
+  ) => {
+    const timeMultiplier = gameDay / gameMonth;
+
+    perCommodity((commodity) => {
+      if (production.pac[commodity].consumes > 0) {
+        removeStorage(
+          storage,
+          commodity,
+          Math.floor(production.pac[commodity].consumes * timeMultiplier)
+        );
+      }
+    });
+    perCommodity((commodity) => {
+      if (production.pac[commodity].produces > 0) {
+        const quantity =
+          production.pac[commodity].produces *
+          timeMultiplier *
+          sum(outputMultipliers);
+        addStorage(
+          storage,
+          commodity,
+          Math.floor(Math.min(storage.quota[commodity] - quantity, quantity)),
+          false
+        );
+      }
+    });
   };
 
   exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
 
     for (const entity of this.sim.queries.standaloneProduction.getIt()) {
-      if (!isAbleToProduce(entity, entity.cp.storage)) {
+      const willProduce = ProducingSystem.isAbleToProduce(
+        entity,
+        entity.cp.storage
+      );
+      entity.cp.production.produced = willProduce;
+      if (!willProduce) {
         continue;
       }
 
       entity.cooldowns.use("production", gameDay);
 
-      produce(entity.cp.production, entity.cp.storage);
+      ProducingSystem.produce(entity.cp.production, entity.cp.storage, [1]);
     }
 
     for (const facilityModule of this.sim.queries.productionByModules.getIt()) {
-      const facility = findInAncestors(facilityModule, "storage");
+      const facility = findInAncestors(
+        facilityModule,
+        "storage"
+      ).requireComponents(["storage", "crew", "modules"]);
       const storage = facility.cp.storage;
-      if (!isAbleToProduce(facilityModule, storage)) {
+      const willProduce = ProducingSystem.isAbleToProduce(
+        facilityModule,
+        storage
+      );
+      facilityModule.cp.production.produced = willProduce;
+      if (!willProduce) {
         continue;
       }
 
       facilityModule.cooldowns.use("production", gameDay);
-
-      produce(facilityModule.cp.production, storage);
+      ProducingSystem.produce(facilityModule.cp.production, storage, [
+        getMoodMultiplier(facility.cp.crew.mood),
+        getCrewMultiplier(facility),
+      ]);
     }
 
     this.cooldowns.use("exec", gameDay);

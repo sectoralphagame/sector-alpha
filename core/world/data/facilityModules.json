@@ -16,7 +16,8 @@
         "drones": 50
       },
       "time": 220
-    }
+    },
+    "crew": { "cost": 4 }
   },
   {
     "name": "Small Container",
@@ -31,7 +32,8 @@
         "drones": 20
       },
       "time": 70
-    }
+    },
+    "crew": { "cost": 0 }
   },
   {
     "name": "Medium Container",
@@ -40,7 +42,8 @@
     "slug": "containerMedium",
     "time": 0,
     "build": { "cost": {}, "time": 0 },
-    "storage": 20000
+    "storage": 20000,
+    "crew": { "cost": 0 }
   },
   {
     "name": "Shipyard",
@@ -56,13 +59,14 @@
         "drones": 1000
       },
       "time": 0
-    }
+    },
+    "crew": { "cost": 120 }
   },
   {
     "name": "Habitation Dome",
     "type": "habitat",
     "pac": {
-      "food": { "consumes": 100, "produces": 0 },
+      "food": { "consumes": 105, "produces": 0 },
       "fuel": { "consumes": 175, "produces": 0 }
     },
     "slug": "habitat",
@@ -71,7 +75,7 @@
       "cost": { "electronics": 2300, "fuel": 1450, "hullPlates": 22000 },
       "time": 410
     },
-    "crew": "100"
+    "crew": { "cost": 0, "capacity": 35 }
   },
   {
     "name": "Large Container",
@@ -80,7 +84,8 @@
     "slug": "containerLarge",
     "time": 0,
     "build": { "cost": {}, "time": 0 },
-    "storage": 60000
+    "storage": 60000,
+    "crew": { "cost": 0 }
   },
   {
     "name": "Farm",
@@ -92,7 +97,8 @@
     },
     "slug": "farm",
     "time": 240,
-    "build": { "cost": {}, "time": 0 }
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "cost": 5 }
   },
   {
     "name": "Refinery",
@@ -103,7 +109,8 @@
     },
     "slug": "refinery",
     "time": 330,
-    "build": { "cost": {}, "time": 0 }
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "cost": 8 }
   },
   {
     "name": "Fuelium Refinery",
@@ -114,7 +121,8 @@
     },
     "slug": "fueliumRefinery",
     "time": 359,
-    "build": { "cost": {}, "time": 0 }
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "cost": 8 }
   },
   {
     "name": "Hull Plates Factory",
@@ -127,7 +135,8 @@
     },
     "slug": "hullPlatesFactory",
     "time": 600,
-    "build": { "cost": {}, "time": 0 }
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "cost": 12 }
   },
   {
     "name": "Gold Refinery",
@@ -139,7 +148,8 @@
     },
     "slug": "goldRefinery",
     "time": 900,
-    "build": { "cost": {}, "time": 0 }
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "cost": 15 }
   },
   {
     "name": "Silicon Purification",
@@ -150,7 +160,8 @@
     },
     "slug": "siliconPurification",
     "time": 360,
-    "build": { "cost": {}, "time": 0 }
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "cost": 15 }
   },
   {
     "name": "Electronics Factory",
@@ -163,7 +174,8 @@
     },
     "slug": "electronicsFactory",
     "time": 420,
-    "build": { "cost": {}, "time": 0 }
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "cost": 20 }
   },
   {
     "name": "Drone Factory",
@@ -175,7 +187,8 @@
     },
     "slug": "droneFactory",
     "time": 960,
-    "build": { "cost": {}, "time": 0 }
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "cost": 25 }
   },
   {
     "name": "Hyperspace Generator",
@@ -187,16 +200,8 @@
     },
     "slug": "teleport",
     "time": 480,
-    "build": { "cost": {}, "time": 0 }
-  },
-  {
-    "name": "Basic Module",
-    "type": "storage",
-    "pac": {},
-    "slug": "basic",
-    "time": 0,
     "build": { "cost": {}, "time": 0 },
-    "storage": 1000
+    "crew": { "cost": 0 }
   },
   {
     "name": "Small Defense Module",
@@ -205,8 +210,9 @@
     "slug": "smallDefense",
     "time": 0,
     "build": { "cost": {}, "time": 0 },
-    "crew": "",
-    "damage": { "value": 15, "range": 3, "cooldown": 0.7 }
+    "damage": { "value": 15, "range": 3, "cooldown": 0.7 },
+    "storage": 1000,
+    "crew": { "cost": 1 }
   },
   {
     "name": "Hydrogen Factory",
@@ -218,7 +224,8 @@
     },
     "slug": "hydrogenFactory",
     "time": 360,
-    "build": { "cost": {}, "time": 0 }
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "cost": 8 }
   },
   {
     "name": "Coolant Factory",
@@ -230,7 +237,8 @@
     },
     "slug": "coolantFactory",
     "time": 420,
-    "build": { "cost": {}, "time": 0 }
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "cost": 15 }
   },
   {
     "name": "Engine Parts Factory",
@@ -243,7 +251,8 @@
     },
     "slug": "enginePartsFactory",
     "time": 590,
-    "build": { "cost": {}, "time": 0 }
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "cost": 25 }
   },
   {
     "name": "Tau-Metal Factory",
@@ -256,6 +265,29 @@
     },
     "slug": "tauMetalFactory",
     "time": 780,
-    "build": { "cost": { "tauMetal": 10400, "fuel": 1900 }, "time": 0 }
+    "build": { "cost": { "tauMetal": 10400, "fuel": 1900 }, "time": 0 },
+    "crew": { "cost": 0 }
+  },
+  {
+    "name": "Basic Storage",
+    "type": "storage",
+    "pac": {},
+    "slug": "basicStorage",
+    "time": 0,
+    "build": { "cost": {}, "time": 0 },
+    "storage": 1000,
+    "crew": { "cost": 0 }
+  },
+  {
+    "name": "Basic Habitat",
+    "type": "habitat",
+    "pac": {
+      "food": { "consumes": 70, "produces": 0 },
+      "water": { "consumes": 42, "produces": 0 }
+    },
+    "slug": "basicHabitat",
+    "time": 0,
+    "build": { "cost": {}, "time": 0 },
+    "crew": { "capacity": 14 }
   }
 ]

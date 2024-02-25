@@ -15,7 +15,7 @@ const handlers: Partial<
       "owner",
       "deployable",
       "storage",
-      "storageBonus",
+      "facilityModuleBonus",
       "subordinates",
     ]);
     const ownerBudget = builder.sim.get(builder.cp.owner.id)?.cp.budget;
@@ -23,7 +23,7 @@ const handlers: Partial<
       changeBudgetMoney(ownerBudget, builder.cp.budget.money);
     }
 
-    builder.cp.storage.max -= builder.cp.storageBonus.value;
+    builder.cp.storage.max -= builder.cp.facilityModuleBonus.storage!;
 
     builder.cp.subordinates.ids.forEach((id) => {
       removeSubordinate(builder, builder.sim.getOrThrow(id));
@@ -38,7 +38,7 @@ const handlers: Partial<
       .removeComponent("budget")
       .removeComponent("trade")
       .removeComponent("docks")
-      .removeComponent("storageBonus")
+      .removeComponent("facilityModuleBonus")
       .removeComponent("builder");
 
     builder.cp.deployable.cancel = false;

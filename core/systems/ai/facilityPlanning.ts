@@ -12,7 +12,6 @@ import type { Sector } from "../../archetypes/sector";
 import { sectorSize } from "../../archetypes/sector";
 import { hecsToCartesian } from "../../components/hecsPosition";
 import type { PAC } from "../../components/production";
-import { createCompoundProduction } from "../../components/production";
 import { addStorage } from "../../components/storage";
 import type { Commodity } from "../../economy/commodity";
 import { commoditiesArray, mineableCommodities } from "../../economy/commodity";
@@ -119,8 +118,15 @@ export class FacilityPlanningSystem extends System<"plan"> {
         position: getSectorPosition(sector),
         sector,
       });
+      addFacilityModule(
+        facility,
+        facilityModules.basicHabitat.create(this.sim, facility)
+      );
+      addFacilityModule(
+        facility,
+        facilityModules.basicStorage.create(this.sim, facility)
+      );
       facility.cp.name.value = createFacilityName(facility, "Mining Complex");
-      facility.addComponent(createCompoundProduction());
       facility.cp.render.texture = "fMin";
 
       for (
@@ -144,51 +150,6 @@ export class FacilityPlanningSystem extends System<"plan"> {
       );
       addStartingCommodities(facility);
     });
-  };
-
-  planHabitats = (faction: Faction): void => {
-    this.sim.queries.sectors
-      .get()
-      .filter((sector) => sector.cp.owner?.id === faction.id)
-      .forEach((sector) => {
-        const sectorPosition = hecsToCartesian(
-          sector.cp.hecsPosition.value,
-          sectorSize / 10
-        );
-
-        const facility = createFacility(this.sim, {
-          owner: faction,
-          position: add(sectorPosition, [
-            random(-sectorSize / 20, sectorSize / 20),
-            random(-sectorSize / 20, sectorSize / 20),
-          ]) as Position2D,
-          sector,
-        });
-        facility.cp.render.texture = "fCiv";
-        facility.cp.name.value = createFacilityName(facility, "Habitat");
-        facility.addComponent(createCompoundProduction());
-
-        addFacilityModule(
-          facility,
-          facilityModules.containerSmall.create(this.sim, facility)
-        );
-        addFacilityModule(
-          facility,
-          facilityModules.habitat.create(this.sim, facility)
-        );
-        if (Math.random() < 0.2) {
-          addFacilityModule(
-            facility,
-            facilityModules.smallDefense.create(this.sim, facility)
-          );
-        }
-
-        addStartingCommodities(facility);
-        addFacilityModule(
-          facility,
-          facilityModules.smallDefense.create(this.sim, facility)
-        );
-      });
   };
 
   planFactories = (faction: Faction): void => {
@@ -267,7 +228,14 @@ export class FacilityPlanningSystem extends System<"plan"> {
           sector,
         });
         facility.cp.name.value = createFacilityName(facility, "Factory");
-        facility.addComponent(createCompoundProduction());
+        addFacilityModule(
+          facility,
+          facilityModules.basicHabitat.create(this.sim, facility)
+        );
+        addFacilityModule(
+          facility,
+          facilityModules.basicStorage.create(this.sim, facility)
+        );
         addFacilityModule(
           facility,
           facilityModules.smallDefense.create(this.sim, facility)
@@ -312,7 +280,6 @@ export class FacilityPlanningSystem extends System<"plan"> {
             this.planMiningFacilities(sector, faction);
           });
 
-        this.planHabitats(faction);
         this.planFactories(faction);
       });
     }

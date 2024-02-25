@@ -48,5 +48,7 @@ export const componentMask: Record<keyof CoreComponents, bigint> = {
   selectionManager: BigInt(1) << BigInt(43),
   simpleCommodityStorage: BigInt(1) << BigInt(44),
   storage: BigInt(1) << BigInt(45),
-  storageBonus: BigInt(1) << BigInt(46),
+  facilityModuleBonus: BigInt(1) << BigInt(46),
+  crew: BigInt(1) << BigInt(47),
+  crewRequirement: BigInt(1) << BigInt(48),
 };

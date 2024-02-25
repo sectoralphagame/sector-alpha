@@ -11,6 +11,7 @@ import { AttackingSystem } from "@core/systems/attacking";
 import { BudgetPlanningSystem } from "@core/systems/budgetPlanning";
 import { CollectibleUnregisteringSystem } from "@core/systems/collectibleUnregistering";
 import { CooldownUpdatingSystem } from "@core/systems/cooldowns";
+import { CrewGrowingSystem } from "@core/systems/crewGrowing";
 import { DeadUnregisteringSystem } from "@core/systems/deadUnregistering";
 import { DisposableUnregisteringSystem } from "@core/systems/disposableUnregistering";
 import { FacilityBuildingSystem } from "@core/systems/facilityBuilding";
@@ -66,6 +67,7 @@ export const createBaseConfig = (): SimConfig => {
   const config: SimConfig = {
     systems: [
       ...bootstrapSystems,
+      new CrewGrowingSystem(),
       new SelectingSystem(),
       new UndeployingSystem(),
       new AttackingSystem(),

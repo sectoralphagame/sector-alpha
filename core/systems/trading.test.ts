@@ -42,7 +42,7 @@ describe("Trading system", () => {
   });
 
   it("creates offers", () => {
-    system.exec(10);
+    system.exec();
 
     expect(Object.keys(facility.cp.trade.offers)).toHaveLength(
       Object.keys(commodities).length
@@ -51,32 +51,32 @@ describe("Trading system", () => {
   });
 
   it("creates sell offers is surplus is positive", () => {
-    system.exec(10);
+    system.exec();
 
     expect(facility.cp.trade.offers.food.quantity).toBeGreaterThan(0);
   });
 
   it("creates buy offers is surplus is negative", () => {
     changeBudgetMoney(facility.cp.budget, 1000);
-    system.exec(10);
+    system.exec();
 
     expect(facility.cp.trade.offers.water.type).toBe("buy");
   });
 
   it("properly sets offer quantity if has no commodity", () => {
     settleStorageQuota(facility);
-    system.exec(10);
+    system.exec();
 
-    expect(facility.cp.storage.quota.water).toBe(1191);
-    expect(facility.cp.trade.offers.water.quantity).toBe(1191);
+    expect(facility.cp.storage.quota.water).toBe(1190);
+    expect(facility.cp.trade.offers.water.quantity).toBe(1190);
   });
 
   it("properly sets offer quantity if already has some commodity", () => {
     addStorage(facility.cp.storage, "water", 10, false);
     settleStorageQuota(facility);
-    system.exec(10);
+    system.exec();
 
-    expect(facility.cp.storage.quota.water).toBe(1191);
-    expect(facility.cp.trade.offers.water.quantity).toBe(1181);
+    expect(facility.cp.storage.quota.water).toBe(1190);
+    expect(facility.cp.trade.offers.water.quantity).toBe(1180);
   });
 });

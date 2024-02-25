@@ -1,5 +1,7 @@
+import type { FacilityModuleType } from "./archetypes/facilityModule";
 import type { ShipRole } from "./world/ships";
 import { shipRoles } from "./world/ships";
+import modules from "./world/data/facilityModules.json";
 
 const tags = [
   "player",
@@ -13,6 +15,10 @@ const tags = [
   "collectible",
   "ai:attack-force",
   ...shipRoles.map<`role:${ShipRole}`>((role) => `role:${role}`),
+  ...modules.map<`facilityModuleType:${FacilityModuleType}`>(
+    ({ type: facilityModuleType }) =>
+      `facilityModuleType:${facilityModuleType as FacilityModuleType}`
+  ),
 ] as const;
 
 export type EntityTag = (typeof tags)[number];

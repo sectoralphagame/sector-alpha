@@ -6,7 +6,7 @@ import type { CommodityStorage, SimpleCommodityStorage } from "./storage";
 import type { Position } from "./position";
 import type { CompoundProduction, Production } from "./production";
 import type { Parent } from "./parent";
-import type { StorageBonus } from "./storageBonus";
+import type { FacilityModuleBonus } from "./facilityModuleBonus";
 import type { Modules } from "./modules";
 import type { Name } from "./name";
 import type { SelectionManager } from "./selection";
@@ -42,6 +42,8 @@ import type { Disposable } from "./disposable";
 import type { Subordinates } from "./subordinates";
 import type { CreationDate } from "./creationDate";
 import type { Missions } from "./missions";
+import type { Crew } from "./crew";
+import type { CrewRequirement } from "./crewRequirement";
 
 export interface CoreComponents {
   ai: Ai;
@@ -56,12 +58,15 @@ export interface CoreComponents {
   commander: Commander;
   compoundProduction: CompoundProduction;
   creationDate: CreationDate;
+  crew: Crew;
+  crewRequirement: CrewRequirement;
   damage: Damage;
   deployable: Deployable;
   disposable: Disposable;
   dockable: Dockable;
   docks: Docks;
   drive: Drive;
+  facilityModuleBonus: FacilityModuleBonus;
   facilityModuleQueue: FacilityModuleQueue;
   hecsPosition: HECSPosition;
   hitpoints: HitPoints;
@@ -86,7 +91,6 @@ export interface CoreComponents {
   shipyard: Shipyard;
   simpleCommodityStorage: SimpleCommodityStorage;
   storage: CommodityStorage;
-  storageBonus: StorageBonus;
   subordinates: Subordinates;
   systemManager: SystemManager;
   teleport: Teleport;

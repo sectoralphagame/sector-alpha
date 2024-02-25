@@ -37,6 +37,7 @@ import { Storage } from "../Storage/Storage";
 import { ShipyardDialog } from "../ShipyardDialog";
 import { SimpleStorage } from "../Storage";
 import { MissionDialog } from "../MissionDialog";
+import { Crew } from "../Crew/Crew";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -189,6 +190,9 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                     />
                     <hr />
                   </>
+                )}
+                {entity.hasComponents(["crew"]) && (
+                  <Crew entity={entity.requireComponents(["crew"])} />
                 )}
                 <Subordinates entity={entity} />
                 {entity.hasComponents(["deployable"]) && (

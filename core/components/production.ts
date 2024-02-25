@@ -51,12 +51,17 @@ export function getRequiredStorage(production: BaseProduction): number {
 
 export interface Production
   extends BaseComponent<"production">,
-    BaseProduction {}
+    BaseProduction {
+  active: boolean;
+  produced: boolean;
+}
 
 export function createProduction(pac: Partial<PAC> = {}): Production {
   return {
     name: "production",
+    active: true,
     pac: merge(cloneDeep(baseProductionAndConsumption), pac),
+    produced: true,
   };
 }
 

@@ -82,7 +82,7 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
           parent: facility,
         });
         addFacilityModule(
-          facility.requireComponents(["storage", "modules"]),
+          facility.requireComponents(["storage", "modules", "crew"]),
           facilityModule
         );
         facility.cp.facilityModuleQueue.building = null;

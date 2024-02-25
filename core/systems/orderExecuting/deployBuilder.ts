@@ -25,8 +25,8 @@ export function deployBuilderAction(
     .addComponent(createTrade())
     .addComponent({ name: "builder", targetId: order.targetId })
     .addComponent({
-      name: "storageBonus",
-      value: 1e6 - entity.cp.storage!.max,
+      name: "facilityModuleBonus",
+      storage: 1e6 - entity.cp.storage!.max,
     });
 
   entity.cp.trade!.auto = { pricing: false, quantity: false };

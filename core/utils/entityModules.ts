@@ -5,7 +5,7 @@ import type { Commodity } from "../economy/commodity";
 import { commodities } from "../economy/commodity";
 
 export function addFacilityModule(
-  facility: RequireComponent<"modules" | "storage">,
+  facility: RequireComponent<"modules" | "storage" | "crew">,
   facilityModule: FacilityModule
 ) {
   facility.cp.modules.ids.push(facilityModule.id);
@@ -26,7 +26,13 @@ export function addFacilityModule(
     }
   }
 
-  if (facilityModule.hasComponents(["storageBonus"])) {
-    facility.cp.storage.max += facilityModule.cp.storageBonus!.value;
+  if (facilityModule.hasComponents(["facilityModuleBonus"])) {
+    if (facilityModule.cp.facilityModuleBonus!.storage) {
+      facility.cp.storage.max += facilityModule.cp.facilityModuleBonus!.storage;
+    }
+    if (facilityModule.cp.facilityModuleBonus!.workers) {
+      facility.cp.crew.workers.max +=
+        facilityModule.cp.facilityModuleBonus!.workers;
+    }
   }
 }

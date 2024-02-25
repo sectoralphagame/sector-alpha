@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import settings from "@core/settings";
 import { Sim } from "@core/sim";
 import { bootstrapSystems } from "@core/sim/baseConfig";
