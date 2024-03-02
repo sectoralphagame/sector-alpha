@@ -16,7 +16,7 @@ import {
 import { formatInt, useThrottledFormState } from "@devtools/utils";
 import type {
   FacilityModuleInput,
-  HabitatFacilityModuleInput,
+  HubFacilityModuleInput,
   ProductionFacilityModuleInput,
 } from "@core/archetypes/facilityModule";
 import { max, min } from "@fxts/core";
@@ -38,13 +38,13 @@ const FacilityModuleProductionEditor: React.FC<{ index: number }> = ({
 
   if (
     !facilityModule ||
-    !(facilityModule.type === "production" || facilityModule.type === "habitat")
+    !(facilityModule.type === "production" || facilityModule.type === "hub")
   ) {
     return null;
   }
 
   const fm = facilityModule as
-    | HabitatFacilityModuleInput
+    | HubFacilityModuleInput
     | ProductionFacilityModuleInput;
 
   return (

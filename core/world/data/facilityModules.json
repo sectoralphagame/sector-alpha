@@ -281,13 +281,28 @@
   {
     "name": "Basic Habitat",
     "type": "habitat",
-    "pac": {
-      "food": { "consumes": 70, "produces": 0 },
-      "water": { "consumes": 42, "produces": 0 }
-    },
     "slug": "basicHabitat",
     "time": 0,
     "build": { "cost": {}, "time": 0 },
     "crew": { "capacity": 14 }
+  },
+  {
+    "name": "Sector Hub",
+    "type": "hub",
+    "pac": {
+      "food": { "consumes": 5, "produces": 0 },
+      "water": { "consumes": 3, "produces": 0 }
+    },
+    "slug": "hub",
+    "build": {
+      "cost": {
+        "hullPlates": 29000,
+        "drones": 800,
+        "electronics": 3500,
+        "fuel": 1500
+      },
+      "time": 960
+    },
+    "crew": { "cost": 0 }
   }
 ]

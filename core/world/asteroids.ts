@@ -21,7 +21,7 @@ const resourcesPerAsteroid: Record<MineableCommodity, [number, number]> = {
   ice: [55, 270],
   silica: [70, 200],
 };
-const getDensity = (type: MineableCommodity) => random(...densities[type]);
+const getDensity = (type: MineableCommodity) => random(...densities[type]) * 5;
 
 export function spawnAsteroidField(
   sim: Sim,

@@ -1,5 +1,10 @@
 import { sum } from "mathjs";
-import { InsufficientMoney, NegativeBudget, NegativeQuantity } from "../errors";
+import {
+  InsufficientMoney,
+  NegativeBudget,
+  NegativeQuantity,
+  NotFiniteMoney,
+} from "../errors";
 import type { BaseComponent } from "./component";
 import type {
   Allocation,
@@ -77,8 +82,14 @@ export function setMoney(budget: Budget, value: number) {
 export function changeBudgetMoney(budget: Budget, value: number) {
   budget.money += value;
 
+  if (!Number.isFinite(value)) {
+    throw new NotFiniteMoney();
+  }
   if (budget.money < 0) {
     throw new NegativeBudget(budget.money);
+  }
+  if (Number.isNaN(budget.money)) {
+    throw new NotFiniteMoney();
   }
   updateAvailableMoney(budget);
 }

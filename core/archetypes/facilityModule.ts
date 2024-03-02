@@ -35,8 +35,6 @@ export interface TeleportFacilityModuleInput extends FacilityModuleCommonInput {
   type: "teleport";
 }
 export interface HabitatFacilityModuleInput extends FacilityModuleCommonInput {
-  pac: Partial<PAC>;
-  time: number;
   crew: {
     cost: 0;
     capacity: number;
@@ -44,6 +42,7 @@ export interface HabitatFacilityModuleInput extends FacilityModuleCommonInput {
   type: "habitat";
 }
 export interface HubFacilityModuleInput extends FacilityModuleCommonInput {
+  pac: Partial<PAC>;
   type: "hub";
 }
 export interface MilitaryFacilityModuleInput extends FacilityModuleCommonInput {
@@ -79,16 +78,15 @@ export function createFacilityModule(
       value: input.name,
     })
     .addTag("facilityModule")
-    .addTag(input.type);
-  if (input.type === "production" || input.type === "habitat") {
+    .addTag(`facilityModuleType:${input.type}`);
+  if (input.type === "habitat") {
+    entity.addComponent({
+      name: "facilityModuleBonus",
+      workers: input.crew.capacity,
+    });
+  }
+  if (input.type === "production" || input.type === "hub") {
     entity.addComponent(createProduction(input.pac));
-
-    if (input.type === "habitat") {
-      entity.addComponent({
-        name: "facilityModuleBonus",
-        workers: input.crew.capacity,
-      });
-    }
   } else if (input.type === "storage") {
     entity.addComponent({
       name: "facilityModuleBonus",

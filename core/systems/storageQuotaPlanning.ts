@@ -29,14 +29,18 @@ function getShipyardQuota(
 export function settleStorageQuota(entity: RequireComponent<"storage">) {
   const hasProduction = entity.hasComponents(["compoundProduction"]);
 
-  commoditiesArray.forEach((commodity) => {
+  for (const commodity of commoditiesArray) {
     if (hasProduction) {
-      entity.cp.storage.quota[commodity] = Math.floor(
-        (entity.cp.storage.max *
-          (entity.cp.compoundProduction!.pac[commodity].produces +
-            entity.cp.compoundProduction!.pac[commodity].consumes)) /
-          getRequiredStorage(entity.cp.compoundProduction!)
-      );
+      const requiredStorage = getRequiredStorage(entity.cp.compoundProduction!);
+      entity.cp.storage.quota[commodity] =
+        requiredStorage === 0
+          ? 0
+          : Math.floor(
+              (entity.cp.storage.max *
+                (entity.cp.compoundProduction!.pac[commodity].produces +
+                  entity.cp.compoundProduction!.pac[commodity].consumes)) /
+                requiredStorage
+            );
     } else if (entity.hasComponents(["shipyard", "owner"])) {
       entity.cp.storage.quota[commodity] = getShipyardQuota(
         entity.requireComponents(["storage", "shipyard", "owner"]),
@@ -45,7 +49,7 @@ export function settleStorageQuota(entity: RequireComponent<"storage">) {
     } else {
       entity.cp.storage.quota[commodity] = 0;
     }
-  });
+  }
 }
 
 export class StorageQuotaPlanningSystem extends System<"settle"> {

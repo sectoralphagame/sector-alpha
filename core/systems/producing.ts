@@ -40,6 +40,8 @@ function getCrewMultiplier(
   return 1;
 }
 
+export const timeMultiplier = gameDay / gameMonth;
+
 export class ProducingSystem extends System<"exec"> {
   apply = (sim: Sim): void => {
     super.apply(sim);
@@ -92,8 +94,6 @@ export class ProducingSystem extends System<"exec"> {
     storage: CommodityStorage,
     outputMultipliers: number[]
   ) => {
-    const timeMultiplier = gameDay / gameMonth;
-
     perCommodity((commodity) => {
       if (production.pac[commodity].consumes > 0) {
         removeStorage(
@@ -138,6 +138,9 @@ export class ProducingSystem extends System<"exec"> {
     }
 
     for (const facilityModule of this.sim.queries.productionByModules.getIt()) {
+      // It'll be handled by CrewGrowingSystem
+      if (facilityModule.tags.has("facilityModuleType:hub")) continue;
+
       const facility = findInAncestors(
         facilityModule,
         "storage"

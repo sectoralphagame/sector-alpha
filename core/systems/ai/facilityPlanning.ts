@@ -128,6 +128,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
       );
       facility.cp.name.value = createFacilityName(facility, "Mining Complex");
       facility.cp.render.texture = "fMin";
+      facility.cp.crew.workers.current = facility.cp.crew.workers.max * 0.7;
 
       for (
         let i = 0;
@@ -150,6 +151,41 @@ export class FacilityPlanningSystem extends System<"plan"> {
       );
       addStartingCommodities(facility);
     });
+  };
+
+  planHubs = (faction: Faction): void => {
+    for (const sector of this.sim.queries.sectors.getIt()) {
+      if (sector.cp.owner?.id !== faction.id) continue;
+
+      const position = hecsToCartesian(
+        sector.cp.hecsPosition.value,
+        sectorSize / 10
+      );
+      position[0] += random(-sectorSize / 50, sectorSize / 50);
+      position[1] += random(-sectorSize / 50, sectorSize / 50);
+
+      const facility = createFacility(this.sim, {
+        owner: faction,
+        position,
+        sector,
+      });
+      facility.cp.name.value = createFacilityName(facility, "Hub");
+      facility.cp.render.texture = "fHub";
+      addFacilityModule(
+        facility,
+        facilityModules.hub.create(this.sim, facility)
+      );
+      addFacilityModule(
+        facility,
+        facilityModules.containerMedium.create(this.sim, facility)
+      );
+      for (let i = 0; i < 3; i++) {
+        addFacilityModule(
+          facility,
+          facilityModules.smallDefense.create(this.sim, facility)
+        );
+      }
+    }
   };
 
   planFactories = (faction: Faction): void => {
@@ -202,7 +238,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
     while (buildQueue.length > 0) {
       if (
         !facility ||
-        Math.random() > 0.7 ||
+        Math.random() > 0.8 ||
         facility.cp.modules.ids.length > 6
       ) {
         if (facility && this.sim.getTime() === 0) {
@@ -240,6 +276,8 @@ export class FacilityPlanningSystem extends System<"plan"> {
           facility,
           facilityModules.smallDefense.create(this.sim, facility)
         );
+
+        facility.cp.crew.workers.current = facility.cp.crew.workers.max * 0.7;
       }
 
       const facilityModule = buildQueue.pop()!;
@@ -279,7 +317,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
           .forEach((sector) => {
             this.planMiningFacilities(sector, faction);
           });
-
+        this.planHubs(faction);
         this.planFactories(faction);
       });
     }

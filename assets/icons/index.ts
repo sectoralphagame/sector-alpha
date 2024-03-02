@@ -5,6 +5,7 @@ import asteroid from "./asteroid.svg";
 import box from "./box.svg";
 import fCiv from "./f_civ.svg";
 import fFactory from "./f_factory.svg";
+import fHub from "./f_hub.svg";
 import fMil from "./f_mil.svg";
 import fMin from "./f_min.svg";
 import fShipyard from "./f_shipyard.svg";
@@ -40,64 +41,68 @@ export const manifest = {
       frame: { x: 0, y: 126, w: 126, h: 126 },
       src: "./assets/icons/f_factory.svg",
     },
-    fMil: {
+    fHub: {
       frame: { x: 126, y: 126, w: 126, h: 126 },
+      src: "./assets/icons/f_hub.svg",
+    },
+    fMil: {
+      frame: { x: 252, y: 0, w: 126, h: 126 },
       src: "./assets/icons/f_mil.svg",
     },
     fMin: {
-      frame: { x: 252, y: 0, w: 126, h: 126 },
+      frame: { x: 252, y: 126, w: 126, h: 126 },
       src: "./assets/icons/f_min.svg",
     },
     fShipyard: {
-      frame: { x: 252, y: 126, w: 126, h: 126 },
+      frame: { x: 0, y: 252, w: 126, h: 126 },
       src: "./assets/icons/f_shipyard.svg",
     },
     fTeleport: {
-      frame: { x: 0, y: 252, w: 126, h: 126 },
+      frame: { x: 126, y: 252, w: 126, h: 126 },
       src: "./assets/icons/f_teleport.svg",
     },
     lBld: {
-      frame: { x: 126, y: 378, w: 126, h: 82 },
+      frame: { x: 252, y: 378, w: 126, h: 82 },
       src: "./assets/icons/l_bld.svg",
     },
     lCiv: {
-      frame: { x: 126, y: 252, w: 126, h: 101 },
+      frame: { x: 252, y: 252, w: 126, h: 101 },
       src: "./assets/icons/l_civ.svg",
     },
     lMil: {
-      frame: { x: 252, y: 252, w: 126, h: 101 },
+      frame: { x: 378, y: 0, w: 126, h: 101 },
       src: "./assets/icons/l_mil.svg",
     },
     lMin: {
-      frame: { x: 378, y: 0, w: 126, h: 101 },
+      frame: { x: 378, y: 101, w: 126, h: 101 },
       src: "./assets/icons/l_min.svg",
     },
     lStg: {
-      frame: { x: 252, y: 378, w: 126, h: 82 },
+      frame: { x: 378, y: 378, w: 126, h: 82 },
       src: "./assets/icons/l_stg.svg",
     },
     mCiv: {
-      frame: { x: 378, y: 101, w: 126, h: 101 },
+      frame: { x: 378, y: 202, w: 126, h: 101 },
       src: "./assets/icons/m_civ.svg",
     },
     mMil: {
-      frame: { x: 378, y: 202, w: 126, h: 101 },
+      frame: { x: 0, y: 378, w: 126, h: 101 },
       src: "./assets/icons/m_mil.svg",
     },
     mMin: {
-      frame: { x: 0, y: 378, w: 126, h: 101 },
+      frame: { x: 126, y: 378, w: 126, h: 101 },
       src: "./assets/icons/m_min.svg",
     },
     sCiv: {
-      frame: { x: 378, y: 378, w: 126, h: 76 },
+      frame: { x: 0, y: 479, w: 126, h: 76 },
       src: "./assets/icons/s_civ.svg",
     },
     sMil: {
-      frame: { x: 0, y: 479, w: 126, h: 76 },
+      frame: { x: 126, y: 479, w: 126, h: 76 },
       src: "./assets/icons/s_mil.svg",
     },
     sMin: {
-      frame: { x: 126, y: 479, w: 126, h: 76 },
+      frame: { x: 252, y: 479, w: 126, h: 76 },
       src: "./assets/icons/s_min.svg",
     },
   },
@@ -115,6 +120,7 @@ export {
   box,
   fCiv,
   fFactory,
+  fHub,
   fMil,
   fMin,
   fShipyard,

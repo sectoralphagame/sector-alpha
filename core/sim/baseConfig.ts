@@ -61,13 +61,13 @@ export const bootstrapSystems = [
   new FacilityBuildingSystem(),
   new ShipReturningSystem(),
   new DisposableUnregisteringSystem(),
+  new CrewGrowingSystem(),
 ];
 
 export const createBaseConfig = (): SimConfig => {
   const config: SimConfig = {
     systems: [
       ...bootstrapSystems,
-      new CrewGrowingSystem(),
       new SelectingSystem(),
       new UndeployingSystem(),
       new AttackingSystem(),

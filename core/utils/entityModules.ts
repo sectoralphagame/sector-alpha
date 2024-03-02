@@ -1,8 +1,28 @@
 import type { RequireComponent } from "@core/tsHelpers";
 import type { FacilityModule } from "../archetypes/facilityModule";
 import { createCompoundProduction } from "../components/production";
-import type { Commodity } from "../economy/commodity";
-import { commodities } from "../economy/commodity";
+import { commoditiesArray } from "../economy/commodity";
+
+export function recalculateCompoundProduction(
+  facility: RequireComponent<"modules" | "compoundProduction">
+) {
+  for (const commodity of commoditiesArray) {
+    facility.cp.compoundProduction.pac[commodity].consumes = 0;
+    facility.cp.compoundProduction.pac[commodity].produces = 0;
+
+    for (const facilityModuleId of facility.cp.modules.ids) {
+      const facilityModule =
+        facility.sim.getOrThrow<FacilityModule>(facilityModuleId);
+
+      if (facilityModule.cp.production) {
+        facility.cp.compoundProduction.pac[commodity].consumes +=
+          facilityModule.cp.production.pac[commodity].consumes;
+        facility.cp.compoundProduction.pac[commodity].produces +=
+          facilityModule.cp.production.pac[commodity].produces;
+      }
+    }
+  }
+}
 
 export function addFacilityModule(
   facility: RequireComponent<"modules" | "storage" | "crew">,
@@ -17,12 +37,9 @@ export function addFacilityModule(
         createCompoundProduction(facilityModule.cp.production!.pac)
       );
     } else {
-      Object.keys(commodities).forEach((commodity: Commodity) => {
-        facility.cp.compoundProduction!.pac[commodity].produces +=
-          facilityModule.cp.production!.pac[commodity].produces;
-        facility.cp.compoundProduction!.pac[commodity].consumes +=
-          facilityModule.cp.production!.pac[commodity].consumes;
-      });
+      recalculateCompoundProduction(
+        facility.requireComponents(["compoundProduction", "modules"])
+      );
     }
   }
 

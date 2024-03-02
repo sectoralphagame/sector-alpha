@@ -38,6 +38,12 @@ export class InsufficientMoney extends Error {
   }
 }
 
+export class NotFiniteMoney extends Error {
+  constructor() {
+    super("Expected finite money");
+  }
+}
+
 export class NonPositiveAmount extends Error {
   amount: number;
 
