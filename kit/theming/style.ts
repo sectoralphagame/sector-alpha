@@ -35,6 +35,9 @@ export interface Theme {
     header5: string;
     header6: string;
   };
+  z: {
+    tooltip: number;
+  };
 }
 
 const getColor = (v: number): string =>
@@ -76,6 +79,9 @@ export function createTheme(scale: number): Theme {
       header5: `${Math.ceil(baseFontSize * 1.1)}px`,
       header6: `${Math.ceil(baseFontSize * 1.1)}px`,
     },
+    z: {
+      tooltip: 100,
+    },
   };
 }
 
@@ -114,9 +120,12 @@ export const Styles: React.FC<React.PropsWithChildren> = ({ children }) => {
       cssVariables.current = styleTag;
     }
 
-    cssVariables.current!.innerHTML = `:root { ${getProperties(theme)
-      .map(({ key, value }) => `--${key.replace(/\./g, "-")}: ${value};`)
-      .join(" ")} }`;
+    cssVariables.current!.innerHTML = `:root { ${[
+      `--spacing: ${theme.spacing[1]};`,
+      ...getProperties(theme).map(
+        ({ key, value }) => `--${key.replace(/\./g, "-")}: ${value};`
+      ),
+    ].join(" ")} }`;
   }, [theme]);
 
   return children as any;

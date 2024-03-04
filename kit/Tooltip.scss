@@ -1,0 +1,18 @@
+.tooltip {
+  padding: calc(var(--spacing) / 2) var(--spacing);
+  background: var(--palette-background-active);
+  border-radius: 4px;
+}
+
+.container {
+  z-index: var(--z-tooltip);
+  transition: opacity 200ms;
+}
+
+.hide {
+  opacity: 0;
+}
+
+.show {
+  opacity: 1;
+}

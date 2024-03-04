@@ -47,3 +47,7 @@
     text-shadow: currentColor 1px 0 10px;
   }
 }
+
+p.root {
+  margin-bottom: var(--spacing-0-5);
+}
