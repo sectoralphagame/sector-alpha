@@ -1,35 +1,36 @@
 import type { Values } from "../tsHelpers";
 
-export const commodities = {
-  coolant: "coolant",
-  drones: "drones",
-  electronics: "electronics",
-  engineParts: "engineParts",
-  food: "food",
-  fuel: "fuel",
-  fuelium: "fuelium",
-  gold: "gold",
-  goldOre: "goldOre",
-  hullPlates: "hullPlates",
-  hydrogen: "hydrogen",
-  ice: "ice",
-  metals: "metals",
-  ore: "ore",
-  silica: "silica",
-  silicon: "silicon",
-  tauMetal: "tauMetal",
-  water: "water",
-} as const;
-export type Commodity = Values<typeof commodities>;
+export const commodities = [
+  "coolant",
+  "drones",
+  "electronics",
+  "engineParts",
+  "food",
+  "fuel",
+  "fuelium",
+  "gold",
+  "goldOre",
+  "hullPlates",
+  "hydrogen",
+  "ice",
+  "metals",
+  "ore",
+  "silica",
+  "silicon",
+  "superconductors",
+  "tauMetal",
+  "water",
+] as const;
+export type Commodity = (typeof commodities)[number];
 export const commoditiesArray = Object.values(commodities) as Commodity[];
 
 export const mineableCommodities = {
-  fuelium: commodities.fuelium,
-  goldOre: commodities.goldOre,
-  ice: commodities.ice,
-  ore: commodities.ore,
-  silica: commodities.silica,
-};
+  fuelium: "fuelium",
+  goldOre: "goldOre",
+  ice: "ice",
+  ore: "ore",
+  silica: "silica",
+} as const;
 export type MineableCommodity = Values<typeof mineableCommodities>;
 export const mineableCommoditiesArray = Object.values(
   mineableCommodities
@@ -52,6 +53,7 @@ export const commodityLabel: Record<Commodity, string> = {
   ore: "Ore",
   silica: "Silica",
   silicon: "Silicon",
+  superconductors: "Superconductors",
   tauMetal: "Tau-Metal",
   water: "Water",
 };

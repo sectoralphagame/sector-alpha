@@ -13,6 +13,7 @@
     "build-storybook": "storybook build",
     "gen-spritesheet": "node ./scripts/createSpritesheet.js",
     "gen-save": "node -r ts-node/register ./scripts/createSave.ts",
+    "gen-commodities-graph": "node -r ts-node/register ./scripts/createCommoditiesGraph.ts",
     "prepare": "husky install"
   },
   "author": "Dominik Żegleń",
@@ -131,6 +132,7 @@
     "react-hook-form": "^7.50.1",
     "react-inlinesvg": "^3.0.0",
     "react-modal": "^3.15.1",
+    "react-popper": "^2.3.0",
     "react-router": "^6.3.0",
     "react-router-dom": "^6.3.0",
     "recoil": "^0.7.5",

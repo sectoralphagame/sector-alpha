@@ -40,6 +40,8 @@ export function createShipyard(input: InitialFacilityInput, sim: Sim) {
     addFacilityModule(facility, facilityModules.shipyard.create(sim, facility));
   }
 
+  addFacilityModule(facility, facilityModules.habitat.create(sim, facility));
+  addFacilityModule(facility, facilityModules.habitat.create(sim, facility));
   facility.addComponent({ name: "shipyard", queue: [], building: null });
   facility.cp.render.texture = "fShipyard";
   facility.cp.name.value = `${input.owner.cp.name.slug!} Shipyard`;

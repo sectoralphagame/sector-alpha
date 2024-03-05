@@ -1,16 +1,15 @@
 import { first } from "@fxts/core";
 import { sum } from "mathjs";
-import { commodities } from "../economy/commodity";
 import { System } from "./system";
 
 const basketCommodities = [
-  commodities.food,
-  commodities.water,
-  commodities.fuel,
-  commodities.ore,
-  commodities.silicon,
-  commodities.hullPlates,
-  commodities.electronics,
+  "food",
+  "water",
+  "fuel",
+  "ore",
+  "silicon",
+  "hullPlates",
+  "electronics",
 ] as const;
 type BasketCommodities = (typeof basketCommodities)[number];
 const basketWeights: Record<BasketCommodities, number> = {

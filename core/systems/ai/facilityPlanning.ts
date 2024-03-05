@@ -185,6 +185,9 @@ export class FacilityPlanningSystem extends System<"plan"> {
           facilityModules.smallDefense.create(this.sim, facility)
         );
       }
+
+      addStorage(facility.cp.storage, "food", facility.cp.storage.quota.food);
+      addStorage(facility.cp.storage, "water", facility.cp.storage.quota.water);
     }
   };
 

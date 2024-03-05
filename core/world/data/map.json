@@ -468,7 +468,9 @@
           "smallDefense",
           "hydrogenFactory",
           "coolantFactory",
-          "enginePartsFactory"
+          "enginePartsFactory",
+          "superconductorFactory",
+          "hub"
         ]
       },
       "color": "#6fc9f2",
@@ -519,7 +521,9 @@
           "smallDefense",
           "hydrogenFactory",
           "coolantFactory",
-          "enginePartsFactory"
+          "enginePartsFactory",
+          "superconductorFactory",
+          "hub"
         ]
       },
       "color": "#ffc34d",
@@ -603,7 +607,9 @@
           "smallDefense",
           "hydrogenFactory",
           "coolantFactory",
-          "enginePartsFactory"
+          "enginePartsFactory",
+          "hub",
+          "superconductorFactory"
         ]
       },
       "color": "#42f5e3",
@@ -647,7 +653,8 @@
           "smallDefense",
           "hydrogenFactory",
           "coolantFactory",
-          "enginePartsFactory"
+          "enginePartsFactory",
+          "hub"
         ]
       },
       "color": "#ff63e5",
@@ -685,12 +692,13 @@
           "goldRefinery",
           "siliconPurification",
           "smallDefense",
-          "hydrogenFactory",
           "coolantFactory",
           "shipyard",
           "fueliumRefinery",
           "basic",
-          "electronicsFactory"
+          "electronicsFactory",
+          "hydrogenFactory",
+          "hub"
         ]
       },
       "color": "#ff983d",
@@ -730,7 +738,9 @@
           "siliconPurification",
           "smallDefense",
           "hydrogenFactory",
-          "fueliumRefinery"
+          "fueliumRefinery",
+          "hub",
+          "superconductorFactory"
         ]
       },
       "color": "#f7fc5b",
@@ -762,7 +772,9 @@
           "smallDefense",
           "hydrogenFactory",
           "coolantFactory",
-          "enginePartsFactory"
+          "enginePartsFactory",
+          "hub",
+          "superconductorFactory"
         ]
       },
       "color": "#97ff7d",
@@ -773,7 +785,10 @@
     },
     {
       "name": "Pirates",
-      "blueprints": { "facilityModules": ["habitat"], "ships": ["fighter"] },
+      "blueprints": {
+        "facilityModules": ["habitat", "hub"],
+        "ships": ["fighter"]
+      },
       "color": "#f55b5b",
       "sectors": [],
       "slug": "PIR",

@@ -128,7 +128,6 @@
     "name": "Hull Plates Factory",
     "type": "production",
     "pac": {
-      "food": { "consumes": 33, "produces": 0 },
       "fuel": { "consumes": 325, "produces": 0 },
       "metals": { "consumes": 400, "produces": 0 },
       "hullPlates": { "consumes": 0, "produces": 1150 }
@@ -244,10 +243,10 @@
     "name": "Engine Parts Factory",
     "type": "production",
     "pac": {
-      "coolant": { "consumes": 48, "produces": 0 },
       "hullPlates": { "consumes": 50, "produces": 0 },
       "fuel": { "consumes": 128, "produces": 0 },
-      "engineParts": { "consumes": 0, "produces": 40 }
+      "engineParts": { "consumes": 0, "produces": 40 },
+      "superconductors": { "consumes": 5, "produces": 0 }
     },
     "slug": "enginePartsFactory",
     "time": 590,
@@ -304,5 +303,27 @@
       "time": 960
     },
     "crew": { "cost": 0 }
+  },
+  {
+    "name": "Superconductor Factory",
+    "type": "production",
+    "pac": {
+      "gold": { "consumes": 10, "produces": 0 },
+      "metals": { "consumes": 100, "produces": 0 },
+      "fuel": { "consumes": 30, "produces": 0 },
+      "superconductors": { "consumes": 0, "produces": 70 },
+      "coolant": { "consumes": 80, "produces": 0 }
+    },
+    "slug": "superconductorFactory",
+    "build": {
+      "cost": {
+        "fuel": 9000,
+        "hullPlates": 16000,
+        "electronics": 7400,
+        "drones": 90
+      },
+      "time": 370
+    },
+    "crew": { "cost": 21 }
   }
 ]
