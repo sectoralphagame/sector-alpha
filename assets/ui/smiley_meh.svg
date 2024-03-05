@@ -5,6 +5,6 @@
         stroke-width="16" />
     <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
         stroke-width="16" x1="88" x2="168" y1="160" y2="160" />
-    <circle cx="92" cy="108" r="12" />
-    <circle cx="164" cy="108" r="12" />
+    <circle cx="92" cy="108" r="12" fill="currentColor" />
+    <circle cx="164" cy="108" r="12" fill="currentColor" />
 </svg>

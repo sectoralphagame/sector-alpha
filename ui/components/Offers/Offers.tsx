@@ -1,7 +1,7 @@
 import configIcon from "@assets/ui/config.svg";
 import SVG from "react-inlinesvg";
 import React from "react";
-import { commodities, commodityLabel } from "@core/economy/commodity";
+import { commoditiesArray, commodityLabel } from "@core/economy/commodity";
 import type { RequirePureComponent } from "@core/tsHelpers";
 import { Table, TableCell } from "@kit/Table";
 import {
@@ -19,8 +19,7 @@ export interface OffersProps {
 
 export const Offers: React.FC<OffersProps> = ({ entity, onManage }) => {
   const { compoundProduction, trade, storage } = entity.cp;
-  const offered = Object.values(commodities)
-
+  const offered = commoditiesArray
     .map((commodity) => ({
       commodity,
       ...(compoundProduction?.pac[commodity] ?? {}),

@@ -3,7 +3,6 @@ import type { IChartApi, UTCTimestamp } from "lightweight-charts";
 import { ColorType, createChart } from "lightweight-charts";
 import Color from "color";
 import type { Sector } from "@core/archetypes/sector";
-import { commodities } from "@core/economy/commodity";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import { Checkbox } from "@kit/Checkbox";
@@ -26,7 +25,7 @@ const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
   );
   const [displayedResources, setDisplayedResources] = useLocalStorage(
     "SectorPricesDisplayedResources",
-    [commodities.food, commodities.fuel] as string[]
+    ["food", "fuel"] as string[]
   );
 
   React.useEffect(() => {

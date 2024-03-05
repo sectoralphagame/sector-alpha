@@ -11,6 +11,7 @@ import {
 import { sector, sectorComponents } from "@core/archetypes/sector";
 import { IconButton } from "@kit/IconButton";
 import { isOwnedByPlayer } from "@core/utils/misc";
+import { getRequiredCrew } from "@core/utils/crew";
 import FacilityPanel from "../FacilityPanel";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
@@ -192,7 +193,16 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                   </>
                 )}
                 {entity.hasComponents(["crew"]) && (
-                  <Crew entity={entity.requireComponents(["crew"])} />
+                  <Crew
+                    entity={entity.requireComponents(["crew"])}
+                    requiredCrew={
+                      entity.cp.modules
+                        ? getRequiredCrew(
+                            entity.requireComponents(["crew", "modules"])
+                          )
+                        : null
+                    }
+                  />
                 )}
                 <Subordinates entity={entity} />
                 {entity.hasComponents(["deployable"]) && (

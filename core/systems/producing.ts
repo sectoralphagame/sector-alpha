@@ -1,4 +1,5 @@
 import { maxMood, minMood } from "@core/components/crew";
+import { getRequiredCrew } from "@core/utils/crew";
 import { gameDay, gameMonth } from "@core/utils/misc";
 import { every, sum } from "@fxts/core";
 import type { Production } from "../components/production";
@@ -10,29 +11,25 @@ import {
 } from "../components/storage";
 import type { Commodity } from "../economy/commodity";
 import type { Sim } from "../sim";
-import type { RequireComponent } from "../tsHelpers";
+import type { RequireComponent, RequirePureComponent } from "../tsHelpers";
 import { findInAncestors } from "../utils/findInAncestors";
 import { perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
 
-function getMoodMultiplier(mood: number): number {
+export function getMoodMultiplier(mood: number): number {
   const maxPenalty = 0.5;
   const maxBonus = 1.3;
 
   const a = (maxBonus - maxPenalty) / (maxMood - minMood);
   const b = maxPenalty - a * minMood;
 
-  return a * mood + b;
+  return a * mood + b - 1;
 }
 
-function getCrewMultiplier(
-  crewableWithModules: RequireComponent<"crew" | "modules">
+export function getCrewMultiplier(
+  requiredCrew: number,
+  crewableWithModules: RequirePureComponent<"crew">
 ): number {
-  const requiredCrew = crewableWithModules.cp.modules.ids
-    .map((id) => crewableWithModules.sim.getOrThrow(id))
-    .filter((fm) => fm.cp.crewRequirement?.value)
-    .map((fm) => fm.cp.crewRequirement!.value)
-    .reduce((acc, val) => acc + val, 0);
   if (crewableWithModules.cp.crew.workers.current < requiredCrew) {
     return crewableWithModules.cp.crew.workers.current / requiredCrew;
   }
@@ -158,7 +155,7 @@ export class ProducingSystem extends System<"exec"> {
       facilityModule.cooldowns.use("production", gameDay);
       ProducingSystem.produce(facilityModule.cp.production, storage, [
         getMoodMultiplier(facility.cp.crew.mood),
-        getCrewMultiplier(facility),
+        getCrewMultiplier(getRequiredCrew(facility), facility),
       ]);
     }
 
