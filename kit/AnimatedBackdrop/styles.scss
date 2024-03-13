@@ -1,0 +1,43 @@
+@keyframes gradientRotate {
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.root {
+  position: relative;
+
+  &Backdrop {
+    top: 0;
+    left: 0;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    filter: blur(180px);
+    overflow: hidden;
+    opacity: 0.15;
+
+    &Dot {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        #ffffff 0%,
+        var(--palette-primary) 80%,
+        #00000000 100%
+      );
+      animation: gradientRotate 20s infinite linear;
+      transform: rotate(0deg);
+
+      &:nth-child(1) {
+        top: -30%;
+      }
+
+      &:nth-child(2) {
+        top: 30%;
+      }
+    }
+  }
+}
