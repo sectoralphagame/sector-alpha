@@ -2,6 +2,17 @@
   &:hover {
     background: rgba(255, 255, 255, 0.2);
   }
+  &[disabled],
+  &Disabled {
+    &:hover {
+      background: inherit;
+    }
+    background: transparent;
+    border-color: var(--palette-disabled);
+    color: var(--palette-disabled);
+    cursor: auto;
+    pointer-events: none;
+  }
   appearance: none;
   background: rgba(255, 255, 255, 0.1);
   border: none;

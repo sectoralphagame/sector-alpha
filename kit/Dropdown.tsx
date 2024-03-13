@@ -8,12 +8,13 @@ export const Dropdown: React.FC<React.HTMLProps<HTMLDivElement>> = ({
   ...props
 }) => <Menu {...props} as="div" className={clsx(styles.root, className)} />;
 export const DropdownButton: React.FC<
-  React.PropsWithChildren<{ className?: string }>
-> = ({ className, ...props }) => (
+  React.PropsWithChildren<{ className?: string; disabled?: boolean }>
+> = ({ className, disabled, ...props }) => (
   <Menu.Button
     className={({ open }) =>
       clsx(className, styles.button, {
         [styles.buttonActive]: open,
+        [styles.buttonDisabled]: disabled,
       })
     }
     {...props}

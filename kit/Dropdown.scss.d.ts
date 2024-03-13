@@ -2,6 +2,7 @@
 /* prettier-ignore */
 /* eslint-disable */
 export const button: string;
+export const buttonDisabled: string;
 export const buttonActive: string;
 export const dropdown: string;
 export const option: string;
