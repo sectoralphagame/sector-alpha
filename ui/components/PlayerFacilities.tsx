@@ -4,14 +4,17 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
+import { filter, pipe, toArray } from "@fxts/core";
 import { useSim } from "../atoms";
 import { EntityList } from "./EntityList";
 
 export const PlayerFacilities: React.FC = () => {
   const [sim] = useSim();
-  const facilities = sim.queries.facilities
-    .get()
-    .filter((ship) => ship.cp.owner?.id === sim.queries.player.get()[0].id);
+  const facilities = pipe(
+    sim.queries.facilities.getIt(),
+    filter((ship) => ship.cp.owner?.id === sim.queries.player.get()[0].id),
+    toArray
+  );
 
   return (
     <Collapsible>

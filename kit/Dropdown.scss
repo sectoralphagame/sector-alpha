@@ -42,6 +42,10 @@
   position: absolute;
   width: 100%;
   z-index: 1;
+
+  &Up {
+    bottom: calc(100% + var(--spacing));
+  }
 }
 .option {
   &:hover {

@@ -5,6 +5,7 @@ import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "./IconButton";
 import Text from "./Text";
 import styles from "./Dialog.scss";
+import { AnimatedBackdrop } from "./AnimatedBackdrop";
 
 try {
   Modal.setAppElement("#root");
@@ -49,15 +50,17 @@ export const Dialog: React.FC<DialogProps> = ({
       },
     }}
   >
-    <div className={styles.title}>
-      <Text className={styles.titleText} variant="h1" color="primary">
-        {title}
-      </Text>
-      <IconButton className={styles.close} onClick={onClose}>
-        <SVG src={closeIcon} />
-      </IconButton>
-    </div>
-    {children}
+    <AnimatedBackdrop className={styles.backdrop}>
+      <div className={styles.title}>
+        <Text className={styles.titleText} variant="h1" color="primary">
+          {title}
+        </Text>
+        <IconButton className={styles.close} onClick={onClose}>
+          <SVG src={closeIcon} />
+        </IconButton>
+      </div>
+      {children}
+    </AnimatedBackdrop>
   </Modal>
 );
 Dialog.displayName = "Dialog";

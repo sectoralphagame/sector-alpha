@@ -6,6 +6,7 @@ import configIcon from "@assets/ui/config.svg";
 import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import journalIcon from "@assets/ui/journal.svg";
 import { IconButton } from "@kit/IconButton";
+import { AnimatedBackdrop } from "@kit/AnimatedBackdrop";
 import styles from "./Panel.scss";
 
 export interface PanelComponentProps {
@@ -25,7 +26,7 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
   onFocus,
   children,
 }) => (
-  <div
+  <AnimatedBackdrop
     className={clsx(styles.root, {
       [styles.rootCollapsed]: isCollapsed,
     })}
@@ -67,6 +68,6 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
       )}
     </div>
     {!isCollapsed && <div className={styles.scrollArea}>{children}</div>}
-  </div>
+  </AnimatedBackdrop>
 );
 PanelComponent.displayName = "PanelComponent";

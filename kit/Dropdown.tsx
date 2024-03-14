@@ -21,8 +21,15 @@ export const DropdownButton: React.FC<
   />
 );
 export const DropdownOptions: React.FC<
-  React.PropsWithChildren<{ static?: boolean }>
-> = (props) => <Menu.Items className={styles.dropdown} {...props} />;
+  React.PropsWithChildren<{ static?: boolean; direction?: "up" | "down" }>
+> = ({ direction = "down", ...props }) => (
+  <Menu.Items
+    className={clsx(styles.dropdown, {
+      [styles.dropdownUp]: direction === "up",
+    })}
+    {...props}
+  />
+);
 export const DropdownOption: React.FC<
   React.PropsWithChildren<{
     disabled?: boolean;

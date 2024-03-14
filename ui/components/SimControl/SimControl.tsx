@@ -27,7 +27,9 @@ export const SimControlComponent: React.FC<SimControlComponentProps> = ({
   onTurbo,
 }) => (
   <Stack id="control" className={styles.root}>
-    <Text color="text-1">{date}</Text>
+    <Text component="span" color="text-1">
+      {date}
+    </Text>
     <IconButton variant="naked" onClick={onPause}>
       <SVG src={pauseIcon} />
     </IconButton>

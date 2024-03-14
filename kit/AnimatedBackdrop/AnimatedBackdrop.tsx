@@ -8,10 +8,7 @@ export const AnimatedBackdrop: React.FC<React.HTMLProps<HTMLDivElement>> = ({
   ...props
 }) => (
   <div className={clsx(styles.root, className)} {...props}>
-    <div className={styles.rootBackdrop}>
-      <div className={styles.rootBackdropDot} />
-      <div className={styles.rootBackdropDot} />
-    </div>
+    <div className={styles.rootBackdrop} />
     {children}
   </div>
 );
