@@ -8,14 +8,14 @@
   position: relative;
 
   &Backdrop {
-    background: url("../../assets/ui/smoke_yellow.png") 0% 0% repeat;
+    background: url("../../assets/ui/smoke.png") 0% 0% repeat;
     animation: background 40s infinite linear;
     top: 0;
     left: 0;
     position: absolute;
     height: 100%;
     width: 100%;
-    filter: opacity(0.15);
+    filter: opacity(0.1);
     pointer-events: none;
     z-index: -1;
   }
