@@ -22,6 +22,7 @@ export interface Theme {
     success: string;
     active: string;
     primary: string;
+    "debug-error": string;
   };
   typography: {
     button: string;
@@ -66,6 +67,7 @@ export function createTheme(scale: number): Theme {
       success: "#52fa6e",
       primary: "#f7c14a",
       active: "#f7c14a",
+      "debug-error": "#ff5b4522",
     },
     typography: {
       button: `${baseFontSize * 0.875}px`,

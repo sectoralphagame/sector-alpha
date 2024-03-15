@@ -1,0 +1,5 @@
+@mixin dev-overlay($color: --palette-debug-error) {
+  :global(#game-root)[data-debug="true"] & {
+    background-color: var($color);
+  }
+}
