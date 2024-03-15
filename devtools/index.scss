@@ -15,8 +15,15 @@
 }
 
 .card {
+  &:hover {
+    background-color: var(--palette-background-active);
+  }
+
+  transition: 150ms;
+
   &Link {
     color: var(--palette-text-1);
+    display: contents;
     flex: 1;
     text-decoration: none;
   }
