@@ -157,7 +157,7 @@ export const Game: React.FC = () => {
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-    <div>
+    <div id="game-root" data-debug={window.dev}>
       {/* This div is managed by react so each render would override
       any changes made by pixi, like cursor property. That's why rendering
       system creates own canvas here */}
