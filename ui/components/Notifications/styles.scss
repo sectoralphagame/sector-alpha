@@ -13,6 +13,7 @@
   transition: 200ms;
   position: relative;
   cursor: pointer;
+  pointer-events: visible;
 
   &::before {
     content: "";
@@ -82,4 +83,5 @@
   bottom: 300px;
   height: 400px;
   right: 0;
+  pointer-events: none;
 }
