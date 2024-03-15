@@ -104,6 +104,12 @@ export function createFacilityModule(
       targetId: null,
     });
   }
+  if (input.crew.cost > 0) {
+    entity.addComponent({
+      name: "crewRequirement",
+      value: input.crew.cost,
+    });
+  }
 
   return entity as FacilityModule;
 }
