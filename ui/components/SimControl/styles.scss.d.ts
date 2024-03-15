@@ -4,3 +4,4 @@
 export const root: string;
 export const turbo: string;
 export const money: string;
+export const date: string;

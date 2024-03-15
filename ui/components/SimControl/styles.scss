@@ -14,3 +14,24 @@
 .money {
   pointer-events: none;
 }
+
+#date {
+  display: block;
+  position: relative;
+  width: 120px;
+
+  &::before {
+    content: "";
+    width: calc((100% + var(--spacing-2)) * var(--progress) / 24);
+    height: calc(100% + var(--spacing-2));
+    position: absolute;
+    top: calc(-1 * var(--spacing-1));
+    left: calc(-1 * var(--spacing-1));
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &::after {
+    height: calc(100% + var(--spacing-2));
+    top: calc(-1 * var(--spacing-1));
+  }
+}

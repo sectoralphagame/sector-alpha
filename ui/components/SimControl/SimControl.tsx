@@ -13,6 +13,7 @@ import styles from "./styles.scss";
 
 export interface SimControlComponentProps {
   date: string;
+  progress: number;
   onPause: () => void;
   onPlay: () => void;
   onSpeed: () => void;
@@ -21,13 +22,20 @@ export interface SimControlComponentProps {
 
 export const SimControlComponent: React.FC<SimControlComponentProps> = ({
   date,
+  progress,
   onPause,
   onPlay,
   onSpeed,
   onTurbo,
 }) => (
   <Stack id="control" className={styles.root}>
-    <Text component="span" color="text-1">
+    <Text
+      id={styles.date}
+      component="span"
+      color="text-1"
+      // @ts-expect-error
+      style={{ "--progress": progress }}
+    >
       {date}
     </Text>
     <IconButton variant="naked" onClick={onPause}>
@@ -53,6 +61,7 @@ export const SimControl: React.FC = () => {
   return (
     <SimControlComponent
       date={getGameDate(sim.getTime())}
+      progress={sim.getTime() % 24}
       onPause={sim?.pause}
       onPlay={() => {
         sim.setSpeed(1);
