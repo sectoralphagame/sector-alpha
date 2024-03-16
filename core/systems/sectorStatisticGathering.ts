@@ -1,14 +1,22 @@
+import type { Sim } from "@core/sim";
+import { gameDay } from "@core/utils/misc";
 import mapValues from "lodash/mapValues";
 import { getSectorResources } from "../utils/resources";
 import { getSectorPrices } from "../utils/trading";
 import { System } from "./system";
 
 export class SectorStatisticGatheringSystem extends System {
+  apply(sim: Sim): void {
+    super.apply(sim);
+
+    sim.hooks.phase.end.tap(this.constructor.name, this.exec);
+  }
+
   exec = (): void => {
     if (
       this.sim.getTime() -
         this.sim.queries.settings.get()[0].cp.systemManager.lastStatUpdate >
-      10 * 60
+      gameDay * 10
     ) {
       this.sim.queries.settings.get()[0].cp.systemManager.lastStatUpdate =
         this.sim.getTime();
