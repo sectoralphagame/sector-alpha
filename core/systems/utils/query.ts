@@ -191,7 +191,12 @@ export function createQueries(sim: Sim) {
     habitats: new Query(sim, ["parent", "facilityModuleBonus"]),
     mining: new Query(sim, ["mining", "storage"]),
     orderable: new Query(sim, ["orders", "position", "model", "owner"]),
-    player: new Query(sim, [...factionComponents, "missions"], ["player"]),
+    player: new Query(
+      sim,
+      [...factionComponents, "missions"],
+      ["player"],
+      true
+    ),
     productionByModules: new Query(sim, ["production", "parent"]),
     renderable: new Query(sim, ["render", "position"]),
     renderableGraphics: new Query(sim, ["renderGraphics"]),
