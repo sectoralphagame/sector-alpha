@@ -9,6 +9,7 @@ import { Input } from "@kit/Input";
 import { IconButton } from "@kit/IconButton";
 import { createBaseConfig } from "@core/sim/baseConfig";
 import { Settings } from "@ui/views/Settings";
+import LZString from "lz-string";
 import { useLocation } from "../context/Location";
 import styles from "./ConfigDialog.scss";
 import { Saves } from "./Saves";
@@ -103,7 +104,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
               setSim(
                 Sim.load(
                   createBaseConfig(),
-                  saves.find((s) => s.id === id)!.data
+                  LZString.decompress(saves.find((s) => s.id === id)!.data)
                 )
               );
               onClose();
