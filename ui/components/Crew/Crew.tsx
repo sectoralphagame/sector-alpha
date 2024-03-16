@@ -15,10 +15,13 @@ import { Tooltip } from "@kit/Tooltip";
 import Text from "@kit/Text";
 import { getCrewMultiplier, getMoodMultiplier } from "@core/systems/producing";
 import { sum } from "@fxts/core";
+import arrowUpFatIcon from "@assets/ui/arrow_up_fat.svg";
+import arrowDownFatIcon from "@assets/ui/arrow_down_fat.svg";
 import styles from "./styles.scss";
 
 export interface CrewProps {
   entity: RequirePureComponent<"crew">;
+  growth: "positive" | "negative" | "neutral";
   requiredCrew: number | null;
 }
 
@@ -57,7 +60,7 @@ const Smiley = React.forwardRef<SVGAElement, { mood: number }>(
   }
 );
 
-export const Crew: React.FC<CrewProps> = ({ entity, requiredCrew }) => (
+export const Crew: React.FC<CrewProps> = ({ entity, requiredCrew, growth }) => (
   <>
     <Collapsible defaultOpen>
       <CollapsibleSummary className={styles.summary}>
@@ -107,13 +110,25 @@ export const Crew: React.FC<CrewProps> = ({ entity, requiredCrew }) => (
         <Text component="p">
           Current {Math.floor(entity.cp.crew.workers.current)} /{" "}
           {entity.cp.crew.workers.max} Max
+          {growth === "positive" && (
+            <SVG
+              className={clsx(styles.icon, styles.growth, styles.positive)}
+              src={arrowUpFatIcon}
+            />
+          )}
+          {growth === "negative" && (
+            <SVG
+              className={clsx(styles.icon, styles.growth, styles.negative)}
+              src={arrowDownFatIcon}
+            />
+          )}
         </Text>
         {requiredCrew !== null && (
           <Text component="p">
             Crew is working at{" "}
             {Math.floor(
               sum([
-                getCrewMultiplier(requiredCrew, entity),
+                getCrewMultiplier(requiredCrew, entity.cp.crew.workers.current),
                 getMoodMultiplier(entity.cp.crew.mood),
               ]) * 100
             )}

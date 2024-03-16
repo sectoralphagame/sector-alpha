@@ -4,6 +4,7 @@ import React from "react";
 import { shipComponents, ship as asShip } from "@core/archetypes/ship";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@kit/Tabs";
 import type { Entity } from "@core/entity";
+import type { Facility } from "@core/archetypes/facility";
 import {
   facilityComponents,
   facility as asFacility,
@@ -12,6 +13,7 @@ import { sector, sectorComponents } from "@core/archetypes/sector";
 import { IconButton } from "@kit/IconButton";
 import { isOwnedByPlayer } from "@core/utils/misc";
 import { getRequiredCrew } from "@core/utils/crew";
+import { find } from "@fxts/core";
 import FacilityPanel from "../FacilityPanel";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
@@ -90,6 +92,29 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
   }, [dialog, sim]);
 
   const playerOwned = entity ? isOwnedByPlayer(entity) : false;
+
+  let requiredCrew: number | null = null;
+  let growth: "positive" | "negative" | "neutral" | undefined;
+  if (entity?.cp.crew) {
+    requiredCrew = getRequiredCrew(
+      entity.requireComponents(["crew", "modules"])
+    );
+    const hubModule = find(
+      (e) =>
+        e.tags.has("facilityModuleType:hub") &&
+        sim.getOrThrow<Facility>(e.cp.parent!.id!).cp.position.sector ===
+          entity.cp.position!.sector,
+      sim.entities.values()
+    );
+    if (hubModule)
+      growth = hubModule.cp.production!.produced
+        ? entity.cp.crew!.workers.current >= entity.cp.crew!.workers.max
+          ? "neutral"
+          : "positive"
+        : entity.cp.crew!.workers.current > 0
+        ? "negative"
+        : "neutral";
+  }
 
   return (
     <>
@@ -195,13 +220,8 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                 {entity.hasComponents(["crew"]) && (
                   <Crew
                     entity={entity.requireComponents(["crew"])}
-                    requiredCrew={
-                      entity.cp.modules
-                        ? getRequiredCrew(
-                            entity.requireComponents(["crew", "modules"])
-                          )
-                        : null
-                    }
+                    requiredCrew={requiredCrew}
+                    growth={growth!}
                   />
                 )}
                 <Subordinates entity={entity} />

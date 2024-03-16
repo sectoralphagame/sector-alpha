@@ -47,4 +47,5 @@ defaultEntity.components.crew = {
 Default.args = {
   entity: defaultEntity,
   requiredCrew: 100,
+  growth: "positive",
 } as CrewProps;

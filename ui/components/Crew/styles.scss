@@ -5,7 +5,6 @@
 }
 
 .icon {
-  justify-self: flex-end;
   display: inline-block;
   height: 16px;
   width: 16px;
@@ -13,4 +12,16 @@
 
 .warning {
   color: var(--palette-warning);
+}
+
+.growth {
+  margin-left: var(--spacing);
+}
+
+.negative {
+  color: var(--palette-error);
+}
+
+.positive {
+  color: var(--palette-success);
 }
