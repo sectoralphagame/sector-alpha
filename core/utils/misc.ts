@@ -73,6 +73,6 @@ export const gameYear = gameMonth * 12;
 export function getGameDate(timeOffset: number): string {
   const actual = timeOffset - settings.bootTime;
   return `${1 + (Math.floor(actual / gameDay) % 30)}.${
-    1 + (Math.floor(actual / gameMonth) % 30)
+    1 + (Math.floor(actual / gameMonth) % 12)
   }.${2519 + (Math.floor(actual / gameYear) % 12)}`;
 }
