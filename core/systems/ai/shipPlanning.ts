@@ -3,7 +3,7 @@ import type { DockSize } from "@core/components/dockable";
 import { relationThresholds } from "@core/components/relations";
 import { addSubordinate } from "@core/components/subordinates";
 import { removeCommander } from "@core/components/commander";
-import { getSubordinates } from "@core/utils/misc";
+import { gameDay, getSubordinates } from "@core/utils/misc";
 import { filter, map, pipe, toArray } from "@fxts/core";
 import type { InitialShipInput } from "../../archetypes/ship";
 import { createShipName, createShip } from "../../archetypes/ship";
@@ -68,6 +68,52 @@ export function requestShip(
   }
 
   return bp;
+}
+
+function assignSmallPatrol(
+  fighters: RequireComponent<"position" | "model" | "orders" | "owner">[]
+) {
+  const commanders: RequireComponent<
+    "position" | "autoOrder" | "subordinates"
+  >[] = [];
+
+  for (const fighter of fighters) {
+    const commander = commanders.find(
+      (cmd) =>
+        cmd.cp.autoOrder!.default.type === "patrol" &&
+        cmd.cp.autoOrder!.default.sectorId === fighter.cp.position.sector
+    );
+
+    if (commander) {
+      addSubordinate(commander, fighter);
+      fighter.requireComponents(["autoOrder"]).cp.autoOrder.default = {
+        type: "escort",
+        targetId: commander.id,
+      };
+    } else {
+      let sector = fighter.sim.getOrThrow(fighter.cp.position.sector);
+      if (sector.cp.owner?.id !== fighter.cp.owner.id) {
+        sector = pickRandom(
+          fighter.sim.queries.sectors
+            .get()
+            .filter((s) => s.cp.owner?.id === fighter.cp.owner.id)
+        );
+      }
+      if (!sector) return;
+
+      fighter.addComponent({
+        name: "autoOrder",
+        default: {
+          type: "patrol",
+          sectorId: sector.id,
+          clockwise: Math.random() > 0.5,
+        },
+      });
+      commanders.push(
+        fighter.requireComponents(["position", "autoOrder", "subordinates"])
+      );
+    }
+  }
 }
 
 export class ShipPlanningSystem extends System<"plan"> {
@@ -479,6 +525,8 @@ export class ShipPlanningSystem extends System<"plan"> {
                 };
               }
               addSubordinate(commander, ship);
+            } else {
+              spareFighters.push(ship);
             }
           } else if (fightersInShipyards.length > 0) {
             fightersInShipyards.pop();
@@ -493,11 +541,13 @@ export class ShipPlanningSystem extends System<"plan"> {
           }
         }
       });
+
+    assignSmallPatrol(spareFighters);
   };
 
   exec = (): void => {
     if (this.cooldowns.canUse("plan")) {
-      this.cooldowns.use("plan", 60);
+      this.cooldowns.use("plan", gameDay);
 
       this.sim.queries.ai.get().forEach((faction) => {
         const shipRequests = this.getShipRequests(faction);
