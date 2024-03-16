@@ -13,6 +13,9 @@ import {
 import configIcon from "@assets/ui/config.svg";
 import { useGameDialog } from "@ui/atoms";
 import { isOwnedByPlayer } from "@core/utils/misc";
+import exclamationIcon from "@assets/ui/exclamation.svg";
+import { Tooltip } from "@kit/Tooltip";
+import Text from "@kit/Text";
 import styles from "./Production.scss";
 
 export interface ProductionProps {
@@ -61,14 +64,28 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
           {productionModules?.length > 0 || utilityModules?.length > 0 ? (
             <Table>
               <tbody>
-                {(productionModules ?? []).map((facilityModule, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <tr key={`${facilityModule.cp.name!.value}-${index}`}>
+                {(productionModules ?? []).map((facilityModule) => (
+                  <tr key={facilityModule.id}>
                     <TableCell>{facilityModule.cp.name!.value}</TableCell>
                     <TableCell style={{ textAlign: "right" }}>
-                      {facilityModule.cooldowns.timers.production?.toFixed(0) ??
-                        "0"}
-                      s
+                      {facilityModule.cp.production!.active &&
+                        !facilityModule.cp.production!.produced && (
+                          <Tooltip
+                            // eslint-disable-next-line react/no-unstable-nested-components
+                            anchor={(ref) => (
+                              <SVG
+                                innerRef={ref}
+                                src={exclamationIcon}
+                                className={styles.haltedIcon}
+                              />
+                            )}
+                          >
+                            <Text variant="caption">
+                              Production is halted. <br />
+                              Does facility has enough resources?
+                            </Text>
+                          </Tooltip>
+                        )}
                     </TableCell>
                   </tr>
                 ))}
