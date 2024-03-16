@@ -18,24 +18,24 @@ export const Allocations: React.FC<AllocationsProps> = ({ entity }) => (
       {entity.cp.storage.allocations.length === 0 ? (
         <div>No incoming transactions</div>
       ) : (
-        entity.cp.storage.allocations.map((allocation) => (
-          <div key={allocation.id}>
-            <b>
-              {
-                entity.sim
-                  .getOrThrow(
-                    Number(parseTradeId(allocation.meta.tradeId).initiator)
-                  )
-                  .requireComponents(["name"]).cp.name.value
-              }
-            </b>
-            : {allocation.type === "incoming" ? "buying" : "selling"}{" "}
-            {Object.entries(allocation.amount)
-              .filter(([, amount]) => amount > 0)
-              .map(([commodity, amount]) => `${amount}x ${commodity}`)
-              .join(", ")}
-          </div>
-        ))
+        entity.cp.storage.allocations.map((allocation) => {
+          const initiator = entity.sim.get(
+            Number(parseTradeId(allocation.meta.tradeId).initiator)
+          );
+
+          if (!initiator) return null;
+
+          return (
+            <div key={allocation.id}>
+              <b>{initiator.requireComponents(["name"]).cp.name.value}</b>:{" "}
+              {allocation.type === "incoming" ? "buying" : "selling"}{" "}
+              {Object.entries(allocation.amount)
+                .filter(([, amount]) => amount > 0)
+                .map(([commodity, amount]) => `${amount}x ${commodity}`)
+                .join(", ")}
+            </div>
+          );
+        })
       )}
     </CollapsibleContent>
   </Collapsible>
