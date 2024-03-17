@@ -40,8 +40,7 @@
     "babel-loader": "^8.3.0",
     "css-loader": "^6.7.1",
     "dts-css-modules-loader": "^2.0.1",
-    "esbuild": "^0.13.15",
-    "esbuild-jest": "^0.5.0",
+    "esbuild": "0.20.2",
     "esbuild-loader": "^2.16.0",
     "eslint": "^8.14.0",
     "eslint-config-airbnb": "^19.0.1",
@@ -71,35 +70,6 @@
     "webpack": "^5.58.2",
     "webpack-cli": "^4.9.0",
     "webpack-dev-server": "^4.3.1"
-  },
-  "jest": {
-    "setupFiles": [
-      "jest-canvas-mock"
-    ],
-    "testEnvironment": "jsdom",
-    "resetMocks": false,
-    "transform": {
-      "^.+\\.(jsx?|tsx?)$": [
-        "esbuild-jest",
-        {
-          "sourcemap": true
-        }
-      ],
-      ".+\\.(svg|css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub"
-    },
-    "testRegex": ".*\\.test\\.tsx?$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "moduleNameMapper": {
-      "@assets/(.*)$": "<rootDir>/assets/$1",
-      "@core/(.*)$": "<rootDir>/core/$1",
-      "@devtools/(.*)$": "<rootDir>/devtools/$1",
-      "@kit/(.*)$": "<rootDir>/kit/$1",
-      "@ui/(.*)$": "<rootDir>/ui/$1"
-    }
   },
   "dependencies": {
     "@alenaksu/json-viewer": "^1.0.1",

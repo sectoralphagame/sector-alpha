@@ -20,7 +20,7 @@ const config = {
         loader: "esbuild-loader",
         options: {
           loader: "tsx",
-          target: "es2018",
+          target: "es2020",
         },
       },
       {
@@ -30,7 +30,7 @@ const config = {
           fullySpecified: false,
         },
         options: {
-          target: "es2018",
+          target: "es2020",
         },
       },
       {
