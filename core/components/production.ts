@@ -53,11 +53,23 @@ export interface Production
   extends BaseComponent<"production">,
     BaseProduction {
   active: boolean;
+  /**
+   * Indicates if entity completed production in last cycle
+   */
   produced: boolean;
+  /**
+   * Some commodities are produced or consumed only once per few cycles.
+   * To mitigate this they are stored in production buffer
+   */
+  buffer: Record<"production" | "consumption", Record<Commodity, number>>;
 }
 
 export function createProduction(pac: Partial<PAC> = {}): Production {
   return {
+    buffer: {
+      production: perCommodity(() => 0),
+      consumption: perCommodity(() => 0),
+    },
     name: "production",
     active: true,
     pac: merge(cloneDeep(baseProductionAndConsumption), pac),

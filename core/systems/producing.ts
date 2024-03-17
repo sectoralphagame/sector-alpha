@@ -11,7 +11,7 @@ import {
 } from "../components/storage";
 import type { Commodity } from "../economy/commodity";
 import type { Sim } from "../sim";
-import type { RequireComponent, RequirePureComponent } from "../tsHelpers";
+import type { RequireComponent } from "../tsHelpers";
 import { findInAncestors } from "../utils/findInAncestors";
 import { perCommodity } from "../utils/perCommodity";
 import { System } from "./system";
@@ -28,10 +28,10 @@ export function getMoodMultiplier(mood: number): number {
 
 export function getCrewMultiplier(
   requiredCrew: number,
-  crewableWithModules: RequirePureComponent<"crew">
+  availableCrew: number
 ): number {
-  if (crewableWithModules.cp.crew.workers.current < requiredCrew) {
-    return crewableWithModules.cp.crew.workers.current / requiredCrew;
+  if (availableCrew < requiredCrew) {
+    return Math.floor(availableCrew) / requiredCrew;
   }
 
   return 1;
@@ -93,11 +93,14 @@ export class ProducingSystem extends System<"exec"> {
   ) => {
     perCommodity((commodity) => {
       if (production.pac[commodity].consumes > 0) {
-        removeStorage(
-          storage,
-          commodity,
-          Math.floor(production.pac[commodity].consumes * timeMultiplier)
-        );
+        const quantity = production.pac[commodity].consumes * timeMultiplier;
+        if (production.buffer.consumption[commodity] > quantity) {
+          production.buffer.consumption[commodity] -= quantity;
+        } else {
+          production.buffer.consumption[commodity] +=
+            Math.ceil(quantity) - quantity;
+          removeStorage(storage, commodity, Math.ceil(quantity));
+        }
       }
     });
     perCommodity((commodity) => {
@@ -106,12 +109,24 @@ export class ProducingSystem extends System<"exec"> {
           production.pac[commodity].produces *
           timeMultiplier *
           sum(outputMultipliers);
-        addStorage(
-          storage,
-          commodity,
-          Math.floor(Math.min(storage.quota[commodity] - quantity, quantity)),
-          false
-        );
+
+        production.buffer.production[commodity] += quantity;
+
+        if (production.buffer.production[commodity] >= 1) {
+          const dumped = Math.floor(
+            Math.max(
+              0,
+              Math.min(
+                storage.quota[commodity] -
+                  production.buffer.production[commodity],
+                production.buffer.production[commodity]
+              )
+            )
+          );
+          production.buffer.production[commodity] -= dumped;
+
+          addStorage(storage, commodity, dumped, false);
+        }
       }
     });
   };
@@ -155,7 +170,10 @@ export class ProducingSystem extends System<"exec"> {
       facilityModule.cooldowns.use("production", gameDay);
       ProducingSystem.produce(facilityModule.cp.production, storage, [
         getMoodMultiplier(facility.cp.crew.mood),
-        getCrewMultiplier(getRequiredCrew(facility), facility),
+        getCrewMultiplier(
+          getRequiredCrew(facility),
+          facility.cp.crew.workers.current
+        ),
       ]);
     }
 

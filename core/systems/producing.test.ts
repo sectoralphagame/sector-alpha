@@ -20,7 +20,7 @@ describe("ProducingSystem", () => {
     addStorage(storage, "water", 100);
     ProducingSystem.produce(production, storage, [1]);
 
-    expect(storage.stored.water).toEqual(67);
+    expect(storage.stored.water).toEqual(66);
     expect(storage.stored.food).toEqual(33);
   });
 
@@ -28,7 +28,7 @@ describe("ProducingSystem", () => {
     addStorage(storage, "water", 100);
     ProducingSystem.produce(production, storage, [2]);
 
-    expect(storage.stored.water).toEqual(67);
-    expect(storage.stored.food).toEqual(66);
+    expect(storage.stored.water).toEqual(66);
+    expect(storage.stored.food).toEqual(67);
   });
 });
