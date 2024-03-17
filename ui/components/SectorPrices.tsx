@@ -7,6 +7,17 @@ import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import { Checkbox } from "@kit/Checkbox";
 import { useLocalStorage } from "@ui/hooks/useLocalStorage";
+import { commodityLabel } from "@core/economy/commodity";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleSummary,
+} from "@kit/Collapsible";
+import { Table, TableCell } from "@kit/Table";
+import okIcon from "@assets/ui/ok.svg";
+import closeIcon from "@assets/ui/close.svg";
+import SVG from "react-inlinesvg";
+import clsx from "clsx";
 import styles from "./SectorPrices.scss";
 
 const baseColor = Color.rgb(151, 255, 125);
@@ -19,9 +30,17 @@ const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
   const availableCommodities = React.useMemo(
     () =>
       Object.entries(entity.cp.sectorStats.prices)
-        .filter(([, offers]) => offers.buy || offers.sell)
-        .map(([commodity]) => commodity),
-    [entity.cp.sectorStats.prices.fuelium.buy.length]
+        .filter(
+          ([, offers]) =>
+            offers.buy.some((v) => v > 0) || offers.sell.some((v) => v > 0)
+        )
+        .map(([commodity, offers]) => ({
+          commodity,
+          buy: offers.buy.some((v) => v > 0),
+          sell: offers.sell.some((v) => v > 0),
+        }))
+        .filter(({ commodity }) => commodity !== "tauMetal"),
+    [entity.cp.sectorStats.prices.fuelium.buy.length, entity]
   );
   const [displayedResources, setDisplayedResources] = useLocalStorage(
     "SectorPricesDisplayedResources",
@@ -109,13 +128,51 @@ const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
   ]);
 
   return (
-    <div>
-      <div className={styles.header}>Pricing history</div>
-      <Button onClick={() => setOpen(true)}>See chart</Button>
+    <>
+      <Collapsible defaultOpen>
+        <CollapsibleSummary className={styles.header}>
+          Available Wares
+        </CollapsibleSummary>
+        <CollapsibleContent className={styles.collapsible}>
+          <Table>
+            <thead>
+              <th>Name</th>
+              <th align="right">Buy</th>
+              <th align="right">Sell</th>
+            </thead>
+            <tbody>
+              {availableCommodities.map(({ commodity, buy, sell }) => (
+                <tr key={commodity}>
+                  <TableCell>{commodityLabel[commodity]}</TableCell>
+                  <TableCell align="right">
+                    <SVG
+                      src={buy ? okIcon : closeIcon}
+                      className={clsx(
+                        styles.icon,
+                        buy ? styles.iconSuccess : styles.iconError
+                      )}
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <SVG
+                      src={sell ? okIcon : closeIcon}
+                      className={clsx(
+                        styles.icon,
+                        sell ? styles.iconSuccess : styles.iconError
+                      )}
+                    />
+                  </TableCell>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <Button onClick={() => setOpen(true)}>See pricing history</Button>
+        </CollapsibleContent>
+      </Collapsible>
       <Dialog open={open} onClose={() => setOpen(false)} width="80vw">
         <div className={styles.container} ref={setChartContainer as any} />
         <div className={styles.commodities}>
-          {availableCommodities.map((commodity) => (
+          {availableCommodities.map(({ commodity }) => (
             <div key={commodity} className={styles.labelContainer}>
               <Checkbox
                 id={`display-${commodity}-toggle`}
@@ -132,13 +189,13 @@ const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
                 className={styles.label}
                 htmlFor={`display-${commodity}-toggle`}
               >
-                {commodity}
+                {commodityLabel[commodity]}
               </label>
             </div>
           ))}
         </div>
       </Dialog>
-    </div>
+    </>
   );
 };
 

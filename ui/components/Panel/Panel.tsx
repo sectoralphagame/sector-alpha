@@ -19,7 +19,6 @@ import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
 import EntityName from "../EntityName";
 import Resources from "../Resources";
-import SectorResources from "../SectorStats";
 import SectorPrices from "../SectorPrices";
 import Inflation from "../InflationStats";
 import { useGameDialog, useSim } from "../../atoms";
@@ -189,7 +188,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                 {entity.hasComponents(sectorComponents) && (
                   <>
                     <Resources entity={sector(entity)} />
-                    <SectorResources entity={sector(entity)} />
+                    <hr />
                     <SectorPrices entity={sector(entity)} />
                   </>
                 )}

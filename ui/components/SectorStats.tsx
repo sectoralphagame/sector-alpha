@@ -7,6 +7,7 @@ import { fieldColors } from "@core/archetypes/asteroid";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import { Checkbox } from "@kit/Checkbox";
+import { commodityLabel } from "@core/economy/commodity";
 import styles from "./SectorStats.scss";
 
 const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {
@@ -109,7 +110,7 @@ const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {
                 className={styles.label}
                 htmlFor={`display-${commodity}-toggle`}
               >
-                {commodity}
+                {commodityLabel[commodity]}
               </label>
             </div>
           ))}
