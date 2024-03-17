@@ -1,6 +1,6 @@
 {
   "name": "sector-alpha",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Browser-based economic sim set in space",
   "main": "index.js",
   "scripts": {
