@@ -60,13 +60,15 @@ export class ProducingSystem extends System<"exec"> {
 
   static isAbleToProduce = (
     facilityModule: RequireComponent<"production">,
-    storage: CommodityStorage
+    storage: CommodityStorage,
+    outputMultipliers: number[]
     // eslint-disable-next-line no-unused-vars
   ): boolean => {
     if (
       !(
         facilityModule.cooldowns.canUse("production") &&
-        facilityModule.cp.production.active
+        facilityModule.cp.production.active &&
+        sum(outputMultipliers) > 0
       )
     )
       return false;
@@ -137,7 +139,8 @@ export class ProducingSystem extends System<"exec"> {
     for (const entity of this.sim.queries.standaloneProduction.getIt()) {
       const willProduce = ProducingSystem.isAbleToProduce(
         entity,
-        entity.cp.storage
+        entity.cp.storage,
+        [1]
       );
       entity.cp.production.produced = willProduce;
       if (!willProduce) {
@@ -157,10 +160,18 @@ export class ProducingSystem extends System<"exec"> {
         facilityModule,
         "storage"
       ).requireComponents(["storage", "crew", "modules"]);
+      const multipliers = [
+        getMoodMultiplier(facility.cp.crew.mood),
+        getCrewMultiplier(
+          getRequiredCrew(facility),
+          facility.cp.crew.workers.current
+        ),
+      ];
       const storage = facility.cp.storage;
       const willProduce = ProducingSystem.isAbleToProduce(
         facilityModule,
-        storage
+        storage,
+        multipliers
       );
       facilityModule.cp.production.produced = willProduce;
       if (!willProduce) {
@@ -168,13 +179,11 @@ export class ProducingSystem extends System<"exec"> {
       }
 
       facilityModule.cooldowns.use("production", gameDay);
-      ProducingSystem.produce(facilityModule.cp.production, storage, [
-        getMoodMultiplier(facility.cp.crew.mood),
-        getCrewMultiplier(
-          getRequiredCrew(facility),
-          facility.cp.crew.workers.current
-        ),
-      ]);
+      ProducingSystem.produce(
+        facilityModule.cp.production,
+        storage,
+        multipliers
+      );
     }
 
     this.cooldowns.use("exec", gameDay);

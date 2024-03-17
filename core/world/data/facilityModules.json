@@ -4,7 +4,7 @@
     "slug": "waterProduction",
     "pac": {
       "ice": { "consumes": 1200, "produces": 0 },
-      "water": { "consumes": 0, "produces": 600 }
+      "water": { "consumes": 0, "produces": 900 }
     },
     "time": 300,
     "type": "production",
@@ -65,17 +65,13 @@
   {
     "name": "Habitation Dome",
     "type": "habitat",
-    "pac": {
-      "food": { "consumes": 105, "produces": 0 },
-      "fuel": { "consumes": 175, "produces": 0 }
-    },
     "slug": "habitat",
     "time": 900,
     "build": {
       "cost": { "electronics": 2300, "fuel": 1450, "hullPlates": 22000 },
       "time": 410
     },
-    "crew": { "cost": 0, "capacity": 35 }
+    "crew": { "cost": 0, "capacity": 50 }
   },
   {
     "name": "Large Container",
@@ -91,7 +87,7 @@
     "name": "Farm",
     "type": "production",
     "pac": {
-      "food": { "consumes": 0, "produces": 325 },
+      "food": { "consumes": 0, "produces": 750 },
       "fuel": { "consumes": 88, "produces": 0 },
       "water": { "consumes": 175, "produces": 0 }
     },
@@ -289,8 +285,8 @@
     "name": "Sector Hub",
     "type": "hub",
     "pac": {
-      "food": { "consumes": 5, "produces": 0 },
-      "water": { "consumes": 3, "produces": 0 }
+      "food": { "consumes": 4, "produces": 0 },
+      "water": { "consumes": 2, "produces": 0 }
     },
     "slug": "hub",
     "build": {

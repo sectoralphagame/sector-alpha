@@ -1,0 +1,19 @@
+[
+  {
+    "name": "Farming Facility",
+    "slug": "baseFarm",
+    "modules": [
+      "basicHabitat",
+      "basicStorage",
+      "farm",
+      "farm",
+      "farm",
+      "containerLarge",
+      "smallDefense",
+      "habitat",
+      "waterProduction",
+      "farm",
+      "farm"
+    ]
+  }
+]

@@ -379,7 +379,7 @@
       "resources": {
         "fuelium": 0,
         "goldOre": 0,
-        "ice": 0,
+        "ice": 3,
         "ore": 0,
         "silica": 0
       }

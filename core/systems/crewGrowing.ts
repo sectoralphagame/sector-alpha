@@ -4,6 +4,7 @@ import { gameDay, gameMonth } from "@core/utils/misc";
 import { filter, find, groupBy, map, pipe, some } from "@fxts/core";
 import { facilityModules } from "@core/archetypes/facilityModule";
 import type { RequireComponent } from "@core/tsHelpers";
+import { getRequiredCrew } from "@core/utils/crew";
 import type { Sim } from "../sim";
 import { System } from "./system";
 import { ProducingSystem, timeMultiplier } from "./producing";
@@ -64,7 +65,8 @@ export class CrewGrowingSystem extends System<"exec"> {
       const hubModule = getHubModule(hub);
       // eslint-disable-next-line guard-for-in
       for (const commodity in hubModuleTemplate.pac) {
-        hubModule!.cp.production!.pac[commodity].consumes = 0;
+        hubModule!.cp.production!.pac[commodity].consumes =
+          hubModuleTemplate.pac[commodity].consumes;
       }
     }
 
@@ -90,7 +92,7 @@ export class CrewGrowingSystem extends System<"exec"> {
       );
 
       const hubModule = getHubModule(hub);
-      if (ProducingSystem.isAbleToProduce(hubModule!, hub.cp.storage!)) {
+      if (ProducingSystem.isAbleToProduce(hubModule!, hub.cp.storage!, [1])) {
         ProducingSystem.produce(hubModule!.cp.production, hub.cp.storage!, [
           timeMultiplier,
         ]);
@@ -136,7 +138,8 @@ export class CrewGrowingSystem extends System<"exec"> {
         0,
         Math.min(
           facility.cp.crew.workers.current + crewChange,
-          facility.cp.crew.workers.max + 0.5
+          facility.cp.crew.workers.max + 0.5,
+          getRequiredCrew(facility) + 0.5
         )
       );
     }

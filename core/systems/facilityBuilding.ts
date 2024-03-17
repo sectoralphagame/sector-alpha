@@ -10,6 +10,7 @@ import { System } from "./system";
 import { hasSufficientStorage, removeStorage } from "../components/storage";
 
 const buildTimer = "facilityModuleBuild";
+export const maxFacilityModules = 12;
 
 export class FacilityBuildingSystem extends System<"build" | "offers"> {
   apply = (sim: Sim) => {

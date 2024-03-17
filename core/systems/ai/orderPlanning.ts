@@ -6,7 +6,6 @@ import { filter, flatMap, map, pipe, sum, toArray } from "@fxts/core";
 import type { TransactionInput } from "@core/components/trade";
 import type { Position2D } from "@core/components/position";
 import { getRandomPositionInBounds } from "@core/utils/misc";
-import { asteroid } from "../../archetypes/asteroid";
 import { asteroidField } from "../../archetypes/asteroidField";
 import { commanderRange, facility } from "../../archetypes/facility";
 import type { Waypoint } from "../../archetypes/waypoint";
@@ -322,13 +321,7 @@ function autoMineForCommander(
           asteroidFields.filter((f) => f.cp.position!.sector === sector.id)
         ),
         map(asteroidField),
-        filter(
-          (e) =>
-            e.cp.asteroidSpawn.type === mineable &&
-            e.cp.children.entities
-              .map((child) => asteroid(entity.sim.getOrThrow(child)))
-              .some((a) => !a.cp.minable.minedById)
-        ),
+        filter((e) => e.cp.asteroidSpawn.type === mineable),
         toArray
       );
       const field = minBy(eligibleFields, (e) =>

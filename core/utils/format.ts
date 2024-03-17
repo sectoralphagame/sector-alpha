@@ -12,3 +12,18 @@ export function formatTime(time: number): string {
 
   return str;
 }
+
+export function formatGameTime(time: number): string {
+  const hours = time % 24;
+  const days = Math.floor(time / 24) % 30;
+  const years = Math.floor(time / 24 / 30 / 12);
+
+  let str = "";
+  if (years > 0) str += `${years}y `;
+  if (days > 0) str += `${days}d `;
+  if (hours > 0) str += `${hours}h`;
+
+  if (str.endsWith(" ")) str = str.slice(0, str.length - 1);
+
+  return str;
+}

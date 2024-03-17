@@ -14,14 +14,17 @@ describe("Storage", () => {
     newStorageAllocation(storage, {
       amount: { ...perCommodity(() => 0), food: 5 },
       type: "incoming",
+      issued: 0,
     });
     newStorageAllocation(storage, {
       amount: { ...perCommodity(() => 0), fuel: 5 },
       type: "incoming",
+      issued: 0,
     });
     newStorageAllocation(storage, {
       amount: { ...perCommodity(() => 0), food: 9 },
       type: "outgoing",
+      issued: 0,
     });
 
     const stored = storage.availableWares;
@@ -42,6 +45,7 @@ describe("Storage", () => {
         food: 10,
       },
       type: "outgoing",
+      issued: 0,
     });
 
     expect(allocation).not.toBeNull();
@@ -59,6 +63,7 @@ describe("Storage", () => {
         food: 10,
       },
       type: "incoming",
+      issued: 0,
     });
 
     expect(allocation).not.toBeNull();

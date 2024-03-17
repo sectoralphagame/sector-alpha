@@ -308,7 +308,7 @@ export function createOffers(entity: WithTrade) {
   if (!entity.cp.trade.auto.pricing && entity.cp.trade.auto.quantity) {
     updateOfferQuantity(entity);
   } else if (entity.cp.trade.auto.pricing && entity.cp.trade.auto.quantity) {
-    commoditiesArray.forEach((commodity) => {
+    for (const commodity of commoditiesArray) {
       const offeredQuantity = getOfferedQuantity(entity, commodity);
       const producedNet = entity.hasComponents(["compoundProduction"])
         ? getProductionSurplus(
@@ -323,7 +323,7 @@ export function createOffers(entity: WithTrade) {
       offer.price = offer.price ?? commodityPrices[commodity].avg;
       offer.quantity = Math.abs(offeredQuantity);
       offer.type = producedNet > 0 ? "sell" : "buy";
-    });
+    }
   }
 }
 

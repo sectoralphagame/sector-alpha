@@ -126,11 +126,17 @@ export const Crew: React.FC<CrewProps> = ({ entity, requiredCrew, growth }) => (
         {requiredCrew !== null && (
           <Text component="p">
             Crew is working at{" "}
-            {Math.floor(
-              sum([
-                getCrewMultiplier(requiredCrew, entity.cp.crew.workers.current),
-                getMoodMultiplier(entity.cp.crew.mood),
-              ]) * 100
+            {Math.max(
+              0,
+              Math.floor(
+                sum([
+                  getCrewMultiplier(
+                    requiredCrew,
+                    entity.cp.crew.workers.current
+                  ),
+                  getMoodMultiplier(entity.cp.crew.mood),
+                ]) * 100
+              )
             )}
             % efficiency.
           </Text>

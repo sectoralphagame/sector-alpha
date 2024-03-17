@@ -4,6 +4,7 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { discriminate } from "@core/utils/maps";
 import shuffle from "lodash/shuffle";
 import { distance, add, random } from "mathjs";
+import keyBy from "lodash/keyBy";
 import type { Facility } from "../../archetypes/facility";
 import { createFacilityName, createFacility } from "../../archetypes/facility";
 import { facilityModules } from "../../archetypes/facilityModule";
@@ -24,8 +25,12 @@ import {
   getResourceUsage,
   getSectorResources,
 } from "../../utils/resources";
+import { maxFacilityModules } from "../facilityBuilding";
 import { settleStorageQuota } from "../storageQuotaPlanning";
 import { System } from "../system";
+import facilityTemplatesData from "../../world/data/facilityTemplates.json";
+
+const facilityTemplates = keyBy(facilityTemplatesData, "slug");
 
 function isAbleToBuild(
   pac: Partial<PAC>,
@@ -55,19 +60,23 @@ export function addStartingCommodities(facility: RequireComponent<"storage">) {
   });
 }
 
-function getSectorPosition(sector: Sector): Position2D {
+function getSectorPosition(
+  sector: Sector,
+  radius?: number,
+  point?: Position2D
+): Position2D {
   const sectorPosition = hecsToCartesian(
     sector.cp.hecsPosition.value,
     sectorSize / 10
   );
-
   let position: Position2D;
   let isNearAnyFacility: boolean;
+  const r = radius ?? -sectorSize / 20;
 
   do {
-    position = add(sectorPosition, [
-      random(-sectorSize / 20, sectorSize / 20),
-      random(-sectorSize / 20, sectorSize / 20),
+    position = add(point ?? sectorPosition, [
+      random(-r, r),
+      random(-r, r),
     ]) as Position2D;
 
     isNearAnyFacility = sector.sim.queries.facilities
@@ -86,16 +95,51 @@ export class FacilityPlanningSystem extends System<"plan"> {
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
   };
 
-  planMiningFacilities = (sector: Sector, faction: Faction): void => {
-    const resources = getSectorResources(sector, 1);
-    const facilities = this.sim.queries.facilityWithProduction
-      .get()
-      .filter(
-        (facility) =>
-          facility.cp.owner?.id === faction.id &&
-          facility.cp.position.sector === sector.id
+  createNewFactory = (faction: Faction): Facility => {
+    const sector = pickRandom(
+      this.sim.queries.sectors
+        .get()
+        .filter((s) => s.cp.owner?.id === faction.id)
+    );
+    const sectorPosition = hecsToCartesian(
+      sector.cp.hecsPosition.value,
+      sectorSize / 10
+    );
+    const facility = createFacility(this.sim, {
+      owner: faction,
+      position: add(sectorPosition, [
+        random(-sectorSize / 20, sectorSize / 20),
+        random(-sectorSize / 20, sectorSize / 20),
+      ]) as Position2D,
+      sector,
+    });
+    facility.cp.name.value = createFacilityName(facility, "Factory");
+    addFacilityModule(
+      facility,
+      facilityModules.basicHabitat.create(this.sim, facility)
+    );
+    addFacilityModule(
+      facility,
+      facilityModules.basicStorage.create(this.sim, facility)
+    );
+    addFacilityModule(
+      facility,
+      facilityModules.smallDefense.create(this.sim, facility)
+    );
+    for (let i = 0; i < 3; i++) {
+      addFacilityModule(
+        facility,
+        facilityModules.containerLarge.create(this.sim, facility)
       );
-    const resourceUsageInFacilities = getResourceUsage(facilities);
+    }
+
+    facility.cp.crew.workers.current = facility.cp.crew.workers.max * 0.7;
+
+    return facility;
+  };
+
+  planMiningFacilities = (sector: Sector, faction: Faction): void => {
+    const resources = getSectorResources(sector, 0);
     const factionBlueprints = Object.values(facilityModules).filter((f) =>
       faction.cp.blueprints.facilityModules.find((fm) => fm.slug === f.slug)
     );
@@ -104,18 +148,26 @@ export class FacilityPlanningSystem extends System<"plan"> {
       const facilityModule = factionBlueprints
         .filter(discriminate("type", "production"))
         .find((fm) => fm.pac?.[commodity]?.consumes);
-      const canBeMined =
-        resources[commodity].max > 0 &&
-        resourceUsageInFacilities[commodity] === 0 &&
-        !!facilityModule;
+      const canBeMined = resources[commodity].max > 0 && !!facilityModule;
 
       if (!canBeMined) {
         return;
       }
 
+      const minableField = this.sim.queries.asteroidFields
+        .get()
+        .find(
+          (af) =>
+            af.cp.asteroidSpawn.type === commodity &&
+            af.cp.position.sector === sector.id
+        );
       const facility = createFacility(this.sim, {
         owner: faction,
-        position: getSectorPosition(sector),
+        position: getSectorPosition(
+          sector,
+          10,
+          minableField?.cp.position.coord
+        ),
         sector,
       });
       addFacilityModule(
@@ -135,7 +187,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
         i <
           resources[commodity].max /
             ((10000 * facilityModule.pac![commodity]!.consumes) / 3600) &&
-        i < 8;
+        i < maxFacilityModules / 2 - 2;
         i++
       ) {
         addFacilityModule(
@@ -177,6 +229,10 @@ export class FacilityPlanningSystem extends System<"plan"> {
       );
       addFacilityModule(
         facility,
+        facilityModules.basicHabitat.create(this.sim, facility)
+      );
+      addFacilityModule(
+        facility,
         facilityModules.containerMedium.create(this.sim, facility)
       );
       for (let i = 0; i < 3; i++) {
@@ -186,8 +242,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
         );
       }
 
-      addStorage(facility.cp.storage, "food", facility.cp.storage.quota.food);
-      addStorage(facility.cp.storage, "water", facility.cp.storage.quota.water);
+      addStartingCommodities(facility);
     }
   };
 
@@ -242,53 +297,17 @@ export class FacilityPlanningSystem extends System<"plan"> {
       if (
         !facility ||
         Math.random() > 0.8 ||
-        facility.cp.modules.ids.length > 6
+        facility.cp.modules.ids.length >= maxFacilityModules
       ) {
         if (facility && this.sim.getTime() === 0) {
           addStartingCommodities(facility);
         }
 
-        const sector = pickRandom(
-          this.sim.queries.sectors
-            .get()
-            .filter((s) => s.cp.owner?.id === faction.id)
-        );
-        const sectorPosition = hecsToCartesian(
-          sector.cp.hecsPosition.value,
-          sectorSize / 10
-        );
-
-        facility = createFacility(this.sim, {
-          owner: faction,
-          position: add(sectorPosition, [
-            random(-sectorSize / 20, sectorSize / 20),
-            random(-sectorSize / 20, sectorSize / 20),
-          ]) as Position2D,
-          sector,
-        });
-        facility.cp.name.value = createFacilityName(facility, "Factory");
-        addFacilityModule(
-          facility,
-          facilityModules.basicHabitat.create(this.sim, facility)
-        );
-        addFacilityModule(
-          facility,
-          facilityModules.basicStorage.create(this.sim, facility)
-        );
-        addFacilityModule(
-          facility,
-          facilityModules.smallDefense.create(this.sim, facility)
-        );
-
-        facility.cp.crew.workers.current = facility.cp.crew.workers.max * 0.7;
+        facility = this.createNewFactory(faction);
       }
 
       const facilityModule = buildQueue.pop()!;
 
-      addFacilityModule(
-        facility,
-        facilityModules.containerSmall.create(this.sim, facility)
-      );
       addFacilityModule(facility, facilityModule.create(this.sim, facility));
     }
 
@@ -314,6 +333,28 @@ export class FacilityPlanningSystem extends System<"plan"> {
       this.cooldowns.use("plan", 500);
 
       this.sim.queries.ai.get().forEach((faction) => {
+        const sectorWithSSF = pickRandom(
+          this.sim.queries.sectors
+            .get()
+            .filter((sector) => sector.cp.owner?.id === faction.id)
+        );
+
+        if (!sectorWithSSF) return;
+
+        const ssf = createFacility(this.sim, {
+          owner: faction,
+          position: getSectorPosition(sectorWithSSF),
+          sector: sectorWithSSF,
+        });
+        ssf.cp.name.value = createFacilityName(
+          ssf,
+          facilityTemplates.baseFarm.name
+        );
+
+        for (const m of facilityTemplates.baseFarm.modules) {
+          addFacilityModule(ssf, facilityModules[m].create(this.sim, ssf));
+        }
+
         this.sim.queries.sectors
           .get()
           .filter((sector) => sector.cp.owner?.id === faction.id)
