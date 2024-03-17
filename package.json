@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=development webpack serve",
+    "release": "release-it",
     "build": "NODE_ENV=production webpack",
     "gen-archetype": "hygen archetype new",
     "test": "jest",
@@ -59,6 +60,7 @@
     "node-sass": "^7.0.3",
     "prettier": "2.8.4",
     "prettier-eslint": "^8.8.2",
+    "release-it": "17.1.1",
     "sass-loader": "^13.1.0",
     "storybook": "^7.0.0-beta.45",
     "string-replace-loader": "^3.1.0",
@@ -119,5 +121,8 @@
     "*.{json,scss}": [
       "prettier --write"
     ]
+  },
+  "npm": {
+    "publish": false
   }
 }
