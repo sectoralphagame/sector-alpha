@@ -1,4 +1,5 @@
 import { changeBudgetMoney } from "@core/components/budget";
+import { transferOwnership } from "@core/utils/ownership";
 import type { DevAction, PlayerAction, TargetAction } from "./types";
 
 const addMoney: PlayerAction<[number]> = {
@@ -27,9 +28,23 @@ const destroy: TargetAction<[]> = {
   },
 };
 
+const takeOwnership: TargetAction<[]> = {
+  type: "target",
+  slug: "take",
+  name: "Take ownership",
+  description: "Take ownership over targeted entity",
+  category: "core",
+  variants: [],
+  fn: (sim, targetId: number) => {
+    const entity = sim.getOrThrow(targetId).requireComponents(["owner"]);
+    transferOwnership(entity, sim.queries.player.get()[0].id);
+  },
+};
+
 export const coreActions: DevAction[] = [
   addMoney,
   destroy,
+  takeOwnership,
   // {
   //     type:"target",
   //   name: "addCommodity",
