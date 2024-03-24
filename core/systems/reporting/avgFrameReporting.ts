@@ -1,19 +1,28 @@
 import type { Sim } from "@core/sim";
-import { setCheat } from "@core/utils/misc";
 import { System } from "../system";
 
 export class AvgFrameReportingSystem extends System {
   start = 0;
   iterations = 0;
   accumulator = 0;
-  reporting = true;
+  reporting = false;
 
   apply(sim: Sim): void {
     super.apply(sim);
 
-    setCheat("toggleAvgFrameReporting", () => {
-      this.reporting = !this.reporting;
-    });
+    this.sim.actions.register(
+      {
+        type: "basic",
+        slug: "avgFrameTie",
+        name: "Average frame time",
+        category: "performance",
+        description: "Toggle average frame time reporting",
+        fn: () => {
+          this.reporting = !this.reporting;
+        },
+      },
+      this.constructor.name
+    );
 
     sim.hooks.phase.start.tap(this.constructor.name, () => {
       this.start = performance.now();

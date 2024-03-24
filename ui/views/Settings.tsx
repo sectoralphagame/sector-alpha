@@ -51,6 +51,25 @@ export const Settings: React.FC = () => {
           step={0.1}
         />
       </div>
+      <hr />
+      <div className={styles.settingsRow}>
+        <div>Developer tools</div>
+        <Select
+          onChange={(value) =>
+            setSettings((prevSettings) => ({
+              ...prevSettings,
+              dev: value === "true",
+            }))
+          }
+          value={(settings.dev ?? false).toString()}
+        >
+          <SelectButton>{settings.dev ? "Enabled" : "Disabled"}</SelectButton>
+          <SelectOptions>
+            <SelectOption value="true">Enabled</SelectOption>
+            <SelectOption value="false">Disabled</SelectOption>
+          </SelectOptions>
+        </Select>
+      </div>
     </div>
   );
 };

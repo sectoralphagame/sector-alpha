@@ -4,7 +4,6 @@ import Color from "color";
 import { Entity } from "@core/entity";
 import { manifest } from "@assets/icons";
 import type { Sim } from "@core/sim";
-import { setCheat } from "@core/utils/misc";
 import { isHeadless } from "@core/settings";
 import { first } from "@fxts/core";
 import { storageHook } from "@core/hooks";
@@ -121,10 +120,31 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
     this.initLayers();
     this.initListeners();
 
-    setCheat("hexGrid", this.toggleGrid);
-    setCheat("displayRange", () => {
-      this.displayRange = !this.displayRange;
-    });
+    this.sim.actions.register(
+      {
+        type: "basic",
+        slug: "toggleGrid",
+        name: "Toggle hex grid",
+        category: "drawing",
+        description: "Toggle hexagonal grid",
+        fn: () => this.toggleGrid(),
+      },
+      this.constructor.name
+    );
+
+    this.sim.actions.register(
+      {
+        type: "basic",
+        slug: "displayRange",
+        name: "Display range",
+        category: "drawing",
+        description: "Toggle displaying entity ranges",
+        fn: () => {
+          this.displayRange = !this.displayRange;
+        },
+      },
+      this.constructor.name
+    );
 
     this.initialized = true;
     this.scale = window.localStorage.getItem("gameSettings")

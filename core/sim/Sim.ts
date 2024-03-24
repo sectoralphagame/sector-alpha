@@ -13,6 +13,7 @@ import type { CoreComponents } from "@core/components/component";
 import type { EntityTag } from "@core/tags";
 import { componentMask } from "@core/components/masks";
 import LZString from "lz-string";
+import { ActionLoader } from "@core/actionLoader";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -52,9 +53,12 @@ export class Sim extends BaseSim {
   queries: Queries;
   paths: Record<string, Record<string, Path>>;
 
+  actions: ActionLoader;
+
   constructor({ systems }: SimConfig = { systems: [] }) {
     super();
 
+    this.actions = new ActionLoader(this);
     this.entities = new Map();
     this.hooks = {
       addComponent: new SyncHook(["addComponent"]),
