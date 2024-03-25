@@ -7,7 +7,7 @@ module.exports = {
       "<rootDir>/TransformerESBuild.js",
       {
         sourcemap: true,
-        target: "es2020",
+        target: "chrome112",
         loader: "tsx",
       },
     ],
