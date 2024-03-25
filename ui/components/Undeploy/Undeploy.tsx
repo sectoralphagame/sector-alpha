@@ -1,12 +1,11 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import type { Entity } from "@core/entity";
 import type { RequireComponent } from "@core/tsHelpers";
-import redoIcon from "@assets/ui/redo.svg";
 import { IconButton } from "@kit/IconButton";
 import { Button } from "@kit/Button";
 import clsx from "clsx";
 import { isOwnedByPlayer } from "@core/utils/misc";
+import { RedoIcon } from "@assets/ui/icons";
 import styles from "./Undeploy.scss";
 
 export interface UndeployProps {
@@ -36,7 +35,7 @@ export const Undeploy: React.FC<UndeployProps> = ({ facility, deployable }) => {
                 selectionManager.focused = true;
               }}
             >
-              <SVG src={redoIcon} />
+              <RedoIcon />
             </IconButton>
           </div>
         </div>

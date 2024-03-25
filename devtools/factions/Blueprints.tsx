@@ -1,14 +1,13 @@
 import React from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { useThrottledFormState } from "@devtools/utils";
-import SVG from "react-inlinesvg";
-import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import clsx from "clsx";
 import { shipClasses } from "@core/world/ships";
 import { facilityModules } from "@core/archetypes/facilityModule";
 import { IconButton } from "@kit/IconButton";
 import { Checkbox } from "@kit/Checkbox";
 import Text from "@kit/Text";
+import { ArrowLeftIcon } from "@assets/ui/icons";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import type { FactionInput, FormData } from "./utils";
 import styles from "./styles.scss";
@@ -37,8 +36,7 @@ const FactionBlueprintsEditor: React.FC<{ index: number }> = ({ index }) => {
       <tr>
         <TableCell>
           <IconButton onClick={() => setExpanded(!expanded)}>
-            <SVG
-              src={arrowLeftIcon}
+            <ArrowLeftIcon
               className={clsx(styles.rowExpander, {
                 [styles.rowExpanderToggled]: expanded,
               })}

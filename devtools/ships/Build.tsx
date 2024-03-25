@@ -1,12 +1,9 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
 import type { ShipInput } from "@core/world/ships";
 import type { Commodity } from "@core/economy/commodity";
 import { commodityLabel, commoditiesArray } from "@core/economy/commodity";
-import arrowLeftIcon from "@assets/ui/arrow_left.svg";
-import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
 import allModules from "@core/world/data/facilityModules.json";
 import {
@@ -18,6 +15,7 @@ import {
 import { formatInt, useThrottledFormState } from "@devtools/utils";
 import { max, min } from "@fxts/core";
 import { getCommodityCost } from "@core/economy/utils";
+import { ArrowLeftIcon, CloseIcon } from "@assets/ui/icons";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
 import type { FormData } from "./utils";
@@ -36,8 +34,7 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
       <tr>
         <TableCell>
           <IconButton onClick={() => setExpanded(!expanded)}>
-            <SVG
-              src={arrowLeftIcon}
+            <ArrowLeftIcon
               className={clsx(styles.rowExpander, {
                 [styles.rowExpanderToggled]: expanded,
               })}
@@ -132,7 +129,7 @@ const ShipBuildEditor: React.FC<{ index: number }> = ({ index }) => {
                         )
                       }
                     >
-                      <SVG src={closeIcon} />
+                      <CloseIcon />
                     </IconButton>
                   </React.Fragment>
                 ))}

@@ -1,5 +1,3 @@
-import configIcon from "@assets/ui/config.svg";
-import SVG from "react-inlinesvg";
 import React from "react";
 import { shipComponents, ship as asShip } from "@core/archetypes/ship";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@kit/Tabs";
@@ -14,6 +12,7 @@ import { IconButton } from "@kit/IconButton";
 import { isOwnedByPlayer } from "@core/utils/misc";
 import { getRequiredCrew } from "@core/utils/crew";
 import { find } from "@fxts/core";
+import { ConfigIcon } from "@assets/ui/icons";
 import FacilityPanel from "../FacilityPanel";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
@@ -156,7 +155,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                             })
                           }
                         >
-                          <SVG src={configIcon} />
+                          <ConfigIcon />
                         </IconButton>
                       )}
                     </div>

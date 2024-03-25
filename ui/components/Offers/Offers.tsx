@@ -1,5 +1,3 @@
-import configIcon from "@assets/ui/config.svg";
-import SVG from "react-inlinesvg";
 import React from "react";
 import { commoditiesArray, commodityLabel } from "@core/economy/commodity";
 import type { RequirePureComponent } from "@core/tsHelpers";
@@ -10,6 +8,7 @@ import {
   CollapsibleSummary,
 } from "@kit/Collapsible";
 import { IconButton } from "@kit/IconButton";
+import { ConfigIcon } from "@assets/ui/icons";
 import styles from "./Offers.scss";
 
 export interface OffersProps {
@@ -43,7 +42,7 @@ export const Offers: React.FC<OffersProps> = ({ entity, onManage }) => {
               onManage();
             }}
           >
-            <SVG src={configIcon} />
+            <ConfigIcon />
           </IconButton>
         )}
       </CollapsibleSummary>

@@ -1,3 +1,4 @@
+import { CloseIcon } from "@assets/ui/icons";
 import type { Blueprints } from "@core/components/blueprints";
 import { commodityLabel } from "@core/economy/commodity";
 import { Button } from "@kit/Button";
@@ -8,8 +9,6 @@ import Text from "@kit/Text";
 import clsx from "clsx";
 import { sum } from "mathjs";
 import React from "react";
-import SVG from "react-inlinesvg";
-import closeIcon from "@assets/ui/close.svg";
 import type { ModalProps } from "../ConfigDialog";
 import styles from "./ShipyardDialog.scss";
 
@@ -150,7 +149,7 @@ export const ShipyardDialogComponent: React.FC<
                         )
                       }
                     >
-                      <SVG src={closeIcon} />
+                      <CloseIcon />
                     </IconButton>
                   </div>
                 </div>

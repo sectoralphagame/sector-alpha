@@ -1,8 +1,6 @@
 import React from "react";
 import groupBy from "lodash/groupBy";
-import SVG from "react-inlinesvg";
 import type { RequireComponent } from "@core/tsHelpers";
-import locationIcon from "@assets/ui/location.svg";
 import { Table, TableCell } from "@kit/Table";
 import { IconButton } from "@kit/IconButton";
 import {
@@ -10,12 +8,11 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
-import configIcon from "@assets/ui/config.svg";
 import { useGameDialog } from "@ui/atoms";
 import { isOwnedByPlayer } from "@core/utils/misc";
-import exclamationIcon from "@assets/ui/exclamation.svg";
 import { Tooltip } from "@kit/Tooltip";
 import Text from "@kit/Text";
+import { ConfigIcon, ExclamationIcon, LocationIcon } from "@assets/ui/icons";
 import styles from "./Production.scss";
 
 export interface ProductionProps {
@@ -55,7 +52,7 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
                 variant="naked"
                 onClick={openModuleManager}
               >
-                <SVG src={configIcon} />
+                <ConfigIcon />
               </IconButton>
             )}
           </div>
@@ -73,9 +70,8 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
                           <Tooltip
                             // eslint-disable-next-line react/no-unstable-nested-components
                             anchor={(ref) => (
-                              <SVG
+                              <ExclamationIcon
                                 innerRef={ref}
-                                src={exclamationIcon}
                                 className={styles.haltedIcon}
                               />
                             )}
@@ -114,7 +110,7 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
                               selectionManager.focused = true;
                             }}
                           >
-                            <SVG src={locationIcon} />
+                            <LocationIcon />
                           </IconButton>
                         )}
                       </TableCell>

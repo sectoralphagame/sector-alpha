@@ -1,12 +1,13 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import clsx from "clsx";
-import locationIcon from "@assets/ui/location.svg";
-import configIcon from "@assets/ui/config.svg";
-import arrowLeftIcon from "@assets/ui/arrow_left.svg";
-import journalIcon from "@assets/ui/journal.svg";
 import { IconButton } from "@kit/IconButton";
 import { AnimatedBackdrop } from "@kit/AnimatedBackdrop";
+import {
+  ArrowLeftIcon,
+  ConfigIcon,
+  JournalIcon,
+  LocationIcon,
+} from "@assets/ui/icons";
 import styles from "./Panel.scss";
 
 export interface PanelComponentProps {
@@ -39,31 +40,31 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
     >
       {isCollapsed ? (
         <IconButton onClick={onCollapseToggle}>
-          <SVG className={styles.rotate} src={arrowLeftIcon} />
+          <ArrowLeftIcon className={styles.rotate} />
         </IconButton>
       ) : (
         <IconButton onClick={onConfig}>
-          <SVG src={configIcon} />
+          <ConfigIcon />
         </IconButton>
       )}
       <IconButton onClick={onPlayerAssets}>
-        <SVG src={journalIcon} />
+        <JournalIcon />
       </IconButton>
       {!!onFocus && (
         <IconButton onClick={onFocus}>
-          <SVG src={locationIcon} />
+          <LocationIcon />
         </IconButton>
       )}
       {!isCollapsed ? (
         <>
           <div className={styles.spacer} />
           <IconButton onClick={onCollapseToggle}>
-            <SVG src={arrowLeftIcon} />
+            <ArrowLeftIcon />
           </IconButton>
         </>
       ) : (
         <IconButton onClick={onConfig}>
-          <SVG src={configIcon} />
+          <ConfigIcon />
         </IconButton>
       )}
     </div>

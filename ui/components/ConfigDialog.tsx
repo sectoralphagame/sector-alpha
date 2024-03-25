@@ -1,8 +1,6 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import { Sim } from "@core/sim";
 import type { Save } from "@core/db";
-import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { Dialog } from "@kit/Dialog";
 import { Button } from "@kit/Button";
 import { Input } from "@kit/Input";
@@ -11,6 +9,7 @@ import { createBaseConfig } from "@core/sim/baseConfig";
 import { Settings } from "@ui/views/Settings";
 import LZString from "lz-string";
 import { regen } from "@core/systems/pathPlanning";
+import { ArrowLeftIcon } from "@assets/ui/icons";
 import { useLocation } from "../context/Location";
 import styles from "./ConfigDialog.scss";
 import { Saves } from "./Saves";
@@ -63,7 +62,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
           className={styles.backButton}
           onClick={() => setView("default")}
         >
-          <SVG src={arrowLeftIcon} />
+          <ArrowLeftIcon />
         </IconButton>
       )}
       {view === "default" ? (

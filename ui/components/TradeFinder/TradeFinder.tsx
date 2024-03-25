@@ -8,12 +8,11 @@ import {
 } from "@kit/Dropdown";
 import { IconButton } from "@kit/IconButton";
 import React from "react";
-import SVG from "react-inlinesvg";
-import redoIcon from "@assets/ui/redo.svg";
 import { useLocalStorage } from "@ui/hooks/useLocalStorage";
 import sortBy from "lodash/sortBy";
 import clsx from "clsx";
 import { relationThresholds } from "@core/components/relations";
+import { RedoIcon } from "@assets/ui/icons";
 import { useSim } from "../../atoms";
 import styles from "./TradeFinder.scss";
 
@@ -83,7 +82,7 @@ export const TradeFinder: React.FC = () => {
                       entity.id;
                   }}
                 >
-                  <SVG src={redoIcon} />
+                  <RedoIcon />
                 </IconButton>
               </div>
             ))}

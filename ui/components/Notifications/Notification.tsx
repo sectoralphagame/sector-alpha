@@ -1,10 +1,7 @@
 import clsx from "clsx";
 import React from "react";
-import questionIcon from "@assets/ui/question.svg";
-import exclamationIcon from "@assets/ui/exclamation.svg";
-import closeIcon from "@assets/ui/close.svg";
-import SVG from "react-inlinesvg";
 import { IconButton } from "@kit/IconButton";
+import { CloseIcon, ExclamationIcon, QuestionIcon } from "@assets/ui/icons";
 import styles from "./styles.scss";
 import type { NotificationProps } from "./types";
 
@@ -24,10 +21,11 @@ export const Notification: React.FC<NotificationProps> = ({
     onClick={onClick}
     type="button"
   >
-    <SVG
-      src={icon === "exclamation" ? exclamationIcon : questionIcon}
-      className={styles.notificationIcon}
-    />
+    {icon === "exclamation" ? (
+      <ExclamationIcon className={styles.notificationIcon} />
+    ) : (
+      <QuestionIcon className={styles.notificationIcon} />
+    )}
     <p className={styles.notificationMessage}>{message}</p>
     {dismiss && (
       <IconButton
@@ -38,7 +36,7 @@ export const Notification: React.FC<NotificationProps> = ({
         }}
         variant="naked"
       >
-        <SVG src={closeIcon} />
+        <CloseIcon />
       </IconButton>
     )}
   </button>

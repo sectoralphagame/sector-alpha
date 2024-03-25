@@ -1,13 +1,12 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
-import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import type { ShipInput } from "@core/world/ships";
 import { LabeledInput } from "@kit/Input";
 import { IconButton } from "@kit/IconButton";
 import { Card, CardHeader } from "@kit/Card";
 import { useThrottledFormState } from "@devtools/utils";
+import { ArrowLeftIcon } from "@assets/ui/icons";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
 import type { FormData } from "./utils";
@@ -32,8 +31,7 @@ const ShipFreightEditor: React.FC<{ index: number }> = ({ index }) => {
       <tr>
         <TableCell>
           <IconButton onClick={() => setExpanded(!expanded)}>
-            <SVG
-              src={arrowLeftIcon}
+            <ArrowLeftIcon
               className={clsx(styles.rowExpander, {
                 [styles.rowExpanderToggled]: expanded,
               })}

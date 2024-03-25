@@ -1,9 +1,8 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import clsx from "clsx";
-import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { Button } from "@kit/Button";
 import { IconButton } from "@kit/IconButton";
+import { ArrowLeftIcon } from "@assets/ui/icons";
 import styles from "./JSONOutput.scss";
 import { useThrottledFormState } from "../../utils";
 
@@ -22,8 +21,7 @@ export const JSONOutput: React.FC<{
     <div className={styles.root}>
       <div className={styles.toolbar}>
         <IconButton onClick={onExpand}>
-          <SVG
-            src={arrowLeftIcon}
+          <ArrowLeftIcon
             className={clsx({
               [styles.rotate]: expanded,
             })}

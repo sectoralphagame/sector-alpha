@@ -6,8 +6,6 @@ import {
   DropdownOptions,
 } from "@kit/Dropdown";
 import { maxFacilityModules } from "@core/systems/facilityBuilding";
-import closeIcon from "@assets/ui/close.svg";
-import SVG from "react-inlinesvg";
 import { IconButton } from "@kit/IconButton";
 import { commoditiesArray, commodityLabel } from "@core/economy/commodity";
 import { sum } from "@fxts/core";
@@ -17,6 +15,7 @@ import { formatGameTime } from "@core/utils/format";
 import { getCrewMultiplier } from "@core/systems/producing";
 import { AnimatedBackdrop } from "@kit/AnimatedBackdrop";
 import { Button } from "@kit/Button";
+import { CloseIcon } from "@assets/ui/icons";
 import styles from "./styles.scss";
 import facilityModules from "../../core/world/data/facilityModules.json";
 import facilityTemplates from "../../core/world/data/facilityTemplates.json";
@@ -93,7 +92,7 @@ const FacilityBuilder: React.FC = () => {
               }}
               variant="naked"
             >
-              <SVG src={closeIcon} />
+              <CloseIcon />
             </IconButton>
             {fm.name}
           </div>

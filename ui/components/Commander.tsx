@@ -1,11 +1,9 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import type { Entity } from "@core/entity";
 import type { RequireComponent } from "@core/tsHelpers";
-import redoIcon from "@assets/ui/redo.svg";
-import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
 import { removeCommander } from "@core/components/commander";
+import { CloseIcon, RedoIcon } from "@assets/ui/icons";
 import { useSim } from "../atoms";
 import styles from "./Commander.scss";
 
@@ -33,7 +31,7 @@ export const Commander: React.FC<CommanderProps> = ({ commander, ship }) => {
             selectionManager.focused = true;
           }}
         >
-          <SVG src={redoIcon} />
+          <RedoIcon />
         </IconButton>
         {isOwned && (
           <IconButton
@@ -42,7 +40,7 @@ export const Commander: React.FC<CommanderProps> = ({ commander, ship }) => {
               removeCommander(ship);
             }}
           >
-            <SVG src={closeIcon} />
+            <CloseIcon />
           </IconButton>
         )}
       </div>

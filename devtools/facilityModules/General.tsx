@@ -4,8 +4,7 @@ import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { useThrottledFormState } from "@devtools/utils";
 import type { FacilityModuleInput } from "@core/archetypes/facilityModule";
 import { IconButton } from "@kit/IconButton";
-import SVG from "react-inlinesvg";
-import closeIcon from "@assets/ui/close.svg";
+import { CloseIcon } from "@assets/ui/icons";
 import type { FormData } from "./utils";
 import { Table, TableCell, TableHeader } from "../components/Table";
 
@@ -26,7 +25,7 @@ const FacilityModuleGeneralEditor: React.FC<{ index: number }> = ({
     <tr>
       <TableCell>
         <IconButton onClick={() => remove(index)}>
-          <SVG src={closeIcon} />
+          <CloseIcon />
         </IconButton>
       </TableCell>
       <TableCell>

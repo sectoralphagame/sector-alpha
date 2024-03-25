@@ -1,9 +1,8 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import type { RequireComponent } from "@core/tsHelpers";
-import redoIcon from "@assets/ui/redo.svg";
 import { IconButton } from "@kit/IconButton";
 import { Table, TableCell } from "@kit/Table";
+import { RedoIcon } from "@assets/ui/icons";
 import styles from "./EntityList.scss";
 
 export interface EntityListProps {
@@ -27,7 +26,7 @@ export const EntityList: React.FC<EntityListProps> = ({ entities }) => (
                   selectionManager.id = entity.id;
                 }}
               >
-                <SVG src={redoIcon} />
+                <RedoIcon />
               </IconButton>
             </TableCell>
           )}

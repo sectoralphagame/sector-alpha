@@ -1,10 +1,9 @@
 import type { RequireComponent } from "@core/tsHelpers";
 import { IconButton } from "@kit/IconButton";
 import React from "react";
-import SVG from "react-inlinesvg";
-import chevronIcon from "@assets/ui/chevron_down.svg";
 import clsx from "clsx";
 import Text from "@kit/Text";
+import { ChevronDownIcon } from "@assets/ui/icons";
 import styles from "./FleetOverlay.scss";
 
 type Ship = RequireComponent<"name" | "autoOrder">;
@@ -95,7 +94,7 @@ const FleetComponent: React.FC<FleetComponentProps> = ({
           onClick={() => setExpanded((prevExpanded) => !prevExpanded)}
           variant="naked"
         >
-          <SVG src={chevronIcon} />
+          <ChevronDownIcon />
         </IconButton>
         <ShipButton
           className={styles.shipNoMargin}
