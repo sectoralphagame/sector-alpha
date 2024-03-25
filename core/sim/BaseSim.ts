@@ -2,8 +2,11 @@ import { Exclude, Expose } from "class-transformer";
 import { notImplemented } from "../errors";
 import settings from "../settings";
 
+let counter = 1;
+
 @Exclude()
 export class BaseSim {
+  id: number;
   firstTick: number;
   lastTick: number;
   intervalHandle: number | null;
@@ -12,6 +15,8 @@ export class BaseSim {
   speed = 1;
 
   constructor() {
+    this.id = counter;
+    counter += 1;
     this.timeOffset = 0;
   }
 
@@ -37,7 +42,11 @@ export class BaseSim {
         // eslint-disable-next-line no-console
         console.error(err);
         // eslint-disable-next-line no-console
-        console.error(`This error occured at ${this.getTime()}`);
+        console.error(
+          `This error occured at ${this.getTime().toFixed(3)} in sim #${
+            this.id
+          }`
+        );
         this.stop();
       }
     }, 1e3 / settings.global.targetFps) as unknown as number;

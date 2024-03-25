@@ -10,6 +10,7 @@ import { IconButton } from "@kit/IconButton";
 import { createBaseConfig } from "@core/sim/baseConfig";
 import { Settings } from "@ui/views/Settings";
 import LZString from "lz-string";
+import { regen } from "@core/systems/pathPlanning";
 import { useLocation } from "../context/Location";
 import styles from "./ConfigDialog.scss";
 import { Saves } from "./Saves";
@@ -100,14 +101,18 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
           <Saves
             saves={saves}
             onClick={async (id) => {
+              // @ts-expect-error
+              setSim(null);
               sim.destroy();
-              setSim(
-                Sim.load(
-                  createBaseConfig(),
-                  LZString.decompress(saves.find((s) => s.id === id)!.data)
-                )
+              const newSim = Sim.load(
+                createBaseConfig(),
+                LZString.decompress(saves.find((s) => s.id === id)!.data)
               );
-              onClose();
+              setTimeout(() => {
+                setSim(newSim);
+                regen(newSim);
+                onClose();
+              }, 100);
             }}
             onDelete={async (id) => {
               await Sim.deleteSave(id);
