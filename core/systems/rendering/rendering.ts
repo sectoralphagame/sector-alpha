@@ -530,6 +530,9 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
       this.init();
       return;
     }
+    // For some reason this is needed to prevent logging error when loading game
+    if (!this.viewport.transform) return;
+
     this.settingsManager = first(this.sim.queries.settings.getIt())!;
 
     this.onChange(

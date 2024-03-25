@@ -44,7 +44,7 @@ const overlayKeyCodes: Record<string, NonNullable<GameOverlayProps>> = {
   KeyJ: "missions",
 };
 
-export const Game: React.FC = () => {
+const Game: React.FC = () => {
   const [sim, setSim] = useSim();
   const system = React.useRef<RenderingSystem>();
   const canvasRoot = React.useRef<HTMLDivElement>(null);
@@ -54,10 +54,10 @@ export const Game: React.FC = () => {
   const { addNotification } = useNotifications();
   const [gameSettings] = useGameSettings();
 
-  const selectedId = sim?.queries.settings.get()[0]!.cp.selectionManager.id;
+  const selectedId = sim.queries.settings.get()[0]!.cp.selectionManager.id;
   const [selectedEntity, setSelectedEntity] = React.useState<
     Entity | undefined
-  >(selectedId ? sim?.get(selectedId) : undefined);
+  >(selectedId ? sim.get(selectedId) : undefined);
   const player = sim.queries.player.get()[0]!;
 
   React.useEffect(() => {
@@ -203,3 +203,13 @@ export const Game: React.FC = () => {
     </div>
   );
 };
+
+const GameWrapper: React.FC = () => {
+  const [sim] = useSim();
+
+  if (!sim) return null;
+
+  return <Game />;
+};
+
+export { GameWrapper as Game };
