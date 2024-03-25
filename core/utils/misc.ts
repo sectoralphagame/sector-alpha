@@ -3,7 +3,7 @@ import { ship } from "@core/archetypes/ship";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { Position2D } from "@core/components/position";
 import type { Entity } from "@core/entity";
-import settings, { isHeadless } from "@core/settings";
+import settings from "@core/settings";
 import type { RequireComponent } from "@core/tsHelpers";
 import { first } from "@fxts/core";
 import { add, norm, random, subtract } from "mathjs";
@@ -27,16 +27,6 @@ function _normalizeAngle(value: number, start: number, end: number): number {
 }
 export function normalizeAngle(value: number): number {
   return _normalizeAngle(value, -Math.PI, Math.PI);
-}
-
-export function setCheat(key: string, fn: Function) {
-  if (!isHeadless) {
-    if (!window.cheats) {
-      window.cheats = {};
-    }
-
-    window.cheats[key] = fn;
-  }
 }
 
 export function getRandomPositionInBounds(

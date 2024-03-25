@@ -47,7 +47,7 @@ export const gameDialog = atom<GameDialogProps>({
 });
 export const useGameDialog = () => useRecoilState(gameDialog);
 
-export type GameOverlayProps = "fleet" | "missions" | null;
+export type GameOverlayProps = "fleet" | "missions" | "dev" | null;
 
 export const gameOverlay = atom<GameOverlayProps>({
   key: "gameOverlay",

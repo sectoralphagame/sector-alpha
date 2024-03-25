@@ -5,9 +5,6 @@ import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import type { Entity } from "@core/entity";
 import { MapView } from "@ui/components/MapView";
 import { useRerender } from "@ui/hooks/useRerender";
-import type { Commodity } from "@core/economy/commodity";
-import { addStorage } from "@core/components/storage";
-import { changeBudgetMoney } from "@core/components/budget";
 import { MapPanel } from "@ui/components/MapPanel";
 import {
   MapPanelButton,
@@ -18,9 +15,10 @@ import { Relations } from "@ui/components/Relations/Relations";
 import { Overlay } from "@ui/components/Overlay/Overlay";
 import { FleetOverlay } from "@ui/components/FleetOverlay/FleetOverlay";
 import { MissionsOverlay } from "@ui/components/MissionsOverlay";
-import { setCheat } from "@core/utils/misc";
 import { Notifications } from "@ui/components/Notifications";
 import { SimControl } from "@ui/components/SimControl/SimControl";
+import DevOverlay from "@ui/components/DevOverlay/DevOverlay";
+import { useGameSettings } from "@ui/hooks/useGameSettings";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -38,8 +36,10 @@ import { PlayerMoney } from "../components/PlayerMoney";
 const overlayNames: Record<NonNullable<GameOverlayProps>, string> = {
   fleet: "Fleet Management",
   missions: "Active Missions",
+  dev: "Developer Tools",
 };
 const overlayKeyCodes: Record<string, NonNullable<GameOverlayProps>> = {
+  Backslash: "dev",
   KeyF: "fleet",
   KeyJ: "missions",
 };
@@ -52,6 +52,7 @@ export const Game: React.FC = () => {
   const [dialog, setDialog] = useGameDialog();
   const [overlay, setOverlay] = useGameOverlay();
   const { addNotification } = useNotifications();
+  const [gameSettings] = useGameSettings();
 
   const selectedId = sim?.queries.settings.get()[0]!.cp.selectionManager.id;
   const [selectedEntity, setSelectedEntity] = React.useState<
@@ -78,22 +79,6 @@ export const Game: React.FC = () => {
       }
     });
     sim.hooks.destroy.tap("Game", unmount);
-
-    setCheat(
-      "addCommodity",
-      (commodity: Commodity, quantity: number, id?: number) => {
-        const entity = id ? sim.getOrThrow(id) : (window.selected as Entity);
-        if (entity) {
-          addStorage(entity.cp.storage!, commodity, quantity);
-        }
-      }
-    );
-    setCheat("addMoney", (quantity: number, id?: number) => {
-      const entity = id
-        ? sim.getOrThrow(id)
-        : (window.selected as Entity | undefined) ?? player;
-      changeBudgetMoney(entity.cp.budget!, quantity);
-    });
 
     window.sim = sim;
 
@@ -124,7 +109,10 @@ export const Game: React.FC = () => {
 
       if (event.target instanceof HTMLInputElement) return;
 
-      if (event.code in overlayKeyCodes) {
+      if (
+        event.code in overlayKeyCodes &&
+        (overlayKeyCodes[event.code] !== "dev" || gameSettings.dev)
+      ) {
         setOverlay((prev) =>
           prev === overlayKeyCodes[event.code]
             ? null
@@ -140,7 +128,7 @@ export const Game: React.FC = () => {
     document.addEventListener("keydown", handler);
 
     return () => document.removeEventListener("keydown", handler);
-  }, [setDialog, overlay]);
+  }, [setDialog, overlay, gameSettings.dev]);
 
   React.useEffect(() => {
     if (player.cp.missions.offer) {
@@ -193,6 +181,7 @@ export const Game: React.FC = () => {
       >
         <FleetOverlay />
         <MissionsOverlay />
+        {gameSettings.dev && <DevOverlay />}
       </Overlay>
       {menu.active && (!!menu.sector || menu.overlay) && (
         <ClickAwayListener

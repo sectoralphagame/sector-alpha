@@ -21,14 +21,6 @@ export class CrewGrowingSystem extends System<"exec"> {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    this.sim.hooks.removeEntity.tap("CrewGrowingSystem", (entity) => {
-      if (entity.cp.modules) {
-        entity.cp.modules.ids.forEach((id) =>
-          this.sim.getOrThrow(id).unregister()
-        );
-      }
-    });
-
     // Execute every day at the start of the day
     const offset =
       Math.floor(sim.getTime() / gameDay) + 1 - sim.getTime() / gameDay;

@@ -1,7 +1,6 @@
 import type { Reward } from "@core/components/missions";
 import type { Sim } from "@core/sim";
 import { pickRandom } from "@core/utils/generators";
-import { setCheat } from "@core/utils/misc";
 import { first } from "@fxts/core";
 import { System } from "../system";
 import type { MissionHandler } from "./types";
@@ -30,7 +29,17 @@ export class MissionSystem extends System<"generate" | "track"> {
 
     sim.hooks.phase.update.tap(this.constructor.name, this.exec);
 
-    setCheat("generateMission", () => this.generate(true));
+    this.sim.actions.register(
+      {
+        name: "Generate mission",
+        slug: "generate",
+        description: "Generate a new mission",
+        category: "mission",
+        type: "basic",
+        fn: () => this.generate(true),
+      },
+      this.constructor.name
+    );
   }
 
   track = () => {

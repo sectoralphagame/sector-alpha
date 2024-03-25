@@ -1,6 +1,5 @@
-// Shamelessly copied from https://github.com/aelbore/esbuild-jest/issues/69
-
 const { transformSync } = require("esbuild");
+const tsconfig = require("./tsconfig.json");
 
 const defaultOptions = {
   format: "cjs",
@@ -14,6 +13,7 @@ module.exports = {
         const options = {
           ...defaultOptions,
           ...userOptions,
+          tsconfigRaw: tsconfig,
           sourcefile: sourcePath,
         };
         const { code, map } = transformSync(sourceText, options);

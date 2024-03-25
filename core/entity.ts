@@ -56,7 +56,9 @@ export class Entity {
     return this.components;
   }
 
-  hasComponents(components: Readonly<Array<keyof CoreComponents>>): boolean {
+  hasComponents(
+    components: Readonly<Array<keyof CoreComponents>>
+  ): this is RequireComponent<(typeof components)[number]> {
     return components.every((name) => !!this.components[name]);
   }
 

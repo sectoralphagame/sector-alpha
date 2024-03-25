@@ -1,0 +1,23 @@
+.root {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--spacing);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+
+  button {
+    font-size: var(--typography-caption);
+  }
+}
+
+.category {
+  h4 {
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
