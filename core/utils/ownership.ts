@@ -1,5 +1,6 @@
 import { faction } from "@core/archetypes/faction";
 import { removeSubordinate } from "@core/components/subordinates";
+import { removeOrder } from "@core/systems/orderExecuting/orderExecuting";
 import type { RequireComponent } from "@core/tsHelpers";
 import Color from "color";
 
@@ -10,11 +11,14 @@ export function transferOwnership(
   const newOwner = faction(entity.sim.getOrThrow(newOwnerId));
   entity.cp.owner.id = newOwnerId;
 
-  if (entity.cp.commander) {
-    removeSubordinate(
-      entity.sim.getOrThrow(entity.cp.commander.id),
-      entity.requireComponents(["commander"])
-    );
+  if (entity.hasComponents(["commander"])) {
+    removeSubordinate(entity.sim.getOrThrow(entity.cp.commander.id), entity);
+  }
+
+  if (entity.hasComponents(["orders"])) {
+    while (entity.cp.orders.value.length > 0) {
+      removeOrder(entity, 0);
+    }
   }
 
   if (entity.cp.children) {
@@ -23,6 +27,21 @@ export function transferOwnership(
 
       if (child.cp.owner) {
         transferOwnership(child.requireComponents(["owner"]), newOwnerId);
+      }
+    }
+  }
+
+  if (entity.hasComponents(["subordinates"])) {
+    for (const subordinateId of entity.cp.subordinates.ids) {
+      const subordinate = entity.sim.getOrThrow(subordinateId);
+      if (subordinate.hasComponents(["autoOrder", "commander", "orders"])) {
+        removeSubordinate(entity, subordinate);
+        while (subordinate.cp.orders.value.length > 0) {
+          removeOrder(subordinate, 0);
+        }
+        subordinate.cp.autoOrder.default = {
+          type: "hold",
+        };
       }
     }
   }

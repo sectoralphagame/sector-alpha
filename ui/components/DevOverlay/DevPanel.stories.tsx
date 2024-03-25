@@ -2,6 +2,7 @@ import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { coreActions } from "@core/actions/core";
+import { action } from "@storybook/addon-actions";
 import type { DevOverlayComponentProps } from "./DevOverlayComponent";
 import { DevOverlayComponent } from "./DevOverlayComponent";
 
@@ -24,4 +25,6 @@ const Template: StoryFn<typeof DevOverlayComponent> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   actions: coreActions,
+  onClose: action("onClose"),
+  onReload: action("onReload"),
 } as DevOverlayComponentProps;

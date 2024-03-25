@@ -14,14 +14,16 @@ function getLabel(action: DevAction) {
 
 export interface DevOverlayComponentProps {
   actions: DevAction[];
+  target: number | null;
   // eslint-disable-next-line react/no-unused-prop-types
   onReload: () => void;
-  target: number | null;
+  onClose: () => void;
 }
 
 export const DevOverlayComponent: React.FC<DevOverlayComponentProps> = ({
   actions: actionsProp,
   target,
+  onClose,
 }) => {
   const [sim] = useSim();
   const actionsByCategory = React.useMemo(
@@ -54,6 +56,7 @@ export const DevOverlayComponent: React.FC<DevOverlayComponentProps> = ({
                     action.fn(sim, ...action.variants[0]);
                   } else if (action.type === "target" && target) {
                     action.fn(sim, target);
+                    onClose();
                   }
                 }}
               >

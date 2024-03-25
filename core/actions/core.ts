@@ -41,10 +41,29 @@ const takeOwnership: TargetAction<[]> = {
   },
 };
 
+const heal: TargetAction<[]> = {
+  type: "target",
+  slug: "heal",
+  name: "Heal",
+  description: "Restore hitpoints of targeted entity",
+  category: "core",
+  variants: [],
+  fn: (sim, targetId: number) => {
+    const entity = sim.getOrThrow(targetId);
+    if (entity.hasComponents(["hitpoints"])) {
+      entity.cp.hitpoints.hp.value = entity.cp.hitpoints.hp.max;
+      if (entity.cp.hitpoints.shield) {
+        entity.cp.hitpoints.shield.value = entity.cp.hitpoints.shield.max;
+      }
+    }
+  },
+};
+
 export const coreActions: DevAction[] = [
   addMoney,
   destroy,
   takeOwnership,
+  heal,
   // {
   //     type:"target",
   //   name: "addCommodity",

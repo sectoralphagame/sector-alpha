@@ -6,7 +6,7 @@ import { DevOverlayComponent } from "./DevOverlayComponent";
 const DevOverlay: React.FC = () => {
   const [sim] = useSim();
   const [actions, setActions] = React.useState<DevAction[]>(sim.actions.all());
-  const [overlay] = useGameOverlay();
+  const [overlay, setOverlay] = useGameOverlay();
 
   if (overlay !== "dev") {
     return null;
@@ -17,6 +17,7 @@ const DevOverlay: React.FC = () => {
       actions={actions}
       target={sim.queries.settings.get()[0].cp.selectionManager.id}
       onReload={() => setActions(sim.actions.all())}
+      onClose={() => setOverlay(null)}
     />
   );
 };
