@@ -64,16 +64,4 @@ export const coreActions: DevAction[] = [
   destroy,
   takeOwnership,
   heal,
-  // {
-  //     type:"target",
-  //   name: "addCommodity",
-  //   description: "Add commodity to targeted storage",
-  //   category: "cheats",
-  //   fn: (commodity: Commodity, quantity: number, id?: number) => {
-  //     const entity = id ? sim.getOrThrow(id) : (window.selected as Entity);
-  //     if (entity) {
-  //       addStorage(entity.cp.storage!, commodity, quantity);
-  //     }
-  //   }
-  // },
 ];
