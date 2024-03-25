@@ -101,6 +101,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
           <Saves
             saves={saves}
             onClick={async (id) => {
+              // @ts-expect-error
               setSim(null);
               sim.destroy();
               const newSim = Sim.load(
