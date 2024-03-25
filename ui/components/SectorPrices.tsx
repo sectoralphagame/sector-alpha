@@ -14,10 +14,8 @@ import {
   CollapsibleSummary,
 } from "@kit/Collapsible";
 import { Table, TableCell } from "@kit/Table";
-import okIcon from "@assets/ui/ok.svg";
-import closeIcon from "@assets/ui/close.svg";
-import SVG from "react-inlinesvg";
 import clsx from "clsx";
+import { CloseIcon, OKIcon } from "@assets/ui/icons";
 import styles from "./SectorPrices.scss";
 
 const baseColor = Color.rgb(151, 255, 125);
@@ -145,22 +143,26 @@ const SectorPrices: React.FC<{ entity: Sector }> = ({ entity }) => {
                 <tr key={commodity}>
                   <TableCell>{commodityLabel[commodity]}</TableCell>
                   <TableCell align="right">
-                    <SVG
-                      src={buy ? okIcon : closeIcon}
-                      className={clsx(
-                        styles.icon,
-                        buy ? styles.iconSuccess : styles.iconError
-                      )}
-                    />
+                    {buy ? (
+                      <OKIcon
+                        className={clsx(styles.icon, styles.iconSuccess)}
+                      />
+                    ) : (
+                      <CloseIcon
+                        className={clsx(styles.icon, styles.iconError)}
+                      />
+                    )}
                   </TableCell>
                   <TableCell align="right">
-                    <SVG
-                      src={sell ? okIcon : closeIcon}
-                      className={clsx(
-                        styles.icon,
-                        sell ? styles.iconSuccess : styles.iconError
-                      )}
-                    />
+                    {sell ? (
+                      <OKIcon
+                        className={clsx(styles.icon, styles.iconSuccess)}
+                      />
+                    ) : (
+                      <CloseIcon
+                        className={clsx(styles.icon, styles.iconError)}
+                      />
+                    )}
                   </TableCell>
                 </tr>
               ))}

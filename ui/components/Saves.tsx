@@ -1,10 +1,9 @@
 import clsx from "clsx";
 import React from "react";
-import SVG from "react-inlinesvg";
 import type { Save } from "@core/db";
-import closeIcon from "@assets/ui/close.svg";
 import { Button } from "@kit/Button";
 import { IconButton } from "@kit/IconButton";
+import { CloseIcon } from "@assets/ui/icons";
 import styles from "./Saves.scss";
 
 export interface SavesProps {
@@ -25,7 +24,7 @@ export const Saves: React.FC<SavesProps> = ({ saves, onClick, onDelete }) => (
         >
           <Button onClick={() => onClick(save.id!)}>{save.name}</Button>
           <IconButton onClick={() => onDelete(save.id!)}>
-            <SVG src={closeIcon} />
+            <CloseIcon />
           </IconButton>
         </div>
       ))}

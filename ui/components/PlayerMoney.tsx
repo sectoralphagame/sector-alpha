@@ -1,11 +1,8 @@
 import { IconButton } from "@kit/IconButton";
 import React from "react";
-import SVG from "react-inlinesvg";
-import fleetIcon from "@assets/ui/fleet.svg";
-import lockIcon from "@assets/ui/lock.svg";
-import journalIcon from "@assets/ui/journal.svg";
 import Stack from "@kit/Stack";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
+import { FleetIcon, JournalIcon, LockIcon } from "@assets/ui/icons";
 import { useGameOverlay, useSim } from "../atoms";
 import styles from "./PlayerMoney.scss";
 
@@ -30,10 +27,10 @@ export const PlayerMoney: React.FC = () => {
         {player.cp.budget!.available.toFixed(0)} UTT
       </span>
       <IconButton variant="naked" onClick={() => setOverlay("fleet")}>
-        <SVG src={fleetIcon} />
+        <FleetIcon />
       </IconButton>
       <IconButton variant="naked" onClick={() => setOverlay("missions")}>
-        <SVG src={journalIcon} />
+        <JournalIcon />
       </IconButton>
       {gameSettings.dev && (
         <IconButton
@@ -41,7 +38,7 @@ export const PlayerMoney: React.FC = () => {
           variant="naked"
           onClick={() => setOverlay("dev")}
         >
-          <SVG src={lockIcon} />
+          <LockIcon />
         </IconButton>
       )}
     </Stack>

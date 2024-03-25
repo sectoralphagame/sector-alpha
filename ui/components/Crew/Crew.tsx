@@ -5,18 +5,19 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
-import smiley from "@assets/ui/smiley.svg";
-import sadSmiley from "@assets/ui/smiley_sad.svg";
-import mehSmiley from "@assets/ui/smiley_meh.svg";
-import exclamation from "@assets/ui/exclamation.svg";
-import SVG from "react-inlinesvg";
 import clsx from "clsx";
 import { Tooltip } from "@kit/Tooltip";
 import Text from "@kit/Text";
 import { getCrewMultiplier, getMoodMultiplier } from "@core/systems/producing";
 import { sum } from "@fxts/core";
-import arrowUpFatIcon from "@assets/ui/arrow_up_fat.svg";
-import arrowDownFatIcon from "@assets/ui/arrow_down_fat.svg";
+import {
+  ArrowDownFatIcon,
+  ArrowUpFatIcon,
+  ExclamationIcon,
+  SmileyIcon,
+  SmileyMehIcon,
+  SmileySadIcon,
+} from "@assets/ui/icons";
 import styles from "./styles.scss";
 
 export interface CrewProps {
@@ -29,9 +30,8 @@ const Smiley = React.forwardRef<SVGAElement, { mood: number }>(
   ({ mood }, ref) => {
     if (mood > 70) {
       return (
-        <SVG
+        <SmileyIcon
           innerRef={ref!}
-          src={smiley}
           className={styles.icon}
           style={{ color: "var(--palette-success)" }}
         />
@@ -40,9 +40,8 @@ const Smiley = React.forwardRef<SVGAElement, { mood: number }>(
 
     if (mood < 30) {
       return (
-        <SVG
+        <SmileySadIcon
           innerRef={ref}
-          src={sadSmiley}
           className={styles.icon}
           style={{ color: "var(--palette-error)" }}
         />
@@ -50,9 +49,8 @@ const Smiley = React.forwardRef<SVGAElement, { mood: number }>(
     }
 
     return (
-      <SVG
+      <SmileyMehIcon
         innerRef={ref}
-        src={mehSmiley}
         className={styles.icon}
         style={{ color: "var(--palette-warning)" }}
       />
@@ -87,9 +85,8 @@ export const Crew: React.FC<CrewProps> = ({ entity, requiredCrew, growth }) => (
             anchor={
               // eslint-disable-next-line react/no-unstable-nested-components
               (ref) => (
-                <SVG
+                <ExclamationIcon
                   innerRef={ref}
-                  src={exclamation}
                   className={clsx(styles.icon, styles.warning)}
                 />
               )
@@ -111,15 +108,13 @@ export const Crew: React.FC<CrewProps> = ({ entity, requiredCrew, growth }) => (
           Current {Math.floor(entity.cp.crew.workers.current)} /{" "}
           {entity.cp.crew.workers.max} Max
           {growth === "positive" && (
-            <SVG
+            <ArrowUpFatIcon
               className={clsx(styles.icon, styles.growth, styles.positive)}
-              src={arrowUpFatIcon}
             />
           )}
           {growth === "negative" && (
-            <SVG
+            <ArrowDownFatIcon
               className={clsx(styles.icon, styles.growth, styles.negative)}
-              src={arrowDownFatIcon}
             />
           )}
         </Text>

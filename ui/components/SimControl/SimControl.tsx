@@ -1,14 +1,11 @@
 import { IconButton } from "@kit/IconButton";
 import React from "react";
-import SVG from "react-inlinesvg";
-import ffIcon from "@assets/ui/ff.svg";
-import playIcon from "@assets/ui/play.svg";
-import pauseIcon from "@assets/ui/pause.svg";
 import { useSim } from "@ui/atoms";
 import { isDev } from "@core/settings";
 import Stack from "@kit/Stack";
 import { getGameDate } from "@core/utils/misc";
 import Text from "@kit/Text";
+import { FFIcon, PauseIcon, PlayIcon } from "@assets/ui/icons";
 import styles from "./styles.scss";
 
 export interface SimControlComponentProps {
@@ -39,17 +36,17 @@ export const SimControlComponent: React.FC<SimControlComponentProps> = ({
       {date}
     </Text>
     <IconButton variant="naked" onClick={onPause}>
-      <SVG src={pauseIcon} />
+      <PauseIcon />
     </IconButton>
     <IconButton variant="naked" onClick={onPlay}>
-      <SVG src={playIcon} />
+      <PlayIcon />
     </IconButton>
     <IconButton variant="naked" onClick={onSpeed}>
-      <SVG src={ffIcon} />
+      <FFIcon />
     </IconButton>
     {!!onTurbo && (
       <IconButton variant="naked" className={styles.turbo} onClick={onTurbo}>
-        <SVG src={ffIcon} />
+        <FFIcon />
       </IconButton>
     )}
   </Stack>

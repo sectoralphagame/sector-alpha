@@ -8,9 +8,8 @@ import {
 import { shipBuildTimer } from "@core/systems/shipBuilding";
 import { useGameDialog, useSim } from "@ui/atoms";
 import { relationThresholds } from "@core/components/relations";
-import redoIcon from "@assets/ui/redo.svg";
-import SVG from "react-inlinesvg";
 import type { Faction } from "@core/archetypes/faction";
+import { RedoIcon } from "@assets/ui/icons";
 import styles from "./ShipBuildingQueue.scss";
 
 const TagFromFactionId: React.FC<{ factionId: number }> = ({ factionId }) => {
@@ -59,7 +58,7 @@ const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
             setDialog({ type: "shipyard", shipyardId: entity.id });
           }}
         >
-          Buy ships <SVG src={redoIcon} />
+          Buy ships <RedoIcon />
         </button>
       </CollapsibleSummary>
       <CollapsibleContent>

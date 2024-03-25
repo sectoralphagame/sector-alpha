@@ -1,5 +1,4 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import type {
   DockAction,
   MineAction,
@@ -9,7 +8,6 @@ import type {
 import { asteroidField } from "@core/archetypes/asteroidField";
 import type { Ship } from "@core/archetypes/ship";
 import type { Sim } from "@core/sim";
-import closeIcon from "@assets/ui/close.svg";
 import {
   Collapsible,
   CollapsibleContent,
@@ -18,6 +16,7 @@ import {
 import { IconButton } from "@kit/IconButton";
 import { isOwnedByPlayer } from "@core/utils/misc";
 import { removeOrder } from "@core/systems/orderExecuting/orderExecuting";
+import { CloseIcon } from "@assets/ui/icons";
 import styles from "./Orders.scss";
 
 function getOrderDescription(ship: Ship, order: Action) {
@@ -118,7 +117,7 @@ const Orders: React.FC<{ ship: Ship }> = ({ ship }) => {
                     removeOrder(ship, orderIndex);
                   }}
                 >
-                  <SVG src={closeIcon} />
+                  <CloseIcon />
                 </IconButton>
               )}
             </div>

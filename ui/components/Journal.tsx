@@ -1,10 +1,9 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import type { Faction } from "@core/archetypes/faction";
 import type { RequireComponent } from "@core/tsHelpers";
 import { limitMax, limitMin } from "@core/utils/limit";
-import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { IconButton } from "@kit/IconButton";
+import { ArrowLeftIcon } from "@assets/ui/icons";
 import styles from "./Journal.scss";
 
 const pageSize = 20;
@@ -59,13 +58,13 @@ const Journal: React.FC<{ entity: RequireComponent<"journal"> }> = ({
               setCursor((prevCursor) => limitMin(prevCursor - pageSize, 0))
             }
           >
-            <SVG src={arrowLeftIcon} />
+            <ArrowLeftIcon />
           </IconButton>
           <IconButton
             disabled={cursor + pageSize >= entity.cp.journal.entries.length}
             onClick={() => setCursor((prevCursor) => prevCursor + pageSize)}
           >
-            <SVG className={styles.arrowRight} src={arrowLeftIcon} />
+            <ArrowLeftIcon className={styles.arrowRight} />
           </IconButton>
         </div>
       </div>

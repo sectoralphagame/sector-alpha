@@ -1,8 +1,7 @@
 import React from "react";
-import SVG from "react-inlinesvg";
-import arrowLeftIcon from "@assets/ui/arrow_left.svg";
 import { IconButton } from "@kit/IconButton";
 import Text from "@kit/Text";
+import { ArrowLeftIcon } from "@assets/ui/icons";
 import styles from "./View.scss";
 import { useLocation } from "../context/Location";
 
@@ -25,7 +24,7 @@ export const View: React.FC<ViewProps> = ({
         <div className={styles.backButtonBar}>
           {showBack && (
             <IconButton onClick={() => navigate("main")}>
-              <SVG src={arrowLeftIcon} />
+              <ArrowLeftIcon />
             </IconButton>
           )}
           <Text className={styles.title} variant="h1">

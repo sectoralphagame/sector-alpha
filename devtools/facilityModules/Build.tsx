@@ -1,11 +1,8 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import { useFormContext } from "react-hook-form";
 import clsx from "clsx";
 import type { Commodity } from "@core/economy/commodity";
 import { commoditiesArray, commodityLabel } from "@core/economy/commodity";
-import arrowLeftIcon from "@assets/ui/arrow_left.svg";
-import closeIcon from "@assets/ui/close.svg";
 import { IconButton } from "@kit/IconButton";
 import {
   Dropdown,
@@ -17,6 +14,7 @@ import { formatInt, useThrottledFormState } from "@devtools/utils";
 import type { FacilityModuleInput } from "@core/archetypes/facilityModule";
 import { max, min } from "@fxts/core";
 import { getCommodityCost } from "@core/economy/utils";
+import { ArrowLeftIcon, CloseIcon } from "@assets/ui/icons";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
 import type { FormData } from "./utils";
@@ -39,8 +37,7 @@ const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
       <tr>
         <TableCell>
           <IconButton onClick={() => setExpanded(!expanded)}>
-            <SVG
-              src={arrowLeftIcon}
+            <ArrowLeftIcon
               className={clsx(styles.rowExpander, {
                 [styles.rowExpanderToggled]: expanded,
               })}
@@ -143,7 +140,7 @@ const FacilityModuleBuildEditor: React.FC<{ index: number }> = ({ index }) => {
                         )
                       }
                     >
-                      <SVG src={closeIcon} />
+                      <CloseIcon />
                     </IconButton>
                   </React.Fragment>
                 ))}

@@ -1,12 +1,11 @@
 import React from "react";
-import SVG from "react-inlinesvg";
 import type { RequireComponent } from "@core/tsHelpers";
-import okIcon from "@assets/ui/ok.svg";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { IconButton } from "@kit/IconButton";
 import Text from "@kit/Text";
 import type { AutoOrder as AutoOrderType } from "@core/components/autoOrder";
 import type { Sector } from "@core/archetypes/sector";
+import { OKIcon } from "@assets/ui/icons";
 import { useSim } from "../atoms";
 import styles from "./AutoOrder.scss";
 
@@ -113,7 +112,7 @@ const AutoOrder: React.FC<{
         disabled={defaultOrder === entity.cp.autoOrder.default}
         onClick={onSubmit}
       >
-        <SVG src={okIcon} />
+        <OKIcon />
       </IconButton>
     </div>
   );

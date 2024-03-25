@@ -14,6 +14,7 @@
     "build-storybook": "storybook build",
     "gen-spritesheet": "node ./scripts/createSpritesheet.js",
     "gen-save": "node -r ts-node/register ./scripts/createSave.ts",
+    "gen-icons": "node -r ts-node/register ./scripts/createIconsModule.ts",
     "gen-commodities-graph": "node -r ts-node/register ./scripts/createCommoditiesGraph.ts",
     "prepare": "husky install"
   },
