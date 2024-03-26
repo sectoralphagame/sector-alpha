@@ -4,9 +4,10 @@ import { relationThresholds } from "@core/components/relations";
 import type { Sim } from "@core/sim";
 import { pickRandom } from "@core/utils/generators";
 import { randomInt } from "mathjs";
-import { formatTime } from "@core/utils/format";
+import { formatGameTime } from "@core/utils/format";
 import { filter, first, pipe, some, toArray } from "@fxts/core";
 import type { Sector } from "@core/archetypes/sector";
+import { gameDay } from "@core/utils/misc";
 import type { MissionHandler } from "./types";
 import missions from "../../world/data/missions.json";
 import { getRelationFactor } from "./utils";
@@ -58,15 +59,16 @@ export const patrolMissionHandler: MissionHandler = {
             )
         )
     );
-    const time = randomInt(1, 4) * 5 * 60;
-    const reward = Math.round((time * getRelationFactor(faction) * 1000) / 60);
+    const weeks = randomInt(2, 4);
+    const time = weeks * 7 * gameDay;
+    const reward = Math.floor(weeks * getRelationFactor(faction) * 10000);
 
     const template = pickRandom(missions.patrol);
     const transform = (text: string) =>
       Mustache.render(text, {
         faction: faction.cp.name.value,
         sector: sector.cp.name.value,
-        time: formatTime(time),
+        time: formatGameTime(time, "full"),
         reward,
       });
 
@@ -86,8 +88,12 @@ export const patrolMissionHandler: MissionHandler = {
         description: transform(template.description),
         rewards: [
           { type: "money", amount: reward },
-          // Add 1 relation point for every 10 minutes of patrol
-          { type: "relation", amount: time / (10 * 60), factionId: faction.id },
+          // Add 1 relation point for every week of patrol
+          {
+            type: "relation",
+            amount: time / (10 * 7 * gameDay),
+            factionId: faction.id,
+          },
         ],
         references: [{ id: sector.id, name: sector.cp.name.value }],
         progress: {
@@ -127,5 +133,5 @@ export const patrolMissionHandler: MissionHandler = {
     if (isPatrolling) mission.progress.current += 1;
   },
   formatProgress: (mission: Mission) =>
-    `${formatTime(mission.progress.max - mission.progress.current)} left`,
+    `${formatGameTime(mission.progress.max - mission.progress.current)} left`,
 };

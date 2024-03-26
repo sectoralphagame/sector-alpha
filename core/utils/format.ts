@@ -13,15 +13,28 @@ export function formatTime(time: number): string {
   return str;
 }
 
-export function formatGameTime(time: number): string {
+export function formatGameTime(
+  time: number,
+  variant: "short" | "full" = "short"
+): string {
   const hours = time % 24;
   const days = Math.floor(time / 24) % 30;
   const years = Math.floor(time / 24 / 30 / 12);
 
   let str = "";
-  if (years > 0) str += `${years}y `;
-  if (days > 0) str += `${days}d `;
-  if (hours > 0) str += `${hours}h`;
+  if (years > 0)
+    str +=
+      variant === "short"
+        ? `${years}y `
+        : `${years} year${years > 1 ? "s" : ""} `;
+  if (days > 0)
+    str +=
+      variant === "short" ? `${days}d ` : `${days} day${days > 1 ? "s" : ""} `;
+  if (hours > 0)
+    str +=
+      variant === "short"
+        ? `${hours}h`
+        : `${hours} hour${hours > 1 ? "s" : ""}`;
 
   if (str.endsWith(" ")) str = str.slice(0, str.length - 1);
 
