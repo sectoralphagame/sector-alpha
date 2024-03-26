@@ -119,7 +119,6 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
       <PanelComponent
         isCollapsed={isCollapsed}
         onCollapseToggle={toggleCollapse}
-        onConfig={() => setDialog({ type: "config" })}
         onFocus={
           entity
             ? () => {

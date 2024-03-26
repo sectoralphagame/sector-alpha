@@ -2,8 +2,8 @@ import { IconButton } from "@kit/IconButton";
 import React from "react";
 import Stack from "@kit/Stack";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
-import { FleetIcon, JournalIcon, LockIcon } from "@assets/ui/icons";
-import { useGameOverlay, useSim } from "../atoms";
+import { ConfigIcon, FleetIcon, JournalIcon, LockIcon } from "@assets/ui/icons";
+import { useGameDialog, useGameOverlay, useSim } from "../atoms";
 import styles from "./PlayerMoney.scss";
 
 export const PlayerMoney: React.FC = () => {
@@ -11,6 +11,7 @@ export const PlayerMoney: React.FC = () => {
   const [player, setPlayer] = React.useState(sim.queries.player.get()[0]);
   const [, setOverlay] = useGameOverlay();
   const [gameSettings] = useGameSettings();
+  const [, setDialog] = useGameDialog();
 
   React.useEffect(() => {
     const handle = setInterval(
@@ -41,6 +42,9 @@ export const PlayerMoney: React.FC = () => {
           <LockIcon />
         </IconButton>
       )}
+      <IconButton onClick={() => setDialog({ type: "config" })} variant="naked">
+        <ConfigIcon />
+      </IconButton>
     </Stack>
   );
 };

@@ -2,19 +2,13 @@ import React from "react";
 import clsx from "clsx";
 import { IconButton } from "@kit/IconButton";
 import { AnimatedBackdrop } from "@kit/AnimatedBackdrop";
-import {
-  ArrowLeftIcon,
-  ConfigIcon,
-  JournalIcon,
-  LocationIcon,
-} from "@assets/ui/icons";
+import { ArrowLeftIcon, JournalIcon, LocationIcon } from "@assets/ui/icons";
 import styles from "./Panel.scss";
 
 export interface PanelComponentProps {
   children: React.ReactNode;
   isCollapsed: boolean;
   onCollapseToggle: () => void;
-  onConfig: () => void;
   onPlayerAssets: () => void;
   onFocus: (() => void) | undefined;
 }
@@ -22,7 +16,6 @@ export interface PanelComponentProps {
 export const PanelComponent: React.FC<PanelComponentProps> = ({
   isCollapsed,
   onCollapseToggle,
-  onConfig,
   onPlayerAssets,
   onFocus,
   children,
@@ -38,13 +31,9 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
         [styles.iconBarCollapsed]: isCollapsed,
       })}
     >
-      {isCollapsed ? (
+      {isCollapsed && (
         <IconButton onClick={onCollapseToggle}>
           <ArrowLeftIcon className={styles.rotate} />
-        </IconButton>
-      ) : (
-        <IconButton onClick={onConfig}>
-          <ConfigIcon />
         </IconButton>
       )}
       <IconButton onClick={onPlayerAssets}>
@@ -55,17 +44,13 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
           <LocationIcon />
         </IconButton>
       )}
-      {!isCollapsed ? (
+      {!isCollapsed && (
         <>
           <div className={styles.spacer} />
           <IconButton onClick={onCollapseToggle}>
             <ArrowLeftIcon />
           </IconButton>
         </>
-      ) : (
-        <IconButton onClick={onConfig}>
-          <ConfigIcon />
-        </IconButton>
       )}
     </div>
     {!isCollapsed && <div className={styles.scrollArea}>{children}</div>}
