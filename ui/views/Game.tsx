@@ -33,11 +33,6 @@ import {
 import { ContextMenu } from "../components/ContextMenu";
 import { PlayerMoney } from "../components/PlayerMoney";
 
-const overlayNames: Record<NonNullable<GameOverlayProps>, string> = {
-  fleet: "Fleet Management",
-  missions: "Active Missions",
-  dev: "Developer Tools",
-};
 const overlayKeyCodes: Record<string, NonNullable<GameOverlayProps>> = {
   Backslash: "dev",
   KeyF: "fleet",
@@ -175,9 +170,9 @@ const Game: React.FC = () => {
       <Panel entity={selectedEntity} />
       <Notifications />
       <Overlay
+        active={overlay}
         open={!!overlay}
         onClose={() => setOverlay(null)}
-        title={overlay === null ? "" : overlayNames[overlay] ?? ""}
       >
         <FleetOverlay />
         <MissionsOverlay />
