@@ -1,10 +1,12 @@
 import { useGameOverlay, useSim } from "@ui/atoms";
 import React from "react";
+import { useOverlayRegister } from "../Overlay/Overlay";
 import { MissionsOverlayComponent } from "./MissionsOverlayComponent";
 
 export const MissionsOverlay: React.FC = () => {
   const [sim] = useSim();
   const [overlay, setOverlay] = useGameOverlay();
+  useOverlayRegister("missions");
 
   if (overlay !== "missions") return null;
 

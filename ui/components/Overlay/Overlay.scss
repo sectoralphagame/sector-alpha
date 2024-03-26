@@ -22,8 +22,36 @@
 }
 
 .bar {
+  align-items: center;
   display: flex;
   gap: var(--spacing-4);
+  padding-bottom: var(--spacing-3);
   margin-bottom: var(--spacing-4);
   border-bottom: 1px solid var(--palette-border);
+
+  h1,
+  h3 {
+    position: relative;
+    margin: 0 !important;
+    cursor: pointer;
+
+    &:after {
+      display: block;
+      height: 1rem;
+      width: 1px;
+      background-color: var(--palette-border);
+      position: absolute;
+      right: calc(-1 * var(--spacing-2));
+      top: 6px;
+    }
+
+    &:not(:last-child):after {
+      content: "";
+    }
+  }
+
+  h1:after {
+    height: 1.5rem;
+    top: 8px;
+  }
 }

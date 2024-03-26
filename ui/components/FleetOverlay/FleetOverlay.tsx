@@ -3,11 +3,13 @@ import { getSelected } from "@core/components/selection";
 import { filter, map, pipe, toArray } from "@fxts/core";
 import { useContextMenu, useGameOverlay, useSim } from "@ui/atoms";
 import React from "react";
+import { useOverlayRegister } from "../Overlay/Overlay";
 import { FleetOverlayComponent } from "./FleetOverlayComponent";
 
 export const FleetOverlay: React.FC = () => {
   const [sim] = useSim();
   const [overlay, setOverlay] = useGameOverlay();
+  useOverlayRegister("fleet");
   const [selected, setSelectedState] = React.useState<number | undefined>(
     getSelected(sim)?.id
   );

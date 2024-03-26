@@ -1,6 +1,6 @@
 .root {
   display: flex;
-  top: var(--spacing-2);
+  top: 0;
   position: absolute;
   right: -1px;
   margin: auto;
@@ -8,6 +8,7 @@
   width: fit-content;
   background: var(--palette-background);
   border: 1px solid var(--palette-border);
+  border-top: none;
   border-bottom-left-radius: 8px;
   line-height: 1;
   overflow: hidden;

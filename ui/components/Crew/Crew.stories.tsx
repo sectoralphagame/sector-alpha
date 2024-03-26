@@ -21,7 +21,6 @@ const Template: StoryFn<typeof Crew> = (args) => (
       <PanelComponent
         isCollapsed={false}
         onCollapseToggle={action("onCollapseToggle")}
-        onConfig={action("onConfig")}
         onFocus={action("onFocus")}
         onPlayerAssets={action("onPlayerAssets")}
       >
