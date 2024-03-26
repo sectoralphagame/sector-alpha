@@ -94,7 +94,9 @@ export const Overlay: React.FC<OverlayProps> = ({
             </div>
             <div>{children}</div>
           </>
-        ) : null}
+        ) : (
+          children
+        )}
       </div>
     </OverlayContext.Provider>
   );
