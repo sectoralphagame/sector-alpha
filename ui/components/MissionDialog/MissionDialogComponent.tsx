@@ -4,6 +4,7 @@ import type { DialogProps } from "@kit/Dialog";
 import { Dialog } from "@kit/Dialog";
 import { DialogActions } from "@kit/DialogActions";
 import Text from "@kit/Text";
+import clsx from "clsx";
 import React from "react";
 import styles from "./MissionDialog.scss";
 
@@ -61,21 +62,22 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
       ? []
       : mission.responses.filter((r) => !responses.includes(r));
 
+  const canClose = responses.length > 0 && responses.at(-1)?.type !== "neutral";
+
   return (
     <Dialog
       {...dialogProps}
-      onClose={() => {
-        if (responses.at(-1)?.type !== "accept") {
-          onDecline();
-        }
-        onClose();
-      }}
+      onClose={canClose ? onClose : null}
       title={mission.title}
       width="550px"
     >
-      <div className={styles.log}>
+      <div
+        className={clsx(styles.log, {
+          [styles.logNoResponses]: availableResponses.length === 0,
+        })}
+      >
         {log.map((l, lIndex) => (
-          <p key={lIndex}>
+          <React.Fragment key={lIndex}>
             {l.actor !== "world" && (
               <Text
                 color={l.actor === "player" ? "primary" : "default"}
@@ -84,8 +86,8 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
                 {l.actor === "npc" ? l.name : "You"}:{" "}
               </Text>
             )}
-            {l.text}
-          </p>
+            <Text>{l.text}</Text>
+          </React.Fragment>
         ))}
       </div>
 
@@ -118,11 +120,11 @@ export const MissionDialogComponent: React.FC<MissionDialogComponentProps> = ({
           </ol>
         </div>
       )}
-      <DialogActions>
-        {responses.length > 0 && responses.at(-1)?.type !== "neutral" && (
+      {canClose && (
+        <DialogActions>
           <Button onClick={onClose}>Close</Button>
-        )}
-      </DialogActions>
+        </DialogActions>
+      )}
     </Dialog>
   );
 };

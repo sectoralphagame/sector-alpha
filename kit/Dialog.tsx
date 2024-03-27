@@ -19,16 +19,12 @@ export interface DialogProps {
   onClose: () => void;
 }
 
-export const Dialog: React.FC<DialogProps> = ({
-  children,
-  title,
-  open,
-  width,
-  onClose,
-}) => (
+export const Dialog: React.FC<
+  Omit<DialogProps, "onClose"> & { onClose: (() => void) | null }
+> = ({ children, title, open, width, onClose }) => (
   <Modal
     isOpen={open}
-    onRequestClose={onClose}
+    onRequestClose={onClose ?? undefined}
     style={{
       content: {
         backgroundColor: "#080808",
@@ -54,9 +50,11 @@ export const Dialog: React.FC<DialogProps> = ({
         <Text className={styles.titleText} variant="h1" color="primary">
           {title}
         </Text>
-        <IconButton className={styles.close} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
+        {onClose && (
+          <IconButton className={styles.close} onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        )}
       </div>
       {children}
     </AnimatedBackdrop>
