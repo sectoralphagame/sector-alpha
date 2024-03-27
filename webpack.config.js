@@ -2,6 +2,36 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
+const { EnvironmentPlugin } = require("webpack");
+const { BugsnagSourceMapUploaderPlugin } = require("webpack-bugsnag-plugins");
+const packageJson = require("./package.json");
+
+const plugins = [
+  new HtmlWebpackPlugin({
+    inject: true,
+    template: "./gateway/index.html",
+  }),
+  new ForkTsCheckerWebpackPlugin(),
+  new EnvironmentPlugin({
+    NODE_ENV: "development",
+    BUGSNAG_API_KEY: undefined,
+    BUILD_ENV: "local",
+  }),
+];
+
+if (
+  process.env.BUGSNAG_API_KEY &&
+  process.env.NODE_ENV === "production" &&
+  process.env.BUILD_ENV
+) {
+  plugins.push(
+    new BugsnagSourceMapUploaderPlugin({
+      apiKey: process.env.BUGSNAG_API_KEY,
+      appVersion: packageJson.version,
+      releaseStage: process.env.BUILD_ENV,
+    })
+  );
+}
 
 const config = {
   entry: ["./gateway/index.tsx"],
@@ -65,13 +95,7 @@ const config = {
     publicPath: "/",
     filename: "bundle.[hash].js",
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      inject: true,
-      template: "./gateway/index.html",
-    }),
-    new ForkTsCheckerWebpackPlugin(),
-  ],
+  plugins,
   devServer: {
     static: {
       directory: path.join(__dirname, "public"),
