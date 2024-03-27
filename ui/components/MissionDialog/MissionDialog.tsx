@@ -20,8 +20,7 @@ export const MissionDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   }, [dialog]);
 
   if (dialog?.type !== "missionOffer") return null;
-  throw new Error("Not implemented");
-  // eslint-disable-next-line no-unreachable
+
   return (
     <MissionDialogComponent
       mission={sim.queries.player.get()[0]!.cp.missions.offer!}
