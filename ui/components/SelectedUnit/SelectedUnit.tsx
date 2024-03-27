@@ -23,7 +23,10 @@ export const SelectedUnit: React.FC = () => {
           sim.queries.settings.get()[0].cp.selectionManager.focused = true;
         }}
       >
-        <Text variant="caption">{selectedUnit.cp.name!.value}</Text>
+        <Text variant="caption">
+          {selectedUnit.cp.name?.value ??
+            (selectedUnit.hasTags(["collectible"]) ? "Collectible" : "Unknown")}
+        </Text>
       </div>
     </div>
   );
