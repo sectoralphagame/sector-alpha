@@ -19,6 +19,7 @@ import { Notifications } from "@ui/components/Notifications";
 import { SimControl } from "@ui/components/SimControl/SimControl";
 import DevOverlay from "@ui/components/DevOverlay/DevOverlay";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
+import { SelectedUnit } from "@ui/components/SelectedUnit";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -147,6 +148,7 @@ const Game: React.FC = () => {
       <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
         <PlayerMoney />
         <SimControl />
+        <SelectedUnit />
         <MapPanel
           tabs={
             <>

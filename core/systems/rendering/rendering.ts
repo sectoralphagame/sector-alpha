@@ -76,6 +76,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   displayRange: boolean;
   scale: number;
   contextMenuApi: ContextMenuApi;
+  lastClicked: number;
 
   constructor(contextMenuApi: ContextMenuApi) {
     super();
@@ -363,6 +364,12 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
           sprite.addEventListener("pointerdown", (event) => {
             if (event.button === 0) {
               this.settingsManager.cp.selectionManager.id = entity.id;
+
+              if (Date.now() - this.lastClicked < 200) {
+                this.settingsManager.cp.selectionManager.focused = true;
+              }
+
+              this.lastClicked = Date.now();
             }
           });
           sprite.addEventListener("rightdown", () => {
