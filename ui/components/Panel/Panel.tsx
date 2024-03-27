@@ -119,15 +119,6 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
       <PanelComponent
         isCollapsed={isCollapsed}
         onCollapseToggle={toggleCollapse}
-        onFocus={
-          entity
-            ? () => {
-                sim.find((e) =>
-                  e.hasComponents(["selectionManager"])
-                )!.cp.selectionManager!.focused = true;
-              }
-            : undefined
-        }
         onPlayerAssets={() => {
           sim.queries.settings.get()[0].cp.selectionManager.id = null;
         }}

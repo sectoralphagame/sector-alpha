@@ -23,7 +23,6 @@ const Template: StoryFn<typeof Offers> = (args) => (
       <PanelComponent
         isCollapsed={false}
         onCollapseToggle={action("onCollapseToggle")}
-        onFocus={action("onFocus")}
         onPlayerAssets={action("onPlayerAssets")}
       >
         <Offers {...args} />
