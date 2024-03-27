@@ -12,7 +12,11 @@ const plugins = [
     template: "./gateway/index.html",
   }),
   new ForkTsCheckerWebpackPlugin(),
-  new EnvironmentPlugin(["NODE_ENV", "BUGSNAG_API_KEY", "BUILD_ENV"]),
+  new EnvironmentPlugin({
+    NODE_ENV: "development",
+    BUGSNAG_API_KEY: undefined,
+    BUILD_ENV: "local",
+  }),
 ];
 
 if (
