@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import { IconButton } from "@kit/IconButton";
 import { AnimatedBackdrop } from "@kit/AnimatedBackdrop";
-import { ArrowLeftIcon, JournalIcon, LocationIcon } from "@assets/ui/icons";
+import { ArrowLeftIcon, JournalIcon } from "@assets/ui/icons";
 import styles from "./Panel.scss";
 
 export interface PanelComponentProps {
@@ -10,14 +10,12 @@ export interface PanelComponentProps {
   isCollapsed: boolean;
   onCollapseToggle: () => void;
   onPlayerAssets: () => void;
-  onFocus: (() => void) | undefined;
 }
 
 export const PanelComponent: React.FC<PanelComponentProps> = ({
   isCollapsed,
   onCollapseToggle,
   onPlayerAssets,
-  onFocus,
   children,
 }) => (
   <AnimatedBackdrop
@@ -39,11 +37,6 @@ export const PanelComponent: React.FC<PanelComponentProps> = ({
       <IconButton onClick={onPlayerAssets}>
         <JournalIcon />
       </IconButton>
-      {!!onFocus && (
-        <IconButton onClick={onFocus}>
-          <LocationIcon />
-        </IconButton>
-      )}
       {!isCollapsed && (
         <>
           <div className={styles.spacer} />
