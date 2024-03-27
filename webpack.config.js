@@ -15,14 +15,16 @@ const plugins = [
   new EnvironmentPlugin(["NODE_ENV", "BUGSNAG_API_KEY", "BUILD_ENV"]),
 ];
 
-if (process.env.BUGSNAG_API_KEY && process.env.NODE_ENV === "production") {
+if (
+  process.env.BUGSNAG_API_KEY &&
+  process.env.NODE_ENV === "production" &&
+  process.env.BUILD_ENV
+) {
   plugins.push(
     new BugsnagSourceMapUploaderPlugin({
       apiKey: process.env.BUGSNAG_API_KEY,
       appVersion: packageJson.version,
-      metadata: {
-        environment: process.env.BUILD_ENV ?? "local",
-      },
+      releaseStage: process.env.BUILD_ENV,
     })
   );
 }

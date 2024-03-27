@@ -17,9 +17,7 @@ if (process.env.BUGSNAG_API_KEY) {
     apiKey: process.env.BUGSNAG_API_KEY,
     plugins: [new BugsnagPluginReact()],
     appVersion: packageJson.version,
-    metadata: {
-      environment: process.env.BUILD_ENV ?? "local",
-    },
+    releaseStage: process.env.BUILD_ENV,
   });
   // @ts-expect-error
   ErrorBoundary = Bugsnag.getPlugin("react")!.createErrorBoundary(React);
