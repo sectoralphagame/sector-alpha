@@ -36,7 +36,7 @@ describe("Trading module", () => {
       systems: [new PathPlanningSystem(), new OrderExecutingSystem()],
     });
     // Run path planning
-    sim.hooks.phase.init.call(0);
+    sim.hooks.phase.init.notify(0);
 
     sector = createSector(sim, { name: "", position: matrix([0, 0, 0]) });
     facility = createFarm(
@@ -297,7 +297,7 @@ describe("Trade flow", () => {
       })
       .addTag("player");
     // Run path planning
-    sim.hooks.phase.init.call(0);
+    sim.hooks.phase.init.notify(0);
   });
 
   it("between factions", () => {
