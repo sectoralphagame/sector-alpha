@@ -116,7 +116,7 @@ const Game: React.FC = () => {
         );
       }
       if (event.code === "Space") {
-        if (sim.speed === 0) sim.setSpeed(1);
+        if (sim.speed === 0) sim.unpause();
         else sim.pause();
       }
     };
