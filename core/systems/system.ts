@@ -18,7 +18,10 @@ export abstract class System<T extends string | never = never> {
   apply(sim: Sim) {
     this.sim = sim;
 
-    sim.hooks.phase.start.tap(this.constructor.name, this.cooldowns.update);
-    sim.hooks.destroy.tap(this.constructor.name, this.destroy);
+    sim.hooks.phase.start.subscribe(
+      this.constructor.name,
+      this.cooldowns.update
+    );
+    sim.hooks.destroy.subscribe(this.constructor.name, this.destroy);
   }
 }

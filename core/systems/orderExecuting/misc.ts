@@ -75,10 +75,10 @@ export function teleportAction(
       sector: destination.cp.position.sector,
       moved: true,
     };
-    SectorQuery.call(prevSector, destination.cp.position.sector, docked);
+    SectorQuery.notify(prevSector, destination.cp.position.sector, docked);
   });
 
-  SectorQuery.call(prevSector, destination.cp.position.sector, entity);
+  SectorQuery.notify(prevSector, destination.cp.position.sector, entity);
 
   return true;
 }

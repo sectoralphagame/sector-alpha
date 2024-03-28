@@ -5,7 +5,7 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    sim.hooks.phase.cleanup.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.cleanup.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (delta: number): void => {

@@ -9,7 +9,7 @@ export class OutOfBoundsCheckingSystem extends System<"exec"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    sim.hooks.phase.start.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.start.subscribe(this.constructor.name, this.exec);
   };
   exec = (): void => {
     if (this.cooldowns.canUse("exec")) {

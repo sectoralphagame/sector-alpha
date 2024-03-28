@@ -90,7 +90,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
     }
 
     this.sectorQuery = new SectorQuery(sim, ["render"]);
-    sim.hooks.phase.render.tap("RenderingSystem", this.exec);
+    sim.hooks.phase.render.subscribe("RenderingSystem", this.exec);
   };
 
   init = () => {
@@ -151,7 +151,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
     this.scale = window.localStorage.getItem("gameSettings")
       ? JSON.parse(window.localStorage.getItem("gameSettings")!).scale
       : 1;
-    storageHook.tap("RenderingSystem", this.onSettingsChange);
+    storageHook.subscribe("RenderingSystem", this.onSettingsChange);
   };
 
   initViewport = (root: Element, canvasRoot: HTMLCanvasElement) => {
@@ -243,7 +243,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
       this.keysPressed.delete(event.key);
     });
 
-    this.sim.hooks.removeComponent.tap(
+    this.sim.hooks.removeComponent.subscribe(
       "RenderingSystem",
       ({ entity, component }) =>
         this.clearEntity(
@@ -253,7 +253,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
         )
     );
 
-    this.sim.hooks.removeEntity.tap("RenderingSystem", (entity) => {
+    this.sim.hooks.removeEntity.subscribe("RenderingSystem", (entity) => {
       this.clearEntity(entity);
 
       if (entity.id === this.settingsManager.cp.selectionManager.id) {
@@ -310,10 +310,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   };
 
   destroy = (): void => {
-    const index = storageHook.taps.findIndex(
-      (tap) => tap.fn === this.onSettingsChange
-    );
-    storageHook.taps.splice(index, 1);
+    storageHook.unsubscribe(this.onSettingsChange);
     this.resizeObserver.disconnect();
     this.viewport.destroy();
     this.app.destroy(true);

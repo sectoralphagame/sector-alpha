@@ -5,7 +5,6 @@ import { Exclude, Expose, Type, plainToInstance } from "class-transformer";
 // @ts-expect-error
 import { replacer } from "mathjs";
 import type { Path } from "graphlib";
-import { SyncHook } from "tapable";
 
 import { filter, pipe, toArray } from "@fxts/core";
 import { isHeadless } from "@core/settings";
@@ -14,6 +13,7 @@ import type { EntityTag } from "@core/tags";
 import { componentMask } from "@core/components/masks";
 import LZString from "lz-string";
 import { ActionLoader } from "@core/actionLoader";
+import { Observable } from "@core/utils/observer";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -31,19 +31,25 @@ export class Sim extends BaseSim {
   @Expose()
   entityIdCounter: number = 0;
   hooks: {
-    addComponent: SyncHook<{ entity: Entity; component: keyof CoreComponents }>;
-    removeComponent: SyncHook<{
-      entity: Entity;
-      component: keyof CoreComponents;
-    }>;
-    addTag: SyncHook<{ entity: Entity; tag: EntityTag }>;
-    removeTag: SyncHook<{ entity: Entity; tag: EntityTag }>;
-    removeEntity: SyncHook<Entity>;
-    destroy: SyncHook<void>;
+    addComponent: Observable<
+      [{ entity: Entity; component: keyof CoreComponents }]
+    >;
+    removeComponent: Observable<
+      [
+        {
+          entity: Entity;
+          component: keyof CoreComponents;
+        }
+      ]
+    >;
+    addTag: Observable<[{ entity: Entity; tag: EntityTag }]>;
+    removeTag: Observable<[{ entity: Entity; tag: EntityTag }]>;
+    removeEntity: Observable<[Entity]>;
+    destroy: Observable<[]>;
 
     phase: Record<
       "start" | "init" | "update" | "render" | "cleanup" | "end",
-      SyncHook<number>
+      Observable<[number]>
     >;
   };
 
@@ -61,19 +67,19 @@ export class Sim extends BaseSim {
     this.actions = new ActionLoader(this);
     this.entities = new Map();
     this.hooks = {
-      addComponent: new SyncHook(["addComponent"]),
-      removeComponent: new SyncHook(["removeComponent"]),
-      addTag: new SyncHook(["addTag"]),
-      removeTag: new SyncHook(["removeTag"]),
-      removeEntity: new SyncHook(["removeEntity"]),
-      destroy: new SyncHook(["destroy"]),
+      addComponent: new Observable("addComponent"),
+      removeComponent: new Observable("removeComponent"),
+      addTag: new Observable("addTag"),
+      removeTag: new Observable("removeTag"),
+      removeEntity: new Observable("removeEntity"),
+      destroy: new Observable("destroy"),
       phase: {
-        start: new SyncHook(["delta"]),
-        init: new SyncHook(["delta"]),
-        update: new SyncHook(["delta"]),
-        render: new SyncHook(["delta"]),
-        cleanup: new SyncHook(["delta"]),
-        end: new SyncHook(["delta"]),
+        start: new Observable("phase.start", false),
+        init: new Observable("phase.init", false),
+        update: new Observable("phase.update", false),
+        render: new Observable("phase.render", false),
+        cleanup: new Observable("phase.cleanup", false),
+        end: new Observable("phase.end", false),
       },
     };
 
@@ -89,17 +95,17 @@ export class Sim extends BaseSim {
   };
 
   unregisterEntity = (entity: Entity) => {
-    this.hooks.removeEntity.call(entity);
+    this.hooks.removeEntity.notify(entity);
     this.entities.delete(entity.id);
   };
 
   next = (delta: number) => {
-    this.hooks.phase.start.call(delta);
-    this.hooks.phase.init.call(delta);
-    this.hooks.phase.update.call(delta);
-    this.hooks.phase.render.call(delta);
-    this.hooks.phase.cleanup.call(delta);
-    this.hooks.phase.end.call(delta);
+    this.hooks.phase.start.notify(delta);
+    this.hooks.phase.init.notify(delta);
+    this.hooks.phase.update.notify(delta);
+    this.hooks.phase.render.notify(delta);
+    this.hooks.phase.cleanup.notify(delta);
+    this.hooks.phase.end.notify(delta);
 
     this.updateTimer(delta);
   };
@@ -166,7 +172,7 @@ export class Sim extends BaseSim {
 
   destroy = () => {
     this.stop();
-    this.hooks.destroy.call();
+    this.hooks.destroy.notify();
     if (!isHeadless) {
       window.sim = undefined!;
       window.selected = undefined!;

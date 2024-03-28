@@ -34,7 +34,7 @@ export class BudgetPlanningSystem extends System<"exec"> {
     super.apply(sim);
 
     this.query = new Query(sim, ["budget", "owner", "trade"]);
-    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (): void => {

@@ -120,7 +120,7 @@ export class ShipPlanningSystem extends System<"plan"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   getFacilityShipRequests = (faction: Faction): ShipRequest[] =>

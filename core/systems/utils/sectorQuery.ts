@@ -2,15 +2,14 @@ import type { CoreComponents } from "@core/components/component";
 import type { Sim } from "@core/sim";
 import type { EntityTag } from "@core/tags";
 import type { RequireComponent } from "@core/tsHelpers";
-import { SyncHook } from "tapable";
+import { Observable } from "@core/utils/observer";
 import type { QueryEntities } from "./query";
 import { BaseQuery } from "./query";
 
-const hook = new SyncHook<[number, number, RequireComponent<"position">]>([
-  "oldSector",
-  "newSector",
-  "entity",
-]);
+// Old sector, new sector and entity
+const hook = new Observable<[number, number, RequireComponent<"position">]>(
+  "sectorQuery"
+);
 
 export class SectorQuery<T extends keyof CoreComponents> {
   sectors: Map<number, QueryEntities<T | "position">>;
@@ -29,11 +28,11 @@ export class SectorQuery<T extends keyof CoreComponents> {
     );
     this.query.enableHooks();
 
-    hook.tap(this.constructor.name, this.changePosition);
-    this.query.hooks.add.tap(this.constructor.name, (entity) => {
+    hook.subscribe(this.constructor.name, this.changePosition);
+    this.query.hooks.add.subscribe(this.constructor.name, (entity) => {
       this.add(entity.cp.position.sector, entity);
     });
-    this.query.hooks.remove.tap(this.constructor.name, (entityId) => {
+    this.query.hooks.remove.subscribe(this.constructor.name, (entityId) => {
       this.remove(entityId);
     });
   }
@@ -97,11 +96,11 @@ export class SectorQuery<T extends keyof CoreComponents> {
     this.sectors.clear();
   };
 
-  static call(
+  static notify(
     oldSector: number,
     newSector: number,
     entity: RequireComponent<"position">
   ) {
-    hook.call(oldSector, newSector, entity);
+    hook.notify(oldSector, newSector, entity);
   }
 }

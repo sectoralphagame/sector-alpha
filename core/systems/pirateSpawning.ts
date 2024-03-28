@@ -261,7 +261,7 @@ export class PirateSpawningSystem extends System<
       "role:military",
     ]);
 
-    sim.hooks.phase.start.tap(this.constructor.name, () => {
+    sim.hooks.phase.start.subscribe(this.constructor.name, () => {
       if (!this.faction) {
         this.faction = sim.queries.ai
           .get()
@@ -269,6 +269,6 @@ export class PirateSpawningSystem extends System<
       }
     });
 
-    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 }

@@ -7,7 +7,7 @@ export class AsteroidSpawningSystem extends System<"exec"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (): void => {

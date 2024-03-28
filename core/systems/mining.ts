@@ -39,7 +39,7 @@ export class MiningSystem extends System {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
   exec = (delta: number): void => {
     for (const entity of this.sim.queries.mining.getIt()) {

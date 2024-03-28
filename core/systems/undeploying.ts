@@ -54,7 +54,7 @@ export class UndeployingSystem extends System<"exec"> {
 
     this.query = new Query(sim, ["deployable"]);
 
-    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (): void => {
