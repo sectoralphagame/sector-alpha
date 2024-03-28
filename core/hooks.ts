@@ -1,3 +1,3 @@
-import { SyncHook } from "tapable";
+import { Observable } from "./utils/observer";
 
-export const storageHook = new SyncHook<string>(["localStorageUpdate"]);
+export const storageHook = new Observable<[string]>("storage");

@@ -5,7 +5,7 @@ export class CooldownUpdatingSystem extends System {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    sim.hooks.phase.init.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.init.subscribe(this.constructor.name, this.exec);
   };
   exec = (delta: number): void => {
     this.sim.entities.forEach((entity) => entity.cooldowns.update(delta));

@@ -43,7 +43,7 @@ export class ProducingSystem extends System<"exec"> {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    this.sim.hooks.removeEntity.tap("ProducingSystem", (entity) => {
+    this.sim.hooks.removeEntity.subscribe("ProducingSystem", (entity) => {
       if (entity.cp.modules) {
         entity.cp.modules.ids.forEach((id) =>
           this.sim.getOrThrow(id).unregister()
@@ -55,7 +55,7 @@ export class ProducingSystem extends System<"exec"> {
     const offset =
       Math.floor(sim.getTime() / gameDay) + 1 - sim.getTime() / gameDay;
     this.cooldowns.use("exec", offset);
-    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   static isAbleToProduce = (

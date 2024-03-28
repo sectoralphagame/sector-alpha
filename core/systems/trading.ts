@@ -337,7 +337,7 @@ export class TradingSystem extends System<"adjustPrices" | "createOffers"> {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (): void => {

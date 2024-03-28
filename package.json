@@ -114,8 +114,7 @@
     "recoil": "^0.7.5",
     "reflect-metadata": "^0.1.13",
     "sharp": "^0.32.0",
-    "spritesmith": "^3.4.1",
-    "tapable": "^2.2.1"
+    "spritesmith": "^3.4.1"
   },
   "lint-staged": {
     "*.{ts,tsx,js}": [

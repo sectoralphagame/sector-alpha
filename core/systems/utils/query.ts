@@ -2,8 +2,8 @@ import { filter } from "@fxts/core";
 import type { EntityTag } from "@core/tags";
 import { shipComponents } from "@core/archetypes/ship";
 import { collectibleComponents } from "@core/archetypes/collectible";
-import { SyncHook } from "tapable";
 import { componentMask } from "@core/components/masks";
+import { Observable } from "@core/utils/observer";
 import { asteroidFieldComponents } from "../../archetypes/asteroidField";
 import { facilityComponents } from "../../archetypes/facility";
 import { factionComponents } from "../../archetypes/faction";
@@ -21,8 +21,8 @@ export type QueryEntities<T extends keyof CoreComponents> = Array<
 
 export class BaseQuery<T extends keyof CoreComponents> {
   hooks: {
-    add: SyncHook<RequireComponent<T>>;
-    remove: SyncHook<[number, Entity]>;
+    add: Observable<[RequireComponent<T>]>;
+    remove: Observable<[number, Entity]>;
   };
   requiredComponents: readonly (keyof CoreComponents)[];
   requiredComponentsMask: bigint;
@@ -46,11 +46,11 @@ export class BaseQuery<T extends keyof CoreComponents> {
 
   enableHooks = () => {
     this.hooks = {
-      add: new SyncHook(["entity"]),
-      remove: new SyncHook(["entityId", "entity"]),
+      add: new Observable("queryAdd"),
+      remove: new Observable("queryRemove"),
     };
 
-    this.sim.hooks.addComponent.tap("query", ({ entity, component }) => {
+    this.sim.hooks.addComponent.subscribe("query", ({ entity, component }) => {
       if (
         this.requiredComponents.includes(component) &&
         this.canBeAdded(entity)
@@ -59,25 +59,28 @@ export class BaseQuery<T extends keyof CoreComponents> {
       }
     });
 
-    this.sim.hooks.removeComponent.tap("query", ({ component, entity }) => {
-      if (this.requiredComponents.includes(component)) {
-        this.remove(entity);
+    this.sim.hooks.removeComponent.subscribe(
+      "query",
+      ({ component, entity }) => {
+        if (this.requiredComponents.includes(component)) {
+          this.remove(entity);
+        }
       }
-    });
+    );
 
-    this.sim.hooks.addTag.tap("query", ({ entity, tag }) => {
+    this.sim.hooks.addTag.subscribe("query", ({ entity, tag }) => {
       if (this.requiredTags.includes(tag) && this.canBeAdded(entity)) {
         this.add(entity as RequireComponent<T>);
       }
     });
 
-    this.sim.hooks.removeTag.tap("query", ({ tag, entity }) => {
+    this.sim.hooks.removeTag.subscribe("query", ({ tag, entity }) => {
       if (this.requiredTags.includes(tag)) {
         this.remove(entity);
       }
     });
 
-    this.sim.hooks.removeEntity.tap("query", (entity: Entity) => {
+    this.sim.hooks.removeEntity.subscribe("query", (entity: Entity) => {
       this.remove(entity);
     });
   };
@@ -93,11 +96,11 @@ export class BaseQuery<T extends keyof CoreComponents> {
   };
 
   add = (entity: RequireComponent<T>) => {
-    this.hooks.add.call(entity);
+    this.hooks.add.notify(entity);
   };
 
   remove = (entity: Entity) => {
-    this.hooks.remove.call(entity.id, entity);
+    this.hooks.remove.notify(entity.id, entity);
   };
 }
 
@@ -121,12 +124,12 @@ export class Query<T extends keyof CoreComponents> extends BaseQuery<T> {
   enableCache = () => {
     this.cache = true;
     this.enableHooks();
-    this.hooks.add.tap("query", (entity) => {
+    this.hooks.add.subscribe("query", (entity) => {
       if (this.entities) {
         this.entities.add(entity);
       }
     });
-    this.hooks.remove.tap("query", (_id, entity) => {
+    this.hooks.remove.subscribe("query", (_id, entity) => {
       if (this.entities) {
         this.entities.delete(entity as RequireComponent<T>);
       }

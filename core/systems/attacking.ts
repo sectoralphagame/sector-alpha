@@ -76,7 +76,7 @@ export class AttackingSystem extends System {
 
     this.query = new Query(sim, ["damage"]);
 
-    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (): void => {

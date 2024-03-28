@@ -30,14 +30,9 @@ export function useLocalStorage<T>(
         setStoredValue(item ? JSON.parse(item) : initialValue);
       }
     };
-    hook.tap("localStorageUpdate", handler);
+    hook.subscribe("localStorageUpdate", handler);
 
-    return () => {
-      const index = hook.taps.findIndex((tap) => tap.fn === handler);
-      if (index > -1) {
-        hook.taps.splice(index, 1);
-      }
-    };
+    return () => hook.unsubscribe(handler);
   }, []);
 
   const setValue: Dispatch<SetStateAction<T>> = (value) => {
@@ -50,7 +45,7 @@ export function useLocalStorage<T>(
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
       }
 
-      hook.call(key);
+      hook.notify(key);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log(error);

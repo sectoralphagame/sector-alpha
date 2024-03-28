@@ -69,12 +69,12 @@ const Game: React.FC = () => {
       setSim(undefined!);
     };
 
-    sim.hooks.removeEntity.tap("Game", (entity) => {
+    sim.hooks.removeEntity.subscribe("Game", (entity) => {
       if (entity.id === selectedId) {
         setSelectedEntity(undefined);
       }
     });
-    sim.hooks.destroy.tap("Game", unmount);
+    sim.hooks.destroy.subscribe("Game", unmount);
 
     window.sim = sim;
 

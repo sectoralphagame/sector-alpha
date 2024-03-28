@@ -11,7 +11,7 @@ export class DeadUnregisteringSystem extends System {
 
     this.query = new Query(sim, ["hitpoints"]);
 
-    sim.hooks.phase.cleanup.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.cleanup.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (): void => {

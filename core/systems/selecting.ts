@@ -25,7 +25,7 @@ export class SelectingSystem extends SystemWithHooks {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    sim.hooks.phase.update.tap("SelectingSystem", this.exec);
+    sim.hooks.phase.update.subscribe("SelectingSystem", this.exec);
   };
 
   exec = (delta: number): void => {

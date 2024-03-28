@@ -31,7 +31,7 @@ export class PathPlanningSystem extends System<"regen"> {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    sim.hooks.phase.init.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.init.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (): void => {

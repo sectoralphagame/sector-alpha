@@ -23,7 +23,7 @@ export class MilitaryModuleSpottingSystem extends System<"exec"> {
       modules: new Query(sim, ["parent", "damage"], ["facilityModule"]),
     };
 
-    sim.hooks.phase.update.tap(this.constructor.name, this.exec);
+    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (): void => {
