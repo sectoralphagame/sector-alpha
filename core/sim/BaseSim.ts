@@ -13,6 +13,7 @@ export class BaseSim {
   @Expose()
   timeOffset: number;
   speed = 1;
+  prevSpeed = 1;
 
   constructor() {
     this.id = counter;
@@ -21,7 +22,8 @@ export class BaseSim {
   }
 
   setSpeed = (value: number) => {
-    this.speed = value ?? 1;
+    this.prevSpeed = this.speed;
+    this.speed = value;
   };
 
   start = () => {
@@ -64,7 +66,11 @@ export class BaseSim {
   };
 
   pause = (): void => {
-    this.speed = 0;
+    this.setSpeed(0);
+  };
+
+  unpause = (): void => {
+    this.setSpeed(this.prevSpeed);
   };
 
   stop = () => {

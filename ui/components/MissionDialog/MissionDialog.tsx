@@ -39,7 +39,7 @@ export const MissionDialog: React.FC<ModalProps> = ({ open, onClose }) => {
         onClose();
         sim.queries.player.get()[0]!.cp.missions.offer = null;
         if (settings.pauseOnMissionOffer) {
-          sim.setSpeed(1);
+          sim.unpause();
         }
       }}
     />

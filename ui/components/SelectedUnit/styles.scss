@@ -4,6 +4,7 @@
   width: 100%;
   display: flex;
   justify-content: center;
+  pointer-events: none;
 }
 
 .panel {
@@ -17,4 +18,5 @@
   width: 250px;
   padding: var(--spacing-1) var(--spacing-2);
   line-height: 1;
+  pointer-events: all;
 }

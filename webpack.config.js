@@ -14,7 +14,7 @@ const plugins = [
   new ForkTsCheckerWebpackPlugin(),
   new EnvironmentPlugin({
     NODE_ENV: "development",
-    BUGSNAG_API_KEY: undefined,
+    BUGSNAG_API_KEY: "",
     BUILD_ENV: "local",
   }),
 ];
