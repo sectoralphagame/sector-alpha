@@ -90,6 +90,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
   }, [dialog, sim]);
 
   const playerOwned = entity ? isOwnedByPlayer(entity) : false;
+  const player = sim.queries.player.get()[0]!;
 
   let requiredCrew: number | null = null;
   let growth: "positive" | "negative" | "neutral" | undefined;
@@ -226,7 +227,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
               </JournalWrapper>
             </>
           ) : (
-            <>
+            <JournalWrapper entity={player}>
               <PlayerShips />
               <PlayerFacilities />
               {window.dev && (
@@ -235,7 +236,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                   <hr />
                 </>
               )}
-            </>
+            </JournalWrapper>
           ))}
       </PanelComponent>
       <ConfigDialog

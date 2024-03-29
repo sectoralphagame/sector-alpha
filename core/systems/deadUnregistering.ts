@@ -1,5 +1,6 @@
 import type { Sim } from "@core/sim";
 import { dumpCargo } from "@core/components/storage";
+import type { Faction } from "@core/archetypes/faction";
 import { Query } from "./utils/query";
 import { System } from "./system";
 
@@ -19,6 +20,15 @@ export class DeadUnregisteringSystem extends System {
       if (entity.cp.hitpoints.hp.value <= 0) {
         if (entity.cp.storage) {
           dumpCargo(entity.requireComponents(["storage"]));
+        }
+        if (entity.hasComponents(["owner", "name", "position"])) {
+          const owner = this.sim.getOrThrow<Faction>(entity.cp.owner.id);
+          owner.cp.journal.entries.push({
+            type: "destroy",
+            entity: entity.cp.name.value,
+            sectorId: entity.cp.position.sector,
+            time: this.sim.getTime(),
+          });
         }
         entity.unregister();
       }
