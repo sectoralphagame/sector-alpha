@@ -14,6 +14,7 @@ const tags = [
   "virtual",
   "collectible",
   "ai:attack-force",
+  "ai:spare",
   ...shipRoles.map<`role:${ShipRole}`>((role) => `role:${role}`),
   ...modules.map<`facilityModuleType:${FacilityModuleType}`>(
     ({ type: facilityModuleType }) =>

@@ -55,7 +55,7 @@ function idleMovement(entity: RequireComponent<"position" | "orders">) {
     entity.sim.getOrThrow<Waypoint>(entity.cp.commander.id);
 
   entity.cp.orders.value.push({
-    origin: "auto",
+    origin: "OrderPlanningSystem:auto",
     actions: moveToActions(
       entity,
       createWaypoint(
@@ -115,7 +115,7 @@ function autoTrade(entity: Trading, sectorDistance: number) {
 
       if (actions) {
         entity.cp.orders.value.push({
-          origin: "auto",
+          origin: "OrderPlanningSystem:auto",
           type: "trade",
           actions,
         });
@@ -249,7 +249,7 @@ function autoMine(
     }
 
     entity.cp.orders.value.push({
-      origin: "auto",
+      origin: "OrderPlanningSystem:auto",
       type: "mine",
       actions: [
         ...moveToActions(entity, field),
@@ -336,7 +336,7 @@ function autoMineForCommander(
       }
 
       entity.cp.orders.value.push({
-        origin: "auto",
+        origin: "OrderPlanningSystem:auto",
         type: "mine",
         actions: [
           ...moveToActions(entity, field),
@@ -365,7 +365,7 @@ function escortCommander(
         actions: [],
         type: "escort",
         ordersForSector: 0,
-        origin: "auto",
+        origin: "OrderPlanningSystem:auto",
         targetId: commander.id,
       },
     ];
@@ -391,7 +391,7 @@ function autoOrder(entity: RequireComponent<"autoOrder" | "orders">) {
           {
             ...entity.cp.autoOrder.default,
             actions: [],
-            origin: "auto",
+            origin: "OrderPlanningSystem:auto",
             clockwise: Math.random() > 0.5,
           },
         ];

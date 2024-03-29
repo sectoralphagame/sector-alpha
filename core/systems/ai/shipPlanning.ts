@@ -73,11 +73,13 @@ export function requestShip(
 function assignSmallPatrol(
   fighters: RequireComponent<"position" | "model" | "orders" | "owner">[]
 ) {
-  const commanders: RequireComponent<
-    "position" | "autoOrder" | "subordinates"
-  >[] = [];
+  const commanders = fighters
+    .filter((f) => f.tags.has("ai:spare"))
+    .map((f) => f.requireComponents(["position", "autoOrder", "subordinates"]));
 
   for (const fighter of fighters) {
+    fighter.addTag("ai:spare");
+
     const commander = commanders.find(
       (cmd) =>
         cmd.cp.autoOrder!.default.type === "patrol" &&
@@ -429,7 +431,7 @@ export class ShipPlanningSystem extends System<"plan"> {
             ship.cp.dockable?.size === "medium" &&
             ship.tags.has("role:military") &&
             !ship.tags.has("ai:attack-force") &&
-            ship.cp.orders.value.length === 0
+            (ship.cp.orders.value.length === 0 || ship.tags.has("ai:spare"))
         )
     );
 
@@ -445,6 +447,7 @@ export class ShipPlanningSystem extends System<"plan"> {
         for (let i = 0; i < -patrols; i++) {
           if (spareFrigates.length > 0 && sector) {
             const ship = spareFrigates.pop()!;
+            ship.tags.delete("ai:spare");
             if (faction.cp.name.slug !== "TAU") {
               ship.cp.name.value = createShipName(ship, "Patrol Leader");
             }
@@ -480,7 +483,7 @@ export class ShipPlanningSystem extends System<"plan"> {
           ship.cp.dockable?.size === "small" &&
           ship.tags.has("role:military") &&
           !ship.tags.has("ai:attack-force") &&
-          ship.cp.orders.value.length === 0
+          (ship.cp.orders.value.length === 0 || ship.tags.has("ai:spare"))
       );
 
     const fightersInShipyards = requestsInShipyards.filter(
@@ -495,6 +498,7 @@ export class ShipPlanningSystem extends System<"plan"> {
         for (let i = 0; i < -fighters; i++) {
           if (spareFighters.length > 0) {
             const ship = spareFighters.pop()!;
+            ship.tags.delete("ai:spare");
             const commander = this.sim.queries.ships
               .get()
               .find(

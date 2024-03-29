@@ -66,7 +66,7 @@ export type Action =
   | BuilderDeployAction
   | CollectAction;
 export interface BaseOrder {
-  origin: "auto" | "manual";
+  origin: string;
   actions: Action[];
   interrupt?: boolean;
 }
