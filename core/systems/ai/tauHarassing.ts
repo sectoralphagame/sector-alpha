@@ -92,7 +92,7 @@ export class TauHarassingSystem extends System<"exec"> {
           ship.cp.dockable?.size === "small" &&
           ship.tags.has("role:military") &&
           !ship.tags.has("ai:attack-force") &&
-          ship.cp.orders.value.length === 0
+          (ship.cp.orders.value.length === 0 || ship.tags.has("ai:spare"))
       );
 
     const fightersInShipyards = fullQueue.filter(
@@ -184,7 +184,7 @@ export class TauHarassingSystem extends System<"exec"> {
     commander.cp.orders.value.push({
       type: "pillage",
       actions: [],
-      origin: "auto",
+      origin: this.constructor.name,
       sectorId: invadedSector.id,
       clockwise: Math.random() > 0.5,
     });

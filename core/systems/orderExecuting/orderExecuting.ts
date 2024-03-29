@@ -160,11 +160,13 @@ function cleanupDocks(entity: Entity): void {
 
   if (entity.cp.dockable?.dockedIn) {
     const dockedIn = entity.sim
-      .getOrThrow(entity.cp.dockable?.dockedIn)
-      .requireComponents(["docks"]);
-    dockedIn.cp.docks.docked = dockedIn.cp.docks.docked.filter(
-      (id) => id !== entity.id
-    );
+      .get(entity.cp.dockable?.dockedIn)
+      ?.requireComponents(["docks"]);
+    if (dockedIn) {
+      dockedIn.cp.docks.docked = dockedIn.cp.docks.docked.filter(
+        (id) => id !== entity.id
+      );
+    }
   }
 }
 
