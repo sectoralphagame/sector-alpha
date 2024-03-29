@@ -6,6 +6,15 @@ interface Entry {
   time: number;
 }
 
+export interface DestroyEntry extends Entry {
+  type: "destroy";
+  /**
+   * Name of entity
+   */
+  entity: string;
+  sectorId: number;
+}
+
 export interface TradeEntry extends Entry {
   type: "trade";
   commodity: Commodity;
@@ -28,7 +37,7 @@ export interface ShipyardEntry extends Entry {
   price: number;
 }
 
-export type JournalEntry = TradeEntry | ShipyardEntry;
+export type JournalEntry = TradeEntry | ShipyardEntry | DestroyEntry;
 
 export interface Journal extends BaseComponent<"journal"> {
   entries: JournalEntry[];

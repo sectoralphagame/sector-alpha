@@ -15,26 +15,35 @@ export function formatTime(time: number): string {
 
 export function formatGameTime(
   time: number,
-  variant: "short" | "full" = "short"
+  variant: "veryshort" | "short" | "full" = "short"
 ): string {
-  const hours = time % 24;
-  const days = Math.floor(time / 24) % 30;
+  const hours = Math.floor(time % 24);
+  const days = Math.floor(time / 24);
+  const months = Math.floor(time / 24 / 30) % 12;
   const years = Math.floor(time / 24 / 30 / 12);
 
   let str = "";
-  if (years > 0)
-    str +=
-      variant === "short"
-        ? `${years}y `
-        : `${years} year${years > 1 ? "s" : ""} `;
-  if (days > 0)
-    str +=
-      variant === "short" ? `${days}d ` : `${days} day${days > 1 ? "s" : ""} `;
-  if (hours > 0)
-    str +=
-      variant === "short"
-        ? `${hours}h`
-        : `${hours} hour${hours > 1 ? "s" : ""}`;
+
+  if (variant === "veryshort") {
+    if (years > 0) return `${years}y`;
+    if (days % (12 * 30) > 0) return `${days % (12 * 30)}d`;
+    if (hours > 0) return `${hours}h`;
+    return "seconds";
+  }
+
+  if (variant === "short") {
+    if (years > 0) str += `${years}y`;
+    if (days % (12 * 30) > 0) str += `${days % (12 * 30)}d`;
+    if (hours > 0) str += `${hours}h`;
+
+    return str;
+  }
+
+  if (years > 0) str += `${years} year${years > 1 ? "s" : ""} `;
+  if (months % 12 > 0)
+    str += `${months % 12} day${months % 12 > 1 ? "s" : ""} `;
+  if (days % 30 > 0) str += `${days % 30} day${days % 30 > 1 ? "s" : ""} `;
+  if (hours > 0) str += `${hours} hour${hours > 1 ? "s" : ""}`;
 
   if (str.endsWith(" ")) str = str.slice(0, str.length - 1);
 

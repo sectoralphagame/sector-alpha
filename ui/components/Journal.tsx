@@ -4,9 +4,47 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { limitMax, limitMin } from "@core/utils/limit";
 import { IconButton } from "@kit/IconButton";
 import { ArrowLeftIcon } from "@assets/ui/icons";
+import type {
+  DestroyEntry,
+  ShipyardEntry,
+  TradeEntry,
+} from "@core/components/journal";
+import type { Sim } from "@core/sim";
+import type { Sector } from "@core/archetypes/sector";
+import Text from "@kit/Text";
+import { formatGameTime } from "@core/utils/format";
+import { Tooltip } from "@kit/Tooltip";
+import { getGameDate } from "@core/utils/misc";
 import styles from "./Journal.scss";
 
 const pageSize = 20;
+
+const components = {
+  trade: ({ entry }: { entry: TradeEntry; sim: Sim }) => (
+    <div>
+      {entry.action === "buy"
+        ? `Bought ${entry.quantity} x ${entry.commodity} for ${
+            entry.price * entry.quantity
+          } UTT (${entry.price} UTT) from ${entry.target}`
+        : `Sold ${entry.quantity} x ${entry.commodity} for ${
+            entry.price * entry.quantity
+          } UTT (${entry.price} UTT) to ${entry.target}`}
+    </div>
+  ),
+  shipyard: ({ entry, sim }: { entry: ShipyardEntry; sim: Sim }) => (
+    <div>
+      Built ship {entry.name} for{" "}
+      {sim.getOrThrow<Faction>(entry.faction).cp.name.value} for {entry.price}{" "}
+      UTT
+    </div>
+  ),
+  destroy: ({ entry, sim }: { entry: DestroyEntry; sim: Sim }) => (
+    <div>
+      {entry.entity} was destroyed in sector{" "}
+      {sim.getOrThrow<Sector>(entry.sectorId).cp.name.value}
+    </div>
+  ),
+};
 
 const Journal: React.FC<{ entity: RequireComponent<"journal"> }> = ({
   entity,
@@ -20,30 +58,33 @@ const Journal: React.FC<{ entity: RequireComponent<"journal"> }> = ({
           .slice()
           .reverse()
           .slice(cursor, cursor + pageSize)
-          .map((entry, entryIndex) => (
-            <li
-              className={styles.item}
-              key={entry.time.toString() + entryIndex}
-            >
-              {entry.type === "trade" ? (
-                <div>
-                  {entry.action === "buy"
-                    ? `Bought ${entry.quantity} x ${entry.commodity} for ${
-                        entry.price * entry.quantity
-                      } UTT (${entry.price} UTT) from ${entry.target}`
-                    : `Sold ${entry.quantity} x ${entry.commodity} for ${
-                        entry.price * entry.quantity
-                      } UTT (${entry.price} UTT) to ${entry.target}`}
-                </div>
-              ) : (
-                <div>
-                  Build ship {entry.name} to{" "}
-                  {entity.sim.getOrThrow<Faction>(entry.faction).cp.name.value}{" "}
-                  for {entry.price} UTT
-                </div>
-              )}
-            </li>
-          ))}
+          .map((entry, entryIndex) => {
+            const EntryComponent = components[entry.type];
+
+            return (
+              <li
+                className={styles.item}
+                key={entry.time.toString() + entryIndex}
+              >
+                {/* @ts-expect-error */}
+                <EntryComponent entry={entry} sim={entity.sim} />
+                <Tooltip
+                  // eslint-disable-next-line react/no-unstable-nested-components
+                  anchor={(ref) => (
+                    <Text ref={ref} variant="caption">
+                      {formatGameTime(
+                        entity.sim.getTime() - entry.time,
+                        "veryshort"
+                      )}{" "}
+                      ago
+                    </Text>
+                  )}
+                >
+                  {getGameDate(entry.time)}
+                </Tooltip>
+              </li>
+            );
+          })}
       </ul>
       <div className={styles.pagination}>
         <span>
