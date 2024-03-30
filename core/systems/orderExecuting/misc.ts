@@ -7,7 +7,7 @@ import {
 } from "../../components/drive";
 import type { MoveAction, TeleportAction } from "../../components/orders";
 import type { RequireComponent } from "../../tsHelpers";
-import { SectorQuery } from "../utils/sectorQuery";
+import { SectorIndex } from "../utils/sectorIndex";
 import { undockShip } from "./dock";
 
 export function moveActionCleanup(
@@ -75,10 +75,10 @@ export function teleportAction(
       sector: destination.cp.position.sector,
       moved: true,
     };
-    SectorQuery.notify(prevSector, destination.cp.position.sector, docked);
+    SectorIndex.notify(prevSector, destination.cp.position.sector, docked);
   });
 
-  SectorQuery.notify(prevSector, destination.cp.position.sector, entity);
+  SectorIndex.notify(prevSector, destination.cp.position.sector, entity);
 
   return true;
 }

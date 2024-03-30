@@ -3,17 +3,17 @@ import type { Sim } from "@core/sim";
 import type { EntityTag } from "@core/tags";
 import type { RequireComponent } from "@core/tsHelpers";
 import { Observable } from "@core/utils/observer";
-import type { QueryEntities } from "./query";
-import { BaseQuery } from "./query";
+import type { IndexEntities } from "./entityIndex";
+import { BaseIndex } from "./entityIndex";
 
 // Old sector, new sector and entity
 const hook = new Observable<[number, number, RequireComponent<"position">]>(
-  "sectorQuery"
+  "sectorIndex"
 );
 
-export class SectorQuery<T extends keyof CoreComponents> {
-  sectors: Map<number, QueryEntities<T | "position">>;
-  query: BaseQuery<T | "position">;
+export class SectorIndex<T extends keyof CoreComponents> {
+  sectors: Map<number, IndexEntities<T | "position">>;
+  index: BaseIndex<T | "position">;
 
   constructor(
     sim: Sim,
@@ -21,18 +21,18 @@ export class SectorQuery<T extends keyof CoreComponents> {
     requiredTags: readonly EntityTag[] = []
   ) {
     this.sectors = new Map();
-    this.query = new BaseQuery(
+    this.index = new BaseIndex(
       sim,
       [...requiredComponents, "position"],
       requiredTags
     );
-    this.query.enableHooks();
+    this.index.enableHooks();
 
     hook.subscribe(this.constructor.name, this.changePosition);
-    this.query.hooks.add.subscribe(this.constructor.name, (entity) => {
+    this.index.hooks.add.subscribe(this.constructor.name, (entity) => {
       this.add(entity.cp.position.sector, entity);
     });
-    this.query.hooks.remove.subscribe(this.constructor.name, (entityId) => {
+    this.index.hooks.remove.subscribe(this.constructor.name, (entityId) => {
       this.remove(entityId);
     });
   }
@@ -42,7 +42,7 @@ export class SectorQuery<T extends keyof CoreComponents> {
     newSector: number,
     entity: RequireComponent<T | "position">
   ) => {
-    if (oldSector !== newSector && this.query.canBeAdded(entity)) {
+    if (oldSector !== newSector && this.index.canBeAdded(entity)) {
       this.remove(entity.id, oldSector);
       this.add(newSector, entity);
     }
@@ -83,10 +83,10 @@ export class SectorQuery<T extends keyof CoreComponents> {
   //     this.sim.entities.values()
   //   ) as any;
 
-  get = (sectorId: number): QueryEntities<T> => {
+  get = (sectorId: number): IndexEntities<T> => {
     if (!this.sectors.get(sectorId)) {
       this.sectors.set(sectorId, []);
-      this.query.collect();
+      this.index.collect();
     }
 
     return this.sectors.get(sectorId)!;

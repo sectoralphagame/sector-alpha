@@ -19,7 +19,7 @@ import type { Cooldowns } from "../../utils/cooldowns";
 import { SystemWithHooks } from "../utils/hooks";
 import { clearFocus } from "../../components/selection";
 import type { Layer, Textures } from "../../components/render";
-import { SectorQuery } from "../utils/sectorQuery";
+import { SectorIndex } from "../utils/sectorIndex";
 import { drawHpBars } from "./hpBars";
 
 const minScale = 0.08;
@@ -70,7 +70,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   overlay: HTMLDivElement;
   grid: RequireComponent<"renderGraphics"> | null = null;
   layers: Record<Layer, PIXI.Container>;
-  sectorQuery: SectorQuery<"render">;
+  sectorIndex: SectorIndex<"render">;
   sprites: Map<Entity, PIXI.Sprite> = new Map();
   graphics: Map<Entity, PIXI.Graphics> = new Map();
   displayRange: boolean;
@@ -89,7 +89,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
       (window as any).rendering = this;
     }
 
-    this.sectorQuery = new SectorQuery(sim, ["render"]);
+    this.sectorIndex = new SectorIndex(sim, ["render"]);
     sim.hooks.phase.render.subscribe("RenderingSystem", this.exec);
   };
 

@@ -15,7 +15,7 @@ import { shipClasses } from "@core/world/ships";
 import { filter, find, map, pipe, toArray } from "@fxts/core";
 import { add, distance, random, randomInt } from "mathjs";
 import { System } from "./system";
-import { Query } from "./utils/query";
+import { Index } from "./utils/entityIndex";
 
 const flagshipDistanceFromSectorCenter =
   ((1 + Math.random() / 5) * sectorSize) / 15;
@@ -157,7 +157,7 @@ export class PirateSpawningSystem extends System<
   "return" | "spawnFlagship" | "spawnSquad"
 > {
   faction: Faction;
-  query: Query<ShipComponent>;
+  index: Index<ShipComponent>;
 
   moveFlagship = (flagships: Ship[]) => {
     const shipToMove = pickRandom(
@@ -196,7 +196,7 @@ export class PirateSpawningSystem extends System<
   };
 
   exec = (): void => {
-    const ships = this.query.get();
+    const ships = this.index.get();
 
     const squads = pipe(
       ships,
@@ -257,7 +257,7 @@ export class PirateSpawningSystem extends System<
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    this.query = new Query<ShipComponent>(sim, shipComponents, [
+    this.index = new Index<ShipComponent>(sim, shipComponents, [
       "role:military",
     ]);
 

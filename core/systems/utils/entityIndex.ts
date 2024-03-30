@@ -13,13 +13,13 @@ import type { Entity } from "../../entity";
 import { tradeComponents } from "../../economy/utils";
 import type { Sim } from "../../sim";
 import type { RequireComponent } from "../../tsHelpers";
-import { SectorQuery } from "./sectorQuery";
+import { SectorIndex } from "./sectorIndex";
 
-export type QueryEntities<T extends keyof CoreComponents> = Array<
+export type IndexEntities<T extends keyof CoreComponents> = Array<
   RequireComponent<T>
 >;
 
-export class BaseQuery<T extends keyof CoreComponents> {
+export class BaseIndex<T extends keyof CoreComponents> {
   hooks: {
     add: Observable<[RequireComponent<T>]>;
     remove: Observable<[number, Entity]>;
@@ -46,11 +46,11 @@ export class BaseQuery<T extends keyof CoreComponents> {
 
   enableHooks = () => {
     this.hooks = {
-      add: new Observable("queryAdd"),
-      remove: new Observable("queryRemove"),
+      add: new Observable("indexAdd"),
+      remove: new Observable("indexRemove"),
     };
 
-    this.sim.hooks.addComponent.subscribe("query", ({ entity, component }) => {
+    this.sim.hooks.addComponent.subscribe("index", ({ entity, component }) => {
       if (
         this.requiredComponents.includes(component) &&
         this.canBeAdded(entity)
@@ -60,7 +60,7 @@ export class BaseQuery<T extends keyof CoreComponents> {
     });
 
     this.sim.hooks.removeComponent.subscribe(
-      "query",
+      "index",
       ({ component, entity }) => {
         if (this.requiredComponents.includes(component)) {
           this.remove(entity);
@@ -68,19 +68,19 @@ export class BaseQuery<T extends keyof CoreComponents> {
       }
     );
 
-    this.sim.hooks.addTag.subscribe("query", ({ entity, tag }) => {
+    this.sim.hooks.addTag.subscribe("index", ({ entity, tag }) => {
       if (this.requiredTags.includes(tag) && this.canBeAdded(entity)) {
         this.add(entity as RequireComponent<T>);
       }
     });
 
-    this.sim.hooks.removeTag.subscribe("query", ({ tag, entity }) => {
+    this.sim.hooks.removeTag.subscribe("index", ({ tag, entity }) => {
       if (this.requiredTags.includes(tag)) {
         this.remove(entity);
       }
     });
 
-    this.sim.hooks.removeEntity.subscribe("query", (entity: Entity) => {
+    this.sim.hooks.removeEntity.subscribe("index", (entity: Entity) => {
       this.remove(entity);
     });
   };
@@ -104,7 +104,7 @@ export class BaseQuery<T extends keyof CoreComponents> {
   };
 }
 
-export class Query<T extends keyof CoreComponents> extends BaseQuery<T> {
+export class Index<T extends keyof CoreComponents> extends BaseIndex<T> {
   cache: boolean;
   entities: Set<RequireComponent<T>> | null;
   sim: Sim;
@@ -124,19 +124,19 @@ export class Query<T extends keyof CoreComponents> extends BaseQuery<T> {
   enableCache = () => {
     this.cache = true;
     this.enableHooks();
-    this.hooks.add.subscribe("query", (entity) => {
+    this.hooks.add.subscribe("index", (entity) => {
       if (this.entities) {
         this.entities.add(entity);
       }
     });
-    this.hooks.remove.subscribe("query", (_id, entity) => {
+    this.hooks.remove.subscribe("index", (_id, entity) => {
       if (this.entities) {
         this.entities.delete(entity as RequireComponent<T>);
       }
     });
   };
 
-  get = (): QueryEntities<T> => {
+  get = (): IndexEntities<T> => {
     if (this.cache) {
       if (!this.entities) {
         this.entities = new Set();
@@ -146,7 +146,7 @@ export class Query<T extends keyof CoreComponents> extends BaseQuery<T> {
       return [...this.entities];
     }
 
-    return this.sim.filter(this.canBeAdded) as QueryEntities<T>;
+    return this.sim.filter(this.canBeAdded) as IndexEntities<T>;
   };
 
   getIt = (): IterableIterator<RequireComponent<T>> => {
@@ -172,59 +172,59 @@ export class Query<T extends keyof CoreComponents> extends BaseQuery<T> {
 
 export function createQueries(sim: Sim) {
   return {
-    ai: new Query(sim, [...factionComponents, "ai"]),
-    asteroidFields: new Query(sim, asteroidFieldComponents, [], true),
-    autoOrderable: new Query(sim, ["autoOrder", "orders", "position"]),
-    budget: new Query(sim, ["budget"], [], true),
-    builders: new Query(sim, ["builder", "storage", "trade", "docks"]),
-    children: new Query(sim, ["parent"]),
-    collectibles: new Query(sim, collectibleComponents, ["collectible"]),
-    disposable: new Query(sim, ["disposable"]),
-    facilities: new Query(
+    ai: new Index(sim, [...factionComponents, "ai"]),
+    asteroidFields: new Index(sim, asteroidFieldComponents, [], true),
+    autoOrderable: new Index(sim, ["autoOrder", "orders", "position"]),
+    budget: new Index(sim, ["budget"], [], true),
+    builders: new Index(sim, ["builder", "storage", "trade", "docks"]),
+    children: new Index(sim, ["parent"]),
+    collectibles: new Index(sim, collectibleComponents, ["collectible"]),
+    disposable: new Index(sim, ["disposable"]),
+    facilities: new Index(
       sim,
       ["modules", "position", "facilityModuleQueue", "subordinates", "crew"],
       [],
       true
     ),
-    facilityWithProduction: new Query(sim, [
+    facilityWithProduction: new Index(sim, [
       "compoundProduction",
       "modules",
       "position",
     ]),
-    habitats: new Query(sim, ["parent", "facilityModuleBonus"]),
-    mining: new Query(sim, ["mining", "storage"]),
-    orderable: new Query(sim, ["orders", "position", "model", "owner"]),
-    player: new Query(
+    habitats: new Index(sim, ["parent", "facilityModuleBonus"]),
+    mining: new Index(sim, ["mining", "storage"]),
+    orderable: new Index(sim, ["orders", "position", "model", "owner"]),
+    player: new Index(
       sim,
       [...factionComponents, "missions"],
       ["player"],
       true
     ),
-    productionByModules: new Query(sim, ["production", "parent"]),
-    renderable: new Query(sim, ["render", "position"]),
-    renderableGraphics: new Query(sim, ["renderGraphics"]),
-    sectors: new Query(sim, sectorComponents, [], true),
-    selectable: new Query(sim, ["render", "position"], ["selection"]),
-    settings: new Query(
+    productionByModules: new Index(sim, ["production", "parent"]),
+    renderable: new Index(sim, ["render", "position"]),
+    renderableGraphics: new Index(sim, ["renderGraphics"]),
+    sectors: new Index(sim, sectorComponents, [], true),
+    selectable: new Index(sim, ["render", "position"], ["selection"]),
+    settings: new Index(
       sim,
       ["selectionManager", "systemManager", "inflationStats", "camera"],
       [],
       true
     ),
-    ships: new Query(sim, shipComponents, ["ship"]),
-    shipyards: new Query(
+    ships: new Index(sim, shipComponents, ["ship"]),
+    shipyards: new Index(
       sim,
       [...facilityComponents, "owner", "shipyard"],
       [],
       true
     ),
-    standaloneProduction: new Query(sim, ["production", "storage"]),
-    storage: new Query(sim, ["storage"]),
-    storageAndTrading: new Query(sim, ["storage", "trade"]),
-    teleports: new Query(sim, ["teleport"], [], true),
-    trading: new Query(sim, tradeComponents),
+    standaloneProduction: new Index(sim, ["production", "storage"]),
+    storage: new Index(sim, ["storage"]),
+    storageAndTrading: new Index(sim, ["storage", "trade"]),
+    teleports: new Index(sim, ["teleport"], [], true),
+    trading: new Index(sim, tradeComponents),
     bySectors: {
-      trading: new SectorQuery(sim, tradeComponents),
+      trading: new SectorIndex(sim, tradeComponents),
     },
   } as const;
 }

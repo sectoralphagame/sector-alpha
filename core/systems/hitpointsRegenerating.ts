@@ -1,16 +1,16 @@
 import type { Sim } from "@core/sim";
-import { Query } from "./utils/query";
+import { Index } from "./utils/entityIndex";
 import { System } from "./system";
 
 export const regenCooldown = "regen";
 
 export class HitpointsRegeneratingSystem extends System<"exec"> {
-  query: Query<"hitpoints">;
+  index: Index<"hitpoints">;
 
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    this.query = new Query(sim, ["hitpoints"]);
+    this.index = new Index(sim, ["hitpoints"]);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
@@ -19,7 +19,7 @@ export class HitpointsRegeneratingSystem extends System<"exec"> {
     if (!this.cooldowns.canUse("exec")) return;
 
     this.cooldowns.use("exec", 1);
-    for (const entity of this.query.getIt()) {
+    for (const entity of this.index.getIt()) {
       if (!entity.cooldowns.canUse(regenCooldown)) continue;
       entity.cp.hitpoints.hp.value = Math.min(
         entity.cp.hitpoints.hp.value +

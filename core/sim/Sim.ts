@@ -17,8 +17,8 @@ import { Observable } from "@core/utils/observer";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
-import type { Queries } from "../systems/utils/query";
-import { Query, createQueries } from "../systems/utils/query";
+import type { Queries } from "../systems/utils/entityIndex";
+import { Index, createQueries } from "../systems/utils/entityIndex";
 import { MissingEntityError } from "../errors";
 import { openDb } from "../db";
 
@@ -219,11 +219,11 @@ export class Sim extends BaseSim {
     );
     const sim = plainToInstance(Sim, save);
     config.systems.forEach((system) => system.apply(sim));
-    Object.values(sim.queries).forEach((queryOrNested) => {
-      if (queryOrNested instanceof Query) {
-        queryOrNested.reset();
+    Object.values(sim.queries).forEach((indexOrNested) => {
+      if (indexOrNested instanceof Index) {
+        indexOrNested.reset();
       } else {
-        Object.values(queryOrNested).forEach((query) => query.reset());
+        Object.values(indexOrNested).forEach((index) => index.reset());
       }
     });
     const entityMap = new Map();
