@@ -8,7 +8,7 @@ import { distance } from "mathjs";
 import type { DockSize } from "@core/components/dockable";
 import type { Entity } from "@core/entity";
 import { regenCooldown } from "./hitpointsRegenerating";
-import { Query } from "./utils/query";
+import { Index } from "./utils/entityIndex";
 import { System } from "./system";
 
 const sizeMultipliers: Record<DockSize, [number, number, number]> = {
@@ -69,12 +69,12 @@ function attack(attacker: RequireComponent<"orders">, target: Entity) {
 const cdKey = "attack";
 
 export class AttackingSystem extends System {
-  query: Query<"damage">;
+  index: Index<"damage">;
 
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    this.query = new Query(sim, ["damage"]);
+    this.index = new Index(sim, ["damage"]);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
@@ -82,7 +82,7 @@ export class AttackingSystem extends System {
   exec = (): void => {
     if (this.sim.getTime() < settings.bootTime) return;
 
-    for (const entity of this.query.getIt()) {
+    for (const entity of this.index.getIt()) {
       if (entity.cp.damage.targetId && entity.cooldowns.canUse(cdKey)) {
         if (!this.sim.entities.has(entity.cp.damage.targetId)) {
           entity.cp.damage.targetId = null;

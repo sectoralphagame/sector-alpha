@@ -9,7 +9,7 @@ import {
 } from "../components/drive";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
-import { Query } from "./utils/query";
+import { Index } from "./utils/entityIndex";
 import { System } from "./system";
 
 type Driveable = RequireComponent<"drive" | "position">;
@@ -259,18 +259,18 @@ function setDrive(entity: Driveable, delta: number) {
 
 export class NavigatingSystem extends System {
   entities: Driveable[];
-  query: Query<"drive" | "position">;
+  index: Index<"drive" | "position">;
 
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    this.query = new Query(sim, ["drive", "position"]);
+    this.index = new Index(sim, ["drive", "position"]);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (delta: number): void => {
-    for (const entity of this.query.getIt()) {
+    for (const entity of this.index.getIt()) {
       setDrive(entity, delta);
     }
   };

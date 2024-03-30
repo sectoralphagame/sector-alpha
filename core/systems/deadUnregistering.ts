@@ -1,22 +1,22 @@
 import type { Sim } from "@core/sim";
 import { dumpCargo } from "@core/components/storage";
 import type { Faction } from "@core/archetypes/faction";
-import { Query } from "./utils/query";
+import { Index } from "./utils/entityIndex";
 import { System } from "./system";
 
 export class DeadUnregisteringSystem extends System {
-  query: Query<"hitpoints">;
+  index: Index<"hitpoints">;
 
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    this.query = new Query(sim, ["hitpoints"]);
+    this.index = new Index(sim, ["hitpoints"]);
 
     sim.hooks.phase.cleanup.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (): void => {
-    for (const entity of this.query.getIt()) {
+    for (const entity of this.index.getIt()) {
       if (entity.cp.hitpoints.hp.value <= 0) {
         if (entity.cp.storage) {
           dumpCargo(entity.requireComponents(["storage"]));

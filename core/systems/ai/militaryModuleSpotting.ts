@@ -4,23 +4,23 @@ import { facilityComponents } from "@core/archetypes/facility";
 import { pickRandom } from "@core/utils/generators";
 import { System } from "../system";
 import type { Sim } from "../../sim";
-import { Query } from "../utils/query";
+import { Index } from "../utils/entityIndex";
 import { SpottingSystem } from "./spotting";
-import { SectorQuery } from "../utils/sectorQuery";
+import { SectorIndex } from "../utils/sectorIndex";
 import { isInDistance } from "../attacking";
 
 export class MilitaryModuleSpottingSystem extends System<"exec"> {
-  queries: {
-    enemies: SectorQuery<"hitpoints" | "owner" | "position">;
-    modules: Query<"parent" | "damage">;
+  indexes: {
+    enemies: SectorIndex<"hitpoints" | "owner" | "position">;
+    modules: Index<"parent" | "damage">;
   };
 
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    this.queries = {
-      enemies: new SectorQuery(sim, ["hitpoints", "owner", "position"]),
-      modules: new Query(sim, ["parent", "damage"], ["facilityModule"]),
+    this.indexes = {
+      enemies: new SectorIndex(sim, ["hitpoints", "owner", "position"]),
+      modules: new Index(sim, ["parent", "damage"], ["facilityModule"]),
     };
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
@@ -34,7 +34,7 @@ export class MilitaryModuleSpottingSystem extends System<"exec"> {
       Array<RequireComponent<"hitpoints" | "owner" | "position">>
     > = {};
 
-    this.queries.modules.get().forEach((entity) => {
+    this.indexes.modules.get().forEach((entity) => {
       const facility = this.sim.getOrThrow<Facility>(entity.cp.parent.id);
       if (
         !facility.cp.owner ||
@@ -46,7 +46,7 @@ export class MilitaryModuleSpottingSystem extends System<"exec"> {
 
       const enemy = pickRandom(
         SpottingSystem.getEnemies(
-          this.queries.enemies.get(facility.cp.position.sector),
+          this.indexes.enemies.get(facility.cp.position.sector),
           cache,
           facility.requireComponents([...facilityComponents, "owner"])
         ).slice(0, 3)

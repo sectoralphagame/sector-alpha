@@ -6,7 +6,7 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { pickRandom } from "@core/utils/generators";
 import { System } from "../system";
 import type { Sim } from "../../sim";
-import { SectorQuery } from "../utils/sectorQuery";
+import { SectorIndex } from "../utils/sectorIndex";
 
 export const spottingRadius = 6;
 
@@ -16,12 +16,12 @@ export type EnemyArrayCache = Record<
 >;
 
 export class SpottingSystem extends System<"exec"> {
-  query: SectorQuery<"hitpoints" | "owner" | "position">;
+  index: SectorIndex<"hitpoints" | "owner" | "position">;
 
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    this.query = new SectorQuery(sim, ["hitpoints", "owner", "position"]);
+    this.index = new SectorIndex(sim, ["hitpoints", "owner", "position"]);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
@@ -103,7 +103,7 @@ export class SpottingSystem extends System<"exec"> {
 
       const enemy = pickRandom(
         SpottingSystem.getEnemies(
-          this.query.get(entity.cp.position.sector),
+          this.index.get(entity.cp.position.sector),
           cache,
           entity
         ).slice(0, 3)
