@@ -36,6 +36,7 @@ export class Observable<T extends any[]> {
         try {
           observer.fn(...data);
         } catch (err) {
+          // eslint-disable-next-line no-console
           console.error(
             `Error in observer ${this.name} calling for ${observer.origin}`
           );

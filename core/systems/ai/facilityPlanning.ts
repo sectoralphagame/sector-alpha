@@ -82,7 +82,10 @@ function getSectorPosition(
     isNearAnyFacility = sector.sim.queries.facilities
       .get()
       .filter((facility) => facility.cp.position.sector === sector.id)
-      .some((facility) => distance(facility.cp.position.coord, position) < 10);
+      .some(
+        (facility) =>
+          (distance(facility.cp.position.coord, position) as number) < 10
+      );
   } while (isNearAnyFacility);
 
   return position;

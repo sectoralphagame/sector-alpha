@@ -41,7 +41,7 @@ export function getRandomPositionInBounds(
       random(-distance, distance),
     ]);
   } while (
-    norm(
+    (norm(
       subtract(
         hecsToCartesian(
           entity.sim.getOrThrow(entity.cp.position.sector).cp.hecsPosition!
@@ -50,7 +50,7 @@ export function getRandomPositionInBounds(
         ),
         position
       ) as Position2D
-    ) > sectorSize
+    ) as number) > sectorSize
   );
 
   return position;

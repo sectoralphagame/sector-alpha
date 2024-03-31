@@ -27,10 +27,10 @@ export function isInDistance(
   r: number = entity.cp.damage.range
 ): boolean {
   return (
-    distance(
+    (distance(
       findInAncestors(entity, "position").cp.position.coord,
       target.cp.position.coord
-    ) <= r
+    ) as number) <= r
   );
 }
 

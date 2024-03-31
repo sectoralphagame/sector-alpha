@@ -33,8 +33,9 @@ export const ShipToSpace: React.FC = () => {
         .get()
         .filter(
           (field) =>
-            norm(subtract(field.cp.position.coord, menu.worldPosition)) <
-            field.cp.asteroidSpawn.size
+            (norm(
+              subtract(field.cp.position.coord, menu.worldPosition)
+            ) as number) < field.cp.asteroidSpawn.size
         )
     : [];
 
