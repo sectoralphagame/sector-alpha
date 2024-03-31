@@ -28,19 +28,12 @@ export function createLink(
   const [telA, telB] = sectors.map((sector, sectorIndex) => {
     let linkPosition: Position2D;
     if (!position?.[sectorIndex]) {
-      const sectorPosition = hecsToCartesian(
-        sector.cp.hecsPosition.value,
-        sectorSize / 10
-      );
       const a =
         (sectorIndex === 0 ? angle : Math.PI + angle) +
         random(-Math.PI / 6, Math.PI / 6);
       const r = random(20, 35);
 
-      linkPosition = [
-        r * Math.cos(a) + sectorPosition[0],
-        r * Math.sin(a) + sectorPosition[1],
-      ];
+      linkPosition = [r * Math.cos(a), r * Math.sin(a)];
     } else {
       linkPosition = position[sectorIndex];
     }

@@ -8,8 +8,9 @@ import { isHeadless } from "@core/settings";
 import { first } from "@fxts/core";
 import { storageHook } from "@core/hooks";
 import type { ContextMenuApi } from "@ui/atoms";
-import { worldToHecs } from "@core/components/hecsPosition";
+import { hecsToCartesian, worldToHecs } from "@core/components/hecsPosition";
 import { deepEqual } from "mathjs";
+import { sectorSize, type Sector } from "@core/archetypes/sector";
 import {
   createRenderGraphics,
   graphics,
@@ -348,7 +349,11 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
 
   updateRenderables = () => {
     for (const sectorId of this.sectorIndex.sectors.keys()) {
-      // const sector = this.sim.getOrThrow<Sector>(sectorId)
+      const sector = this.sim.getOrThrow<Sector>(sectorId);
+      const sectorPos = hecsToCartesian(
+        sector.cp.hecsPosition.value,
+        sectorSize / 10
+      );
 
       for (const entity of this.sectorIndex.sectors.get(sectorId)!) {
         const entityRender = entity.cp.render;
@@ -390,8 +395,8 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
           entity.cp.position.moved = false;
 
           sprite!.position.set(
-            entity.cp.position.coord[0] * 10,
-            entity.cp.position.coord[1] * 10
+            (sectorPos[0] + entity.cp.position.coord[0]) * 10,
+            (sectorPos[1] + entity.cp.position.coord[1]) * 10
           );
           sprite!.rotation = entity.cp.position.angle;
         }

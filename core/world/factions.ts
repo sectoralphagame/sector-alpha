@@ -1,13 +1,11 @@
-import type { Position2D } from "@core/components/position";
 import { addStartingCommodities } from "@core/systems/ai/facilityPlanning";
-import { add, random } from "mathjs";
+import { random } from "mathjs";
 import type { Faction } from "../archetypes/faction";
 import { createFaction } from "../archetypes/faction";
 import type { Sector } from "../archetypes/sector";
 import { sectorSize } from "../archetypes/sector";
 import { setMoney } from "../components/budget";
 import type { DockSize } from "../components/dockable";
-import { hecsToCartesian } from "../components/hecsPosition";
 import type { Sim } from "../sim";
 import { requestShip } from "../systems/ai/shipPlanning";
 import { pickRandom, pickRandomWithIndex } from "../utils/generators";
@@ -96,16 +94,10 @@ export function populateSectors(sim: Sim, sectors: Sector[], faction: Faction) {
       {
         owner: faction,
         sector: sectorWithShipyard,
-        position: add(
-          hecsToCartesian(
-            sectorWithShipyard.cp.hecsPosition.value,
-            sectorSize / 10
-          ),
-          [
-            random(-sectorSize / 20, sectorSize / 20),
-            random(-sectorSize / 20, sectorSize / 20),
-          ]
-        ) as Position2D,
+        position: [
+          random(-sectorSize / 20, sectorSize / 20),
+          random(-sectorSize / 20, sectorSize / 20),
+        ],
       },
       sim
     );

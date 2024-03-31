@@ -11,7 +11,6 @@ import { facilityModules } from "../../archetypes/facilityModule";
 import type { Faction } from "../../archetypes/faction";
 import type { Sector } from "../../archetypes/sector";
 import { sectorSize } from "../../archetypes/sector";
-import { hecsToCartesian } from "../../components/hecsPosition";
 import type { PAC } from "../../components/production";
 import { addStorage } from "../../components/storage";
 import type { Commodity } from "../../economy/commodity";
@@ -65,16 +64,12 @@ function getSectorPosition(
   radius?: number,
   point?: Position2D
 ): Position2D {
-  const sectorPosition = hecsToCartesian(
-    sector.cp.hecsPosition.value,
-    sectorSize / 10
-  );
   let position: Position2D;
   let isNearAnyFacility: boolean;
   const r = radius ?? -sectorSize / 20;
 
   do {
-    position = add(point ?? sectorPosition, [
+    position = add(point ?? [0, 0], [
       random(-r, r),
       random(-r, r),
     ]) as Position2D;
@@ -104,16 +99,12 @@ export class FacilityPlanningSystem extends System<"plan"> {
         .get()
         .filter((s) => s.cp.owner?.id === faction.id)
     );
-    const sectorPosition = hecsToCartesian(
-      sector.cp.hecsPosition.value,
-      sectorSize / 10
-    );
     const facility = createFacility(this.sim, {
       owner: faction,
-      position: add(sectorPosition, [
+      position: [
         random(-sectorSize / 20, sectorSize / 20),
         random(-sectorSize / 20, sectorSize / 20),
-      ]) as Position2D,
+      ],
       sector,
     });
     facility.cp.name.value = createFacilityName(facility, "Factory");
@@ -212,12 +203,10 @@ export class FacilityPlanningSystem extends System<"plan"> {
     for (const sector of this.sim.queries.sectors.getIt()) {
       if (sector.cp.owner?.id !== faction.id) continue;
 
-      const position = hecsToCartesian(
-        sector.cp.hecsPosition.value,
-        sectorSize / 10
-      );
-      position[0] += random(-sectorSize / 50, sectorSize / 50);
-      position[1] += random(-sectorSize / 50, sectorSize / 50);
+      const position: Position2D = [
+        random(-sectorSize / 50, sectorSize / 50),
+        random(-sectorSize / 50, sectorSize / 50),
+      ];
 
       const facility = createFacility(this.sim, {
         owner: faction,

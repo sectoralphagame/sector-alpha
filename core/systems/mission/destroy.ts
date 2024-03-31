@@ -2,13 +2,11 @@ import Mustache from "mustache";
 import type { Mission, MissionCommon } from "@core/components/missions";
 import { relationThresholds } from "@core/components/relations";
 import { pickRandom } from "@core/utils/generators";
-import { add, random, randomInt } from "mathjs";
+import { random, randomInt } from "mathjs";
 import { first, map, pipe, repeat, toArray } from "@fxts/core";
 import { createShip } from "@core/archetypes/ship";
 import { shipClasses } from "@core/world/ships";
-import { hecsToCartesian } from "@core/components/hecsPosition";
 import { addSubordinate } from "@core/components/subordinates";
-import { sectorSize } from "@core/archetypes/sector";
 import type { Position2D } from "@core/components/position";
 import type { Sim } from "@core/sim";
 import missions from "../../world/data/missions.json";
@@ -68,19 +66,13 @@ export const destroyMissionHandler: MissionHandler = {
       .get()
       .find((f) => f.cp.name.slug === "PIR")!;
     const shipClass = shipClasses.find((s) => s.slug === "roach")!;
-    const spawnPoint = hecsToCartesian(
-      sector.cp.hecsPosition.value,
-      sectorSize / 10
-    );
+    const spawnPoint: Position2D = [randomInt(-0.3, 0.3), randomInt(-0.3, 0.3)];
     const entities = pipe(
       repeat(randomInt(2, 4), () =>
         createShip(sim, {
           ...shipClass,
           owner: pirateFaction,
-          position: add(spawnPoint, [
-            randomInt(-0.3, 0.3),
-            randomInt(-0.3, 0.3),
-          ]) as Position2D,
+          position: spawnPoint,
           sector,
         })
       ),
