@@ -347,60 +347,64 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   };
 
   updateRenderables = () => {
-    for (const entity of this.sim.queries.renderable.getIt()) {
-      const entityRender = entity.cp.render;
-      let sprite = this.sprites.get(entity);
+    for (const sectorId of this.sectorIndex.sectors.keys()) {
+      // const sector = this.sim.getOrThrow<Sector>(sectorId)
 
-      if (!sprite) {
-        sprite = new PIXI.Sprite();
-        setTexture(entity, sprite, entityRender.texture);
-        this.sprites.set(entity, sprite);
-        this.viewport.addChild(sprite);
-        if (entity.tags.has("selection")) {
-          sprite.interactive = true;
-          sprite.addEventListener("pointerdown", (event) => {
-            if (event.button === 0) {
-              this.settingsManager.cp.selectionManager.id = entity.id;
+      for (const entity of this.sectorIndex.sectors.get(sectorId)!) {
+        const entityRender = entity.cp.render;
+        let sprite = this.sprites.get(entity);
 
-              if (Date.now() - this.lastClicked < 200) {
-                this.settingsManager.cp.selectionManager.focused = true;
+        if (!sprite) {
+          sprite = new PIXI.Sprite();
+          setTexture(entity, sprite, entityRender.texture);
+          this.sprites.set(entity, sprite);
+          this.viewport.addChild(sprite);
+          if (entity.tags.has("selection")) {
+            sprite.interactive = true;
+            sprite.addEventListener("pointerdown", (event) => {
+              if (event.button === 0) {
+                this.settingsManager.cp.selectionManager.id = entity.id;
+
+                if (Date.now() - this.lastClicked < 200) {
+                  this.settingsManager.cp.selectionManager.focused = true;
+                }
+
+                this.lastClicked = Date.now();
               }
+            });
+            sprite.addEventListener("rightdown", () => {
+              this.settingsManager.cp.selectionManager.secondaryId = entity.id;
+            });
+            sprite.cursor = "pointer";
+          }
 
-              this.lastClicked = Date.now();
-            }
-          });
-          sprite.addEventListener("rightdown", () => {
-            this.settingsManager.cp.selectionManager.secondaryId = entity.id;
-          });
-          sprite.cursor = "pointer";
+          sprite.tint = entityRender.color;
+          this.layers[entityRender.layer].addChild(sprite);
+          this.updateEntityScaling(entity);
+          entity.cp.position.moved = true;
         }
 
-        sprite.tint = entityRender.color;
-        this.layers[entityRender.layer].addChild(sprite);
-        this.updateEntityScaling(entity);
-        entity.cp.position.moved = true;
-      }
+        drawHpBars(entity, sprite);
 
-      drawHpBars(entity, sprite);
+        if (entity.cp.position.moved) {
+          entity.cp.position.moved = false;
 
-      if (entity.cp.position.moved) {
-        entity.cp.position.moved = false;
+          sprite!.position.set(
+            entity.cp.position.coord[0] * 10,
+            entity.cp.position.coord[1] * 10
+          );
+          sprite!.rotation = entity.cp.position.angle;
+        }
 
-        sprite!.position.set(
-          entity.cp.position.coord[0] * 10,
-          entity.cp.position.coord[1] * 10
-        );
-        sprite!.rotation = entity.cp.position.angle;
-      }
-
-      if (getTexture(entityRender.texture) !== sprite?.texture) {
-        setTexture(entity, sprite!, entityRender.texture);
-      }
-      if (entity.tags.has("selection") !== sprite?.interactive) {
-        sprite!.interactive = entity.tags.has("selection");
-      }
-      if (entityRender.visible !== sprite?.visible) {
-        sprite!.visible = entityRender.visible;
+        if (getTexture(entityRender.texture) !== sprite?.texture) {
+          setTexture(entity, sprite!, entityRender.texture);
+        }
+        if (entity.tags.has("selection") !== sprite?.interactive) {
+          sprite!.interactive = entity.tags.has("selection");
+        }
+        if (entityRender.visible !== sprite?.visible) {
+          sprite!.visible = entityRender.visible;
+        }
       }
     }
   };
@@ -417,7 +421,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
       previousSelected!.removeComponent("renderGraphics");
     }
 
-    for (const entity of this.sim.queries.renderable.getIt()) {
+    for (const entity of this.sectorIndex.all()) {
       const entityRender = entity.cp.render;
       const sprite = this.sprites.get(entity);
       const selected =
@@ -465,7 +469,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   };
 
   updateScaling = () => {
-    for (const entity of this.sim.queries.renderable.getIt()) {
+    for (const entity of this.sectorIndex.all()) {
       this.updateEntityScaling(entity);
     }
 

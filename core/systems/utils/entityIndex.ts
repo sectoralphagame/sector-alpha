@@ -201,7 +201,6 @@ export function createQueries(sim: Sim) {
       true
     ),
     productionByModules: new Index(sim, ["production", "parent"]),
-    renderable: new Index(sim, ["render", "position"]),
     renderableGraphics: new Index(sim, ["renderGraphics"]),
     sectors: new Index(sim, sectorComponents, [], true),
     selectable: new Index(sim, ["render", "position"], ["selection"]),
