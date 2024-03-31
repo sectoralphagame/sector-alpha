@@ -141,7 +141,10 @@ export class TauHarassingSystem extends System<"exec"> {
       fighters.every(
         (f) =>
           f.cp.position.sector === commander!.cp.position.sector &&
-          distance(f.cp.position.coord, commander!.cp.position.coord) < 4
+          (distance(
+            f.cp.position.coord,
+            commander!.cp.position.coord
+          ) as number) < 4
       )
     ) {
       return commander;
