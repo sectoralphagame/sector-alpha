@@ -130,9 +130,12 @@ function autoTrade(entity: Trading, sectorDistance: number) {
         (entity.cp.autoOrder.default as TradeOrder).sectorId!
       ),
       sectorDistance,
-      Object.entries(owner.cp.relations.values)
-        .filter(([, value]) => value < relationThresholds.trade)
-        .map(([id]) => Number(id))
+      (f) =>
+        !Object.entries(owner.cp.relations.values)
+          .filter(([, value]) => value < relationThresholds.trade)
+          .map(([id]) => Number(id))
+          .includes(f.cp.owner.id) &&
+        (owner.tags.has("player") ? f.tags.has("discovered") : true)
     );
     if (trade) {
       makingTrade = resellCommodity(

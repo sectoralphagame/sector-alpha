@@ -12,7 +12,8 @@ const divisions = 2 ** 6;
 
 export class FogOfWarUpdatingSystem extends System<"exec"> {
   grid: RequireComponent<"renderGraphics"> | null = null;
-  index: Index<"position" | "owner">;
+  entitiesWithInfluence: Index<"position" | "owner">;
+  entitiesToHide: Index<"position" | "render">;
   enabled = true;
 
   apply = (sim: Sim): void => {
@@ -65,7 +66,9 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       this.constructor.name
     );
 
-    this.index = new Index(sim, ["position", "owner"]);
+    this.entitiesWithInfluence = new Index(sim, ["position", "owner"]);
+    this.entitiesToHide = new Index(sim, ["position", "render"]);
+
     sim.hooks.phase.init.subscribe(this.constructor.name, this.updateFog);
   };
 
@@ -84,7 +87,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
 
       const player = this.sim.queries.player.get()[0];
 
-      for (const entity of this.index.getIt()) {
+      for (const entity of this.entitiesWithInfluence.getIt()) {
         const position = entity.cp.position;
         const owner = entity.cp.owner;
         if (owner.id !== player.id) continue;
@@ -106,7 +109,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
         }
       }
 
-      for (const entity of this.sim.queries.orderable.getIt()) {
+      for (const entity of this.entitiesToHide.getIt()) {
         if (entity.cp.dockable?.dockedIn) continue;
 
         if (!this.enabled) {
@@ -116,9 +119,16 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
             entity.cp.position.coord
           );
 
-          if (entity.cp.owner.id !== player.id) {
+          if (entity.cp.owner?.id !== player.id) {
             entity.cp.render!.visible =
-              !!sectorMaps[entity.cp.position.sector]?.[y * divisions + x];
+              !!sectorMaps[entity.cp.position.sector]?.[y * divisions + x] ||
+              entity.tags.has("discovered");
+            if (
+              entity.cp.render!.visible &&
+              (entity.tags.has("facility") || entity.tags.has("collectible"))
+            ) {
+              entity.tags.add("discovered");
+            }
           }
         }
       }

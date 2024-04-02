@@ -14,6 +14,7 @@ import {
   sortBy as fxtsSortBy,
   reverse,
   take,
+  identity,
 } from "@fxts/core";
 import type { Faction } from "@core/archetypes/faction";
 import { relationThresholds } from "@core/components/relations";
@@ -65,7 +66,7 @@ export interface TradeWithMostProfit {
 export function getTradeWithMostProfit(
   from: Waypoint | Sector,
   sectorDistance: number,
-  notAllowedFactions: number[]
+  facilityFilter: (_f: WithTrade) => boolean
 ): TradeWithMostProfit | null {
   const sectorsInTeleportRange = getSectorsInTeleportRange(
     asSector(
@@ -84,7 +85,7 @@ export function getTradeWithMostProfit(
     flatMap((sector) =>
       pipe(
         from.sim.queries.bySectors.trading.get(sector.id),
-        filter((f) => !notAllowedFactions.includes(f.cp.owner.id)),
+        filter(facilityFilter),
         toArray
       )
     ),
@@ -184,6 +185,9 @@ export function getBuyersForCommodityInRange(
         f.cp.trade.offers[commodity].type === "buy" &&
         f.cp.trade.offers[commodity].quantity >= minQuantity
     ),
+    faction.tags.has("player")
+      ? filter((f) => f.tags.has("discovered"))
+      : identity,
     map((f) => ({
       facility: f,
       profit: profit(f),
@@ -253,6 +257,9 @@ export function getFacilityWithMostProfit(
           facility.cp.trade.offers[commodity].type &&
         f.cp.trade.offers[commodity].quantity >= minQuantity
     ),
+    faction.tags.has("player")
+      ? filter((f) => f.tags.has("discovered"))
+      : identity,
     map((f) => ({
       facility: f,
       profit: profit(f),
