@@ -38,6 +38,7 @@ import { ShipBuildingSystem } from "@core/systems/shipBuilding";
 import { StorageQuotaPlanningSystem } from "@core/systems/storageQuotaPlanning";
 import { TradingSystem } from "@core/systems/trading";
 import { UndeployingSystem } from "@core/systems/undeploying";
+import { FogOfWarUpdatingSystem } from "@core/systems/fogOfWarUpdating";
 import type { SimConfig } from "./Sim";
 
 export const bootstrapSystems = [
@@ -88,6 +89,7 @@ export const createBaseConfig = (): SimConfig => {
         }
       ),
       new PirateSpawningSystem(),
+      new FogOfWarUpdatingSystem(),
     ],
   };
 

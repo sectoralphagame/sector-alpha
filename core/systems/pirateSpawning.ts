@@ -4,8 +4,6 @@ import { sectorSize } from "@core/archetypes/sector";
 import type { Ship, ShipComponent } from "@core/archetypes/ship";
 import { createShip, shipComponents } from "@core/archetypes/ship";
 import { createWaypoint } from "@core/archetypes/waypoint";
-import { hecsToCartesian } from "@core/components/hecsPosition";
-import type { Position2D } from "@core/components/position";
 import { addSubordinate } from "@core/components/subordinates";
 import { isDev } from "@core/settings";
 import type { Sim } from "@core/sim";
@@ -13,7 +11,7 @@ import { pickRandom } from "@core/utils/generators";
 import { moveToActions } from "@core/utils/moving";
 import { shipClasses } from "@core/world/ships";
 import { filter, find, map, pipe, toArray } from "@fxts/core";
-import { add, distance, random, randomInt } from "mathjs";
+import { distance, random, randomInt } from "mathjs";
 import { System } from "./system";
 import { Index } from "./utils/entityIndex";
 
@@ -77,13 +75,10 @@ function spawnFlagship(sim: Sim, faction: Faction, flagships: Ship[]) {
     owner: faction,
     sector,
     angle: Math.random() * 2 * Math.PI,
-    position: add(
-      hecsToCartesian(sector.cp.hecsPosition.value, sectorSize / 10),
-      [
-        Math.cos(angle) * flagshipDistanceFromSectorCenter,
-        Math.sin(angle) * flagshipDistanceFromSectorCenter,
-      ]
-    ) as Position2D,
+    position: [
+      Math.cos(angle) * flagshipDistanceFromSectorCenter,
+      Math.sin(angle) * flagshipDistanceFromSectorCenter,
+    ],
   });
 }
 
@@ -166,14 +161,9 @@ export class PirateSpawningSystem extends System<
 
     if (!shipToMove) return;
 
-    const sectorPosition = hecsToCartesian(
-      this.sim.getOrThrow<Sector>(shipToMove.cp.position.sector).cp.hecsPosition
-        .value,
-      sectorSize / 10
-    );
     const angle = Math.atan2(
-      shipToMove.cp.position.coord[1] - sectorPosition[1],
-      shipToMove.cp.position.coord[0] - sectorPosition[0]
+      shipToMove.cp.position.coord[1],
+      shipToMove.cp.position.coord[0]
     );
     const dAngle =
       (random(8, 20) * (Math.random() > 0.5 ? 1 : -1) * 2 * Math.PI) / 360;
@@ -184,10 +174,10 @@ export class PirateSpawningSystem extends System<
         shipToMove,
         createWaypoint(this.sim, {
           sector: shipToMove.cp.position.sector,
-          value: add(sectorPosition, [
+          value: [
             flagshipDistanceFromSectorCenter * Math.cos(angle + dAngle),
             flagshipDistanceFromSectorCenter * Math.sin(angle + dAngle),
-          ]) as Position2D,
+          ],
           owner: shipToMove.id,
         })
       ),

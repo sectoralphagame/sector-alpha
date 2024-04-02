@@ -8,7 +8,7 @@ import { System } from "../system";
 import type { Sim } from "../../sim";
 import { SectorIndex } from "../utils/sectorIndex";
 
-export const spottingRadius = 6;
+export const spottingRadius = 5;
 
 export type EnemyArrayCache = Record<
   string,

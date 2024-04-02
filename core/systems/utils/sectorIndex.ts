@@ -3,6 +3,7 @@ import type { Sim } from "@core/sim";
 import type { EntityTag } from "@core/tags";
 import type { RequireComponent } from "@core/tsHelpers";
 import { Observable } from "@core/utils/observer";
+import { flatMap, pipe } from "@fxts/core";
 import type { IndexEntities } from "./entityIndex";
 import { BaseIndex } from "./entityIndex";
 
@@ -35,7 +36,14 @@ export class SectorIndex<T extends keyof CoreComponents> {
     this.index.hooks.remove.subscribe(this.constructor.name, (entityId) => {
       this.remove(entityId);
     });
+    this.index.collect();
   }
+
+  all = (): IterableIterator<RequireComponent<T>> =>
+    pipe(
+      this.sectors.keys(),
+      flatMap((sector) => this.get(sector))
+    );
 
   changePosition = (
     oldSector: number,

@@ -1,13 +1,12 @@
-import { createSector, sectorSize } from "@core/archetypes/sector";
-import { add, random } from "mathjs";
+import { createSector } from "@core/archetypes/sector";
+import { random } from "mathjs";
 import type { PositionAxial } from "@core/components/hecsPosition";
-import { axialToCube, hecsToCartesian } from "@core/components/hecsPosition";
+import { axialToCube } from "@core/components/hecsPosition";
 import type { AiType } from "@core/components/ai";
 import { requestShip } from "@core/systems/ai/shipPlanning";
 import { facilityModules } from "@core/archetypes/facilityModule";
 import { changeRelations } from "@core/components/relations";
 import settings from "@core/settings";
-import type { Position2D } from "@core/components/position";
 import { createFaction } from "../archetypes/faction";
 import { createShip } from "../archetypes/ship";
 import { changeBudgetMoney, createBudget } from "../components/budget";
@@ -121,10 +120,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
   const playerShip = createShip(sim, {
     ...pickRandom(shipClasses.filter(({ slug }) => slug === "courierA")),
     angle: random(-Math.PI, Math.PI),
-    position: add(
-      hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
-      [random(-1, 1), random(-1, 1)]
-    ) as Position2D,
+    position: [random(-1, 1), random(-1, 1)],
     owner: player,
     sector: startingSector,
   });
@@ -133,10 +129,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
   const playerMiningShip = createShip(sim, {
     ...shipClasses.find(({ slug }) => slug === "smallMinerA")!,
     angle: random(-Math.PI, Math.PI),
-    position: add(
-      hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
-      [random(-1, 1), random(-1, 1)]
-    ) as Position2D,
+    position: [random(-1, 1), random(-1, 1)],
     owner: player,
     sector: startingSector,
   });
@@ -145,10 +138,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
   const builderShip = createShip(sim, {
     ...pickRandom(shipClasses.filter(({ role }) => role === "building")),
     angle: random(-Math.PI, Math.PI),
-    position: add(
-      hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
-      [random(-1, 1), random(-1, 1)]
-    ) as Position2D,
+    position: [random(-1, 1), random(-1, 1)],
     owner: player,
     sector: startingSector,
   });
@@ -157,10 +147,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
   const storageShip = createShip(sim, {
     ...pickRandom(shipClasses.filter(({ role }) => role === "storage")),
     angle: random(-Math.PI, Math.PI),
-    position: add(
-      hecsToCartesian(startingSector.cp.hecsPosition.value, sectorSize / 10),
-      [random(-1, 1), random(-1, 1)]
-    ) as Position2D,
+    position: [random(-1, 1), random(-1, 1)],
     owner: player,
     sector: startingSector,
   });

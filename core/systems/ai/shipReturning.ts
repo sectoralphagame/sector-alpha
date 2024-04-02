@@ -1,12 +1,9 @@
 import type { Faction } from "@core/archetypes/faction";
 import { createWaypoint } from "@core/archetypes/waypoint";
-import { sectorSize } from "@core/archetypes/sector";
-import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { Sim } from "@core/sim";
 import { moveToActions } from "@core/utils/moving";
 import { each, filter, first, map, pipe, sortBy } from "@fxts/core";
-import { add, random } from "mathjs";
-import type { Position2D } from "@core/components/position";
+import { random } from "mathjs";
 import { System } from "../system";
 
 /**
@@ -62,13 +59,7 @@ export class ShipReturningSystem extends System<"exec"> {
               createWaypoint(this.sim, {
                 sector: closestSector.id,
                 owner: ship.id,
-                value: add(
-                  hecsToCartesian(
-                    closestSector.cp.hecsPosition!.value,
-                    sectorSize / 10
-                  ),
-                  [random(-5, 5), random(-5, 5)]
-                ) as Position2D,
+                value: [random(-5, 5), random(-5, 5)],
               })
             ),
             origin: "auto",

@@ -1,12 +1,11 @@
 import { sectorSize } from "@core/archetypes/sector";
 import { ship } from "@core/archetypes/ship";
-import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { Position2D } from "@core/components/position";
 import type { Entity } from "@core/entity";
 import settings from "@core/settings";
 import type { RequireComponent } from "@core/tsHelpers";
 import { first } from "@fxts/core";
-import { add, norm, random, subtract } from "mathjs";
+import { add, norm, random } from "mathjs";
 
 export function isOwnedByPlayer(entity: Entity): boolean {
   return entity!.cp.owner?.id === first(entity.sim.queries.player.getIt())!.id;
@@ -40,18 +39,7 @@ export function getRandomPositionInBounds(
       random(-distance, distance),
       random(-distance, distance),
     ]);
-  } while (
-    (norm(
-      subtract(
-        hecsToCartesian(
-          entity.sim.getOrThrow(entity.cp.position.sector).cp.hecsPosition!
-            .value,
-          sectorSize / 10
-        ),
-        position
-      ) as Position2D
-    ) as number) > sectorSize
-  );
+  } while ((norm(position) as number) > sectorSize);
 
   return position;
 }

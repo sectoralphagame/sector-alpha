@@ -5,11 +5,14 @@ import type { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
 import { spottingRadius } from "@core/systems/ai/spotting";
 import { first } from "@fxts/core";
+import { FogOfWarUpdatingSystem } from "@core/systems/fogOfWarUpdating";
+import type { Sector } from "../archetypes/sector";
 import { sectorSize } from "../archetypes/sector";
 import { findInAncestors } from "../utils/findInAncestors";
 import type { BaseComponent } from "./component";
 import type { Entity } from "../entity";
 import { hecsToCartesian } from "./hecsPosition";
+import type { Position2D } from "./position";
 
 const path = ({
   g,
@@ -22,10 +25,19 @@ const path = ({
 }) => {
   if (!entity.hasComponents(["orders"])) return;
 
+  g.zIndex = 1;
   const { orders } = entity.requireComponents(["orders"]).cp;
-  const originPosition = findInAncestors(entity, "position").cp.position;
+  const origin = findInAncestors(entity, "position");
+  const originPosition: Position2D = add(
+    origin.cp.position.coord,
+    hecsToCartesian(
+      entity.sim.getOrThrow<Sector>(origin.cp.position.sector).cp.hecsPosition
+        .value,
+      sectorSize / 10
+    )
+  );
 
-  g.moveTo(originPosition!.coord[0] * 10, originPosition!.coord[1] * 10);
+  g.moveTo(originPosition[0] * 10, originPosition[1] * 10);
 
   orders.value.forEach((order) =>
     order.actions.forEach((action) => {
@@ -38,26 +50,28 @@ const path = ({
         const target = entity.sim.get(action.targetId);
         if (!target) return;
 
-        const targetPosition = findInAncestors(target!, "position").cp.position;
+        const targetWithPosition = findInAncestors(target!, "position");
+        const targetPosition = add(
+          targetWithPosition.cp.position.coord,
+          hecsToCartesian(
+            entity.sim.getOrThrow<Sector>(targetWithPosition.cp.position.sector)
+              .cp.hecsPosition.value,
+            sectorSize / 10
+          )
+        );
 
         if (action.type === "teleport") {
-          g.moveTo(
-            targetPosition!.coord[0] * 10,
-            targetPosition!.coord[1] * 10
-          );
+          g.moveTo(targetPosition[0] * 10, targetPosition[1] * 10);
         } else {
           g.lineStyle({
             alpha: 0.3,
             width: 3 / viewport.scale.x,
             color: Color.hsl(0, 0, 70).rgbNumber(),
           });
-          g.lineTo(
-            targetPosition!.coord[0] * 10,
-            targetPosition!.coord[1] * 10
-          );
+          g.lineTo(targetPosition[0] * 10, targetPosition[1] * 10);
           g.drawCircle(
-            targetPosition!.coord[0] * 10,
-            targetPosition!.coord[1] * 10,
+            targetPosition[0] * 10,
+            targetPosition[1] * 10,
             3 / viewport.scale.x
           );
         }
@@ -73,34 +87,39 @@ export type Graphics = Record<
   | "sector"
   | "path"
   | "pathWithRange"
-  | "hexGrid",
+  | "hexGrid"
+  | "fogOfWarGrid",
   // eslint-disable-next-line no-unused-vars
   (opts: { g: PIXI.Graphics; entity: Entity; viewport: Viewport }) => void
 >;
 export const graphics: Graphics = {
   asteroidField: ({ g, entity }) => {
-    const { position, asteroidSpawn } = entity.requireComponents([
+    g.zIndex = 1;
+    const { position: posInSector, asteroidSpawn } = entity.requireComponents([
       "asteroidSpawn",
       "position",
     ]).cp;
+    const position: Position2D = add(
+      posInSector.coord,
+      hecsToCartesian(
+        entity.sim.getOrThrow<Sector>(posInSector.sector).cp.hecsPosition.value,
+        sectorSize / 10
+      )
+    );
     g.lineStyle({
       alpha: 0.3,
       width: 1,
       color: Color(fieldColors[asteroidSpawn!.type]).rgbNumber(),
     })
-      .drawCircle(
-        position!.coord[0] * 10,
-        position!.coord[1] * 10,
-        asteroidSpawn!.size * 10
-      )
+      .drawCircle(position[0] * 10, position[1] * 10, asteroidSpawn!.size * 10)
       .lineStyle({
         alpha: 0.2,
         width: 0.8,
         color: Color(fieldColors[asteroidSpawn!.type]).rgbNumber(),
       })
       .drawCircle(
-        position!.coord[0] * 10,
-        position!.coord[1] * 10,
+        position[0] * 10,
+        position[1] * 10,
         asteroidSpawn!.size * 10 - 2
       )
       .lineStyle({
@@ -109,18 +128,35 @@ export const graphics: Graphics = {
         color: Color(fieldColors[asteroidSpawn!.type]).rgbNumber(),
       })
       .drawCircle(
-        position!.coord[0] * 10,
-        position!.coord[1] * 10,
+        position[0] * 10,
+        position[1] * 10,
         asteroidSpawn!.size * 10 - 4
       );
   },
   link: ({ g, entity }) => {
+    g.zIndex = 1;
     const { teleport } = entity.requireComponents(["teleport"]).cp;
-    const originPosition = findInAncestors(entity, "position").cp.position;
-    const targetPosition = findInAncestors(
+    const origin = findInAncestors(entity, "position");
+    const originPosition: Position2D = add(
+      origin.cp.position.coord,
+      hecsToCartesian(
+        entity.sim.getOrThrow<Sector>(origin.cp.position.sector).cp.hecsPosition
+          .value,
+        sectorSize / 10
+      )
+    );
+    const target = findInAncestors(
       entity.sim.getOrThrow(teleport.destinationId!),
       "position"
-    ).cp.position;
+    );
+    const targetPosition: Position2D = add(
+      target.cp.position.coord,
+      hecsToCartesian(
+        entity.sim.getOrThrow<Sector>(target.cp.position.sector).cp.hecsPosition
+          .value,
+        sectorSize / 10
+      )
+    );
     const targetTeleport = entity.sim
       .getOrThrow(teleport.destinationId!)
       .requireComponents(["teleport"]).cp.teleport;
@@ -129,50 +165,50 @@ export const graphics: Graphics = {
       width: 5,
       color: Color.hsl(0, 0, 70).rgbNumber(),
     });
-    g.moveTo(originPosition!.coord[0] * 10, originPosition!.coord[1] * 10);
+    g.moveTo(originPosition[0] * 10, originPosition[1] * 10);
     if (teleport.draw) {
       g.bezierCurveTo(
         ...((teleport.draw === "horizontal"
           ? [
-              (originPosition!.coord[0] + targetPosition!.coord[0]) * 5,
-              originPosition!.coord[1] * 10,
+              (originPosition[0] + targetPosition[0]) * 5,
+              originPosition[1] * 10,
             ]
           : [
-              originPosition!.coord[0] * 10,
-              (targetPosition!.coord[1] + originPosition!.coord[1]) * 5,
+              originPosition[0] * 10,
+              (targetPosition[1] + originPosition[1]) * 5,
             ]) as [number, number]),
         ...((targetTeleport.draw === "horizontal"
           ? [
-              (originPosition!.coord[0] + targetPosition!.coord[0]) * 5,
-              targetPosition!.coord[1] * 10,
+              (originPosition[0] + targetPosition[0]) * 5,
+              targetPosition[1] * 10,
             ]
           : [
-              targetPosition!.coord[0] * 10,
-              (targetPosition!.coord[1] + originPosition!.coord[1]) * 5,
+              targetPosition[0] * 10,
+              (targetPosition[1] + originPosition[1]) * 5,
             ]) as [number, number]),
-        targetPosition!.coord[0] * 10,
-        targetPosition!.coord[1] * 10
+        targetPosition[0] * 10,
+        targetPosition[1] * 10
       );
     } else if (
-      Math.abs(targetPosition!.coord[0] - originPosition!.coord[0]) >
-      Math.abs(targetPosition!.coord[1] - originPosition!.coord[1])
+      Math.abs(targetPosition[0] - originPosition[0]) >
+      Math.abs(targetPosition[1] - originPosition[1])
     ) {
       g.bezierCurveTo(
-        (originPosition!.coord[0] + targetPosition!.coord[0]) * 5,
-        originPosition!.coord[1] * 10,
-        (originPosition!.coord[0] + targetPosition!.coord[0]) * 5,
-        targetPosition!.coord[1] * 10,
-        targetPosition!.coord[0] * 10,
-        targetPosition!.coord[1] * 10
+        (originPosition[0] + targetPosition[0]) * 5,
+        originPosition[1] * 10,
+        (originPosition[0] + targetPosition[0]) * 5,
+        targetPosition[1] * 10,
+        targetPosition[0] * 10,
+        targetPosition[1] * 10
       );
     } else {
       g.bezierCurveTo(
-        originPosition!.coord[0] * 10,
-        (targetPosition!.coord[1] + originPosition!.coord[1]) * 5,
-        targetPosition!.coord[0] * 10,
-        (targetPosition!.coord[1] + originPosition!.coord[1]) * 5,
-        targetPosition!.coord[0] * 10,
-        targetPosition!.coord[1] * 10
+        originPosition[0] * 10,
+        (targetPosition[1] + originPosition[1]) * 5,
+        targetPosition[0] * 10,
+        (targetPosition[1] + originPosition[1]) * 5,
+        targetPosition[0] * 10,
+        targetPosition[1] * 10
       );
     }
   },
@@ -180,27 +216,33 @@ export const graphics: Graphics = {
   pathWithRange: ({ g, entity, viewport }) => {
     path({ g, entity, viewport });
     if (entity.cp.damage) {
+      const entityPos = add(
+        hecsToCartesian(
+          entity.sim.getOrThrow<Sector>(entity.cp.position!.sector).cp
+            .hecsPosition.value,
+          sectorSize / 10
+        ),
+        entity.cp.position!.coord
+      );
       g.lineStyle({
         width: 0.3,
         color: 0xff0000,
       })
         .drawCircle(
-          entity.cp.position!.coord[0] * 10,
-          entity.cp.position!.coord[1] * 10,
+          entityPos[0] * 10,
+          entityPos[1] * 10,
           entity.cp.damage.range * 10
         )
         .lineStyle({
           width: 0.2,
           color: 0x0000ff,
         })
-        .drawCircle(
-          entity.cp.position!.coord[0] * 10,
-          entity.cp.position!.coord[1] * 10,
-          spottingRadius * 10
-        );
+        .drawCircle(entityPos[0] * 10, entityPos[1] * 10, spottingRadius * 10);
     }
   },
   waypoint: ({ g, entity }) => {
+    g.zIndex = 1;
+
     const { position } = entity.requireComponents(["position"]).cp;
     g.lineStyle({
       alpha: 0.3,
@@ -223,7 +265,8 @@ export const graphics: Graphics = {
         : 0x3a3a3a,
       width: 5,
     });
-    g.drawRegularPolygon!(0, 0, sectorSize - 2.5, 6, Math.PI / 6);
+    g.beginFill(0x202020);
+    g.drawRegularPolygon!(0, 0, sectorSize - 2.5, 6, Math.PI / 6).endFill();
     const textGraphics = new PIXI.Text(name.value, {
       fill: 0x404040,
       fontFamily: "Space Mono",
@@ -270,6 +313,63 @@ export const graphics: Graphics = {
       }
     }
   },
+  fogOfWarGrid: ({ g, entity }) => {
+    g.lineStyle({
+      color: 0x323232,
+      width: 0.25,
+    });
+
+    const sectorMaps = FogOfWarUpdatingSystem.getMaps();
+    const divisions = FogOfWarUpdatingSystem.getDivisions();
+    const chunkSize = (sectorSize / divisions) * 2;
+
+    for (const sector of entity.sim.queries.sectors.get()) {
+      const pos = hecsToCartesian(sector.cp.hecsPosition.value, sectorSize);
+
+      for (let x = 0; x <= divisions; x += 1) {
+        for (let y = 0; y <= divisions; y += 1) {
+          if (sectorMaps[sector.id]?.[y * divisions + x]) {
+            g.beginFill(0x000000)
+              .drawRect(
+                pos[0] + chunkSize * (x - divisions / 2),
+                pos[1] + chunkSize * (y - divisions / 2),
+                (sectorSize / divisions) * 2,
+                (sectorSize / divisions) * 2
+              )
+              .endFill();
+          }
+        }
+      }
+
+      for (let x = -sectorSize + chunkSize; x <= sectorSize; x += chunkSize) {
+        let h = 0;
+        if (x <= -sectorSize / 2) {
+          h = Math.tan(Math.PI / 3) * (x + sectorSize) - 10;
+        } else if (x > -sectorSize / 2 && x <= sectorSize / 2) {
+          h = (sectorSize * Math.sqrt(3)) / 2 - 5;
+        } else if (x > sectorSize / 2) {
+          h = Math.tan(Math.PI / 3) * (sectorSize - x) - 10;
+        }
+        g.moveTo(pos[0] + x, pos[1] - h);
+        g.lineTo(pos[0] + x, pos[1] + h);
+      }
+      for (let y = -sectorSize; y <= sectorSize; y += chunkSize) {
+        if (
+          y > (-sectorSize * Math.sqrt(3)) / 2 &&
+          y < (sectorSize * Math.sqrt(3)) / 2
+        ) {
+          let h = 0;
+          if (y <= 0) {
+            h = Math.tan(Math.PI / 6) * (y + sectorSize) - 45 + sectorSize / 2;
+          } else {
+            h = Math.tan(Math.PI / 6) * (sectorSize - y) - 45 + sectorSize / 2;
+          }
+          g.moveTo(pos[0] - h, pos[1] + y);
+          g.lineTo(pos[0] + h, pos[1] + y);
+        }
+      }
+    }
+  },
 };
 
 export interface RenderGraphics<T extends keyof Graphics>
@@ -284,7 +384,7 @@ export function createRenderGraphics<T extends keyof Graphics>(
 ): RenderGraphics<T> {
   return {
     draw,
-    redraw: ["path", "pathWithRange"].includes(draw),
+    redraw: false,
     realTime: ["path", "pathWithRange"].includes(draw),
     name: "renderGraphics",
   };

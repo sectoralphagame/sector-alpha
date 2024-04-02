@@ -8,14 +8,14 @@ import { isHeadless } from "@core/settings";
 import { first } from "@fxts/core";
 import { storageHook } from "@core/hooks";
 import type { ContextMenuApi } from "@ui/atoms";
-import { worldToHecs } from "@core/components/hecsPosition";
-import { deepEqual } from "mathjs";
+import { hecsToCartesian, worldToHecs } from "@core/components/hecsPosition";
+import { deepEqual, subtract } from "mathjs";
+import { sectorSize, type Sector } from "@core/archetypes/sector";
 import {
   createRenderGraphics,
   graphics,
 } from "../../components/renderGraphics";
 import type { RequireComponent } from "../../tsHelpers";
-import type { Cooldowns } from "../../utils/cooldowns";
 import { SystemWithHooks } from "../utils/hooks";
 import { clearFocus } from "../../components/selection";
 import type { Layer, Textures } from "../../components/render";
@@ -56,14 +56,13 @@ export function setTexture(
   }
 }
 
-export class RenderingSystem extends SystemWithHooks<"graphics"> {
+export class RenderingSystem extends SystemWithHooks<never> {
   rendering: true;
   settingsManager: RequireComponent<"selectionManager" | "camera">;
   viewport: Viewport;
   app: PIXI.Application;
   initialized = false;
   resizeObserver: ResizeObserver;
-  cooldowns: Cooldowns<"graphics">;
   dragging: boolean = false;
   keysPressed = new Set<string>();
   toolbar: HTMLDivElement;
@@ -277,16 +276,22 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
           event.offsetY
         );
         const worldPosition = [worldX / 10, worldY / 10];
-        const sectors = this.sim.queries.sectors.get();
+        const sector =
+          this.sim.queries.sectors.get().find((s) => {
+            const ww = worldToHecs([worldPosition[0], worldPosition[1]]);
+            return deepEqual(s.cp.hecsPosition.value, ww);
+          }) ?? null;
+
         const data = {
           active: true,
           position: [event.clientX, event.clientY],
-          worldPosition,
-          sector:
-            sectors.find((s) => {
-              const ww = worldToHecs([worldPosition[0], worldPosition[1]]);
-              return deepEqual(s.cp.hecsPosition.value, ww);
-            }) ?? null,
+          worldPosition: sector
+            ? subtract(
+                worldPosition,
+                hecsToCartesian(sector.cp.hecsPosition.value, sectorSize / 10)
+              )
+            : [0, 0],
+          sector,
         };
         setMenu(data);
       }, 40);
@@ -319,88 +324,92 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   updateGraphics = () => {
     for (const entity of this.sim.queries.renderableGraphics.getIt()) {
       let g = this.graphics.get(entity);
-      if (entity.cp.renderGraphics.redraw || !g) {
-        if (
-          entity.cp.renderGraphics.realTime ||
-          this.cooldowns.canUse("graphics")
-        ) {
-          if (!g) {
-            g = new PIXI.Graphics();
-            this.graphics.set(entity, g);
-            this.viewport.addChild(g);
-          } else {
-            g.children.forEach((c) => c.destroy());
-            g.clear();
-          }
-          graphics[entity.cp.renderGraphics.draw]({
-            g,
-            entity,
-            viewport: this.viewport,
-          });
+      if (
+        entity.cp.renderGraphics.redraw ||
+        entity.cp.renderGraphics.realTime ||
+        !g
+      ) {
+        if (!g) {
+          g = new PIXI.Graphics();
+          this.graphics.set(entity, g);
+          this.viewport.addChild(g);
+        } else {
+          g.children.forEach((c) => c.destroy());
+          g.clear();
         }
+        graphics[entity.cp.renderGraphics.draw]({
+          g,
+          entity,
+          viewport: this.viewport,
+        });
+        entity.cp.renderGraphics.redraw = false;
       }
-    }
-
-    if (this.cooldowns.canUse("graphics")) {
-      this.cooldowns.use("graphics", this.sim.speed);
     }
   };
 
   updateRenderables = () => {
-    for (const entity of this.sim.queries.renderable.getIt()) {
-      const entityRender = entity.cp.render;
-      let sprite = this.sprites.get(entity);
+    for (const sectorId of this.sectorIndex.sectors.keys()) {
+      const sector = this.sim.getOrThrow<Sector>(sectorId);
+      const sectorPos = hecsToCartesian(
+        sector.cp.hecsPosition.value,
+        sectorSize / 10
+      );
 
-      if (!sprite) {
-        sprite = new PIXI.Sprite();
-        setTexture(entity, sprite, entityRender.texture);
-        this.sprites.set(entity, sprite);
-        this.viewport.addChild(sprite);
-        if (entity.tags.has("selection")) {
-          sprite.interactive = true;
-          sprite.addEventListener("pointerdown", (event) => {
-            if (event.button === 0) {
-              this.settingsManager.cp.selectionManager.id = entity.id;
+      for (const entity of this.sectorIndex.sectors.get(sectorId)!) {
+        const entityRender = entity.cp.render;
+        let sprite = this.sprites.get(entity);
 
-              if (Date.now() - this.lastClicked < 200) {
-                this.settingsManager.cp.selectionManager.focused = true;
+        if (!sprite) {
+          sprite = new PIXI.Sprite();
+          setTexture(entity, sprite, entityRender.texture);
+          this.sprites.set(entity, sprite);
+          this.viewport.addChild(sprite);
+          if (entity.tags.has("selection")) {
+            sprite.interactive = true;
+            sprite.addEventListener("pointerdown", (event) => {
+              if (event.button === 0) {
+                this.settingsManager.cp.selectionManager.id = entity.id;
+
+                if (Date.now() - this.lastClicked < 200) {
+                  this.settingsManager.cp.selectionManager.focused = true;
+                }
+
+                this.lastClicked = Date.now();
               }
+            });
+            sprite.addEventListener("rightdown", () => {
+              this.settingsManager.cp.selectionManager.secondaryId = entity.id;
+            });
+            sprite.cursor = "pointer";
+          }
 
-              this.lastClicked = Date.now();
-            }
-          });
-          sprite.addEventListener("rightdown", () => {
-            this.settingsManager.cp.selectionManager.secondaryId = entity.id;
-          });
-          sprite.cursor = "pointer";
+          sprite.tint = entityRender.color;
+          this.layers[entityRender.layer].addChild(sprite);
+          this.updateEntityScaling(entity);
+          entity.cp.position.moved = true;
         }
 
-        sprite.tint = entityRender.color;
-        this.layers[entityRender.layer].addChild(sprite);
-        this.updateEntityScaling(entity);
-        entity.cp.position.moved = true;
-      }
+        drawHpBars(entity, sprite);
 
-      drawHpBars(entity, sprite);
+        if (entity.cp.position.moved) {
+          entity.cp.position.moved = false;
 
-      if (entity.cp.position.moved) {
-        entity.cp.position.moved = false;
+          sprite!.position.set(
+            (sectorPos[0] + entity.cp.position.coord[0]) * 10,
+            (sectorPos[1] + entity.cp.position.coord[1]) * 10
+          );
+          sprite!.rotation = entity.cp.position.angle;
+        }
 
-        sprite!.position.set(
-          entity.cp.position.coord[0] * 10,
-          entity.cp.position.coord[1] * 10
-        );
-        sprite!.rotation = entity.cp.position.angle;
-      }
-
-      if (getTexture(entityRender.texture) !== sprite?.texture) {
-        setTexture(entity, sprite!, entityRender.texture);
-      }
-      if (entity.tags.has("selection") !== sprite?.interactive) {
-        sprite!.interactive = entity.tags.has("selection");
-      }
-      if (entityRender.visible !== sprite?.visible) {
-        sprite!.visible = entityRender.visible;
+        if (getTexture(entityRender.texture) !== sprite?.texture) {
+          setTexture(entity, sprite!, entityRender.texture);
+        }
+        if (entity.tags.has("selection") !== sprite?.interactive) {
+          sprite!.interactive = entity.tags.has("selection");
+        }
+        if (entityRender.visible !== sprite?.visible) {
+          sprite!.visible = entityRender.visible;
+        }
       }
     }
   };
@@ -417,7 +426,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
       previousSelected!.removeComponent("renderGraphics");
     }
 
-    for (const entity of this.sim.queries.renderable.getIt()) {
+    for (const entity of this.sectorIndex.all()) {
       const entityRender = entity.cp.render;
       const sprite = this.sprites.get(entity);
       const selected =
@@ -465,7 +474,7 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
   };
 
   updateScaling = () => {
-    for (const entity of this.sim.queries.renderable.getIt()) {
+    for (const entity of this.sectorIndex.all()) {
       this.updateEntityScaling(entity);
     }
 
@@ -559,8 +568,8 @@ export class RenderingSystem extends SystemWithHooks<"graphics"> {
     }
 
     setTimeout(() => {
-      this.updateViewport();
       this.updateGraphics();
+      this.updateViewport();
       this.updateRenderables();
     }, 0);
   };

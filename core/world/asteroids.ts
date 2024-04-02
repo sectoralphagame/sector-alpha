@@ -1,11 +1,10 @@
-import { add, random } from "mathjs";
+import { random } from "mathjs";
 import type { Position2D } from "@core/components/position";
 import type { MineableCommodity } from "../economy/commodity";
 import { createAsteroidField } from "../archetypes/asteroidField";
 import type { Sim } from "../sim";
 import type { Sector } from "../archetypes/sector";
 import { sectorSize } from "../archetypes/sector";
-import { hecsToCartesian } from "../components/hecsPosition";
 
 const densities: Record<MineableCommodity, [number, number]> = {
   fuelium: [100, 600],
@@ -31,21 +30,14 @@ export function spawnAsteroidField(
 ) {
   const maxR = (sectorSize / 20) * Math.sqrt(3);
 
-  const sectorCenterPosition = hecsToCartesian(
-    sector.cp.hecsPosition.value,
-    sectorSize / 10
-  );
   const polarPosition = {
     r: random(0, maxR - size - 0.5),
     a: random(-Math.PI, Math.PI),
   };
-  const position = add(
-    [
-      polarPosition.r * Math.cos(polarPosition.a),
-      polarPosition.r * Math.sin(polarPosition.a),
-    ],
-    sectorCenterPosition
-  ) as Position2D;
+  const position: Position2D = [
+    polarPosition.r * Math.cos(polarPosition.a),
+    polarPosition.r * Math.sin(polarPosition.a),
+  ];
 
   createAsteroidField(sim, position, sector, {
     asteroidResources: {

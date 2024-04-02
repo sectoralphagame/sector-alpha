@@ -33,7 +33,8 @@ export const TradeFinder: React.FC = () => {
               entity.cp.trade.offers[selectedCommodity].quantity > 0 &&
               sim.queries.player.get()[0].cp.relations.values[
                 entity.cp.owner.id
-              ] > relationThresholds.trade
+              ] > relationThresholds.trade &&
+              entity.tags.has("discovered")
           ),
         `components.trade.offers.${selectedCommodity}.price`
       ),

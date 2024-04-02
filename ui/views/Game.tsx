@@ -49,6 +49,7 @@ const Game: React.FC = () => {
   const [overlay, setOverlay] = useGameOverlay();
   const { addNotification } = useNotifications();
   const [gameSettings] = useGameSettings();
+  const pressedKeys = React.useRef(new Set<string>());
 
   const selectedId = sim.queries.settings.get()[0]!.cp.selectionManager.id;
   const [selectedEntity, setSelectedEntity] = React.useState<
@@ -94,7 +95,9 @@ const Game: React.FC = () => {
   }, [menu.active]);
 
   React.useEffect(() => {
-    const handler = (event: KeyboardEvent) => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      pressedKeys.current.add(event.code);
+
       if (event.code === "Escape") {
         if (overlay) {
           setOverlay(null);
@@ -119,11 +122,24 @@ const Game: React.FC = () => {
         if (sim.speed === 0) sim.unpause();
         else sim.pause();
       }
+
+      if (
+        event.code.startsWith("Digit") &&
+        pressedKeys.current.has("ShiftLeft")
+      ) {
+        if (event.code === "Digit1") sim.setSpeed(1);
+        if (event.code === "Digit2") sim.setSpeed(5);
+        if (event.code === "Digit3" && gameSettings.dev) sim.setSpeed(50);
+      }
+    };
+    const onKeyUp = (event: KeyboardEvent) => {
+      pressedKeys.current.delete(event.code);
     };
 
-    document.addEventListener("keydown", handler);
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keyup", onKeyUp);
 
-    return () => document.removeEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", onKeyDown);
   }, [setDialog, overlay, gameSettings.dev]);
 
   React.useEffect(() => {
