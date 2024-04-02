@@ -218,14 +218,6 @@ export class Sim extends BaseSim {
         : v
     );
     const sim = plainToInstance(Sim, save);
-    config.systems.forEach((system) => system.apply(sim));
-    Object.values(sim.queries).forEach((indexOrNested) => {
-      if (indexOrNested instanceof Index) {
-        indexOrNested.reset();
-      } else {
-        Object.values(indexOrNested).forEach((index) => index.reset());
-      }
-    });
     const entityMap = new Map();
 
     sim.entities.forEach((entity) => {
@@ -244,6 +236,15 @@ export class Sim extends BaseSim {
     });
 
     sim.entities = entityMap;
+
+    config.systems.forEach((system) => system.apply(sim));
+    Object.values(sim.queries).forEach((indexOrNested) => {
+      if (indexOrNested instanceof Index) {
+        indexOrNested.reset();
+      } else {
+        Object.values(indexOrNested).forEach((index) => index.reset());
+      }
+    });
 
     return sim;
   }

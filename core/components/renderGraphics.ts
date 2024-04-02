@@ -5,6 +5,7 @@ import type { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
 import { spottingRadius } from "@core/systems/ai/spotting";
 import { first } from "@fxts/core";
+import { FogOfWarUpdatingSystem } from "@core/systems/fogOfWarUpdating";
 import type { Sector } from "../archetypes/sector";
 import { sectorSize } from "../archetypes/sector";
 import { findInAncestors } from "../utils/findInAncestors";
@@ -24,6 +25,7 @@ const path = ({
 }) => {
   if (!entity.hasComponents(["orders"])) return;
 
+  g.zIndex = 1;
   const { orders } = entity.requireComponents(["orders"]).cp;
   const origin = findInAncestors(entity, "position");
   const originPosition: Position2D = add(
@@ -85,12 +87,14 @@ export type Graphics = Record<
   | "sector"
   | "path"
   | "pathWithRange"
-  | "hexGrid",
+  | "hexGrid"
+  | "fogOfWarGrid",
   // eslint-disable-next-line no-unused-vars
   (opts: { g: PIXI.Graphics; entity: Entity; viewport: Viewport }) => void
 >;
 export const graphics: Graphics = {
   asteroidField: ({ g, entity }) => {
+    g.zIndex = 1;
     const { position: posInSector, asteroidSpawn } = entity.requireComponents([
       "asteroidSpawn",
       "position",
@@ -130,6 +134,7 @@ export const graphics: Graphics = {
       );
   },
   link: ({ g, entity }) => {
+    g.zIndex = 1;
     const { teleport } = entity.requireComponents(["teleport"]).cp;
     const origin = findInAncestors(entity, "position");
     const originPosition: Position2D = add(
@@ -211,27 +216,33 @@ export const graphics: Graphics = {
   pathWithRange: ({ g, entity, viewport }) => {
     path({ g, entity, viewport });
     if (entity.cp.damage) {
+      const entityPos = add(
+        hecsToCartesian(
+          entity.sim.getOrThrow<Sector>(entity.cp.position!.sector).cp
+            .hecsPosition.value,
+          sectorSize / 10
+        ),
+        entity.cp.position!.coord
+      );
       g.lineStyle({
         width: 0.3,
         color: 0xff0000,
       })
         .drawCircle(
-          entity.cp.position!.coord[0] * 10,
-          entity.cp.position!.coord[1] * 10,
+          entityPos[0] * 10,
+          entityPos[1] * 10,
           entity.cp.damage.range * 10
         )
         .lineStyle({
           width: 0.2,
           color: 0x0000ff,
         })
-        .drawCircle(
-          entity.cp.position!.coord[0] * 10,
-          entity.cp.position!.coord[1] * 10,
-          spottingRadius * 10
-        );
+        .drawCircle(entityPos[0] * 10, entityPos[1] * 10, spottingRadius * 10);
     }
   },
   waypoint: ({ g, entity }) => {
+    g.zIndex = 1;
+
     const { position } = entity.requireComponents(["position"]).cp;
     g.lineStyle({
       alpha: 0.3,
@@ -254,7 +265,8 @@ export const graphics: Graphics = {
         : 0x3a3a3a,
       width: 5,
     });
-    g.drawRegularPolygon!(0, 0, sectorSize - 2.5, 6, Math.PI / 6);
+    g.beginFill(0x202020);
+    g.drawRegularPolygon!(0, 0, sectorSize - 2.5, 6, Math.PI / 6).endFill();
     const textGraphics = new PIXI.Text(name.value, {
       fill: 0x404040,
       fontFamily: "Space Mono",
@@ -301,6 +313,63 @@ export const graphics: Graphics = {
       }
     }
   },
+  fogOfWarGrid: ({ g, entity }) => {
+    g.lineStyle({
+      color: 0x323232,
+      width: 0.25,
+    });
+
+    const sectorMaps = FogOfWarUpdatingSystem.getMaps();
+    const divisions = FogOfWarUpdatingSystem.getDivisions();
+    const chunkSize = (sectorSize / divisions) * 2;
+
+    for (const sector of entity.sim.queries.sectors.get()) {
+      const pos = hecsToCartesian(sector.cp.hecsPosition.value, sectorSize);
+
+      for (let x = 0; x <= divisions; x += 1) {
+        for (let y = 0; y <= divisions; y += 1) {
+          if (sectorMaps[sector.id]?.[y * divisions + x]) {
+            g.beginFill(0x000000)
+              .drawRect(
+                pos[0] + chunkSize * (x - divisions / 2),
+                pos[1] + chunkSize * (y - divisions / 2),
+                (sectorSize / divisions) * 2,
+                (sectorSize / divisions) * 2
+              )
+              .endFill();
+          }
+        }
+      }
+
+      for (let x = -sectorSize + chunkSize; x <= sectorSize; x += chunkSize) {
+        let h = 0;
+        if (x <= -sectorSize / 2) {
+          h = Math.tan(Math.PI / 3) * (x + sectorSize) - 10;
+        } else if (x > -sectorSize / 2 && x <= sectorSize / 2) {
+          h = (sectorSize * Math.sqrt(3)) / 2 - 5;
+        } else if (x > sectorSize / 2) {
+          h = Math.tan(Math.PI / 3) * (sectorSize - x) - 10;
+        }
+        g.moveTo(pos[0] + x, pos[1] - h);
+        g.lineTo(pos[0] + x, pos[1] + h);
+      }
+      for (let y = -sectorSize; y <= sectorSize; y += chunkSize) {
+        if (
+          y > (-sectorSize * Math.sqrt(3)) / 2 &&
+          y < (sectorSize * Math.sqrt(3)) / 2
+        ) {
+          let h = 0;
+          if (y <= 0) {
+            h = Math.tan(Math.PI / 6) * (y + sectorSize) - 45 + sectorSize / 2;
+          } else {
+            h = Math.tan(Math.PI / 6) * (sectorSize - y) - 45 + sectorSize / 2;
+          }
+          g.moveTo(pos[0] - h, pos[1] + y);
+          g.lineTo(pos[0] + h, pos[1] + y);
+        }
+      }
+    }
+  },
 };
 
 export interface RenderGraphics<T extends keyof Graphics>
@@ -315,7 +384,7 @@ export function createRenderGraphics<T extends keyof Graphics>(
 ): RenderGraphics<T> {
   return {
     draw,
-    redraw: ["path", "pathWithRange"].includes(draw),
+    redraw: false,
     realTime: ["path", "pathWithRange"].includes(draw),
     name: "renderGraphics",
   };
