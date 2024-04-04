@@ -1,6 +1,8 @@
 import type { Reward } from "@core/components/missions";
+import settings from "@core/settings";
 import type { Sim } from "@core/sim";
 import { pickRandom } from "@core/utils/generators";
+import { gameDay } from "@core/utils/misc";
 import { first } from "@fxts/core";
 import { System } from "../system";
 import type { MissionHandler } from "./types";
@@ -36,7 +38,9 @@ export class MissionSystem extends System<"generate" | "track"> {
         description: "Generate a new mission",
         category: "mission",
         type: "basic",
-        fn: () => this.generate(true),
+        fn: (_sim: Sim, template?: string) => {
+          this.generate(true, template);
+        },
       },
       this.constructor.name
     );
@@ -70,11 +74,21 @@ export class MissionSystem extends System<"generate" | "track"> {
     });
   };
 
-  generate = (force: boolean) => {
+  generate = (force: boolean, template?: string) => {
     if (!this.cooldowns.canUse("generate") && !force) return;
     this.cooldowns.use("generate", 1 + Math.random());
 
     const player = this.sim.queries.player.get()[0];
+
+    if (
+      this.sim.getTime() - settings.bootTime < gameDay &&
+      player.cp.missions.offer === null
+    ) {
+      player.cp.missions.offer = this.handlers.mission[
+        "main.ffw.tutorial.miner"
+      ].generate(this.sim);
+      return;
+    }
 
     if (
       ((player.cp.missions.value.length < 3 &&
@@ -87,9 +101,17 @@ export class MissionSystem extends System<"generate" | "track"> {
         force) &&
       player.cp.missions.offer === null
     ) {
-      player.cp.missions.offer = pickRandom(
-        Object.values(this.handlers.mission)
-      ).generate(this.sim);
+      if (template) {
+        player.cp.missions.offer = this.handlers.mission[template].generate(
+          this.sim
+        );
+      } else {
+        player.cp.missions.offer = pickRandom(
+          Object.entries(this.handlers.mission)
+            .filter(([key]) => key.startsWith("main."))
+            .map(([, data]) => data)
+        ).generate(this.sim);
+      }
     }
   };
 

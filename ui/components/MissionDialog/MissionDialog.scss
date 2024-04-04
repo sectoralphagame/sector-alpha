@@ -1,3 +1,5 @@
+@import "../../../kit/theming/global.scss";
+
 $actions: 56px;
 $responses: 200px;
 $log: 300px;
@@ -7,12 +9,12 @@ $log: 300px;
   display: grid;
   grid-template-columns: 100px 1fr;
   grid-auto-rows: min-content;
-  gap: var(--spacing);
+  gap: $spacing;
   height: $log;
   overflow-y: scroll;
 
   &NoResponses {
-    height: $log + $responses - $actions;
+    height: $log + $responses - $actions + $spacing * 2;
   }
 }
 
@@ -20,9 +22,10 @@ $log: 300px;
   border-top: 1px solid var(--palette-border);
   height: $responses;
   overflow-y: scroll;
+  margin-top: $spacing * 2;
 
   li {
-    margin-bottom: var(--spacing-2);
+    margin-bottom: $spacing * 2;
   }
 
   button {

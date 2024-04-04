@@ -9,3 +9,22 @@ export interface MissionHandler {
   update: (_mission: Mission, _sim: Sim) => void;
   formatProgress: (_mission: Mission) => string;
 }
+
+export interface MissionConversation {
+  Start: string;
+  Actors: {
+    [k: string]: {
+      name?: string;
+      lines: {
+        [k: string]: {
+          text: string;
+          next?: string;
+          set?: {
+            status?: string;
+            flags?: string[];
+          };
+        };
+      };
+    };
+  };
+}

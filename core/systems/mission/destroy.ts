@@ -115,7 +115,7 @@ export const destroyMissionHandler: MissionHandler = {
     return {
       title: transform(template.title),
       prompt: transform(template.prompt),
-      actorName: "Local Police",
+      actorName: template.actorName,
       responses: template.responses.map((r) => ({
         next: transform(r.next),
         text: transform(r.text),

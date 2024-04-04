@@ -1,0 +1,31 @@
+Start: Russo.greeting
+
+Actors:
+  Russo:
+    name: Adm. Raphael Russo
+    lines:
+      greeting:
+        text: This is Admiral Russo speaking. I am your new commanding officer at Federation of Free Worlds' Space Force, and I will be guiding you through your training. I expect you to follow my orders to the letter, and I will not tolerate any insubordination. Do you understand?
+        next: player.greeting
+      instructions:
+        text: Good. Now, let's get started. Your first task is to mine some ore from the nearby field. You will need to use your mining laser to extract the ore from the asteroids. We already sent you a Slate-class mining ship so you wouldn't have to worry about that. Do you have any questions?
+        next: player.instructions, player.instructions_question
+      instructions_question:
+        text: Simply select the mining ship with LMB, and then right-click on the asteroid you want to mine. A menu will appear with the option to start mining.
+        next: Russo.instructions2
+      instructions2:
+        text: Very well. Report back to me when you have completed your task.
+        set:
+          status: accepted
+
+  player:
+    lines:
+      greeting:
+        text: Yes, sir.
+        next: Russo.instructions
+      instructions:
+        text: No, sir.
+        next: Russo.instructions2
+      instructions_question:
+        text: Yes, sir. How do I order the ship to start mining?
+        next: Russo.instructions_question

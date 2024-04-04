@@ -20,6 +20,7 @@ import { InflationStatisticGatheringSystem } from "@core/systems/inflationStatis
 import { MiningSystem } from "@core/systems/mining";
 import { MissionSystem } from "@core/systems/mission";
 import { destroyMissionHandler } from "@core/systems/mission/destroy";
+import { mainFfwTutorialMinerMissionHandler } from "@core/systems/mission/main/ffw/tutorial-miner";
 import { patrolMissionHandler } from "@core/systems/mission/patrol";
 import {
   moneyRewardHandler,
@@ -82,6 +83,7 @@ export const createBaseConfig = (): SimConfig => {
         {
           patrol: patrolMissionHandler,
           destroy: destroyMissionHandler,
+          "main.ffw.tutorial.miner": mainFfwTutorialMinerMissionHandler,
         },
         {
           money: moneyRewardHandler,

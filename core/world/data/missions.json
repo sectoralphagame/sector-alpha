@@ -150,5 +150,21 @@
       ],
       "variant": "facilityRaid"
     }
+  ],
+  "main.ffw.tutorial.miner": [
+    {
+      "title": "Greetings!",
+      "actorName": "Adm. Raphael Russo",
+      "description": "Admiral Russo wants you to show your resource management skills. Deploy miner to gather ice from the asteroid field from the Pontus sector.",
+      "prompt": "This is Admiral Raphael Russo speaking. Your resource management skills have become the stuff of legend, a beacon of efficiency amidst the chaos of the cosmos.\nUnder your astute guidance, our fleets have flourished, our coffers overflowed, and our enemies trembled. Your dedication to the cause has not only secured our survival but propelled us towards greatness.\nNow, as the stars themselves seem to align in your favor, I, Admiral Raphael Russo, extend a hand of opportunity. With the weight of your accomplishments firmly upon your shoulders, I offer you a chance of unparalleled significance: command of your very own fleet.\nYour prowess in resource management has not gone unnoticed, Commander. It is time to harness that talent, to lead our forces to victory and carve our mark upon the galaxy.\nThe stars beckon, Commander. Will you seize this opportunity and forge your destiny among them?",
+      "responses": [
+        {
+          "text": "Affirmative. My fleet will engage and neutralize the pirate ships in {{sector}}.",
+          "next": "Thank you, Commander. Your fleet's intervention will ensure the safety of our civilian vessels and restore peace in the sector.",
+          "type": "accept"
+        }
+      ],
+      "variant": "ships"
+    }
   ]
 }
