@@ -31,25 +31,22 @@ export class Sim extends BaseSim {
   @Expose()
   entityIdCounter: number = 0;
   hooks: {
-    addComponent: Observable<
-      [{ entity: Entity; component: keyof CoreComponents }]
-    >;
-    removeComponent: Observable<
-      [
-        {
-          entity: Entity;
-          component: keyof CoreComponents;
-        }
-      ]
-    >;
-    addTag: Observable<[{ entity: Entity; tag: EntityTag }]>;
-    removeTag: Observable<[{ entity: Entity; tag: EntityTag }]>;
-    removeEntity: Observable<[Entity]>;
-    destroy: Observable<[]>;
+    addComponent: Observable<{
+      entity: Entity;
+      component: keyof CoreComponents;
+    }>;
+    removeComponent: Observable<{
+      entity: Entity;
+      component: keyof CoreComponents;
+    }>;
+    addTag: Observable<{ entity: Entity; tag: EntityTag }>;
+    removeTag: Observable<{ entity: Entity; tag: EntityTag }>;
+    removeEntity: Observable<Entity>;
+    destroy: Observable<void>;
 
     phase: Record<
       "start" | "init" | "update" | "render" | "cleanup" | "end",
-      Observable<[number]>
+      Observable<number>
     >;
   };
 

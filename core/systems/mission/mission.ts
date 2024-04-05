@@ -59,6 +59,8 @@ export class MissionSystem extends System<"generate" | "track"> {
         player.cp.missions.value = player.cp.missions.value.filter(
           (m) => m !== mission
         );
+
+        return;
       }
 
       if (this.handlers.mission[mission.type].isCompleted(mission, this.sim)) {
