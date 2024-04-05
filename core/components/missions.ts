@@ -1,4 +1,4 @@
-import type { MissionOffer } from "@ui/components/MissionDialog";
+import type { MissionConversation } from "@core/systems/mission/types";
 import type { BaseComponent } from "./component";
 
 export type Reward = {
@@ -23,11 +23,18 @@ export interface MissionCommon {
     max: number;
     label?: string;
   };
+  cancellable: boolean;
 }
 export type Mission = MissionCommon & {
   type: string;
   [key: string]: any;
 };
+
+export interface MissionOffer {
+  conversation: MissionConversation;
+  rewards: Reward[];
+  type: string;
+}
 
 export interface Missions extends BaseComponent<"missions"> {
   /**

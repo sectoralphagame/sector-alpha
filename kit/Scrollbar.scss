@@ -1,0 +1,7 @@
+.root {
+  ::before {
+    background-color: var(--palette-primary);
+  }
+
+  padding-right: var(--spacing-3);
+}

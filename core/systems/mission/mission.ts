@@ -1,8 +1,6 @@
 import type { Reward } from "@core/components/missions";
-import settings from "@core/settings";
 import type { Sim } from "@core/sim";
 import { pickRandom } from "@core/utils/generators";
-import { gameDay } from "@core/utils/misc";
 import { first } from "@fxts/core";
 import { System } from "../system";
 import type { MissionHandler } from "./types";
@@ -81,7 +79,7 @@ export class MissionSystem extends System<"generate" | "track"> {
     const player = this.sim.queries.player.get()[0];
 
     if (
-      this.sim.getTime() - settings.bootTime < gameDay &&
+      !player.tags.has("mainQuestStarted") &&
       player.cp.missions.offer === null
     ) {
       player.cp.missions.offer = this.handlers.mission[
@@ -108,7 +106,7 @@ export class MissionSystem extends System<"generate" | "track"> {
       } else {
         player.cp.missions.offer = pickRandom(
           Object.entries(this.handlers.mission)
-            .filter(([key]) => key.startsWith("main."))
+            .filter(([key]) => !key.startsWith("main."))
             .map(([, data]) => data)
         ).generate(this.sim);
       }

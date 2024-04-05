@@ -23,20 +23,15 @@
                   "type": "string"
                 },
                 "next": {
-                  "type": "string"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "set": {
                   "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string"
-                    },
-                    "flags": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
+                  "additionalProperties": {
+                    "type": "string"
                   }
                 }
               },

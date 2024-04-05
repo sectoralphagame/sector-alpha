@@ -70,16 +70,18 @@ export const MissionsOverlayComponent: React.FC<
                   </div>
                 ))}
               </div>
-              <Button
-                onClick={() => {
-                  if (selected > 0) {
-                    setSelected(selected - 1);
-                  }
-                  onMissionCancel(selected);
-                }}
-              >
-                Cancel mission
-              </Button>
+              {missions[selected].cancellable && (
+                <Button
+                  onClick={() => {
+                    if (selected > 0) {
+                      setSelected(selected - 1);
+                    }
+                    onMissionCancel(selected);
+                  }}
+                >
+                  Cancel mission
+                </Button>
+              )}
             </div>
           </div>
         )}

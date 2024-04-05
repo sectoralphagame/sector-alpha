@@ -4,18 +4,20 @@ $actions: 56px;
 $responses: 200px;
 $log: 300px;
 
+.scrollable {
+  height: $log;
+
+  &NoResponses {
+    height: $log + $responses - $actions + $spacing * 2;
+  }
+}
+
 .log {
   user-select: none;
   display: grid;
   grid-template-columns: 100px 1fr;
   grid-auto-rows: min-content;
   gap: $spacing;
-  height: $log;
-  overflow-y: scroll;
-
-  &NoResponses {
-    height: $log + $responses - $actions + $spacing * 2;
-  }
 }
 
 .responses {

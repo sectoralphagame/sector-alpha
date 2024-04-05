@@ -118,6 +118,7 @@
     "recoil": "^0.7.5",
     "reflect-metadata": "^0.1.13",
     "sharp": "^0.32.0",
+    "simplebar-react": "^3.2.4",
     "spritesmith": "^3.4.1"
   },
   "lint-staged": {

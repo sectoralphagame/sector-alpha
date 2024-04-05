@@ -144,12 +144,16 @@ const Game: React.FC = () => {
 
   React.useEffect(() => {
     if (player.cp.missions.offer) {
-      addNotification({
-        icon: "question",
-        message: "New mission offer",
-        type: "warning",
-        onClick: () => setDialog({ type: "missionOffer" }),
-      });
+      if (player.cp.missions.offer.type === "main.ffw.tutorial.miner") {
+        setDialog({ type: "missionOffer" });
+      } else {
+        addNotification({
+          icon: "question",
+          message: "New mission offer",
+          type: "warning",
+          onClick: () => setDialog({ type: "missionOffer" }),
+        });
+      }
     }
   }, [player.cp.missions.offer]);
 

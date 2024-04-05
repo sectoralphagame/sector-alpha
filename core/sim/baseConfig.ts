@@ -19,9 +19,9 @@ import { HitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating
 import { InflationStatisticGatheringSystem } from "@core/systems/inflationStatisticGathering";
 import { MiningSystem } from "@core/systems/mining";
 import { MissionSystem } from "@core/systems/mission";
-import { destroyMissionHandler } from "@core/systems/mission/destroy";
+// import { destroyMissionHandler } from "@core/systems/mission/destroy";
 import { mainFfwTutorialMinerMissionHandler } from "@core/systems/mission/main/ffw/tutorial-miner";
-import { patrolMissionHandler } from "@core/systems/mission/patrol";
+// import { patrolMissionHandler } from "@core/systems/mission/patrol";
 import {
   moneyRewardHandler,
   relationRewardHandler,
@@ -81,8 +81,8 @@ export const createBaseConfig = (): SimConfig => {
       new CollectibleUnregisteringSystem(),
       new MissionSystem(
         {
-          patrol: patrolMissionHandler,
-          destroy: destroyMissionHandler,
+          // patrol: patrolMissionHandler,
+          // destroy: destroyMissionHandler,
           "main.ffw.tutorial.miner": mainFfwTutorialMinerMissionHandler,
         },
         {

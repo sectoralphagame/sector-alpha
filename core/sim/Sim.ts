@@ -56,6 +56,7 @@ export class Sim extends BaseSim {
   @Expose()
   @Type(() => Entity)
   entities: Map<number, Entity>;
+  systems: System[];
   queries: Queries;
   paths: Record<string, Record<string, Path>>;
 
@@ -84,8 +85,9 @@ export class Sim extends BaseSim {
     };
 
     this.queries = createQueries(this);
+    this.systems = systems;
 
-    systems.forEach((system) => system.apply(this));
+    this.systems.forEach((system) => system.apply(this));
   }
 
   registerEntity = (entity: Entity) => {
@@ -237,6 +239,7 @@ export class Sim extends BaseSim {
 
     sim.entities = entityMap;
 
+    sim.systems = config.systems;
     config.systems.forEach((system) => system.apply(sim));
     Object.values(sim.queries).forEach((indexOrNested) => {
       if (indexOrNested instanceof Index) {

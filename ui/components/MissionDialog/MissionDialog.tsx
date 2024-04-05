@@ -1,8 +1,9 @@
 import { useGameDialog, useSim } from "@ui/atoms";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
 import React from "react";
+import { MissionSystem } from "@core/systems/mission";
 import type { ModalProps } from "../ConfigDialog";
-import { MissionDialogComponent } from "./MissionDialogComponent";
+import { ConversationDialog } from "../ConversationDialog";
 
 export interface MissionDialogProps {
   type: "missionOffer";
@@ -22,18 +23,26 @@ export const MissionDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   if (dialog?.type !== "missionOffer") return null;
 
   return (
-    <MissionDialogComponent
-      mission={sim.queries.player.get()[0]!.cp.missions.offer!}
+    <ConversationDialog
+      conversation={
+        sim.queries.player.get()[0]!.cp.missions.offer!.conversation
+      }
       open={open}
-      onAccept={() => {
-        const player = sim.queries.player.get()[0]!;
-        player.cp.missions.value.push({
-          ...player.cp.missions.offer!.data,
-          accepted: sim.getTime(),
-        });
-      }}
-      onDecline={() => {
-        sim.queries.player.get()[0]!.cp.missions.declined = sim.getTime();
+      onEnd={(flags) => {
+        if (flags.status === "accepted") {
+          const player = sim.queries.player.get()[0]!;
+          const missionSystem = sim.systems.find(
+            (s) => s instanceof MissionSystem
+          ) as MissionSystem;
+          player.cp.missions.value.push({
+            ...missionSystem.handlers.mission[
+              player.cp.missions.offer!.type
+            ].accept(sim, player.cp.missions.offer!),
+            accepted: sim.getTime(),
+          });
+        } else {
+          sim.queries.player.get()[0]!.cp.missions.declined = sim.getTime();
+        }
       }}
       onClose={() => {
         onClose();
