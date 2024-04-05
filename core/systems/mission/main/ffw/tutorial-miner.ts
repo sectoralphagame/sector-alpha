@@ -11,7 +11,7 @@ import conversation from "../../../../world/data/missions/main/ffw/tutorial-mine
 Mustache.escape = (text) => text;
 
 interface MainFfwTutorialMinerMission extends Mission {
-  type: "main.ffw.tutorial.miner";
+  type: "main.ffw.tutorial-miner";
 }
 
 export const mainFfwTutorialMinerMission = (
@@ -20,19 +20,19 @@ export const mainFfwTutorialMinerMission = (
 ): MainFfwTutorialMinerMission => ({
   ...common,
   minerId,
-  type: "main.ffw.tutorial.miner",
+  type: "main.ffw.tutorial-miner",
 });
 
 export const isMainFfwTutorialMinerMission = (
   mission: Mission
 ): mission is MainFfwTutorialMinerMission =>
-  mission.type === "main.ffw.tutorial.miner";
+  mission.type === "main.ffw.tutorial-miner";
 
 export const mainFfwTutorialMinerMissionHandler: MissionHandler = {
   generate: (_sim) => ({
     conversation,
     rewards: [],
-    type: "main.ffw.tutorial.miner",
+    type: "main.ffw.tutorial-miner",
   }),
   accept: (sim, offer) => {
     const player = first(sim.queries.player.getIt())!;

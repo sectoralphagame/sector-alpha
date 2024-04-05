@@ -83,7 +83,7 @@ export class MissionSystem extends System<"generate" | "track"> {
       player.cp.missions.offer === null
     ) {
       player.cp.missions.offer = this.handlers.mission[
-        "main.ffw.tutorial.miner"
+        "main.ffw.tutorial-miner"
       ].generate(this.sim);
       return;
     }

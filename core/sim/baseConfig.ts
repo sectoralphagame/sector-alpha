@@ -83,7 +83,7 @@ export const createBaseConfig = (): SimConfig => {
         {
           // patrol: patrolMissionHandler,
           // destroy: destroyMissionHandler,
-          "main.ffw.tutorial.miner": mainFfwTutorialMinerMissionHandler,
+          "main.ffw.tutorial-miner": mainFfwTutorialMinerMissionHandler,
         },
         {
           money: moneyRewardHandler,
