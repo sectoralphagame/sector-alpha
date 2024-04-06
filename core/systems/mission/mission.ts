@@ -119,15 +119,17 @@ export class MissionSystem extends System<"generate" | "track"> {
     }
 
     if (
-      ((player.cp.missions.value.length < 3 &&
-        this.sim.getTime() -
-          Math.max(
-            ...player.cp.missions.value.map((m) => m.accepted),
-            player.cp.missions.declined
-          ) >
-          5 * 60) ||
-        force) &&
-      player.cp.missions.offer === null
+      force ||
+      (player.cp.missions.value.every((m) => !m.type.includes("tutorial")) &&
+        ((player.cp.missions.value.length < 3 &&
+          this.sim.getTime() -
+            Math.max(
+              ...player.cp.missions.value.map((m) => m.accepted),
+              player.cp.missions.declined
+            ) >
+            5 * 60) ||
+          force) &&
+        player.cp.missions.offer === null)
     ) {
       if (template) {
         player.cp.missions.offer = this.handlers.mission[template].generate(
