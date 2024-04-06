@@ -90,7 +90,7 @@ const config = {
       },
       {
         test: /world\/data\/missions\/.*\.yml$/,
-        use: ["./build/mission-loader.ts"],
+        use: ["./build/conversation-loader.ts"],
       },
       {
         test: /\.(svg|png|jpe?g)$/,

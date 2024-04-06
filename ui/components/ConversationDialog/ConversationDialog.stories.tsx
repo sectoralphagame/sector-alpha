@@ -5,7 +5,7 @@ import React from "react";
 import { action } from "@storybook/addon-actions";
 import type { ConversationDialogProps } from "./ConversationDialog";
 import { ConversationDialog } from "./ConversationDialog";
-import conversation from "../../../core/world/data/missions/main/ffw/tutorial-miner.m.yml";
+import conversation from "../../../core/world/data/missions/main/ffw/tutorial-miner.yml";
 
 export default {
   title: "Dialogs / Conversation",

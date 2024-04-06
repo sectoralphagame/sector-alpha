@@ -18,21 +18,34 @@ const loader: webpack.LoaderDefinition = function (this, content) {
     throw new Error(validator.errorsText());
   }
 
-  fs.writeFileSync(
-    `${this.resourcePath.split(".yml")[0]}.d.ts`,
-    `/* @generated */
+  const filename = `${this.resourcePath.split(".yml")[0]}.d.ts`;
+
+  let fileContent = "";
+  try {
+    fileContent = fs.readFileSync(filename).toString();
+  } catch (err) {
+    if (err.code !== "ENOENT") {
+      throw err;
+    }
+  }
+
+  const generatedContent = `/* @generated */
 /* prettier-ignore */
 /* eslint-disable */
 declare module "*/${path.relative(
-      path.join(process.cwd(), "core/world/data"),
-      this.resourcePath
-    )}" {
+    path.join(process.cwd(), "core/world/data"),
+    this.resourcePath
+  )}" {
   import type { MissionConversation } from "@core/systems/mission/types";
 
   const content: MissionConversation;
   export default content;
-}`
-  );
+}
+`;
+
+  if (fileContent !== generatedContent) {
+    fs.writeFileSync(filename, generatedContent);
+  }
 
   return `export default ${JSON.stringify(parsed)}`;
 };

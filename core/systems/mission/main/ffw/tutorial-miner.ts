@@ -6,7 +6,7 @@ import { createShip } from "@core/archetypes/ship";
 import { shipClasses } from "@core/world/ships";
 import type { Sim } from "@core/sim";
 import type { MissionHandler } from "../../types";
-import conversation from "../../../../world/data/missions/main/ffw/tutorial-miner.m.yml";
+import conversation from "../../../../world/data/missions/main/ffw/tutorial-miner.yml";
 import type { MissionReward } from "../../rewards";
 
 Mustache.escape = (text) => text;

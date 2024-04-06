@@ -5,7 +5,7 @@ import type { Sim } from "@core/sim";
 import { distance } from "mathjs";
 import type { Facility } from "@core/archetypes/facility";
 import type { MissionHandler } from "../../types";
-import conversation from "../../../../world/data/missions/main/ffw/tutorial-trade.m.yml";
+import conversation from "../../../../world/data/missions/main/ffw/tutorial-trade.yml";
 
 Mustache.escape = (text) => text;
 

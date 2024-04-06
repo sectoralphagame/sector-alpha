@@ -1,5 +1,5 @@
 ---
-to: core/world/data/missions/<%= name.split(".").join("/") %>.m.yml
+to: core/world/data/missions/<%= name.split(".").join("/") %>.yml
 ---
 
 Start: npc.greeting
