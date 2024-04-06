@@ -14,7 +14,7 @@ Actors:
           - player.instructions
           - player.instructions_question
       instructions_question:
-        text: Simply select the mining ship with LMB, and then right-click on the asteroid you want to mine. A menu will appear with the option to start mining.
+        text: Simply select the mining ship with LMB, and then right-click on the asteroid field you want to mine - it will appear as a red circle on your tactical map. After you click on it, a menu will appear with the option to start mining.
         next:
           - Russo.instructions2
       instructions2:

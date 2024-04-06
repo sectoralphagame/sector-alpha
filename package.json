@@ -12,6 +12,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "gen-archetype": "hygen archetype new",
+    "gen-mission": "hygen mission new",
     "gen-spritesheet": "node ./scripts/createSpritesheet.js",
     "gen-save": "node -r ts-node/register ./scripts/createSave.ts",
     "gen-icons": "node -r ts-node/register ./scripts/createIconsModule.ts",

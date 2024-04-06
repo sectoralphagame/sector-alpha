@@ -5,7 +5,11 @@ Actors:
     name: Adm. Raphael Russo
     lines:
       greeting:
-        text: Well done, lieutenant. Now that your miner is full, it's time to sell the ore. Head to the nearby station and dock with it. Once you're docked, you can sell the ore in the station's market.
+        text: Well done, lieutenant. As you may recall, there are few different kinds of materials which can be mined, that is ore, fuelium, gold ore, silica and ice, and they all pay very important role in our economy.
+        next:
+          - Russo.greeting2
+      greeting2:
+        text: Now that your miner is full, it's time to sell the ore. Head to the nearby station and dock with it. Once you're docked, you can sell the ore in the station's market.
         next:
           - player.accept
           - player.instructions
