@@ -1,12 +1,13 @@
-import { createSector } from "@core/archetypes/sector";
+import { createSector, sectorSize } from "@core/archetypes/sector";
 import { random } from "mathjs";
 import type { PositionAxial } from "@core/components/hecsPosition";
-import { axialToCube } from "@core/components/hecsPosition";
+import { axialToCube, hecsToCartesian } from "@core/components/hecsPosition";
 import type { AiType } from "@core/components/ai";
 import { requestShip } from "@core/systems/ai/shipPlanning";
 import { facilityModules } from "@core/archetypes/facilityModule";
 import { changeRelations } from "@core/components/relations";
 import settings from "@core/settings";
+import { find } from "@fxts/core";
 import { createFaction } from "../archetypes/faction";
 import { createShip } from "../archetypes/ship";
 import { changeBudgetMoney, createBudget } from "../components/budget";
@@ -143,6 +144,13 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     sector: startingSector,
   });
   storageShip.cp.autoOrder!.default = { type: "hold" };
+
+  const sector = find(
+    (s) => s.cp.name.value === "Teegarden's Star II",
+    sim.queries.sectors.get()
+  )!;
+  const camera = sim.queries.settings.get()[0].cp.camera;
+  camera.position = hecsToCartesian(sector.cp.hecsPosition.value, sectorSize);
 
   return Promise.resolve();
 }

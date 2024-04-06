@@ -104,7 +104,7 @@ export const ConfigDialog: React.FC<ModalProps> = ({ open, onClose }) => {
               setSim(null);
               sim.destroy();
               const newSim = Sim.load(
-                createBaseConfig(),
+                await createBaseConfig(),
                 LZString.decompress(saves.find((s) => s.id === id)!.data)
               );
               setTimeout(() => {

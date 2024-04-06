@@ -34,6 +34,7 @@ export interface MissionOffer {
   conversation: MissionConversation;
   rewards: Reward[];
   type: string;
+  immediate: boolean;
 }
 
 export interface Missions extends BaseComponent<"missions"> {

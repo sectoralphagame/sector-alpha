@@ -7,6 +7,7 @@ import { shipClasses } from "@core/world/ships";
 import type { Sim } from "@core/sim";
 import type { MissionHandler } from "../../types";
 import conversation from "../../../../world/data/missions/main/ffw/tutorial-miner.m.yml";
+import type { MissionReward } from "../../rewards";
 
 Mustache.escape = (text) => text;
 
@@ -31,12 +32,18 @@ export const isMainFfwTutorialMinerMission = (
 export const mainFfwTutorialMinerMissionHandler: MissionHandler = {
   generate: (_sim) => ({
     conversation,
-    rewards: [],
+    rewards: [
+      {
+        mission: "main.ffw.tutorial-trade",
+        type: "mission",
+      } as MissionReward,
+    ],
     type: "main.ffw.tutorial-miner",
+    immediate: true,
   }),
   accept: (sim, offer) => {
     const player = first(sim.queries.player.getIt())!;
-    player.tags.add("mainQuestStarted");
+    player.addTag("mainQuestStarted");
     const sector = find(
       (s) => s.cp.name.value === "Teegarden's Star II",
       sim.queries.sectors.get()
@@ -55,7 +62,7 @@ export const mainFfwTutorialMinerMissionHandler: MissionHandler = {
       accepted: sim.getTime(),
       title: "Tutorial: Mining",
       description:
-        "Admiral Russo has requested that you mine some resources as a part of your training.",
+        "Admiral Russo has requested that you mine some ore as a part of your training.",
       rewards: offer.rewards,
       references: [{ id: miner.id, name: miner.cp.name.value }],
       progress: {
@@ -75,8 +82,10 @@ export const mainFfwTutorialMinerMissionHandler: MissionHandler = {
     if (!isMainFfwTutorialMinerMission(mission))
       throw new Error("Mission is not a mainFfwTutorialMiner mission");
 
-    const miner = sim.get(mission.minerId);
-    return !!miner?.cp.mining!.entityId;
+    const miner = sim
+      .getOrThrow(mission.minerId)
+      .requireComponents(["mining", "storage"]);
+    return miner.cp.storage.max === miner.cp.storage.stored.ore;
   },
   update: (mission: Mission, _sim: Sim) => {
     if (!isMainFfwTutorialMinerMission(mission))

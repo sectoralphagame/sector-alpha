@@ -4,6 +4,13 @@ import { pickRandom } from "@core/utils/generators";
 import { first } from "@fxts/core";
 import { System } from "../system";
 import type { MissionHandler } from "./types";
+import {
+  missionRewardHandler,
+  moneyRewardHandler,
+  relationRewardHandler,
+} from "./rewards";
+import { mainFfwTutorialMinerMissionHandler } from "./main/ffw/tutorial-miner";
+import { mainFfwTutorialTradeMissionHandler } from "./main/ffw/tutorial-trade";
 
 type MissionHandlers = Record<string, MissionHandler>;
 
@@ -13,15 +20,25 @@ export class MissionSystem extends System<"generate" | "track"> {
     rewards: Record<string, (_reward: Reward, _sim: Sim) => void>;
   };
 
-  constructor(
-    missionHandlers: MissionHandlers,
-    rewardHandlers: Record<string, (_reward: Reward, _sim: Sim) => void>
-  ) {
+  constructor() {
     super();
     this.handlers = {
-      mission: missionHandlers,
-      rewards: rewardHandlers,
+      mission: {},
+      rewards: {},
     };
+
+    this.registerReward("money", moneyRewardHandler);
+    this.registerReward("relation", relationRewardHandler);
+    this.registerReward("mission", missionRewardHandler);
+
+    this.registerMission(
+      "main.ffw.tutorial-miner",
+      mainFfwTutorialMinerMissionHandler
+    );
+    this.registerMission(
+      "main.ffw.tutorial-trade",
+      mainFfwTutorialTradeMissionHandler
+    );
   }
 
   apply(sim: Sim): void {
@@ -43,6 +60,17 @@ export class MissionSystem extends System<"generate" | "track"> {
       this.constructor.name
     );
   }
+
+  registerMission = (type: string, handler: MissionHandler) => {
+    this.handlers.mission[type] = handler;
+  };
+
+  registerReward = (
+    type: string,
+    handler: (_reward: Reward, _sim: Sim) => void
+  ) => {
+    this.handlers.rewards[type] = handler;
+  };
 
   track = () => {
     if (!this.cooldowns.canUse("track")) return;
@@ -108,7 +136,7 @@ export class MissionSystem extends System<"generate" | "track"> {
       } else {
         player.cp.missions.offer = pickRandom(
           Object.entries(this.handlers.mission)
-            .filter(([key]) => !key.startsWith("main."))
+            .filter(([key]) => key.startsWith("generic."))
             .map(([, data]) => data)
         ).generate(this.sim);
       }

@@ -22,8 +22,8 @@ export interface HeadlessSimInitMsg {
 
 export type HeadlessSimMsg = HeadlessSimUpdateMsg | HeadlessSimCompletedeMsg;
 
-self.onmessage = (event: MessageEvent<HeadlessSimInitMsg>) => {
-  const sim = Sim.load(createBaseConfig(), event.data.sim);
+self.onmessage = async (event: MessageEvent<HeadlessSimInitMsg>) => {
+  const sim = Sim.load(await createBaseConfig(), event.data.sim);
 
   let cycles = 0;
 

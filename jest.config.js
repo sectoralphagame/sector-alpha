@@ -11,7 +11,7 @@ module.exports = {
         loader: "tsx",
       },
     ],
-    ".+\\.(svg|css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$":
+    ".+\\.(svg|css|styl|less|sass|scss|png|jpg|ttf|woff|woff2|yml)$":
       "jest-transform-stub",
   },
   testRegex: ".*\\.test\\.tsx?$",

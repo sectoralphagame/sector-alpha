@@ -49,6 +49,7 @@ Default.args = {
       time: 1800,
       type: "patrol",
       faction: 377,
+      cancellable: true,
     },
     {
       accepted: 0,
@@ -69,6 +70,7 @@ Default.args = {
       time: 1800,
       type: "patrol",
       faction: 385,
+      cancellable: false,
     },
     {
       accepted: 0,
@@ -89,6 +91,7 @@ Default.args = {
       time: 5400,
       type: "patrol",
       faction: 337,
+      cancellable: true,
     },
   ],
   onMissionCancel: action("onMissionCancel"),

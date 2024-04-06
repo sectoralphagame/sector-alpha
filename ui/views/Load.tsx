@@ -26,7 +26,7 @@ export const LoadGame: React.FC = () => {
             saves={saves}
             onClick={async (id) => {
               const sim = Sim.load(
-                createBaseConfig(),
+                await createBaseConfig(),
                 LZString.decompress(saves.find((s) => s.id === id)!.data)
               );
               setSim(sim);

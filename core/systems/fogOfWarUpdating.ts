@@ -127,7 +127,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
               entity.cp.render!.visible &&
               (entity.tags.has("facility") || entity.tags.has("collectible"))
             ) {
-              entity.tags.add("discovered");
+              entity.addTag("discovered");
             }
           }
         }

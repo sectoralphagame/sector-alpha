@@ -15,7 +15,10 @@ export const NewGame: React.FC = () => {
     async function load() {
       const data = await import("@core/world/data/base.json");
       setProgress(0.5);
-      sim.current = Sim.load(createBaseConfig(), JSON.stringify(data.default));
+      sim.current = Sim.load(
+        await createBaseConfig(),
+        JSON.stringify(data.default)
+      );
       setSim(sim.current);
       navigate("game");
     }

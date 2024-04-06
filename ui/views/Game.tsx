@@ -144,7 +144,7 @@ const Game: React.FC = () => {
 
   React.useEffect(() => {
     if (player.cp.missions.offer) {
-      if (player.cp.missions.offer.type === "main.ffw.tutorial-miner") {
+      if (player.cp.missions.offer.immediate) {
         setDialog({ type: "missionOffer" });
       } else {
         addNotification({

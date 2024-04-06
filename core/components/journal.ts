@@ -26,6 +26,12 @@ export interface TradeEntry extends Entry {
    * entity)
    */
   target: string;
+  /**
+   * ID of target object
+   *
+   * Entity may not exist anymore, therefore sim.getOrThrow should not be used
+   */
+  targetId: number;
   price: number;
   action: TradeOfferType;
 }
