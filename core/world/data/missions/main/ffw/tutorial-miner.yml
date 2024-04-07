@@ -2,10 +2,10 @@ Start: Russo.greeting
 
 Actors:
   Russo:
-    name: Adm. Raphael Russo
+    name: Cmdr. Raphael Russo
     lines:
       greeting:
-        text: This is Admiral Russo speaking. I am your new commanding officer at Federation of Free Worlds' Space Force, and I will be guiding you through your training. I expect you to follow my orders to the letter, and I will not tolerate any insubordination. Do you understand?
+        text: This is Commander Russo speaking. I am your new commanding officer at Federation of Free Worlds' Space Force, and I will be guiding you through your training. I expect you to follow my orders to the letter, and I will not tolerate any insubordination. Do you understand?
         next:
           - player.greeting
       instructions:

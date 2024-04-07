@@ -62,7 +62,7 @@ export const mainFfwTutorialMinerMissionHandler: MissionHandler = {
       accepted: sim.getTime(),
       title: "Tutorial: Mining",
       description:
-        "Admiral Russo has requested that you mine some ore as a part of your training.",
+        "Commander Russo has requested that you mine some ore as a part of your training.",
       rewards: offer.rewards,
       references: [{ id: miner.id, name: miner.cp.name.value }],
       progress: {

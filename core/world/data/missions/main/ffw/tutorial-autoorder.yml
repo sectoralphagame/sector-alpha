@@ -2,7 +2,7 @@ Start: Russo.greeting
 
 Actors:
   Russo:
-    name: Adm. Raphael Russo
+    name: Cmdr. Raphael Russo
     lines:
       greeting:
         text: Good. As you may have noticed, giving orders manually can be time-consuming and inefficient. That's why we have developed an automated order system that allows you to set up orders in advance and have them executed automatically. Let's try it out.

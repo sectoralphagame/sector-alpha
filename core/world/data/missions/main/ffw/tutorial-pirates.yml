@@ -2,7 +2,7 @@ Start: Russo.greeting
 
 Actors:
   Russo:
-    name: Adm. Raphael Russo
+    name: Cmdr. Raphael Russo
     lines:
       greeting:
         text: It looks like someone is following your miner. Hail them and see what they want.

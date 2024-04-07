@@ -2,7 +2,7 @@ Start: Russo.greeting
 
 Actors:
   Russo:
-    name: Adm. Raphael Russo
+    name: Cmdr. Raphael Russo
     lines:
       greeting:
         text: As you can see, your miner is now mining ore on his own and will continue to do so until he runs out of storage space. Then, it will sell mined resources to facility known to buy this kind of commodities. This is the automated order system in action. It allows you to set up orders in advance and have them executed automatically.
