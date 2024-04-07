@@ -1,5 +1,5 @@
 import { random } from "mathjs";
-import type { Position2D } from "@core/components/position";
+import { fromPolar } from "@core/utils/misc";
 import type { MineableCommodity } from "../economy/commodity";
 import { createAsteroidField } from "../archetypes/asteroidField";
 import type { Sim } from "../sim";
@@ -29,15 +29,10 @@ export function spawnAsteroidField(
   sector: Sector
 ) {
   const maxR = (sectorSize / 20) * Math.sqrt(3);
-
-  const polarPosition = {
-    r: random(0, maxR - size - 0.5),
-    a: random(-Math.PI, Math.PI),
-  };
-  const position: Position2D = [
-    polarPosition.r * Math.cos(polarPosition.a),
-    polarPosition.r * Math.sin(polarPosition.a),
-  ];
+  const position = fromPolar(
+    random(-Math.PI, Math.PI),
+    random(0, maxR - size - 0.5)
+  );
 
   createAsteroidField(sim, position, sector, {
     asteroidResources: {

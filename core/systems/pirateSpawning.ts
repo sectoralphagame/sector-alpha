@@ -12,6 +12,7 @@ import { moveToActions } from "@core/utils/moving";
 import { shipClasses } from "@core/world/ships";
 import { filter, find, map, pipe, toArray } from "@fxts/core";
 import { distance, random, randomInt } from "mathjs";
+import { fromPolar } from "@core/utils/misc";
 import { System } from "./system";
 import { Index } from "./utils/entityIndex";
 
@@ -75,10 +76,7 @@ function spawnFlagship(sim: Sim, faction: Faction, flagships: Ship[]) {
     owner: faction,
     sector,
     angle: Math.random() * 2 * Math.PI,
-    position: [
-      Math.cos(angle) * flagshipDistanceFromSectorCenter,
-      Math.sin(angle) * flagshipDistanceFromSectorCenter,
-    ],
+    position: fromPolar(angle, flagshipDistanceFromSectorCenter),
   });
 }
 
@@ -174,10 +172,7 @@ export class PirateSpawningSystem extends System<
         shipToMove,
         createWaypoint(this.sim, {
           sector: shipToMove.cp.position.sector,
-          value: [
-            flagshipDistanceFromSectorCenter * Math.cos(angle + dAngle),
-            flagshipDistanceFromSectorCenter * Math.sin(angle + dAngle),
-          ],
+          value: fromPolar(angle + dAngle, flagshipDistanceFromSectorCenter),
           owner: shipToMove.id,
         })
       ),
