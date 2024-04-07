@@ -1,0 +1,42 @@
+Start: Russo.greeting
+
+Actors:
+  Russo:
+    name: Adm. Raphael Russo
+    lines:
+      greeting:
+        text: It looks like someone is following your miner. Hail them and see what they want.
+        next:
+          - player.response
+      pirates:
+        text: Looks like they are pirates. Truly a scourge upon this sector. I hope you understand that handing over the cargo is unacceptable. You need to defend your miner.
+        next:
+          - player.pirates1
+          - player.pirates2
+
+  player:
+    lines:
+      response:
+        text: Yes, sir. I will hail them. Unidentified ship, this is the Federation of Free Worlds' Space Force. Identify yourself and state your intentions.
+        next:
+          - pirate.greeting
+      pirates1:
+        text: I understand, sir. I will defend the miner.
+        set:
+          status: accepted
+      pirates2:
+        text: Pirate ship, I'll give you one chance to leave peacefully. If you don't, I will be forced to defend my ship.
+        next:
+          - pirate.end
+
+  pirate:
+    name: Pirate
+    lines:
+      greeting:
+        text: Hello, guys. We noticed you are carrying quite heavy cargo, so we came here to relieve you of your this burden. Hand over your ore, and we'll let you go unharmed.
+        next:
+          - Russo.pirates
+      end:
+        text: This is where the fun begins. Let's see if you can handle yourself in a fight.
+        set:
+          status: accepted

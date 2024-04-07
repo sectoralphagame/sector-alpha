@@ -54,3 +54,7 @@ export function getGameDate(timeOffset: number): string {
     1 + (Math.floor(actual / gameMonth) % 12)
   }.${2519 + (Math.floor(actual / gameYear) % 12)}`;
 }
+
+export function fromPolar(angle: number, distance: number): Position2D {
+  return [distance * Math.cos(angle), distance * Math.sin(angle)];
+}

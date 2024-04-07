@@ -69,8 +69,14 @@ export const mainFfwTutorialTradeMissionHandler: MissionHandler = {
       progress: { current: 0, max: 0 },
       references: [
         { id: nearestFacility!.id, name: nearestFacility!.cp.name!.value },
+        { id: miner!.id, name: miner!.cp.name!.value },
       ],
-      rewards: [],
+      rewards: [
+        {
+          type: "mission",
+          mission: "main.ffw.tutorial-autoorder",
+        },
+      ],
       title: "Tutorial: Trading",
     });
   },

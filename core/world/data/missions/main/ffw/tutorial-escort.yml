@@ -1,0 +1,34 @@
+Start: Russo.greeting
+
+Actors:
+  Russo:
+    name: Adm. Raphael Russo
+    lines:
+      greeting:
+        text: As you can see, your miner is now mining ore on his own and will continue to do so until he runs out of storage space. Then, it will sell mined resources to facility known to buy this kind of commodities. This is the automated order system in action. It allows you to set up orders in advance and have them executed automatically.
+        next:
+          - Russo.greeting2
+      greeting2:
+        text: Now, let's try something more complex. I want you to escort this miner using a fighter I'm giving you command on. It's an ordinary Dart-class fighter, but it will suffice to defend ship as small as Slate against pirates. Select the fighter and set up an escort order for the miner. Once you confirm it, the fighter will start escorting the miner automatically. Any questions, lieutenant?
+        next:
+          - player.response
+          - player.question
+      pirates:
+        text: It's a shame to admit it directly, but pirates are a common threat in this sector, so you should always be on the lookout for them. We believe they have a base somewhere in this sector, but we haven't been able to locate it yet. Keep your eyes open, lieutenant.
+        next:
+          - Russo.end
+      end:
+        text: Remember, you can always cancel orders by selecting the ship and clicking button with "x" on it. Now, report back to me when you have completed your task.
+        set:
+          status: accepted
+
+  player:
+    lines:
+      response:
+        text: No, sir.
+        next:
+          - Russo.end
+      question:
+        text: Yes, sir. Is the activity of pirates high in the area?
+        next:
+          - Russo.pirates

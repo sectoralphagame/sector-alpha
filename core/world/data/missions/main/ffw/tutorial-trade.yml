@@ -5,7 +5,7 @@ Actors:
     name: Adm. Raphael Russo
     lines:
       greeting:
-        text: Well done, lieutenant. As you may recall, there are few different kinds of materials which can be mined, that is ore, fuelium, gold ore, silica and ice, and they all pay very important role in our economy.
+        text: Well done, lieutenant. As you may recall, there are few different kinds of materials which can be mined, that is ore, fuelium, gold ore, silica and ice, and they all play very important role in our economy.
         next:
           - Russo.greeting2
       greeting2:

@@ -48,13 +48,14 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
     }
 
     const [actor, line] = nextNodes[0].split(".");
-    if (conversation.Actors[actor].lines[line].set) {
+    const isResponse = actor === "player";
+    if (!isResponse && conversation.Actors[actor].lines[line].set) {
       setFlags((prevFlags) => ({
         ...prevFlags,
         ...conversation.Actors[actor].lines[line].set,
       }));
     }
-    if (actor === "player") {
+    if (isResponse) {
       setResponses(
         nextNodes.map(
           (node) => conversation.Actors[actor].lines[node.split(".")[1]]
@@ -123,10 +124,12 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
                       ...prevLog,
                       { actor: "player", line: response },
                     ]);
-                    setResponses((prevResponses) => [
-                      ...prevResponses,
-                      response,
-                    ]);
+                    if (response.set) {
+                      setFlags((prevFlags) => ({
+                        ...prevFlags,
+                        ...response.set,
+                      }));
+                    }
                   }}
                 >
                   {response?.text}

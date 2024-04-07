@@ -1,0 +1,14 @@
+Start: Russo.greeting
+
+Actors:
+  Russo:
+    name: Adm. Raphael Russo
+    lines:
+      greeting:
+        text: Good. As you may have noticed, giving orders manually can be time-consuming and inefficient. That's why we have developed an automated order system that allows you to set up orders in advance and have them executed automatically. Let's try it out.
+        next:
+          - Russo.greeting2
+      greeting2:
+        text: Select your mining ship and change default order to "mine". An option to select target sector will appear. For now, let's keep it simple and set Teegarden's Star II, your current sector of operation. Once you confirm it, the ship will start mining automatically.
+        set:
+          status: accepted

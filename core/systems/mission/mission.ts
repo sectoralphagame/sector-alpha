@@ -4,13 +4,7 @@ import { pickRandom } from "@core/utils/generators";
 import { first } from "@fxts/core";
 import { System } from "../system";
 import type { MissionHandler } from "./types";
-import {
-  missionRewardHandler,
-  moneyRewardHandler,
-  relationRewardHandler,
-} from "./rewards";
-import { mainFfwTutorialMinerMissionHandler } from "./main/ffw/tutorial-miner";
-import { mainFfwTutorialTradeMissionHandler } from "./main/ffw/tutorial-trade";
+import { rewards, missions } from "./mapping";
 
 type MissionHandlers = Record<string, MissionHandler>;
 
@@ -27,18 +21,15 @@ export class MissionSystem extends System<"generate" | "track"> {
       rewards: {},
     };
 
-    this.registerReward("money", moneyRewardHandler);
-    this.registerReward("relation", relationRewardHandler);
-    this.registerReward("mission", missionRewardHandler);
+    // eslint-disable-next-line guard-for-in
+    for (const reward in rewards) {
+      this.registerReward(reward, rewards[reward]);
+    }
 
-    this.registerMission(
-      "main.ffw.tutorial-miner",
-      mainFfwTutorialMinerMissionHandler
-    );
-    this.registerMission(
-      "main.ffw.tutorial-trade",
-      mainFfwTutorialTradeMissionHandler
-    );
+    // eslint-disable-next-line guard-for-in
+    for (const mission in missions) {
+      this.registerMission(mission, missions[mission]);
+    }
   }
 
   apply(sim: Sim): void {
