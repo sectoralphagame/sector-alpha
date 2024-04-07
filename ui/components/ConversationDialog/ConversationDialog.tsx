@@ -124,6 +124,7 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
                       ...prevLog,
                       { actor: "player", line: response },
                     ]);
+                    setResponses([]);
                     if (response.set) {
                       setFlags((prevFlags) => ({
                         ...prevFlags,
