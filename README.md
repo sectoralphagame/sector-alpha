@@ -1,6 +1,6 @@
 # Sector Alpha
 
-Welcome to Sector Alpha, where you take on the role of a fleet commander in a universe that's living its own life. Set in the 2600s, shortly after humankind's first encounter with the enigmatic Tau in Tau Ceti system, this game unfolds in a world shrouded in mystery. Humanity knows little about the Tau, and fear is our constant companion.
+Welcome to Sector Alpha, where you take on the role of a fleet commander in a universe that's living its own life. Set in the 2500s, shortly after humankind's first encounter with the enigmatic Tau in Tau Ceti system, this game unfolds in a world shrouded in mystery. Humanity knows little about the Tau, and fear is our constant companion.
 
 ### Game Features
 
