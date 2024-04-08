@@ -1,0 +1,21 @@
+Start: npc.greeting
+
+Actors:
+  npc:
+    name: "{{ship}}"
+    lines:
+      greeting:
+        text: Mayday! Mayday! This is captain of the {{ship}}. We are under attack in {{sector}} by pirates and need immediate assistance. Is anyone out there? Please respond!
+        next:
+          - player.accept
+          - player.decline
+
+  player:
+    lines:
+      accept:
+        text: "We hear you, {{ship}}. We are on our way to assist you. Hang in there."
+        set:
+          status: accepted
+      decline:
+        action: Ignore the distress call
+        text: We can't spare any resources to help them now.

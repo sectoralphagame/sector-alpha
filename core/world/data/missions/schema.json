@@ -22,6 +22,9 @@
                 "text": {
                   "type": "string"
                 },
+                "action": {
+                  "type": "string"
+                },
                 "next": {
                   "type": "array",
                   "items": {

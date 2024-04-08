@@ -1,3 +1,4 @@
+import { genericShipRescueMissionHandler } from "./generic/ship-rescue";
 import { mainFfwTutorialAutoorderMissionHandler } from "./main/ffw/tutorial-autoorder";
 import { mainFfwTutorialEscortMissionHandler } from "./main/ffw/tutorial-escort";
 import { mainFfwTutorialMinerMissionHandler } from "./main/ffw/tutorial-miner";
@@ -21,4 +22,6 @@ export const missions = {
   "main.ffw.tutorial-autoorder": mainFfwTutorialAutoorderMissionHandler,
   "main.ffw.tutorial-escort": mainFfwTutorialEscortMissionHandler,
   "main.ffw.tutorial-pirates": mainFfwTutorialPiratesMissionHandler,
+
+  "generic.ship-rescue": genericShipRescueMissionHandler,
 };

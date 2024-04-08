@@ -106,7 +106,10 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
                     : conversation.Actors[l.actor].name}
                 </Text>
               )}
-              <Text>{l.line.text}</Text>
+              <Text>
+                {!!l.line.action && <b>[{l.line.action}] </b>}
+                {l.line.text}
+              </Text>
             </React.Fragment>
           ))}
         </div>
@@ -133,6 +136,7 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
                     }
                   }}
                 >
+                  {!!response.action && <b>[{response.action}] </b>}
                   {response?.text}
                 </button>
               </li>

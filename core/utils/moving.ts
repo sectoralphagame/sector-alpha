@@ -1,4 +1,7 @@
 import { find } from "@fxts/core";
+import type { Position2D } from "@core/components/position";
+import type { RequireComponent } from "@core/tsHelpers";
+import { SectorIndex } from "@core/systems/utils/sectorIndex";
 import type { Waypoint } from "../archetypes/waypoint";
 import type { Action } from "../components/orders";
 import { findInAncestors } from "./findInAncestors";
@@ -23,7 +26,7 @@ export function moveToActions(
 
   let s = origin.cp.position.sector.toString();
   while (s !== targetSector) {
-    const teleport = find(
+    const teleportFacility = find(
       (t) =>
         findInAncestors(t, "position").cp.position.sector.toString() === s &&
         findInAncestors(
@@ -33,13 +36,13 @@ export function moveToActions(
       origin.sim.queries.teleports.getIt()
     );
 
-    if (!teleport) {
+    if (!teleportFacility) {
       return actions;
     }
 
-    const t1 = findInAncestors(teleport, "position");
+    const t1 = findInAncestors(teleportFacility, "position");
     const t2 = findInAncestors(
-      origin.sim.getOrThrow(teleport?.cp.teleport.destinationId!),
+      origin.sim.getOrThrow(teleportFacility?.cp.teleport.destinationId!),
       "position"
     );
 
@@ -70,4 +73,36 @@ export function moveToActions(
   }
 
   return actions;
+}
+
+export function teleport(
+  entity: RequireComponent<"position">,
+  position: Position2D,
+  sector: number
+) {
+  const prevSector = entity.cp.position.sector;
+
+  entity.cp.position = {
+    name: "position",
+    angle: entity.cp.position.angle,
+    coord: position,
+    sector,
+    moved: true,
+  };
+
+  entity.cp.docks?.docked.forEach((dockedId) => {
+    const docked =
+      entity.sim.getOrThrow<RequireComponent<"position">>(dockedId);
+
+    docked.cp.position = {
+      name: "position",
+      angle: entity.cp.position.angle,
+      coord: position,
+      sector,
+      moved: true,
+    };
+    SectorIndex.notify(prevSector, sector, docked);
+  });
+
+  SectorIndex.notify(prevSector, sector, entity);
 }

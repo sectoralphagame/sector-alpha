@@ -1,3 +1,4 @@
+import { teleport } from "@core/utils/moving";
 import { waypoint } from "../../archetypes/waypoint";
 import {
   clearTarget,
@@ -7,7 +8,6 @@ import {
 } from "../../components/drive";
 import type { MoveAction, TeleportAction } from "../../components/orders";
 import type { RequireComponent } from "../../tsHelpers";
-import { SectorIndex } from "../utils/sectorIndex";
 import { undockShip } from "./dock";
 
 export function moveActionCleanup(
@@ -54,31 +54,12 @@ export function teleportAction(
   order: TeleportAction
 ): boolean {
   const destination = waypoint(entity.sim.getOrThrow(order.targetId));
-  const prevSector = entity.cp.position.sector;
 
-  entity.cp.position = {
-    name: "position",
-    angle: entity.cp.position.angle,
-    coord: [...destination.cp.position.coord],
-    sector: destination.cp.position.sector,
-    moved: true,
-  };
-
-  entity.cp.docks?.docked.forEach((dockedId) => {
-    const docked =
-      entity.sim.getOrThrow<RequireComponent<"position">>(dockedId);
-
-    docked.cp.position = {
-      name: "position",
-      angle: entity.cp.position.angle,
-      coord: [...destination.cp.position.coord],
-      sector: destination.cp.position.sector,
-      moved: true,
-    };
-    SectorIndex.notify(prevSector, destination.cp.position.sector, docked);
-  });
-
-  SectorIndex.notify(prevSector, destination.cp.position.sector, entity);
+  teleport(
+    entity,
+    destination.cp.position.coord,
+    destination.cp.position.sector
+  );
 
   return true;
 }

@@ -13,6 +13,7 @@ export interface MissionHandler {
 export interface ConversationLine {
   text: string;
   next?: string[];
+  action?: string;
   set?: Record<string, string>;
 }
 
