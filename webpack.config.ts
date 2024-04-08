@@ -85,6 +85,14 @@ const config = {
         ],
       },
       {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /world\/data\/missions\/.*\.yml$/,
+        use: ["./build/conversation-loader.ts"],
+      },
+      {
         test: /\.(svg|png|jpe?g)$/,
         type: "asset/resource",
       },

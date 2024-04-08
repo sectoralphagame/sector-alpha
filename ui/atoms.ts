@@ -1,5 +1,6 @@
 import { atom, useRecoilState } from "recoil";
 import type { Sim } from "@core/sim";
+import { Observable } from "@core/utils/observer";
 import type { ConfigDialogProps } from "./components/ConfigDialog";
 import type { ContextMenu } from "./components/ContextMenu/types";
 import type { TradeDialogProps } from "./components/TradeDialog";
@@ -10,6 +11,8 @@ import type { ShipyardDialogProps } from "./components/ShipyardDialog";
 import type { MissionDialogProps } from "./components/MissionDialog";
 import type { NotificationProps } from "./components/Notifications";
 import type { Notification } from "./components/Notifications/types";
+import { useObservable } from "./hooks/useObservable";
+import type { ImmediateConversationDialogProps } from "./components/ImmediateConversation";
 
 export const sim = atom<Sim>({
   key: "sim",
@@ -39,13 +42,11 @@ export type GameDialogProps =
   | FacilityTradeManagerProps
   | ShipyardDialogProps
   | MissionDialogProps
+  | ImmediateConversationDialogProps
   | null;
 
-export const gameDialog = atom<GameDialogProps>({
-  key: "gameDialog",
-  default: null,
-});
-export const useGameDialog = () => useRecoilState(gameDialog);
+export const gameDialog = new Observable<GameDialogProps>("gameDialog");
+export const useGameDialog = () => useObservable(gameDialog);
 
 export type GameOverlayProps = "fleet" | "missions" | "dev" | null;
 

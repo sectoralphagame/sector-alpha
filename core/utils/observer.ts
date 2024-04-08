@@ -1,17 +1,18 @@
-type ObserverFn<T extends any[]> = (..._data: T) => void;
+type ObserverFn<T> = (_value: T) => void;
 
-type Observer<T extends any[]> = {
+type Observer<T> = {
   fn: ObserverFn<T>;
   origin: string;
 };
 
-export class Observable<T extends any[]> {
+export class Observable<T> {
   /**
    * If true, the observer will add a error boundary to the observer calls
    */
   boundary: boolean;
   name: string;
   observers: Observer<T>[];
+  value: T;
 
   constructor(name: string, boundary = true) {
     this.name = name;
@@ -24,17 +25,19 @@ export class Observable<T extends any[]> {
       fn,
       origin,
     });
+    if (this.value) fn(this.value);
   };
 
   unsubscribe = (f: ObserverFn<T>) => {
     this.observers = this.observers.filter((subscriber) => subscriber.fn !== f);
   };
 
-  notify: ObserverFn<T> = (...data) => {
+  notify: ObserverFn<T> = (data) => {
+    this.value = data;
     this.observers.forEach((observer) => {
       if (this.boundary) {
         try {
-          observer.fn(...data);
+          observer.fn(data);
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error(
@@ -43,7 +46,7 @@ export class Observable<T extends any[]> {
           throw err;
         }
       } else {
-        observer.fn(...data);
+        observer.fn(data);
       }
     });
   };

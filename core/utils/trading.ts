@@ -144,6 +144,7 @@ export function acceptTrade(
       quantity: input.quantity,
       price: input.price,
       target: initiator.cp.name.value,
+      targetId: initiator.id,
       time: entityWithOffer.sim.getTime(),
     });
     initiator.cp.journal.entries.push({
@@ -153,6 +154,7 @@ export function acceptTrade(
       quantity: input.quantity,
       price: input.price,
       target: entityWithOffer.requireComponents(["name"]).cp.name.value,
+      targetId: entityWithOffer.id,
       time: entityWithOffer.sim.getTime(),
     });
 
@@ -403,7 +405,7 @@ export function resellCommodity(
     )
   );
 
-  if (quantity === 0) {
+  if (quantity <= 0) {
     return false;
   }
 

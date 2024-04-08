@@ -21,8 +21,8 @@ export type IndexEntities<T extends keyof CoreComponents> = Array<
 
 export class BaseIndex<T extends keyof CoreComponents> {
   hooks: {
-    add: Observable<[RequireComponent<T>]>;
-    remove: Observable<[number, Entity]>;
+    add: Observable<RequireComponent<T>>;
+    remove: Observable<{ id: number; entity: Entity }>;
   };
   requiredComponents: readonly (keyof CoreComponents)[];
   requiredComponentsMask: bigint;
@@ -100,7 +100,7 @@ export class BaseIndex<T extends keyof CoreComponents> {
   };
 
   remove = (entity: Entity) => {
-    this.hooks.remove.notify(entity.id, entity);
+    this.hooks.remove.notify({ id: entity.id, entity });
   };
 }
 
@@ -129,7 +129,7 @@ export class Index<T extends keyof CoreComponents> extends BaseIndex<T> {
         this.entities.add(entity);
       }
     });
-    this.hooks.remove.subscribe("index", (_id, entity) => {
+    this.hooks.remove.subscribe("index", ({ entity }) => {
       if (this.entities) {
         this.entities.delete(entity as RequireComponent<T>);
       }

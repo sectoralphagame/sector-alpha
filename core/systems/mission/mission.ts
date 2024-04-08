@@ -4,6 +4,7 @@ import { pickRandom } from "@core/utils/generators";
 import { first } from "@fxts/core";
 import { System } from "../system";
 import type { MissionHandler } from "./types";
+import { rewards, missions } from "./mapping";
 
 type MissionHandlers = Record<string, MissionHandler>;
 
@@ -13,15 +14,22 @@ export class MissionSystem extends System<"generate" | "track"> {
     rewards: Record<string, (_reward: Reward, _sim: Sim) => void>;
   };
 
-  constructor(
-    missionHandlers: MissionHandlers,
-    rewardHandlers: Record<string, (_reward: Reward, _sim: Sim) => void>
-  ) {
+  constructor() {
     super();
     this.handlers = {
-      mission: missionHandlers,
-      rewards: rewardHandlers,
+      mission: {},
+      rewards: {},
     };
+
+    // eslint-disable-next-line guard-for-in
+    for (const reward in rewards) {
+      this.registerReward(reward, rewards[reward]);
+    }
+
+    // eslint-disable-next-line guard-for-in
+    for (const mission in missions) {
+      this.registerMission(mission, missions[mission]);
+    }
   }
 
   apply(sim: Sim): void {
@@ -36,11 +44,24 @@ export class MissionSystem extends System<"generate" | "track"> {
         description: "Generate a new mission",
         category: "mission",
         type: "basic",
-        fn: () => this.generate(true),
+        fn: (_sim: Sim, template?: string) => {
+          this.generate(true, template);
+        },
       },
       this.constructor.name
     );
   }
+
+  registerMission = (type: string, handler: MissionHandler) => {
+    this.handlers.mission[type] = handler;
+  };
+
+  registerReward = (
+    type: string,
+    handler: (_reward: Reward, _sim: Sim) => void
+  ) => {
+    this.handlers.rewards[type] = handler;
+  };
 
   track = () => {
     if (!this.cooldowns.canUse("track")) return;
@@ -57,6 +78,8 @@ export class MissionSystem extends System<"generate" | "track"> {
         player.cp.missions.value = player.cp.missions.value.filter(
           (m) => m !== mission
         );
+
+        return;
       }
 
       if (this.handlers.mission[mission.type].isCompleted(mission, this.sim)) {
@@ -70,26 +93,46 @@ export class MissionSystem extends System<"generate" | "track"> {
     });
   };
 
-  generate = (force: boolean) => {
+  generate = (force: boolean, template?: string) => {
     if (!this.cooldowns.canUse("generate") && !force) return;
     this.cooldowns.use("generate", 1 + Math.random());
 
     const player = this.sim.queries.player.get()[0];
 
     if (
-      ((player.cp.missions.value.length < 3 &&
-        this.sim.getTime() -
-          Math.max(
-            ...player.cp.missions.value.map((m) => m.accepted),
-            player.cp.missions.declined
-          ) >
-          5 * 60) ||
-        force) &&
+      !player.tags.has("mainQuestStarted") &&
       player.cp.missions.offer === null
     ) {
-      player.cp.missions.offer = pickRandom(
-        Object.values(this.handlers.mission)
-      ).generate(this.sim);
+      player.cp.missions.offer = this.handlers.mission[
+        "main.ffw.tutorial-miner"
+      ].generate(this.sim);
+      return;
+    }
+
+    if (
+      force ||
+      (player.cp.missions.value.every((m) => !m.type.includes("tutorial")) &&
+        ((player.cp.missions.value.length < 3 &&
+          this.sim.getTime() -
+            Math.max(
+              ...player.cp.missions.value.map((m) => m.accepted),
+              player.cp.missions.declined
+            ) >
+            5 * 60) ||
+          force) &&
+        player.cp.missions.offer === null)
+    ) {
+      if (template) {
+        player.cp.missions.offer = this.handlers.mission[template].generate(
+          this.sim
+        );
+      } else {
+        player.cp.missions.offer = pickRandom(
+          Object.entries(this.handlers.mission)
+            .filter(([key]) => key.startsWith("generic."))
+            .map(([, data]) => data)
+        ).generate(this.sim);
+      }
     }
   };
 

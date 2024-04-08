@@ -2,8 +2,9 @@ import { createWaypoint } from "@core/archetypes/waypoint";
 import { sectorSize } from "@core/archetypes/sector";
 import type { Sector } from "@core/archetypes/sector";
 import { random } from "lodash";
-import { multiply, randomInt } from "mathjs";
+import { randomInt } from "mathjs";
 import type { Position2D } from "@core/components/position";
+import { fromPolar } from "@core/utils/misc";
 import type { PatrolOrder } from "../../components/orders";
 import type { RequireComponent } from "../../tsHelpers";
 import { moveToActions } from "../../utils/moving";
@@ -23,10 +24,10 @@ export function patrolOrder(
       const angleOffset =
         (Math.PI / randomInt(4, 8)) * (order.clockwise ? 1 : -1);
 
-      waypointPosition = multiply(
-        [Math.cos(angle + angleOffset), Math.sin(angle + angleOffset)],
+      waypointPosition = fromPolar(
+        angle + angleOffset,
         random(sectorSize / 30, sectorSize / 15)
-      ) as Position2D;
+      );
     } else {
       waypointPosition = [
         random(-sectorSize / 20, sectorSize / 20),

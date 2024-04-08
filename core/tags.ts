@@ -14,6 +14,7 @@ const tags = [
   "virtual",
   "collectible",
   "discovered",
+  "mainQuestStarted",
   "ai:attack-force",
   "ai:spare",
   ...shipRoles.map<`role:${ShipRole}`>((role) => `role:${role}`),

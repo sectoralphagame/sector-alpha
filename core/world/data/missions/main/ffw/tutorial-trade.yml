@@ -1,0 +1,34 @@
+Start: Russo.greeting
+
+Actors:
+  Russo:
+    name: Cmdr. Raphael Russo
+    lines:
+      greeting:
+        text: Well done, lieutenant. As you may recall, there are few different kinds of materials which can be mined, that is ore, fuelium, gold ore, silica and ice, and they all play very important role in our economy.
+        next:
+          - Russo.greeting2
+      greeting2:
+        text: Now that your miner is full, it's time to sell the ore. Head to the nearby station and dock with it. Once you're docked, you can sell the ore in the station's market.
+        next:
+          - player.accept
+          - player.instructions
+      instructions:
+        text: Select the mining ship with LMB, and then right-click on the station you want to dock with. A menu will appear with the option to trade, which will also automatically create order for the mining ship to dock.
+        next:
+          - Russo.report
+      report:
+        text: Report back to me when you have completed your task.
+        set:
+          status: accepted
+
+  player:
+    lines:
+      accept:
+        text: Yes, sir. On my way.
+        next:
+          - Russo.report
+      instructions:
+        text: How do I do it?
+        next:
+          - Russo.instructions

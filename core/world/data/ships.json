@@ -317,15 +317,15 @@
     "range": 2,
     "mining": 0,
     "role": "military",
-    "cruise": 1.9,
+    "cruise": 3.8,
     "maneuver": 0.6,
     "rotary": 142,
     "ttc": 0.8,
-    "name": "Fighter",
+    "name": "Dart",
     "size": "small",
     "storage": 10,
     "texture": "sMil",
-    "slug": "fighter",
+    "slug": "dart",
     "hitpoints": {
       "hp": { "value": 110, "regen": 0.2 },
       "shield": { "value": 35, "regen": 3 }

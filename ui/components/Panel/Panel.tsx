@@ -39,6 +39,7 @@ import { ShipyardDialog } from "../ShipyardDialog";
 import { SimpleStorage } from "../Storage";
 import { MissionDialog } from "../MissionDialog";
 import { Crew } from "../Crew/Crew";
+import { ImmediateConversationDialog } from "../ImmediateConversation";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -265,6 +266,10 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
       />
       <MissionDialog
         open={dialog?.type === "missionOffer"}
+        onClose={closeDialog}
+      />
+      <ImmediateConversationDialog
+        open={dialog?.type === "conversation"}
         onClose={closeDialog}
       />
     </>

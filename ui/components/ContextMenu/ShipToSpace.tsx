@@ -35,7 +35,8 @@ export const ShipToSpace: React.FC = () => {
           (field) =>
             (norm(
               subtract(field.cp.position.coord, menu.worldPosition)
-            ) as number) < field.cp.asteroidSpawn.size
+            ) as number) < field.cp.asteroidSpawn.size &&
+            menu.sector?.id === field.cp.position.sector
         )
     : [];
 

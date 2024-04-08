@@ -1,5 +1,6 @@
 import type { Position2D } from "@core/components/position";
 import { random, subtract } from "mathjs";
+import { fromPolar } from "@core/utils/misc";
 import type { Sector } from "../archetypes/sector";
 import { sectorSize } from "../archetypes/sector";
 import { hecsToCartesian } from "../components/hecsPosition";
@@ -33,7 +34,7 @@ export function createLink(
         random(-Math.PI / 6, Math.PI / 6);
       const r = random(20, 35);
 
-      linkPosition = [r * Math.cos(a), r * Math.sin(a)];
+      linkPosition = fromPolar(a, r);
     } else {
       linkPosition = position[sectorIndex];
     }

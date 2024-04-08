@@ -1,4 +1,4 @@
-import custom from "../webpack.config.js";
+import custom from "../webpack.config.ts";
 
 module.exports = {
   stories: [
