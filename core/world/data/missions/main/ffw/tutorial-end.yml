@@ -1,0 +1,12 @@
+Start: Russo.greeting
+
+Actors:
+  Russo:
+    name: Cmdr. Raphael Russo
+    lines:
+      greeting:
+        text: Well done lieutenant. Now that you can handle the basics, I'm sure you can figure out the rest. Your job here is to keep the peace and maintain order in the space of Federation of Free Worlds, however you see fit.
+        next:
+          - Russo.greeting2
+      greeting2:
+        text: You have been officially promoted to the rank of captain. Congratulations. You are now in command of your own ship and crew. I expect great things from you, captain. Dismissed.

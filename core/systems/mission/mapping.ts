@@ -5,6 +5,7 @@ import { mainFfwTutorialMinerMissionHandler } from "./main/ffw/tutorial-miner";
 import { mainFfwTutorialPiratesMissionHandler } from "./main/ffw/tutorial-pirates";
 import { mainFfwTutorialTradeMissionHandler } from "./main/ffw/tutorial-trade";
 import {
+  conversationRewardHandler,
   missionRewardHandler,
   moneyRewardHandler,
   relationRewardHandler,
@@ -14,6 +15,7 @@ export const rewards = {
   money: moneyRewardHandler,
   relation: relationRewardHandler,
   mission: missionRewardHandler,
+  conversation: conversationRewardHandler,
 };
 
 export const missions = {

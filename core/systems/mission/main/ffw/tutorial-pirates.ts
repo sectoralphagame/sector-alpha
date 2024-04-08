@@ -8,6 +8,7 @@ import type { Sector } from "@core/archetypes/sector";
 import { add } from "mathjs";
 import { fromPolar } from "@core/utils/misc";
 import conversation from "../../../../world/data/missions/main/ffw/tutorial-pirates.yml";
+import endConversation from "../../../../world/data/missions/main/ffw/tutorial-end.yml";
 import type { MissionHandler } from "../../types";
 
 Mustache.escape = (text) => text;
@@ -92,7 +93,12 @@ export const mainFfwTutorialPiratesMissionHandler: MissionHandler = {
             name: pirate!.cp.name!.value,
           })),
         ],
-        rewards: [],
+        rewards: [
+          {
+            type: "conversation",
+            conversation: endConversation,
+          },
+        ],
         title: "Tutorial: Pirates",
       }
     );

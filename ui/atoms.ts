@@ -12,6 +12,7 @@ import type { MissionDialogProps } from "./components/MissionDialog";
 import type { NotificationProps } from "./components/Notifications";
 import type { Notification } from "./components/Notifications/types";
 import { useObservable } from "./hooks/useObservable";
+import type { ImmediateConversationDialogProps } from "./components/ImmediateConversation";
 
 export const sim = atom<Sim>({
   key: "sim",
@@ -41,9 +42,10 @@ export type GameDialogProps =
   | FacilityTradeManagerProps
   | ShipyardDialogProps
   | MissionDialogProps
+  | ImmediateConversationDialogProps
   | null;
 
-const gameDialog = new Observable<GameDialogProps>("gameDialog");
+export const gameDialog = new Observable<GameDialogProps>("gameDialog");
 export const useGameDialog = () => useObservable(gameDialog);
 
 export type GameOverlayProps = "fleet" | "missions" | "dev" | null;
