@@ -9,11 +9,13 @@ import arrow_down_fat from "@assets/ui/icons/arrow_down_fat.svg";
 import arrow_left from "@assets/ui/icons/arrow_left.svg";
 import arrow_up_fat from "@assets/ui/icons/arrow_up_fat.svg";
 import chevron_down from "@assets/ui/icons/chevron_down.svg";
+import circle_filled from "@assets/ui/icons/circle_filled.svg";
 import close from "@assets/ui/icons/close.svg";
 import config from "@assets/ui/icons/config.svg";
 import exclamation from "@assets/ui/icons/exclamation.svg";
 import ff from "@assets/ui/icons/ff.svg";
 import fleet from "@assets/ui/icons/fleet.svg";
+import heart from "@assets/ui/icons/heart.svg";
 import journal from "@assets/ui/icons/journal.svg";
 import location from "@assets/ui/icons/location.svg";
 import lock from "@assets/ui/icons/lock.svg";
@@ -39,6 +41,9 @@ export const ArrowUpFatIcon: React.FC<Omit<Props, "src">> = (props) => (
 export const ChevronDownIcon: React.FC<Omit<Props, "src">> = (props) => (
   <SVG {...props} src={chevron_down} />
 );
+export const CircleFilledIcon: React.FC<Omit<Props, "src">> = (props) => (
+  <SVG {...props} src={circle_filled} />
+);
 export const CloseIcon: React.FC<Omit<Props, "src">> = (props) => (
   <SVG {...props} src={close} />
 );
@@ -53,6 +58,9 @@ export const FFIcon: React.FC<Omit<Props, "src">> = (props) => (
 );
 export const FleetIcon: React.FC<Omit<Props, "src">> = (props) => (
   <SVG {...props} src={fleet} />
+);
+export const HeartIcon: React.FC<Omit<Props, "src">> = (props) => (
+  <SVG {...props} src={heart} />
 );
 export const JournalIcon: React.FC<Omit<Props, "src">> = (props) => (
   <SVG {...props} src={journal} />

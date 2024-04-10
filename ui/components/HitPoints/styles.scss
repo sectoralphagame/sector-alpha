@@ -1,0 +1,18 @@
+.icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.hp {
+  color: var(--palette-success);
+}
+
+.shield {
+  color: var(--palette-blue);
+}
+
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}

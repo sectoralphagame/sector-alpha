@@ -40,6 +40,7 @@ import { SimpleStorage } from "../Storage";
 import { MissionDialog } from "../MissionDialog";
 import { Crew } from "../Crew/Crew";
 import { ImmediateConversationDialog } from "../ImmediateConversation";
+import { HitPointsInfo } from "../HitPoints";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -170,6 +171,9 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                     />
                     <hr />
                   </>
+                )}
+                {entity.hasComponents(["hitpoints"]) && (
+                  <HitPointsInfo hp={entity.cp.hitpoints} />
                 )}
                 {entity.hasComponents(shipComponents) ? (
                   <ShipPanel entity={asShip(entity)} />

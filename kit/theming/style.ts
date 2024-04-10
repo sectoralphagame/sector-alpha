@@ -22,6 +22,7 @@ export interface Theme {
     success: string;
     active: string;
     primary: string;
+    blue: string;
     "debug-error": string;
   };
   typography: {
@@ -67,6 +68,7 @@ export function createTheme(scale: number): Theme {
       success: "#52fa6e",
       primary: "#f7c14a",
       active: "#f7c14a",
+      blue: "#328bcf",
       "debug-error": "#ff5b4522",
     },
     typography: {
