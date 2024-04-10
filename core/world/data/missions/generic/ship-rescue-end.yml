@@ -1,0 +1,8 @@
+Start: npc.greeting
+
+Actors:
+  npc:
+    name: "{{ship}}"
+    lines:
+      greeting:
+        text: Thank you, captain! I'm glad you made it in time. Godspeed!

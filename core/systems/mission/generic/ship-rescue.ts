@@ -12,6 +12,7 @@ import { fromPolar } from "@core/utils/misc";
 import { getSectorsInTeleportRange } from "@core/economy/utils";
 import { teleport } from "@core/utils/moving";
 import template from "../../../world/data/missions/generic/ship-rescue.yml";
+import templateEnd from "../../../world/data/missions/generic/ship-rescue-end.yml";
 import type { MissionHandler } from "../types";
 
 interface GenericShipRescueMission extends Mission {
@@ -156,6 +157,12 @@ export const genericShipRescueMissionHandler: MissionHandler = {
           {
             type: "money",
             amount: random(20000, 35000),
+          },
+          {
+            type: "conversation",
+            conversation: mustacheConversation(templateEnd, {
+              ship: offer.data!.shipName,
+            }),
           },
         ],
         title: `Rescue ${ship.cp.name.value}`,
