@@ -322,50 +322,61 @@ export const graphics: Graphics = {
     const sectorMaps = FogOfWarUpdatingSystem.getMaps();
     const divisions = FogOfWarUpdatingSystem.getDivisions();
     const chunkSize = (sectorSize / divisions) * 2;
+    const zoom = entity.sim.queries.settings.get()[0].cp.camera.zoom;
 
-    for (const sector of entity.sim.queries.sectors.get()) {
-      const pos = hecsToCartesian(sector.cp.hecsPosition.value, sectorSize);
+    if (zoom > 0.35) {
+      for (const sector of entity.sim.queries.sectors.get()) {
+        const pos = hecsToCartesian(sector.cp.hecsPosition.value, sectorSize);
 
-      for (let x = 0; x <= divisions; x += 1) {
-        for (let y = 0; y <= divisions; y += 1) {
-          if (sectorMaps[sector.id]?.[y * divisions + x]) {
-            g.beginFill(0x000000)
-              .drawRect(
-                pos[0] + chunkSize * (x - divisions / 2),
-                pos[1] + chunkSize * (y - divisions / 2),
-                (sectorSize / divisions) * 2,
-                (sectorSize / divisions) * 2
-              )
-              .endFill();
+        for (let x = 0; x <= divisions; x += 1) {
+          for (let y = 0; y <= divisions; y += 1) {
+            if (sectorMaps[sector.id]?.[y * divisions + x]) {
+              g.beginFill(0x000000)
+                .drawRect(
+                  pos[0] + chunkSize * (x - divisions / 2),
+                  pos[1] + chunkSize * (y - divisions / 2),
+                  (sectorSize / divisions) * 2,
+                  (sectorSize / divisions) * 2
+                )
+                .endFill();
+            }
           }
         }
-      }
 
-      for (let x = -sectorSize + chunkSize; x <= sectorSize; x += chunkSize) {
-        let h = 0;
-        if (x <= -sectorSize / 2) {
-          h = Math.tan(Math.PI / 3) * (x + sectorSize) - 10;
-        } else if (x > -sectorSize / 2 && x <= sectorSize / 2) {
-          h = (sectorSize * Math.sqrt(3)) / 2 - 5;
-        } else if (x > sectorSize / 2) {
-          h = Math.tan(Math.PI / 3) * (sectorSize - x) - 10;
-        }
-        g.moveTo(pos[0] + x, pos[1] - h);
-        g.lineTo(pos[0] + x, pos[1] + h);
-      }
-      for (let y = -sectorSize; y <= sectorSize; y += chunkSize) {
-        if (
-          y > (-sectorSize * Math.sqrt(3)) / 2 &&
-          y < (sectorSize * Math.sqrt(3)) / 2
-        ) {
+        let i = -1;
+        for (let x = -sectorSize + chunkSize; x <= sectorSize; x += chunkSize) {
+          i++;
+          if (zoom < 1 && i % 2 === 1) continue;
           let h = 0;
-          if (y <= 0) {
-            h = Math.tan(Math.PI / 6) * (y + sectorSize) - 45 + sectorSize / 2;
-          } else {
-            h = Math.tan(Math.PI / 6) * (sectorSize - y) - 45 + sectorSize / 2;
+          if (x <= -sectorSize / 2) {
+            h = Math.tan(Math.PI / 3) * (x + sectorSize) - 10;
+          } else if (x > -sectorSize / 2 && x <= sectorSize / 2) {
+            h = (sectorSize * Math.sqrt(3)) / 2 - 5;
+          } else if (x > sectorSize / 2) {
+            h = Math.tan(Math.PI / 3) * (sectorSize - x) - 10;
           }
-          g.moveTo(pos[0] - h, pos[1] + y);
-          g.lineTo(pos[0] + h, pos[1] + y);
+          g.moveTo(pos[0] + x, pos[1] - h);
+          g.lineTo(pos[0] + x, pos[1] + h);
+        }
+        i = -1;
+        for (let y = -sectorSize; y <= sectorSize; y += chunkSize) {
+          i++;
+          if (zoom < 1 && i % 2 === 1) continue;
+          if (
+            y > (-sectorSize * Math.sqrt(3)) / 2 &&
+            y < (sectorSize * Math.sqrt(3)) / 2
+          ) {
+            let h = 0;
+            if (y <= 0) {
+              h =
+                Math.tan(Math.PI / 6) * (y + sectorSize) - 45 + sectorSize / 2;
+            } else {
+              h =
+                Math.tan(Math.PI / 6) * (sectorSize - y) - 45 + sectorSize / 2;
+            }
+            g.moveTo(pos[0] - h, pos[1] + y);
+            g.lineTo(pos[0] + h, pos[1] + y);
+          }
         }
       }
     }

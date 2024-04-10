@@ -15,6 +15,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
   entitiesWithInfluence: Index<"position" | "owner">;
   entitiesToHide: Index<"position" | "render">;
   enabled = true;
+  intervalHandle: number | null = null;
 
   apply = (sim: Sim): void => {
     super.apply(sim);
@@ -31,6 +32,12 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
     if (!this.grid) {
       this.initGrid();
     }
+
+    this.intervalHandle = setInterval(() => {
+      if (this.grid) {
+        this.grid.cp.renderGraphics.redraw = true;
+      }
+    }, 300) as unknown as number;
 
     sim.actions.register(
       {
@@ -80,6 +87,12 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       .addComponent(createRenderGraphics("fogOfWarGrid"))
       .requireComponents(["renderGraphics"]);
   };
+
+  destroy(): void {
+    if (this.intervalHandle) {
+      clearInterval(this.intervalHandle);
+    }
+  }
 
   updateFog = () => {
     this.cooldowns.doEvery("exec", 0.3, () => {
@@ -131,10 +144,6 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
             }
           }
         }
-      }
-
-      if (this.grid) {
-        this.grid.cp.renderGraphics.redraw = true;
       }
     });
   };
