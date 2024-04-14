@@ -1,0 +1,8 @@
+Start: npc.greeting
+
+Actors:
+  npc:
+    name: "{{shipName}}"
+    lines:
+      greeting:
+        text: Thank you for escorting us, captain. Our accountants are already processing the payment - it should appear in your bank account in a moment. Safe travels!

@@ -24,6 +24,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
   const sectors = mapData.sectors.map((data) =>
     createSector(sim, {
       ...data,
+      slug: data.id,
       position: axialToCube(data.position as PositionAxial),
     })
   );

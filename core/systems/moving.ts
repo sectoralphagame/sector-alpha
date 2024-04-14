@@ -36,6 +36,10 @@ function move(entity: Driveable, delta: number) {
     dockedPosition.coord = [...entityPosition.coord];
     dockedPosition.angle += dAngle;
   });
+
+  if (entity.hasTags(["facility"])) {
+    throw new Error("wtf");
+  }
 }
 
 export class MovingSystem extends System {

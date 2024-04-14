@@ -31,9 +31,13 @@ export function sector(entity: Entity): Sector {
 export interface InitialSectorInput {
   position: PositionHex;
   name: string;
+  slug: string;
 }
 
-export function createSector(sim: Sim, { position, name }: InitialSectorInput) {
+export function createSector(
+  sim: Sim,
+  { position, name, slug }: InitialSectorInput
+) {
   const entity = new Entity(sim);
   entity
     .addComponent({
@@ -43,6 +47,7 @@ export function createSector(sim: Sim, { position, name }: InitialSectorInput) {
     .addComponent({
       name: "name",
       value: name,
+      slug,
     })
     .addComponent({
       name: "sectorStats",

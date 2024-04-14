@@ -85,7 +85,7 @@ export function teleport(
   entity.cp.position = {
     name: "position",
     angle: entity.cp.position.angle,
-    coord: position,
+    coord: [...position],
     sector,
     moved: true,
   };
@@ -97,7 +97,7 @@ export function teleport(
     docked.cp.position = {
       name: "position",
       angle: entity.cp.position.angle,
-      coord: position,
+      coord: [...position],
       sector,
       moved: true,
     };

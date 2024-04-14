@@ -35,7 +35,7 @@ export interface MissionOffer {
   rewards: Reward[];
   type: string;
   immediate: boolean;
-  data?: Record<string, any>;
+  data?: any;
 }
 
 export interface Missions extends BaseComponent<"missions"> {

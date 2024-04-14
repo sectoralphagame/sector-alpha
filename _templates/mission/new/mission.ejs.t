@@ -2,14 +2,11 @@
 to: core/systems/mission/<%= name.split(".").join("/") %>.ts
 ---
 
-import Mustache from "mustache";
 import type { Mission, MissionCommon } from "@core/components/missions";
 import { first } from "@fxts/core";
 import type { Sim } from "@core/sim";
 import type { MissionHandler } from "../../types";
 import conversation from "../../../../world/data/missions/<%= name.split(".").join("/") %>.yml";
-
-Mustache.escape = (text) => text;
 
 interface <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>Mission extends Mission {
   type: "<%= name %>";
