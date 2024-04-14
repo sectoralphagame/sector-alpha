@@ -6,18 +6,27 @@ import type { Mission, MissionCommon } from "@core/components/missions";
 import { first } from "@fxts/core";
 import type { Sim } from "@core/sim";
 import type { MissionHandler } from "../../types";
-import conversation from "../../../../world/data/missions/<%= name.split(".").join("/") %>.yml";
+import conversation from "../<%= new Array(name.split(".").length).fill("..").join("/") %>/world/data/missions/<%= name.split(".").join("/") %>.yml";
+
+interface <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>MissionData {
+  originId: number;
+  destinationId: number;
+  factionId: number;
+  shipName: string;
+  freighterId: number;
+}
 
 interface <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>Mission extends Mission {
+  data: <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>MissionData;
   type: "<%= name %>";
 }
 
 export const <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), true) %>Mission = (
-  minerId: number,
+  data: <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>MissionData,
   common: MissionCommon
 ): <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_")) %>Mission => ({
   ...common,
-  minerId,
+  data,
   type: "<%= name %>",
 });
 
@@ -34,6 +43,7 @@ export const <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_
   }),
   accept: (sim, offer) => {
     const player = first(sim.queries.player.getIt())!;
+    const data = offer.data as <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>MissionData;
 
     return <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), true) %>Mission(miner.id, {
       accepted: sim.getTime(),
