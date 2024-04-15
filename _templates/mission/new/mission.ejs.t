@@ -2,27 +2,20 @@
 to: core/systems/mission/<%= name.split(".").join("/") %>.ts
 ---
 
-import Mustache from "mustache";
-import type { Mission, MissionCommon } from "@core/components/missions";
+import type { Mission } from "@core/components/missions";
 import { first } from "@fxts/core";
 import type { Sim } from "@core/sim";
-import type { MissionHandler } from "../../types";
-import conversation from "../../../../world/data/missions/<%= name.split(".").join("/") %>.yml";
+import type { MissionHandler } from "<%= new Array(name.split(".").length - 1).fill("..").join("/") %>/types";
+import conversation from "<%= new Array(name.split(".").length + 1).fill("..").join("/") %>/world/data/missions/<%= name.split(".").join("/") %>.yml";
 
-Mustache.escape = (text) => text;
-
-interface <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>Mission extends Mission {
-  type: "<%= name %>";
+interface <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>MissionData {
+  
 }
 
-export const <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), true) %>Mission = (
-  minerId: number,
-  common: MissionCommon
-): <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_")) %>Mission => ({
-  ...common,
-  minerId,
-  type: "<%= name %>",
-});
+interface <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>Mission extends Mission {
+  data: <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>MissionData;
+  type: "<%= name %>";
+}
 
 export const is<%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_")) %>Mission = (
   mission: Mission
@@ -35,12 +28,15 @@ export const <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_
     rewards: [],
     type: "<%= name %>",
   }),
-  accept: (sim, offer) => {
+  accept: (sim, offer): <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>Mission => {
     const player = first(sim.queries.player.getIt())!;
+    const data = offer.data as <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), false) %>MissionData;
 
-    return <%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_"), true) %>Mission(miner.id, {
+    return {
+      data,
       accepted: sim.getTime(),
-    });
+      type: "<%= name %>",
+    };
   },
   isFailed: (mission, sim) => {
     if (!is<%= h.inflection.camelize(name.replace(/\./g, "_").replace(/-/g, "_")) %>Mission(mission))

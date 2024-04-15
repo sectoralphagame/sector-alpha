@@ -1,0 +1,21 @@
+Start: npc.greeting
+
+Actors:
+  npc:
+    name: Sector Governor
+    lines:
+      greeting:
+        text: This is the Sector Governor speaking. We have a pressing matter that requires your immediate attention. Our sector {{sector}} is facing increased pirate activity, and we need your assistance in patrolling the area for the next {{time}} days. Your efforts will greatly contribute to maintaining the safety and security of our citizens. Will you honor us with your assistance? We'll ensure you are duly compensated for your service.
+        next:
+          - player.accept
+          - player.decline
+
+  player:
+    lines:
+      accept:
+        text: We can do it, governor. My fleet will begin patrolling immediately. Please provide any additional instructions or coordinates for specific areas of concern. (...)
+        set:
+          status: accepted
+      decline:
+        text: My apologies, Sector Governor, but my fleet is currently engaged in another critical mission. I regretfully must decline your request at this time.
+        action: Decline

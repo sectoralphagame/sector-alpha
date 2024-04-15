@@ -82,7 +82,6 @@ export const mainFfwTutorialPiratesMissionHandler: MissionHandler = {
       pirates.map((pirate) => pirate.id),
       {
         accepted: sim.getTime(),
-        progress: { max: 2, current: 0 },
         cancellable: false,
         description:
           "This part of training requires you to defend your miner from pirates.",
@@ -115,14 +114,17 @@ export const mainFfwTutorialPiratesMissionHandler: MissionHandler = {
 
     return !mission.pirateIds.some(sim.get);
   },
-  update: (mission: Mission, sim: Sim) => {
+  update: (mission: Mission, _sim: Sim) => {
     if (!isMainFfwTutorialPiratesMission(mission))
       throw new Error("Mission is not a main.ffw.tutorial-pirates mission");
-
-    mission.progress.current = mission.pirateIds.filter(
+  },
+  formatProgress: (mission: MainFfwTutorialPiratesMission, sim) => {
+    const remainingPirates = mission.pirateIds.filter(
       (id) => !sim.get(id)
     ).length;
+
+    return `${mission.pirateIds.length - remainingPirates} / ${
+      mission.pirateIds.length
+    } pirates destroyed`;
   },
-  formatProgress: (mission: MainFfwTutorialPiratesMission) =>
-    `${mission.progress.current}/${mission.progress.max} pirates destroyed`,
 };

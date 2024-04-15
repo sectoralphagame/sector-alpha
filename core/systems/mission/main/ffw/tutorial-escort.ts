@@ -71,7 +71,6 @@ export const mainFfwTutorialEscortMissionHandler: MissionHandler = {
       accepted: sim.getTime(),
       cancellable: false,
       description: "Use Dart fighter to escort your miner",
-      progress: { max: 0, current: 0 },
       references: [
         { id: miner!.id, name: miner!.cp.name!.value },
         { id: escort!.id, name: escort!.cp.name!.value },

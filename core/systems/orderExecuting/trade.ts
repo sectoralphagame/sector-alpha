@@ -5,6 +5,59 @@ import { NotDockedError } from "../../errors";
 import type { RequireComponent } from "../../tsHelpers";
 import { acceptTrade } from "../../utils/trading";
 
+export function trade(
+  order: TradeAction,
+  entity: RequireComponent<"drive" | "storage" | "dockable">,
+  target: RequireComponent<
+    "storage" | "trade" | "owner" | "budget" | "docks" | "journal" | "position"
+  >
+) {
+  if (order.offer.type === "sell") {
+    if (order.offer.allocations?.buyer?.storage) {
+      releaseStorageAllocation(
+        target.cp.storage,
+        order.offer.allocations.buyer.storage
+      );
+    }
+    if (order.offer.allocations?.seller?.storage) {
+      releaseStorageAllocation(
+        entity.cp.storage,
+        order.offer.allocations.seller.storage
+      );
+    }
+
+    transfer(
+      entity.cp.storage,
+      order.offer.commodity,
+      order.offer.quantity,
+      target.cp.storage,
+      true
+    );
+  } else {
+    if (order.offer.allocations?.buyer?.storage) {
+      releaseStorageAllocation(
+        entity.cp.storage,
+        order.offer.allocations.buyer.storage
+      );
+    }
+    if (order.offer.allocations?.seller?.storage) {
+      releaseStorageAllocation(
+        target.cp.storage,
+        order.offer.allocations.seller.storage
+      );
+    }
+    transfer(
+      target.cp.storage,
+      order.offer.commodity,
+      order.offer.quantity,
+      entity.cp.storage,
+      true
+    );
+  }
+
+  acceptTrade(target, order.offer);
+}
+
 export function tradeOrder(
   entity: RequireComponent<"drive" | "storage" | "dockable" | "journal">,
   order: TradeAction
@@ -21,50 +74,7 @@ export function tradeOrder(
       "journal",
     ]);
   if (entity.cp.dockable.dockedIn === target.id) {
-    if (order.offer.type === "sell") {
-      if (order.offer.allocations?.buyer?.storage) {
-        releaseStorageAllocation(
-          target.cp.storage,
-          order.offer.allocations.buyer.storage
-        );
-      }
-      if (order.offer.allocations?.seller?.storage) {
-        releaseStorageAllocation(
-          entity.cp.storage,
-          order.offer.allocations.seller.storage
-        );
-      }
-
-      transfer(
-        entity.cp.storage,
-        order.offer.commodity,
-        order.offer.quantity,
-        target.cp.storage,
-        true
-      );
-    } else {
-      if (order.offer.allocations?.buyer?.storage) {
-        releaseStorageAllocation(
-          entity.cp.storage,
-          order.offer.allocations.buyer.storage
-        );
-      }
-      if (order.offer.allocations?.seller?.storage) {
-        releaseStorageAllocation(
-          target.cp.storage,
-          order.offer.allocations.seller.storage
-        );
-      }
-      transfer(
-        target.cp.storage,
-        order.offer.commodity,
-        order.offer.quantity,
-        entity.cp.storage,
-        true
-      );
-    }
-
-    acceptTrade(target, order.offer);
+    trade(order, entity, target);
     return true;
   }
 

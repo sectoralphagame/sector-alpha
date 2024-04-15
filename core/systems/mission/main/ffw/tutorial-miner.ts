@@ -65,10 +65,6 @@ export const mainFfwTutorialMinerMissionHandler: MissionHandler = {
         "Commander Russo has requested that you mine some ore as a part of your training.",
       rewards: offer.rewards,
       references: [{ id: miner.id, name: miner.cp.name.value }],
-      progress: {
-        current: 0,
-        max: 1,
-      },
       cancellable: false,
     });
   },
@@ -91,6 +87,6 @@ export const mainFfwTutorialMinerMissionHandler: MissionHandler = {
     if (!isMainFfwTutorialMinerMission(mission))
       throw new Error("Mission is not a mainFfwTutorialMiner mission");
   },
-  formatProgress: (mission: MainFfwTutorialMinerMission) =>
-    `${mission.progress.current} / ${mission.progress.max} miners working`,
+  formatProgress: (_mission: MainFfwTutorialMinerMission) =>
+    "0 / 1 miners working",
 };

@@ -1,0 +1,21 @@
+Start: npc.greeting
+
+Actors:
+  npc:
+    name: "{{shipName}}"
+    lines:
+      greeting:
+        text: Captain! This is the {{shipName}} of {{faction}}. We are en route from {{origin}} to {{destination}}, transporting valuable goods, and we require an escort during the flight. Will you honor us with your assistance? We'll reward you with {{reward}} UTT when we arrive in destination.
+        next:
+          - player.accept
+          - player.decline
+
+  player:
+    lines:
+      accept:
+        text: Of course, {{shipName}}. We'll provide escort. Please share your current coordinates.
+        set:
+          status: accepted
+      decline:
+        text: Apologies, but we are unable to assist at this time. Wishing you a safe journey.
+        action: Decline

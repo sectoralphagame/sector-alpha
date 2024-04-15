@@ -26,6 +26,13 @@ export function moneyRewardHandler(reward: Reward, sim: Sim): void {
   );
 }
 
+export function moneyReward(amount: number): MoneyReward {
+  return {
+    type: "money",
+    amount,
+  };
+}
+
 export interface RelationReward {
   type: "relation";
   amount: number;
@@ -45,6 +52,17 @@ export function relationRewardHandler(reward: Reward, sim: Sim): void {
     sim.getOrThrow<Faction>(reward.factionId),
     reward.amount
   );
+}
+
+export function relationReward(
+  amount: number,
+  factionId: number
+): RelationReward {
+  return {
+    type: "relation",
+    amount,
+    factionId,
+  };
 }
 
 export interface MissionReward {

@@ -12,6 +12,7 @@ import { fromPolar } from "@core/utils/misc";
 import { getSectorsInTeleportRange } from "@core/economy/utils";
 import { teleport } from "@core/utils/moving";
 import template from "../../../world/data/missions/generic/ship-rescue.yml";
+import templateEnd from "../../../world/data/missions/generic/ship-rescue-end.yml";
 import type { MissionHandler } from "../types";
 
 interface GenericShipRescueMission extends Mission {
@@ -141,7 +142,6 @@ export const genericShipRescueMissionHandler: MissionHandler = {
         accepted: sim.getTime(),
         cancellable: true,
         description: `Captain of the ${ship.cp.name.value} is in distress, struggling to deal with pirate attacks. Rescue them before it's too late.`,
-        progress: { max: pirates.length, current: 0 },
         references: [
           {
             id: ship.id,
@@ -156,6 +156,12 @@ export const genericShipRescueMissionHandler: MissionHandler = {
           {
             type: "money",
             amount: random(20000, 35000),
+          },
+          {
+            type: "conversation",
+            conversation: mustacheConversation(templateEnd, {
+              ship: offer.data!.shipName,
+            }),
           },
         ],
         title: `Rescue ${ship.cp.name.value}`,
@@ -177,14 +183,17 @@ export const genericShipRescueMissionHandler: MissionHandler = {
       mission.pirateIds.every((id) => !sim.get(id))
     );
   },
-  update: (mission: Mission, sim: Sim) => {
+  update: (mission: Mission, _sim) => {
     if (!isGenericShipRescueMission(mission))
       throw new Error("Mission is not a generic.ship-rescue mission");
-
-    mission.progress.current = mission.pirateIds.filter(
+  },
+  formatProgress: (mission: GenericShipRescueMission, sim: Sim) => {
+    const remainingPirates = mission.pirateIds.filter(
       (id) => !sim.get(id)
     ).length;
+
+    return `${mission.pirateIds.length - remainingPirates}/${
+      mission.pirateIds.length
+    } pirates defeated`;
   },
-  formatProgress: (mission: GenericShipRescueMission) =>
-    `${mission.progress.current}/${mission.progress.max} pirates defeated`,
 };

@@ -10,6 +10,7 @@ import clsx from "clsx";
 import mapData from "@core/world/data/map.json";
 import { Button } from "@kit/Button";
 import { Tab, TabList } from "@kit/Tabs";
+import { sortBy } from "@fxts/core";
 import type { FormData } from "./utils";
 import styles from "./styles.scss";
 import { JSONOutput } from "../components/JSONOutput";
@@ -109,10 +110,13 @@ export const Factions: React.FC = () => {
         <JSONOutput
           fn={(data: FormData) => ({
             ...data,
-            relations: data.relations.map((relation) => ({
-              ...relation,
-              factions: relation.factions.map((f) => data.factions[f].slug),
-            })),
+            relations: sortBy(
+              (r) => r.factions.join(""),
+              data.relations.map((relation) => ({
+                ...relation,
+                factions: relation.factions.map((f) => data.factions[f].slug),
+              }))
+            ),
           })}
           expanded={expanded}
           onExpand={() => setExpanded(!expanded)}

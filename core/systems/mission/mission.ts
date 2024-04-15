@@ -13,6 +13,7 @@ export class MissionSystem extends System<"generate" | "track"> {
     mission: MissionHandlers;
     rewards: Record<string, (_reward: Reward, _sim: Sim) => void>;
   };
+  nextDelta: number;
 
   constructor() {
     super();
@@ -65,14 +66,19 @@ export class MissionSystem extends System<"generate" | "track"> {
 
   track = () => {
     if (!this.cooldowns.canUse("track")) return;
-    this.cooldowns.use("track", 1 + Math.random());
 
     const player = first(this.sim.queries.player.getIt())!;
 
     player.cp.missions.value.forEach((mission) => {
-      this.handlers.mission[mission.type].update(mission, this.sim);
-      mission.progress.label =
-        this.handlers.mission[mission.type].formatProgress(mission);
+      this.handlers.mission[mission.type].update(
+        mission,
+        this.sim,
+        this.nextDelta
+      );
+      mission.progress = this.handlers.mission[mission.type].formatProgress(
+        mission,
+        this.sim
+      );
 
       if (this.handlers.mission[mission.type].isFailed(mission, this.sim)) {
         player.cp.missions.value = player.cp.missions.value.filter(
@@ -91,6 +97,9 @@ export class MissionSystem extends System<"generate" | "track"> {
         );
       }
     });
+
+    this.nextDelta = 1 + Math.random();
+    this.cooldowns.use("track", this.nextDelta);
   };
 
   generate = (force: boolean, template?: string) => {
