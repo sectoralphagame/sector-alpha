@@ -18,11 +18,6 @@ export interface MissionCommon {
    * Ids and names of the entities that are referenced by this mission
    */
   references: Array<{ id: number; name: string }>;
-  progress: {
-    current: number;
-    max: number;
-    label?: string;
-  };
   cancellable: boolean;
 }
 export type Mission = MissionCommon & {

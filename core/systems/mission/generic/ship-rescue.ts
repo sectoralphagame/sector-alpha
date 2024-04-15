@@ -142,7 +142,6 @@ export const genericShipRescueMissionHandler: MissionHandler = {
         accepted: sim.getTime(),
         cancellable: true,
         description: `Captain of the ${ship.cp.name.value} is in distress, struggling to deal with pirate attacks. Rescue them before it's too late.`,
-        progress: { max: pirates.length, current: 0 },
         references: [
           {
             id: ship.id,
@@ -184,14 +183,17 @@ export const genericShipRescueMissionHandler: MissionHandler = {
       mission.pirateIds.every((id) => !sim.get(id))
     );
   },
-  update: (mission: Mission, sim: Sim) => {
+  update: (mission: Mission, _sim) => {
     if (!isGenericShipRescueMission(mission))
       throw new Error("Mission is not a generic.ship-rescue mission");
-
-    mission.progress.current = mission.pirateIds.filter(
+  },
+  formatProgress: (mission: GenericShipRescueMission, sim: Sim) => {
+    const remainingPirates = mission.pirateIds.filter(
       (id) => !sim.get(id)
     ).length;
+
+    return `${mission.pirateIds.length - remainingPirates}/${
+      mission.pirateIds.length
+    } pirates defeated`;
   },
-  formatProgress: (mission: GenericShipRescueMission) =>
-    `${mission.progress.current}/${mission.progress.max} pirates defeated`,
 };

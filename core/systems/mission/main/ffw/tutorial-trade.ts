@@ -66,7 +66,6 @@ export const mainFfwTutorialTradeMissionHandler: MissionHandler = {
       cancellable: false,
       description:
         "Commander Russo ordered you to sell the mined resources to the facility. You can do this by selecting the ship and right-clicking on the station.",
-      progress: { current: 0, max: 0 },
       references: [
         { id: nearestFacility!.id, name: nearestFacility!.cp.name!.value },
         { id: miner!.id, name: miner!.cp.name!.value },

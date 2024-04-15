@@ -43,7 +43,6 @@ export const mainFfwTutorialAutoorderMissionHandler: MissionHandler = {
 
     return mainFfwTutorialAutoorderMission(miner.id, {
       accepted: sim.getTime(),
-      progress: { max: 0, current: 0 },
       cancellable: false,
       description:
         "This part of training requires you to set up an auto-order for your miner.",

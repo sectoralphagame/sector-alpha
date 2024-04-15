@@ -214,7 +214,6 @@ export const genericEscortMissionHandler: MissionHandler = {
       accepted: sim.getTime(),
       cancellable: true,
       description: `You were asked to escort ${data.shipName} from ${origin.cp.name.value} to ${destination.cp.name.value}.`,
-      progress: { current: 0, max: 0 },
       references: [
         {
           id: origin.id,

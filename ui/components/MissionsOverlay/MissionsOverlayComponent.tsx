@@ -17,6 +17,14 @@ export const MissionsOverlayComponent: React.FC<
 > = ({ missions, onMissionCancel, onReferenceClick }) => {
   const [selected, setSelected] = React.useState(0);
 
+  React.useEffect(() => {
+    if (!missions[selected]) {
+      setSelected(0);
+    }
+  }, [missions.length]);
+
+  if (!missions[selected]) return null;
+
   return (
     <div>
       <div className={styles.grid}>
@@ -39,10 +47,10 @@ export const MissionsOverlayComponent: React.FC<
           <div>
             <Text variant="h3">{missions[selected].title}</Text>
             <Text>{missions[selected].description}</Text>
-            {!!missions[selected].progress.label && (
+            {!!missions[selected].progress && (
               <div className={styles.progress}>
                 <Text variant="h6">Progress</Text>
-                <Text>{missions[selected].progress.label}</Text>
+                <Text>{missions[selected].progress}</Text>
               </div>
             )}
             <div className={styles.references}>

@@ -6,8 +6,8 @@ export interface MissionHandler {
   isFailed: (_mission: Mission, _sim: Sim) => boolean;
   generate: (_sim: Sim) => MissionOffer | null;
   accept: (_sim: Sim, _mission: MissionOffer) => Mission;
-  update: (_mission: Mission, _sim: Sim) => void;
-  formatProgress: (_mission: Mission) => string;
+  update: (_mission: Mission, _sim: Sim, _delta: number) => void;
+  formatProgress: (_mission: Mission, _sim: Sim) => string;
 }
 
 export interface ConversationLine {

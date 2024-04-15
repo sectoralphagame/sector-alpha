@@ -1,4 +1,5 @@
 import { genericEscortMissionHandler } from "./generic/escort";
+import { genericPatrolMissionHandler } from "./generic/patrol";
 import { genericShipRescueMissionHandler } from "./generic/ship-rescue";
 import { mainFfwTutorialAutoorderMissionHandler } from "./main/ffw/tutorial-autoorder";
 import { mainFfwTutorialEscortMissionHandler } from "./main/ffw/tutorial-escort";
@@ -28,4 +29,5 @@ export const missions = {
 
   "generic.ship-rescue": genericShipRescueMissionHandler,
   "generic.escort": genericEscortMissionHandler,
+  "generic.patrol": genericPatrolMissionHandler,
 };

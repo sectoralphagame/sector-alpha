@@ -40,10 +40,6 @@ Default.args = {
         { id: 16, name: "GJ 229 II" },
         { id: 123, name: "PIR Roach" },
       ],
-      progress: {
-        current: 2,
-        max: 15,
-      },
       elapsed: 0,
       sector: 16,
       time: 1800,
@@ -61,10 +57,6 @@ Default.args = {
         { type: "relation", amount: 1.5, factionId: 385 },
       ],
       references: [{ id: 15, name: "Therr" }],
-      progress: {
-        current: 10,
-        max: 15,
-      },
       elapsed: 0,
       sector: 15,
       time: 1800,
@@ -81,10 +73,6 @@ Default.args = {
         { type: "money", amount: 92000 },
         { type: "relation", amount: 1.5, factionId: 337 },
       ],
-      progress: {
-        current: 12,
-        max: 15,
-      },
       references: [{ id: 11, name: "Discordis c" }],
       elapsed: 0,
       sector: 11,
