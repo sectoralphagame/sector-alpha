@@ -50,23 +50,6 @@ export const Overlay: React.FC<OverlayProps> = ({
     }, 200);
   };
 
-  const inactiveOverlays = React.useMemo(() => {
-    if (active === null) return overlays;
-    let tries = 0;
-    let newOverlays = overlays.slice();
-    while (newOverlays[0] !== active) {
-      const last = newOverlays.pop()!;
-      newOverlays = [last, ...newOverlays];
-      tries++;
-
-      if (tries > newOverlays.length) {
-        return newOverlays;
-      }
-    }
-
-    return newOverlays.slice(1);
-  }, [active]);
-
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <OverlayContext.Provider value={register}>
@@ -83,12 +66,14 @@ export const Overlay: React.FC<OverlayProps> = ({
               <Button type="button" onClick={close}>
                 Back
               </Button>
-              <Text variant="h1" color="primary">
-                {overlayNames[active ?? ""]}
-              </Text>
-              {inactiveOverlays.map((slug) => (
-                <Text key={slug} variant="h3" onClick={() => setOverlay(slug)}>
-                  {overlayNames[slug!]}
+              {overlays.map((slug) => (
+                <Text
+                  variant="h3"
+                  color={active === slug ? "primary" : "default"}
+                  onClick={() => setOverlay(slug)}
+                  key={slug}
+                >
+                  {overlayNames[slug ?? ""]}
                 </Text>
               ))}
             </div>
