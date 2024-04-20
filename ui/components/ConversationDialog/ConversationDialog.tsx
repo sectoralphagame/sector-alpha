@@ -17,17 +17,17 @@ export interface ConversationDialogProps extends DialogProps {
   onEnd: (_flags: Record<string, string>) => void;
 }
 
+type Log = { line: ConversationLine; actor: string }[];
+
 export const ConversationDialog: React.FC<ConversationDialogProps> = ({
   conversation,
   onClose,
   onEnd,
   ...dialogProps
 }) => {
-  const logRef = React.useRef<HTMLDivElement>(null);
+  const scrollableRef = React.useRef<any>(null);
   const [flags, setFlags] = React.useState<Record<string, string>>({});
-  const [log, setLog] = React.useState<
-    { line: ConversationLine; actor: string }[]
-  >(() => {
+  const [log, setLog] = React.useState<Log>(() => {
     const [actor, line] = conversation.Start.split(".");
 
     return [
@@ -37,61 +37,73 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
       },
     ];
   });
-  const [responses, setResponses] = React.useState<ConversationLine[]>([]);
-  const canClose = responses.length === 0;
+  const [responses, setResponses] = React.useState<ConversationLine[]>(() => {
+    const nextNodes = log.at(-1)!.line.next;
+
+    if (!nextNodes) return [];
+
+    const [actor] = nextNodes[0].split(".");
+
+    return actor === "player"
+      ? nextNodes.map(
+          (node) => conversation.Actors[actor].lines[node.split(".")[1]]
+        )
+      : [];
+  });
+  const canClose = !log.at(-1)!.line.next;
 
   React.useEffect(() => {
+    if (canClose) {
+      onEnd(flags);
+    }
+  }, [flags, canClose]);
+
+  // eslint-disable-next-line no-shadow
+  const loadNextNode = (log: Log) => {
     const nextNodes = log.at(-1)!.line.next;
     if (nextNodes === undefined) {
-      onEnd(flags);
+      setLog(log);
       return;
     }
 
-    const [actor, line] = nextNodes[0].split(".");
-    const isResponse = actor === "player";
-    if (!isResponse && conversation.Actors[actor].lines[line].set) {
+    const [actor, lineId] = nextNodes[0].split(".");
+    const line = conversation.Actors[actor].lines[lineId];
+    setLog([...log, { line, actor }]);
+    if (line.set) {
       setFlags((prevFlags) => ({
         ...prevFlags,
-        ...conversation.Actors[actor].lines[line].set,
+        ...line.set,
       }));
     }
-    if (isResponse) {
-      setResponses(
-        nextNodes.map(
-          (node) => conversation.Actors[actor].lines[node.split(".")[1]]
-        )
-      );
-    } else {
-      setLog((prevLog) => [
-        ...prevLog,
-        {
-          line: conversation.Actors[actor].lines[line],
-          actor,
-        },
-      ]);
-      if (!conversation.Actors[actor].lines[line].next) {
-        setResponses([]);
+
+    if (line.next) {
+      const [nextActor] = line.next[0].split(".");
+      if (nextActor === "player") {
+        setResponses(
+          line.next.map(
+            (node) => conversation.Actors[nextActor].lines[node.split(".")[1]]
+          )
+        );
       }
     }
 
-    if (logRef.current) {
-      logRef.current.scrollTop = logRef.current.scrollHeight;
+    if (scrollableRef.current) {
+      setTimeout(() => {
+        scrollableRef.current!.contentWrapperEl.scrollTop =
+          scrollableRef.current!.contentWrapperEl.scrollHeight;
+      }, 50);
     }
-  }, [log]);
+  };
 
   return (
-    <Dialog
-      {...dialogProps}
-      onClose={canClose ? onClose : null}
-      title="Conversation"
-      width="650px"
-    >
+    <Dialog {...dialogProps} onClose={canClose ? onClose : null} width="650px">
       <Scrollbar
         className={clsx(styles.scrollable, {
-          [styles.scrollableNoResponses]: responses.length === 0,
+          [styles.scrollableNoResponses]: canClose,
         })}
+        ref={scrollableRef}
       >
-        <div className={styles.log} ref={logRef}>
+        <div className={styles.log}>
           {log.map((l, lIndex) => (
             <React.Fragment key={lIndex}>
               {log[lIndex - 1]?.actor === l.actor ? (
@@ -106,7 +118,7 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
                     : conversation.Actors[l.actor].name}
                 </Text>
               )}
-              <Text>
+              <Text color={l.actor === "player" ? "text-3" : "default"}>
                 {!!l.line.action && <b>[{l.line.action}] </b>}
                 {l.line.text}
               </Text>
@@ -115,18 +127,14 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
         </div>
       </Scrollbar>
 
-      {responses.length > 0 && (
-        <div className={styles.responses}>
+      {!!log.at(-1)?.line.next && (
+        <Scrollbar className={styles.responses}>
           <ol>
             {responses.map((response, rIndex) => (
               <li key={rIndex}>
                 <button
                   type="button"
                   onClick={() => {
-                    setLog((prevLog) => [
-                      ...prevLog,
-                      { actor: "player", line: response },
-                    ]);
                     setResponses([]);
                     if (response.set) {
                       setFlags((prevFlags) => ({
@@ -134,6 +142,7 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
                         ...response.set,
                       }));
                     }
+                    loadNextNode([...log, { actor: "player", line: response }]);
                   }}
                 >
                   {!!response.action && <b>[{response.action}] </b>}
@@ -141,8 +150,16 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
                 </button>
               </li>
             ))}
+            {log.at(-1)?.actor !== "player" &&
+              !log.at(-1)!.line.next![0].startsWith("player") && (
+                <li>
+                  <button type="button" onClick={() => loadNextNode(log)}>
+                    <b>Continue</b>
+                  </button>
+                </li>
+              )}
           </ol>
-        </div>
+        </Scrollbar>
       )}
       {canClose && (
         <DialogActions>

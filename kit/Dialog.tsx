@@ -36,9 +36,10 @@ export const Dialog: React.FC<
         width: width ?? "300px",
         marginRight: "-50%",
         transform: "translate(-50%, -50%)",
-        borderColor: "var(--palette-border)",
+        borderColor: "var(--palette-active)",
         overflow: "unset",
         userSelect: "none",
+        boxShadow: "0px 0px 23px -4px var(--palette-active)",
       },
       overlay: {
         backgroundColor: "rgb(0 0 0 / 85%)",
@@ -46,16 +47,18 @@ export const Dialog: React.FC<
     }}
   >
     <AnimatedBackdrop className={styles.backdrop}>
-      <div className={styles.title}>
-        <Text className={styles.titleText} variant="h1" color="primary">
-          {title}
-        </Text>
-        {onClose && (
-          <IconButton className={styles.close} onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
-        )}
-      </div>
+      {!!title && (
+        <div className={styles.title}>
+          <Text className={styles.titleText} variant="h1" color="primary">
+            {title}
+          </Text>
+          {onClose && (
+            <IconButton className={styles.close} onClick={onClose}>
+              <CloseIcon />
+            </IconButton>
+          )}
+        </div>
+      )}
       {children}
     </AnimatedBackdrop>
   </Modal>
