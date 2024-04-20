@@ -62,6 +62,7 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
   const loadNextNode = (log: Log) => {
     const nextNodes = log.at(-1)!.line.next;
     if (nextNodes === undefined) {
+      setLog(log);
       return;
     }
 
@@ -127,7 +128,7 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
       </Scrollbar>
 
       {!!log.at(-1)?.line.next && (
-        <div className={styles.responses}>
+        <Scrollbar className={styles.responses}>
           <ol>
             {responses.map((response, rIndex) => (
               <li key={rIndex}>
@@ -158,7 +159,7 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
                 </li>
               )}
           </ol>
-        </div>
+        </Scrollbar>
       )}
       {canClose && (
         <DialogActions>
