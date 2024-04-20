@@ -63,27 +63,6 @@ input[type="number"] {
 }
 
 :global(.ReactModal__Content.ReactModal__Content--after-open) {
-  &:before,
-  &:after {
-    content: "";
-    display: block;
-    width: 30px;
-    height: 30px;
-    position: absolute;
-    border-radius: 13px;
-  }
-  &:before {
-    bottom: -15px;
-    left: -15px;
-    border-left: 1px solid var(--palette-border);
-    border-bottom: 1px solid var(--palette-border);
-  }
-  &:after {
-    top: -15px;
-    right: -15px;
-    border-right: 1px solid var(--palette-border);
-    border-top: 1px solid var(--palette-border);
-  }
 }
 
 // Having stylesheet without local class breaks type generation

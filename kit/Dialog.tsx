@@ -36,9 +36,10 @@ export const Dialog: React.FC<
         width: width ?? "300px",
         marginRight: "-50%",
         transform: "translate(-50%, -50%)",
-        borderColor: "var(--palette-border)",
+        borderColor: "var(--palette-active)",
         overflow: "unset",
         userSelect: "none",
+        boxShadow: "0px 0px 23px -4px var(--palette-active)",
       },
       overlay: {
         backgroundColor: "rgb(0 0 0 / 85%)",
