@@ -8,6 +8,7 @@ import { getRequiredCrew } from "@core/utils/crew";
 import type { Sim } from "../sim";
 import { System } from "./system";
 import { ProducingSystem, timeMultiplier } from "./producing";
+import { Index } from "./utils/entityIndex";
 
 function getHubModule(facility: RequireComponent<"modules">) {
   return pipe(
@@ -18,8 +19,17 @@ function getHubModule(facility: RequireComponent<"modules">) {
 }
 
 export class CrewGrowingSystem extends System<"exec"> {
+  crewable: Index<"crew" | "modules" | "position">;
+
   apply = (sim: Sim): void => {
     super.apply(sim);
+
+    this.crewable = new Index(
+      sim,
+      ["modules", "position", "facilityModuleQueue", "subordinates", "crew"],
+      [],
+      true
+    );
 
     // Execute every day at the start of the day
     const offset =
@@ -31,9 +41,9 @@ export class CrewGrowingSystem extends System<"exec"> {
   exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
 
-    const facilities = this.sim.queries.facilities.get();
+    const facilities = this.crewable.get();
     const sectorHubs = pipe(
-      this.sim.queries.facilities.getIt(),
+      this.crewable.getIt(),
       filter((facility) =>
         some(
           (facilityModuleId) =>

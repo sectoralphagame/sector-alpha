@@ -127,7 +127,9 @@ export class FacilityPlanningSystem extends System<"plan"> {
       );
     }
 
-    facility.cp.crew.workers.current = facility.cp.crew.workers.max * 0.7;
+    if (facility.hasComponents(["crew"])) {
+      facility.cp.crew.workers.current = facility.cp.crew.workers.max * 0.7;
+    }
 
     return facility;
   };
@@ -174,7 +176,9 @@ export class FacilityPlanningSystem extends System<"plan"> {
       );
       facility.cp.name.value = createFacilityName(facility, "Mining Complex");
       facility.cp.render.texture = "fMin";
-      facility.cp.crew.workers.current = facility.cp.crew.workers.max * 0.7;
+      if (facility.hasComponents(["crew"])) {
+        facility.cp.crew.workers.current = facility.cp.crew.workers.max * 0.7;
+      }
 
       for (
         let i = 0;
@@ -200,6 +204,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
   };
 
   planHubs = (faction: Faction): void => {
+    if (faction.cp.name.slug === "TAU") return;
     for (const sector of this.sim.queries.sectors.getIt()) {
       if (sector.cp.owner?.id !== faction.id) continue;
 

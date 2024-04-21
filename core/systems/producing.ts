@@ -159,13 +159,17 @@ export class ProducingSystem extends System<"exec"> {
       const facility = findInAncestors(
         facilityModule,
         "storage"
-      ).requireComponents(["storage", "crew", "modules"]);
+      ).requireComponents(["storage", "modules"]);
       const multipliers = [
-        getMoodMultiplier(facility.cp.crew.mood),
-        getCrewMultiplier(
-          getRequiredCrew(facility),
-          facility.cp.crew.workers.current
-        ),
+        ...(facility.hasComponents(["crew"])
+          ? [
+              getMoodMultiplier(facility.cp.crew.mood),
+              getCrewMultiplier(
+                getRequiredCrew(facility),
+                facility.cp.crew.workers.current
+              ),
+            ]
+          : []),
       ];
       const storage = facility.cp.storage;
       const willProduce = ProducingSystem.isAbleToProduce(
