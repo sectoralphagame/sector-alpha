@@ -25,7 +25,7 @@ export function recalculateCompoundProduction(
 }
 
 export function addFacilityModule(
-  facility: RequireComponent<"modules" | "storage" | "crew">,
+  facility: RequireComponent<"modules" | "storage">,
   facilityModule: FacilityModule
 ) {
   facility.cp.modules.ids.push(facilityModule.id);
@@ -47,7 +47,7 @@ export function addFacilityModule(
     if (facilityModule.cp.facilityModuleBonus!.storage) {
       facility.cp.storage.max += facilityModule.cp.facilityModuleBonus!.storage;
     }
-    if (facilityModule.cp.facilityModuleBonus!.workers) {
+    if (facility.cp.crew && facilityModule.cp.facilityModuleBonus!.workers) {
       facility.cp.crew.workers.max +=
         facilityModule.cp.facilityModuleBonus!.workers;
     }

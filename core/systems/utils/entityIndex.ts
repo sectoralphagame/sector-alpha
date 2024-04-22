@@ -182,7 +182,7 @@ export function createQueries(sim: Sim) {
     disposable: new Index(sim, ["disposable"]),
     facilities: new Index(
       sim,
-      ["modules", "position", "facilityModuleQueue", "subordinates", "crew"],
+      ["modules", "position", "facilityModuleQueue", "subordinates"],
       [],
       true
     ),

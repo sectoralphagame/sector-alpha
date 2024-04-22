@@ -15,7 +15,6 @@ export const commanderRange = 2;
 
 export const facilityComponents = [
   "budget",
-  "crew",
   "docks",
   "modules",
   "name",
@@ -99,14 +98,6 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
       ),
     })
     .addComponent({ name: "subordinates", ids: [] })
-    .addComponent({
-      name: "crew",
-      workers: {
-        current: 0,
-        max: 0,
-      },
-      mood: 50,
-    })
     .addTag("selection")
     .addTag("facility");
 
@@ -115,6 +106,17 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
       name: "owner",
       id: initial.owner.id,
     });
+
+    if (initial.owner.cp.name.slug !== "TAU") {
+      entity.addComponent({
+        name: "crew",
+        workers: {
+          current: 0,
+          max: 0,
+        },
+        mood: 50,
+      });
+    }
   }
 
   return facility(entity);

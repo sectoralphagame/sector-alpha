@@ -6,10 +6,24 @@ export interface Subordinates extends BaseComponent<"subordinates"> {
   ids: number[];
 }
 
+function checkCyclicCommandChain(entity: Entity, commanderId: number): void {
+  if (entity.id === commanderId) throw new Error("Cyclic chain of command");
+
+  if (entity.hasComponents(["subordinates"])) {
+    for (const subordinateId of entity.cp.subordinates.ids) {
+      checkCyclicCommandChain(
+        entity.sim.getOrThrow(subordinateId),
+        commanderId
+      );
+    }
+  }
+}
+
 export function addSubordinate(
   entity: RequireComponent<"subordinates">,
   subordinate: Entity
 ) {
+  checkCyclicCommandChain(subordinate, entity.id);
   entity.cp.subordinates.ids.push(subordinate.id);
   if (!subordinate.cp.commander) {
     subordinate.addComponent({ name: "commander", id: entity.id });
