@@ -169,7 +169,7 @@ export class ProducingSystem extends System<"exec"> {
                 facility.cp.crew.workers.current
               ),
             ]
-          : []),
+          : [1]),
       ];
       const storage = facility.cp.storage;
       const willProduce = ProducingSystem.isAbleToProduce(

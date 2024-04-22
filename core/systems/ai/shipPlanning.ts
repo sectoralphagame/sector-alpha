@@ -78,6 +78,8 @@ function assignSmallPatrol(
     .map((f) => f.requireComponents(["position", "autoOrder", "subordinates"]));
 
   for (const fighter of fighters) {
+    if (commanders.some((cmdr) => cmdr.id === fighter.id)) return;
+
     fighter.addTag("ai:spare");
 
     const commander = commanders.find(
