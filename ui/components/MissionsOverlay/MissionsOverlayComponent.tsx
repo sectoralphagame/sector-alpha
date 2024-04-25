@@ -4,6 +4,7 @@ import Text from "@kit/Text";
 import { isMoneyReward, isRelationReward } from "@core/systems/mission/rewards";
 import { Button } from "@kit/Button";
 import clsx from "clsx";
+import { BaseButton } from "@kit/BaseButton";
 import styles from "./MissionsOverlay.scss";
 
 export interface MissionsOverlayComponentProps {
@@ -56,13 +57,9 @@ export const MissionsOverlayComponent: React.FC<
             <div className={styles.references}>
               <Text variant="h6">References</Text>
               {missions[selected].references.map(({ id, name }) => (
-                <button
-                  type="button"
-                  key={id}
-                  onClick={() => onReferenceClick(id)}
-                >
+                <BaseButton key={id} onClick={() => onReferenceClick(id)}>
                   {name}
-                </button>
+                </BaseButton>
               ))}
             </div>
             <hr className={styles.divider} />

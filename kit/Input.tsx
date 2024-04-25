@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import React from "react";
 import styles from "./Input.scss";
+import { popSound } from "./BaseButton";
 
 export const Input = React.forwardRef<
   HTMLInputElement,
@@ -8,12 +9,18 @@ export const Input = React.forwardRef<
     React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
   >
->((props, ref) => (
+>(({ onMouseEnter, ...props }, ref) => (
   <input
     {...props}
     ref={ref}
     // eslint-disable-next-line react/destructuring-assignment
     className={clsx(styles.root, props?.className)}
+    onMouseEnter={(event) => {
+      popSound.play();
+      if (onMouseEnter) {
+        onMouseEnter(event);
+      }
+    }}
   />
 ));
 Input.displayName = "Input";

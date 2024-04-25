@@ -2,6 +2,7 @@ import clsx from "clsx";
 import React from "react";
 import { IconButton } from "@kit/IconButton";
 import { CloseIcon, ExclamationIcon, QuestionIcon } from "@assets/ui/icons";
+import { BaseButton } from "@kit/BaseButton";
 import styles from "./styles.scss";
 import type { NotificationProps } from "./types";
 
@@ -12,14 +13,13 @@ export const Notification: React.FC<NotificationProps> = ({
   onClick,
   dismiss,
 }) => (
-  <button
+  <BaseButton
     className={clsx(styles.notification, {
       [styles.notificationSuccess]: type === "success",
       [styles.notificationWarning]: type === "warning",
       [styles.notificationError]: type === "error",
     })}
     onClick={onClick}
-    type="button"
   >
     {icon === "exclamation" ? (
       <ExclamationIcon className={styles.notificationIcon} />
@@ -39,5 +39,5 @@ export const Notification: React.FC<NotificationProps> = ({
         <CloseIcon />
       </IconButton>
     )}
-  </button>
+  </BaseButton>
 );

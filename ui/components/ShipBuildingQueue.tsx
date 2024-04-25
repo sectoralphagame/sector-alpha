@@ -10,6 +10,7 @@ import { useGameDialog, useSim } from "@ui/atoms";
 import { relationThresholds } from "@core/components/relations";
 import type { Faction } from "@core/archetypes/faction";
 import { RedoIcon } from "@assets/ui/icons";
+import { BaseButton } from "@kit/BaseButton";
 import styles from "./ShipBuildingQueue.scss";
 
 const TagFromFactionId: React.FC<{ factionId: number }> = ({ factionId }) => {
@@ -50,16 +51,15 @@ const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
     <Collapsible>
       <CollapsibleSummary className={styles.summary}>
         <span>Ship Building ({entity.cp.shipyard.queue.length})</span>
-        <button
+        <BaseButton
           className={styles.buyBtn}
-          type="button"
           onClick={(event) => {
             event.stopPropagation();
             setDialog({ type: "shipyard", shipyardId: entity.id });
           }}
         >
           Buy ships <RedoIcon />
-        </button>
+        </BaseButton>
       </CollapsibleSummary>
       <CollapsibleContent>
         {entity.cp.shipyard.queue.length === 0 ? (

@@ -1,13 +1,14 @@
 import clsx from "clsx";
 import React from "react";
 import styles from "./Checkbox.scss";
+import { defaultClickSound, popSound } from "./BaseButton";
 
 export const Checkbox: React.FC<
   React.DetailedHTMLProps<
     React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
   >
-> = (props) => {
+> = ({ onClick, onMouseEnter, ...props }) => {
   const ref = React.useRef<HTMLInputElement>(null);
 
   return (
@@ -15,6 +16,18 @@ export const Checkbox: React.FC<
       type="checkbox"
       {...props}
       ref={ref}
+      onClick={(event) => {
+        defaultClickSound.play();
+        if (onClick) {
+          onClick(event);
+        }
+      }}
+      onMouseEnter={(event) => {
+        popSound.play();
+        if (onMouseEnter) {
+          onMouseEnter(event);
+        }
+      }}
       onMouseUp={() => {
         ref.current?.blur();
       }}

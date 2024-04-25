@@ -2,6 +2,7 @@ import { Menu } from "@headlessui/react";
 import clsx from "clsx";
 import React from "react";
 import styles from "./Dropdown.scss";
+import { BaseButton } from "./BaseButton";
 
 export const Dropdown: React.FC<React.HTMLProps<HTMLDivElement>> = ({
   className,
@@ -11,6 +12,7 @@ export const DropdownButton: React.FC<
   React.PropsWithChildren<{ className?: string; disabled?: boolean }>
 > = ({ className, disabled, ...props }) => (
   <Menu.Button
+    as={BaseButton}
     className={({ open }) =>
       clsx(className, styles.button, {
         [styles.buttonActive]: open,
@@ -38,16 +40,15 @@ export const DropdownOption: React.FC<
 > = ({ children, onClick, ...props }) => (
   <Menu.Item {...props}>
     {({ active, disabled }) => (
-      <button
+      <BaseButton
         className={clsx(styles.option, {
           [styles.optionActive]: active,
         })}
         disabled={disabled}
-        type="button"
         onClick={onClick}
       >
         {children}
-      </button>
+      </BaseButton>
     )}
   </Menu.Item>
 );

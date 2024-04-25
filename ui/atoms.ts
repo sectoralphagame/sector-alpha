@@ -1,6 +1,8 @@
 import { atom, useRecoilState } from "recoil";
 import type { Sim } from "@core/sim";
 import { Observable } from "@core/utils/observer";
+import notificationSound from "@assets/ui/sounds/notification.wav";
+import { Howl } from "howler";
 import type { ConfigDialogProps } from "./components/ConfigDialog";
 import type { ContextMenu } from "./components/ContextMenu/types";
 import type { TradeDialogProps } from "./components/TradeDialog";
@@ -56,6 +58,9 @@ export const gameOverlay = atom<GameOverlayProps>({
 });
 export const useGameOverlay = () => useRecoilState(gameOverlay);
 
+const notificationHowl = new Howl({
+  src: notificationSound,
+});
 export const notificationsAtom = atom<Notification[]>({
   key: "notiifications",
   default: [],
@@ -78,6 +83,7 @@ export const useNotifications = () => {
       ...prevNotifications,
       { ...notification, id },
     ]);
+    notificationHowl.play();
     if (notification.expires) {
       setTimeout(() => removeNotification(id), notification.expires);
     }

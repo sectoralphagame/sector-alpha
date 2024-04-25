@@ -10,6 +10,7 @@ import type {
   MissionConversation,
 } from "@core/systems/mission/types";
 import { Scrollbar } from "@kit/Scrollbar";
+import { BaseButton } from "@kit/BaseButton";
 import styles from "./styles.scss";
 
 export interface ConversationDialogProps extends DialogProps {
@@ -118,7 +119,7 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
                     : conversation.Actors[l.actor].name}
                 </Text>
               )}
-              <Text color={l.actor === "player" ? "text-3" : "default"}>
+              <Text color={l.actor === "player" ? "text-2" : "default"}>
                 {!!l.line.action && <b>[{l.line.action}] </b>}
                 {l.line.text}
               </Text>
@@ -132,8 +133,7 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
           <ol>
             {responses.map((response, rIndex) => (
               <li key={rIndex}>
-                <button
-                  type="button"
+                <BaseButton
                   onClick={() => {
                     setResponses([]);
                     if (response.set) {
@@ -147,15 +147,15 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
                 >
                   {!!response.action && <b>[{response.action}] </b>}
                   {response?.text}
-                </button>
+                </BaseButton>
               </li>
             ))}
             {log.at(-1)?.actor !== "player" &&
               !log.at(-1)!.line.next![0].startsWith("player") && (
                 <li>
-                  <button type="button" onClick={() => loadNextNode(log)}>
+                  <BaseButton onClick={() => loadNextNode(log)}>
                     <b>Continue</b>
-                  </button>
+                  </BaseButton>
                 </li>
               )}
           </ol>
