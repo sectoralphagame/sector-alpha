@@ -23,6 +23,7 @@
       background-color: var(--palette-border);
       display: block;
       content: "";
+      pointer-events: none;
     }
   }
 }

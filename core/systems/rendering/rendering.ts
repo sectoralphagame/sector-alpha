@@ -11,6 +11,7 @@ import type { ContextMenuApi } from "@ui/atoms";
 import { hecsToCartesian, worldToHecs } from "@core/components/hecsPosition";
 import { deepEqual, subtract } from "mathjs";
 import { sectorSize, type Sector } from "@core/archetypes/sector";
+import { defaultClickSound } from "@kit/BaseButton";
 import {
   createRenderGraphics,
   graphics,
@@ -369,6 +370,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
             sprite.addEventListener("pointerdown", (event) => {
               if (event.button === 0) {
                 this.settingsManager.cp.selectionManager.id = entity.id;
+                defaultClickSound.play();
 
                 if (Date.now() - this.lastClicked < 200) {
                   this.settingsManager.cp.selectionManager.focused = true;

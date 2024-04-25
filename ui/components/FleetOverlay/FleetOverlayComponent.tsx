@@ -4,6 +4,7 @@ import React from "react";
 import clsx from "clsx";
 import Text from "@kit/Text";
 import { ChevronDownIcon } from "@assets/ui/icons";
+import { BaseButton } from "@kit/BaseButton";
 import styles from "./FleetOverlay.scss";
 
 type Ship = RequireComponent<"name" | "autoOrder">;
@@ -48,18 +49,17 @@ const ShipButton: React.FC<ShipButtonProps> = ({
   onFocus,
   onContextMenu,
 }) => (
-  <button
+  <BaseButton
     className={clsx(styles.ship, className, {
       [styles.shipActive]: selected === ship.id,
     })}
     onClick={() => onSelect(ship.id)}
     onDoubleClick={onFocus}
     onContextMenu={(event) => onContextMenu(ship.id, event)}
-    type="button"
   >
     {ship.cp.name.value}
     <span className={styles.shipOrder}>{ship.cp.autoOrder.default.type}</span>
-  </button>
+  </BaseButton>
 );
 
 interface FleetComponentProps {
