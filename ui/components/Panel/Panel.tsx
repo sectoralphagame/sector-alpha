@@ -1,19 +1,14 @@
 import React from "react";
-import { shipComponents, ship as asShip } from "@core/archetypes/ship";
+import { shipComponents } from "@core/archetypes/ship";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@kit/Tabs";
 import type { Entity } from "@core/entity";
 import type { Facility } from "@core/archetypes/facility";
-import {
-  facilityComponents,
-  facility as asFacility,
-} from "@core/archetypes/facility";
 import { sector, sectorComponents } from "@core/archetypes/sector";
 import { IconButton } from "@kit/IconButton";
 import { isOwnedByPlayer } from "@core/utils/misc";
 import { getRequiredCrew } from "@core/utils/crew";
 import { find } from "@fxts/core";
 import { ConfigIcon } from "@assets/ui/icons";
-import FacilityPanel from "../FacilityPanel";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
 import EntityName from "../EntityName";
@@ -41,17 +36,19 @@ import { MissionDialog } from "../MissionDialog";
 import { Crew } from "../Crew/Crew";
 import { ImmediateConversationDialog } from "../ImmediateConversation";
 import { HitPointsInfo } from "../HitPoints";
+import { Docks } from "../Docks";
+import ShipBuildingQueue from "../ShipBuildingQueue";
+import { Production } from "../Production";
 
 export interface PanelProps {
   expanded?: boolean;
   entity: Entity | undefined;
 }
 
-const JournalWrapper: React.FC<React.PropsWithChildren<{ entity: Entity }>> = ({
-  entity,
-  children,
-}) =>
-  entity.hasComponents(["journal"]) ? (
+const JournalWrapper: React.FC<
+  React.PropsWithChildren<{ entity: Entity; isPlayerOwned: boolean }>
+> = ({ entity, isPlayerOwned, children }) =>
+  entity.hasComponents(["journal"]) && isPlayerOwned ? (
     <TabGroup>
       <TabList className={styles.tab}>
         <Tab>General</Tab>
@@ -73,8 +70,22 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
 
   const [dialog, setDialog] = useGameDialog();
   const toggleCollapse = React.useCallback(() => setCollapsed((c) => !c), []);
+  const [showHidden, setShowHidden] = React.useState(false);
 
   const [sim] = useSim();
+  React.useEffect(() => {
+    sim.actions.register(
+      {
+        category: "core",
+        description: "Show all entity data like they were owned by player",
+        fn: () => setShowHidden((v) => !v),
+        name: "Show hidden entity data",
+        slug: "showEntityHiddenData",
+        type: "basic",
+      },
+      "Panel"
+    );
+  }, []);
 
   const closeDialog = React.useCallback(() => setDialog(null), []);
 
@@ -117,6 +128,8 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
         : "neutral";
   }
 
+  const showSensitive = playerOwned || showHidden;
+
   return (
     <>
       <PanelComponent
@@ -130,28 +143,33 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
           (entity ? (
             <>
               {entity.hasComponents(["name"]) && (
-                <EntityName entity={entity.requireComponents(["name"])} />
+                <EntityName
+                  entity={entity.requireComponents(["name"])}
+                  editable={playerOwned}
+                />
               )}
-              <JournalWrapper entity={entity}>
+              <JournalWrapper entity={entity} isPlayerOwned={playerOwned}>
                 {entity.hasComponents(["trade", "storage", "budget"]) && (
                   <>
-                    <div>
-                      Money: {entity.components.budget!.available.toFixed(0)}
-                      {playerOwned && (
-                        <IconButton
-                          className={styles.manage}
-                          variant="naked"
-                          onClick={() =>
-                            setDialog({
-                              type: "facilityMoneyManager",
-                              entityId: entity.id,
-                            })
-                          }
-                        >
-                          <ConfigIcon />
-                        </IconButton>
-                      )}
-                    </div>
+                    {showSensitive && (
+                      <div>
+                        Money: {entity.components.budget!.available.toFixed(0)}
+                        {playerOwned && (
+                          <IconButton
+                            className={styles.manage}
+                            variant="naked"
+                            onClick={() =>
+                              setDialog({
+                                type: "facilityMoneyManager",
+                                entityId: entity.id,
+                              })
+                            }
+                          >
+                            <ConfigIcon />
+                          </IconButton>
+                        )}
+                      </div>
+                    )}
                     <hr />
                     <Offers
                       entity={entity.requireComponents([
@@ -175,11 +193,28 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                 {entity.hasComponents(["hitpoints"]) && (
                   <HitPointsInfo hp={entity.cp.hitpoints} />
                 )}
-                {entity.hasComponents(shipComponents) ? (
-                  <ShipPanel entity={asShip(entity)} />
-                ) : entity.hasComponents(facilityComponents) ? (
-                  <FacilityPanel entity={asFacility(entity)} />
-                ) : null}
+                {entity.hasComponents(shipComponents) && (
+                  <ShipPanel entity={entity} showSensitive={showSensitive} />
+                )}
+                {entity.hasComponents(["modules", "compoundProduction"]) &&
+                  showSensitive && (
+                    <>
+                      <Production entity={entity} />
+                      <hr />
+                    </>
+                  )}
+                {entity.hasComponents(["shipyard"]) && (
+                  <>
+                    <ShipBuildingQueue entity={entity} />
+                    <hr />
+                  </>
+                )}
+                {entity.hasComponents(["docks"]) && (
+                  <>
+                    <Docks entity={entity} />
+                    <hr />
+                  </>
+                )}
                 {entity.hasComponents(sectorComponents) && (
                   <>
                     <Resources entity={sector(entity)} />
@@ -187,7 +222,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                     <SectorPrices entity={sector(entity)} />
                   </>
                 )}
-                {entity.hasComponents(["storage"]) && (
+                {entity.hasComponents(["storage"]) && showSensitive && (
                   <>
                     <Storage entity={entity.requireComponents(["storage"])} />
                     <hr />
@@ -201,25 +236,26 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                     )}
                   </>
                 )}
-                {entity.hasComponents(["simpleCommodityStorage"]) && (
-                  <>
-                    <SimpleStorage
-                      entity={entity.requireComponents([
-                        "simpleCommodityStorage",
-                      ])}
-                    />
-                    <hr />
-                  </>
-                )}
-                {entity.hasComponents(["crew"]) && (
+                {entity.hasComponents(["simpleCommodityStorage"]) &&
+                  showSensitive && (
+                    <>
+                      <SimpleStorage
+                        entity={entity.requireComponents([
+                          "simpleCommodityStorage",
+                        ])}
+                      />
+                      <hr />
+                    </>
+                  )}
+                {entity.hasComponents(["crew"]) && showSensitive && (
                   <Crew
                     entity={entity.requireComponents(["crew"])}
                     requiredCrew={requiredCrew}
                     growth={growth!}
                   />
                 )}
-                <Subordinates entity={entity} />
-                {entity.hasComponents(["deployable"]) && (
+                {showSensitive && <Subordinates entity={entity} />}
+                {entity.hasComponents(["deployable"]) && showSensitive && (
                   <Undeploy
                     deployable={entity.requireComponents(["deployable"])}
                     facility={
@@ -232,7 +268,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
               </JournalWrapper>
             </>
           ) : (
-            <JournalWrapper entity={player}>
+            <JournalWrapper isPlayerOwned entity={player}>
               <PlayerShips />
               <PlayerFacilities />
               {window.dev && (
