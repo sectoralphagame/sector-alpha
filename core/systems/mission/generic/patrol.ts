@@ -111,7 +111,8 @@ export const genericPatrolMissionHandler: MissionHandler = {
       (s) =>
         s.cp.owner.id === player.id &&
         s.cp.orders.value[0]?.type === "patrol" &&
-        s.cp.orders.value[0].sectorId === mission.data.sectorId,
+        s.cp.orders.value[0].sectorId === mission.data.sectorId &&
+        s.cp.position.sector === mission.data.sectorId,
       sim.queries.ships.getIt()
     );
 
