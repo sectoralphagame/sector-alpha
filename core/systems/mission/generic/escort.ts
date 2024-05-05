@@ -252,8 +252,11 @@ export const genericEscortMissionHandler: MissionHandler = {
       throw new Error("Mission is not a generic.escort mission");
 
     const freighter = sim
-      .getOrThrow(mission.data.freighterId)
-      .requireComponents(["position", "orders"]);
+      .get(mission.data.freighterId)
+      ?.requireComponents(["position", "orders"]);
+
+    if (!freighter) return;
+
     const shipInDistance = pipe(
       sim.queries.ships.getIt(),
       find(

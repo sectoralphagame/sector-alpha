@@ -1,4 +1,5 @@
 .commodities {
+  margin-top: var(--spacing-2);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 }

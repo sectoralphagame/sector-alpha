@@ -36,19 +36,11 @@ export const Overlay: React.FC<OverlayProps> = ({
   children,
 }) => {
   const [overlays, setOverlays] = React.useState<GameOverlayProps[]>([]);
-  const [closing, setClosing] = React.useState(false);
   const [, setOverlay] = useGameOverlay();
   const register = React.useCallback(
     (name: GameOverlayProps) => setOverlays((prev) => uniq([...prev, name])),
     []
   );
-  const close = () => {
-    setClosing(true);
-    setTimeout(() => {
-      setClosing(false);
-      onClose();
-    }, 200);
-  };
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -56,14 +48,13 @@ export const Overlay: React.FC<OverlayProps> = ({
       <div
         className={clsx(styles.root, {
           [styles.active]: open,
-          [styles.closing]: closing,
         })}
         id="overlay"
       >
         {open ? (
           <>
             <div className={styles.bar}>
-              <Button type="button" onClick={close}>
+              <Button type="button" onClick={onClose}>
                 Back
               </Button>
               {overlays.map((slug) => (

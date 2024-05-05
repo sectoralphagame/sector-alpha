@@ -13,10 +13,10 @@ export class SelectingSystem extends SystemWithHooks {
       return;
     }
 
-    if (this.manager.cp.selectionManager.id) {
-      window.selected = this.sim.getOrThrow(
-        this.manager.cp.selectionManager.id!
-      );
+    const selected = this.sim.get(this.manager.cp.selectionManager.id!);
+
+    if (this.manager.cp.selectionManager.id && selected) {
+      window.selected = selected;
     } else {
       clearFocus(this.manager.cp.selectionManager);
     }
