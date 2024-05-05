@@ -29,6 +29,7 @@ if (
       apiKey: process.env.BUGSNAG_API_KEY,
       appVersion: packageJson.version,
       releaseStage: process.env.BUILD_ENV,
+      overwrite: true,
     })
   );
 }

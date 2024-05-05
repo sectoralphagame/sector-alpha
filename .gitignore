@@ -5,6 +5,7 @@
 !.github
 !.eslintrc.js
 !.prettierrc
+!.prettierignore
 !.storybook
 !.husky
 dist
