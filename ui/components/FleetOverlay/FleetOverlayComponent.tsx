@@ -64,7 +64,6 @@ const FleetComponent: React.FC<FleetComponentProps> = ({
           <ChevronDownIcon />
         </IconButton>
         <ShipButton
-          className={styles.shipNoMargin}
           key={fleet.commander.id}
           ship={fleet.commander}
           selected={selected}
@@ -75,8 +74,9 @@ const FleetComponent: React.FC<FleetComponentProps> = ({
       </div>
       {expanded && (
         <div
+          className={styles.fleetSubordinates}
           style={{
-            marginLeft: `calc(${level} * var(--spacing-2))`,
+            marginLeft: `calc(${3} * var(--spacing))`,
           }}
         >
           {fleet.subordinates
@@ -107,6 +107,7 @@ const FleetComponent: React.FC<FleetComponentProps> = ({
                 </div>
               ) : (
                 <ShipButton
+                  className={styles.shipMargin}
                   key={subordinate.id}
                   ship={subordinate}
                   selected={selected}
@@ -157,7 +158,6 @@ export const FleetOverlayComponent: React.FC<FleetOverlayComponentProps> = ({
           <div>
             {unassigned.map((ship) => (
               <ShipButton
-                className={styles.shipNoMargin}
                 key={ship.id}
                 ship={ship}
                 selected={selected}

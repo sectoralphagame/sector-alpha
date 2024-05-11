@@ -11,10 +11,13 @@
   }
   &Expand {
     transform: rotate(-90deg);
-    margin-left: calc(2.5 * var(--spacing-1));
+    width: 16px;
   }
   &Expanded {
     transform: rotate(0deg);
+  }
+  &Subordinates {
+    margin-left: calc(3 * var(--spacing));
   }
 }
 
@@ -22,6 +25,6 @@
   margin: var(--spacing-4) 0;
 }
 
-.shipNoMargin {
-  margin-left: 0;
+.shipMargin {
+  margin-left: calc(3 * var(--spacing-1));
 }

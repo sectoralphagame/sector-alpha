@@ -8,7 +8,6 @@ import { first } from "@fxts/core";
 import { getSelected } from "@core/components/selection";
 import { useContextMenu, useSim } from "../atoms";
 import { ShipButton } from "./ShipButton";
-import styles from "./PlayerShips.scss";
 
 export const PlayerShips: React.FC = () => {
   const [sim] = useSim();
@@ -58,7 +57,6 @@ export const PlayerShips: React.FC = () => {
         ) : (
           ships.map((ship) => (
             <ShipButton
-              className={styles.noMargin}
               key={ship.id}
               ship={ship}
               selected={selected}

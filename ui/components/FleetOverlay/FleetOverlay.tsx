@@ -3,8 +3,20 @@ import { getSelected } from "@core/components/selection";
 import { filter, map, pipe, toArray } from "@fxts/core";
 import { useContextMenu, useGameOverlay, useSim } from "@ui/atoms";
 import React from "react";
+import type { Sim } from "@core/sim";
 import { useOverlayRegister } from "../Overlay/Overlay";
 import { FleetOverlayComponent } from "./FleetOverlayComponent";
+
+function getSubordinateTree(commander: Ship, sim: Sim) {
+  if (commander.cp.subordinates.ids.length === 0) return commander;
+
+  return {
+    commander,
+    subordinates: commander.cp.subordinates.ids.map((id) =>
+      getSubordinateTree(sim.getOrThrow(id), sim)
+    ),
+  };
+}
 
 export const FleetOverlay: React.FC = () => {
   const [sim] = useSim();
@@ -54,12 +66,7 @@ export const FleetOverlay: React.FC = () => {
             ship.cp.subordinates.ids.length > 0 &&
             !ship.cp.commander
         ),
-        map((commander) => ({
-          commander,
-          subordinates: commander.cp.subordinates.ids.map((id) =>
-            sim.getOrThrow<Ship>(id)
-          ),
-        })),
+        map((commander) => getSubordinateTree(commander, sim)),
         toArray
       ),
     [sim.queries.ships.get()]

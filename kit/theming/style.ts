@@ -109,14 +109,6 @@ export const Styles: React.FC<React.PropsWithChildren> = ({ children }) => {
   );
 
   React.useEffect(() => {
-    const styleTag = document.createElement("style");
-    document.head.append(styleTag);
-    styleTag.innerHTML =
-      // eslint-disable-next-line quotes
-      '@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap");';
-  }, []);
-
-  React.useEffect(() => {
     if (!cssVariables.current) {
       const styleTag = document.createElement("style");
       styleTag.setAttribute("data-css-variable", "true");

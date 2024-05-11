@@ -1,5 +1,7 @@
 $spacing: 8px;
 
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap");
+
 * {
   box-sizing: border-box;
   font-family: Space Mono, monospace;
@@ -60,9 +62,6 @@ input::-webkit-inner-spin-button {
 
 input[type="number"] {
   appearance: textfield;
-}
-
-:global(.ReactModal__Content.ReactModal__Content--after-open) {
 }
 
 // Having stylesheet without local class breaks type generation
