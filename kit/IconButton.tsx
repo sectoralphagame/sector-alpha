@@ -5,7 +5,7 @@ import type { BaseButtonProps } from "./BaseButton";
 import { BaseButton } from "./BaseButton";
 
 interface IconButtonProps extends BaseButtonProps {
-  variant?: "outlined" | "naked";
+  variant?: "outlined" | "naked" | "opaque";
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({
@@ -19,6 +19,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
     className={clsx(styles.root, props?.className, {
       [styles.outlined]: variant === "outlined",
       [styles.naked]: variant === "naked",
+      [styles.opaque]: variant === "opaque",
     })}
   />
 );

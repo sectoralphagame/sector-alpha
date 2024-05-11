@@ -116,6 +116,7 @@ const Orders: React.FC<{ ship: Ship }> = ({ ship }) => {
                     event.stopPropagation();
                     removeOrder(ship, orderIndex);
                   }}
+                  variant="opaque"
                 >
                   <CloseIcon />
                 </IconButton>
