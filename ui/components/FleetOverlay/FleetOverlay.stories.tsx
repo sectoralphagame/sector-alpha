@@ -144,4 +144,6 @@ Default.args = {
   unassigned,
   selected: 0,
   onSelect: action("onSelect"),
+  onContextMenu: action("onContextMenu"),
+  onFocus: action("onFocus"),
 } as FleetOverlayComponentProps;
