@@ -1,0 +1,44 @@
+@import "kit/theming/global.scss";
+
+.ship {
+  appearance: none;
+  background: none;
+  border: none;
+  margin-left: calc(5 * var(--spacing-1));
+  text-align: left;
+  color: var(--palette-text);
+  cursor: pointer;
+  padding: 3px 0;
+  width: fill-available;
+  width: -webkit-fill-available;
+
+  &Active {
+    background-color: var(--palette-background-active);
+  }
+
+  &Order {
+    float: right;
+    text-align: right;
+  }
+
+  &Icon {
+    height: 12px;
+    width: 16px;
+    margin-right: $spacing;
+
+    [fill="#fff"],
+    [fill="#ffffff"],
+    [fill="#FFF"],
+    [fill="#FFFFFF"],
+    [fill="white"] {
+      fill: currentColor;
+    }
+    [stroke="#fff"],
+    [stroke="#ffffff"],
+    [stroke="#FFF"],
+    [stroke="#FFFFFF"],
+    [stroke="white"] {
+      stroke: currentColor;
+    }
+  }
+}

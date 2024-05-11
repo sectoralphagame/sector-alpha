@@ -1,13 +1,13 @@
-import type { RequireComponent } from "@core/tsHelpers";
 import { IconButton } from "@kit/IconButton";
 import React from "react";
 import clsx from "clsx";
 import Text from "@kit/Text";
 import { ChevronDownIcon } from "@assets/ui/icons";
-import { BaseButton } from "@kit/BaseButton";
+import type { RequirePureComponent } from "@core/tsHelpers";
 import styles from "./FleetOverlay.scss";
+import { ShipButton } from "../ShipButton";
 
-type Ship = RequireComponent<"name" | "autoOrder">;
+type Ship = RequirePureComponent<"name" | "autoOrder">;
 
 export interface Fleet {
   commander: Ship;
@@ -28,39 +28,6 @@ export interface FleetOverlayComponentProps {
 function isFleet(value: Fleet | Ship): value is Fleet {
   return (value as Fleet).subordinates !== undefined;
 }
-
-interface ShipButtonProps {
-  className?: string;
-  ship: Ship;
-  selected: number | undefined;
-  onSelect: (_id: number) => void;
-  onFocus: () => void;
-  onContextMenu: (
-    _id: number,
-    _event: React.MouseEvent<HTMLButtonElement>
-  ) => void;
-}
-
-const ShipButton: React.FC<ShipButtonProps> = ({
-  className,
-  ship,
-  selected,
-  onSelect,
-  onFocus,
-  onContextMenu,
-}) => (
-  <BaseButton
-    className={clsx(styles.ship, className, {
-      [styles.shipActive]: selected === ship.id,
-    })}
-    onClick={() => onSelect(ship.id)}
-    onDoubleClick={onFocus}
-    onContextMenu={(event) => onContextMenu(ship.id, event)}
-  >
-    {ship.cp.name.value}
-    <span className={styles.shipOrder}>{ship.cp.autoOrder.default.type}</span>
-  </BaseButton>
-);
 
 interface FleetComponentProps {
   fleet: Fleet;

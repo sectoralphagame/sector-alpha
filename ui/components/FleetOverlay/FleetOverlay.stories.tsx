@@ -37,6 +37,15 @@ const fleets = Array(3)
         type: "hold",
       },
     };
+    commander.cp.render = {
+      color: 0x00ff00,
+      texture: "lMil",
+      defaultScale: 1,
+      interactive: true,
+      layer: "ship",
+      name: "render",
+      visible: true,
+    };
 
     return {
       commander,
@@ -75,6 +84,16 @@ const fleets = Array(3)
                       type: "escort",
                     },
                   };
+                  subordinate.cp.render = {
+                    color: 0x00ff00,
+                    texture: "sMil",
+                    defaultScale: 1,
+                    interactive: true,
+                    layer: "ship",
+                    name: "render",
+                    visible: true,
+                  };
+
                   return subordinate;
                 }),
             };
@@ -107,6 +126,15 @@ const unassigned = Array(5)
       default: {
         type: "trade",
       },
+    };
+    ship.cp.render = {
+      color: 0x00ff00,
+      texture: "lMil",
+      defaultScale: 1,
+      interactive: true,
+      layer: "ship",
+      name: "render",
+      visible: true,
     };
 
     return ship;
