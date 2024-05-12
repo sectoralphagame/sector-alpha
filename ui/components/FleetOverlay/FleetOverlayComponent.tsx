@@ -29,6 +29,18 @@ function isFleet(value: Fleet | Ship): value is Fleet {
   return (value as Fleet).subordinates !== undefined;
 }
 
+function hasSelectedSubordinate(
+  fleet: Fleet,
+  selected: number | undefined
+): boolean {
+  return fleet.subordinates.some((subordinate) =>
+    isFleet(subordinate)
+      ? hasSelectedSubordinate(subordinate, selected) ||
+        subordinate.commander.id === selected
+      : subordinate.id === selected
+  );
+}
+
 interface FleetComponentProps {
   fleet: Fleet;
   level?: number;
@@ -49,7 +61,9 @@ const FleetComponent: React.FC<FleetComponentProps> = ({
   onFocus,
   onContextMenu,
 }) => {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(
+    hasSelectedSubordinate(fleet, selected)
+  );
 
   return (
     <div>
