@@ -83,7 +83,6 @@ export class Entity {
     };
     this.componentsMask |= componentMask[componentName];
     if (!exists) {
-      console.log("add component");
       this.sim.hooks.addComponent.notify({
         entity: this,
         component: component.name,
