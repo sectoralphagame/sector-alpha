@@ -1,13 +1,13 @@
-import type { RequireComponent } from "@core/tsHelpers";
 import { IconButton } from "@kit/IconButton";
 import React from "react";
 import clsx from "clsx";
 import Text from "@kit/Text";
 import { ChevronDownIcon } from "@assets/ui/icons";
-import { BaseButton } from "@kit/BaseButton";
+import type { RequirePureComponent } from "@core/tsHelpers";
 import styles from "./FleetOverlay.scss";
+import { ShipButton } from "../ShipButton";
 
-type Ship = RequireComponent<"name" | "autoOrder">;
+type Ship = RequirePureComponent<"name" | "autoOrder">;
 
 export interface Fleet {
   commander: Ship;
@@ -29,38 +29,17 @@ function isFleet(value: Fleet | Ship): value is Fleet {
   return (value as Fleet).subordinates !== undefined;
 }
 
-interface ShipButtonProps {
-  className?: string;
-  ship: Ship;
-  selected: number | undefined;
-  onSelect: (_id: number) => void;
-  onFocus: () => void;
-  onContextMenu: (
-    _id: number,
-    _event: React.MouseEvent<HTMLButtonElement>
-  ) => void;
+function hasSelectedSubordinate(
+  fleet: Fleet,
+  selected: number | undefined
+): boolean {
+  return fleet.subordinates.some((subordinate) =>
+    isFleet(subordinate)
+      ? hasSelectedSubordinate(subordinate, selected) ||
+        subordinate.commander.id === selected
+      : subordinate.id === selected
+  );
 }
-
-const ShipButton: React.FC<ShipButtonProps> = ({
-  className,
-  ship,
-  selected,
-  onSelect,
-  onFocus,
-  onContextMenu,
-}) => (
-  <BaseButton
-    className={clsx(styles.ship, className, {
-      [styles.shipActive]: selected === ship.id,
-    })}
-    onClick={() => onSelect(ship.id)}
-    onDoubleClick={onFocus}
-    onContextMenu={(event) => onContextMenu(ship.id, event)}
-  >
-    {ship.cp.name.value}
-    <span className={styles.shipOrder}>{ship.cp.autoOrder.default.type}</span>
-  </BaseButton>
-);
 
 interface FleetComponentProps {
   fleet: Fleet;
@@ -82,7 +61,9 @@ const FleetComponent: React.FC<FleetComponentProps> = ({
   onFocus,
   onContextMenu,
 }) => {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(
+    hasSelectedSubordinate(fleet, selected)
+  );
 
   return (
     <div>
@@ -97,7 +78,6 @@ const FleetComponent: React.FC<FleetComponentProps> = ({
           <ChevronDownIcon />
         </IconButton>
         <ShipButton
-          className={styles.shipNoMargin}
           key={fleet.commander.id}
           ship={fleet.commander}
           selected={selected}
@@ -108,8 +88,9 @@ const FleetComponent: React.FC<FleetComponentProps> = ({
       </div>
       {expanded && (
         <div
+          className={styles.fleetSubordinates}
           style={{
-            marginLeft: `calc(${level} * var(--spacing-2))`,
+            marginLeft: `calc(${3} * var(--spacing))`,
           }}
         >
           {fleet.subordinates
@@ -140,6 +121,7 @@ const FleetComponent: React.FC<FleetComponentProps> = ({
                 </div>
               ) : (
                 <ShipButton
+                  className={styles.shipMargin}
                   key={subordinate.id}
                   ship={subordinate}
                   selected={selected}
@@ -190,7 +172,6 @@ export const FleetOverlayComponent: React.FC<FleetOverlayComponentProps> = ({
           <div>
             {unassigned.map((ship) => (
               <ShipButton
-                className={styles.shipNoMargin}
                 key={ship.id}
                 ship={ship}
                 selected={selected}

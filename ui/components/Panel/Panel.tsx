@@ -66,7 +66,9 @@ const JournalWrapper: React.FC<
   );
 
 export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
-  const [isCollapsed, setCollapsed] = React.useState(!expanded);
+  const [isCollapsed, setCollapsed] = React.useState(
+    expanded === undefined ? false : !expanded
+  );
 
   const [dialog, setDialog] = useGameDialog();
   const toggleCollapse = React.useCallback(() => setCollapsed((c) => !c), []);

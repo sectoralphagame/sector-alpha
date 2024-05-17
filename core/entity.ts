@@ -101,8 +101,12 @@ export class Entity {
   }
 
   addTag(tag: EntityTag): Entity {
-    this.tags.add(tag);
-    this.sim.hooks.addTag.notify({ tag, entity: this });
+    const hasTag = this.tags.has(tag);
+
+    if (!hasTag) {
+      this.tags.add(tag);
+      this.sim.hooks.addTag.notify({ tag, entity: this });
+    }
 
     return this;
   }

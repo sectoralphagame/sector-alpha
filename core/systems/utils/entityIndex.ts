@@ -210,7 +210,7 @@ export function createQueries(sim: Sim) {
       [],
       true
     ),
-    ships: new Index(sim, shipComponents, ["ship"]),
+    ships: new Index(sim, shipComponents, ["ship"], true),
     shipyards: new Index(
       sim,
       [...facilityComponents, "owner", "shipyard"],

@@ -20,7 +20,12 @@ module.exports = {
       ...config,
       module: {
         ...config.module,
-        rules: [...config.module.rules, ...custom.module.rules],
+        rules: [
+          ...config.module.rules.filter(({ test }) =>
+            test ? !test.toString().includes(".css") : true
+          ),
+          ...custom.module.rules,
+        ],
       },
       resolve: {
         ...config.resolve,
