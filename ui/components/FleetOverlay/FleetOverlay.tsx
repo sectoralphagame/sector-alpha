@@ -59,7 +59,7 @@ export const FleetOverlay: React.FC = () => {
   const fleets = React.useMemo(
     () =>
       pipe(
-        sim.queries.ships.get(),
+        sim.queries.ships.getIt(),
         filter(
           (ship) =>
             ship.cp.owner.id === player.id &&
@@ -69,12 +69,12 @@ export const FleetOverlay: React.FC = () => {
         map((commander) => getSubordinateTree(commander, sim)),
         toArray
       ),
-    [sim.queries.ships.get()]
+    [sim.queries.ships.getIt()]
   );
   const unassigned = React.useMemo(
     () =>
       pipe(
-        sim.queries.ships.get(),
+        sim.queries.ships.getIt(),
         filter(
           (ship) =>
             ship.cp.owner.id === player.id &&
@@ -83,7 +83,7 @@ export const FleetOverlay: React.FC = () => {
         ),
         toArray
       ),
-    [sim.queries.ships.get()]
+    [sim.queries.ships.getIt()]
   );
 
   if (overlay !== "fleet") return null;

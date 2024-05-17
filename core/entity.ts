@@ -83,6 +83,7 @@ export class Entity {
     };
     this.componentsMask |= componentMask[componentName];
     if (!exists) {
+      console.log("add component");
       this.sim.hooks.addComponent.notify({
         entity: this,
         component: component.name,
@@ -101,8 +102,12 @@ export class Entity {
   }
 
   addTag(tag: EntityTag): Entity {
-    this.tags.add(tag);
-    this.sim.hooks.addTag.notify({ tag, entity: this });
+    const hasTag = this.tags.has(tag);
+
+    if (!hasTag) {
+      this.tags.add(tag);
+      this.sim.hooks.addTag.notify({ tag, entity: this });
+    }
 
     return this;
   }
