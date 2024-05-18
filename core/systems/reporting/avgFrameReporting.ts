@@ -1,5 +1,9 @@
 import type { Sim } from "@core/sim";
+import { Observable } from "@core/utils/observer";
 import { System } from "../system";
+
+export const frameData = new Observable<number[]>("frameData", false);
+frameData.value = [];
 
 export class AvgFrameReportingSystem extends System {
   start = 0;
@@ -19,6 +23,9 @@ export class AvgFrameReportingSystem extends System {
         description: "Toggle average frame time reporting",
         fn: () => {
           this.reporting = !this.reporting;
+          if (!this.reporting) {
+            frameData.notify([]);
+          }
         },
       },
       this.constructor.name
@@ -36,7 +43,12 @@ export class AvgFrameReportingSystem extends System {
 
       if (this.iterations === 60) {
         // eslint-disable-next-line no-console
-        console.log("Avg frame time: ", (this.accumulator / 60).toFixed(2));
+        const newData = frameData.value.slice();
+        newData.unshift(this.accumulator / 60);
+        if (newData.length > 31) {
+          newData.pop();
+        }
+        frameData.notify(newData);
         this.iterations = 0;
         this.accumulator = 0;
       }
