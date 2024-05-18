@@ -20,6 +20,7 @@ import { SimControl } from "@ui/components/SimControl/SimControl";
 import DevOverlay from "@ui/components/DevOverlay/DevOverlay";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
 import { SelectedUnit } from "@ui/components/SelectedUnit";
+import SimAvgTimeGraph from "@ui/components/dev/SimAvgTimeGraph/SimAvgTimeGraph";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -166,6 +167,7 @@ const Game: React.FC = () => {
       any changes made by pixi, like cursor property. That's why rendering
       system creates own canvas here */}
       <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
+        <SimAvgTimeGraph />
         <PlayerMoney />
         <SimControl />
         <SelectedUnit />

@@ -1,0 +1,8 @@
+.root {
+  position: fixed;
+  top: 120px;
+  right: 0;
+  pointer-events: none;
+  background-color: var(--palette-background);
+  padding: var(--spacing);
+}
