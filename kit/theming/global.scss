@@ -54,6 +54,13 @@ th {
   isolation: isolate;
 }
 
+:global(#error) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   appearance: none;
