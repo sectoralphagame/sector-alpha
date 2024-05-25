@@ -1,3 +1,4 @@
+@use "sass:math";
 @import "kit/theming/global.scss";
 
 $actions: 56px;
@@ -25,23 +26,34 @@ $log: 400px;
   height: $responses;
   overflow-y: scroll;
   margin-top: $spacing * 2;
+}
 
-  li {
-    margin-bottom: $spacing * 2;
+.option {
+  &:hover {
+    color: var(--palette-active);
   }
 
-  button {
-    &:hover {
-      color: var(--palette-active);
-    }
-    text-align: left;
-    appearance: none;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    color: var(--palette-text-1);
-    font-size: var(--typography-default);
-    transition: 200ms;
+  transition: 200ms;
+  text-align: left;
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-size: var(--typography-default);
+  padding: var(--spacing-0-5);
+  margin: $spacing 0;
+  display: block;
+  width: 100%;
+
+  &Content {
+    display: inline-block;
+  }
+
+  &Index {
+    display: inline-block;
+    width: 2rem;
+    text-align: right;
+    padding-right: math.div($spacing, 2);
   }
 }
