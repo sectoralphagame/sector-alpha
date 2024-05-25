@@ -20,6 +20,15 @@ export interface ConversationDialogProps extends DialogProps {
 
 type Log = { line: ConversationLine; actor: string }[];
 
+const OptionButton: React.FC<
+  React.PropsWithChildren<{ onClick: () => void; index: number }>
+> = ({ index, onClick, children }) => (
+  <BaseButton className={styles.option} onClick={onClick}>
+    <span className={styles.optionIndex}>{index}.</span>
+    <span className={styles.optionContent}>{children}</span>
+  </BaseButton>
+);
+
 export const ConversationDialog: React.FC<ConversationDialogProps> = ({
   conversation,
   onClose,
@@ -130,35 +139,31 @@ export const ConversationDialog: React.FC<ConversationDialogProps> = ({
 
       {!!log.at(-1)?.line.next && (
         <Scrollbar className={styles.responses}>
-          <ol>
-            {responses.map((response, rIndex) => (
-              <li key={rIndex}>
-                <BaseButton
-                  onClick={() => {
-                    setResponses([]);
-                    if (response.set) {
-                      setFlags((prevFlags) => ({
-                        ...prevFlags,
-                        ...response.set,
-                      }));
-                    }
-                    loadNextNode([...log, { actor: "player", line: response }]);
-                  }}
-                >
-                  {!!response.action && <b>[{response.action}] </b>}
-                  {response?.text}
-                </BaseButton>
-              </li>
-            ))}
-            {log.at(-1)?.actor !== "player" &&
-              !log.at(-1)!.line.next![0].startsWith("player") && (
-                <li>
-                  <BaseButton onClick={() => loadNextNode(log)}>
-                    <b>Continue</b>
-                  </BaseButton>
-                </li>
-              )}
-          </ol>
+          {responses.map((response, rIndex) => (
+            <OptionButton
+              key={rIndex}
+              index={rIndex + 1}
+              onClick={() => {
+                setResponses([]);
+                if (response.set) {
+                  setFlags((prevFlags) => ({
+                    ...prevFlags,
+                    ...response.set,
+                  }));
+                }
+                loadNextNode([...log, { actor: "player", line: response }]);
+              }}
+            >
+              {!!response.action && <b>[{response.action}] </b>}
+              {response?.text}
+            </OptionButton>
+          ))}
+          {log.at(-1)?.actor !== "player" &&
+            !log.at(-1)!.line.next![0].startsWith("player") && (
+              <OptionButton index={1} onClick={() => loadNextNode(log)}>
+                <b>Continue</b>
+              </OptionButton>
+            )}
         </Scrollbar>
       )}
       {canClose && (
