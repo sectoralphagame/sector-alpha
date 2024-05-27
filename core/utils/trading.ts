@@ -116,19 +116,21 @@ export function acceptTrade(
           .getOrThrow(input.budget)
           .requireComponents(["budget"]).cp.budget
       : null;
-    // They are buying from us
-    if (input.type === "sell" && input.allocations?.buyer?.budget && budget) {
-      const allocation = releaseBudgetAllocation(
-        entityWithOffer.cp.budget,
-        input.allocations.buyer.budget
-      );
-      transferMoney(entityWithOffer.cp.budget, allocation.amount, budget);
-    } else if (input.allocations?.buyer?.budget && budget) {
-      const allocation = releaseBudgetAllocation(
-        budget,
-        input.allocations.buyer.budget
-      );
-      transferMoney(budget, allocation.amount, entityWithOffer.cp.budget);
+    if (input.allocations?.buyer?.budget && budget) {
+      // They are buying from us
+      if (input.type === "sell") {
+        const allocation = releaseBudgetAllocation(
+          entityWithOffer.cp.budget,
+          input.allocations.buyer.budget
+        );
+        transferMoney(entityWithOffer.cp.budget, allocation.amount, budget);
+      } else {
+        const allocation = releaseBudgetAllocation(
+          budget,
+          input.allocations.buyer.budget
+        );
+        transferMoney(budget, allocation.amount, entityWithOffer.cp.budget);
+      }
     }
   }
 

@@ -105,6 +105,22 @@ const Orders: React.FC<{ ship: Ship }> = ({ ship }) => {
 
   return (
     <>
+      {ship.tags.has("busy") && (
+        <div className={styles.orderGroupHeader}>
+          {ship.cp.storageTransfer
+            ? `Awaiting for cargo... ${(
+                (ship.cp.storageTransfer.transferred /
+                  ship.cp.storageTransfer.amount) *
+                100
+              ).toFixed(0)}%`
+            : "Awaiting..."}
+          {isOwned && (
+            <IconButton disabled variant="opaque">
+              <CloseIcon />
+            </IconButton>
+          )}
+        </div>
+      )}
       {ship.cp.orders.value.map((order, orderIndex) => (
         <Collapsible key={`${order.type}-${orderIndex}`}>
           <CollapsibleSummary>

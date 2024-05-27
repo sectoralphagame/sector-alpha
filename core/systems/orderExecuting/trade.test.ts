@@ -1,9 +1,13 @@
 import { matrix } from "mathjs";
 import { createFacility, facilityComponents } from "../../archetypes/facility";
+import type { Faction } from "../../archetypes/faction";
 import { createFaction } from "../../archetypes/faction";
 import { createSector } from "../../archetypes/sector";
 import { createShip } from "../../archetypes/ship";
-import { changeBudgetMoney } from "../../components/budget";
+import {
+  changeBudgetMoney,
+  newBudgetAllocation,
+} from "../../components/budget";
 import { addStorage } from "../../components/storage";
 import type { TransactionInput } from "../../components/trade";
 import { Sim } from "../../sim";
@@ -11,6 +15,182 @@ import { tradeCommodity } from "../../utils/trading";
 import { shipClasses } from "../../world/ships";
 import { PathPlanningSystem } from "../pathPlanning";
 import { removeOrder } from "./orderExecuting";
+import type { RequireComponent } from "../../tsHelpers";
+import { trade } from "./trade";
+import type { TradeAction } from "../../components/orders";
+
+describe("Trading", () => {
+  let sim: Sim;
+  let source: RequireComponent<"drive" | "storage" | "dockable">;
+  let target: RequireComponent<
+    "storage" | "trade" | "owner" | "budget" | "docks" | "journal" | "position"
+  >;
+  let sourceOwner: Faction;
+  let targetOwner: Faction;
+
+  beforeEach(() => {
+    sim = new Sim();
+    sourceOwner = createFaction("SourceOwner", sim);
+    targetOwner = createFaction("TargetOwner", sim);
+    const sector = createSector(sim, {
+      name: "Sector",
+      position: [0, 0],
+      slug: "sector",
+    });
+    source = createShip(sim, {
+      ...shipClasses.find((sc) => sc.slug === "courierA")!,
+      position: [0, 0],
+      owner: sourceOwner,
+      sector,
+    });
+    target = createFacility(sim, {
+      position: [0, 0],
+      owner: targetOwner,
+      sector,
+    }).requireComponents([...facilityComponents, "owner"]);
+    target.cp.storage.max = 1000;
+  });
+
+  it("should be properly handled for sell orders", () => {
+    addStorage(source.cp.storage, "food", 10);
+    target.cp.trade.offers.food = {
+      active: true,
+      price: 10,
+      quantity: 100,
+      type: "buy",
+    };
+    const offer: TransactionInput = {
+      budget: sourceOwner.id,
+      commodity: "food",
+      factionId: targetOwner.id,
+      initiator: source.id,
+      price: 10,
+      quantity: 10,
+      type: "sell",
+      allocations: null,
+    };
+    const order: TradeAction = {
+      offer,
+      targetId: target.id,
+      type: "trade",
+    };
+    trade(order, source, target);
+    expect(source.cp.storage.stored.food).toBe(0);
+    expect(target.cp.storage.stored.food).toBe(10);
+    expect(sourceOwner.cp.budget.money).toBe(0);
+    expect(targetOwner.cp.budget.money).toBe(0);
+    expect(source.cp.storageTransfer).toBeDefined();
+  });
+
+  it("should be properly handled for sell orders with allocations", () => {
+    addStorage(source.cp.storage, "food", 10);
+    changeBudgetMoney(target.cp.budget, 100);
+    const allocation = newBudgetAllocation(target.cp.budget, {
+      amount: 100,
+      issued: 0,
+    });
+    target.cp.trade.offers.food = {
+      active: true,
+      price: 10,
+      quantity: 100,
+      type: "buy",
+    };
+    const offer: TransactionInput = {
+      budget: sourceOwner.id,
+      commodity: "food",
+      factionId: targetOwner.id,
+      initiator: source.id,
+      price: 10,
+      quantity: 10,
+      type: "sell",
+      allocations: {
+        buyer: { budget: allocation.id, storage: null },
+        seller: { budget: null, storage: null },
+      },
+    };
+    const order: TradeAction = {
+      offer,
+      targetId: target.id,
+      type: "trade",
+    };
+    trade(order, source, target);
+    expect(source.cp.storage.stored.food).toBe(0);
+    expect(target.cp.storage.stored.food).toBe(10);
+    expect(sourceOwner.cp.budget.money).toBe(100);
+    expect(targetOwner.cp.budget.money).toBe(0);
+    expect(source.cp.storageTransfer).toBeDefined();
+  });
+
+  it("should be properly handled for buy orders", () => {
+    addStorage(target.cp.storage, "food", 10);
+    target.cp.trade.offers.food = {
+      active: true,
+      price: 10,
+      quantity: 100,
+      type: "sell",
+    };
+    const offer: TransactionInput = {
+      budget: sourceOwner.id,
+      commodity: "food",
+      factionId: targetOwner.id,
+      initiator: source.id,
+      price: 10,
+      quantity: 10,
+      type: "buy",
+      allocations: null,
+    };
+    const order: TradeAction = {
+      offer,
+      targetId: target.id,
+      type: "trade",
+    };
+    trade(order, source, target);
+    expect(source.cp.storage.stored.food).toBe(10);
+    expect(target.cp.storage.stored.food).toBe(0);
+    expect(sourceOwner.cp.budget.money).toBe(0);
+    expect(targetOwner.cp.budget.money).toBe(0);
+    expect(target.cp.storageTransfer).toBeDefined();
+  });
+
+  it("should be properly handled for buy orders with allocations", () => {
+    changeBudgetMoney(sourceOwner.cp.budget, 100);
+    const allocation = newBudgetAllocation(sourceOwner.cp.budget, {
+      amount: 100,
+      issued: 0,
+    });
+    addStorage(target.cp.storage, "food", 10);
+    target.cp.trade.offers.food = {
+      active: true,
+      price: 10,
+      quantity: 100,
+      type: "sell",
+    };
+    const offer: TransactionInput = {
+      budget: sourceOwner.id,
+      commodity: "food",
+      factionId: targetOwner.id,
+      initiator: source.id,
+      price: 10,
+      quantity: 10,
+      type: "buy",
+      allocations: {
+        buyer: { budget: allocation.id, storage: null },
+        seller: { budget: null, storage: null },
+      },
+    };
+    const order: TradeAction = {
+      offer,
+      targetId: target.id,
+      type: "trade",
+    };
+    trade(order, source, target);
+    expect(source.cp.storage.stored.food).toBe(10);
+    expect(target.cp.storage.stored.food).toBe(0);
+    expect(sourceOwner.cp.budget.money).toBe(0);
+    expect(target.cp.budget.money).toBe(100);
+    expect(target.cp.storageTransfer).toBeDefined();
+  });
+});
 
 describe("Trade action cleanup", () => {
   let sim: Sim;
@@ -22,7 +202,7 @@ describe("Trade action cleanup", () => {
     sim = new Sim({
       systems: [pathPlanning],
     });
-    pathPlanning.exec(0);
+    pathPlanning.exec();
   });
 
   it("should work for sell orders", () => {
@@ -30,6 +210,7 @@ describe("Trade action cleanup", () => {
     const sector = createSector(sim, {
       position: matrix([0, 0]),
       name: "Sector",
+      slug: "sector",
     });
     const ship = createShip(sim, {
       ...shipClasses.find((sc) => sc.slug === "courierA")!,
@@ -97,6 +278,7 @@ describe("Trade action cleanup", () => {
     const sector = createSector(sim, {
       position: matrix([0, 0]),
       name: "Sector",
+      slug: "sector",
     });
     const ship = createShip(sim, {
       ...shipClasses.find((sc) => sc.slug === "courierA")!,

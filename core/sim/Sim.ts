@@ -29,7 +29,7 @@ export interface SimConfig {
 @Exclude()
 export class Sim extends BaseSim {
   @Expose()
-  entityIdCounter: number = 0;
+  entityIdCounter: number = 1;
   hooks: {
     addComponent: Observable<{
       entity: Entity;

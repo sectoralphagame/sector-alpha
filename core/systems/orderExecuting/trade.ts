@@ -26,13 +26,10 @@ export function trade(
       );
     }
 
-    transfer(
-      entity.cp.storage,
-      order.offer.commodity,
-      order.offer.quantity,
-      target.cp.storage,
-      true
-    );
+    transfer(entity, order.offer.commodity, order.offer.quantity, target, {
+      exact: true,
+      transfer: true,
+    });
   } else {
     if (order.offer.allocations?.buyer?.storage) {
       releaseStorageAllocation(
@@ -46,13 +43,10 @@ export function trade(
         order.offer.allocations.seller.storage
       );
     }
-    transfer(
-      target.cp.storage,
-      order.offer.commodity,
-      order.offer.quantity,
-      entity.cp.storage,
-      true
-    );
+    transfer(target, order.offer.commodity, order.offer.quantity, entity, {
+      exact: true,
+      transfer: true,
+    });
   }
 
   acceptTrade(target, order.offer);
