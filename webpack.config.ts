@@ -4,6 +4,7 @@ const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 const { EnvironmentPlugin } = require("webpack");
 const { BugsnagSourceMapUploaderPlugin } = require("webpack-bugsnag-plugins");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const packageJson = require("./package.json");
 
 const plugins = [
@@ -17,6 +18,7 @@ const plugins = [
     BUGSNAG_API_KEY: "",
     BUILD_ENV: "local",
   }),
+  new MiniCssExtractPlugin(),
 ];
 
 if (
@@ -67,7 +69,7 @@ const config = {
       {
         test: /\.scss$/i,
         use: [
-          "style-loader",
+          MiniCssExtractPlugin.loader,
           {
             loader: "dts-css-modules-loader",
             options: {
@@ -87,7 +89,7 @@ const config = {
       },
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
         test: /world\/data\/missions\/.*\.yml$/,
