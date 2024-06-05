@@ -4,7 +4,10 @@ const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 const { EnvironmentPlugin } = require("webpack");
 const { BugsnagSourceMapUploaderPlugin } = require("webpack-bugsnag-plugins");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const packageJson = require("./package.json");
+
+const devMode = process.env.NODE_ENV !== "production";
 
 const plugins = [
   new HtmlWebpackPlugin({
@@ -16,6 +19,10 @@ const plugins = [
     NODE_ENV: "development",
     BUGSNAG_API_KEY: "",
     BUILD_ENV: "local",
+  }),
+  new MiniCssExtractPlugin({
+    filename: devMode ? "[name].css" : "[name].[contenthash].css",
+    chunkFilename: devMode ? "[id].css" : "[id].[contenthash].css",
   }),
 ];
 
@@ -67,7 +74,7 @@ const config = {
       {
         test: /\.scss$/i,
         use: [
-          "style-loader",
+          MiniCssExtractPlugin.loader,
           {
             loader: "dts-css-modules-loader",
             options: {
@@ -87,7 +94,7 @@ const config = {
       },
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
         test: /world\/data\/missions\/.*\.yml$/,
