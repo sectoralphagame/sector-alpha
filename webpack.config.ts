@@ -7,6 +7,8 @@ const { BugsnagSourceMapUploaderPlugin } = require("webpack-bugsnag-plugins");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const packageJson = require("./package.json");
 
+const devMode = process.env.NODE_ENV !== "production";
+
 const plugins = [
   new HtmlWebpackPlugin({
     inject: true,
@@ -18,7 +20,10 @@ const plugins = [
     BUGSNAG_API_KEY: "",
     BUILD_ENV: "local",
   }),
-  new MiniCssExtractPlugin(),
+  new MiniCssExtractPlugin({
+    filename: devMode ? "[name].css" : "[name].[contenthash].css",
+    chunkFilename: devMode ? "[id].css" : "[id].[contenthash].css",
+  }),
 ];
 
 if (
