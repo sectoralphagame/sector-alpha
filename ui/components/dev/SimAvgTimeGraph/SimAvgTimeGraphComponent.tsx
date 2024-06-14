@@ -7,7 +7,7 @@ interface GraphProps {
 }
 
 const maxPoints = 31;
-const offsetX = 40;
+const offsetX = 60;
 const offsetY = 10;
 
 function drawLabel(
@@ -74,7 +74,7 @@ export const SimAvgTimeGraphComponent: React.FC<GraphProps> = ({
 
       context.strokeStyle = styles.getPropertyValue("--palette-text-3");
       context.fillStyle = styles.getPropertyValue("--palette-text-1");
-      context.font = "normal 12px Monospace";
+      context.font = "normal 18px Monospace";
       [max, (max * 3) / 4, max / 2, max / 4].forEach((value) =>
         drawLabel(context, value, width, height, max)
       );

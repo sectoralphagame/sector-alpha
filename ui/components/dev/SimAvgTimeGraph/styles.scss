@@ -5,4 +5,9 @@
   pointer-events: none;
   background-color: var(--palette-background);
   padding: var(--spacing);
+
+  canvas {
+    width: 300px;
+    height: 100px;
+  }
 }
