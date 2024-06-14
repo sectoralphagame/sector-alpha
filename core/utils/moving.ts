@@ -106,3 +106,40 @@ export function teleport(
 
   SectorIndex.notify(prevSector, sector, entity);
 }
+
+export type Driveable = RequireComponent<"drive" | "movable">;
+
+export function startCruise(entity: Driveable) {
+  entity.cp.drive.state = "warming";
+}
+
+export function stopCruise(entity: Driveable) {
+  entity.cp.movable.velocity = Math.min(
+    entity.cp.movable.velocity,
+    entity.cp.drive.maneuver
+  );
+  entity.cp.drive.state = "maneuver";
+}
+
+export function stop(entity: Driveable) {
+  entity.cp.movable.rotary = 0;
+  entity.cp.movable.velocity = 0;
+}
+
+export function setTarget(entity: Driveable, target: number | null) {
+  const shouldUpdate =
+    target === null ? true : target !== entity.cp.drive.target;
+
+  if (shouldUpdate) {
+    entity.cp.drive.state = "maneuver";
+    entity.cp.drive.target = target;
+    entity.cp.drive.targetReached = false;
+  }
+}
+
+export function clearTarget(entity: Driveable) {
+  stop(entity);
+  setTarget(entity, null);
+  entity.cp.drive.targetReached = true;
+  entity.cp.drive.mode = "goto";
+}

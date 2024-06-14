@@ -4,13 +4,10 @@ import type { RequireComponent } from "../tsHelpers";
 import { Index } from "./utils/entityIndex";
 import { System } from "./system";
 
-type Driveable = RequireComponent<"drive" | "position">;
+type Movable = RequireComponent<"movable" | "position">;
 
-function move(entity: Driveable, delta: number) {
-  if (!entity.cp.drive.active) return;
-
+function move(entity: Movable, delta: number) {
   const entityPosition = entity.cp.position;
-  const drive = entity.cp.drive;
 
   const entityAngle = normalizeAngle(
     // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
@@ -18,10 +15,10 @@ function move(entity: Driveable, delta: number) {
   );
   const moveVec = [Math.cos(entityAngle), Math.sin(entityAngle)];
   const dPos = [
-    moveVec[0] * drive.currentSpeed * delta,
-    moveVec[1] * drive.currentSpeed * delta,
+    moveVec[0] * entity.cp.movable.velocity * delta,
+    moveVec[1] * entity.cp.movable.velocity * delta,
   ];
-  const dAngle = drive.currentRotary;
+  const dAngle = entity.cp.movable.rotary * delta;
 
   entityPosition.coord[0] += dPos[0];
   entityPosition.coord[1] += dPos[1];
@@ -43,13 +40,13 @@ function move(entity: Driveable, delta: number) {
 }
 
 export class MovingSystem extends System {
-  entities: Driveable[];
-  index: Index<"drive" | "position">;
+  entities: Movable[];
+  index: Index<"movable" | "position">;
 
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    this.index = new Index(sim, ["drive", "position"]);
+    this.index = new Index(sim, ["movable", "position"]);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

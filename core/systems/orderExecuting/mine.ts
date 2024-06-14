@@ -1,14 +1,15 @@
-import { stop } from "@core/components/drive";
 import { asteroid } from "../../archetypes/asteroid";
 import { asteroidField, spawn } from "../../archetypes/asteroidField";
 import type { MineAction } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
 import { getMineableAsteroid } from "../../economy/utils";
 import type { RequireComponent } from "../../tsHelpers";
-import { moveToActions } from "../../utils/moving";
+import { moveToActions, stop } from "../../utils/moving";
 
 export function mineAction(
-  entity: RequireComponent<"drive" | "mining" | "position" | "storage">,
+  entity: RequireComponent<
+    "drive" | "mining" | "movable" | "position" | "storage"
+  >,
   order: MineAction
 ): boolean {
   const targetField = asteroidField(entity.sim.getOrThrow(order.targetFieldId));
@@ -37,7 +38,7 @@ export function mineAction(
     const rock = asteroid(entity.sim.getOrThrow(order.targetRockId!));
     entity.cp.mining.entityId = order.targetRockId;
     rock.cp.minable.minedById = entity.id;
-    stop(entity.cp.drive);
+    stop(entity);
 
     if (getAvailableSpace(entity.cp.storage) === 0) {
       entity.cp.mining.entityId = null;

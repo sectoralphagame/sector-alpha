@@ -13,7 +13,7 @@ export function escortOrder(
 }
 
 export function escortOrderCompleted(
-  entity: RequireComponent<"drive" | "position" | "orders">
+  entity: RequireComponent<"drive" | "movable" | "position" | "orders">
 ) {
   followOrderCompleted(entity);
 }

@@ -51,4 +51,5 @@ export const componentMask: Record<keyof CoreComponents, bigint> = {
   facilityModuleBonus: BigInt(1) << BigInt(46),
   crew: BigInt(1) << BigInt(47),
   crewRequirement: BigInt(1) << BigInt(48),
+  movable: BigInt(1) << BigInt(49),
 };
