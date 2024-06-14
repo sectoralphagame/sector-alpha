@@ -1,27 +1,22 @@
-import { teleport } from "@core/utils/moving";
+import { clearTarget, setTarget, stop, teleport } from "@core/utils/moving";
 import { waypoint } from "../../archetypes/waypoint";
-import {
-  clearTarget,
-  defaultDriveLimit,
-  setTarget,
-  stop,
-} from "../../components/drive";
+import { defaultDriveLimit } from "../../components/drive";
 import type { MoveAction, TeleportAction } from "../../components/orders";
 import type { RequireComponent } from "../../tsHelpers";
 import { undockShip } from "./dock";
 
 export function moveActionCleanup(
-  entity: RequireComponent<"drive" | "orders">
+  entity: RequireComponent<"drive" | "movable" | "orders">
 ): void {
-  clearTarget(entity.cp.drive);
+  clearTarget(entity);
   entity.cp.drive.limit = defaultDriveLimit;
 }
 
 export function moveAction(
-  entity: RequireComponent<"drive" | "orders">,
+  entity: RequireComponent<"drive" | "movable" | "orders">,
   order: MoveAction
 ): boolean {
-  setTarget(entity.cp.drive, order.targetId);
+  setTarget(entity, order.targetId);
   entity.cp.drive.limit = order.onlyManeuver
     ? entity.cp.drive.maneuver
     : defaultDriveLimit;
@@ -42,9 +37,9 @@ export function moveAction(
 }
 
 export function holdAction(
-  entity: RequireComponent<"drive" | "orders">
+  entity: RequireComponent<"drive" | "movable" | "orders">
 ): boolean {
-  stop(entity.cp.drive);
+  stop(entity);
 
   return false;
 }

@@ -44,6 +44,7 @@ import type { CreationDate } from "./creationDate";
 import type { Missions } from "./missions";
 import type { Crew } from "./crew";
 import type { CrewRequirement } from "./crewRequirement";
+import type { Movable } from "./movable";
 
 export interface CoreComponents {
   ai: Ai;
@@ -77,6 +78,7 @@ export interface CoreComponents {
   missions: Missions;
   model: Model;
   modules: Modules;
+  movable: Movable;
   name: Name;
   orders: Orders;
   owner: Owner;

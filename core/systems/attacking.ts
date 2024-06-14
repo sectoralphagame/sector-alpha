@@ -1,4 +1,3 @@
-import { stopCruise } from "@core/components/drive";
 import { changeHp } from "@core/components/hitpoints";
 import settings from "@core/settings";
 import type { Sim } from "@core/sim";
@@ -7,6 +6,7 @@ import { findInAncestors } from "@core/utils/findInAncestors";
 import { distance } from "mathjs";
 import type { DockSize } from "@core/components/dockable";
 import type { Entity } from "@core/entity";
+import { stopCruise } from "@core/utils/moving";
 import { regenCooldown } from "./hitpointsRegenerating";
 import { Index } from "./utils/entityIndex";
 import { System } from "./system";
@@ -96,19 +96,19 @@ export class AttackingSystem extends System {
         if (isInDistance(entity, target)) {
           entity.cooldowns.use(cdKey, entity.cp.damage.cooldown);
           if (
-            !target.cp.drive ||
+            !target.cp.movable ||
             !target.cp.dockable ||
             Math.random() >
               getEvasionChance(
-                target.cp.drive.currentSpeed,
+                target.cp.movable.velocity,
                 target.cp.dockable.size
               )
           ) {
             changeHp(target, entity.cp.damage.value);
             const parentEntity = findInAncestors(entity, "position");
 
-            if (target.cp.drive) {
-              stopCruise(target.cp.drive);
+            if (target.hasComponents(["drive", "movable"])) {
+              stopCruise(target);
             }
             if (shouldAttackBack(entity, target)) {
               if (target.cp.orders) {

@@ -1,8 +1,7 @@
 import type { Waypoint } from "@core/archetypes/waypoint";
-import { clearTarget } from "@core/components/drive";
 import type { FollowOrder, MoveAction } from "@core/components/orders";
 import type { RequireComponent } from "@core/tsHelpers";
-import { moveToActions } from "@core/utils/moving";
+import { clearTarget, moveToActions } from "@core/utils/moving";
 
 export function followOrder(
   entity: RequireComponent<"drive" | "position" | "orders">,
@@ -30,9 +29,9 @@ export function followOrder(
 }
 
 export function followOrderCompleted(
-  entity: RequireComponent<"drive" | "position" | "orders">
+  entity: RequireComponent<"drive" | "movable" | "position" | "orders">
 ) {
-  clearTarget(entity.cp.drive);
+  clearTarget(entity);
   entity.cp.drive.limit = Infinity;
   entity.cp.drive.minimalDistance = 0.01;
 }

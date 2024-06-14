@@ -10,7 +10,7 @@ const SimAvgTimeGraph: React.FC = () => {
   return (
     <div className={styles.root}>
       {data.length > 0 && (
-        <SimAvgTimeGraphComponent data={data} height={100} width={300} />
+        <SimAvgTimeGraphComponent data={data} height={200} width={600} />
       )}
     </div>
   );

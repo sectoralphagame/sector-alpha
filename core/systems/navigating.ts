@@ -1,21 +1,18 @@
 import { random, norm } from "mathjs";
 import { normalizeAngle } from "@core/utils/misc";
 import type { Position2D } from "@core/components/position";
-import {
-  clearTarget,
-  defaultDriveLimit,
-  startCruise,
-  stopCruise,
-} from "../components/drive";
+import type { Driveable } from "@core/utils/moving";
+import { clearTarget, startCruise, stopCruise } from "@core/utils/moving";
+import { defaultDriveLimit } from "../components/drive";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import { Index } from "./utils/entityIndex";
 import { System } from "./system";
 
-type Driveable = RequireComponent<"drive" | "position">;
+type Navigable = Driveable & RequireComponent<"position">;
 
-function hold(entity: Driveable) {
-  clearTarget(entity.cp.drive);
+function hold(entity: Navigable) {
+  clearTarget(entity);
   if (entity.cp.orders) {
     if (entity.cp.owner) {
       if (
@@ -65,8 +62,9 @@ export function getDeltaAngle(
 
 const cruiseTimer = "cruise";
 
-function setFlybyDrive(entity: Driveable, delta: number) {
+function setFlybyDrive(entity: Navigable, delta: number) {
   const drive = entity.cp.drive;
+  const movable = entity.cp.movable;
   const entityPosition = entity.cp.position;
   const targetEntity = entity.sim.get(drive.target!)!;
   const targetPosition = targetEntity.cp.position!;
@@ -90,7 +88,7 @@ function setFlybyDrive(entity: Driveable, delta: number) {
     ? entity.cp.hitpoints.shield.value / entity.cp.hitpoints.shield.max > 0.5
     : true;
 
-  drive.currentRotary =
+  movable.rotary =
     angleOffset > Math.PI * 0.85 &&
     (isInRange || !shieldsUp || Math.random() > 0.3)
       ? 0
@@ -103,36 +101,37 @@ function setFlybyDrive(entity: Driveable, delta: number) {
 
   entity.cp.drive.limit = defaultDriveLimit;
   if (
-    (targetEntity.cp.drive?.currentSpeed ?? 0) > drive.maneuver ||
+    (targetEntity.cp.movable?.velocity ?? 0) > drive.maneuver ||
     distance > drive.maneuver * drive.ttc
   ) {
     if (canCruise && drive.state === "maneuver") {
       entity.cooldowns.use(cruiseTimer, drive.ttc);
-      startCruise(drive);
+      startCruise(entity);
     }
   } else if (drive.state !== "maneuver") {
-    stopCruise(drive);
+    stopCruise(entity);
   }
 
   const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
   const maxSpeedLimited = Math.min(drive.limit ?? defaultDriveLimit, maxSpeed);
   const deltaSpeedMultiplier =
     angleOffset > Math.PI / 3 ? random(0.1, 0.55) : 1;
-  drive.currentSpeed = Math.max(
+  movable.velocity = Math.max(
     0,
     Math.min(
-      drive.currentSpeed +
+      movable.velocity +
         maxSpeed * drive.acceleration * delta * deltaSpeedMultiplier,
       maxSpeedLimited
     )
   );
 }
 
-function setDrive(entity: Driveable, delta: number) {
+function setDrive(entity: Navigable, delta: number) {
   if (!entity.cp.drive.active || delta === 0) return;
 
   const entityPosition = entity.cp.position;
   const drive = entity.cp.drive;
+  const movable = entity.cp.movable;
 
   if (!drive.target) return;
 
@@ -178,15 +177,10 @@ function setDrive(entity: Driveable, delta: number) {
   const distance = norm(path) as number;
   const angleOffset = Math.abs(targetAngle - entityAngle);
 
-  drive.currentRotary = getDeltaAngle(
-    targetAngle,
-    entityAngle,
-    drive.rotary,
-    delta
-  );
+  movable.rotary = getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
 
   if (distance < 0.1) {
-    drive.currentSpeed = 0;
+    movable.velocity = 0;
     drive.targetReached = true;
     if (targetEntity.cp.disposable) {
       targetEntity.unregister();
@@ -201,19 +195,19 @@ function setDrive(entity: Driveable, delta: number) {
 
   if (drive.mode === "follow" && targetEntity.cp.drive) {
     if (
-      targetEntity.cp.drive!.currentSpeed > drive.maneuver ||
+      targetEntity.cp.movable!.velocity > drive.maneuver ||
       distance > drive.maneuver * drive.ttc
     ) {
       if (canCruise && drive.state === "maneuver") {
         entity.cooldowns.use(cruiseTimer, drive.ttc);
-        startCruise(drive);
+        startCruise(entity);
       }
     } else if (drive.state !== "maneuver") {
-      stopCruise(drive);
+      stopCruise(entity);
     }
 
     if (distance <= 0.5) {
-      entity.cp.drive.limit = targetEntity.cp.drive!.currentSpeed;
+      entity.cp.drive.limit = targetEntity.cp.movable!.velocity;
     } else {
       entity.cp.drive.limit = defaultDriveLimit;
     }
@@ -221,7 +215,7 @@ function setDrive(entity: Driveable, delta: number) {
     entity.cp.drive.limit = defaultDriveLimit;
 
     if (distance <= drive.minimalDistance) {
-      drive.currentSpeed = 0;
+      movable.velocity = 0;
       drive.targetReached = true;
       if (targetEntity.cp.disposable) {
         targetEntity.unregister();
@@ -234,11 +228,11 @@ function setDrive(entity: Driveable, delta: number) {
       entity.cooldowns.canUse(cruiseTimer)
     ) {
       entity.cooldowns.use(cruiseTimer, drive.ttc);
-      startCruise(drive);
+      startCruise(entity);
     }
 
     if (!canCruise && drive.state === "cruise") {
-      stopCruise(drive);
+      stopCruise(entity);
     }
   }
 
@@ -246,25 +240,25 @@ function setDrive(entity: Driveable, delta: number) {
   const maxSpeedLimited = Math.min(drive.limit ?? defaultDriveLimit, maxSpeed);
   const speedMultiplier = angleOffset < Math.PI / 8 ? 1 : 0;
 
-  drive.currentSpeed =
+  movable.velocity =
     speedMultiplier *
     Math.max(
       0,
       Math.min(
-        drive.currentSpeed + maxSpeed * drive.acceleration * delta,
+        movable.velocity + maxSpeed * drive.acceleration * delta,
         maxSpeedLimited
       )
     );
 }
 
 export class NavigatingSystem extends System {
-  entities: Driveable[];
-  index: Index<"drive" | "position">;
+  entities: Navigable[];
+  index: Index<"drive" | "movable" | "position">;
 
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    this.index = new Index(sim, ["drive", "position"]);
+    this.index = new Index(sim, ["drive", "movable", "position"]);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

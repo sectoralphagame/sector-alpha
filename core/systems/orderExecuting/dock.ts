@@ -1,19 +1,19 @@
+import { clearTarget, setTarget } from "@core/utils/moving";
 import type { WithDock } from "../../components/dockable";
 import { availableDocks } from "../../components/dockable";
-import { clearTarget, setTarget } from "../../components/drive";
 import type { DockAction } from "../../components/orders";
 import { hide, show } from "../../components/render";
 import { DockSizeMismatchError } from "../../errors";
 import type { RequireComponent } from "../../tsHelpers";
 
 export function dockShip(
-  ship: RequireComponent<"drive" | "dockable" | "position">,
+  ship: RequireComponent<"drive" | "dockable" | "movable" | "position">,
   dock: WithDock
 ) {
   dock.cp.docks.docked.push(ship.id);
   ship.cp.dockable.dockedIn = dock.id;
   ship.cp.drive.active = false;
-  clearTarget(ship.cp.drive);
+  clearTarget(ship);
 
   if (ship.cp.render) {
     hide(ship.cp.render);
@@ -36,7 +36,7 @@ export function undockShip(
 }
 
 export function dockOrder(
-  entity: RequireComponent<"drive" | "dockable" | "position">,
+  entity: RequireComponent<"drive" | "dockable" | "movable" | "position">,
   order: DockAction
 ): boolean {
   const target = entity.sim
@@ -44,7 +44,7 @@ export function dockOrder(
     .requireComponents(["position", "docks"]);
   const { docks } = target.cp;
   const { size } = entity.cp.dockable;
-  setTarget(entity.cp.drive, order.targetId);
+  setTarget(entity, order.targetId);
 
   if (docks.pads[size] === 0) {
     throw new DockSizeMismatchError(size);

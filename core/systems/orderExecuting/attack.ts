@@ -1,18 +1,18 @@
 import type { Waypoint } from "@core/archetypes/waypoint";
-import { clearTarget, setTarget } from "@core/components/drive";
 import type {
   AttackAction,
   AttackOrder,
   MoveAction,
 } from "@core/components/orders";
 import type { RequireComponent } from "@core/tsHelpers";
-import { moveToActions } from "@core/utils/moving";
+import { clearTarget, moveToActions, setTarget } from "@core/utils/moving";
 import { isInDistance } from "../attacking";
 
-export function attackOrder(
-  entity: RequireComponent<"drive" | "position" | "orders" | "damage">,
-  group: AttackOrder
-) {
+type OffensiveEntity = RequireComponent<
+  "drive" | "movable" | "position" | "orders" | "damage"
+>;
+
+export function attackOrder(entity: OffensiveEntity, group: AttackOrder) {
   entity.cp.drive.minimalDistance = entity.cp.damage.range * 0.4;
   entity.cp.damage.targetId = group.targetId;
   const target = entity.sim.getOrThrow<Waypoint>(group.targetId);
@@ -42,7 +42,7 @@ export function attackOrder(
 }
 
 export function isAttackOrderCompleted(
-  entity: RequireComponent<"drive" | "position" | "orders" | "damage">,
+  entity: OffensiveEntity,
   group: AttackOrder
 ) {
   const target = group.targetId
@@ -58,11 +58,13 @@ export function isAttackOrderCompleted(
 }
 
 export function attackAction(
-  entity: RequireComponent<"drive" | "orders" | "damage" | "position">,
+  entity: RequireComponent<
+    "drive" | "movable" | "orders" | "damage" | "position"
+  >,
   action: AttackAction
 ): boolean {
   const target = entity.sim.getOrThrow<Waypoint>(action.targetId);
-  setTarget(entity.cp.drive, action.targetId);
+  setTarget(entity, action.targetId);
 
   if (target.cp.drive) {
     entity.cp.drive.mode =
@@ -76,17 +78,13 @@ export function attackAction(
     : true;
 }
 
-export function attackActionCleanup(
-  entity: RequireComponent<"drive" | "position" | "orders" | "damage">
-): void {
-  clearTarget(entity.cp.drive);
+export function attackActionCleanup(entity: OffensiveEntity): void {
+  clearTarget(entity);
   entity.cp.drive.limit = Infinity;
   entity.cp.drive.minimalDistance = 0.01;
   entity.cp.damage.targetId = null;
 }
 
-export function attackOrderCompleted(
-  entity: RequireComponent<"drive" | "position" | "orders" | "damage">
-) {
+export function attackOrderCompleted(entity: OffensiveEntity) {
   attackActionCleanup(entity);
 }

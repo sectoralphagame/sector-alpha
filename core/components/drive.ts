@@ -24,12 +24,10 @@ export interface Drive extends BaseComponent<"drive"> {
   active: boolean;
   /** Expressed in percent of max speed per second */
   acceleration: number;
-  currentSpeed: number;
   maneuver: number;
   cruise: number;
   /** Expressed in radians per second */
   rotary: number;
-  currentRotary: number;
   /** Time to initiate cruise engine */
   ttc: number;
 
@@ -49,8 +47,6 @@ export function createDrive(input: ShipDriveProps): Drive {
   return {
     ...input,
     active: true,
-    currentSpeed: 0,
-    currentRotary: 0,
     rotary: (input.rotary * Math.PI) / 180,
     state: "maneuver",
     target: null,
@@ -60,35 +56,4 @@ export function createDrive(input: ShipDriveProps): Drive {
     limit: defaultDriveLimit,
     mode: "goto",
   };
-}
-
-export function startCruise(drive: Drive) {
-  drive.state = "warming";
-}
-
-export function stopCruise(drive: Drive) {
-  drive.currentSpeed = Math.min(drive.currentSpeed, drive.maneuver);
-  drive.state = "maneuver";
-}
-
-export function setTarget(drive: Drive, target: number | null) {
-  const shouldUpdate = target === null ? true : target !== drive.target;
-
-  if (shouldUpdate) {
-    drive.state = "maneuver";
-    drive.target = target;
-    drive.targetReached = false;
-  }
-}
-
-export function stop(drive: Drive) {
-  drive.currentRotary = 0;
-  drive.currentSpeed = 0;
-}
-
-export function clearTarget(drive: Drive) {
-  stop(drive);
-  setTarget(drive, null);
-  drive.targetReached = true;
-  drive.mode = "goto";
 }

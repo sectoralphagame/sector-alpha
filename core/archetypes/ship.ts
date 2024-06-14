@@ -17,6 +17,7 @@ import type { ShipInput } from "../world/ships";
 export const shipComponents = [
   "autoOrder",
   "drive",
+  "movable",
   "dockable",
   "name",
   "orders",
@@ -79,6 +80,12 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
         pick(initial, ["acceleration", "rotary", "cruise", "ttc", "maneuver"])
       )
     )
+    .addComponent({
+      name: "movable",
+      acceleration: 0,
+      rotary: 0,
+      velocity: 0,
+    })
     .addComponent({
       name: "orders",
       value: [],
