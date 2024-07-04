@@ -1,7 +1,13 @@
 import { clearTarget, setTarget, stop, teleport } from "@core/utils/moving";
+import { distance } from "mathjs";
+import { show } from "@core/components/render";
 import { waypoint } from "../../archetypes/waypoint";
 import { defaultDriveLimit } from "../../components/drive";
-import type { MoveAction, TeleportAction } from "../../components/orders";
+import type {
+  MoveAction,
+  TeleportAction,
+  UndockAction,
+} from "../../components/orders";
 import type { RequireComponent } from "../../tsHelpers";
 import { undockShip } from "./dock";
 
@@ -22,7 +28,10 @@ export function moveAction(
     : defaultDriveLimit;
 
   if (entity.cp.dockable?.dockedIn) {
-    undockShip(entity.requireComponents(["drive", "position", "dockable"]));
+    entity.cp.orders.value[0].actions.unshift({
+      type: "undock",
+    });
+    return false;
   }
 
   if (order.ignoreReached) return false;
@@ -34,6 +43,32 @@ export function moveAction(
   }
 
   return reached;
+}
+
+export function undockAction(
+  entity: RequireComponent<
+    "drive" | "dockable" | "movable" | "orders" | "position" | "render"
+  >,
+  _order: UndockAction
+): boolean {
+  entity.cp.dockable.undocking = true;
+  entity.cp.drive.active = true;
+  entity.cp.drive.target = null;
+  show(entity.cp.render);
+  entity.cp.movable.velocity = entity.cp.drive.maneuver;
+  const facility = entity.sim
+    .getOrThrow(entity.cp.dockable!.dockedIn!)
+    .requireComponents(["position"]);
+  entity.cp.position.angle = facility.cp.position.angle + Math.PI;
+  const undocked =
+    (distance(entity.cp.position.coord, facility.cp.position.coord) as number) >
+    0.4;
+
+  if (undocked) {
+    undockShip(entity);
+  }
+
+  return undocked;
 }
 
 export function holdAction(

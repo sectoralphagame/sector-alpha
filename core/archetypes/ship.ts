@@ -111,6 +111,7 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       name: "dockable",
       size: initial.size,
       dockedIn: null,
+      undocking: false,
     })
     .addComponent({ name: "journal", entries: [] })
     .addComponent({

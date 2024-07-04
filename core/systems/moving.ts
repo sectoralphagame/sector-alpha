@@ -1,4 +1,3 @@
-import { normalizeAngle } from "@core/utils/misc";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import { Index } from "./utils/entityIndex";
@@ -9,19 +8,14 @@ type Movable = RequireComponent<"movable" | "position">;
 function move(entity: Movable, delta: number) {
   const entityPosition = entity.cp.position;
 
-  const entityAngle = normalizeAngle(
-    // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
-    entityPosition.angle - Math.PI / 2
-  );
+  // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
+  const entityAngle = entityPosition.angle - Math.PI / 2;
   const moveVec = [Math.cos(entityAngle), Math.sin(entityAngle)];
-  const dPos = [
-    moveVec[0] * entity.cp.movable.velocity * delta,
-    moveVec[1] * entity.cp.movable.velocity * delta,
-  ];
-  const dAngle = entity.cp.movable.rotary * delta;
+  const dAngle = entity.cp.movable.rotary;
+  const dPos = entity.cp.movable.velocity * delta;
 
-  entityPosition.coord[0] += dPos[0];
-  entityPosition.coord[1] += dPos[1];
+  entityPosition.coord[0] += moveVec[0] * dPos;
+  entityPosition.coord[1] += moveVec[1] * dPos;
   entityPosition.angle += dAngle;
   entityPosition.moved = true;
 
@@ -30,13 +24,11 @@ function move(entity: Movable, delta: number) {
       .get(docked)!
       .requireComponents(["position"]).cp.position;
 
-    dockedPosition.coord = [...entityPosition.coord];
+    dockedPosition.coord[0] += moveVec[0] * dPos;
+    dockedPosition.coord[1] += moveVec[1] * dPos;
     dockedPosition.angle += dAngle;
+    dockedPosition.moved = true;
   });
-
-  if (entity.hasTags(["facility"])) {
-    throw new Error("wtf");
-  }
 }
 
 export class MovingSystem extends System {

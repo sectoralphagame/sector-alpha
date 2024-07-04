@@ -17,6 +17,7 @@ import {
   moveAction,
   moveActionCleanup,
   teleportAction,
+  undockAction,
 } from "./misc";
 import { tradeActionCleanup, tradeOrder } from "./trade";
 import { deployFacilityAction } from "./deployFacility";
@@ -217,6 +218,7 @@ const actionFns: Partial<
   move: moveAction,
   teleport: teleportAction,
   dock: dockOrder,
+  undock: undockAction,
   deployFacility: deployFacilityAction,
   deployBuilder: deployBuilderAction,
   collect: collectAction,

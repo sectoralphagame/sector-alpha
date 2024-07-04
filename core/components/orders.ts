@@ -12,6 +12,10 @@ export interface DockAction {
   targetId: number;
 }
 
+export interface UndockAction {
+  type: "undock";
+}
+
 export interface TeleportAction {
   type: "teleport";
   targetId: number;
@@ -62,6 +66,7 @@ export type Action =
   | HoldPositionAction
   | TeleportAction
   | DockAction
+  | UndockAction
   | FacilityDeployAction
   | BuilderDeployAction
   | CollectAction;
