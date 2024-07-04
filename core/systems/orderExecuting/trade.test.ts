@@ -149,7 +149,8 @@ describe("Trading", () => {
     expect(target.cp.storage.stored.food).toBe(0);
     expect(sourceOwner.cp.budget.money).toBe(0);
     expect(targetOwner.cp.budget.money).toBe(0);
-    expect(target.cp.storageTransfer).toBeDefined();
+    expect(source.tags.has("busy")).toBe(true);
+    expect(source.cp.storageTransfer).toBeDefined();
   });
 
   it("should be properly handled for buy orders with allocations", () => {
@@ -188,7 +189,8 @@ describe("Trading", () => {
     expect(target.cp.storage.stored.food).toBe(0);
     expect(sourceOwner.cp.budget.money).toBe(0);
     expect(target.cp.budget.money).toBe(100);
-    expect(target.cp.storageTransfer).toBeDefined();
+    expect(source.tags.has("busy")).toBe(true);
+    expect(source.cp.storageTransfer).toBeDefined();
   });
 });
 
