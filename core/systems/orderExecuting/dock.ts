@@ -28,6 +28,7 @@ export function undockShip(
     .requireComponents(["docks"]);
   dock.cp.docks.docked = dock.cp.docks.docked.filter((e) => e !== ship.id);
   ship.cp.dockable.dockedIn = null;
+  ship.cp.dockable.undocking = false;
   ship.cp.drive.active = true;
 
   if (ship.cp.render) {

@@ -7,11 +7,11 @@ import styles from "./styles.scss";
 const SimAvgTimeGraph: React.FC = () => {
   const [data] = useObservable(frameData);
 
+  if (data.length === 0) return null;
+
   return (
     <div className={styles.root}>
-      {data.length > 0 && (
-        <SimAvgTimeGraphComponent data={data} height={200} width={600} />
-      )}
+      <SimAvgTimeGraphComponent data={data} height={200} width={600} />
     </div>
   );
 };

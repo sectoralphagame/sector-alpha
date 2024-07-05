@@ -47,6 +47,10 @@ function getOrderDescription(ship: Ship, order: Action) {
       if (order.targetId === ship.cp.commander?.id)
         return "Dock at commanding facility";
       return `Dock at ${ship.sim.getOrThrow(order.targetId).cp.name?.value}`;
+    case "undock":
+      return `Undock from ${
+        ship.sim.getOrThrow(ship.cp.dockable!.dockedIn!).cp.name?.value
+      }`;
     case "attack":
       return `Attack ${
         ship.sim.get(order.targetId)?.cp.name?.value ?? "target"
@@ -105,6 +109,22 @@ const Orders: React.FC<{ ship: Ship }> = ({ ship }) => {
 
   return (
     <>
+      {ship.tags.has("busy") && (
+        <div className={styles.orderGroupHeader}>
+          {ship.cp.storageTransfer
+            ? `Awaiting for cargo... ${(
+                (ship.cp.storageTransfer.transferred /
+                  ship.cp.storageTransfer.amount) *
+                100
+              ).toFixed(0)}%`
+            : "Awaiting..."}
+          {isOwned && (
+            <IconButton disabled variant="opaque">
+              <CloseIcon />
+            </IconButton>
+          )}
+        </div>
+      )}
       {ship.cp.orders.value.map((order, orderIndex) => (
         <Collapsible key={`${order.type}-${orderIndex}`}>
           <CollapsibleSummary>

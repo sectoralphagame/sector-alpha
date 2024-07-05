@@ -15,6 +15,7 @@ const tags = [
   "collectible",
   "discovered",
   "mainQuestStarted",
+  "busy",
   "ai:attack-force",
   "ai:spare",
   "ai:mission",

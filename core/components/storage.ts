@@ -122,9 +122,8 @@ export function validateStorageAllocation(
   return result;
 }
 
-export function addStorage(
+export function getTransferableQuantity(
   storage: CommodityStorage,
-  commodity: Commodity,
   quantity: number,
   exact = true
 ): number {
@@ -134,25 +133,34 @@ export function addStorage(
   if (!Number.isInteger(quantity)) {
     throw new NonIntegerQuantity(quantity);
   }
-  if (quantity === 0) {
-    return 0;
-  }
 
   const availableSpace = getAvailableSpace(storage);
 
   if (availableSpace >= quantity) {
-    storage.stored[commodity] += quantity;
-    updateAvailableWares(storage);
-    return 0;
+    return quantity;
   }
   if (exact) {
     throw new InsufficientStorageSpace(quantity, availableSpace);
   }
 
-  storage.stored[commodity] += availableSpace;
+  return availableSpace;
+}
+
+export function addStorage(
+  storage: CommodityStorage,
+  commodity: Commodity,
+  quantity: number,
+  exact = true
+): number {
+  if (quantity === 0) {
+    return 0;
+  }
+
+  const transferred = getTransferableQuantity(storage, quantity, exact);
+  storage.stored[commodity] += transferred;
   updateAvailableWares(storage);
 
-  return quantity - availableSpace;
+  return quantity - transferred;
 }
 
 export function removeStorage(
@@ -178,28 +186,46 @@ export function removeStorage(
 }
 
 export function transfer(
-  storage: CommodityStorage,
+  source: RequireComponent<"storage">,
   commodity: Commodity,
   quantity: number,
-  target: CommodityStorage,
-  exact: boolean
+  target: RequireComponent<"storage">,
+  options: { exact: boolean; transfer: boolean }
 ): number {
   let quantityToTransfer = quantity;
-  if (storage.availableWares[commodity] < quantity) {
-    if (exact) {
+  if (source.cp.storage.availableWares[commodity] < quantity) {
+    if (options.exact) {
       throw new InsufficientStorage(
         quantity,
-        storage.availableWares[commodity]
+        source.cp.storage.availableWares[commodity]
       );
     }
   } else {
-    quantityToTransfer = min(storage.availableWares[commodity], quantity);
+    quantityToTransfer = min(
+      source.cp.storage.availableWares[commodity],
+      quantity
+    );
   }
 
-  const transferred =
-    quantityToTransfer -
-    addStorage(target, commodity, quantityToTransfer, exact);
-  removeStorage(storage, commodity, transferred);
+  const transferred = getTransferableQuantity(
+    target.cp.storage,
+    quantityToTransfer,
+    true
+  );
+
+  addStorage(target.cp.storage, commodity, quantityToTransfer, options.exact);
+  removeStorage(source.cp.storage, commodity, transferred);
+
+  if (options.transfer) {
+    (source.cp.drive ? source : target)
+      .addComponent({
+        name: "storageTransfer",
+        amount: transferred,
+        transferred: 0,
+        targetId: target.id,
+      })
+      .addTag("busy");
+  }
 
   return transferred;
 }

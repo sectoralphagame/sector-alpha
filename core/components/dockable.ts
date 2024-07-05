@@ -9,6 +9,7 @@ export type DockSize = "small" | "medium" | "large";
 
 export interface Dockable extends BaseComponent<"dockable"> {
   dockedIn: number | null;
+  undocking: boolean;
   size: DockSize;
 }
 

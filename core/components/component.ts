@@ -45,6 +45,7 @@ import type { Missions } from "./missions";
 import type { Crew } from "./crew";
 import type { CrewRequirement } from "./crewRequirement";
 import type { Movable } from "./movable";
+import type { StorageTransfer } from "./storageTransfer";
 
 export interface CoreComponents {
   ai: Ai;
@@ -93,6 +94,7 @@ export interface CoreComponents {
   shipyard: Shipyard;
   simpleCommodityStorage: SimpleCommodityStorage;
   storage: CommodityStorage;
+  storageTransfer: StorageTransfer;
   subordinates: Subordinates;
   systemManager: SystemManager;
   teleport: Teleport;

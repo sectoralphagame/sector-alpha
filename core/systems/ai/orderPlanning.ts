@@ -86,10 +86,10 @@ function autoTrade(entity: Trading, sectorDistance: number) {
   let makingTrade = false;
   const owner = entity.sim.getOrThrow<Faction>(entity.cp.owner.id);
 
-  if (sum(Object.values(entity.cp.storage.stored)) > 0) {
-    const commodityToSell = Object.entries(entity.cp.storage.stored).find(
-      ([, quantity]) => quantity > 0
-    )![0] as Commodity;
+  if (sum(Object.values(entity.cp.storage.availableWares)) > 0) {
+    const commodityToSell = Object.entries(
+      entity.cp.storage.availableWares
+    ).find(([, quantity]) => quantity > 0)![0] as Commodity;
 
     const buyer = sellCommodityWithMostProfit(
       entity,
