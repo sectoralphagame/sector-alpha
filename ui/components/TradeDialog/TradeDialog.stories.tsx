@@ -35,6 +35,26 @@ const Template: StoryFn = () => (
             price={100}
             sellDisabled={false}
           />
+          <TradeDialogLine
+            availableQuantity={100}
+            buyDisabled={false}
+            commodity="electronics"
+            max={100}
+            offerType="buy"
+            onAction={action("onAction")}
+            price={100}
+            sellDisabled={false}
+          />
+          <TradeDialogLine
+            availableQuantity={100}
+            buyDisabled={false}
+            commodity="silica"
+            max={100}
+            offerType="buy"
+            onAction={action("onAction")}
+            price={100}
+            sellDisabled={false}
+          />
         </TradeDialogComponent>
       </Wrapper>
     </Styles>

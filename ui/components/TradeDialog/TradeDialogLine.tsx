@@ -1,6 +1,6 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import type { Commodity } from "@core/economy/commodity";
+import { commodityLabel, type Commodity } from "@core/economy/commodity";
 import { Button } from "@kit/Button";
 import { Input } from "@kit/Input";
 import { TableCell } from "@kit/Table";
@@ -32,24 +32,26 @@ export const TradeDialogLine: React.FC<TradeDialogLineProps> = ({
 
   return (
     <tr className={styles.row} key={commodity}>
-      <TableCell className={styles.colName}>{commodity}</TableCell>
+      <TableCell className={styles.colName}>
+        {commodityLabel[commodity]}
+      </TableCell>
       <TableCell>
-        <Text color={buyDisabled ? "disabled" : "default"}>
+        <Text variant="caption" color={buyDisabled ? "disabled" : "default"}>
           {offerType === "buy" ? price : "-"}
         </Text>
       </TableCell>
       <TableCell>
-        <Text color={buyDisabled ? "disabled" : "default"}>
+        <Text variant="caption" color={buyDisabled ? "disabled" : "default"}>
           {offerType === "buy" ? availableQuantity : "-"}
         </Text>
       </TableCell>
       <TableCell>
-        <Text color={sellDisabled ? "disabled" : "default"}>
+        <Text variant="caption" color={sellDisabled ? "disabled" : "default"}>
           {offerType === "sell" ? price : "-"}
         </Text>
       </TableCell>
       <TableCell>
-        <Text color={sellDisabled ? "disabled" : "default"}>
+        <Text variant="caption" color={sellDisabled ? "disabled" : "default"}>
           {offerType === "sell" ? availableQuantity : "-"}
         </Text>
       </TableCell>
@@ -57,16 +59,21 @@ export const TradeDialogLine: React.FC<TradeDialogLineProps> = ({
         <TableCell>
           <Input
             className={styles.input}
-            placeholder="Quantity"
+            placeholder="0"
             type="number"
             max={max}
             min={0}
             {...register(commodity)}
           />
-          <Text component="span" className={styles.max} color="text-3">
+          <Text
+            variant="caption"
+            component="span"
+            className={styles.max}
+            color="text-3"
+          >
             /{max}
           </Text>
-          <Button onClick={onAction}>
+          <Button className={styles.actionBtn} onClick={onAction}>
             {offerType === "buy" ? "sell" : "buy"}
           </Button>
         </TableCell>

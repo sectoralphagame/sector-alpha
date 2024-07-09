@@ -3,14 +3,36 @@
     text-align: left;
   }
 }
-.input {
-  width: 70px;
-}
+
 .row {
   & td,
   & th {
     text-align: right;
   }
+
+  .input {
+    border: none;
+    font-size: var(--typography-label);
+    padding: 0 4px;
+    text-align: right;
+    height: unset;
+    width: 40px;
+  }
+
+  .actionBtn {
+    margin-left: var(--spacing-1);
+    height: unset;
+    padding: 2px 4px;
+    font-size: var(--typography-table);
+    font-weight: 400;
+    width: 40px;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--palette-border);
+  }
+
+  font-size: var(--typography-label);
 }
 .max {
   margin: 0 calc(var(--spacing-1) / 2);
