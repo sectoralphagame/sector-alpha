@@ -6,6 +6,9 @@ import styles from "./Tooltip.scss";
 
 export interface TooltipProps {
   containerClassName?: string;
+  /**
+   * Element to display over which the tooltip will be shown
+   */
   anchor: (_ref: Dispatch<SetStateAction<any>>) => ReactElement;
 }
 
