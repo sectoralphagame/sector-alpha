@@ -1,11 +1,12 @@
 import React from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import type { WithTrade } from "@core/economy/utils";
 import type { Commodity } from "@core/economy/commodity";
 import { commoditiesArray } from "@core/economy/commodity";
 import type { RequireComponent } from "@core/tsHelpers";
 import { getAvailableSpace } from "@core/components/storage";
 import { tradeCommodity } from "@core/utils/trading";
+import { entries, map, pipe, sum } from "@fxts/core";
 import { useGameDialog, useSim } from "../../atoms";
 import type { ModalProps } from "../ConfigDialog";
 import { TradeDialogLine } from "./TradeDialogLine";
@@ -21,6 +22,11 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const [sim] = useSim();
   const [dialog] = useGameDialog();
   const form = useForm();
+  const values = useWatch({ control: form.control });
+
+  React.useEffect(() => {
+    form.reset();
+  }, [open]);
 
   if (dialog?.type !== "trade") return null;
 
@@ -50,23 +56,81 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const getAction = (commodity: Commodity) =>
     canBuy(commodity) ? "buy" : canSell(commodity) ? "sell" : null;
 
+  const getMax = (commodity: Commodity) => {
+    const action = getAction(commodity);
+
+    return action === "buy"
+      ? Math.min(
+          offers[commodity].quantity,
+          getAvailableSpace(initiator.cp.storage)
+        )
+      : Math.min(
+          offers[commodity].quantity,
+          initiator.cp.storage.availableWares[commodity]
+        );
+  };
+
+  const onAccept = () => {
+    for (const commodity of commoditiesArray) {
+      const quantity = form.getValues()[commodity];
+
+      if (!(quantity > 0 && quantity <= getMax(commodity))) {
+        continue;
+      }
+
+      const orders = tradeCommodity(
+        initiator,
+        {
+          allocations: null,
+          budget: sim.queries.player.get()[0].id,
+          commodity,
+          factionId: sim.queries.player.get()[0].id,
+          initiator: initiator.id,
+          price: offers[commodity].price,
+          quantity,
+          type: getAction(commodity)!,
+        },
+        target
+      );
+
+      if (orders) {
+        initiator.cp.orders.value.push({
+          origin: "manual",
+          type: "trade",
+          actions: orders,
+        });
+      }
+    }
+
+    onClose();
+  };
+
+  const total =
+    pipe(
+      values,
+      entries,
+      map(
+        ([commodity, quantity]) =>
+          offers[commodity].price *
+          (Number(quantity) || 0) *
+          (offers[commodity].type === "buy" ? 1 : -1)
+      ),
+      sum
+    ) ?? 0;
+
   return (
     <FormProvider {...form}>
-      <TradeDialogComponent open={open} onClose={onClose}>
+      <TradeDialogComponent
+        canAccept={sim.queries.player.get()[0].cp.budget.available + total > 0}
+        total={total}
+        open={open}
+        onAccept={onAccept}
+        onClose={onClose}
+      >
         {commoditiesArray
           .filter((commodity) => offers[commodity].active)
           .map((commodity) => {
-            const action = getAction(commodity);
-            const max =
-              action === "buy"
-                ? Math.min(
-                    offers[commodity].quantity,
-                    getAvailableSpace(initiator.cp.storage)
-                  )
-                : Math.min(
-                    offers[commodity].quantity,
-                    initiator.cp.storage.availableWares[commodity]
-                  );
+            const max = getMax(commodity);
 
             return (
               <TradeDialogLine
@@ -76,43 +140,9 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
                 commodity={commodity}
                 max={max}
                 offerType={offers[commodity].type}
-                onAction={
-                  action
-                    ? () => {
-                        const quantity = form.getValues()[commodity];
-
-                        if (!(quantity > 0 && quantity <= max)) {
-                          return;
-                        }
-
-                        const orders = tradeCommodity(
-                          initiator,
-                          {
-                            allocations: null,
-                            budget: sim.queries.player.get()[0].id,
-                            commodity,
-                            factionId: sim.queries.player.get()[0].id,
-                            initiator: initiator.id,
-                            price: offers[commodity].price,
-                            quantity,
-                            type: action,
-                          },
-                          target
-                        );
-
-                        if (orders) {
-                          initiator.cp.orders.value.push({
-                            origin: "manual",
-                            type: "trade",
-                            actions: orders,
-                          });
-                        }
-                        onClose();
-                      }
-                    : undefined
-                }
                 price={offers[commodity].price}
                 sellDisabled={isSellOfferDisabled(commodity)}
+                hasAction={offers[commodity].active}
               />
             );
           })}

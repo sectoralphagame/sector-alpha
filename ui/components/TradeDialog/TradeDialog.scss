@@ -1,3 +1,5 @@
+$btnHeight: 18px;
+
 .colName {
   &.colName {
     text-align: left;
@@ -10,12 +12,17 @@
     text-align: right;
   }
 
+  button {
+    height: $btnHeight;
+    vertical-align: bottom;
+  }
+
   .input {
     border: none;
     font-size: var(--typography-label);
     padding: 0 4px;
     text-align: right;
-    height: unset;
+    height: $btnHeight;
     width: 40px;
     font-size: var(--typography-table);
     font-weight: 400;
@@ -38,4 +45,20 @@
 }
 .max {
   margin: 0 calc(var(--spacing-1) / 2);
+}
+
+.totalRow {
+  td {
+    text-align: right;
+    font-size: var(--typography-header4);
+    padding-top: var(--spacing-3);
+  }
+}
+td.total {
+  font-weight: 600;
+  text-align: left;
+}
+
+.acceptBtn {
+  width: 112px;
 }

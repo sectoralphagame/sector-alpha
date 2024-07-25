@@ -1,10 +1,11 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { commodityLabel, type Commodity } from "@core/economy/commodity";
-import { Button } from "@kit/Button";
 import { Input } from "@kit/Input";
 import { TableCell } from "@kit/Table";
 import Text from "@kit/Text";
+import { IconButton } from "@kit/IconButton";
+import { ChevronLeftIcon, ChevronRightIcon } from "@assets/ui/icons";
 import styles from "./TradeDialog.scss";
 
 export interface TradeDialogLineProps {
@@ -15,7 +16,7 @@ export interface TradeDialogLineProps {
   price: number;
   availableQuantity: number;
   max: number;
-  onAction: (() => void) | undefined;
+  hasAction: boolean;
 }
 
 export const TradeDialogLine: React.FC<TradeDialogLineProps> = ({
@@ -26,9 +27,9 @@ export const TradeDialogLine: React.FC<TradeDialogLineProps> = ({
   offerType,
   price,
   availableQuantity,
-  onAction,
+  hasAction,
 }) => {
-  const { register } = useFormContext();
+  const { register, getValues, setValue } = useFormContext();
 
   return (
     <tr className={styles.row} key={commodity}>
@@ -36,18 +37,13 @@ export const TradeDialogLine: React.FC<TradeDialogLineProps> = ({
         {commodityLabel[commodity]}
       </TableCell>
       <TableCell>
-        <Text variant="caption" color={buyDisabled ? "disabled" : "default"}>
-          {offerType === "buy" ? price : "-"}
-        </Text>
-      </TableCell>
-      <TableCell>
-        <Text variant="caption" color={buyDisabled ? "disabled" : "default"}>
-          {offerType === "buy" ? availableQuantity : "-"}
-        </Text>
-      </TableCell>
-      <TableCell>
         <Text variant="caption" color={sellDisabled ? "disabled" : "default"}>
           {offerType === "sell" ? price : "-"}
+        </Text>
+      </TableCell>
+      <TableCell>
+        <Text variant="caption" color={buyDisabled ? "disabled" : "default"}>
+          {offerType === "buy" ? price : "-"}
         </Text>
       </TableCell>
       <TableCell>
@@ -55,8 +51,20 @@ export const TradeDialogLine: React.FC<TradeDialogLineProps> = ({
           {offerType === "sell" ? availableQuantity : "-"}
         </Text>
       </TableCell>
-      {!!onAction && (
+      <TableCell>
+        <Text variant="caption" color={buyDisabled ? "disabled" : "default"}>
+          {offerType === "buy" ? availableQuantity : "-"}
+        </Text>
+      </TableCell>
+      {hasAction && (
         <TableCell>
+          <IconButton
+            variant="naked"
+            onClick={() => setValue(commodity, 0)}
+            disabled={getValues()[commodity] <= 0}
+          >
+            <ChevronLeftIcon />
+          </IconButton>
           <Input
             className={styles.input}
             placeholder="0"
@@ -73,9 +81,13 @@ export const TradeDialogLine: React.FC<TradeDialogLineProps> = ({
           >
             /{max}
           </Text>
-          <Button className={styles.actionBtn} onClick={onAction}>
-            {offerType === "buy" ? "sell" : "buy"}
-          </Button>
+          <IconButton
+            variant="naked"
+            onClick={() => setValue(commodity, max)}
+            disabled={getValues()[commodity] >= max}
+          >
+            <ChevronRightIcon />
+          </IconButton>
         </TableCell>
       )}
     </tr>

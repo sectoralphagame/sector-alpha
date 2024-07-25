@@ -9,6 +9,9 @@ import arrow_down_fat from "@assets/ui/icons/arrow_down_fat.svg";
 import arrow_left from "@assets/ui/icons/arrow_left.svg";
 import arrow_up_fat from "@assets/ui/icons/arrow_up_fat.svg";
 import chevron_down from "@assets/ui/icons/chevron_down.svg";
+import chevron_left from "@assets/ui/icons/chevron_left.svg";
+import chevron_right from "@assets/ui/icons/chevron_right.svg";
+import chevron_up from "@assets/ui/icons/chevron_up.svg";
 import circle_filled from "@assets/ui/icons/circle_filled.svg";
 import close from "@assets/ui/icons/close.svg";
 import config from "@assets/ui/icons/config.svg";
@@ -40,6 +43,15 @@ export const ArrowUpFatIcon: React.FC<Omit<Props, "src">> = (props) => (
 );
 export const ChevronDownIcon: React.FC<Omit<Props, "src">> = (props) => (
   <SVG {...props} src={chevron_down} />
+);
+export const ChevronLeftIcon: React.FC<Omit<Props, "src">> = (props) => (
+  <SVG {...props} src={chevron_left} />
+);
+export const ChevronRightIcon: React.FC<Omit<Props, "src">> = (props) => (
+  <SVG {...props} src={chevron_right} />
+);
+export const ChevronUpIcon: React.FC<Omit<Props, "src">> = (props) => (
+  <SVG {...props} src={chevron_up} />
 );
 export const CircleFilledIcon: React.FC<Omit<Props, "src">> = (props) => (
   <SVG {...props} src={circle_filled} />
