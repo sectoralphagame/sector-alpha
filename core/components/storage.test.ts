@@ -53,25 +53,27 @@ describe("Storage", () => {
     addStorage(storage, "food", 10);
     newStorageAllocation(storage, {
       amount: { ...perCommodity(() => 0), food: 5 },
-      type: "incoming",
       issued: 0,
     });
     newStorageAllocation(storage, {
       amount: { ...perCommodity(() => 0), fuel: 5 },
-      type: "incoming",
       issued: 0,
     });
     newStorageAllocation(storage, {
-      amount: { ...perCommodity(() => 0), food: 9 },
-      type: "outgoing",
+      amount: { ...perCommodity(() => 0), food: -7 },
+      issued: 0,
+    });
+    newStorageAllocation(storage, {
+      amount: { ...perCommodity(() => 0), food: -2, fuel: 3 },
       issued: 0,
     });
 
-    const stored = storage.availableWares;
+    const available = storage.availableWares;
 
-    expect(stored.food).toBe(1);
-    expect(stored.fuel).toBe(0);
-    expect(getAvailableSpace(storage)).toBe(80);
+    expect(storage.allocations.length).toBe(4);
+    expect(available.food).toBe(1);
+    expect(available.fuel).toBe(0);
+    expect(getAvailableSpace(storage)).toBe(79);
   });
 
   it("properly validates new outgoing allocations", () => {
@@ -80,9 +82,8 @@ describe("Storage", () => {
     const allocation = newStorageAllocation(storage, {
       amount: {
         ...perCommodity(() => 0),
-        food: 10,
+        food: -10,
       },
-      type: "outgoing",
       issued: 0,
     });
 
@@ -98,7 +99,6 @@ describe("Storage", () => {
         ...perCommodity(() => 0),
         food: 10,
       },
-      type: "incoming",
       issued: 0,
     });
 

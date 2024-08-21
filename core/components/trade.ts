@@ -4,28 +4,38 @@ import { commodityPrices, perCommodity } from "../utils/perCommodity";
 import type { BaseComponent } from "./component";
 
 export type PriceBelief = [number, number];
+export type TradeOfferType = "buy" | "sell";
 
-export interface TransactionInput extends Omit<TradeOffer, "active"> {
+export interface TransactionItem {
   commodity: Commodity;
+  quantity: number;
+  price: number;
+  type: TradeOfferType;
+}
+
+export type TransactionAllocations = Record<
+  "trader" | "customer",
+  {
+    budget: number | null;
+    storage: number | null;
+  }
+>;
+export const createTransactionAllocations = (): TransactionAllocations => ({
+  trader: { budget: null, storage: null },
+  customer: { budget: null, storage: null },
+});
+
+export interface TransactionInput {
+  items: TransactionItem[];
   /**
    * ID of entity that initiates trade (usually ship)
    */
   initiator: number;
+  allocations: TransactionAllocations;
+  budgets: Record<"trader" | "customer", number>;
   factionId: number;
-  /**
-   *  ID of entity with budget
-   * */
-  budget: number | null;
-  allocations: Record<
-    "buyer" | "seller",
-    {
-      budget: number | null;
-      storage: number | null;
-    } | null
-  > | null;
+  tradeId: string;
 }
-
-export type TradeOfferType = "buy" | "sell";
 
 export interface TradeOffer {
   active: boolean;

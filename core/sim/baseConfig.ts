@@ -29,7 +29,7 @@ import { SectorStatisticGatheringSystem } from "@core/systems/sectorStatisticGat
 import { SelectingSystem } from "@core/systems/selecting";
 import { ShipBuildingSystem } from "@core/systems/shipBuilding";
 import { StorageQuotaPlanningSystem } from "@core/systems/storageQuotaPlanning";
-import { TradingSystem } from "@core/systems/trading";
+import { tradingSystem } from "@core/systems/trading";
 import { UndeployingSystem } from "@core/systems/undeploying";
 import { FogOfWarUpdatingSystem } from "@core/systems/fogOfWarUpdating";
 import { StorageTransferringSystem } from "@core/systems/storageTransferring";
@@ -40,7 +40,7 @@ export const bootstrapSystems = [
   new CooldownUpdatingSystem(),
   new ProducingSystem(),
   new StorageQuotaPlanningSystem(),
-  new TradingSystem(),
+  tradingSystem,
   new BudgetPlanningSystem(),
   new OrderPlanningSystem(),
   new NavigatingSystem(),

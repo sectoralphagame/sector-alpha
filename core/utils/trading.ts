@@ -1,4 +1,3 @@
-import merge from "lodash/merge";
 import { mean } from "mathjs";
 import { filter, first, map, pipe, sortBy, toArray } from "@fxts/core";
 import {
@@ -6,10 +5,17 @@ import {
   relationThresholds,
 } from "@core/components/relations";
 import type { Faction } from "@core/archetypes/faction";
-import type { Entity } from "@core/entity";
+import { tradingSystem, updateOfferQuantity } from "@core/systems/trading";
+import cloneDeep from "lodash/cloneDeep";
 import type { Action, TradeAction } from "../components/orders";
 import { tradeAction } from "../components/orders";
-import type { TransactionInput } from "../components/trade";
+import type {
+  TradeOfferType,
+  TransactionAllocations,
+  TransactionInput,
+  TransactionItem,
+} from "../components/trade";
+import { createTransactionAllocations } from "../components/trade";
 import type { Commodity } from "../economy/commodity";
 import { commoditiesArray } from "../economy/commodity";
 import type { WithTrade } from "../economy/utils";
@@ -54,246 +60,242 @@ export function isTradeAccepted(
   entity: WithTrade,
   input: Omit<TransactionInput, "allocations">
 ): boolean {
-  let validPrice = false;
-
-  const offer = entity.cp.trade.offers[input.commodity];
-
-  if (offer.price < 0) {
-    throw new NonPositiveAmount(offer.price);
-  }
-
-  if (offer.type === input.type) {
-    throw new InvalidOfferType(input.type);
-  }
-
-  if (offer.quantity < input.quantity) {
-    throw new ExceededOfferQuantity(input.quantity, offer.quantity);
-  }
-
   const isTheSameFaction = input.factionId === entity.cp.owner.id;
-
-  if (input.type === "buy") {
-    if (isTheSameFaction) {
-      validPrice = true;
-    } else {
-      validPrice = input.price >= offer.price;
-    }
-
-    return (
-      validPrice &&
-      hasSufficientStorage(entity.cp.storage, input.commodity, input.quantity)
-    );
-  }
-
-  if (isTheSameFaction) {
-    validPrice = true;
-  } else {
-    validPrice = input.price <= offer.price;
-  }
-
   const isNotEnemy =
     isTheSameFaction ||
     entity.sim.getOrThrow<Faction>(entity.cp.owner.id).cp.relations.values[
       input.factionId
     ] > relationThresholds.trade;
 
-  const result =
-    isNotEnemy &&
-    validPrice &&
-    entity.cp.budget.available >= input.price * input.quantity &&
-    hasSufficientStorageSpace(entity.cp.storage, input.quantity);
+  if (!isNotEnemy) return false;
 
-  return result;
+  for (const transactionInput of input.items) {
+    let isPriceValid = false;
+
+    const offer = entity.cp.trade.offers[transactionInput.commodity];
+
+    if (offer.price < 0) {
+      throw new NonPositiveAmount(offer.price);
+    }
+
+    if (offer.type === transactionInput.type) {
+      throw new InvalidOfferType(transactionInput.type);
+    }
+
+    if (offer.quantity < transactionInput.quantity) {
+      throw new ExceededOfferQuantity(
+        transactionInput.quantity,
+        offer.quantity
+      );
+    }
+
+    if (transactionInput.type === "buy") {
+      if (isTheSameFaction) {
+        isPriceValid = true;
+      } else {
+        isPriceValid = transactionInput.price >= offer.price;
+      }
+
+      return (
+        isPriceValid &&
+        hasSufficientStorage(
+          entity.cp.storage,
+          transactionInput.commodity,
+          transactionInput.quantity
+        )
+      );
+    }
+
+    if (isTheSameFaction) {
+      isPriceValid = true;
+    } else {
+      isPriceValid = transactionInput.price <= offer.price;
+    }
+
+    const canAfford =
+      entity.cp.budget.available >=
+      transactionInput.price * transactionInput.quantity;
+    const hasSpace = hasSufficientStorageSpace(
+      entity.cp.storage,
+      transactionInput.quantity
+    );
+
+    if (!(isPriceValid && canAfford && hasSpace)) return false;
+  }
+
+  return true;
 }
 
 export function acceptTrade(
   entityWithOffer: WithTrade,
   input: TransactionInput
 ) {
-  if (input.price > 0) {
-    const budget = input.budget
-      ? entityWithOffer.sim
-          .getOrThrow(input.budget)
-          .requireComponents(["budget"]).cp.budget
-      : null;
-    if (input.allocations?.buyer?.budget && budget) {
-      // They are buying from us
-      if (input.type === "sell") {
-        const allocation = releaseBudgetAllocation(
-          entityWithOffer.cp.budget,
-          input.allocations.buyer.budget
+  const sim = entityWithOffer.sim;
+  const customerBudget = sim
+    .getOrThrow(input.budgets.customer)
+    .requireComponents(["budget"]).cp.budget;
+  const traderBudget = sim
+    .getOrThrow(input.budgets.trader)
+    .requireComponents(["budget"]).cp.budget;
+
+  if (input.allocations.customer.budget) {
+    const allocation = releaseBudgetAllocation(
+      customerBudget,
+      input.allocations.customer.budget,
+      "accepted"
+    );
+    transferMoney(customerBudget, allocation.amount, traderBudget);
+  } else if (input.allocations.trader.budget) {
+    const allocation = releaseBudgetAllocation(
+      traderBudget,
+      input.allocations.trader.budget,
+      "accepted"
+    );
+    transferMoney(traderBudget, allocation.amount, customerBudget);
+  }
+
+  for (const inputItem of input.items) {
+    if (entityWithOffer.cp.owner.id !== input.factionId) {
+      const initiator = entityWithOffer.sim
+        .getOrThrow(input.initiator)
+        .requireComponents(["name", "journal"]);
+
+      entityWithOffer.cp.journal.entries.push({
+        type: "trade",
+        action: inputItem.type === "buy" ? "sell" : "buy",
+        commodity: inputItem.commodity,
+        quantity: inputItem.quantity,
+        price: inputItem.price,
+        target: initiator.cp.name.value,
+        targetId: initiator.id,
+        time: entityWithOffer.sim.getTime(),
+      });
+      initiator.cp.journal.entries.push({
+        type: "trade",
+        action: inputItem.type,
+        commodity: inputItem.commodity,
+        quantity: inputItem.quantity,
+        price: inputItem.price,
+        target: entityWithOffer.requireComponents(["name"]).cp.name.value,
+        targetId: entityWithOffer.id,
+        time: entityWithOffer.sim.getTime(),
+      });
+
+      const player = first(entityWithOffer.sim.queries.player.getIt())!;
+      if ([input.factionId, entityWithOffer.cp.owner.id].includes(player.id)) {
+        changeRelations(
+          player,
+          entityWithOffer.sim.getOrThrow<Faction>(entityWithOffer.cp.owner.id),
+          inputItem.price / 1e6
         );
-        transferMoney(entityWithOffer.cp.budget, allocation.amount, budget);
-      } else {
-        const allocation = releaseBudgetAllocation(
-          budget,
-          input.allocations.buyer.budget
-        );
-        transferMoney(budget, allocation.amount, entityWithOffer.cp.budget);
       }
     }
   }
-
-  if (entityWithOffer.cp.owner.id !== input.factionId) {
-    const initiator = entityWithOffer.sim
-      .getOrThrow(input.initiator)
-      .requireComponents(["name", "journal"]);
-
-    entityWithOffer.cp.journal.entries.push({
-      type: "trade",
-      action: input.type === "buy" ? "sell" : "buy",
-      commodity: input.commodity,
-      quantity: input.quantity,
-      price: input.price,
-      target: initiator.cp.name.value,
-      targetId: initiator.id,
-      time: entityWithOffer.sim.getTime(),
-    });
-    initiator.cp.journal.entries.push({
-      type: "trade",
-      action: input.type,
-      commodity: input.commodity,
-      quantity: input.quantity,
-      price: input.price,
-      target: entityWithOffer.requireComponents(["name"]).cp.name.value,
-      targetId: entityWithOffer.id,
-      time: entityWithOffer.sim.getTime(),
-    });
-
-    const player = first(entityWithOffer.sim.queries.player.getIt())!;
-    if ([input.factionId, entityWithOffer.cp.owner.id].includes(player.id)) {
-      changeRelations(
-        player,
-        entityWithOffer.sim.getOrThrow<Faction>(entityWithOffer.cp.owner.id),
-        input.price / 1e6
-      );
-    }
-  }
-}
-
-export function createTradeId(
-  entity: Entity,
-  offer: Omit<TransactionInput, "allocations">
-) {
-  return [entity.id, offer.initiator, offer.type, entity.sim.getTime()].join(
-    ":"
-  );
-}
-
-export function parseTradeId(tradeId: string) {
-  const [, entity, initiator, type, time] = tradeId.match(
-    /([0-9]+):([0-9]+):(buy|sell):([0-9]+)/
-  )!;
-  return { entity, initiator, type, time };
 }
 
 /**
  * Allocates resources necessary to finish trade before it is actually done
+ *
+ * @param trader Entity with offers, like facility
+ * @param offer Transaction input
  */
 export function allocate(
-  entity: WithTrade,
+  trader: WithTrade,
   offer: Omit<TransactionInput, "allocations">
-) {
-  if (isTradeAccepted(entity, offer)) {
-    entity.cp.trade.offers[offer.commodity].quantity -= offer.quantity;
+): TransactionAllocations {
+  // FIXME: Trader and customer values are literally the same but mirrored
+  const allocationsToMake: Record<
+    "trader" | "customer",
+    { budget: number; storage: Partial<Record<Commodity, number>> }
+  > = {
+    trader: {
+      budget: 0,
+      storage: {},
+    },
+    customer: {
+      budget: 0,
+      storage: {},
+    },
+  };
 
-    const tradeId = createTradeId(entity, offer);
+  for (const item of offer.items) {
+    if (item.type === "buy") {
+      if (item.price) {
+        allocationsToMake.customer.budget -= item.price * item.quantity;
+        allocationsToMake.trader.budget += item.price * item.quantity;
+      }
 
-    if (offer.type === "buy") {
-      return {
-        buyer: {
-          budget:
-            offer.price === 0
-              ? null
-              : newBudgetAllocation(
-                  entity.sim
-                    .getOrThrow(offer.budget!)
-                    .requireComponents(["budget"]).cp.budget,
-                  {
-                    amount: offer.price * offer.quantity,
-                    issued: entity.sim.getTime(),
-                  },
-                  { tradeId }
-                )?.id,
-          storage: newStorageAllocation(
-            entity.sim
-              .getOrThrow(offer.initiator)
-              .requireComponents(["storage"]).cp.storage,
-            {
-              amount: {
-                ...perCommodity(() => 0),
-                [offer.commodity]: offer.quantity,
-              },
-              issued: entity.sim.getTime(),
-              type: "incoming",
-            },
-            { tradeId }
-          )?.id,
-        },
-        seller: {
-          budget: null,
-          storage: newStorageAllocation(
-            entity.cp.storage,
-            {
-              amount: {
-                ...perCommodity(() => 0),
-                [offer.commodity]: offer.quantity,
-              },
-              issued: entity.sim.getTime(),
-              type: "outgoing",
-            },
-            { tradeId }
-          )?.id,
-        },
-      };
+      allocationsToMake.customer.storage[item.commodity]! ??= 0;
+      allocationsToMake.customer.storage[item.commodity]! += item.quantity;
+      allocationsToMake.trader.storage[item.commodity]! ??= 0;
+      allocationsToMake.trader.storage[item.commodity]! -= item.quantity;
+    } else {
+      if (item.price) {
+        allocationsToMake.customer.budget += item.price * item.quantity;
+        allocationsToMake.trader.budget -= item.price * item.quantity;
+      }
+      allocationsToMake.customer.storage[item.commodity]! ??= 0;
+      allocationsToMake.customer.storage[item.commodity]! -= item.quantity;
+      allocationsToMake.trader.storage[item.commodity]! ??= 0;
+      allocationsToMake.trader.storage[item.commodity]! += item.quantity;
     }
-
-    return {
-      buyer: {
-        budget:
-          offer.price === 0
-            ? null
-            : newBudgetAllocation(
-                entity.cp.budget,
-                {
-                  amount: offer.price * offer.quantity,
-                  issued: entity.sim.getTime(),
-                },
-                { tradeId }
-              )?.id,
-        storage: newStorageAllocation(
-          entity.cp.storage,
-          {
-            amount: {
-              ...perCommodity(() => 0),
-              [offer.commodity]: offer.quantity,
-            },
-            issued: entity.sim.getTime(),
-            type: "incoming",
-          },
-          { tradeId }
-        )?.id,
-      },
-      seller: {
-        budget: null,
-        storage: newStorageAllocation(
-          entity.sim.getOrThrow(offer.initiator).requireComponents(["storage"])
-            .cp.storage,
-          {
-            amount: {
-              ...perCommodity(() => 0),
-              [offer.commodity]: offer.quantity,
-            },
-            issued: entity.sim.getTime(),
-            type: "outgoing",
-          },
-          { tradeId }
-        )?.id,
-      },
-    };
   }
 
-  return null;
+  const allocations = createTransactionAllocations();
+  const issued = trader.sim.getTime();
+
+  if (allocationsToMake.customer.budget < 0) {
+    allocations.customer.budget = newBudgetAllocation(
+      trader.sim
+        .getOrThrow(offer.budgets.customer)
+        .requireComponents(["budget"]).cp.budget,
+      {
+        amount: Math.abs(allocationsToMake.customer.budget),
+        issued,
+      },
+      { tradeId: offer.tradeId }
+    )?.id;
+  }
+
+  if (allocationsToMake.trader.budget < 0) {
+    allocations.trader.budget = newBudgetAllocation(
+      trader.cp.budget,
+      {
+        amount: Math.abs(allocationsToMake.trader.budget),
+        issued,
+      },
+      { tradeId: offer.tradeId }
+    )?.id;
+  }
+
+  if (Object.keys(allocationsToMake.customer.storage).length) {
+    allocations.customer.storage = newStorageAllocation(
+      trader.sim.getOrThrow(offer.initiator).requireComponents(["storage"]).cp
+        .storage,
+      {
+        amount: perCommodity(
+          (commodity) => allocationsToMake.customer.storage[commodity] || 0
+        ),
+        issued,
+      },
+      { tradeId: offer.tradeId }
+    )?.id;
+  }
+
+  if (Object.keys(allocationsToMake.trader.storage).length) {
+    allocations.trader.storage = newStorageAllocation(
+      trader.cp.storage,
+      {
+        amount: perCommodity(
+          (commodity) => allocationsToMake.trader.storage[commodity] || 0
+        ),
+        issued,
+      },
+      { tradeId: offer.tradeId }
+    )?.id;
+  }
+
+  return allocations;
 }
 
 export function getNeededCommodities(entity: WithTrade): Commodity[] {
@@ -349,18 +351,20 @@ export function getCommoditiesForSell(entity: WithTrade): Commodity[] {
  * Arrange a series of orders "go and buy or sell there"
  * @param entity Ship that initiates trade
  */
-export function tradeCommodity(
+export function performTrade(
   entity: RequireComponent<
     "storage" | "owner" | "orders" | "position" | "dockable"
   >,
-  offer: TransactionInput,
+  offer: Omit<TransactionInput, "allocations">,
   target: WithTrade,
   position?: Waypoint
 ): Action[] | null {
-  const allocations = allocate(target, offer);
-  if (!allocations) {
+  if (!isTradeAccepted(target, offer)) {
     return null;
   }
+
+  const allocations = allocate(target, offer);
+  updateOfferQuantity(target);
 
   return [
     ...moveToActions(position ?? entity, target),
@@ -395,6 +399,10 @@ export function resellCommodity(
       entity.cp.commander ? entity.cp.commander.id : entity.cp.owner.id
     )
     .requireComponents(["budget"]);
+  const availableMoney =
+    seller.cp.owner.id === entity.cp.owner.id
+      ? Infinity
+      : entityWithBudget.cp.budget.available;
 
   const availableSpace = getAvailableSpace(entity.cp.storage);
   const quantity = Math.floor(
@@ -402,8 +410,7 @@ export function resellCommodity(
       buyer.cp.trade.offers[commodity].quantity,
       availableSpace,
       seller.cp.trade.offers[commodity].quantity,
-      entityWithBudget.cp.budget.available /
-        seller.cp.trade.offers[commodity].price
+      availableMoney / seller.cp.trade.offers[commodity].price
     )
   );
 
@@ -412,65 +419,88 @@ export function resellCommodity(
   }
 
   const buyPrice =
-    seller.id === entity.cp.commander?.id
+    seller.cp.owner.id === entity.cp.owner.id
       ? 0
       : seller.cp.trade.offers[commodity].price;
   const sellPrice =
-    buyer.id === entity.cp.commander?.id
+    seller.cp.owner.id === entity.cp.owner.id
       ? 0
       : buyer.cp.trade.offers[commodity].price;
 
   const offer = {
     initiator: entity.id,
-    quantity,
-    commodity,
     factionId: entity.cp.owner.id,
-    budget: entityWithBudget.id,
-    allocations: null,
+    budgets: {
+      trader: 0,
+      customer: entity.cp.commander?.id ?? entity.cp.owner.id,
+    },
   };
 
   // Entity buys from facility, facility sells
   const offerForBuyer = {
-    ...offer,
-    price: sellPrice,
-    type: "sell" as "sell",
+    ...cloneDeep(offer),
+    tradeId: tradingSystem.createId(entity.id, buyer.id),
+    items: [
+      {
+        commodity,
+        quantity,
+        price: sellPrice,
+        type: "sell" as TradeOfferType,
+      },
+    ],
   };
+  offerForBuyer.budgets.trader = buyer.id;
   // Entity sells to facility, facility buys
   const offerForSeller = {
-    ...offer,
-    price: buyPrice,
-    type: "buy" as "buy",
+    ...cloneDeep(offer),
+    tradeId: tradingSystem.createId(entity.id, seller.id),
+    items: [
+      {
+        commodity,
+        quantity,
+        price: buyPrice,
+        type: "buy" as TradeOfferType,
+      },
+    ],
   };
+  offerForSeller.budgets.trader = seller.id;
 
-  if (
-    offerForSeller.price * offer.quantity >
-    entityWithBudget.cp.budget.available
-  ) {
+  if (buyPrice * quantity > availableMoney) {
     return false;
   }
 
-  const buyActions = tradeCommodity(entity, offerForSeller, seller);
+  const buyActions = performTrade(entity, offerForSeller, seller);
   if (buyActions === null) {
     return false;
   }
-  const sellActions = tradeCommodity(entity, offerForBuyer, buyer, seller);
+  const sellActions = performTrade(entity, offerForBuyer, buyer, seller);
   if (sellActions === null) {
     const sellOrdersAllocations = (
       buyActions.find((o) => o.type === "trade") as TradeAction
     ).offer.allocations!;
-    if (sellOrdersAllocations.buyer!.budget) {
+    if (sellOrdersAllocations.customer!.budget) {
       releaseBudgetAllocation(
         entityWithBudget.cp.budget,
-        sellOrdersAllocations!.buyer!.budget!
+        sellOrdersAllocations!.customer!.budget!,
+        "accepted"
+      );
+    }
+    if (sellOrdersAllocations.trader!.budget) {
+      releaseBudgetAllocation(
+        entityWithBudget.cp.budget,
+        sellOrdersAllocations!.trader!.budget!,
+        "accepted"
       );
     }
     releaseStorageAllocation(
       seller.cp.storage,
-      sellOrdersAllocations.seller!.storage!
+      sellOrdersAllocations.trader!.storage!,
+      "accepted"
     );
     releaseStorageAllocation(
       entity.cp.storage,
-      sellOrdersAllocations.buyer!.storage!
+      sellOrdersAllocations.customer!.storage!,
+      "accepted"
     );
     return false;
   }
@@ -563,7 +593,7 @@ export function returnToFacility(
     .getOrThrow(entity.cp.commander.id)
     .requireComponents(tradingCommanderComponents);
 
-  const deliveryOrders = pipe(
+  const itemsToDeliver = pipe(
     commoditiesArray,
     filter(
       (commodity) =>
@@ -572,57 +602,34 @@ export function returnToFacility(
         commander.cp.trade.offers[commodity].type === "buy"
     ),
     map((commodity) => {
-      const offer: TransactionInput = {
+      const offer: TransactionItem = {
         commodity,
-        initiator: entity.id,
         quantity: limitMax(
           entity.cp.storage.availableWares[commodity],
           commander.cp.trade.offers[commodity].quantity
         ),
         price: 0,
-        budget: null,
-        allocations: null,
         type: "sell",
-        factionId: entity.cp.owner.id,
       };
 
-      const allocations = allocate(commander, offer);
-      if (allocations) {
-        return tradeAction(
-          merge(
-            {
-              targetId: commander.id,
-              offer,
-            },
-            {
-              offer: {
-                allocations,
-              },
-            }
-          )
-        );
-      }
-
-      return undefined;
+      return offer;
     }),
     filter(Boolean),
     toArray
   );
 
-  if (deliveryOrders.length) {
-    entity.cp.orders.value.push({
-      origin: "auto",
-      actions: [
-        ...moveToActions(entity, commander),
-        {
-          type: "dock",
-          targetId: commander.id,
-        },
-        ...deliveryOrders,
-      ],
-      type: "trade",
-    });
-  }
+  const offer = {
+    items: itemsToDeliver,
+    budgets: {
+      customer: entity.cp.owner.id,
+      trader: commander.id,
+    },
+    factionId: entity.cp.owner.id,
+    initiator: entity.id,
+    tradeId: tradingSystem.createId(entity.id, commander.id),
+  };
+
+  performTrade(entity, offer, commander);
 }
 
 export function getSectorPrices(sector: Sector): SectorPriceStats {

@@ -9,15 +9,19 @@ import {
   newBudgetAllocation,
 } from "../../components/budget";
 import { addStorage } from "../../components/storage";
-import type { TransactionInput } from "../../components/trade";
+import {
+  createTransactionAllocations,
+  type TransactionInput,
+} from "../../components/trade";
 import { Sim } from "../../sim";
-import { tradeCommodity } from "../../utils/trading";
+import { performTrade } from "../../utils/trading";
 import { shipClasses } from "../../world/ships";
 import { PathPlanningSystem } from "../pathPlanning";
 import { removeOrder } from "./orderExecuting";
 import type { RequireComponent } from "../../tsHelpers";
 import { trade } from "./trade";
-import type { TradeAction } from "../../components/orders";
+import { tradeAction } from "../../components/orders";
+import type { Commodity } from "../../economy/commodity";
 
 describe("Trading", () => {
   let sim: Sim;
@@ -60,20 +64,27 @@ describe("Trading", () => {
       type: "buy",
     };
     const offer: TransactionInput = {
-      budget: sourceOwner.id,
-      commodity: "food",
+      budgets: {
+        customer: sourceOwner.id,
+        trader: targetOwner.id,
+      },
       factionId: targetOwner.id,
       initiator: source.id,
-      price: 10,
-      quantity: 10,
-      type: "sell",
-      allocations: null,
+      items: [
+        {
+          commodity: "food",
+          price: 10,
+          quantity: 10,
+          type: "sell",
+        },
+      ],
+      allocations: createTransactionAllocations(),
+      tradeId: 0,
     };
-    const order: TradeAction = {
+    const order = tradeAction({
       offer,
       targetId: target.id,
-      type: "trade",
-    };
+    });
     trade(order, source, target);
     expect(source.cp.storage.stored.food).toBe(0);
     expect(target.cp.storage.stored.food).toBe(10);
@@ -96,23 +107,28 @@ describe("Trading", () => {
       type: "buy",
     };
     const offer: TransactionInput = {
-      budget: sourceOwner.id,
-      commodity: "food",
+      budgets: {
+        customer: sourceOwner.id,
+        trader: target.id,
+      },
       factionId: targetOwner.id,
       initiator: source.id,
-      price: 10,
-      quantity: 10,
-      type: "sell",
-      allocations: {
-        buyer: { budget: allocation.id, storage: null },
-        seller: { budget: null, storage: null },
-      },
+      items: [
+        {
+          commodity: "food",
+          price: 10,
+          quantity: 10,
+          type: "sell",
+        },
+      ],
+      allocations: createTransactionAllocations(),
+      tradeId: 0,
     };
-    const order: TradeAction = {
+    offer.allocations!.trader.budget = allocation.id;
+    const order = tradeAction({
       offer,
       targetId: target.id,
-      type: "trade",
-    };
+    });
     trade(order, source, target);
     expect(source.cp.storage.stored.food).toBe(0);
     expect(target.cp.storage.stored.food).toBe(10);
@@ -130,20 +146,27 @@ describe("Trading", () => {
       type: "sell",
     };
     const offer: TransactionInput = {
-      budget: sourceOwner.id,
-      commodity: "food",
+      budgets: {
+        customer: sourceOwner.id,
+        trader: targetOwner.id,
+      },
       factionId: targetOwner.id,
       initiator: source.id,
-      price: 10,
-      quantity: 10,
-      type: "buy",
-      allocations: null,
+      items: [
+        {
+          commodity: "food",
+          price: 10,
+          quantity: 10,
+          type: "buy",
+        },
+      ],
+      allocations: createTransactionAllocations(),
+      tradeId: 0,
     };
-    const order: TradeAction = {
+    const order = tradeAction({
       offer,
       targetId: target.id,
-      type: "trade",
-    };
+    });
     trade(order, source, target);
     expect(source.cp.storage.stored.food).toBe(10);
     expect(target.cp.storage.stored.food).toBe(0);
@@ -167,23 +190,28 @@ describe("Trading", () => {
       type: "sell",
     };
     const offer: TransactionInput = {
-      budget: sourceOwner.id,
-      commodity: "food",
+      budgets: {
+        customer: sourceOwner.id,
+        trader: target.id,
+      },
       factionId: targetOwner.id,
       initiator: source.id,
-      price: 10,
-      quantity: 10,
-      type: "buy",
-      allocations: {
-        buyer: { budget: allocation.id, storage: null },
-        seller: { budget: null, storage: null },
-      },
+      items: [
+        {
+          commodity: "food",
+          price: 10,
+          quantity: 10,
+          type: "buy",
+        },
+      ],
+      allocations: createTransactionAllocations(),
+      tradeId: 0,
     };
-    const order: TradeAction = {
+    offer.allocations!.customer.budget = allocation.id;
+    const order = tradeAction({
       offer,
       targetId: target.id,
-      type: "trade",
-    };
+    });
     trade(order, source, target);
     expect(source.cp.storage.stored.food).toBe(10);
     expect(target.cp.storage.stored.food).toBe(0);
@@ -196,7 +224,7 @@ describe("Trading", () => {
 
 describe("Trade action cleanup", () => {
   let sim: Sim;
-  const commodity = "food";
+  const commodity = "food" as Commodity;
   const quantity = 10;
 
   beforeEach(() => {
@@ -236,17 +264,24 @@ describe("Trade action cleanup", () => {
     };
     changeBudgetMoney(facility.cp.budget, 10000);
 
-    const offer: TransactionInput = {
-      budget: faction.id,
-      commodity,
+    const offer = {
+      budgets: {
+        customer: faction.id,
+        trader: facility.id,
+      },
       factionId: faction.id,
       initiator: ship.id,
-      price: 10,
-      quantity,
-      type: "sell",
-      allocations: null,
+      items: [
+        {
+          commodity,
+          price: 10,
+          quantity,
+          type: "sell" as "sell",
+        },
+      ],
+      tradeId: 0,
     };
-    const actions = tradeCommodity(
+    const actions = performTrade(
       ship,
       offer,
       facility.requireComponents([...facilityComponents, "owner"])
@@ -303,17 +338,24 @@ describe("Trade action cleanup", () => {
       type: "sell",
     };
 
-    const offer: TransactionInput = {
-      budget: faction.id,
-      commodity,
+    const offer = {
+      budgets: {
+        customer: faction.id,
+        trader: facility.id,
+      },
       factionId: faction.id,
       initiator: ship.id,
-      price: 10,
-      quantity,
-      type: "buy",
-      allocations: null,
+      items: [
+        {
+          commodity,
+          price: 10,
+          quantity,
+          type: "buy" as "buy",
+        },
+      ],
+      tradeId: 0,
     };
-    const actions = tradeCommodity(
+    const actions = performTrade(
       ship,
       offer,
       facility.requireComponents([...facilityComponents, "owner"])

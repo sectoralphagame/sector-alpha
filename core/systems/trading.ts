@@ -1,5 +1,14 @@
-import { average, filter, flatMap, map, pipe, sum as fxSum } from "@fxts/core";
+import {
+  average,
+  filter,
+  flatMap,
+  map,
+  pipe,
+  sum as fxSum,
+  max,
+} from "@fxts/core";
 import { randomInt, sum } from "mathjs";
+import { isIncomingAllocation } from "@core/components/storage";
 import type { Sector } from "../archetypes/sector";
 import type { TradeEntry } from "../components/journal";
 import type { PriceBelief } from "../components/trade";
@@ -254,12 +263,19 @@ export function getProductionSurplus(
 
 export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
   const stored = entity.cp.storage.availableWares;
+  const incoming =
+    pipe(
+      entity.cp.storage.allocations,
+      filter((a) => isIncomingAllocation(a.amount[commodity])),
+      map((a) => a.amount[commodity]),
+      fxSum
+    ) || 0;
   const quota = entity.cp.storage.quota[commodity];
 
   if (entity.hasComponents(["shipyard"])) {
-    return stored[commodity] > quota
+    return stored[commodity] + incoming > quota
       ? 0
-      : Math.floor(stored[commodity] - quota);
+      : Math.floor(stored[commodity] - incoming - quota);
   }
 
   if (!entity.hasComponents(["compoundProduction"])) {
@@ -291,7 +307,9 @@ export function getOfferedQuantity(entity: WithTrade, commodity: Commodity) {
     );
   }
 
-  return stored[commodity] > quota ? 0 : Math.floor(stored[commodity] - quota);
+  return stored[commodity] > quota
+    ? 0
+    : Math.floor(stored[commodity] - incoming - quota);
 }
 
 export function updateOfferQuantity(entity: WithTrade) {
@@ -334,11 +352,39 @@ export function createOffers(entity: WithTrade) {
  * @link https://ianparberry.com/pubs/econ.pdf
  */
 export class TradingSystem extends System<"adjustPrices" | "createOffers"> {
+  latestTradeId = 0;
+
+  collect = (sim: Sim): void => {
+    this.latestTradeId =
+      pipe(
+        sim.queries.ships.getIt(),
+        flatMap((ship) => ship.cp.orders.value),
+        filter((order) => order.type === "trade"),
+        flatMap((order) => order.actions),
+        map((action) =>
+          action.type === "trade"
+            ? Number(action.offer.tradeId.split(":")[2])
+            : 0
+        ),
+        max
+      ) || 0;
+  };
+
+  createId = (initiatorId: number, targetId: number): string => {
+    this.latestTradeId++;
+    return [initiatorId, targetId, this.latestTradeId].join(":");
+  };
+
   apply = (sim: Sim): void => {
     super.apply(sim);
+    this.collect(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
+
+  destroy(): void {
+    this.latestTradeId = 0;
+  }
 
   exec = (): void => {
     if (this.cooldowns.canUse("adjustPrices")) {
@@ -356,3 +402,5 @@ export class TradingSystem extends System<"adjustPrices" | "createOffers"> {
     }
   };
 }
+
+export const tradingSystem = new TradingSystem();

@@ -171,23 +171,21 @@ export const genericEscortMissionHandler: MissionHandler = {
           const tradeAction = order.actions.find(
             (a) => a.type === "trade"
           ) as TradeAction;
-          if (tradeAction.offer.type === "sell") {
-            trade(
-              tradeAction,
-              freighter,
-              sim
-                .getOrThrow(tradeAction.targetId)
-                .requireComponents([
-                  "storage",
-                  "trade",
-                  "journal",
-                  "budget",
-                  "docks",
-                  "owner",
-                  "position",
-                ])
-            );
-          }
+          trade(
+            tradeAction,
+            freighter,
+            sim
+              .getOrThrow(tradeAction.targetId)
+              .requireComponents([
+                "storage",
+                "trade",
+                "journal",
+                "budget",
+                "docks",
+                "owner",
+                "position",
+              ])
+          );
         }
       }
       freighter.cp.orders.value = [

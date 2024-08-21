@@ -5,17 +5,16 @@ import {
   CollapsibleContent,
   CollapsibleSummary,
 } from "@kit/Collapsible";
-import { parseTradeId } from "@core/utils/trading";
 
 export interface AllocationsProps {
   entity: RequireComponent<"storage">;
 }
 
-export const Allocations: React.FC<AllocationsProps> = ({ entity }) => (
+export const Allocations: React.FC<AllocationsProps> = () => (
   <Collapsible>
     <CollapsibleSummary>Incoming Transactions</CollapsibleSummary>
     <CollapsibleContent>
-      {entity.cp.storage.allocations.length === 0 ? (
+      {/* {entity.cp.storage.allocations.length === 0 ? (
         <div>No incoming transactions</div>
       ) : (
         entity.cp.storage.allocations.map((allocation) => {
@@ -36,7 +35,7 @@ export const Allocations: React.FC<AllocationsProps> = ({ entity }) => (
             </div>
           );
         })
-      )}
+      )} */}
     </CollapsibleContent>
   </Collapsible>
 );

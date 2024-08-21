@@ -5,8 +5,9 @@ import type { Commodity } from "@core/economy/commodity";
 import { commoditiesArray } from "@core/economy/commodity";
 import type { RequireComponent } from "@core/tsHelpers";
 import { getAvailableSpace } from "@core/components/storage";
-import { tradeCommodity } from "@core/utils/trading";
+import { performTrade } from "@core/utils/trading";
 import { entries, map, pipe, sum } from "@fxts/core";
+import { tradingSystem } from "@core/systems/trading";
 import { useGameDialog, useSim } from "../../atoms";
 import type { ModalProps } from "../ConfigDialog";
 import { TradeDialogLine } from "./TradeDialogLine";
@@ -71,35 +72,43 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   };
 
   const onAccept = () => {
-    for (const commodity of commoditiesArray) {
-      const quantity = form.getValues()[commodity];
+    // for (const commodity of commoditiesArray) {
+    //   const quantity = form.getValues()[commodity];
 
-      if (!(quantity > 0 && quantity <= getMax(commodity))) {
-        continue;
-      }
+    //   if (!(quantity > 0 && quantity <= getMax(commodity))) {
+    //     continue;
+    //   }
 
-      const orders = tradeCommodity(
-        initiator,
-        {
-          allocations: null,
-          budget: sim.queries.player.get()[0].id,
-          commodity,
-          factionId: sim.queries.player.get()[0].id,
-          initiator: initiator.id,
-          price: offers[commodity].price,
-          quantity,
-          type: getAction(commodity)!,
+    // }
+
+    const orders = performTrade(
+      initiator,
+      {
+        budgets: {
+          customer: sim.queries.player.get()[0].id,
+          trader: target.id,
         },
-        target
-      );
+        factionId: sim.queries.player.get()[0].id,
+        initiator: initiator.id,
+        items: commoditiesArray
+          .filter((commodity) => form.getValues()[commodity] > 0)
+          .map((commodity) => ({
+            commodity,
+            price: offers[commodity].price,
+            quantity: form.getValues()[commodity],
+            type: getAction(commodity)!,
+          })),
+        tradeId: tradingSystem.createId(initiator.id, target.id),
+      },
+      target
+    );
 
-      if (orders) {
-        initiator.cp.orders.value.push({
-          origin: "manual",
-          type: "trade",
-          actions: orders,
-        });
-      }
+    if (orders) {
+      initiator.cp.orders.value.push({
+        origin: "manual",
+        type: "trade",
+        actions: orders,
+      });
     }
 
     onClose();
