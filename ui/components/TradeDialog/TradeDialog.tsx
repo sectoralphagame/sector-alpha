@@ -5,7 +5,7 @@ import type { Commodity } from "@core/economy/commodity";
 import { commoditiesArray } from "@core/economy/commodity";
 import type { RequireComponent } from "@core/tsHelpers";
 import { getAvailableSpace } from "@core/components/storage";
-import { performTrade } from "@core/utils/trading";
+import { arrangeTrade } from "@core/utils/trading";
 import { entries, map, pipe, sum } from "@fxts/core";
 import { tradingSystem } from "@core/systems/trading";
 import { useGameDialog, useSim } from "../../atoms";
@@ -42,17 +42,17 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   const isSellOfferDisabled = (commodity: Commodity) =>
     offers[commodity].type !== "sell" || offers[commodity].quantity === 0;
 
-  const canBuy = (commodity: Commodity) =>
-    offers[commodity].type === "sell"
-      ? !isSellOfferDisabled(commodity) &&
-        getAvailableSpace(initiator.cp.storage) >
-          initiator.cp.storage.stored[commodity]
-      : false;
-  const canSell = (commodity: Commodity) =>
-    offers[commodity].type === "sell"
-      ? false
-      : !isBuyOfferDisabled(commodity) &&
-        initiator.cp.storage.availableWares[commodity] > 0;
+  const availableSpace =
+    getAvailableSpace(initiator.cp.storage) +
+    (pipe(
+      values,
+      entries,
+      map(([c, a]) => Number(a) * (offers[c].type === "buy" ? 1 : -1)),
+      sum
+    ) || 0);
+
+  const canBuy = (commodity: Commodity) => !isSellOfferDisabled(commodity);
+  const canSell = (commodity: Commodity) => !isBuyOfferDisabled(commodity);
 
   const getAction = (commodity: Commodity) =>
     canBuy(commodity) ? "buy" : canSell(commodity) ? "sell" : null;
@@ -63,12 +63,14 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
     return action === "buy"
       ? Math.min(
           offers[commodity].quantity,
-          getAvailableSpace(initiator.cp.storage)
+          availableSpace + (Number(values[commodity]) || 0)
         )
-      : Math.min(
+      : action === "sell"
+      ? Math.min(
           offers[commodity].quantity,
           initiator.cp.storage.availableWares[commodity]
-        );
+        )
+      : 0;
   };
 
   const onAccept = () => {
@@ -81,7 +83,7 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
 
     // }
 
-    const orders = performTrade(
+    const orders = arrangeTrade(
       initiator,
       {
         budgets: {
@@ -95,8 +97,8 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
           .map((commodity) => ({
             commodity,
             price: offers[commodity].price,
-            quantity: form.getValues()[commodity],
-            type: getAction(commodity)!,
+            quantity: Number(form.getValues()[commodity]),
+            type: offers[commodity].type === "buy" ? "sell" : "buy",
           })),
         tradeId: tradingSystem.createId(initiator.id, target.id),
       },
@@ -125,12 +127,15 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
           (offers[commodity].type === "buy" ? 1 : -1)
       ),
       sum
-    ) ?? 0;
+    ) || 0;
 
   return (
     <FormProvider {...form}>
       <TradeDialogComponent
-        canAccept={sim.queries.player.get()[0].cp.budget.available + total > 0}
+        canAccept={
+          sim.queries.player.get()[0].cp.budget.available + total > 0 &&
+          (pipe(Object.values(values), map(Number), sum) || 0) > 0
+        }
         total={total}
         open={open}
         onAccept={onAccept}
@@ -138,23 +143,19 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
       >
         {commoditiesArray
           .filter((commodity) => offers[commodity].active)
-          .map((commodity) => {
-            const max = getMax(commodity);
-
-            return (
-              <TradeDialogLine
-                key={commodity}
-                availableQuantity={offers[commodity].quantity}
-                buyDisabled={isBuyOfferDisabled(commodity)}
-                commodity={commodity}
-                max={max}
-                offerType={offers[commodity].type}
-                price={offers[commodity].price}
-                sellDisabled={isSellOfferDisabled(commodity)}
-                hasAction={offers[commodity].active}
-              />
-            );
-          })}
+          .map((commodity) => (
+            <TradeDialogLine
+              key={commodity}
+              availableQuantity={offers[commodity].quantity}
+              buyDisabled={isBuyOfferDisabled(commodity)}
+              commodity={commodity}
+              max={getMax(commodity)}
+              offerType={offers[commodity].type}
+              price={offers[commodity].price}
+              sellDisabled={isSellOfferDisabled(commodity)}
+              hasAction={offers[commodity].active}
+            />
+          ))}
       </TradeDialogComponent>
     </FormProvider>
   );

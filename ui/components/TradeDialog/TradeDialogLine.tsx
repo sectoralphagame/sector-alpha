@@ -79,7 +79,7 @@ export const TradeDialogLine: React.FC<TradeDialogLineProps> = ({
             className={styles.max}
             color="text-3"
           >
-            /{max}
+            {max}
           </Text>
           <IconButton
             variant="naked"

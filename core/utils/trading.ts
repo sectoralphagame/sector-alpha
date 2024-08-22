@@ -351,7 +351,7 @@ export function getCommoditiesForSell(entity: WithTrade): Commodity[] {
  * Arrange a series of orders "go and buy or sell there"
  * @param entity Ship that initiates trade
  */
-export function performTrade(
+export function arrangeTrade(
   entity: RequireComponent<
     "storage" | "owner" | "orders" | "position" | "dockable"
   >,
@@ -469,11 +469,11 @@ export function resellCommodity(
     return false;
   }
 
-  const buyActions = performTrade(entity, offerForSeller, seller);
+  const buyActions = arrangeTrade(entity, offerForSeller, seller);
   if (buyActions === null) {
     return false;
   }
-  const sellActions = performTrade(entity, offerForBuyer, buyer, seller);
+  const sellActions = arrangeTrade(entity, offerForBuyer, buyer, seller);
   if (sellActions === null) {
     const sellOrdersAllocations = (
       buyActions.find((o) => o.type === "trade") as TradeAction
@@ -629,7 +629,7 @@ export function returnToFacility(
     tradeId: tradingSystem.createId(entity.id, commander.id),
   };
 
-  performTrade(entity, offer, commander);
+  arrangeTrade(entity, offer, commander);
 }
 
 export function getSectorPrices(sector: Sector): SectorPriceStats {

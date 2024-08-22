@@ -67,6 +67,11 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
         name: "Fog of war",
         fn: () => {
           this.enabled = !this.enabled;
+          if (!this.enabled) {
+            for (const entity of this.sim.queries.facilities.getIt()) {
+              entity.addTag("discovered");
+            }
+          }
         },
         slug: "fogOfWar",
       },

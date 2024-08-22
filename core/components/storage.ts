@@ -1,4 +1,4 @@
-import { add, min, random, sum } from "mathjs";
+import { add, random, sum } from "mathjs";
 import map from "lodash/map";
 import {
   pipe,
@@ -205,51 +205,6 @@ export function removeStorage(
 
   storage.stored[commodity] -= quantity;
   updateAvailableWares(storage);
-}
-
-export function transfer(
-  source: RequireComponent<"storage">,
-  commodity: Commodity,
-  quantity: number,
-  target: RequireComponent<"storage">,
-  options: { exact: boolean; transfer: boolean }
-): number {
-  let quantityToTransfer = quantity;
-  if (source.cp.storage.availableWares[commodity] < quantity) {
-    if (options.exact) {
-      throw new InsufficientStorage(
-        quantity,
-        source.cp.storage.availableWares[commodity]
-      );
-    }
-  } else {
-    quantityToTransfer = min(
-      source.cp.storage.availableWares[commodity],
-      quantity
-    );
-  }
-
-  const transferred = getTransferableQuantity(
-    target.cp.storage,
-    quantityToTransfer,
-    true
-  );
-
-  addStorage(target.cp.storage, commodity, quantityToTransfer, options.exact);
-  removeStorage(source.cp.storage, commodity, transferred);
-
-  if (options.transfer) {
-    (source.cp.drive ? source : target)
-      .addComponent({
-        name: "storageTransfer",
-        amount: transferred,
-        transferred: 0,
-        targetId: target.id,
-      })
-      .addTag("busy");
-  }
-
-  return transferred;
 }
 
 export function newStorageAllocation(

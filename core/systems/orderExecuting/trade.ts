@@ -1,6 +1,11 @@
 import { releaseBudgetAllocation } from "@core/components/budget";
+import { map, pipe, sum } from "@fxts/core";
 import type { TradeAction } from "../../components/orders";
-import { releaseStorageAllocation, transfer } from "../../components/storage";
+import {
+  addStorage,
+  releaseStorageAllocation,
+  removeStorage,
+} from "../../components/storage";
 import { NotDockedError } from "../../errors";
 import type { RequireComponent } from "../../tsHelpers";
 import { acceptTrade } from "../../utils/trading";
@@ -28,18 +33,32 @@ export function trade(
   }
 
   for (const item of order.offer.items) {
-    if (item.type === "sell") {
-      transfer(entity, item.commodity, item.quantity, target, {
-        exact: true,
-        transfer: true,
-      });
-    } else {
-      transfer(target, item.commodity, item.quantity, entity, {
-        exact: true,
-        transfer: true,
-      });
-    }
+    removeStorage(
+      (item.type === "sell" ? entity : target).cp.storage,
+      item.commodity,
+      item.quantity
+    );
   }
+  for (const item of order.offer.items) {
+    addStorage(
+      (item.type === "buy" ? entity : target).cp.storage,
+      item.commodity,
+      item.quantity,
+      true
+    );
+  }
+  entity
+    .addComponent({
+      name: "storageTransfer",
+      amount: pipe(
+        order.offer.items,
+        map((i) => i.quantity),
+        sum
+      ),
+      transferred: 0,
+      targetId: target.id,
+    })
+    .addTag("busy");
 
   acceptTrade(target, order.offer);
 }

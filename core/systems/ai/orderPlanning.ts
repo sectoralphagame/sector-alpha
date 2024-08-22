@@ -33,7 +33,7 @@ import {
   getNeededCommodities,
   returnToFacility,
   resellCommodity,
-  performTrade,
+  arrangeTrade,
 } from "../../utils/trading";
 import { holdPosition } from "../orderExecuting/misc";
 import { System } from "../system";
@@ -118,7 +118,7 @@ function autoTrade(entity: Trading, sectorDistance: number) {
           },
         ],
       };
-      const actions = performTrade(
+      const actions = arrangeTrade(
         entity,
         { ...offer, tradeId: tradingSystem.createId(entity.id, buyer.id) },
         buyer

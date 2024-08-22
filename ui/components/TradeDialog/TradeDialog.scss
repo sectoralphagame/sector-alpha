@@ -23,7 +23,7 @@ $btnHeight: 18px;
     padding: 0 4px;
     text-align: right;
     height: $btnHeight;
-    width: 40px;
+    width: 50px;
     font-size: var(--typography-table);
     font-weight: 400;
   }
@@ -44,7 +44,17 @@ $btnHeight: 18px;
   font-size: var(--typography-label);
 }
 .max {
+  &:before {
+    content: "/";
+    left: 0;
+    position: absolute;
+  }
+  display: inline-block;
   margin: 0 calc(var(--spacing-1) / 2);
+  padding-left: 0.5rem;
+  width: 3rem;
+  text-align: center;
+  position: relative;
 }
 
 .totalRow {

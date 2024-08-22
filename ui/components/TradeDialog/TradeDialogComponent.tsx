@@ -31,9 +31,8 @@ export const TradeDialogComponent: React.FC<
         <tr className={styles.totalRow}>
           <td className={styles.total}>Total</td>
           <td />
-          <td />
           <td
-            colSpan={2}
+            colSpan={3}
             style={{
               color:
                 total > 0

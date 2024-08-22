@@ -14,7 +14,7 @@ import {
   type TransactionInput,
 } from "../../components/trade";
 import { Sim } from "../../sim";
-import { performTrade } from "../../utils/trading";
+import { arrangeTrade } from "../../utils/trading";
 import { shipClasses } from "../../world/ships";
 import { PathPlanningSystem } from "../pathPlanning";
 import { removeOrder } from "./orderExecuting";
@@ -281,7 +281,7 @@ describe("Trade action cleanup", () => {
       ],
       tradeId: 0,
     };
-    const actions = performTrade(
+    const actions = arrangeTrade(
       ship,
       offer,
       facility.requireComponents([...facilityComponents, "owner"])
@@ -355,7 +355,7 @@ describe("Trade action cleanup", () => {
       ],
       tradeId: 0,
     };
-    const actions = performTrade(
+    const actions = arrangeTrade(
       ship,
       offer,
       facility.requireComponents([...facilityComponents, "owner"])

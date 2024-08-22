@@ -1,6 +1,6 @@
 import { NotFound } from "../../errors";
 
-const LOG_RELEASE = process.env.NODE_ENV !== "production" && true;
+const LOG_RELEASE = process.env.NODE_ENV !== "production" && false;
 
 export type AllocationMeta = Record<string, string>;
 
