@@ -149,3 +149,5 @@ export class CrewGrowingSystem extends System<"exec"> {
     this.cooldowns.use("exec", gameDay);
   };
 }
+
+export const crewGrowingSystem = new CrewGrowingSystem();

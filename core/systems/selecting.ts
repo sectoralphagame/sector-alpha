@@ -34,3 +34,5 @@ export class SelectingSystem extends SystemWithHooks {
     this.onChange(this.manager.cp.selectionManager.id, this.refresh);
   };
 }
+
+export const selectingSystem = new SelectingSystem();

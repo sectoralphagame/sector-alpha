@@ -35,3 +35,5 @@ export class DeadUnregisteringSystem extends System {
     }
   };
 }
+
+export const deadUnregisteringSystem = new DeadUnregisteringSystem();

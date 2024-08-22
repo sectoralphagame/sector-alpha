@@ -30,3 +30,6 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
     }
   };
 }
+
+export const disposableUnregisteringSystem =
+  new DisposableUnregisteringSystem();

@@ -127,3 +127,5 @@ export class SpottingSystem extends System<"exec"> {
     this.cooldowns.use("exec", 1 + Math.random());
   };
 }
+
+export const spottingSystem = new SpottingSystem();

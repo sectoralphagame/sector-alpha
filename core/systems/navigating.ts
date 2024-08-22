@@ -269,3 +269,5 @@ export class NavigatingSystem extends System {
     }
   };
 }
+
+export const navigatingSystem = new NavigatingSystem();

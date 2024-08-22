@@ -11,3 +11,5 @@ export class CooldownUpdatingSystem extends System {
     this.sim.entities.forEach((entity) => entity.cooldowns.update(delta));
   };
 }
+
+export const cooldownUpdatingSystem = new CooldownUpdatingSystem();

@@ -199,3 +199,5 @@ export class TauHarassingSystem extends System<"exec"> {
     }
   };
 }
+
+export const tauHarassingSystem = new TauHarassingSystem();

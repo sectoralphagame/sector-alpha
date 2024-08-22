@@ -60,3 +60,5 @@ export class MilitaryModuleSpottingSystem extends System<"exec"> {
     this.cooldowns.use("exec", 1 + Math.random());
   };
 }
+
+export const militaryModuleSpottingSystem = new MilitaryModuleSpottingSystem();

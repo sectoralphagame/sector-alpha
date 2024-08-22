@@ -51,3 +51,5 @@ export class MovingSystem extends System {
     }
   };
 }
+
+export const movingSystem = new MovingSystem();

@@ -30,3 +30,5 @@ export class StorageTransferringSystem extends System<"exec"> {
     }
   };
 }
+
+export const storageTransferringSystem = new StorageTransferringSystem();

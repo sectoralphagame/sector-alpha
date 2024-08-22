@@ -69,3 +69,5 @@ export class ShipReturningSystem extends System<"exec"> {
     );
   };
 }
+
+export const shipReturningSystem = new ShipReturningSystem();

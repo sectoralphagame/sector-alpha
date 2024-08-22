@@ -257,3 +257,5 @@ export class PirateSpawningSystem extends System<
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 }
+
+export const pirateSpawningSystem = new PirateSpawningSystem();

@@ -364,3 +364,5 @@ export class FacilityPlanningSystem extends System<"plan"> {
     }
   };
 }
+
+export const facilityPlanningSystem = new FacilityPlanningSystem();

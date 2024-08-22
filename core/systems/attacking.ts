@@ -143,3 +143,5 @@ export class AttackingSystem extends System {
     }
   };
 }
+
+export const attackingSystem = new AttackingSystem();

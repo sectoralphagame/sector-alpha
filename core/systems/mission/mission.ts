@@ -150,3 +150,5 @@ export class MissionSystem extends System<"generate" | "track"> {
     this.track();
   };
 }
+
+export const missionSystem = new MissionSystem();

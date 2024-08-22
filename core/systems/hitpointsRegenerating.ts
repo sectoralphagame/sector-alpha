@@ -38,3 +38,5 @@ export class HitpointsRegeneratingSystem extends System<"exec"> {
     }
   };
 }
+
+export const hitpointsRegeneratingSystem = new HitpointsRegeneratingSystem();

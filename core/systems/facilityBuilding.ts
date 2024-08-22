@@ -122,3 +122,5 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
     }
   };
 }
+
+export const facilityBuildingSystem = new FacilityBuildingSystem();

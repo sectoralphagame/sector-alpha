@@ -585,3 +585,5 @@ export class ShipPlanningSystem extends System<"plan"> {
     }
   };
 }
+
+export const shipPlanningSystem = new ShipPlanningSystem();

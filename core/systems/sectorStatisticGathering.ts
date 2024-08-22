@@ -38,3 +38,6 @@ export class SectorStatisticGatheringSystem extends System {
     }
   };
 }
+
+export const sectorStatisticGatheringSystem =
+  new SectorStatisticGatheringSystem();
