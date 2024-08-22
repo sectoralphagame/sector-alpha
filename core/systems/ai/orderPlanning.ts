@@ -3,7 +3,6 @@ import { relationThresholds } from "@core/components/relations";
 import { minBy } from "lodash";
 import { add, norm, random, subtract, distance } from "mathjs";
 import { filter, flatMap, map, pipe, sum, toArray } from "@fxts/core";
-import type { TransactionInput } from "@core/components/trade";
 import type { Position2D } from "@core/components/position";
 import { getRandomPositionInBounds } from "@core/utils/misc";
 import { hecsToCartesian } from "@core/components/hecsPosition";
@@ -34,10 +33,11 @@ import {
   getNeededCommodities,
   returnToFacility,
   resellCommodity,
-  tradeCommodity,
+  arrangeTrade,
 } from "../../utils/trading";
 import { holdPosition } from "../orderExecuting/misc";
 import { System } from "../system";
+import { tradingSystem } from "../trading";
 
 const tradingComponents = [
   "drive",
@@ -99,20 +99,30 @@ function autoTrade(entity: Trading, sectorDistance: number) {
     );
 
     if (buyer) {
-      const offer: TransactionInput = {
-        budget: owner.id,
-        commodity: commodityToSell,
+      const offer = {
+        budgets: {
+          customer: owner.id,
+          trader: buyer.id,
+        },
         factionId: owner.id,
         initiator: entity.id,
-        price: buyer.cp.trade.offers[commodityToSell].price,
-        quantity: Math.min(
-          buyer.cp.trade.offers[commodityToSell].quantity,
-          entity.cp.storage.availableWares[commodityToSell]
-        ),
-        type: "sell",
-        allocations: null,
+        items: [
+          {
+            commodity: commodityToSell,
+            price: buyer.cp.trade.offers[commodityToSell].price,
+            quantity: Math.min(
+              buyer.cp.trade.offers[commodityToSell].quantity,
+              entity.cp.storage.availableWares[commodityToSell]
+            ),
+            type: "sell" as "sell",
+          },
+        ],
       };
-      const actions = tradeCommodity(entity, offer, buyer);
+      const actions = arrangeTrade(
+        entity,
+        { ...offer, tradeId: tradingSystem.createId(entity.id, buyer.id) },
+        buyer
+      );
 
       if (actions) {
         entity.cp.orders.value.push({

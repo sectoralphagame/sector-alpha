@@ -56,9 +56,10 @@ export function newBudgetAllocation(
 
 export function releaseBudgetAllocation(
   budget: Budget,
-  id: number
+  id: number,
+  reason: string
 ): BudgetAllocation {
-  const allocation = releaseAllocation(budget, id);
+  const allocation = releaseAllocation(budget, id, reason);
   updateAvailableMoney(budget);
 
   return allocation;
@@ -109,6 +110,7 @@ export function transferMoney(budget: Budget, value: number, target: Budget) {
 export function createBudget(): Budget {
   return {
     allocationIdCounter: 1,
+    allocationReleaseLog: [],
     allocations: [],
     available: 0,
     money: 0,

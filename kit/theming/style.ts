@@ -29,6 +29,7 @@ export interface Theme {
     button: string;
     caption: string;
     label: string;
+    table: string;
     default: string;
     header: string;
     header2: string;
@@ -75,6 +76,7 @@ export function createTheme(scale: number): Theme {
       button: `${baseFontSize * 0.875}px`,
       caption: `${baseFontSize * 0.75}px`,
       label: `${baseFontSize * 0.875}px`,
+      table: `${baseFontSize * 0.8}px`,
       default: `${baseFontSize}px`,
       header: `${Math.ceil(baseFontSize * 1.3 ** 2)}px`,
       header2: `${Math.ceil(baseFontSize * 1.3)}px`,

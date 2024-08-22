@@ -89,7 +89,8 @@ function cleanupAllocations(entity: Entity): void {
               if (entityAllocation.meta.tradeId === allocation.meta.tradeId) {
                 releaseStorageAllocation(
                   entityWithStorage.cp.storage,
-                  entityAllocation.id
+                  entityAllocation.id,
+                  "cancelled"
                 );
               }
             }
@@ -101,7 +102,8 @@ function cleanupAllocations(entity: Entity): void {
               if (entityAllocation.meta.tradeId === allocation.meta.tradeId) {
                 releaseBudgetAllocation(
                   entityWithBudget.cp.budget,
-                  entityAllocation.id
+                  entityAllocation.id,
+                  "cancelled"
                 );
               }
             }

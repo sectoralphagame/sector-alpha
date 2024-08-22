@@ -1,6 +1,14 @@
-import { add, min, random, sum } from "mathjs";
+import { add, random, sum } from "mathjs";
 import map from "lodash/map";
-import { pipe, map as fxtsMap, sum as fxtsSum } from "@fxts/core";
+import {
+  pipe,
+  map as fxtsMap,
+  sum as fxtsSum,
+  filter,
+  flatMap,
+  identity,
+  values,
+} from "@fxts/core";
 import type { RequireComponent } from "@core/tsHelpers";
 import type { Collectible } from "@core/archetypes/collectible";
 import { createCollectible } from "@core/archetypes/collectible";
@@ -24,11 +32,42 @@ import type { Commodity } from "../economy/commodity";
 import { commoditiesArray } from "../economy/commodity";
 import type { BaseComponent } from "./component";
 
-export type StorageAllocationType = "incoming" | "outgoing";
+export function isIncomingAllocation(amount: number): boolean {
+  return amount > 0;
+}
+
+export function isOutgoingAllocation(amount: number): boolean {
+  return !isIncomingAllocation(amount);
+}
+
+function sumAllocations(
+  allocations: StorageAllocation[],
+  amountFilter?: (_amount: number) => boolean,
+  sumFilter?: (_sum: number) => boolean
+): number {
+  return (
+    pipe(
+      allocations,
+      flatMap(
+        (a) =>
+          pipe(
+            a.amount,
+            values,
+            amountFilter ? filter(amountFilter) : identity,
+            fxtsSum
+          ) ?? 0
+      ),
+      sumFilter ? filter(sumFilter) : identity,
+      fxtsSum
+    ) ?? 0
+  );
+}
 
 export interface StorageAllocation extends Allocation {
+  /**
+   * Negative amount means outgoing transfer, positive means incoming
+   */
   amount: Record<Commodity, number>;
-  type: StorageAllocationType;
 }
 
 export interface CommodityStorage
@@ -50,32 +89,25 @@ export function hasSufficientStorage(
 }
 
 export function updateAvailableWares(storage: CommodityStorage) {
-  const outgoingAllocations = storage.allocations.filter(
-    (a) => a.type === "outgoing"
-  );
-
-  commoditiesArray.forEach((commodity) => {
+  for (const commodity of commoditiesArray) {
     storage.availableWares[commodity] = Math.max(
       0,
-      storage.stored[commodity] -
+      storage.stored[commodity] +
         (pipe(
-          outgoingAllocations,
+          storage.allocations,
           fxtsMap((a) => a.amount[commodity]),
+          filter(isOutgoingAllocation),
           fxtsSum
         ) || 0)
     );
-  });
+  }
 }
 
 export function getAvailableSpace(storage: CommodityStorage) {
   return (
     storage.max -
     sum(map(storage.stored)) -
-    sum(
-      storage.allocations
-        .filter((allocation) => allocation.type === "incoming")
-        .map((allocation) => sum(map(allocation.amount)))
-    )
+    sumAllocations(storage.allocations, undefined, isIncomingAllocation)
   );
 }
 
@@ -94,32 +126,22 @@ export function validateStorageAllocation(
   storage: CommodityStorage,
   allocation: StorageAllocation
 ) {
-  if (allocation.type === "incoming") {
-    return (
-      sum(Object.values(allocation.amount)) <=
-      getAvailableSpace(storage) +
-        sum(
-          storage.allocations
-            .filter((a) => a.type === "outgoing")
-            .map((a) => sum(Object.values(a.amount)))
-        )
-    );
-  }
-
-  const result = Object.entries(allocation.amount)
+  const hasCommoditiesOnStock = Object.entries(allocation.amount)
     .map(
       ([commodity, quantity]) =>
         storage.availableWares[commodity] +
-          sum(
-            storage.allocations
-              .filter((a) => a.type === "incoming")
-              .map((a) => a.amount[commodity])
-          ) >=
-        quantity
+          (pipe(
+            storage.allocations,
+            fxtsMap((a) => a.amount[commodity]),
+            filter(isIncomingAllocation),
+            fxtsSum
+          ) || 0) >=
+        -quantity
     )
     .every(Boolean);
-
-  return result;
+  const hasSpaceForAllocation =
+    sum(Object.values(allocation.amount)) <= getAvailableSpace(storage);
+  return hasCommoditiesOnStock && hasSpaceForAllocation;
 }
 
 export function getTransferableQuantity(
@@ -185,51 +207,6 @@ export function removeStorage(
   updateAvailableWares(storage);
 }
 
-export function transfer(
-  source: RequireComponent<"storage">,
-  commodity: Commodity,
-  quantity: number,
-  target: RequireComponent<"storage">,
-  options: { exact: boolean; transfer: boolean }
-): number {
-  let quantityToTransfer = quantity;
-  if (source.cp.storage.availableWares[commodity] < quantity) {
-    if (options.exact) {
-      throw new InsufficientStorage(
-        quantity,
-        source.cp.storage.availableWares[commodity]
-      );
-    }
-  } else {
-    quantityToTransfer = min(
-      source.cp.storage.availableWares[commodity],
-      quantity
-    );
-  }
-
-  const transferred = getTransferableQuantity(
-    target.cp.storage,
-    quantityToTransfer,
-    true
-  );
-
-  addStorage(target.cp.storage, commodity, quantityToTransfer, options.exact);
-  removeStorage(source.cp.storage, commodity, transferred);
-
-  if (options.transfer) {
-    (source.cp.drive ? source : target)
-      .addComponent({
-        name: "storageTransfer",
-        amount: transferred,
-        transferred: 0,
-        targetId: target.id,
-      })
-      .addTag("busy");
-  }
-
-  return transferred;
-}
-
 export function newStorageAllocation(
   storage: CommodityStorage,
   input: Omit<StorageAllocation, "id" | "meta">,
@@ -245,9 +222,10 @@ export function newStorageAllocation(
 
 export function releaseStorageAllocation(
   storage: CommodityStorage,
-  id: number
+  id: number,
+  reason: string
 ): StorageAllocation {
-  const allocation = releaseAllocation(storage, id);
+  const allocation = releaseAllocation(storage, id, reason);
   updateAvailableWares(storage);
 
   return allocation;
@@ -257,6 +235,7 @@ export function createCommodityStorage(max?: number): CommodityStorage {
   const storage: CommodityStorage = {
     allocationIdCounter: 1,
     allocations: [],
+    allocationReleaseLog: [],
     max: max ?? 0,
     availableWares: perCommodity(() => 0),
     stored: perCommodity(() => 0),

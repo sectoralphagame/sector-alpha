@@ -144,8 +144,10 @@ export type Order =
   | TradeOrder;
 
 export function tradeAction(action: Omit<TradeAction, "type">): TradeAction {
-  if (action.offer.quantity <= 0) {
-    throw new NegativeQuantity(action.offer.quantity);
+  for (const item of action.offer.items) {
+    if (item.quantity <= 0) {
+      throw new NegativeQuantity(item.quantity);
+    }
   }
 
   return {

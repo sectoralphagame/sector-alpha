@@ -24,14 +24,40 @@ const Template: StoryFn = () => (
   <div id="root">
     <Styles>
       <Wrapper>
-        <TradeDialogComponent onClose={action("onClose")} open>
+        <TradeDialogComponent
+          canAccept
+          total={1000}
+          onClose={action("onClose")}
+          onAccept={action("onAccept")}
+          open
+        >
           <TradeDialogLine
             availableQuantity={100}
             buyDisabled={false}
             commodity="drones"
             max={100}
             offerType="buy"
-            onAction={action("onAction")}
+            hasAction
+            price={100}
+            sellDisabled={false}
+          />
+          <TradeDialogLine
+            availableQuantity={100}
+            buyDisabled={false}
+            commodity="electronics"
+            max={100}
+            offerType="buy"
+            hasAction
+            price={100}
+            sellDisabled={false}
+          />
+          <TradeDialogLine
+            availableQuantity={100}
+            buyDisabled={false}
+            commodity="silica"
+            max={100}
+            offerType="buy"
+            hasAction
             price={100}
             sellDisabled={false}
           />

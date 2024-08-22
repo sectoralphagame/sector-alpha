@@ -12,7 +12,10 @@
 }
 
 .root {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing);
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing);
+    margin-right: var(--spacing);
+  }
 }

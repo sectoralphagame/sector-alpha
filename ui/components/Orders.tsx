@@ -28,13 +28,13 @@ function getOrderDescription(ship: Ship, order: Action) {
     case "teleport":
       return "Teleport to location";
     case "trade":
-      return order.offer.type === "sell"
-        ? order.targetId === ship.cp.commander?.id
-          ? `Deliver ${order.offer.quantity}x ${order.offer.commodity} to commander`
-          : `Deliver ${order.offer.quantity}x ${order.offer.commodity} to ${
-              ship.sim.getOrThrow(order.targetId).cp.name?.value
-            }`
-        : `Get ${order.offer.quantity}x ${order.offer.commodity} from ${
+      return order.targetId === ship.cp.commander?.id
+        ? `Trade ${order.offer.items
+            .map((item) => `${item.quantity}x ${item.commodity} (${item.type})`)
+            .join(", ")} with commander`
+        : `Trade ${order.offer.items
+            .map((item) => `${item.quantity}x ${item.commodity} (${item.type})`)
+            .join(", ")} with ${
             ship.sim.getOrThrow(order.targetId).cp.name?.value
           }`;
     case "mine":

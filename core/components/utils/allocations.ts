@@ -1,5 +1,7 @@
 import { NotFound } from "../../errors";
 
+const LOG_RELEASE = process.env.NODE_ENV !== "production" && false;
+
 export type AllocationMeta = Record<string, string>;
 
 export interface Allocation {
@@ -17,6 +19,7 @@ export interface CreateAllocationManagerOpts<T> {
 export interface Allocations<T extends Allocation> {
   allocations: T[];
   allocationIdCounter: number;
+  allocationReleaseLog: Array<{ id: number; reason: string }>;
 }
 
 export function newAllocation<T extends Allocation>(
@@ -54,12 +57,15 @@ export function getAllocation<T extends Allocation>(
 
 export function releaseAllocation<T extends Allocation>(
   manager: Allocations<T>,
-  id: number
+  id: number,
+  reason: string
 ): T {
   const allocation = getAllocation(manager, id);
 
   const index = manager.allocations.findIndex((a) => a.id === id);
   manager.allocations.splice(index, 1);
-
+  if (LOG_RELEASE) {
+    manager.allocationReleaseLog.push({ id, reason });
+  }
   return allocation;
 }

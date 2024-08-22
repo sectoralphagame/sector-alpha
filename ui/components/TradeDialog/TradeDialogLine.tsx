@@ -1,10 +1,11 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import type { Commodity } from "@core/economy/commodity";
-import { Button } from "@kit/Button";
+import { commodityLabel, type Commodity } from "@core/economy/commodity";
 import { Input } from "@kit/Input";
 import { TableCell } from "@kit/Table";
 import Text from "@kit/Text";
+import { IconButton } from "@kit/IconButton";
+import { ChevronLeftIcon, ChevronRightIcon } from "@assets/ui/icons";
 import styles from "./TradeDialog.scss";
 
 export interface TradeDialogLineProps {
@@ -15,7 +16,7 @@ export interface TradeDialogLineProps {
   price: number;
   availableQuantity: number;
   max: number;
-  onAction: (() => void) | undefined;
+  hasAction: boolean;
 }
 
 export const TradeDialogLine: React.FC<TradeDialogLineProps> = ({
@@ -26,49 +27,67 @@ export const TradeDialogLine: React.FC<TradeDialogLineProps> = ({
   offerType,
   price,
   availableQuantity,
-  onAction,
+  hasAction,
 }) => {
-  const { register } = useFormContext();
+  const { register, getValues, setValue } = useFormContext();
 
   return (
     <tr className={styles.row} key={commodity}>
-      <TableCell className={styles.colName}>{commodity}</TableCell>
-      <TableCell>
-        <Text color={buyDisabled ? "disabled" : "default"}>
-          {offerType === "buy" ? price : "-"}
-        </Text>
+      <TableCell className={styles.colName}>
+        {commodityLabel[commodity]}
       </TableCell>
       <TableCell>
-        <Text color={buyDisabled ? "disabled" : "default"}>
-          {offerType === "buy" ? availableQuantity : "-"}
-        </Text>
-      </TableCell>
-      <TableCell>
-        <Text color={sellDisabled ? "disabled" : "default"}>
+        <Text variant="caption" color={sellDisabled ? "disabled" : "default"}>
           {offerType === "sell" ? price : "-"}
         </Text>
       </TableCell>
       <TableCell>
-        <Text color={sellDisabled ? "disabled" : "default"}>
+        <Text variant="caption" color={buyDisabled ? "disabled" : "default"}>
+          {offerType === "buy" ? price : "-"}
+        </Text>
+      </TableCell>
+      <TableCell>
+        <Text variant="caption" color={sellDisabled ? "disabled" : "default"}>
           {offerType === "sell" ? availableQuantity : "-"}
         </Text>
       </TableCell>
-      {!!onAction && (
+      <TableCell>
+        <Text variant="caption" color={buyDisabled ? "disabled" : "default"}>
+          {offerType === "buy" ? availableQuantity : "-"}
+        </Text>
+      </TableCell>
+      {hasAction && (
         <TableCell>
+          <IconButton
+            variant="naked"
+            onClick={() => setValue(commodity, 0)}
+            disabled={getValues()[commodity] <= 0}
+          >
+            <ChevronLeftIcon />
+          </IconButton>
           <Input
             className={styles.input}
-            placeholder="Quantity"
+            placeholder="0"
             type="number"
             max={max}
             min={0}
             {...register(commodity)}
           />
-          <Text component="span" className={styles.max} color="text-3">
-            /{max}
+          <Text
+            variant="caption"
+            component="span"
+            className={styles.max}
+            color="text-3"
+          >
+            {max}
           </Text>
-          <Button onClick={onAction}>
-            {offerType === "buy" ? "sell" : "buy"}
-          </Button>
+          <IconButton
+            variant="naked"
+            onClick={() => setValue(commodity, max)}
+            disabled={getValues()[commodity] >= max}
+          >
+            <ChevronRightIcon />
+          </IconButton>
         </TableCell>
       )}
     </tr>

@@ -1,6 +1,11 @@
 import { releaseBudgetAllocation } from "@core/components/budget";
+import { map, pipe, sum } from "@fxts/core";
 import type { TradeAction } from "../../components/orders";
-import { releaseStorageAllocation, transfer } from "../../components/storage";
+import {
+  addStorage,
+  releaseStorageAllocation,
+  removeStorage,
+} from "../../components/storage";
 import { NotDockedError } from "../../errors";
 import type { RequireComponent } from "../../tsHelpers";
 import { acceptTrade } from "../../utils/trading";
@@ -12,42 +17,48 @@ export function trade(
     "storage" | "trade" | "owner" | "budget" | "docks" | "journal" | "position"
   >
 ) {
-  if (order.offer.type === "sell") {
-    if (order.offer.allocations?.buyer?.storage) {
-      releaseStorageAllocation(
-        target.cp.storage,
-        order.offer.allocations.buyer.storage
-      );
-    }
-    if (order.offer.allocations?.seller?.storage) {
-      releaseStorageAllocation(
-        entity.cp.storage,
-        order.offer.allocations.seller.storage
-      );
-    }
-
-    transfer(entity, order.offer.commodity, order.offer.quantity, target, {
-      exact: true,
-      transfer: true,
-    });
-  } else {
-    if (order.offer.allocations?.buyer?.storage) {
-      releaseStorageAllocation(
-        entity.cp.storage,
-        order.offer.allocations.buyer.storage
-      );
-    }
-    if (order.offer.allocations?.seller?.storage) {
-      releaseStorageAllocation(
-        target.cp.storage,
-        order.offer.allocations.seller.storage
-      );
-    }
-    transfer(target, order.offer.commodity, order.offer.quantity, entity, {
-      exact: true,
-      transfer: true,
-    });
+  if (order.offer.allocations.trader.storage) {
+    releaseStorageAllocation(
+      target.cp.storage,
+      order.offer.allocations.trader.storage,
+      "accepted"
+    );
   }
+  if (order.offer.allocations.customer.storage) {
+    releaseStorageAllocation(
+      entity.cp.storage,
+      order.offer.allocations.customer.storage,
+      "accepted"
+    );
+  }
+
+  for (const item of order.offer.items) {
+    removeStorage(
+      (item.type === "sell" ? entity : target).cp.storage,
+      item.commodity,
+      item.quantity
+    );
+  }
+  for (const item of order.offer.items) {
+    addStorage(
+      (item.type === "buy" ? entity : target).cp.storage,
+      item.commodity,
+      item.quantity,
+      true
+    );
+  }
+  entity
+    .addComponent({
+      name: "storageTransfer",
+      amount: pipe(
+        order.offer.items,
+        map((i) => i.quantity),
+        sum
+      ),
+      transferred: 0,
+      targetId: target.id,
+    })
+    .addTag("busy");
 
   acceptTrade(target, order.offer);
 }
@@ -90,47 +101,38 @@ export function tradeActionCleanup(
       "position",
       "journal",
     ]);
-  const budget =
-    order.offer.budget !== null
-      ? entity.sim.getOrThrow(order.offer.budget).requireComponents(["budget"])
-          .cp.budget
-      : null;
 
-  if (order.offer.type === "sell") {
-    if (order.offer.allocations?.buyer?.storage) {
-      releaseStorageAllocation(
-        target.cp.storage,
-        order.offer.allocations.buyer.storage
-      );
-    }
-    if (order.offer.allocations?.seller?.storage) {
-      releaseStorageAllocation(
-        entity.cp.storage,
-        order.offer.allocations.seller.storage
-      );
-    }
+  if (order.offer.allocations.customer.budget) {
+    releaseBudgetAllocation(
+      entity.sim
+        .getOrThrow(order.offer.budgets.customer)
+        .requireComponents(["budget"]).cp.budget,
+      order.offer.allocations.customer.budget,
+      "cancelled"
+    );
+  }
+  if (order.offer.allocations.customer.storage) {
+    releaseStorageAllocation(
+      entity.cp.storage,
+      order.offer.allocations.customer.storage,
+      "cancelled"
+    );
+  }
 
-    if (order.offer.allocations?.buyer?.budget) {
-      releaseBudgetAllocation(
-        target.cp.budget,
-        order.offer.allocations.buyer.budget
-      );
-    }
-  } else {
-    if (order.offer.allocations?.buyer?.storage) {
-      releaseStorageAllocation(
-        entity.cp.storage,
-        order.offer.allocations.buyer.storage
-      );
-    }
-    if (order.offer.allocations?.seller?.storage) {
-      releaseStorageAllocation(
-        target.cp.storage,
-        order.offer.allocations.seller.storage
-      );
-    }
-    if (order.offer.allocations?.buyer?.budget && budget) {
-      releaseBudgetAllocation(budget, order.offer.allocations.buyer.budget);
-    }
+  if (order.offer.allocations.trader.budget) {
+    releaseBudgetAllocation(
+      entity.sim
+        .getOrThrow(order.offer.budgets.trader)
+        .requireComponents(["budget"]).cp.budget,
+      order.offer.allocations.trader.budget,
+      "cancelled"
+    );
+  }
+  if (order.offer.allocations.trader.storage) {
+    releaseStorageAllocation(
+      target.cp.storage,
+      order.offer.allocations.trader.storage,
+      "cancelled"
+    );
   }
 }

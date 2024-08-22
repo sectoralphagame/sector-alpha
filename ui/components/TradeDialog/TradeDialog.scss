@@ -1,17 +1,74 @@
+$btnHeight: 18px;
+
 .colName {
   &.colName {
     text-align: left;
   }
 }
-.input {
-  width: 70px;
-}
+
 .row {
   & td,
   & th {
     text-align: right;
   }
+
+  button {
+    height: $btnHeight;
+    vertical-align: bottom;
+  }
+
+  .input {
+    border: none;
+    font-size: var(--typography-label);
+    padding: 0 4px;
+    text-align: right;
+    height: $btnHeight;
+    width: 50px;
+    font-size: var(--typography-table);
+    font-weight: 400;
+  }
+
+  .actionBtn {
+    margin-left: var(--spacing-1);
+    height: unset;
+    padding: 2px 4px;
+    font-size: var(--typography-table);
+    font-weight: 400;
+    width: 40px;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--palette-border);
+  }
+
+  font-size: var(--typography-label);
 }
 .max {
+  &:before {
+    content: "/";
+    left: 0;
+    position: absolute;
+  }
+  display: inline-block;
   margin: 0 calc(var(--spacing-1) / 2);
+  padding-left: 0.5rem;
+  width: 3rem;
+  text-align: center;
+  position: relative;
+}
+
+.totalRow {
+  td {
+    text-align: right;
+    font-size: var(--typography-header4);
+    padding-top: var(--spacing-3);
+  }
+}
+td.total {
+  font-weight: 600;
+  text-align: left;
+}
+
+.acceptBtn {
+  width: 112px;
 }

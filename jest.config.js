@@ -6,7 +6,7 @@ module.exports = {
     "^.+\\.(jsx?|tsx?)$": [
       "<rootDir>/TransformerESBuild.js",
       {
-        sourcemap: true,
+        sourcemap: "inline",
         target: "chrome112",
         loader: "tsx",
       },
