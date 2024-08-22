@@ -5,7 +5,7 @@ import { changeRelations } from "@core/components/relations";
 import type { Sim } from "@core/sim";
 import { first } from "@fxts/core";
 import { gameDialog } from "@ui/atoms";
-import { MissionSystem } from "./mission";
+import { missionSystem } from "./mission";
 import type { MissionConversation } from "./types";
 
 export interface MoneyReward {
@@ -71,13 +71,10 @@ export function isMissionReward(reward: Reward): reward is MissionReward {
   return reward.type === "mission";
 }
 
-export function missionRewardHandler(reward: Reward, sim: Sim): void {
+export function missionRewardHandler(reward: Reward, _sim: Sim): void {
   if (!isMissionReward(reward))
     throw new Error("Reward is not a mission reward");
 
-  const missionSystem = sim.systems.find(
-    (s) => s instanceof MissionSystem
-  ) as MissionSystem;
   missionSystem.generate(true, reward.mission);
 }
 

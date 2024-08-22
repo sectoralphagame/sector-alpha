@@ -1,7 +1,7 @@
 import { useGameDialog, useSim } from "@ui/atoms";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
 import React from "react";
-import { MissionSystem } from "@core/systems/mission";
+import { missionSystem } from "@core/systems/mission";
 import type { ModalProps } from "../ConfigDialog";
 import { ConversationDialog } from "../ConversationDialog";
 
@@ -29,9 +29,6 @@ export const MissionDialog: React.FC<ModalProps> = ({ open, onClose }) => {
       onEnd={(flags) => {
         if (flags.status === "accepted") {
           const player = sim.index.player.get()[0]!;
-          const missionSystem = sim.systems.find(
-            (s) => s instanceof MissionSystem
-          ) as MissionSystem;
           player.cp.missions.value.push({
             ...missionSystem.handlers.mission[
               player.cp.missions.offer!.type
