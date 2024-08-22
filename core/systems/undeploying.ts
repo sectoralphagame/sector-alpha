@@ -68,3 +68,5 @@ export class UndeployingSystem extends System<"exec"> {
     }
   };
 }
+
+export const undeployingSystem = new UndeployingSystem();

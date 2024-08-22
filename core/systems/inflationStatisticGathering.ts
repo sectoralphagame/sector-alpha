@@ -63,3 +63,6 @@ export class InflationStatisticGatheringSystem extends System {
     }
   };
 }
+
+export const inflationStatisticGatheringSystem =
+  new InflationStatisticGatheringSystem();

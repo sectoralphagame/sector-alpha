@@ -47,3 +47,5 @@ export class MiningSystem extends System {
     }
   };
 }
+
+export const miningSystem = new MiningSystem();

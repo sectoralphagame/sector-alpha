@@ -51,6 +51,10 @@ export function undockAction(
   >,
   _order: UndockAction
 ): boolean {
+  // FIXME: This is a workaround for the issue with pirate ships undocking from
+  // aparently nowhere
+  if (!entity.cp.dockable?.dockedIn) return true;
+
   entity.cp.dockable.undocking = true;
   entity.cp.drive.active = true;
   entity.cp.drive.target = null;

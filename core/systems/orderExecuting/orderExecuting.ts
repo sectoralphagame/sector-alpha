@@ -305,3 +305,5 @@ export class OrderExecutingSystem extends System {
     }
   };
 }
+
+export const orderExecutingSystem = new OrderExecutingSystem();

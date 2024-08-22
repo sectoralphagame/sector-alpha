@@ -494,3 +494,5 @@ export class OrderPlanningSystem extends System<"exec"> {
     }
   };
 }
+
+export const orderPlanningSystem = new OrderPlanningSystem();

@@ -193,3 +193,5 @@ export class ProducingSystem extends System<"exec"> {
     this.cooldowns.use("exec", gameDay);
   };
 }
+
+export const producingSystem = new ProducingSystem();

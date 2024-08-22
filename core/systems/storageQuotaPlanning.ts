@@ -68,3 +68,5 @@ export class StorageQuotaPlanningSystem extends System<"settle"> {
     }
   };
 }
+
+export const storageQuotaPlanningSystem = new StorageQuotaPlanningSystem();

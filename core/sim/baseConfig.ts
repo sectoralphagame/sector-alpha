@@ -1,82 +1,82 @@
 import { isDev } from "@core/settings";
-import { FacilityPlanningSystem } from "@core/systems/ai/facilityPlanning";
-import { MilitaryModuleSpottingSystem } from "@core/systems/ai/militaryModuleSpotting";
-import { OrderPlanningSystem } from "@core/systems/ai/orderPlanning";
-import { ShipPlanningSystem } from "@core/systems/ai/shipPlanning";
-import { ShipReturningSystem } from "@core/systems/ai/shipReturning";
-import { SpottingSystem } from "@core/systems/ai/spotting";
-import { TauHarassingSystem } from "@core/systems/ai/tauHarassing";
-import { AsteroidSpawningSystem } from "@core/systems/asteroidSpawning";
-import { AttackingSystem } from "@core/systems/attacking";
-import { BudgetPlanningSystem } from "@core/systems/budgetPlanning";
-import { CollectibleUnregisteringSystem } from "@core/systems/collectibleUnregistering";
-import { CooldownUpdatingSystem } from "@core/systems/cooldowns";
-import { CrewGrowingSystem } from "@core/systems/crewGrowing";
-import { DeadUnregisteringSystem } from "@core/systems/deadUnregistering";
-import { DisposableUnregisteringSystem } from "@core/systems/disposableUnregistering";
-import { FacilityBuildingSystem } from "@core/systems/facilityBuilding";
-import { HitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating";
-import { InflationStatisticGatheringSystem } from "@core/systems/inflationStatisticGathering";
-import { MiningSystem } from "@core/systems/mining";
-import { MovingSystem } from "@core/systems/moving";
-import { NavigatingSystem } from "@core/systems/navigating";
-import { OrderExecutingSystem } from "@core/systems/orderExecuting/orderExecuting";
-import { PathPlanningSystem } from "@core/systems/pathPlanning";
-import { PirateSpawningSystem } from "@core/systems/pirateSpawning";
-import { ProducingSystem } from "@core/systems/producing";
+import { facilityPlanningSystem } from "@core/systems/ai/facilityPlanning";
+import { militaryModuleSpottingSystem } from "@core/systems/ai/militaryModuleSpotting";
+import { orderPlanningSystem } from "@core/systems/ai/orderPlanning";
+import { shipPlanningSystem } from "@core/systems/ai/shipPlanning";
+import { shipReturningSystem } from "@core/systems/ai/shipReturning";
+import { spottingSystem } from "@core/systems/ai/spotting";
+import { tauHarassingSystem } from "@core/systems/ai/tauHarassing";
+import { asteroidSpawningSystem } from "@core/systems/asteroidSpawning";
+import { attackingSystem } from "@core/systems/attacking";
+import { budgetPlanningSystem } from "@core/systems/budgetPlanning";
+import { collectibleUnregisteringSystem } from "@core/systems/collectibleUnregistering";
+import { cooldownUpdatingSystem } from "@core/systems/cooldowns";
+import { crewGrowingSystem } from "@core/systems/crewGrowing";
+import { deadUnregisteringSystem } from "@core/systems/deadUnregistering";
+import { disposableUnregisteringSystem } from "@core/systems/disposableUnregistering";
+import { facilityBuildingSystem } from "@core/systems/facilityBuilding";
+import { hitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating";
+import { inflationStatisticGatheringSystem } from "@core/systems/inflationStatisticGathering";
+import { miningSystem } from "@core/systems/mining";
+import { movingSystem } from "@core/systems/moving";
+import { navigatingSystem } from "@core/systems/navigating";
+import { orderExecutingSystem } from "@core/systems/orderExecuting/orderExecuting";
+import { pathPlanningSystem } from "@core/systems/pathPlanning";
+import { pirateSpawningSystem } from "@core/systems/pirateSpawning";
+import { producingSystem } from "@core/systems/producing";
 import { AvgFrameReportingSystem } from "@core/systems/reporting/avgFrameReporting";
-import { SectorStatisticGatheringSystem } from "@core/systems/sectorStatisticGathering";
-import { SelectingSystem } from "@core/systems/selecting";
-import { ShipBuildingSystem } from "@core/systems/shipBuilding";
-import { StorageQuotaPlanningSystem } from "@core/systems/storageQuotaPlanning";
+import { sectorStatisticGatheringSystem } from "@core/systems/sectorStatisticGathering";
+import { selectingSystem } from "@core/systems/selecting";
+import { shipBuildingSystem } from "@core/systems/shipBuilding";
+import { storageQuotaPlanningSystem } from "@core/systems/storageQuotaPlanning";
 import { tradingSystem } from "@core/systems/trading";
-import { UndeployingSystem } from "@core/systems/undeploying";
-import { FogOfWarUpdatingSystem } from "@core/systems/fogOfWarUpdating";
-import { StorageTransferringSystem } from "@core/systems/storageTransferring";
+import { undeployingSystem } from "@core/systems/undeploying";
+import { fogOfWarUpdatingSystem } from "@core/systems/fogOfWarUpdating";
+import { storageTransferringSystem } from "@core/systems/storageTransferring";
 import type { SimConfig } from "./Sim";
 
 export const bootstrapSystems = [
-  new PathPlanningSystem(),
-  new CooldownUpdatingSystem(),
-  new ProducingSystem(),
-  new StorageQuotaPlanningSystem(),
+  pathPlanningSystem,
+  cooldownUpdatingSystem,
+  producingSystem,
+  storageQuotaPlanningSystem,
   tradingSystem,
-  new BudgetPlanningSystem(),
-  new OrderPlanningSystem(),
-  new NavigatingSystem(),
-  new MovingSystem(),
-  new MiningSystem(),
-  new OrderExecutingSystem(),
-  new AsteroidSpawningSystem(),
-  new FacilityPlanningSystem(),
-  new ShipPlanningSystem(),
-  new SectorStatisticGatheringSystem(),
-  new InflationStatisticGatheringSystem(),
-  new ShipBuildingSystem(),
-  new FacilityBuildingSystem(),
-  new ShipReturningSystem(),
-  new DisposableUnregisteringSystem(),
-  new CrewGrowingSystem(),
-  new StorageTransferringSystem(),
+  budgetPlanningSystem,
+  orderPlanningSystem,
+  navigatingSystem,
+  movingSystem,
+  miningSystem,
+  orderExecutingSystem,
+  asteroidSpawningSystem,
+  facilityPlanningSystem,
+  shipPlanningSystem,
+  sectorStatisticGatheringSystem,
+  inflationStatisticGatheringSystem,
+  shipBuildingSystem,
+  facilityBuildingSystem,
+  shipReturningSystem,
+  disposableUnregisteringSystem,
+  crewGrowingSystem,
+  storageTransferringSystem,
 ];
 
 export const createBaseConfig = async (): Promise<SimConfig> => {
-  const { MissionSystem } = await import("@core/systems/mission/mission");
+  const { missionSystem } = await import("@core/systems/mission/mission");
   const config: SimConfig = {
     systems: [
       ...bootstrapSystems,
-      new SelectingSystem(),
-      new UndeployingSystem(),
-      new AttackingSystem(),
-      new SpottingSystem(),
-      new MilitaryModuleSpottingSystem(),
-      new HitpointsRegeneratingSystem(),
-      new TauHarassingSystem(),
-      new DeadUnregisteringSystem(),
-      new CollectibleUnregisteringSystem(),
-      new MissionSystem(),
-      new PirateSpawningSystem(),
-      new FogOfWarUpdatingSystem(),
+      selectingSystem,
+      undeployingSystem,
+      attackingSystem,
+      spottingSystem,
+      militaryModuleSpottingSystem,
+      hitpointsRegeneratingSystem,
+      tauHarassingSystem,
+      deadUnregisteringSystem,
+      collectibleUnregisteringSystem,
+      missionSystem,
+      pirateSpawningSystem,
+      fogOfWarUpdatingSystem,
     ],
   };
 

@@ -68,3 +68,5 @@ export class ShipBuildingSystem extends System<"exec"> {
     }
   };
 }
+
+export const shipBuildingSystem = new ShipBuildingSystem();

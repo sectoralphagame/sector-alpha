@@ -26,3 +26,5 @@ export class AsteroidSpawningSystem extends System<"exec"> {
     }
   };
 }
+
+export const asteroidSpawningSystem = new AsteroidSpawningSystem();

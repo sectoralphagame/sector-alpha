@@ -47,3 +47,5 @@ export class BudgetPlanningSystem extends System<"exec"> {
     }
   };
 }
+
+export const budgetPlanningSystem = new BudgetPlanningSystem();

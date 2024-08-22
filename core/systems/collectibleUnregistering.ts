@@ -16,3 +16,6 @@ export class CollectibleUnregisteringSystem extends System {
     }
   };
 }
+
+export const collectibleUnregisteringSystem =
+  new CollectibleUnregisteringSystem();

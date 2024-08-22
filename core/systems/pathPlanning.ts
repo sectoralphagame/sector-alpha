@@ -42,3 +42,5 @@ export class PathPlanningSystem extends System<"regen"> {
     }
   };
 }
+
+export const pathPlanningSystem = new PathPlanningSystem();

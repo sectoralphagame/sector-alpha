@@ -162,3 +162,5 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
 
   static getDivisions = () => divisions;
 }
+
+export const fogOfWarUpdatingSystem = new FogOfWarUpdatingSystem();
