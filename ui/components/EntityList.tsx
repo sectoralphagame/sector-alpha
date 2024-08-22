@@ -22,7 +22,7 @@ export const EntityList: React.FC<EntityListProps> = ({ entities }) => (
               <IconButton
                 onClick={() => {
                   const { selectionManager } =
-                    entity.sim.queries.settings.get()[0].cp;
+                    entity.sim.index.settings.get()[0].cp;
                   selectionManager.id = entity.id;
                 }}
               >

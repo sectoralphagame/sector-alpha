@@ -17,8 +17,8 @@ import { Observable } from "@core/utils/observer";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
-import type { Queries } from "../systems/utils/entityIndex";
-import { Index, createQueries } from "../systems/utils/entityIndex";
+import type { Indexes } from "../systems/utils/entityIndex";
+import { EntityIndex, createIndexes } from "../systems/utils/entityIndex";
 import { MissingEntityError } from "../errors";
 import { openDb } from "../db";
 
@@ -53,8 +53,7 @@ export class Sim extends BaseSim {
   @Expose()
   @Type(() => Entity)
   entities: Map<number, Entity>;
-  systems: System[];
-  queries: Queries;
+  index: Indexes;
   paths: Record<string, Record<string, Path>>;
 
   actions: ActionLoader;
@@ -81,10 +80,8 @@ export class Sim extends BaseSim {
       },
     };
 
-    this.queries = createQueries(this);
-    this.systems = systems;
-
-    this.systems.forEach((system) => system.apply(this));
+    systems.forEach((system) => system.apply(this));
+    this.index = createIndexes(this);
   }
 
   registerEntity = (entity: Entity) => {
@@ -236,10 +233,9 @@ export class Sim extends BaseSim {
 
     sim.entities = entityMap;
 
-    sim.systems = config.systems;
     config.systems.forEach((system) => system.apply(sim));
-    Object.values(sim.queries).forEach((indexOrNested) => {
-      if (indexOrNested instanceof Index) {
+    Object.values(sim.index).forEach((indexOrNested) => {
+      if (indexOrNested instanceof EntityIndex) {
         indexOrNested.reset();
       } else {
         Object.values(indexOrNested).forEach((index) => index.reset());

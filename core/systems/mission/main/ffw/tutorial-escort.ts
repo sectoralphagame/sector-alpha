@@ -43,10 +43,10 @@ export const mainFfwTutorialEscortMissionHandler: MissionHandler = {
     immediate: true,
   }),
   accept: (sim, _offer) => {
-    const player = first(sim.queries.player.getIt())!;
+    const player = first(sim.index.player.getIt())!;
     const miner = find(
       (s) => s.cp.owner.id === player.id && s.cp.mining,
-      sim.queries.ships.getIt()
+      sim.index.ships.getIt()
     )!;
     const hub = find(
       (f) =>
@@ -54,7 +54,7 @@ export const mainFfwTutorialEscortMissionHandler: MissionHandler = {
         f.cp.modules.ids.some((fm) =>
           sim.getOrThrow<FacilityModule>(fm).hasTags(["facilityModuleType:hub"])
         ),
-      sim.queries.facilities.getIt()
+      sim.index.facilities.getIt()
     )!;
     const escort = createShip(sim, {
       ...shipClasses.find(({ slug }) => slug === "dart")!,

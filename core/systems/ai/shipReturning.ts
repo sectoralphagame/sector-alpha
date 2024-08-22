@@ -21,7 +21,7 @@ export class ShipReturningSystem extends System<"exec"> {
     this.cooldowns.use("exec", 3);
 
     pipe(
-      this.sim.queries.orderable.getIt(),
+      this.sim.index.orderable.getIt(),
       filter(
         (ship) =>
           ship.cp.orders.value.length === 0 &&
@@ -29,7 +29,7 @@ export class ShipReturningSystem extends System<"exec"> {
             ? ship.cp.autoOrder?.default.type === "hold"
             : true) &&
           !this.sim.getOrThrow<Faction>(ship.cp.owner.id).tags.has("player") &&
-          !this.sim.queries.sectors
+          !this.sim.index.sectors
             .get()
             .filter((e) => e.cp.owner?.id === ship.cp.owner.id)
             .map((e) => e.id)
@@ -37,7 +37,7 @@ export class ShipReturningSystem extends System<"exec"> {
       ),
       each((ship) => {
         const closestSector = pipe(
-          this.sim.queries.sectors.getIt(),
+          this.sim.index.sectors.getIt(),
           filter((s) => s.cp.owner?.id === ship.cp.owner.id),
           map((s) => ({
             sector: s,

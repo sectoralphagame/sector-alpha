@@ -1,16 +1,16 @@
 import type { Sim } from "@core/sim";
-import { Index } from "./utils/entityIndex";
+import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
 export const regenCooldown = "regen";
 
 export class HitpointsRegeneratingSystem extends System<"exec"> {
-  index: Index<"hitpoints">;
+  index: EntityIndex<"hitpoints">;
 
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    this.index = new Index(sim, ["hitpoints"]);
+    this.index = new EntityIndex(sim, ["hitpoints"]);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

@@ -4,7 +4,7 @@ import { facilityComponents } from "@core/archetypes/facility";
 import { pickRandom } from "@core/utils/generators";
 import { System } from "../system";
 import type { Sim } from "../../sim";
-import { Index } from "../utils/entityIndex";
+import { EntityIndex } from "../utils/entityIndex";
 import { SpottingSystem } from "./spotting";
 import { SectorIndex } from "../utils/sectorIndex";
 import { isInDistance } from "../attacking";
@@ -12,7 +12,7 @@ import { isInDistance } from "../attacking";
 export class MilitaryModuleSpottingSystem extends System<"exec"> {
   indexes: {
     enemies: SectorIndex<"hitpoints" | "owner" | "position">;
-    modules: Index<"parent" | "damage">;
+    modules: EntityIndex<"parent" | "damage">;
   };
 
   apply = (sim: Sim) => {
@@ -20,7 +20,7 @@ export class MilitaryModuleSpottingSystem extends System<"exec"> {
 
     this.indexes = {
       enemies: new SectorIndex(sim, ["hitpoints", "owner", "position"]),
-      modules: new Index(sim, ["parent", "damage"], ["facilityModule"]),
+      modules: new EntityIndex(sim, ["parent", "damage"], ["facilityModule"]),
     };
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);

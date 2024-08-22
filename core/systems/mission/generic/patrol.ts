@@ -28,10 +28,10 @@ export const isGenericPatrolMission = (
 
 export const genericPatrolMissionHandler: MissionHandler = {
   generate: (sim) => {
-    const player = first(sim.queries.player.getIt())!;
+    const player = first(sim.index.player.getIt())!;
     const faction = pickRandom(
       pipe(
-        sim.queries.ai.get(),
+        sim.index.ai.get(),
         filter(
           (f) => player.cp.relations.values[f.id] >= relationThresholds.mission
         ),
@@ -40,7 +40,7 @@ export const genericPatrolMissionHandler: MissionHandler = {
     );
     const sector = pickRandom(
       pipe(
-        sim.queries.sectors.get(),
+        sim.index.sectors.get(),
         filter((s) => s.cp.owner?.id === faction.id),
         toArray
       )
@@ -106,14 +106,14 @@ export const genericPatrolMissionHandler: MissionHandler = {
     if (!isGenericPatrolMission(mission))
       throw new Error("Mission is not a generic.patrol mission");
 
-    const player = first(sim.queries.player.getIt())!;
+    const player = first(sim.index.player.getIt())!;
     const patrolling = some(
       (s) =>
         s.cp.owner.id === player.id &&
         s.cp.orders.value[0]?.type === "patrol" &&
         s.cp.orders.value[0].sectorId === mission.data.sectorId &&
         s.cp.position.sector === mission.data.sectorId,
-      sim.queries.ships.getIt()
+      sim.index.ships.getIt()
     );
 
     if (patrolling) {

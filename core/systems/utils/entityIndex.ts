@@ -19,7 +19,7 @@ export type IndexEntities<T extends keyof CoreComponents> = Array<
   RequireComponent<T>
 >;
 
-export class BaseIndex<T extends keyof CoreComponents> {
+export class BaseEntityIndex<T extends keyof CoreComponents> {
   hooks: {
     add: Observable<RequireComponent<T>>;
     remove: Observable<{ id: number; entity: Entity }>;
@@ -104,7 +104,9 @@ export class BaseIndex<T extends keyof CoreComponents> {
   };
 }
 
-export class Index<T extends keyof CoreComponents> extends BaseIndex<T> {
+export class EntityIndex<
+  T extends keyof CoreComponents
+> extends BaseEntityIndex<T> {
   cache: boolean;
   entities: Set<RequireComponent<T>> | null;
   sim: Sim;
@@ -170,62 +172,62 @@ export class Index<T extends keyof CoreComponents> extends BaseIndex<T> {
   };
 }
 
-export function createQueries(sim: Sim) {
+export function createIndexes(sim: Sim) {
   return {
-    ai: new Index(sim, [...factionComponents, "ai"]),
-    asteroidFields: new Index(sim, asteroidFieldComponents, [], true),
-    autoOrderable: new Index(sim, ["autoOrder", "orders", "position"]),
-    budget: new Index(sim, ["budget"], [], true),
-    builders: new Index(sim, ["builder", "storage", "trade", "docks"]),
-    children: new Index(sim, ["parent"]),
-    collectibles: new Index(sim, collectibleComponents, ["collectible"]),
-    disposable: new Index(sim, ["disposable"]),
-    facilities: new Index(
+    ai: new EntityIndex(sim, [...factionComponents, "ai"]),
+    asteroidFields: new EntityIndex(sim, asteroidFieldComponents, [], true),
+    autoOrderable: new EntityIndex(sim, ["autoOrder", "orders", "position"]),
+    budget: new EntityIndex(sim, ["budget"], [], true),
+    builders: new EntityIndex(sim, ["builder", "storage", "trade", "docks"]),
+    children: new EntityIndex(sim, ["parent"]),
+    collectibles: new EntityIndex(sim, collectibleComponents, ["collectible"]),
+    disposable: new EntityIndex(sim, ["disposable"]),
+    facilities: new EntityIndex(
       sim,
       ["modules", "position", "facilityModuleQueue", "subordinates"],
       [],
       true
     ),
-    facilityWithProduction: new Index(sim, [
+    facilityWithProduction: new EntityIndex(sim, [
       "compoundProduction",
       "modules",
       "position",
     ]),
-    habitats: new Index(sim, ["parent", "facilityModuleBonus"]),
-    mining: new Index(sim, ["mining", "storage"]),
-    orderable: new Index(sim, ["orders", "position", "model", "owner"]),
-    player: new Index(
+    habitats: new EntityIndex(sim, ["parent", "facilityModuleBonus"]),
+    mining: new EntityIndex(sim, ["mining", "storage"]),
+    orderable: new EntityIndex(sim, ["orders", "position", "model", "owner"]),
+    player: new EntityIndex(
       sim,
       [...factionComponents, "missions"],
       ["player"],
       true
     ),
-    productionByModules: new Index(sim, ["production", "parent"]),
-    renderableGraphics: new Index(sim, ["renderGraphics"]),
-    sectors: new Index(sim, sectorComponents, [], true),
-    selectable: new Index(sim, ["render", "position"], ["selection"]),
-    settings: new Index(
+    productionByModules: new EntityIndex(sim, ["production", "parent"]),
+    renderableGraphics: new EntityIndex(sim, ["renderGraphics"]),
+    sectors: new EntityIndex(sim, sectorComponents, [], true),
+    selectable: new EntityIndex(sim, ["render", "position"], ["selection"]),
+    settings: new EntityIndex(
       sim,
       ["selectionManager", "systemManager", "inflationStats", "camera"],
       [],
       true
     ),
-    ships: new Index(sim, shipComponents, ["ship"], true),
-    shipyards: new Index(
+    ships: new EntityIndex(sim, shipComponents, ["ship"], true),
+    shipyards: new EntityIndex(
       sim,
       [...facilityComponents, "owner", "shipyard"],
       [],
       true
     ),
-    standaloneProduction: new Index(sim, ["production", "storage"]),
-    storage: new Index(sim, ["storage"]),
-    storageAndTrading: new Index(sim, ["storage", "trade"]),
-    teleports: new Index(sim, ["teleport"], [], true),
-    trading: new Index(sim, tradeComponents),
+    standaloneProduction: new EntityIndex(sim, ["production", "storage"]),
+    storage: new EntityIndex(sim, ["storage"]),
+    storageAndTrading: new EntityIndex(sim, ["storage", "trade"]),
+    teleports: new EntityIndex(sim, ["teleport"], [], true),
+    trading: new EntityIndex(sim, tradeComponents),
     bySectors: {
       trading: new SectorIndex(sim, tradeComponents),
     },
   } as const;
 }
 
-export type Queries = ReturnType<typeof createQueries>;
+export type Indexes = ReturnType<typeof createIndexes>;

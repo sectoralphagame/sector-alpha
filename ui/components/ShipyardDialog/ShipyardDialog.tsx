@@ -24,7 +24,7 @@ export const ShipyardDialog: React.FC<ModalProps> = ({ open, onClose }) => {
   if (dialog?.type !== "shipyard") return null;
 
   const shipyard = sim.getOrThrow<Facility>(dialog.shipyardId);
-  const ownFaction = sim.queries.player.get()[0];
+  const ownFaction = sim.index.player.get()[0];
   const shipyardFaction = sim.getOrThrow<Faction>(shipyard.cp.owner!.id);
 
   return (

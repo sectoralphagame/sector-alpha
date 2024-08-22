@@ -5,7 +5,7 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { Observable } from "@core/utils/observer";
 import { flatMap, pipe } from "@fxts/core";
 import type { IndexEntities } from "./entityIndex";
-import { BaseIndex } from "./entityIndex";
+import { BaseEntityIndex } from "./entityIndex";
 
 const hook = new Observable<{
   oldSectorId: number;
@@ -15,7 +15,7 @@ const hook = new Observable<{
 
 export class SectorIndex<T extends keyof CoreComponents> {
   sectors: Map<number, IndexEntities<T | "position">>;
-  index: BaseIndex<T | "position">;
+  index: BaseEntityIndex<T | "position">;
 
   constructor(
     sim: Sim,
@@ -23,7 +23,7 @@ export class SectorIndex<T extends keyof CoreComponents> {
     requiredTags: readonly EntityTag[] = []
   ) {
     this.sectors = new Map();
-    this.index = new BaseIndex(
+    this.index = new BaseEntityIndex(
       sim,
       [...requiredComponents, "position"],
       requiredTags

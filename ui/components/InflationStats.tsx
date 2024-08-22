@@ -14,7 +14,7 @@ import styles from "./InflationStats.scss";
 
 const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
   const [open, setOpen] = React.useState(false);
-  const settings = React.useRef(sim.queries.settings.get()[0]);
+  const settings = React.useRef(sim.index.settings.get()[0]);
   const chart = React.useRef<IChartApi | null>(null);
   const [chartContainer, setChartContainer] =
     React.useState<HTMLElement | null>(null);
@@ -75,7 +75,7 @@ const Inflation: React.FC<{ sim: Sim }> = ({ sim }) => {
   }, [
     chartContainer,
     sim,
-    sim.queries.settings.get()[0].cp.systemManager.lastInflationStatUpdate,
+    sim.index.settings.get()[0].cp.systemManager.lastInflationStatUpdate,
   ]);
 
   return (

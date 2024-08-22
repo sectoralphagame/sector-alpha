@@ -136,7 +136,7 @@ export class ProducingSystem extends System<"exec"> {
   exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
 
-    for (const entity of this.sim.queries.standaloneProduction.getIt()) {
+    for (const entity of this.sim.index.standaloneProduction.getIt()) {
       const willProduce = ProducingSystem.isAbleToProduce(
         entity,
         entity.cp.storage,
@@ -152,7 +152,7 @@ export class ProducingSystem extends System<"exec"> {
       ProducingSystem.produce(entity.cp.production, entity.cp.storage, [1]);
     }
 
-    for (const facilityModule of this.sim.queries.productionByModules.getIt()) {
+    for (const facilityModule of this.sim.index.productionByModules.getIt()) {
       // It'll be handled by CrewGrowingSystem
       if (facilityModule.tags.has("facilityModuleType:hub")) continue;
 

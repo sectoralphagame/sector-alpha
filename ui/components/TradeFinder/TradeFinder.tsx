@@ -25,20 +25,20 @@ export const TradeFinder: React.FC = () => {
   const sortedOffers = React.useMemo(
     () =>
       sortBy(
-        sim.queries.trading
+        sim.index.trading
           .get()
           .filter(
             (entity) =>
               entity.cp.trade.offers[selectedCommodity].active &&
               entity.cp.trade.offers[selectedCommodity].quantity > 0 &&
-              sim.queries.player.get()[0].cp.relations.values[
+              sim.index.player.get()[0].cp.relations.values[
                 entity.cp.owner.id
               ] > relationThresholds.trade &&
               entity.tags.has("discovered")
           ),
         `components.trade.offers.${selectedCommodity}.price`
       ),
-    [sim.queries.trading.get()]
+    [sim.index.trading.get()]
   );
 
   return (
@@ -79,7 +79,7 @@ export const TradeFinder: React.FC = () => {
                 <IconButton
                   variant="naked"
                   onClick={() => {
-                    sim.queries.settings.get()[0].cp.selectionManager.id =
+                    sim.index.settings.get()[0].cp.selectionManager.id =
                       entity.id;
                   }}
                 >

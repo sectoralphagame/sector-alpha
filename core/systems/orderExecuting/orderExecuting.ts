@@ -83,7 +83,7 @@ function cleanupAllocations(entity: Entity): void {
     if (manager) {
       manager.allocations.forEach((allocation: Allocation) => {
         if (allocation.meta.tradeId) {
-          for (const entityWithStorage of entity.sim.queries.storage.getIt()) {
+          for (const entityWithStorage of entity.sim.index.storage.getIt()) {
             for (const entityAllocation of entityWithStorage.cp.storage
               .allocations) {
               if (entityAllocation.meta.tradeId === allocation.meta.tradeId) {
@@ -96,7 +96,7 @@ function cleanupAllocations(entity: Entity): void {
             }
           }
 
-          for (const entityWithBudget of entity.sim.queries.budget.getIt()) {
+          for (const entityWithBudget of entity.sim.index.budget.getIt()) {
             for (const entityAllocation of entityWithBudget.cp.budget
               .allocations) {
               if (entityAllocation.meta.tradeId === allocation.meta.tradeId) {
@@ -120,7 +120,7 @@ function cleanupOrders(entity: Entity): void {
   )
     return;
 
-  for (const ship of entity.sim.queries.orderable.getIt()) {
+  for (const ship of entity.sim.index.orderable.getIt()) {
     if (
       ship.cp.autoOrder?.default.type === "escort" &&
       ship.cp.autoOrder?.default.targetId === entity.id
@@ -203,7 +203,7 @@ function cleanupChildren(entity: Entity): void {
   )
     return;
 
-  for (const child of entity.sim.queries.children.getIt()) {
+  for (const child of entity.sim.index.children.getIt()) {
     if (child.cp.parent.id === entity.id) {
       child.unregister();
     }
@@ -270,7 +270,7 @@ export class OrderExecutingSystem extends System {
   };
 
   exec = () => {
-    for (const entity of this.sim.queries.orderable.getIt()) {
+    for (const entity of this.sim.index.orderable.getIt()) {
       if (entity.hasTags(["busy"])) continue;
 
       if (entity.cp.orders.value.length) {

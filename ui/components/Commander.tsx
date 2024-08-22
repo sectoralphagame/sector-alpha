@@ -14,7 +14,7 @@ export interface CommanderProps {
 
 export const Commander: React.FC<CommanderProps> = ({ commander, ship }) => {
   const [sim] = useSim();
-  const isOwned = sim.queries.player.get()[0].id === ship.cp.owner?.id;
+  const isOwned = sim.index.player.get()[0].id === ship.cp.owner?.id;
 
   return (
     <div className={styles.root}>

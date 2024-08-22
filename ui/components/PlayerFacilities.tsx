@@ -11,8 +11,8 @@ import { EntityList } from "./EntityList";
 export const PlayerFacilities: React.FC = () => {
   const [sim] = useSim();
   const facilities = pipe(
-    sim.queries.facilities.getIt(),
-    filter((ship) => ship.cp.owner?.id === sim.queries.player.get()[0].id),
+    sim.index.facilities.getIt(),
+    filter((ship) => ship.cp.owner?.id === sim.index.player.get()[0].id),
     toArray
   );
 

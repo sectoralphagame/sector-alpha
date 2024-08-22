@@ -42,11 +42,11 @@ export const mainFfwTutorialMinerMissionHandler: MissionHandler = {
     immediate: true,
   }),
   accept: (sim, offer) => {
-    const player = first(sim.queries.player.getIt())!;
+    const player = first(sim.index.player.getIt())!;
     player.addTag("mainQuestStarted");
     const sector = find(
       (s) => s.cp.name.value === "Teegarden's Star II",
-      sim.queries.sectors.get()
+      sim.index.sectors.get()
     )!;
 
     const miner = createShip(sim, {

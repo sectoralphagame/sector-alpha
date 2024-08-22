@@ -20,10 +20,7 @@ export function isMoneyReward(reward: Reward): reward is MoneyReward {
 export function moneyRewardHandler(reward: Reward, sim: Sim): void {
   if (!isMoneyReward(reward)) throw new Error("Reward is not a money reward");
 
-  changeBudgetMoney(
-    first(sim.queries.player.getIt())!.cp.budget,
-    reward.amount
-  );
+  changeBudgetMoney(first(sim.index.player.getIt())!.cp.budget, reward.amount);
 }
 
 export function moneyReward(amount: number): MoneyReward {
@@ -48,7 +45,7 @@ export function relationRewardHandler(reward: Reward, sim: Sim): void {
     throw new Error("Reward is not a relation reward");
 
   changeRelations(
-    first(sim.queries.player.getIt())!,
+    first(sim.index.player.getIt())!,
     sim.getOrThrow<Faction>(reward.factionId),
     reward.amount
   );

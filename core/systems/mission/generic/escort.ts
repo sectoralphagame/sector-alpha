@@ -28,7 +28,7 @@ function getRoute(
 ): [Facility, Facility] {
   for (let counter = 0; counter < 1000; counter++) {
     const availableOriginSectors = pipe(
-      sim.queries.sectors.get(),
+      sim.index.sectors.get(),
       filter((s) => s.cp.owner?.id === faction.id),
       toArray
     );
@@ -36,7 +36,7 @@ function getRoute(
 
     const originSector = pickRandom(availableOriginSectors);
     const availableTargetSectors = pipe(
-      sim.queries.sectors.get(),
+      sim.index.sectors.get(),
       filter(
         (s) =>
           Object.entries(faction.cp.relations.values)
@@ -55,7 +55,7 @@ function getRoute(
     const targetSector = pickRandom(availableTargetSectors);
     const origin = pickRandom(
       pipe(
-        sim.queries.facilities.getIt(),
+        sim.index.facilities.getIt(),
         filter(
           (f) =>
             f.cp.owner?.id === faction.id &&
@@ -66,7 +66,7 @@ function getRoute(
     );
     const target = pickRandom(
       pipe(
-        sim.queries.facilities.getIt(),
+        sim.index.facilities.getIt(),
         filter(
           (f) =>
             Object.entries(faction.cp.relations.values)
@@ -115,7 +115,7 @@ export const isGenericEscortMission = (
 export const genericEscortMissionHandler: MissionHandler = {
   generate: (sim) => {
     const hops = randomInt(2, 4);
-    const faction = sim.queries.ai.get().find((f) => f.cp.name.slug === "FFW")!;
+    const faction = sim.index.ai.get().find((f) => f.cp.name.slug === "FFW")!;
     const [origin, destination] = getRoute(sim, faction, hops);
     const shipName = pickRandom(shipNames.ffw.freighter);
     const reward = {
@@ -158,7 +158,7 @@ export const genericEscortMissionHandler: MissionHandler = {
 
     const freighter = pickRandom(
       pipe(
-        sim.queries.ships.getIt(),
+        sim.index.ships.getIt(),
         filter((s) => s.cp.commander?.id === data.originId),
         toArray
       )
@@ -256,7 +256,7 @@ export const genericEscortMissionHandler: MissionHandler = {
     if (!freighter) return;
 
     const shipInDistance = pipe(
-      sim.queries.ships.getIt(),
+      sim.index.ships.getIt(),
       find(
         (s) =>
           s.tags.has("role:military") &&

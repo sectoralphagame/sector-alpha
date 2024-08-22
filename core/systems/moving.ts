@@ -1,6 +1,6 @@
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
-import { Index } from "./utils/entityIndex";
+import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
 type Movable = RequireComponent<"movable" | "position">;
@@ -33,12 +33,12 @@ function move(entity: Movable, delta: number) {
 
 export class MovingSystem extends System {
   entities: Movable[];
-  index: Index<"movable" | "position">;
+  index: EntityIndex<"movable" | "position">;
 
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    this.index = new Index(sim, ["movable", "position"]);
+    this.index = new EntityIndex(sim, ["movable", "position"]);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

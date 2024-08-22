@@ -4,14 +4,14 @@ import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
 import { deepEqual } from "mathjs";
 import { System } from "../system";
-import { Index } from "../utils/entityIndex";
+import { EntityIndex } from "../utils/entityIndex";
 
 export class OutOfBoundsCheckingSystem extends System<"exec"> {
-  index: Index<"position">;
+  index: EntityIndex<"position">;
 
   apply = (sim: Sim) => {
     super.apply(sim);
-    this.index = new Index(this.sim, ["position"]);
+    this.index = new EntityIndex(this.sim, ["position"]);
 
     sim.hooks.phase.start.subscribe(this.constructor.name, this.exec);
   };

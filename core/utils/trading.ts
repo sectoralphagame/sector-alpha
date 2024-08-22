@@ -181,7 +181,7 @@ export function acceptTrade(
         time: entityWithOffer.sim.getTime(),
       });
 
-      const player = first(entityWithOffer.sim.queries.player.getIt())!;
+      const player = first(entityWithOffer.sim.index.player.getIt())!;
       if ([input.factionId, entityWithOffer.cp.owner.id].includes(player.id)) {
         changeRelations(
           player,
@@ -633,7 +633,7 @@ export function returnToFacility(
 }
 
 export function getSectorPrices(sector: Sector): SectorPriceStats {
-  const facilities = sector.sim.queries.bySectors.trading.get(sector.id);
+  const facilities = sector.sim.index.bySectors.trading.get(sector.id);
 
   return perCommodity((commodity) => {
     const buyOffers = facilities

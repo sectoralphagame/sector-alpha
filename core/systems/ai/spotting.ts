@@ -85,7 +85,7 @@ export class SpottingSystem extends System<"exec"> {
 
     const cache: EnemyArrayCache = {};
 
-    for (const entity of this.sim.queries.orderable.getIt()) {
+    for (const entity of this.sim.index.orderable.getIt()) {
       const currentOrder = entity.cp.orders.value[0];
       if (
         currentOrder?.type !== "patrol" &&

@@ -8,7 +8,7 @@ import { getRequiredCrew } from "@core/utils/crew";
 import type { Sim } from "../sim";
 import { System } from "./system";
 import { ProducingSystem, timeMultiplier } from "./producing";
-import { Index } from "./utils/entityIndex";
+import { EntityIndex } from "./utils/entityIndex";
 
 function getHubModule(facility: RequireComponent<"modules">) {
   return pipe(
@@ -19,12 +19,12 @@ function getHubModule(facility: RequireComponent<"modules">) {
 }
 
 export class CrewGrowingSystem extends System<"exec"> {
-  crewable: Index<"crew" | "modules" | "position">;
+  crewable: EntityIndex<"crew" | "modules" | "position">;
 
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    this.crewable = new Index(
+    this.crewable = new EntityIndex(
       sim,
       ["modules", "position", "facilityModuleQueue", "subordinates", "crew"],
       [],

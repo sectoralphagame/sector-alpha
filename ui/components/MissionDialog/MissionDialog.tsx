@@ -24,13 +24,11 @@ export const MissionDialog: React.FC<ModalProps> = ({ open, onClose }) => {
 
   return (
     <ConversationDialog
-      conversation={
-        sim.queries.player.get()[0]!.cp.missions.offer!.conversation
-      }
+      conversation={sim.index.player.get()[0]!.cp.missions.offer!.conversation}
       open={open}
       onEnd={(flags) => {
         if (flags.status === "accepted") {
-          const player = sim.queries.player.get()[0]!;
+          const player = sim.index.player.get()[0]!;
           const missionSystem = sim.systems.find(
             (s) => s instanceof MissionSystem
           ) as MissionSystem;
@@ -41,12 +39,12 @@ export const MissionDialog: React.FC<ModalProps> = ({ open, onClose }) => {
             accepted: sim.getTime(),
           });
         } else {
-          sim.queries.player.get()[0]!.cp.missions.declined = sim.getTime();
+          sim.index.player.get()[0]!.cp.missions.declined = sim.getTime();
         }
       }}
       onClose={() => {
         onClose();
-        sim.queries.player.get()[0]!.cp.missions.offer = null;
+        sim.index.player.get()[0]!.cp.missions.offer = null;
         if (settings.pauseOnMissionOffer) {
           sim.unpause();
         }

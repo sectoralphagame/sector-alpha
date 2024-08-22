@@ -39,13 +39,13 @@ export const mainFfwTutorialTradeMissionHandler: MissionHandler = {
     immediate: true,
   }),
   accept: (sim, _offer) => {
-    const player = first(sim.queries.player.getIt())!;
+    const player = first(sim.index.player.getIt())!;
     const miner = find(
       (s) => s.cp.owner.id === player.id && s.cp.mining,
-      sim.queries.ships.getIt()
+      sim.index.ships.getIt()
     )!;
     const nearestFacility = pipe(
-      sim.queries.facilities.getIt(),
+      sim.index.facilities.getIt(),
       filter(
         (f) =>
           f.cp.trade?.offers?.ore.active &&

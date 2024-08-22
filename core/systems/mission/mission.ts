@@ -67,7 +67,7 @@ export class MissionSystem extends System<"generate" | "track"> {
   track = () => {
     if (!this.cooldowns.canUse("track")) return;
 
-    const player = first(this.sim.queries.player.getIt())!;
+    const player = first(this.sim.index.player.getIt())!;
 
     player.cp.missions.value.forEach((mission) => {
       this.handlers.mission[mission.type].update(
@@ -106,7 +106,7 @@ export class MissionSystem extends System<"generate" | "track"> {
     if (!this.cooldowns.canUse("generate") && !force) return;
     this.cooldowns.use("generate", 1 + Math.random());
 
-    const player = this.sim.queries.player.get()[0];
+    const player = this.sim.index.player.get()[0];
 
     if (
       !player.tags.has("mainQuestStarted") &&

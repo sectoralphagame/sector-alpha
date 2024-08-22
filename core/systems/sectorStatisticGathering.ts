@@ -15,13 +15,13 @@ export class SectorStatisticGatheringSystem extends System {
   exec = (): void => {
     if (
       this.sim.getTime() -
-        this.sim.queries.settings.get()[0].cp.systemManager.lastStatUpdate >
+        this.sim.index.settings.get()[0].cp.systemManager.lastStatUpdate >
       gameDay * 10
     ) {
-      this.sim.queries.settings.get()[0].cp.systemManager.lastStatUpdate =
+      this.sim.index.settings.get()[0].cp.systemManager.lastStatUpdate =
         this.sim.getTime();
 
-      this.sim.queries.sectors.get().forEach((sector) => {
+      this.sim.index.sectors.get().forEach((sector) => {
         const resources = getSectorResources(sector, 0);
 
         mapValues(sector.cp.sectorStats.availableResources, (v, commodity) =>

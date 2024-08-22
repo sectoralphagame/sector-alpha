@@ -98,7 +98,7 @@ function assignSmallPatrol(
       let sector = fighter.sim.getOrThrow(fighter.cp.position.sector);
       if (sector.cp.owner?.id !== fighter.cp.owner.id) {
         sector = pickRandom(
-          fighter.sim.queries.sectors
+          fighter.sim.index.sectors
             .get()
             .filter((s) => s.cp.owner?.id === fighter.cp.owner.id)
         );
@@ -129,7 +129,7 @@ export class ShipPlanningSystem extends System<"plan"> {
 
   getFacilityShipRequests = (faction: Faction): ShipRequest[] =>
     pipe(
-      this.sim.queries.facilities.getIt(),
+      this.sim.index.facilities.getIt(),
       filter((facility) => facility.cp.owner?.id === faction.id),
       map((facility) => {
         const facilityModules = facility.cp.modules.ids.map(
@@ -193,11 +193,11 @@ export class ShipPlanningSystem extends System<"plan"> {
     );
 
   getPatrolRequests = (faction: Faction): ShipRequest[] =>
-    this.sim.queries.sectors
+    this.sim.index.sectors
       .get()
       .filter((sector) => sector.cp.owner?.id === faction.id)
       .map((sector) => {
-        const sectorPatrols = this.sim.queries.ships
+        const sectorPatrols = this.sim.index.ships
           .get()
           .filter(
             (ship) =>
@@ -228,7 +228,7 @@ export class ShipPlanningSystem extends System<"plan"> {
 
   getTravellingTradersRequests = (faction: Faction): ShipRequest[] => {
     if (faction.cp.ai?.type === "travelling") {
-      return this.sim.queries.shipyards
+      return this.sim.index.shipyards
         .get()
         .filter(
           (shipyard) =>
@@ -239,7 +239,7 @@ export class ShipPlanningSystem extends System<"plan"> {
           this.sim.getOrThrow<Sector>(shipyard.cp.position.sector)
         )
         .map((sector) => {
-          const sectorTraders = this.sim.queries.autoOrderable
+          const sectorTraders = this.sim.index.autoOrderable
             .get()
             .filter(
               (ship) =>
@@ -284,7 +284,7 @@ export class ShipPlanningSystem extends System<"plan"> {
       removeCommander(ship.requireComponents(["commander"]));
     });
     spareTraders.push(
-      ...this.sim.queries.orderable
+      ...this.sim.index.orderable
         .get()
         .filter(
           (ship) =>
@@ -364,7 +364,7 @@ export class ShipPlanningSystem extends System<"plan"> {
       removeCommander(ship.requireComponents(["commander"]));
     });
     spareMiners.push(
-      ...this.sim.queries.mining
+      ...this.sim.index.mining
         .get()
         .filter(
           (ship) => ship.cp.owner?.id === faction.id && !ship.cp.commander
@@ -409,7 +409,7 @@ export class ShipPlanningSystem extends System<"plan"> {
     const spareFrigates = shipRequests
       .filter(({ patrols }) => patrols > 0)
       .flatMap(({ sector, patrols }) =>
-        this.sim.queries.ships
+        this.sim.index.ships
           .get()
           .filter(
             (ship) =>
@@ -424,7 +424,7 @@ export class ShipPlanningSystem extends System<"plan"> {
       );
 
     spareFrigates.push(
-      ...this.sim.queries.ships
+      ...this.sim.index.ships
         .get()
         .filter(
           (ship) =>
@@ -476,7 +476,7 @@ export class ShipPlanningSystem extends System<"plan"> {
         }
       });
 
-    const spareFighters = this.sim.queries.orderable
+    const spareFighters = this.sim.index.orderable
       .get()
       .filter(
         (ship) =>
@@ -501,7 +501,7 @@ export class ShipPlanningSystem extends System<"plan"> {
           if (spareFighters.length > 0) {
             const ship = spareFighters.pop()!;
             ship.tags.delete("ai:spare");
-            const commander = this.sim.queries.ships
+            const commander = this.sim.index.ships
               .get()
               .find(
                 (patrolLeader) =>
@@ -555,9 +555,9 @@ export class ShipPlanningSystem extends System<"plan"> {
     if (this.cooldowns.canUse("plan")) {
       this.cooldowns.use("plan", gameDay);
 
-      this.sim.queries.ai.get().forEach((faction) => {
+      this.sim.index.ai.get().forEach((faction) => {
         const shipRequests = this.getShipRequests(faction);
-        const requestsInShipyards = this.sim.queries.shipyards
+        const requestsInShipyards = this.sim.index.shipyards
           .get()
           .flatMap((shipyard) =>
             [...shipyard.cp.shipyard.queue, shipyard.cp.shipyard.building]
@@ -565,11 +565,11 @@ export class ShipPlanningSystem extends System<"plan"> {
               .filter((queueItem) => queueItem.owner === faction.id)
           );
         const shipyard =
-          this.sim.queries.shipyards
+          this.sim.index.shipyards
             .get()
             .find((s) => s.cp.owner.id === faction.id) ??
           pickRandom(
-            this.sim.queries.shipyards
+            this.sim.index.shipyards
               .get()
               .filter(
                 (s) =>

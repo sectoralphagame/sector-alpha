@@ -277,7 +277,7 @@ export const graphics: Graphics = {
     textGraphics.position.set(textPos[0], textPos[1]);
     textGraphics.interactive = true;
     textGraphics.on("pointerdown", () => {
-      first(entity.sim.queries.settings.getIt())!.cp.selectionManager.id =
+      first(entity.sim.index.settings.getIt())!.cp.selectionManager.id =
         entity.id;
     });
     textGraphics.cursor = "pointer";
@@ -322,10 +322,10 @@ export const graphics: Graphics = {
     const sectorMaps = FogOfWarUpdatingSystem.getMaps();
     const divisions = FogOfWarUpdatingSystem.getDivisions();
     const chunkSize = (sectorSize / divisions) * 2;
-    const zoom = entity.sim.queries.settings.get()[0].cp.camera.zoom;
+    const zoom = entity.sim.index.settings.get()[0].cp.camera.zoom;
 
     if (zoom > 0.35) {
-      for (const sector of entity.sim.queries.sectors.get()) {
+      for (const sector of entity.sim.index.sectors.get()) {
         const pos = hecsToCartesian(sector.cp.hecsPosition.value, sectorSize);
 
         for (let x = 0; x <= divisions; x += 1) {

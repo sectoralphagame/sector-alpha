@@ -6,11 +6,11 @@ import { System } from "./system";
 export function regen(sim: Sim) {
   const graph = new Graph({ directed: false });
 
-  for (const t of sim.queries.teleports.getIt()) {
+  for (const t of sim.index.teleports.getIt()) {
     graph.setNode(findInAncestors(t, "position").cp.position.sector.toString());
   }
 
-  for (const t of sim.queries.teleports.getIt()) {
+  for (const t of sim.index.teleports.getIt()) {
     graph.setEdge(
       findInAncestors(t, "position").cp.position.sector.toString(),
       findInAncestors(

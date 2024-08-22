@@ -105,7 +105,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
   }, [dialog, sim]);
 
   const playerOwned = entity ? isOwnedByPlayer(entity) : false;
-  const player = sim.queries.player.get()[0]!;
+  const player = sim.index.player.get()[0]!;
 
   let requiredCrew: number | null = null;
   let growth: "positive" | "negative" | "neutral" | undefined;
@@ -138,7 +138,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
         isCollapsed={isCollapsed}
         onCollapseToggle={toggleCollapse}
         onPlayerAssets={() => {
-          sim.queries.settings.get()[0].cp.selectionManager.id = null;
+          sim.index.settings.get()[0].cp.selectionManager.id = null;
         }}
       >
         {!isCollapsed &&

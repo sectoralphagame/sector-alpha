@@ -21,7 +21,7 @@ export const FacilityMoneyManager: React.FC<ModalProps> = ({
   if (dialog?.type !== "facilityMoneyManager") return null;
 
   const facility = sim.getOrThrow<Facility>(dialog.entityId);
-  const player = sim.queries.player.get()[0];
+  const player = sim.index.player.get()[0];
 
   return (
     <FacilityMoneyManagerComponent

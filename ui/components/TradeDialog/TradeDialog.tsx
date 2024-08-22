@@ -87,10 +87,10 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
       initiator,
       {
         budgets: {
-          customer: sim.queries.player.get()[0].id,
+          customer: sim.index.player.get()[0].id,
           trader: target.id,
         },
-        factionId: sim.queries.player.get()[0].id,
+        factionId: sim.index.player.get()[0].id,
         initiator: initiator.id,
         items: commoditiesArray
           .filter((commodity) => form.getValues()[commodity] > 0)
@@ -133,7 +133,7 @@ export const TradeDialog: React.FC<ModalProps> = ({ open, onClose }) => {
     <FormProvider {...form}>
       <TradeDialogComponent
         canAccept={
-          sim.queries.player.get()[0].cp.budget.available + total > 0 &&
+          sim.index.player.get()[0].cp.budget.available + total > 0 &&
           (pipe(Object.values(values), map(Number), sum) || 0) > 0
         }
         total={total}

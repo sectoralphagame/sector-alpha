@@ -120,7 +120,7 @@ export const createFactions = (
 
   for (let i = 0; i < 2; i++) {
     const faction = createTradingFaction(i, sim);
-    sim.queries.sectors
+    sim.index.sectors
       .get()
       .filter((sector) => sector.cp.owner)
       .forEach(() => {
@@ -128,7 +128,7 @@ export const createFactions = (
 
         requestShip(
           faction,
-          pickRandom(sim.queries.shipyards.get()),
+          pickRandom(sim.index.shipyards.get()),
           "transport",
           false
         );

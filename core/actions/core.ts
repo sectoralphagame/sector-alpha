@@ -10,7 +10,7 @@ const addMoney: PlayerAction<[number]> = {
   category: "core",
   variants: [[1e4], [1e6], [1e9]],
   fn: (sim, quantity: number) => {
-    const player = sim.queries.player.get()[0];
+    const player = sim.index.player.get()[0];
     changeBudgetMoney(player.cp.budget!, quantity);
   },
 };
@@ -37,7 +37,7 @@ const takeOwnership: TargetAction<[]> = {
   variants: [],
   fn: (sim, targetId: number) => {
     const entity = sim.getOrThrow(targetId).requireComponents(["owner"]);
-    transferOwnership(entity, sim.queries.player.get()[0].id);
+    transferOwnership(entity, sim.index.player.get()[0].id);
   },
 };
 

@@ -90,7 +90,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
       for (let index = 0; index < Math.random() * 10; index++) {
         requestShip(
           faction,
-          pickRandom(sim.queries.shipyards.get()),
+          pickRandom(sim.index.shipyards.get()),
           "transport",
           false
         );
@@ -100,12 +100,12 @@ export function getFixedWorld(sim: Sim): Promise<void> {
 
   mapData.relations.forEach((relation) => {
     const [factionA, factionB] = (relation.factions as [string, string]).map(
-      (slug) => sim.queries.ai.get().find((f) => f.cp.name.slug === slug)
+      (slug) => sim.index.ai.get().find((f) => f.cp.name.slug === slug)
     );
     changeRelations(factionA!, factionB!, relation.value);
   });
 
-  const player = sim.queries.ai.get().find((f) => f.cp.name.slug === "PLA")!;
+  const player = sim.index.ai.get().find((f) => f.cp.name.slug === "PLA")!;
   player.addTag("player");
   player.removeComponent("ai").removeComponent("budget");
   player.addComponent(createBudget());
@@ -148,9 +148,9 @@ export function getFixedWorld(sim: Sim): Promise<void> {
 
   const sector = find(
     (s) => s.cp.name.value === "Teegarden's Star II",
-    sim.queries.sectors.get()
+    sim.index.sectors.get()
   )!;
-  const camera = sim.queries.settings.get()[0].cp.camera;
+  const camera = sim.index.settings.get()[0].cp.camera;
   camera.position = hecsToCartesian(sector.cp.hecsPosition.value, sectorSize);
 
   return Promise.resolve();

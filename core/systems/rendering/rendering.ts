@@ -94,7 +94,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
   };
 
   init = () => {
-    this.settingsManager = first(this.sim.queries.settings.getIt())!;
+    this.settingsManager = first(this.sim.index.settings.getIt())!;
     this.toolbar = document.querySelector("#toolbar")!;
     this.overlay = document.querySelector("#overlay")!;
     const root = document.querySelector("#root")!;
@@ -278,7 +278,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
         );
         const worldPosition = [worldX / 10, worldY / 10];
         const sector =
-          this.sim.queries.sectors.get().find((s) => {
+          this.sim.index.sectors.get().find((s) => {
             const ww = worldToHecs([worldPosition[0], worldPosition[1]]);
             return deepEqual(s.cp.hecsPosition.value, ww);
           }) ?? null;
@@ -323,7 +323,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
   };
 
   updateGraphics = () => {
-    for (const entity of this.sim.queries.renderableGraphics.getIt()) {
+    for (const entity of this.sim.index.renderableGraphics.getIt()) {
       let g = this.graphics.get(entity);
       if (
         entity.cp.renderGraphics.redraw ||
@@ -548,7 +548,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
     // For some reason this is needed to prevent logging error when loading game
     if (!this.viewport.transform) return;
 
-    this.settingsManager = first(this.sim.queries.settings.getIt())!;
+    this.settingsManager = first(this.sim.index.settings.getIt())!;
 
     this.onChange(
       this.settingsManager.cp.selectionManager.id,

@@ -8,7 +8,7 @@ import { first } from "@fxts/core";
 import { add, norm, random } from "mathjs";
 
 export function isOwnedByPlayer(entity: Entity): boolean {
-  return entity!.cp.owner?.id === first(entity.sim.queries.player.getIt())!.id;
+  return entity!.cp.owner?.id === first(entity.sim.index.player.getIt())!.id;
 }
 
 export function getSubordinates(entity: RequireComponent<"subordinates">) {

@@ -32,7 +32,7 @@ export const ShipToEntity: React.FC = () => {
 
   const entity = selected!.requireComponents(["orders", "position"]);
   const actionableRelationship = actionable.cp.owner?.id
-    ? sim.queries.player.get()[0].cp.relations.values[actionable.cp.owner?.id]
+    ? sim.index.player.get()[0].cp.relations.values[actionable.cp.owner?.id]
     : 0;
 
   const onTrade = () => {

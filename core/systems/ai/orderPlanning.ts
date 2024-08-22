@@ -248,7 +248,7 @@ function autoMine(
           : true
       ),
       flatMap((sector) =>
-        entity.sim.queries.asteroidFields
+        entity.sim.index.asteroidFields
           .get()
           .filter((f) => f.cp.position!.sector === sector.id)
       ),
@@ -336,7 +336,7 @@ function autoMineForCommander(
         sectorDistance,
         entity.sim
       );
-      const asteroidFields = entity.sim.queries.asteroidFields.get();
+      const asteroidFields = entity.sim.index.asteroidFields.get();
 
       const eligibleFields = pipe(
         sectorsInTeleportRange,
@@ -488,7 +488,7 @@ export class OrderPlanningSystem extends System<"exec"> {
   exec = (): void => {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 3);
-      for (const entity of this.sim.queries.autoOrderable.getIt()) {
+      for (const entity of this.sim.index.autoOrderable.getIt()) {
         autoOrder(entity);
       }
     }

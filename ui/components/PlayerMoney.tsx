@@ -8,14 +8,14 @@ import styles from "./PlayerMoney.scss";
 
 export const PlayerMoney: React.FC = () => {
   const [sim] = useSim();
-  const [player, setPlayer] = React.useState(sim.queries.player.get()[0]);
+  const [player, setPlayer] = React.useState(sim.index.player.get()[0]);
   const [, setOverlay] = useGameOverlay();
   const [gameSettings] = useGameSettings();
   const [, setDialog] = useGameDialog();
 
   React.useEffect(() => {
     const handle = setInterval(
-      () => setPlayer(sim.queries.player.get()[0]),
+      () => setPlayer(sim.index.player.get()[0]),
       1000
     );
 

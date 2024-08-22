@@ -5,7 +5,7 @@ import { MapViewComponent } from "./MapViewComponent";
 export const MapView: React.FC = () => {
   const [sim] = useSim();
 
-  return <MapViewComponent factions={sim.queries.ai.get()} />;
+  return <MapViewComponent factions={sim.index.ai.get()} />;
 };
 
 MapView.displayName = "MapView";
