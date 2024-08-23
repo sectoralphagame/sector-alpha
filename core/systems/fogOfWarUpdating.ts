@@ -93,11 +93,11 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       .requireComponents(["renderGraphics"]);
   };
 
-  destroy(): void {
+  destroy = (): void => {
     if (this.intervalHandle) {
       clearInterval(this.intervalHandle);
     }
-  }
+  };
 
   updateFog = () => {
     this.cooldowns.doEvery("exec", 0.3, () => {

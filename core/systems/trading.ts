@@ -382,9 +382,9 @@ export class TradingSystem extends System<"adjustPrices" | "createOffers"> {
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
-  destroy(): void {
+  destroy = (): void => {
     this.latestTradeId = 0;
-  }
+  };
 
   exec = (): void => {
     if (this.cooldowns.canUse("adjustPrices")) {

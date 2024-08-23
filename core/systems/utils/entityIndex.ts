@@ -50,6 +50,8 @@ export abstract class BaseEntityIndex<T extends keyof CoreComponents>
     this.enableHooks();
     this.collect();
 
+    // Calling this way as method is overridden in child classes and therefore
+    // pointer to function is not the same
     this.sim.hooks.destroy.subscribe("BaseEntityIndex", () => {
       this.reset();
     });
@@ -142,7 +144,6 @@ export class EntityIndex<
 > extends BaseEntityIndex<T> {
   cache: boolean;
   entities: Set<RequireComponent<T>>;
-  populated = false;
 
   constructor(
     requiredComponents: readonly T[],
@@ -162,7 +163,6 @@ export class EntityIndex<
   };
 
   enableCache = () => {
-    this.enableHooks();
     this.hooks.add.subscribe("EntityIndex", (entity) => {
       this.entities.add(entity);
     });
@@ -171,12 +171,6 @@ export class EntityIndex<
     });
     this.collect();
   };
-
-  collect(): void {
-    super.collect();
-
-    this.populated = true;
-  }
 
   get = (): IndexEntities<T> => {
     if (this.sim === null) {
@@ -207,9 +201,9 @@ export class EntityIndex<
   };
 
   reset = (): void => {
-    if (this.sim === null) {
-      throw new IndexNotAppliedError();
-    }
+    // if (this.sim === null) {
+    //   throw new IndexNotAppliedError();
+    // }
 
     this.clear();
     this.sim = null;
