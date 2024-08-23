@@ -57,7 +57,7 @@ const AutoOrder: React.FC<{
         : defaultOrder
     );
 
-  if (sim.queries.player.get()[0].id !== entity.cp.owner?.id) {
+  if (sim.index.player.get()[0].id !== entity.cp.owner?.id) {
     return <Text>Default Order: {entity.cp.autoOrder.default.type}</Text>;
   }
 
@@ -100,7 +100,7 @@ const AutoOrder: React.FC<{
                 : ""}
             </SelectButton>
             <SelectOptions>
-              {entity.sim.queries.sectors.get().map((sector) => (
+              {entity.sim.index.sectors.get().map((sector) => (
                 <SelectOption key={sector.id} value={sector.id.toString()}>
                   {sector.cp.name.value}
                 </SelectOption>

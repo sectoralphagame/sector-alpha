@@ -74,7 +74,7 @@ function getSectorPosition(
       random(-r, r),
     ]) as Position2D;
 
-    isNearAnyFacility = sector.sim.queries.facilities
+    isNearAnyFacility = sector.sim.index.facilities
       .get()
       .filter((facility) => facility.cp.position.sector === sector.id)
       .some(
@@ -95,9 +95,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
 
   createNewFactory = (faction: Faction): Facility => {
     const sector = pickRandom(
-      this.sim.queries.sectors
-        .get()
-        .filter((s) => s.cp.owner?.id === faction.id)
+      this.sim.index.sectors.get().filter((s) => s.cp.owner?.id === faction.id)
     );
     const facility = createFacility(this.sim, {
       owner: faction,
@@ -150,7 +148,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
         return;
       }
 
-      const minableField = this.sim.queries.asteroidFields
+      const minableField = this.sim.index.asteroidFields
         .get()
         .find(
           (af) =>
@@ -205,7 +203,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
 
   planHubs = (faction: Faction): void => {
     if (faction.cp.name.slug === "TAU") return;
-    for (const sector of this.sim.queries.sectors.getIt()) {
+    for (const sector of this.sim.index.sectors.getIt()) {
       if (sector.cp.owner?.id !== faction.id) continue;
 
       const position: Position2D = [
@@ -247,8 +245,9 @@ export class FacilityPlanningSystem extends System<"plan"> {
     const modulesToBuild: Array<
       (typeof facilityModules)[keyof typeof facilityModules]
     > = [];
-    this.sim.queries.facilityWithProduction.reset();
-    const facilities = this.sim.queries.facilityWithProduction
+    this.sim.index.facilityWithProduction.clear();
+    this.sim.index.facilityWithProduction.collect();
+    const facilities = this.sim.index.facilityWithProduction
       .get()
       .filter((facility) => facility.cp.owner?.id === faction.id);
     const resourceUsageInFacilities = getResourceUsage(facilities);
@@ -329,9 +328,9 @@ export class FacilityPlanningSystem extends System<"plan"> {
     if (this.cooldowns.canUse("plan") && this.sim.getTime() === 0) {
       this.cooldowns.use("plan", 500);
 
-      this.sim.queries.ai.get().forEach((faction) => {
+      this.sim.index.ai.get().forEach((faction) => {
         const sectorWithSSF = pickRandom(
-          this.sim.queries.sectors
+          this.sim.index.sectors
             .get()
             .filter((sector) => sector.cp.owner?.id === faction.id)
         );
@@ -352,7 +351,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
           addFacilityModule(ssf, facilityModules[m].create(this.sim, ssf));
         }
 
-        this.sim.queries.sectors
+        this.sim.index.sectors
           .get()
           .filter((sector) => sector.cp.owner?.id === faction.id)
           .forEach((sector) => {

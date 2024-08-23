@@ -33,7 +33,7 @@ export function moveToActions(
           origin.sim.getOrThrow(t.cp.teleport.destinationId!),
           "position"
         ).cp.position.sector.toString() === paths[s.toString()].predecessor,
-      origin.sim.queries.teleports.getIt()
+      origin.sim.index.teleports.getIt()
     );
 
     if (!teleportFacility) {

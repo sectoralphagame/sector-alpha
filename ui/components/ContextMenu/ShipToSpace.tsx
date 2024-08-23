@@ -29,7 +29,7 @@ export const ShipToSpace: React.FC = () => {
   }
 
   const fieldsToMine = selected.cp.mining
-    ? sim.queries.asteroidFields
+    ? sim.index.asteroidFields
         .get()
         .filter(
           (field) =>

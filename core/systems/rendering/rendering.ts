@@ -70,7 +70,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
   overlay: HTMLDivElement;
   grid: RequireComponent<"renderGraphics"> | null = null;
   layers: Record<Layer, PIXI.Container>;
-  sectorIndex: SectorIndex<"render">;
+  sectorIndex = new SectorIndex(["render"]);
   sprites: Map<Entity, PIXI.Sprite> = new Map();
   graphics: Map<Entity, PIXI.Graphics> = new Map();
   displayRange: boolean;
@@ -85,16 +85,16 @@ export class RenderingSystem extends SystemWithHooks<never> {
 
   apply = (sim: Sim) => {
     super.apply(sim);
+    this.sectorIndex.apply(sim);
     if (!isHeadless) {
       (window as any).rendering = this;
     }
 
-    this.sectorIndex = new SectorIndex(sim, ["render"]);
     sim.hooks.phase.render.subscribe("RenderingSystem", this.exec);
   };
 
   init = () => {
-    this.settingsManager = first(this.sim.queries.settings.getIt())!;
+    this.settingsManager = first(this.sim.index.settings.getIt())!;
     this.toolbar = document.querySelector("#toolbar")!;
     this.overlay = document.querySelector("#overlay")!;
     const root = document.querySelector("#root")!;
@@ -278,7 +278,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
         );
         const worldPosition = [worldX / 10, worldY / 10];
         const sector =
-          this.sim.queries.sectors.get().find((s) => {
+          this.sim.index.sectors.get().find((s) => {
             const ww = worldToHecs([worldPosition[0], worldPosition[1]]);
             return deepEqual(s.cp.hecsPosition.value, ww);
           }) ?? null;
@@ -323,7 +323,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
   };
 
   updateGraphics = () => {
-    for (const entity of this.sim.queries.renderableGraphics.getIt()) {
+    for (const entity of this.sim.index.renderableGraphics.getIt()) {
       let g = this.graphics.get(entity);
       if (
         entity.cp.renderGraphics.redraw ||
@@ -349,14 +349,14 @@ export class RenderingSystem extends SystemWithHooks<never> {
   };
 
   updateRenderables = () => {
-    for (const sectorId of this.sectorIndex.sectors.keys()) {
+    for (const sectorId of this.sectorIndex.getSectors()) {
       const sector = this.sim.getOrThrow<Sector>(sectorId);
       const sectorPos = hecsToCartesian(
         sector.cp.hecsPosition.value,
         sectorSize / 10
       );
 
-      for (const entity of this.sectorIndex.sectors.get(sectorId)!) {
+      for (const entity of this.sectorIndex.sectors[sectorId]!) {
         const entityRender = entity.cp.render;
         let sprite = this.sprites.get(entity);
 
@@ -548,7 +548,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
     // For some reason this is needed to prevent logging error when loading game
     if (!this.viewport.transform) return;
 
-    this.settingsManager = first(this.sim.queries.settings.getIt())!;
+    this.settingsManager = first(this.sim.index.settings.getIt())!;
 
     this.onChange(
       this.settingsManager.cp.selectionManager.id,

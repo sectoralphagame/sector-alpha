@@ -8,7 +8,7 @@ export const SelectedUnit: React.FC = () => {
   const [sim] = useSim();
   const selectedUnit = React.useMemo(
     () => getSelected(sim),
-    [sim.queries.settings.get()[0].cp.selectionManager.id]
+    [sim.index.settings.get()[0].cp.selectionManager.id]
   );
 
   if (!selectedUnit) {
@@ -20,7 +20,7 @@ export const SelectedUnit: React.FC = () => {
       <div
         className={styles.panel}
         onDoubleClick={() => {
-          sim.queries.settings.get()[0].cp.selectionManager.focused = true;
+          sim.index.settings.get()[0].cp.selectionManager.focused = true;
         }}
       >
         <Text variant="caption">

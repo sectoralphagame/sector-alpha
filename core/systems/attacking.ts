@@ -8,7 +8,7 @@ import type { DockSize } from "@core/components/dockable";
 import type { Entity } from "@core/entity";
 import { stopCruise } from "@core/utils/moving";
 import { regenCooldown } from "./hitpointsRegenerating";
-import { Index } from "./utils/entityIndex";
+import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
 const sizeMultipliers: Record<DockSize, [number, number, number]> = {
@@ -69,12 +69,11 @@ function attack(attacker: RequireComponent<"orders">, target: Entity) {
 const cdKey = "attack";
 
 export class AttackingSystem extends System {
-  index: Index<"damage">;
+  index = new EntityIndex(["damage"]);
 
   apply = (sim: Sim) => {
     super.apply(sim);
-
-    this.index = new Index(sim, ["damage"]);
+    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

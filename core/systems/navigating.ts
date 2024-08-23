@@ -6,7 +6,7 @@ import { clearTarget, startCruise, stopCruise } from "@core/utils/moving";
 import { defaultDriveLimit } from "../components/drive";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
-import { Index } from "./utils/entityIndex";
+import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
 type Navigable = Driveable & RequireComponent<"position">;
@@ -253,12 +253,11 @@ function setDrive(entity: Navigable, delta: number) {
 
 export class NavigatingSystem extends System {
   entities: Navigable[];
-  index: Index<"drive" | "movable" | "position">;
+  index = new EntityIndex(["drive", "movable", "position"]);
 
   apply = (sim: Sim): void => {
     super.apply(sim);
-
-    this.index = new Index(sim, ["drive", "movable", "position"]);
+    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

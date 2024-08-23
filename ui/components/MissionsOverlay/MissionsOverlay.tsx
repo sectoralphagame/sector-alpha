@@ -10,7 +10,7 @@ export const MissionsOverlay: React.FC = () => {
 
   if (overlay !== "missions") return null;
 
-  const player = sim.queries.player.get()[0]!;
+  const player = sim.index.player.get()[0]!;
 
   return (
     <MissionsOverlayComponent
@@ -18,7 +18,7 @@ export const MissionsOverlay: React.FC = () => {
       onMissionCancel={(index) => player.cp.missions.value.splice(index, 1)}
       onReferenceClick={(id) => {
         setOverlay(null);
-        const settingsManager = sim.queries.settings.get()[0];
+        const settingsManager = sim.index.settings.get()[0];
         settingsManager.cp.selectionManager.id = id;
         setTimeout(() => {
           settingsManager.cp.selectionManager.focused = true;

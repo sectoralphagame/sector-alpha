@@ -22,7 +22,7 @@ export function clearFocus(manager: SelectionManager) {
 
 export function getSelected(sim: Sim): Entity | undefined {
   return sim.get<Entity>(
-    first(sim.queries.settings.getIt())!.cp.selectionManager.id!
+    first(sim.index.settings.getIt())!.cp.selectionManager.id!
   );
 }
 
@@ -30,6 +30,6 @@ export function getSelectedSecondary(
   sim: Sim
 ): RequireComponent<"position"> | undefined {
   return sim.get<RequireComponent<"position">>(
-    first(sim.queries.settings.getIt())!.cp.selectionManager.secondaryId!
+    first(sim.index.settings.getIt())!.cp.selectionManager.secondaryId!
   );
 }

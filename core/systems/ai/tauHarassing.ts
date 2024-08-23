@@ -20,10 +20,10 @@ export class TauHarassingSystem extends System<"exec"> {
   };
 
   getFleet = (): Ship | null => {
-    const faction = this.sim.queries.ai
+    const faction = this.sim.index.ai
       .get()
       .find((ai) => ai.cp.name.slug === "TAU")!;
-    const shipyard = this.sim.queries.shipyards
+    const shipyard = this.sim.index.shipyards
       .get()
       .find((s) => s.cp.owner.id === faction.id);
 
@@ -33,7 +33,7 @@ export class TauHarassingSystem extends System<"exec"> {
       shipyard.cp.shipyard.building,
       ...shipyard.cp.shipyard.queue,
     ];
-    let commander = this.sim.queries.ships
+    let commander = this.sim.index.ships
       .get()
       .find(
         (entity) =>
@@ -43,7 +43,7 @@ export class TauHarassingSystem extends System<"exec"> {
       );
 
     if (!commander) {
-      const spareFrigates: Entity[] = this.sim.queries.ships
+      const spareFrigates: Entity[] = this.sim.index.ships
         .get()
         .filter(
           (ship) =>
@@ -64,7 +64,7 @@ export class TauHarassingSystem extends System<"exec"> {
       if (spareFrigates.length > 0) {
         commander = spareFrigates
           .pop()!
-          .requireComponents(this.sim.queries.ships.requiredComponents);
+          .requireComponents(this.sim.index.ships.requiredComponents);
         commander.addTag("ai:attack-force");
       } else if (frigatesInShipyards.length > 0) {
         frigatesInShipyards.pop();
@@ -83,7 +83,7 @@ export class TauHarassingSystem extends System<"exec"> {
       return null;
     }
 
-    const spareFighters = this.sim.queries.ships
+    const spareFighters = this.sim.index.ships
       .get()
       .filter(
         (ship) =>
@@ -157,7 +157,7 @@ export class TauHarassingSystem extends System<"exec"> {
     if (!this.cooldowns.canUse("exec")) return;
     this.cooldowns.use("exec", 30);
 
-    const faction = this.sim.queries.ai
+    const faction = this.sim.index.ai
       .get()
       .find((ai) => ai.cp.name.slug === "TAU")!;
 
@@ -168,7 +168,7 @@ export class TauHarassingSystem extends System<"exec"> {
       .filter(([_id, value]) => value < relationThresholds.attack)
       .map(([id]) => Number(id));
     const invadedSector = pipe(
-      this.sim.queries.sectors.get(),
+      this.sim.index.sectors.get(),
       filter((s) =>
         s.cp.owner?.id ? enemyFactions.includes(s.cp.owner.id) : false
       ),

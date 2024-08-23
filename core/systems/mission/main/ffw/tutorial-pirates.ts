@@ -43,14 +43,14 @@ export const mainFfwTutorialPiratesMissionHandler: MissionHandler = {
     immediate: true,
   }),
   accept: (sim, _offer) => {
-    const player = first(sim.queries.player.getIt())!;
+    const player = first(sim.index.player.getIt())!;
     const miner = find(
       (s) => s.cp.owner.id === player.id && s.cp.mining,
-      sim.queries.ships.getIt()
+      sim.index.ships.getIt()
     )!;
     const pirateFaction = find(
       (f) => f.cp.name.slug === "PIR",
-      sim.queries.ai.get()
+      sim.index.ai.get()
     )!;
     const pirates = Array(2)
       .fill(0)

@@ -5,15 +5,15 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { sectorSize } from "@core/archetypes/sector";
 import type { Position2D } from "@core/components/position";
 import { System } from "./system";
-import { Index } from "./utils/entityIndex";
+import { EntityIndex } from "./utils/entityIndex";
 
 let sectorMaps: Record<number, Uint8Array> = {};
 const divisions = 2 ** 6;
 
 export class FogOfWarUpdatingSystem extends System<"exec"> {
   grid: RequireComponent<"renderGraphics"> | null = null;
-  entitiesWithInfluence: Index<"position" | "owner">;
-  entitiesToHide: Index<"position" | "render">;
+  entitiesWithInfluence = new EntityIndex(["position", "owner"]);
+  entitiesToHide = new EntityIndex(["position", "render"]);
   enabled = true;
   intervalHandle: number | null = null;
 
@@ -68,7 +68,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
         fn: () => {
           this.enabled = !this.enabled;
           if (!this.enabled) {
-            for (const entity of this.sim.queries.facilities.getIt()) {
+            for (const entity of this.sim.index.facilities.getIt()) {
               entity.addTag("discovered");
             }
           }
@@ -78,8 +78,8 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       this.constructor.name
     );
 
-    this.entitiesWithInfluence = new Index(sim, ["position", "owner"]);
-    this.entitiesToHide = new Index(sim, ["position", "render"]);
+    this.entitiesToHide.apply(sim);
+    this.entitiesWithInfluence.apply(sim);
 
     sim.hooks.phase.init.subscribe(this.constructor.name, this.updateFog);
   };
@@ -93,17 +93,17 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       .requireComponents(["renderGraphics"]);
   };
 
-  destroy(): void {
+  destroy = (): void => {
     if (this.intervalHandle) {
       clearInterval(this.intervalHandle);
     }
-  }
+  };
 
   updateFog = () => {
     this.cooldowns.doEvery("exec", 0.3, () => {
       sectorMaps = {};
 
-      const player = this.sim.queries.player.get()[0];
+      const player = this.sim.index.player.get()[0];
 
       for (const entity of this.entitiesWithInfluence.getIt()) {
         const position = entity.cp.position;

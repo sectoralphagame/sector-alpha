@@ -26,12 +26,12 @@ export class InflationStatisticGatheringSystem extends System {
   exec = (): void => {
     if (
       this.sim.getTime() -
-        first(this.sim.queries.settings.getIt())!.cp.systemManager
+        first(this.sim.index.settings.getIt())!.cp.systemManager
           .lastInflationStatUpdate >
       10 * 60
     ) {
       first(
-        this.sim.queries.settings.getIt()
+        this.sim.index.settings.getIt()
       )!.cp.systemManager.lastInflationStatUpdate = this.sim.getTime();
 
       const basket = basketCommodities.reduce(
@@ -39,7 +39,7 @@ export class InflationStatisticGatheringSystem extends System {
         {} as Record<BasketCommodities, number[]>
       );
 
-      for (const trader of this.sim.queries.trading.getIt()) {
+      for (const trader of this.sim.index.trading.getIt()) {
         basketCommodities.forEach((commodity) => {
           if (
             trader.cp.trade.offers[commodity].active &&
@@ -56,7 +56,7 @@ export class InflationStatisticGatheringSystem extends System {
         0
       );
       if (basketPrice > 0) {
-        this.sim.queries.settings
+        this.sim.index.settings
           .get()[0]
           .cp.inflationStats.basketPrices.push(basketPrice);
       }

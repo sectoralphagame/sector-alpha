@@ -42,7 +42,7 @@ const ShipBuildingQueue: React.FC<{ entity: RequireComponent<"shipyard"> }> = ({
   const [, setDialog] = useGameDialog();
 
   const isFriendly =
-    sim.queries.player.get()[0].cp.relations.values[entity.cp.owner!.id] >=
+    sim.index.player.get()[0].cp.relations.values[entity.cp.owner!.id] >=
     relationThresholds.shipyard;
 
   if (!isFriendly) return null;

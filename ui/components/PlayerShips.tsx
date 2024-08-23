@@ -11,8 +11,8 @@ import { ShipButton } from "./ShipButton";
 
 export const PlayerShips: React.FC = () => {
   const [sim] = useSim();
-  const player = first(sim.queries.player.getIt())!;
-  const ships = sim.queries.ships
+  const player = first(sim.index.player.getIt())!;
+  const ships = sim.index.ships
     .get()
     .filter((ship) => ship.cp.owner?.id === player.id);
 
@@ -22,14 +22,14 @@ export const PlayerShips: React.FC = () => {
   const [, setMenu] = useContextMenu();
 
   const onSelect = (id: number) => {
-    sim.queries.settings.get()[0].cp.selectionManager.id = id;
+    sim.index.settings.get()[0].cp.selectionManager.id = id;
     setSelectedState(id);
   };
   const onFocus = () => {
-    sim.queries.settings.get()[0].cp.selectionManager.focused = true;
+    sim.index.settings.get()[0].cp.selectionManager.focused = true;
   };
   const onTarget = (id: number) => {
-    sim.queries.settings.get()[0].cp.selectionManager.secondaryId = id;
+    sim.index.settings.get()[0].cp.selectionManager.secondaryId = id;
   };
   const onContextMenu = (
     id: number,

@@ -17,7 +17,7 @@ const DevOverlay: React.FC = () => {
   return (
     <DevOverlayComponent
       actions={actions}
-      target={sim.queries.settings.get()[0].cp.selectionManager.id}
+      target={sim.index.settings.get()[0].cp.selectionManager.id}
       onReload={() => setActions(sim.actions.all())}
       onClose={() => setOverlay(null)}
     />

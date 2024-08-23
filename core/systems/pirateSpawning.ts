@@ -1,7 +1,7 @@
 import type { Faction } from "@core/archetypes/faction";
 import type { Sector } from "@core/archetypes/sector";
 import { sectorSize } from "@core/archetypes/sector";
-import type { Ship, ShipComponent } from "@core/archetypes/ship";
+import type { Ship } from "@core/archetypes/ship";
 import { createShip, shipComponents } from "@core/archetypes/ship";
 import { createWaypoint } from "@core/archetypes/waypoint";
 import { addSubordinate } from "@core/components/subordinates";
@@ -14,7 +14,7 @@ import { filter, find, map, pipe, toArray } from "@fxts/core";
 import { distance, random, randomInt } from "mathjs";
 import { fromPolar } from "@core/utils/misc";
 import { System } from "./system";
-import { Index } from "./utils/entityIndex";
+import { EntityIndex } from "./utils/entityIndex";
 
 const flagshipDistanceFromSectorCenter =
   ((1 + Math.random() / 5) * sectorSize) / 15;
@@ -54,9 +54,9 @@ function returnToFlagship(unassigned: Ship[], flagships: Ship[]) {
 function spawnFlagship(sim: Sim, faction: Faction, flagships: Ship[]) {
   if (flagships.length > 6) return;
 
-  const tau = find((f) => f.cp.name.slug === "TAU", sim.queries.ai.getIt())!;
+  const tau = find((f) => f.cp.name.slug === "TAU", sim.index.ai.getIt())!;
   const sector = pickRandom(
-    sim.queries.sectors
+    sim.index.sectors
       .get()
       .filter(
         (s) =>
@@ -150,7 +150,7 @@ export class PirateSpawningSystem extends System<
   "return" | "spawnFlagship" | "spawnSquad"
 > {
   faction: Faction;
-  index: Index<ShipComponent>;
+  index = new EntityIndex(shipComponents, ["role:military"]);
 
   moveFlagship = (flagships: Ship[]) => {
     const shipToMove = pickRandom(
@@ -241,14 +241,11 @@ export class PirateSpawningSystem extends System<
 
   apply = (sim: Sim) => {
     super.apply(sim);
-
-    this.index = new Index<ShipComponent>(sim, shipComponents, [
-      "role:military",
-    ]);
+    this.index.apply(sim);
 
     sim.hooks.phase.start.subscribe(this.constructor.name, () => {
       if (!this.faction) {
-        this.faction = sim.queries.ai
+        this.faction = sim.index.ai
           .get()
           .find((f) => f.cp.name.slug === "PIR")!;
       }

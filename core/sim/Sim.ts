@@ -14,11 +14,10 @@ import { componentMask } from "@core/components/masks";
 import LZString from "lz-string";
 import { ActionLoader } from "@core/actionLoader";
 import { Observable } from "@core/utils/observer";
+import { defaultIndexer } from "@core/systems/utils/default";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
-import type { Queries } from "../systems/utils/entityIndex";
-import { Index, createQueries } from "../systems/utils/entityIndex";
 import { MissingEntityError } from "../errors";
 import { openDb } from "../db";
 
@@ -53,8 +52,7 @@ export class Sim extends BaseSim {
   @Expose()
   @Type(() => Entity)
   entities: Map<number, Entity>;
-  systems: System[];
-  queries: Queries;
+  index: typeof defaultIndexer;
   paths: Record<string, Record<string, Path>>;
 
   actions: ActionLoader;
@@ -81,10 +79,11 @@ export class Sim extends BaseSim {
       },
     };
 
-    this.queries = createQueries(this);
-    this.systems = systems;
-
-    this.systems.forEach((system) => system.apply(this));
+    this.index = defaultIndexer;
+    for (const index of Object.values(defaultIndexer)) {
+      index.apply(this);
+    }
+    systems.forEach((system) => system.apply(this));
   }
 
   registerEntity = (entity: Entity) => {
@@ -236,15 +235,10 @@ export class Sim extends BaseSim {
 
     sim.entities = entityMap;
 
-    sim.systems = config.systems;
+    for (const index of Object.values(defaultIndexer)) {
+      index.apply(sim);
+    }
     config.systems.forEach((system) => system.apply(sim));
-    Object.values(sim.queries).forEach((indexOrNested) => {
-      if (indexOrNested instanceof Index) {
-        indexOrNested.reset();
-      } else {
-        Object.values(indexOrNested).forEach((index) => index.reset());
-      }
-    });
 
     return sim;
   }

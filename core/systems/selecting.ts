@@ -30,7 +30,7 @@ export class SelectingSystem extends SystemWithHooks {
 
   exec = (delta: number): void => {
     super.exec(delta);
-    this.manager = first(this.sim.queries.settings.getIt())!;
+    this.manager = first(this.sim.index.settings.getIt())!;
     this.onChange(this.manager.cp.selectionManager.id, this.refresh);
   };
 }

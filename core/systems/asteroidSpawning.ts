@@ -13,7 +13,7 @@ export class AsteroidSpawningSystem extends System<"exec"> {
   exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
 
-    for (const entity of this.sim.queries.asteroidFields.getIt()) {
+    for (const entity of this.sim.index.asteroidFields.getIt()) {
       if (this.sim.getTime() > 10) {
         entity.cp.asteroidSpawn.amount = Math.min(
           getFieldMax(entity.cp.asteroidSpawn),

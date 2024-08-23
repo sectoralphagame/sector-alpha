@@ -4,7 +4,7 @@ import type { WithTrade } from "../economy/utils";
 import { getPlannedBudget } from "../economy/utils";
 import type { Sim } from "../sim";
 import { limitMax } from "../utils/limit";
-import { Index } from "./utils/entityIndex";
+import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
 function settleBudget(entity: WithTrade) {
@@ -28,12 +28,12 @@ function settleBudget(entity: WithTrade) {
 }
 
 export class BudgetPlanningSystem extends System<"exec"> {
-  index: Index<"budget" | "owner" | "trade">;
+  index = new EntityIndex(["budget", "owner", "trade"]);
 
   apply = (sim: Sim): void => {
     super.apply(sim);
+    this.index.apply(sim);
 
-    this.index = new Index(sim, ["budget", "owner", "trade"]);
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 

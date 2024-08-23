@@ -69,7 +69,7 @@ export function getAveragePrice(
       getSectorsInTeleportRange(sim.getOrThrow<Sector>(sectorId), jumps, sim),
       flatMap((sector) =>
         pipe(
-          sim.queries.bySectors.trading.get(sector.id),
+          sim.index.sectorTrading.get(sector.id),
           filter((e) => e.cp.trade?.offers[commodity].active),
           map((e) => e.cp.trade!.offers[commodity].price)
         )
@@ -357,7 +357,7 @@ export class TradingSystem extends System<"adjustPrices" | "createOffers"> {
   collect = (sim: Sim): void => {
     this.latestTradeId =
       pipe(
-        sim.queries.ships.getIt(),
+        sim.index.ships.getIt(),
         flatMap((ship) => ship.cp.orders.value),
         filter((order) => order.type === "trade"),
         flatMap((order) => order.actions),
@@ -382,21 +382,21 @@ export class TradingSystem extends System<"adjustPrices" | "createOffers"> {
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
-  destroy(): void {
+  destroy = (): void => {
     this.latestTradeId = 0;
-  }
+  };
 
   exec = (): void => {
     if (this.cooldowns.canUse("adjustPrices")) {
       this.cooldowns.use("adjustPrices", 900);
-      for (const entity of this.sim.queries.trading.getIt()) {
+      for (const entity of this.sim.index.trading.getIt()) {
         adjustPrices(entity);
       }
     }
 
     if (this.cooldowns.canUse("createOffers")) {
       this.cooldowns.use("createOffers", 1);
-      for (const entity of this.sim.queries.trading.getIt()) {
+      for (const entity of this.sim.index.trading.getIt()) {
         createOffers(entity);
       }
     }

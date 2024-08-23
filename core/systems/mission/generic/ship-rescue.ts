@@ -39,12 +39,12 @@ export const isGenericShipRescueMission = (
 
 export const genericShipRescueMissionHandler: MissionHandler = {
   generate: (sim) => {
-    const player = first(sim.queries.player.getIt())!;
+    const player = first(sim.index.player.getIt())!;
     // Teleport ship instead of creating new one to avoid accidental
     // strenthening faction's fleet
     const playerShip = pickRandom(
       pipe(
-        sim.queries.ships.getIt(),
+        sim.index.ships.getIt(),
         filter((ship) => ship.cp.owner.id === player.id),
         toArray
       )
@@ -60,10 +60,10 @@ export const genericShipRescueMissionHandler: MissionHandler = {
       map((s) => s.id),
       toArray
     );
-    const ffw = sim.queries.ai.get().find((f) => f.cp.name.slug === "FFW")!;
+    const ffw = sim.index.ai.get().find((f) => f.cp.name.slug === "FFW")!;
     const ship = pickRandom(
       pipe(
-        sim.queries.ships.getIt(),
+        sim.index.ships.getIt(),
         filter(
           (s) =>
             s.cp.owner.id === ffw.id &&
@@ -120,7 +120,7 @@ export const genericShipRescueMissionHandler: MissionHandler = {
             ship.cp.position.coord,
             fromPolar(random(-Math.PI, Math.PI), 3)
           ),
-          owner: sim.queries.ai.get().find((f) => f.cp.name.slug === "PIR")!,
+          owner: sim.index.ai.get().find((f) => f.cp.name.slug === "PIR")!,
           sector: sim.getOrThrow<Sector>(ship.cp.position.sector),
         })
       );

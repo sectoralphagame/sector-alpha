@@ -16,12 +16,11 @@ export type EnemyArrayCache = Record<
 >;
 
 export class SpottingSystem extends System<"exec"> {
-  index: SectorIndex<"hitpoints" | "owner" | "position">;
+  index = new SectorIndex(["hitpoints", "owner", "position"]);
 
   apply = (sim: Sim) => {
     super.apply(sim);
-
-    this.index = new SectorIndex(sim, ["hitpoints", "owner", "position"]);
+    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
@@ -85,7 +84,7 @@ export class SpottingSystem extends System<"exec"> {
 
     const cache: EnemyArrayCache = {};
 
-    for (const entity of this.sim.queries.orderable.getIt()) {
+    for (const entity of this.sim.index.orderable.getIt()) {
       const currentOrder = entity.cp.orders.value[0];
       if (
         currentOrder?.type !== "patrol" &&

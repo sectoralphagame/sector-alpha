@@ -20,7 +20,7 @@ export class ShipBuildingSystem extends System<"exec"> {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 1);
 
-      for (const shipyard of this.sim.queries.shipyards.getIt()) {
+      for (const shipyard of this.sim.index.shipyards.getIt()) {
         if (!shipyard.cooldowns.canUse(shipBuildTimer)) continue;
 
         if (shipyard.cp.shipyard.building) {

@@ -7,7 +7,7 @@ export const Relations: React.FC = () => {
   const [sim] = useSim();
 
   const factions = Object.entries(
-    sim.queries.player.get()[0]!.cp.relations.values
+    sim.index.player.get()[0]!.cp.relations.values
   ).map(([id, relation]) => {
     const faction = sim.getOrThrow<Faction>(Number(id));
 

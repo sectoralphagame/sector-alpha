@@ -28,15 +28,15 @@ export const FleetOverlay: React.FC = () => {
   const [, setMenu] = useContextMenu();
 
   const setSelected = (id: number) => {
-    sim.queries.settings.get()[0].cp.selectionManager.id = id;
+    sim.index.settings.get()[0].cp.selectionManager.id = id;
     setSelectedState(id);
   };
   const onFocus = () => {
-    sim.queries.settings.get()[0].cp.selectionManager.focused = true;
+    sim.index.settings.get()[0].cp.selectionManager.focused = true;
     setOverlay(null);
   };
   const onTarget = (id: number) => {
-    sim.queries.settings.get()[0].cp.selectionManager.secondaryId = id;
+    sim.index.settings.get()[0].cp.selectionManager.secondaryId = id;
   };
   const onContextMenu = (
     id: number,
@@ -55,11 +55,11 @@ export const FleetOverlay: React.FC = () => {
     }
   };
 
-  const player = sim.queries.player.get()[0]!;
+  const player = sim.index.player.get()[0]!;
   const fleets = React.useMemo(
     () =>
       pipe(
-        sim.queries.ships.getIt(),
+        sim.index.ships.getIt(),
         filter(
           (ship) =>
             ship.cp.owner.id === player.id &&
@@ -69,12 +69,12 @@ export const FleetOverlay: React.FC = () => {
         map((commander) => getSubordinateTree(commander, sim)),
         toArray
       ),
-    [sim.queries.ships.getIt()]
+    [sim.index.ships.getIt()]
   );
   const unassigned = React.useMemo(
     () =>
       pipe(
-        sim.queries.ships.getIt(),
+        sim.index.ships.getIt(),
         filter(
           (ship) =>
             ship.cp.owner.id === player.id &&
@@ -83,7 +83,7 @@ export const FleetOverlay: React.FC = () => {
         ),
         toArray
       ),
-    [sim.queries.ships.getIt()]
+    [sim.index.ships.getIt()]
   );
 
   if (overlay !== "fleet") return null;

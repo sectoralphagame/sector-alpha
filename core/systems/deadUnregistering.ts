@@ -1,16 +1,15 @@
 import type { Sim } from "@core/sim";
 import { dumpCargo } from "@core/components/storage";
 import type { Faction } from "@core/archetypes/faction";
-import { Index } from "./utils/entityIndex";
+import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
 export class DeadUnregisteringSystem extends System {
-  index: Index<"hitpoints">;
+  index = new EntityIndex(["hitpoints"]);
 
   apply = (sim: Sim) => {
     super.apply(sim);
-
-    this.index = new Index(sim, ["hitpoints"]);
+    this.index.apply(sim);
 
     sim.hooks.phase.cleanup.subscribe(this.constructor.name, this.exec);
   };

@@ -20,7 +20,7 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
   };
 
   createOffers = (): void => {
-    for (const builder of this.sim.queries.builders.getIt()) {
+    for (const builder of this.sim.index.builders.getIt()) {
       const facility = this.sim.getOrThrow<Facility>(
         builder.cp.builder.targetId
       );
@@ -59,9 +59,9 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
   };
 
   build = (_delta: number): void => {
-    const builders = this.sim.queries.builders.get();
+    const builders = this.sim.index.builders.get();
 
-    for (const facility of this.sim.queries.facilities.getIt()) {
+    for (const facility of this.sim.index.facilities.getIt()) {
       if (!facility.cooldowns.canUse(buildTimer)) {
         facility.cp.facilityModuleQueue.building!.progress =
           1 -

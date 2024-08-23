@@ -26,7 +26,7 @@ export function getSectorResources(
     toArray
   );
   const fields = pipe(
-    sector.sim.queries.asteroidFields.getIt(),
+    sector.sim.index.asteroidFields.getIt(),
     filter((field) =>
       [sector.id, ...neighbors.map((e) => e.id)].includes(
         field.cp.position.sector

@@ -52,11 +52,11 @@ const Game: React.FC = () => {
   const [gameSettings] = useGameSettings();
   const pressedKeys = React.useRef(new Set<string>());
 
-  const selectedId = sim.queries.settings.get()[0]!.cp.selectionManager.id;
+  const selectedId = sim.index.settings.get()[0]!.cp.selectionManager.id;
   const [selectedEntity, setSelectedEntity] = React.useState<
     Entity | undefined
   >(selectedId ? sim.get(selectedId) : undefined);
-  const player = sim.queries.player.get()[0]!;
+  const player = sim.index.player.get()[0]!;
 
   React.useEffect(() => {
     if (!sim) return () => undefined;
@@ -91,7 +91,7 @@ const Game: React.FC = () => {
 
   React.useEffect(() => {
     if (!menu.active) {
-      sim.queries.settings.get()[0].cp.selectionManager.secondaryId = null;
+      sim.index.settings.get()[0].cp.selectionManager.secondaryId = null;
     }
   }, [menu.active]);
 
