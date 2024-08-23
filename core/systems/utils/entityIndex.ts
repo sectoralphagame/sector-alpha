@@ -201,10 +201,6 @@ export class EntityIndex<
   };
 
   reset = (): void => {
-    // if (this.sim === null) {
-    //   throw new IndexNotAppliedError();
-    // }
-
     this.clear();
     this.sim = null;
   };
