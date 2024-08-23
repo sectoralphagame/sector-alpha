@@ -8,7 +8,7 @@ import { tradeComponents } from "../../economy/utils";
 import { SectorIndex } from "./sectorIndex";
 import { EntityIndex } from "./entityIndex";
 
-export const defaultIndexes = {
+export const defaultIndexer = {
   ai: new EntityIndex([...factionComponents, "ai"]),
   asteroidFields: new EntityIndex(asteroidFieldComponents, [], true),
   autoOrderable: new EntityIndex(["autoOrder", "orders", "position"]),

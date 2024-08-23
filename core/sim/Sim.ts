@@ -14,7 +14,7 @@ import { componentMask } from "@core/components/masks";
 import LZString from "lz-string";
 import { ActionLoader } from "@core/actionLoader";
 import { Observable } from "@core/utils/observer";
-import { defaultIndexes } from "@core/systems/utils/default";
+import { defaultIndexer } from "@core/systems/utils/default";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -52,7 +52,7 @@ export class Sim extends BaseSim {
   @Expose()
   @Type(() => Entity)
   entities: Map<number, Entity>;
-  index: typeof defaultIndexes;
+  index: typeof defaultIndexer;
   paths: Record<string, Record<string, Path>>;
 
   actions: ActionLoader;
@@ -79,7 +79,8 @@ export class Sim extends BaseSim {
       },
     };
 
-    for (const index of Object.values(defaultIndexes)) {
+    this.index = defaultIndexer;
+    for (const index of Object.values(defaultIndexer)) {
       index.apply(this);
     }
     systems.forEach((system) => system.apply(this));
@@ -233,9 +234,8 @@ export class Sim extends BaseSim {
     });
 
     sim.entities = entityMap;
-    sim.index = defaultIndexes;
 
-    for (const index of Object.values(defaultIndexes)) {
+    for (const index of Object.values(defaultIndexer)) {
       index.apply(sim);
     }
     config.systems.forEach((system) => system.apply(sim));
