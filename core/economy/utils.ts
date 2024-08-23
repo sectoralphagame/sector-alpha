@@ -84,7 +84,7 @@ export function getTradeWithMostProfit(
     sectorsInTeleportRange,
     flatMap((sector) =>
       pipe(
-        from.sim.index.bySectors.trading.get(sector.id),
+        from.sim.index.sectorTrading.get(sector.id),
         filter(facilityFilter),
         toArray
       )
@@ -175,7 +175,7 @@ export function getBuyersForCommodityInRange(
       sectorDistance,
       entity.sim
     ),
-    flatMap((sector) => entity.sim.index.bySectors.trading.get(sector.id)),
+    flatMap((sector) => entity.sim.index.sectorTrading.get(sector.id)),
     filter(
       (f) =>
         (f.cp.owner.id === faction.id ||
@@ -246,7 +246,7 @@ export function getFacilityWithMostProfit(
       sectorDistance,
       facility.sim
     ),
-    flatMap((sector) => facility.sim.index.bySectors.trading.get(sector.id)),
+    flatMap((sector) => facility.sim.index.sectorTrading.get(sector.id)),
     filter(
       (f) =>
         (f.cp.owner.id === faction.id ||

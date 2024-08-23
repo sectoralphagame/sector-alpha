@@ -33,12 +33,11 @@ function move(entity: Movable, delta: number) {
 
 export class MovingSystem extends System {
   entities: Movable[];
-  index: EntityIndex<"movable" | "position">;
+  index = new EntityIndex(["movable", "position"]);
 
   apply = (sim: Sim): void => {
     super.apply(sim);
-
-    this.index = new EntityIndex(sim, ["movable", "position"]);
+    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

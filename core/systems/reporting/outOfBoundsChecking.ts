@@ -7,11 +7,11 @@ import { System } from "../system";
 import { EntityIndex } from "../utils/entityIndex";
 
 export class OutOfBoundsCheckingSystem extends System<"exec"> {
-  index: EntityIndex<"position">;
+  index = new EntityIndex(["position"]);
 
   apply = (sim: Sim) => {
     super.apply(sim);
-    this.index = new EntityIndex(this.sim, ["position"]);
+    this.index.apply(sim);
 
     sim.hooks.phase.start.subscribe(this.constructor.name, this.exec);
   };

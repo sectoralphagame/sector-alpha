@@ -10,18 +10,15 @@ import { SectorIndex } from "../utils/sectorIndex";
 import { isInDistance } from "../attacking";
 
 export class MilitaryModuleSpottingSystem extends System<"exec"> {
-  indexes: {
-    enemies: SectorIndex<"hitpoints" | "owner" | "position">;
-    modules: EntityIndex<"parent" | "damage">;
+  indexes = {
+    enemies: new SectorIndex(["hitpoints", "owner", "position"]),
+    modules: new EntityIndex(["parent", "damage"], ["facilityModule"]),
   };
 
   apply = (sim: Sim) => {
     super.apply(sim);
-
-    this.indexes = {
-      enemies: new SectorIndex(sim, ["hitpoints", "owner", "position"]),
-      modules: new EntityIndex(sim, ["parent", "damage"], ["facilityModule"]),
-    };
+    this.indexes.enemies.apply(sim);
+    this.indexes.modules.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

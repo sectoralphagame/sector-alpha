@@ -12,8 +12,8 @@ const divisions = 2 ** 6;
 
 export class FogOfWarUpdatingSystem extends System<"exec"> {
   grid: RequireComponent<"renderGraphics"> | null = null;
-  entitiesWithInfluence: EntityIndex<"position" | "owner">;
-  entitiesToHide: EntityIndex<"position" | "render">;
+  entitiesWithInfluence = new EntityIndex(["position", "owner"]);
+  entitiesToHide = new EntityIndex(["position", "render"]);
   enabled = true;
   intervalHandle: number | null = null;
 
@@ -78,8 +78,8 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       this.constructor.name
     );
 
-    this.entitiesWithInfluence = new EntityIndex(sim, ["position", "owner"]);
-    this.entitiesToHide = new EntityIndex(sim, ["position", "render"]);
+    this.entitiesToHide.apply(sim);
+    this.entitiesWithInfluence.apply(sim);
 
     sim.hooks.phase.init.subscribe(this.constructor.name, this.updateFog);
   };

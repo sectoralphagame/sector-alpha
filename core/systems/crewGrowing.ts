@@ -19,17 +19,15 @@ function getHubModule(facility: RequireComponent<"modules">) {
 }
 
 export class CrewGrowingSystem extends System<"exec"> {
-  crewable: EntityIndex<"crew" | "modules" | "position">;
+  crewable = new EntityIndex(
+    ["modules", "position", "facilityModuleQueue", "subordinates", "crew"],
+    [],
+    true
+  );
 
   apply = (sim: Sim): void => {
     super.apply(sim);
-
-    this.crewable = new EntityIndex(
-      sim,
-      ["modules", "position", "facilityModuleQueue", "subordinates", "crew"],
-      [],
-      true
-    );
+    this.crewable.apply(sim);
 
     // Execute every day at the start of the day
     const offset =

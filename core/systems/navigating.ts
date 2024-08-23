@@ -253,12 +253,11 @@ function setDrive(entity: Navigable, delta: number) {
 
 export class NavigatingSystem extends System {
   entities: Navigable[];
-  index: EntityIndex<"drive" | "movable" | "position">;
+  index = new EntityIndex(["drive", "movable", "position"]);
 
   apply = (sim: Sim): void => {
     super.apply(sim);
-
-    this.index = new EntityIndex(sim, ["drive", "movable", "position"]);
+    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

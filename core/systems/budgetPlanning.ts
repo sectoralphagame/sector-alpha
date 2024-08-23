@@ -28,12 +28,12 @@ function settleBudget(entity: WithTrade) {
 }
 
 export class BudgetPlanningSystem extends System<"exec"> {
-  index: EntityIndex<"budget" | "owner" | "trade">;
+  index = new EntityIndex(["budget", "owner", "trade"]);
 
   apply = (sim: Sim): void => {
     super.apply(sim);
+    this.index.apply(sim);
 
-    this.index = new EntityIndex(sim, ["budget", "owner", "trade"]);
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 

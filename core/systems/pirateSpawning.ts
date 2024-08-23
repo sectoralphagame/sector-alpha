@@ -1,7 +1,7 @@
 import type { Faction } from "@core/archetypes/faction";
 import type { Sector } from "@core/archetypes/sector";
 import { sectorSize } from "@core/archetypes/sector";
-import type { Ship, ShipComponent } from "@core/archetypes/ship";
+import type { Ship } from "@core/archetypes/ship";
 import { createShip, shipComponents } from "@core/archetypes/ship";
 import { createWaypoint } from "@core/archetypes/waypoint";
 import { addSubordinate } from "@core/components/subordinates";
@@ -150,7 +150,7 @@ export class PirateSpawningSystem extends System<
   "return" | "spawnFlagship" | "spawnSquad"
 > {
   faction: Faction;
-  index: EntityIndex<ShipComponent>;
+  index = new EntityIndex(shipComponents, ["role:military"]);
 
   moveFlagship = (flagships: Ship[]) => {
     const shipToMove = pickRandom(
@@ -241,10 +241,7 @@ export class PirateSpawningSystem extends System<
 
   apply = (sim: Sim) => {
     super.apply(sim);
-
-    this.index = new EntityIndex<ShipComponent>(sim, shipComponents, [
-      "role:military",
-    ]);
+    this.index.apply(sim);
 
     sim.hooks.phase.start.subscribe(this.constructor.name, () => {
       if (!this.faction) {

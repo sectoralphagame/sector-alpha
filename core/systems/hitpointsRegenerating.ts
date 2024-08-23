@@ -5,12 +5,11 @@ import { System } from "./system";
 export const regenCooldown = "regen";
 
 export class HitpointsRegeneratingSystem extends System<"exec"> {
-  index: EntityIndex<"hitpoints">;
+  index = new EntityIndex(["hitpoints"]);
 
   apply = (sim: Sim) => {
     super.apply(sim);
-
-    this.index = new EntityIndex(sim, ["hitpoints"]);
+    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

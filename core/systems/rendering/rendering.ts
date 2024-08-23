@@ -70,7 +70,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
   overlay: HTMLDivElement;
   grid: RequireComponent<"renderGraphics"> | null = null;
   layers: Record<Layer, PIXI.Container>;
-  sectorIndex: SectorIndex<"render">;
+  sectorIndex = new SectorIndex(["render"]);
   sprites: Map<Entity, PIXI.Sprite> = new Map();
   graphics: Map<Entity, PIXI.Graphics> = new Map();
   displayRange: boolean;
@@ -85,11 +85,11 @@ export class RenderingSystem extends SystemWithHooks<never> {
 
   apply = (sim: Sim) => {
     super.apply(sim);
+    this.sectorIndex.apply(sim);
     if (!isHeadless) {
       (window as any).rendering = this;
     }
 
-    this.sectorIndex = new SectorIndex(sim, ["render"]);
     sim.hooks.phase.render.subscribe("RenderingSystem", this.exec);
   };
 
@@ -349,14 +349,14 @@ export class RenderingSystem extends SystemWithHooks<never> {
   };
 
   updateRenderables = () => {
-    for (const sectorId of this.sectorIndex.sectors.keys()) {
+    for (const sectorId of this.sectorIndex.getSectors()) {
       const sector = this.sim.getOrThrow<Sector>(sectorId);
       const sectorPos = hecsToCartesian(
         sector.cp.hecsPosition.value,
         sectorSize / 10
       );
 
-      for (const entity of this.sectorIndex.sectors.get(sectorId)!) {
+      for (const entity of this.sectorIndex.sectors[sectorId]!) {
         const entityRender = entity.cp.render;
         let sprite = this.sprites.get(entity);
 

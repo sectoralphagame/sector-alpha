@@ -47,12 +47,11 @@ const handlers: Partial<
 };
 
 export class UndeployingSystem extends System<"exec"> {
-  index: EntityIndex<"deployable">;
+  index = new EntityIndex(["deployable"]);
 
   apply = (sim: Sim) => {
     super.apply(sim);
-
-    this.index = new EntityIndex(sim, ["deployable"]);
+    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

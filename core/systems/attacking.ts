@@ -69,12 +69,11 @@ function attack(attacker: RequireComponent<"orders">, target: Entity) {
 const cdKey = "attack";
 
 export class AttackingSystem extends System {
-  index: EntityIndex<"damage">;
+  index = new EntityIndex(["damage"]);
 
   apply = (sim: Sim) => {
     super.apply(sim);
-
-    this.index = new EntityIndex(sim, ["damage"]);
+    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

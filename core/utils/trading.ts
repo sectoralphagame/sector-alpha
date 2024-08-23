@@ -633,7 +633,7 @@ export function returnToFacility(
 }
 
 export function getSectorPrices(sector: Sector): SectorPriceStats {
-  const facilities = sector.sim.index.bySectors.trading.get(sector.id);
+  const facilities = sector.sim.index.sectorTrading.get(sector.id);
 
   return perCommodity((commodity) => {
     const buyOffers = facilities

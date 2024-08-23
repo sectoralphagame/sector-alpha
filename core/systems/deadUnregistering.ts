@@ -5,12 +5,11 @@ import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
 export class DeadUnregisteringSystem extends System {
-  index: EntityIndex<"hitpoints">;
+  index = new EntityIndex(["hitpoints"]);
 
   apply = (sim: Sim) => {
     super.apply(sim);
-
-    this.index = new EntityIndex(sim, ["hitpoints"]);
+    this.index.apply(sim);
 
     sim.hooks.phase.cleanup.subscribe(this.constructor.name, this.exec);
   };

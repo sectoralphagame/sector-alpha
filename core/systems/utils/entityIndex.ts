@@ -1,25 +1,28 @@
 import { filter } from "@fxts/core";
 import type { EntityTag } from "@core/tags";
-import { shipComponents } from "@core/archetypes/ship";
-import { collectibleComponents } from "@core/archetypes/collectible";
+
 import { componentMask } from "@core/components/masks";
 import { Observable } from "@core/utils/observer";
-import { asteroidFieldComponents } from "../../archetypes/asteroidField";
-import { facilityComponents } from "../../archetypes/facility";
-import { factionComponents } from "../../archetypes/faction";
-import { sectorComponents } from "../../archetypes/sector";
+
 import type { CoreComponents } from "../../components/component";
 import type { Entity } from "../../entity";
-import { tradeComponents } from "../../economy/utils";
 import type { Sim } from "../../sim";
 import type { RequireComponent } from "../../tsHelpers";
-import { SectorIndex } from "./sectorIndex";
+import type { SimIndex } from "./simIndex";
+
+export class IndexNotAppliedError extends Error {
+  constructor() {
+    super("Index not applied to the sim");
+  }
+}
 
 export type IndexEntities<T extends keyof CoreComponents> = Array<
   RequireComponent<T>
 >;
 
-export class BaseEntityIndex<T extends keyof CoreComponents> {
+export abstract class BaseEntityIndex<T extends keyof CoreComponents>
+  implements SimIndex<Entity>
+{
   hooks: {
     add: Observable<RequireComponent<T>>;
     remove: Observable<{ id: number; entity: Entity }>;
@@ -27,16 +30,14 @@ export class BaseEntityIndex<T extends keyof CoreComponents> {
   requiredComponents: readonly (keyof CoreComponents)[];
   requiredComponentsMask: bigint;
   requiredTags: readonly EntityTag[];
-  sim: Sim;
+  sim: Sim | null = null;
 
   constructor(
-    sim: Sim,
     requiredComponents: readonly T[],
     requiredTags: readonly EntityTag[] = []
   ) {
     this.requiredComponents = requiredComponents;
     this.requiredTags = requiredTags;
-    this.sim = sim;
 
     this.requiredComponentsMask = requiredComponents.reduce(
       (mask, name) => mask | componentMask[name],
@@ -44,23 +45,43 @@ export class BaseEntityIndex<T extends keyof CoreComponents> {
     );
   }
 
+  apply(sim: Sim): void {
+    this.sim = sim;
+    this.enableHooks();
+    this.collect();
+
+    this.sim.hooks.destroy.subscribe("BaseEntityIndex", () => {
+      this.reset();
+    });
+  }
+
+  abstract clear(): void;
+  abstract reset(): void;
+
   enableHooks = () => {
+    if (this.sim === null) {
+      throw new IndexNotAppliedError();
+    }
+
     this.hooks = {
       add: new Observable("indexAdd"),
       remove: new Observable("indexRemove"),
     };
 
-    this.sim.hooks.addComponent.subscribe("index", ({ entity, component }) => {
-      if (
-        this.requiredComponents.includes(component) &&
-        this.canBeAdded(entity)
-      ) {
-        this.add(entity as RequireComponent<T>);
+    this.sim.hooks.addComponent.subscribe(
+      "BaseEntityIndex",
+      ({ entity, component }) => {
+        if (
+          this.requiredComponents.includes(component) &&
+          this.canBeAdded(entity)
+        ) {
+          this.add(entity as RequireComponent<T>);
+        }
       }
-    });
+    );
 
     this.sim.hooks.removeComponent.subscribe(
-      "index",
+      "BaseEntityIndex",
       ({ component, entity }) => {
         if (this.requiredComponents.includes(component)) {
           this.remove(entity);
@@ -68,19 +89,19 @@ export class BaseEntityIndex<T extends keyof CoreComponents> {
       }
     );
 
-    this.sim.hooks.addTag.subscribe("index", ({ entity, tag }) => {
+    this.sim.hooks.addTag.subscribe("BaseEntityIndex", ({ entity, tag }) => {
       if (this.requiredTags.includes(tag) && this.canBeAdded(entity)) {
         this.add(entity as RequireComponent<T>);
       }
     });
 
-    this.sim.hooks.removeTag.subscribe("index", ({ tag, entity }) => {
+    this.sim.hooks.removeTag.subscribe("BaseEntityIndex", ({ tag, entity }) => {
       if (this.requiredTags.includes(tag)) {
         this.remove(entity);
       }
     });
 
-    this.sim.hooks.removeEntity.subscribe("index", (entity: Entity) => {
+    this.sim.hooks.removeEntity.subscribe("BaseEntityIndex", (entity) => {
       this.remove(entity);
     });
   };
@@ -89,17 +110,29 @@ export class BaseEntityIndex<T extends keyof CoreComponents> {
     (entity.componentsMask & this.requiredComponentsMask) ===
       this.requiredComponentsMask && entity.hasTags(this.requiredTags);
 
-  collect = () => {
+  collect(): void {
+    if (this.sim === null) {
+      throw new IndexNotAppliedError();
+    }
+
     for (const entity of filter(this.canBeAdded, this.sim.entities.values())) {
       this.add(entity as RequireComponent<T>);
     }
-  };
+  }
 
   add = (entity: RequireComponent<T>) => {
+    if (this.sim === null) {
+      throw new IndexNotAppliedError();
+    }
+
     this.hooks.add.notify(entity);
   };
 
   remove = (entity: Entity) => {
+    if (this.sim === null) {
+      throw new IndexNotAppliedError();
+    }
+
     this.hooks.remove.notify({ id: entity.id, entity });
   };
 }
@@ -108,43 +141,49 @@ export class EntityIndex<
   T extends keyof CoreComponents
 > extends BaseEntityIndex<T> {
   cache: boolean;
-  entities: Set<RequireComponent<T>> | null;
-  sim: Sim;
+  entities: Set<RequireComponent<T>>;
+  populated = false;
 
   constructor(
-    sim: Sim,
     requiredComponents: readonly T[],
     requiredTags: readonly EntityTag[] = [],
     cache = false
   ) {
-    super(sim, requiredComponents, requiredTags);
-    if (cache) {
-      this.enableCache();
-    }
+    super(requiredComponents, requiredTags);
+    this.cache = cache;
   }
 
-  enableCache = () => {
-    this.cache = true;
-    this.enableHooks();
-    this.hooks.add.subscribe("index", (entity) => {
-      if (this.entities) {
-        this.entities.add(entity);
-      }
-    });
-    this.hooks.remove.subscribe("index", ({ entity }) => {
-      if (this.entities) {
-        this.entities.delete(entity as RequireComponent<T>);
-      }
-    });
+  apply = (sim: Sim): void => {
+    super.apply(sim);
+    this.entities = new Set();
+    if (this.cache) {
+      this.enableCache();
+    }
   };
 
-  get = (): IndexEntities<T> => {
-    if (this.cache) {
-      if (!this.entities) {
-        this.entities = new Set();
-        this.collect();
-      }
+  enableCache = () => {
+    this.enableHooks();
+    this.hooks.add.subscribe("EntityIndex", (entity) => {
+      this.entities.add(entity);
+    });
+    this.hooks.remove.subscribe("EntityIndex", ({ entity }) => {
+      this.entities.delete(entity as RequireComponent<T>);
+    });
+    this.collect();
+  };
 
+  collect(): void {
+    super.collect();
+
+    this.populated = true;
+  }
+
+  get = (): IndexEntities<T> => {
+    if (this.sim === null) {
+      throw new IndexNotAppliedError();
+    }
+
+    if (this.cache) {
       return [...this.entities];
     }
 
@@ -152,82 +191,27 @@ export class EntityIndex<
   };
 
   getIt = (): IterableIterator<RequireComponent<T>> => {
-    if (this.cache) {
-      if (!this.entities) {
-        this.entities = new Set();
-        this.collect();
-      }
+    if (this.sim === null) {
+      throw new IndexNotAppliedError();
+    }
 
+    if (this.cache) {
       return this.entities.values();
     }
 
     return filter(this.canBeAdded, this.sim.entities.values()) as any;
   };
 
-  reset = (): void => {
-    if (!this.cache || !this.entities) return;
-
+  clear = (): void => {
     this.entities.clear();
-    this.collect();
+  };
+
+  reset = (): void => {
+    if (this.sim === null) {
+      throw new IndexNotAppliedError();
+    }
+
+    this.clear();
+    this.sim = null;
   };
 }
-
-export function createIndexes(sim: Sim) {
-  return {
-    ai: new EntityIndex(sim, [...factionComponents, "ai"]),
-    asteroidFields: new EntityIndex(sim, asteroidFieldComponents, [], true),
-    autoOrderable: new EntityIndex(sim, ["autoOrder", "orders", "position"]),
-    budget: new EntityIndex(sim, ["budget"], [], true),
-    builders: new EntityIndex(sim, ["builder", "storage", "trade", "docks"]),
-    children: new EntityIndex(sim, ["parent"]),
-    collectibles: new EntityIndex(sim, collectibleComponents, ["collectible"]),
-    disposable: new EntityIndex(sim, ["disposable"]),
-    facilities: new EntityIndex(
-      sim,
-      ["modules", "position", "facilityModuleQueue", "subordinates"],
-      [],
-      true
-    ),
-    facilityWithProduction: new EntityIndex(sim, [
-      "compoundProduction",
-      "modules",
-      "position",
-    ]),
-    habitats: new EntityIndex(sim, ["parent", "facilityModuleBonus"]),
-    mining: new EntityIndex(sim, ["mining", "storage"]),
-    orderable: new EntityIndex(sim, ["orders", "position", "model", "owner"]),
-    player: new EntityIndex(
-      sim,
-      [...factionComponents, "missions"],
-      ["player"],
-      true
-    ),
-    productionByModules: new EntityIndex(sim, ["production", "parent"]),
-    renderableGraphics: new EntityIndex(sim, ["renderGraphics"]),
-    sectors: new EntityIndex(sim, sectorComponents, [], true),
-    selectable: new EntityIndex(sim, ["render", "position"], ["selection"]),
-    settings: new EntityIndex(
-      sim,
-      ["selectionManager", "systemManager", "inflationStats", "camera"],
-      [],
-      true
-    ),
-    ships: new EntityIndex(sim, shipComponents, ["ship"], true),
-    shipyards: new EntityIndex(
-      sim,
-      [...facilityComponents, "owner", "shipyard"],
-      [],
-      true
-    ),
-    standaloneProduction: new EntityIndex(sim, ["production", "storage"]),
-    storage: new EntityIndex(sim, ["storage"]),
-    storageAndTrading: new EntityIndex(sim, ["storage", "trade"]),
-    teleports: new EntityIndex(sim, ["teleport"], [], true),
-    trading: new EntityIndex(sim, tradeComponents),
-    bySectors: {
-      trading: new SectorIndex(sim, tradeComponents),
-    },
-  } as const;
-}
-
-export type Indexes = ReturnType<typeof createIndexes>;
