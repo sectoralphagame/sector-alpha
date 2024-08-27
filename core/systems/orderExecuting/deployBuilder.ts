@@ -11,7 +11,7 @@ export function deployBuilderAction(
   order: BuilderDeployAction
 ): boolean {
   if (entity.cp.commander) {
-    removeCommander(entity.requireComponents(["commander"]));
+    removeCommander(entity.requireComponents(["commander", "orders"]));
   }
 
   (["autoOrder", "orders"] as Array<keyof CoreComponents>).reduce(

@@ -11,7 +11,7 @@ export function transferOwnership(
   const newOwner = faction(entity.sim.getOrThrow(newOwnerId));
   entity.cp.owner.id = newOwnerId;
 
-  if (entity.hasComponents(["commander"])) {
+  if (entity.hasComponents(["commander", "orders"])) {
     removeSubordinate(entity.sim.getOrThrow(entity.cp.commander.id), entity);
   }
 

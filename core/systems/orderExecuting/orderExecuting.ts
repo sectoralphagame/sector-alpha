@@ -114,7 +114,7 @@ function cleanupAllocations(entity: Entity): void {
   });
 }
 
-function cleanupOrders(entity: Entity): void {
+export function cleanupOrders(entity: Entity): void {
   if (
     (["asteroid", "virtual"] as EntityTag[]).some((tag) => entity.tags.has(tag))
   )
@@ -194,7 +194,7 @@ function cleanupChildren(entity: Entity): void {
   if (entity.cp.commander) {
     removeSubordinate(
       entity.sim.getOrThrow(entity.cp.commander.id),
-      entity.requireComponents(["commander"])
+      entity.requireComponents(["commander", "orders"])
     );
   }
 

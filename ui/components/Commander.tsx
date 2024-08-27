@@ -9,7 +9,7 @@ import styles from "./Commander.scss";
 
 export interface CommanderProps {
   commander: Entity;
-  ship: RequireComponent<"commander">;
+  ship: RequireComponent<"commander" | "orders">;
 }
 
 export const Commander: React.FC<CommanderProps> = ({ commander, ship }) => {
