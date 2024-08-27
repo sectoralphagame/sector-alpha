@@ -281,7 +281,7 @@ export class ShipPlanningSystem extends System<"plan"> {
           .slice(0, -trading)
       );
     spareTraders.forEach((ship) => {
-      removeCommander(ship.requireComponents(["commander"]));
+      removeCommander(ship.requireComponents(["commander", "orders"]));
     });
     spareTraders.push(
       ...this.sim.index.orderable
@@ -361,7 +361,7 @@ export class ShipPlanningSystem extends System<"plan"> {
             .slice(0, -mining) ?? []
       );
     spareMiners.forEach((ship) => {
-      removeCommander(ship.requireComponents(["commander"]));
+      removeCommander(ship.requireComponents(["commander", "orders"]));
     });
     spareMiners.push(
       ...this.sim.index.mining

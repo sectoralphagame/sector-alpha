@@ -130,7 +130,7 @@ const Orders: React.FC<{ ship: Ship }> = ({ ship }) => {
           <CollapsibleSummary>
             <div className={styles.orderGroupHeader}>
               {getOrderGroupDescription(order, ship.sim)}
-              {isOwned && (
+              {isOwned && !ship.cp.commander?.id && (
                 <IconButton
                   onClick={(event) => {
                     event.stopPropagation();

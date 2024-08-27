@@ -1,5 +1,6 @@
 import type { Entity } from "@core/entity";
 import type { RequireComponent } from "@core/tsHelpers";
+import { cleanupOrders } from "@core/systems/orderExecuting/orderExecuting";
 import type { BaseComponent } from "./component";
 
 export interface Subordinates extends BaseComponent<"subordinates"> {
@@ -34,10 +35,11 @@ export function addSubordinate(
 
 export function removeSubordinate(
   entity: RequireComponent<"subordinates">,
-  subordinate: RequireComponent<"commander">
+  subordinate: RequireComponent<"commander" | "orders">
 ) {
   entity.cp.subordinates.ids = entity.cp.subordinates.ids.filter(
     (id) => id !== subordinate.id
   );
   subordinate.removeComponent("commander");
+  cleanupOrders(subordinate);
 }

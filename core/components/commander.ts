@@ -6,7 +6,9 @@ export interface Commander extends BaseComponent<"commander"> {
   id: number;
 }
 
-export function removeCommander(entity: RequireComponent<"commander">) {
+export function removeCommander(
+  entity: RequireComponent<"commander" | "orders">
+) {
   removeSubordinate(
     entity.sim.getOrThrow<RequireComponent<"subordinates">>(
       entity.cp.commander.id
@@ -16,7 +18,7 @@ export function removeCommander(entity: RequireComponent<"commander">) {
 }
 
 export function changeCommander(
-  entity: RequireComponent<"commander">,
+  entity: RequireComponent<"commander" | "orders">,
   commander: RequireComponent<"subordinates">
 ) {
   removeCommander(entity);
