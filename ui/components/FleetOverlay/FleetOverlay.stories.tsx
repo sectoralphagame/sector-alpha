@@ -44,7 +44,7 @@ const fleets = Array(3)
       interactive: true,
       layer: "ship",
       name: "render",
-      visible: true,
+      hidden: 0,
     };
 
     return {
@@ -91,7 +91,7 @@ const fleets = Array(3)
                     interactive: true,
                     layer: "ship",
                     name: "render",
-                    visible: true,
+                    hidden: 0,
                   };
 
                   return subordinate;
@@ -134,7 +134,7 @@ const unassigned = Array(5)
       interactive: true,
       layer: "ship",
       name: "render",
-      visible: true,
+      hidden: 0,
     };
 
     return ship;

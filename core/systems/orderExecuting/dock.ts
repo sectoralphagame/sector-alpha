@@ -2,7 +2,7 @@ import { clearTarget, setTarget } from "@core/utils/moving";
 import type { WithDock } from "../../components/dockable";
 import { availableDocks } from "../../components/dockable";
 import type { DockAction } from "../../components/orders";
-import { hide, show } from "../../components/render";
+import { HideReason } from "../../components/render";
 import { DockSizeMismatchError } from "../../errors";
 import type { RequireComponent } from "../../tsHelpers";
 
@@ -16,7 +16,7 @@ export function dockShip(
   clearTarget(ship);
 
   if (ship.cp.render) {
-    hide(ship.cp.render);
+    ship.cp.render.hidden |= HideReason.Docked;
   }
 }
 
@@ -32,7 +32,7 @@ export function undockShip(
   ship.cp.drive.active = true;
 
   if (ship.cp.render) {
-    show(ship.cp.render);
+    ship.cp.render.hidden &= ~HideReason.Docked;
   }
 }
 

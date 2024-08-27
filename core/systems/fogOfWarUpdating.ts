@@ -4,6 +4,7 @@ import { createRenderGraphics } from "@core/components/renderGraphics";
 import type { RequireComponent } from "@core/tsHelpers";
 import { sectorSize } from "@core/archetypes/sector";
 import type { Position2D } from "@core/components/position";
+import { HideReason } from "@core/components/render";
 import { System } from "./system";
 import { EntityIndex } from "./utils/entityIndex";
 
@@ -128,25 +129,26 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       }
 
       for (const entity of this.entitiesToHide.getIt()) {
-        if (entity.cp.dockable?.dockedIn) continue;
+        if (entity.cp.dockable?.dockedIn || entity.cp.owner?.id === player.id)
+          continue;
 
         if (!this.enabled) {
-          entity.cp.render!.visible = true;
+          entity.cp.render.hidden &= ~HideReason.FogOfWar;
         } else {
           const [x, y] = FogOfWarUpdatingSystem.getBox(
             entity.cp.position.coord
           );
 
-          if (entity.cp.owner?.id !== player.id) {
-            entity.cp.render!.visible =
-              !!sectorMaps[entity.cp.position.sector]?.[y * divisions + x] ||
-              entity.tags.has("discovered");
-            if (
-              entity.cp.render!.visible &&
-              (entity.tags.has("facility") || entity.tags.has("collectible"))
-            ) {
-              entity.addTag("discovered");
-            }
+          entity.cp.render.hidden =
+            sectorMaps[entity.cp.position.sector]?.[y * divisions + x] ||
+            entity.tags.has("discovered")
+              ? entity.cp.render.hidden & ~HideReason.FogOfWar
+              : entity.cp.render.hidden | HideReason.FogOfWar;
+          if (
+            !entity.cp.render.hidden &&
+            (entity.tags.has("facility") || entity.tags.has("collectible"))
+          ) {
+            entity.addTag("discovered");
           }
         }
       }
