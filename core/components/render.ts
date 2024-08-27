@@ -22,9 +22,18 @@ export interface Render extends BaseComponent<"render"> {
   texture: keyof Textures;
   layer: Layer;
   name: "render";
-  visible: boolean;
+  /**
+   * Bitmask of reasons why the entity is hidden.
+   */
+  hidden: number;
   interactive: boolean;
 }
+
+export const HideReason = {
+  Manual: 1 << 0,
+  Docked: 1 << 1,
+  FogOfWar: 1 << 2,
+};
 
 export function createRender({
   color,
@@ -38,7 +47,7 @@ export function createRender({
     name: "render",
     layer,
     texture,
-    visible: true,
+    hidden: 0,
     interactive: false,
   };
 
@@ -46,9 +55,9 @@ export function createRender({
 }
 
 export function hide(render: Render) {
-  render.visible = false;
+  render.hidden |= HideReason.Manual;
 }
 
 export function show(render: Render) {
-  render.visible = true;
+  render.hidden &= ~HideReason.Manual;
 }

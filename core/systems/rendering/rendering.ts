@@ -409,8 +409,8 @@ export class RenderingSystem extends SystemWithHooks<never> {
         if (entity.tags.has("selection") !== sprite?.interactive) {
           sprite!.interactive = entity.tags.has("selection");
         }
-        if (entityRender.visible !== sprite?.visible) {
-          sprite!.visible = entityRender.visible;
+        if (!entityRender.hidden !== sprite?.visible) {
+          sprite!.visible = !entityRender.hidden;
         }
       }
     }
