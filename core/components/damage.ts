@@ -5,4 +5,5 @@ export interface Damage extends BaseComponent<"damage"> {
   targetId: number | null;
   range: number;
   value: number;
+  angle: number;
 }

@@ -24,6 +24,7 @@ export interface ShipInput extends ShipDriveProps {
     cooldown: number;
     value: number;
     range: number;
+    angle: number;
   };
   hitpoints: {
     hp: { value: number; regen: number };
