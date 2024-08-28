@@ -98,7 +98,7 @@ export class AttackingSystem extends System {
       if (
         !isInDistance(entity, target) ||
         Math.abs(getAngleDiff(findInAncestors(entity, "position"), target)) >
-          entity.cp.damage.angle
+          entity.cp.damage.angle / 2
       )
         continue;
 

@@ -42,7 +42,7 @@ const Editor: React.FC<{}> = () => {
                 size: "medium",
                 storage: 0,
                 texture: "mCiv",
-                damage: { cooldown: 0, range: 0, value: 0 },
+                damage: { cooldown: 0, range: 0, value: 0, angle: 30 },
                 hitpoints: {
                   hp: { regen: 0, value: 0 },
                   shield: { regen: 0, value: 0 },

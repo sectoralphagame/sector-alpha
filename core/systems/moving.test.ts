@@ -51,14 +51,14 @@ describe("Floating entity", () => {
   it("moves freely in space", () => {
     entity.cp.movable.velocity = 1;
     movingSystem.exec(1);
-    expect(distance(entity.cp.position.coord, [0, -1])).toBeLessThan(0.01);
+    expect(distance(entity.cp.position.coord, [1, 0])).toBeLessThan(0.01);
   });
 
   it("follows its rotation", () => {
     entity.cp.movable.velocity = 1;
     entity.cp.position.angle = Math.PI / 2;
     movingSystem.exec(1);
-    expect(distance(entity.cp.position.coord, [1, 0])).toBeLessThan(0.01);
+    expect(distance(entity.cp.position.coord, [0, 1])).toBeLessThan(0.01);
   });
 });
 
@@ -93,7 +93,7 @@ describe("Ship", () => {
   });
 
   it("is able to go to target position", () => {
-    ship.cp.position.angle = Math.PI;
+    ship.cp.position.angle = 1.5 * Math.PI;
     setTarget(
       ship,
       createWaypoint(sim, {

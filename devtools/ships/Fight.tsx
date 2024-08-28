@@ -48,6 +48,14 @@ const ShipFightEditor: React.FC<{ index: number }> = ({ index }) => {
       </TableCell>
       <TableCell>
         <input
+          {...register(`ships.${index}.damage.angle`, {
+            valueAsNumber: true,
+          })}
+          defaultValue={getValues().ships[index].damage?.angle}
+        />
+      </TableCell>
+      <TableCell>
+        <input
           {...register(`ships.${index}.hitpoints.hp.value`, {
             valueAsNumber: true,
           })}
@@ -94,6 +102,7 @@ export const FightEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
       <col style={{ width: "100px" }} />
       <col style={{ width: "100px" }} />
       <col style={{ width: "100px" }} />
+      <col style={{ width: "100px" }} />
       <col />
     </colgroup>
     <thead>
@@ -103,6 +112,7 @@ export const FightEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
         <TableHeader>Attack</TableHeader>
         <TableHeader>Cooldown</TableHeader>
         <TableHeader>Range</TableHeader>
+        <TableHeader>Angle</TableHeader>
         <TableHeader>HP Max</TableHeader>
         <TableHeader>Regen</TableHeader>
         <TableHeader>Shield Max</TableHeader>

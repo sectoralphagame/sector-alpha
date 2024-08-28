@@ -39,4 +39,10 @@ export interface ShipInput extends ShipDriveProps {
   role: ShipRole;
 }
 
-export const shipClasses = shipClassesData as ShipInput[];
+export const shipClasses = shipClassesData.map((s) => ({
+  ...s,
+  damage: {
+    ...s.damage,
+    angle: (s.damage.angle / 360) * 2 * Math.PI,
+  },
+})) as ShipInput[];
