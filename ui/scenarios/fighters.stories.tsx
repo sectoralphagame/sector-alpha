@@ -31,7 +31,10 @@ import {
 import { selectingSystem } from "@core/systems/selecting";
 import settings from "@core/settings";
 
-const Game: React.FC<{ factions: number }> = ({ factions }) => {
+const Game: React.FC<{ factions: number; fighters: number }> = ({
+  factions,
+  fighters,
+}) => {
   React.useEffect(() => {
     settings.bootTime = 0;
     const renderingSystem = new RenderingSystem([undefined!, () => {}]);
@@ -69,28 +72,33 @@ const Game: React.FC<{ factions: number }> = ({ factions }) => {
       faction.cp.policies.enemySpotted.military = "attack";
       generatedFactions.push(faction);
 
-      const fighter = createShip(sim, {
-        ...pickRandom(shipClasses.filter(({ slug }) => slug === "dart")),
-        angle: random(-Math.PI, Math.PI),
-        position: fromPolar((Math.PI * 2 * i) / factions, random(14, 16)),
-        owner: faction,
-        sector,
-      });
-      fighter.cp.orders.value = [
-        {
-          type: "move",
-          actions: moveToActions(
-            fighter,
-            createWaypoint(sim, {
-              value: [0, 0],
-              sector: sector.id,
-              owner: faction.id,
-            }),
-            {}
+      for (let j = 0; j < fighters; j++) {
+        const fighter = createShip(sim, {
+          ...pickRandom(shipClasses.filter(({ slug }) => slug === "dart")),
+          angle: random(-Math.PI, Math.PI),
+          position: fromPolar(
+            (2 * Math.PI * (i * fighters + j)) / (factions * fighters),
+            random(4, 6)
           ),
-          origin: "manual",
-        },
-      ];
+          owner: faction,
+          sector,
+        });
+        fighter.cp.orders.value = [
+          {
+            type: "move",
+            actions: moveToActions(
+              fighter,
+              createWaypoint(sim, {
+                value: [0, 0],
+                sector: sector.id,
+                owner: faction.id,
+              }),
+              {}
+            ),
+            origin: "manual",
+          },
+        ];
+      }
     }
     for (const factionA of generatedFactions) {
       for (const factionB of generatedFactions) {
@@ -104,22 +112,23 @@ const Game: React.FC<{ factions: number }> = ({ factions }) => {
     return () => {
       sim.destroy();
     };
-  }, [factions]);
+  }, [factions, fighters]);
 
   return <div id="canvasRoot" />;
 };
 
-const Template: StoryFn = ({ factions }) => (
+const Template: StoryFn = ({ factions, fighters }) => (
   <div id="root">
     <Styles>
-      <Game factions={factions} />
+      <Game factions={factions} fighters={fighters} />
     </Styles>
   </div>
 );
 
 export const Default = Template.bind({});
 Default.args = {
-  factions: 5,
+  factions: 3,
+  fighters: 2,
 };
 
 export default {
