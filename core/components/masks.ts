@@ -1,6 +1,7 @@
 /* eslint-disable no-bitwise */
 import type { CoreComponents } from "./component";
 
+// DO NOT CHANGE THE ORDER OF THIS LIST, EVER
 export const componentMask: Record<keyof CoreComponents, bigint> = [
   "ai",
   "asteroidSpawn",
@@ -53,6 +54,7 @@ export const componentMask: Record<keyof CoreComponents, bigint> = [
   "crewRequirement",
   "movable",
   "storageTransfer",
+  "policies",
 ].reduce(
   (acc, component, index) => ({
     ...acc,

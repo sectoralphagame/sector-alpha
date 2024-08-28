@@ -46,6 +46,7 @@ import type { Crew } from "./crew";
 import type { CrewRequirement } from "./crewRequirement";
 import type { Movable } from "./movable";
 import type { StorageTransfer } from "./storageTransfer";
+import type { Policies } from "./policies";
 
 export interface CoreComponents {
   ai: Ai;
@@ -84,6 +85,7 @@ export interface CoreComponents {
   orders: Orders;
   owner: Owner;
   parent: Parent;
+  policies: Policies;
   position: Position;
   production: Production;
   relations: Relations;

@@ -86,16 +86,19 @@ export class SpottingSystem extends System<"exec"> {
 
     for (const entity of this.sim.index.orderable.getIt()) {
       const currentOrder = entity.cp.orders.value[0];
-      if (
-        currentOrder?.type !== "patrol" &&
-        currentOrder?.type !== "pillage" &&
-        currentOrder?.type !== "escort"
-      )
-        continue;
+      const owner = entity.sim.getOrThrow<Faction>(entity.cp.owner.id);
 
       if (
+        !(
+          ["patrol", "pillage", "escort"].includes(currentOrder?.type) ||
+          owner.cp.policies.enemySpotted[
+            entity.tags.has("role:military") ? "military" : "civilian"
+          ] === "attack"
+        ) ||
+        currentOrder?.type === "attack" ||
         !entity.cp.owner ||
-        ((currentOrder.type === "patrol" || currentOrder.type === "pillage") &&
+        ((currentOrder?.type === "patrol" ||
+          currentOrder?.type === "pillage") &&
           entity.cp.position.sector !== currentOrder.sectorId)
       )
         continue;
