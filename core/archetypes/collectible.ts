@@ -54,5 +54,7 @@ export function createCollectible(
     .addTag("collectible")
     .addTag("selection");
 
+  entity.cp.render!.static = true;
+
   return entity as Collectible;
 }

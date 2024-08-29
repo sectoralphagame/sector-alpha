@@ -67,7 +67,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     })
     .addComponent({
       name: "position",
-      angle: 0,
+      angle: Math.random() * Math.PI * 2,
       coord: initial.position,
       sector: initial.sector.id,
       moved: false,
@@ -100,6 +100,8 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     .addComponent({ name: "subordinates", ids: [] })
     .addTag("selection")
     .addTag("facility");
+
+  entity.cp.render!.static = true;
 
   if (initial.owner) {
     entity.addComponent({

@@ -406,7 +406,9 @@ export class RenderingSystem extends SystemWithHooks<never> {
             (sectorPos[0] + entity.cp.position.coord[0]) * 10,
             (sectorPos[1] + entity.cp.position.coord[1]) * 10
           );
-          sprite!.rotation = entity.cp.position.angle + Math.PI / 2;
+          sprite!.rotation = entity.cp.render.static
+            ? -Math.PI / 2
+            : entity.cp.position.angle;
         }
 
         if (getTexture(entityRender.texture) !== sprite?.texture) {

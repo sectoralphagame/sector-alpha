@@ -19,12 +19,8 @@ export function getSubordinates(entity: RequireComponent<"subordinates">) {
 
 export function getAngleDiff(
   origin: RequireComponent<"position">,
-  target: RequireComponent<"position">
+  path: Position2D
 ): number {
-  const path = [
-    target.cp.position.coord[0] - origin.cp.position.coord[0],
-    target.cp.position.coord[1] - origin.cp.position.coord[1],
-  ];
   const pathAngle = Math.atan2(path[1], path[0]);
   const dAngle = pathAngle - origin.cp.position.angle;
 

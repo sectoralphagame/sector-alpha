@@ -17,7 +17,7 @@ function hold(entity: Navigable) {
     if (entity.cp.owner) {
       if (
         entity.sim.getOrThrow(entity.cp.owner.id).cp.ai ||
-        entity.cp.orders.value[0].origin === "auto"
+        entity.cp.orders.value[0]?.origin === "auto"
       ) {
         entity.cp.orders.value = [];
       }
@@ -37,8 +37,8 @@ function getFormationPlace(
   const angle = commander.cp.position.angle;
   const distance = 0.1;
 
-  const x = (subordinateIndex - (subordinatesCount - 1) / 2) * 0.3;
-  const y = distance;
+  const x = distance;
+  const y = (subordinateIndex - (subordinatesCount - 1) / 2) * 0.3;
 
   return [
     x * Math.cos(angle) - y * Math.sin(angle) + commander.cp.position.coord[0],
@@ -67,14 +67,11 @@ function setFlybyDrive(entity: Navigable, delta: number) {
   const targetEntity = entity.sim.get(drive.target!)!;
   const targetPosition = targetEntity.cp.position!;
 
-  const path = [
+  const path: Position2D = [
     targetPosition.coord[0] - entityPosition.coord[0],
     targetPosition.coord[1] - entityPosition.coord[1],
   ];
-  const dAngle = getAngleDiff(
-    entity,
-    targetEntity.requireComponents(["position"])
-  );
+  const dAngle = getAngleDiff(entity, path);
 
   const distance = norm(path) as number;
   const angleOffset = Math.abs(dAngle);
@@ -117,7 +114,7 @@ function setFlybyDrive(entity: Navigable, delta: number) {
   const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
   const maxSpeedLimited = Math.min(drive.limit ?? defaultDriveLimit, maxSpeed);
   const deltaSpeedMultiplier =
-    angleOffset > Math.PI / 3 ? random(0.1, 0.55) : 1;
+    angleOffset > Math.PI / 3 ? random(0.55, 0.8) : 1;
   movable.velocity = Math.max(
     0,
     Math.min(
@@ -165,22 +162,19 @@ function setDrive(entity: Navigable, delta: number) {
     return;
   }
 
-  const path = [
+  const path: Position2D = [
     targetPosition[0] - entityPosition.coord[0],
     targetPosition[1] - entityPosition.coord[1],
   ];
 
-  const dAngle = getAngleDiff(
-    entity,
-    targetEntity.requireComponents(["position"])
-  );
+  const dAngle = getAngleDiff(entity, path);
 
   const distance = norm(path) as number;
   const angleOffset = Math.abs(dAngle);
 
   movable.rotary = getDeltaAngle(dAngle, drive.rotary, delta);
 
-  if (distance < 0.1) {
+  if (distance <= drive.minimalDistance) {
     movable.velocity = 0;
     drive.targetReached = true;
     if (targetEntity.cp.disposable) {
@@ -214,14 +208,6 @@ function setDrive(entity: Navigable, delta: number) {
     }
   } else {
     entity.cp.drive.limit = defaultDriveLimit;
-
-    if (distance <= drive.minimalDistance) {
-      movable.velocity = 0;
-      drive.targetReached = true;
-      if (targetEntity.cp.disposable) {
-        targetEntity.unregister();
-      }
-    }
 
     if (
       canCruise &&

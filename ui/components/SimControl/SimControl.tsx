@@ -71,7 +71,7 @@ export const SimControl: React.FC = () => {
       onTurbo={
         isDev
           ? () => {
-              sim.setSpeed(50);
+              sim.setSpeed(20);
               sim.start();
             }
           : undefined

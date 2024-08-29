@@ -93,12 +93,12 @@ describe("Ship", () => {
   });
 
   it("is able to go to target position", () => {
-    ship.cp.position.angle = 1.5 * Math.PI;
+    ship.cp.position.coord = [0, 0];
     setTarget(
       ship,
       createWaypoint(sim, {
         sector: sector.id,
-        value: [0, 0],
+        value: [1, 0],
         owner: 0,
       }).id
     );
@@ -145,7 +145,7 @@ describe("Ship", () => {
     });
 
     orderExecutingSystem.exec();
-    for (let index = 0; index < 7; index++) {
+    for (let index = 0; index < 9; index++) {
       navigatingSystem.exec(1);
       movingSystem.exec(1);
     }

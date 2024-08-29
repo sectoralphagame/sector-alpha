@@ -233,11 +233,22 @@ export const graphics: Graphics = {
           entityPos[1] * 10,
           entity.cp.damage.range * 10
         )
-        .lineStyle({
-          width: 0.2,
-          color: 0x0000ff,
-        })
-        .drawCircle(entityPos[0] * 10, entityPos[1] * 10, spottingRadius * 10);
+        .closePath();
+
+      for (let i = 2; i < 10; i += 2) {
+        g.arc(
+          entityPos[0] * 10,
+          entityPos[1] * 10,
+          entity.cp.damage.range * i,
+          -entity.cp.damage.angle / 2 + entity.cp.position!.angle,
+          entity.cp.damage.angle / 2 + entity.cp.position!.angle
+        ).closePath();
+      }
+
+      g.lineStyle({
+        width: 0.2,
+        color: 0x0000ff,
+      }).drawCircle(entityPos[0] * 10, entityPos[1] * 10, spottingRadius * 10);
     }
   },
   waypoint: ({ g, entity }) => {

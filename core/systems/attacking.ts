@@ -94,10 +94,16 @@ export class AttackingSystem extends System {
       const target = this.sim
         .getOrThrow(entity.cp.damage.targetId)
         .requireComponents(["position", "hitpoints"]);
+      const entityOrParent = findInAncestors(entity, "position");
 
       if (
         !isInDistance(entity, target) ||
-        Math.abs(getAngleDiff(findInAncestors(entity, "position"), target)) >
+        Math.abs(
+          getAngleDiff(entityOrParent, [
+            target.cp.position.coord[0] - entityOrParent.cp.position.coord[0],
+            target.cp.position.coord[1] - entityOrParent.cp.position.coord[1],
+          ])
+        ) >
           entity.cp.damage.angle / 2
       )
         continue;
@@ -110,7 +116,7 @@ export class AttackingSystem extends System {
           getEvasionChance(target.cp.movable.velocity, target.cp.dockable.size)
       ) {
         changeHp(target, entity.cp.damage.value);
-        const parentEntity = findInAncestors(entity, "position");
+        const parentEntity = entityOrParent;
 
         if (target.hasComponents(["drive", "movable"])) {
           stopCruise(target);

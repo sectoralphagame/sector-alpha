@@ -26,6 +26,10 @@ export interface Render extends BaseComponent<"render"> {
    * Bitmask of reasons why the entity is hidden.
    */
   hidden: number;
+  /**
+   * Indicates that the sprite can be rotated.
+   */
+  static: boolean;
   interactive: boolean;
 }
 
@@ -48,6 +52,7 @@ export function createRender({
     layer,
     texture,
     hidden: 0,
+    static: false,
     interactive: false,
   };
 
