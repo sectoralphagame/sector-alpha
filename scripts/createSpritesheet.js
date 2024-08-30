@@ -16,6 +16,7 @@ Promise.all(
         .resize(size, size, {
           fit: "inside",
         })
+        .rotate(90)
         .toFile(newName);
 
       return newName;

@@ -17,15 +17,14 @@ export function getSubordinates(entity: RequireComponent<"subordinates">) {
   );
 }
 
-// eslint-disable-next-line no-underscore-dangle
-function _normalizeAngle(value: number, start: number, end: number): number {
-  const width = end - start;
-  const offsetValue = value - start;
+export function getAngleDiff(
+  origin: RequireComponent<"position">,
+  path: Position2D
+): number {
+  const pathAngle = Math.atan2(path[1], path[0]);
+  const dAngle = pathAngle - origin.cp.position.angle;
 
-  return offsetValue - Math.floor(offsetValue / width) * width + start;
-}
-export function normalizeAngle(value: number): number {
-  return _normalizeAngle(value, -Math.PI, Math.PI);
+  return Math.atan2(Math.sin(dAngle), Math.cos(dAngle));
 }
 
 export function getRandomPositionInBounds(

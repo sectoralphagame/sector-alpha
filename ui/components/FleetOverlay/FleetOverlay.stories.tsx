@@ -44,6 +44,7 @@ const fleets = Array(3)
       interactive: true,
       layer: "ship",
       name: "render",
+      static: false,
       hidden: 0,
     };
 
@@ -91,6 +92,7 @@ const fleets = Array(3)
                     interactive: true,
                     layer: "ship",
                     name: "render",
+                    static: false,
                     hidden: 0,
                   };
 
@@ -134,6 +136,7 @@ const unassigned = Array(5)
       interactive: true,
       layer: "ship",
       name: "render",
+      static: false,
       hidden: 0,
     };
 

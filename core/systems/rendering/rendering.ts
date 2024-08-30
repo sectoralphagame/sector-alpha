@@ -63,11 +63,12 @@ export class RenderingSystem extends SystemWithHooks<never> {
   viewport: Viewport;
   app: PIXI.Application;
   initialized = false;
+  enableResizing = true;
   resizeObserver: ResizeObserver;
   dragging: boolean = false;
   keysPressed = new Set<string>();
-  toolbar: HTMLDivElement;
-  overlay: HTMLDivElement;
+  toolbar: HTMLDivElement | null;
+  overlay: HTMLDivElement | null;
   grid: RequireComponent<"renderGraphics"> | null = null;
   layers: Record<Layer, PIXI.Container>;
   sectorIndex = new SectorIndex(["render"]);
@@ -95,8 +96,8 @@ export class RenderingSystem extends SystemWithHooks<never> {
 
   init = () => {
     this.settingsManager = first(this.sim.index.settings.getIt())!;
-    this.toolbar = document.querySelector("#toolbar")!;
-    this.overlay = document.querySelector("#overlay")!;
+    this.toolbar = document.querySelector("#toolbar");
+    this.overlay = document.querySelector("#overlay");
     const root = document.querySelector("#root")!;
     const canvasRoot = document.querySelector(
       "#canvasRoot"
@@ -198,11 +199,13 @@ export class RenderingSystem extends SystemWithHooks<never> {
 
     this.viewport.sortableChildren = true;
 
-    this.resizeObserver = new ResizeObserver(() => {
-      this.app.resizeTo = canvasRoot;
-      this.viewport.resize(root.clientWidth, window.innerHeight);
-    });
-    this.resizeObserver.observe(canvasRoot);
+    if (this.enableResizing) {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.app.resizeTo = canvasRoot;
+        this.viewport.resize(root.clientWidth, window.innerHeight);
+      });
+      this.resizeObserver.observe(canvasRoot);
+    }
 
     this.viewport.scale.set(this.settingsManager.cp.camera.zoom);
     this.viewport.moveCenter(
@@ -233,7 +236,10 @@ export class RenderingSystem extends SystemWithHooks<never> {
 
   initListeners = () => {
     window.addEventListener("keydown", (event) => {
-      if (event.target !== document.body || this.overlay?.children.length > 0)
+      if (
+        event.target !== document.body ||
+        Number(this.overlay?.children.length) > 0
+      )
         return;
 
       this.keysPressed.add(event.key);
@@ -317,7 +323,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
 
   destroy = (): void => {
     storageHook.unsubscribe(this.onSettingsChange);
-    this.resizeObserver.disconnect();
+    this.resizeObserver?.disconnect();
     this.viewport.destroy();
     this.app.destroy(true);
   };
@@ -400,7 +406,9 @@ export class RenderingSystem extends SystemWithHooks<never> {
             (sectorPos[0] + entity.cp.position.coord[0]) * 10,
             (sectorPos[1] + entity.cp.position.coord[1]) * 10
           );
-          sprite!.rotation = entity.cp.position.angle;
+          sprite!.rotation = entity.cp.render.static
+            ? -Math.PI / 2
+            : entity.cp.position.angle;
         }
 
         if (getTexture(entityRender.texture) !== sprite?.texture) {

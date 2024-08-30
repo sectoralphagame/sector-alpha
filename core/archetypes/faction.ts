@@ -12,6 +12,7 @@ export const factionComponents = [
   "journal",
   "name",
   "relations",
+  "policies",
 ] as const;
 
 export type FactionComponent = (typeof factionComponents)[number];
@@ -36,7 +37,11 @@ export function createFaction(name: string, sim: Sim) {
     .addComponent({ name: "name", value: name })
     .addComponent({ name: "blueprints", ships: [], facilityModules: [] })
     .addComponent({ name: "journal", entries: [] })
-    .addComponent({ name: "relations", values: {} });
+    .addComponent({ name: "relations", values: {} })
+    .addComponent({
+      name: "policies",
+      enemySpotted: { civilian: "ignore", military: "ignore" },
+    });
 
   return entity as Faction;
 }

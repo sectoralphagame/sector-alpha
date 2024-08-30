@@ -118,7 +118,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
 
         const [x, y] = FogOfWarUpdatingSystem.getBox(position.coord);
 
-        const r = entity.tags.has("facility") ? 7 : 4;
+        const r = entity.tags.has("facility") ? 8 : 5;
 
         for (let i = -r; i <= r; i++) {
           for (let j = -r; j <= r; j++) {

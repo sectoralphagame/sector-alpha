@@ -8,9 +8,10 @@ type Movable = RequireComponent<"movable" | "position">;
 function move(entity: Movable, delta: number) {
   const entityPosition = entity.cp.position;
 
-  // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
-  const entityAngle = entityPosition.angle - Math.PI / 2;
-  const moveVec = [Math.cos(entityAngle), Math.sin(entityAngle)];
+  const moveVec = [
+    Math.cos(entityPosition.angle),
+    Math.sin(entityPosition.angle),
+  ];
   const dAngle = entity.cp.movable.rotary;
   const dPos = entity.cp.movable.velocity * delta;
 

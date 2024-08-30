@@ -26,7 +26,7 @@ import spritesheet from "./spritesheet.png";
 export const manifest = {
   frames: {
     asteroid: {
-      frame: { x: 504, y: 0, w: 96, h: 126 },
+      frame: { x: 0, y: 378, w: 126, h: 96 },
       src: "./assets/icons/asteroid.svg",
     },
     box: {
@@ -62,57 +62,57 @@ export const manifest = {
       src: "./assets/icons/f_teleport.svg",
     },
     lBld: {
-      frame: { x: 252, y: 378, w: 126, h: 82 },
+      frame: { x: 479, y: 252, w: 82, h: 126 },
       src: "./assets/icons/l_bld.svg",
     },
     lCiv: {
-      frame: { x: 252, y: 252, w: 126, h: 101 },
+      frame: { x: 252, y: 252, w: 101, h: 126 },
       src: "./assets/icons/l_civ.svg",
     },
     lMil: {
-      frame: { x: 378, y: 0, w: 126, h: 101 },
+      frame: { x: 378, y: 0, w: 101, h: 126 },
       src: "./assets/icons/l_mil.svg",
     },
     lMin: {
-      frame: { x: 378, y: 101, w: 126, h: 101 },
+      frame: { x: 378, y: 126, w: 101, h: 126 },
       src: "./assets/icons/l_min.svg",
     },
     lStg: {
-      frame: { x: 378, y: 378, w: 126, h: 82 },
+      frame: { x: 580, y: 0, w: 82, h: 126 },
       src: "./assets/icons/l_stg.svg",
     },
     mCiv: {
-      frame: { x: 378, y: 202, w: 126, h: 101 },
+      frame: { x: 378, y: 252, w: 101, h: 126 },
       src: "./assets/icons/m_civ.svg",
     },
     mMil: {
-      frame: { x: 0, y: 378, w: 126, h: 101 },
+      frame: { x: 479, y: 0, w: 101, h: 126 },
       src: "./assets/icons/m_mil.svg",
     },
     mMin: {
-      frame: { x: 126, y: 378, w: 126, h: 101 },
+      frame: { x: 479, y: 126, w: 101, h: 126 },
       src: "./assets/icons/m_min.svg",
     },
     sCiv: {
-      frame: { x: 0, y: 479, w: 126, h: 76 },
+      frame: { x: 580, y: 126, w: 76, h: 126 },
       src: "./assets/icons/s_civ.svg",
     },
     sMil: {
-      frame: { x: 126, y: 479, w: 126, h: 76 },
+      frame: { x: 580, y: 252, w: 76, h: 126 },
       src: "./assets/icons/s_mil.svg",
     },
     sMin: {
-      frame: { x: 252, y: 479, w: 126, h: 76 },
+      frame: { x: 0, y: 474, w: 76, h: 126 },
       src: "./assets/icons/s_min.svg",
     },
   },
   meta: {
     image: spritesheet,
     format: "RGBA8888",
-    size: { w: 600, h: 555 },
+    size: { w: 662, h: 600 },
     scale: "4",
   },
-  properties: { width: 600, height: 555 },
+  properties: { width: 662, height: 600 },
 } as const;
 
 export {

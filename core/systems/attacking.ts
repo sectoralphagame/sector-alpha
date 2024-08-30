@@ -7,6 +7,7 @@ import { distance } from "mathjs";
 import type { DockSize } from "@core/components/dockable";
 import type { Entity } from "@core/entity";
 import { stopCruise } from "@core/utils/moving";
+import { getAngleDiff } from "@core/utils/misc";
 import { regenCooldown } from "./hitpointsRegenerating";
 import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
@@ -82,63 +83,72 @@ export class AttackingSystem extends System {
     if (this.sim.getTime() < settings.bootTime) return;
 
     for (const entity of this.index.getIt()) {
-      if (entity.cp.damage.targetId && entity.cooldowns.canUse(cdKey)) {
-        if (!this.sim.entities.has(entity.cp.damage.targetId)) {
-          entity.cp.damage.targetId = null;
-          continue;
-        }
+      if (!(entity.cp.damage.targetId && entity.cooldowns.canUse(cdKey)))
+        continue;
 
-        const target = this.sim
-          .getOrThrow(entity.cp.damage.targetId)
-          .requireComponents(["position", "hitpoints"]);
-
-        if (isInDistance(entity, target)) {
-          entity.cooldowns.use(cdKey, entity.cp.damage.cooldown);
-          if (
-            !target.cp.movable ||
-            !target.cp.dockable ||
-            Math.random() >
-              getEvasionChance(
-                target.cp.movable.velocity,
-                target.cp.dockable.size
-              )
-          ) {
-            changeHp(target, entity.cp.damage.value);
-            const parentEntity = findInAncestors(entity, "position");
-
-            if (target.hasComponents(["drive", "movable"])) {
-              stopCruise(target);
-            }
-            if (shouldAttackBack(entity, target)) {
-              if (target.cp.orders) {
-                attack(target.requireComponents(["orders"]), entity);
-              }
-            } else if (
-              target.cp.damage &&
-              !target.tags.has("role:military") &&
-              (!target.cp.damage.targetId ||
-                (this.sim.get(target.cp.damage.targetId) &&
-                  !isInDistance(
-                    target.requireComponents(["damage"]),
-                    this.sim.get(target.cp.damage.targetId)!
-                  )))
-            ) {
-              target.cp.damage.targetId = parentEntity.id;
-            }
-            target.cp.subordinates?.ids.forEach((subordinateId) => {
-              const subordinate = this.sim
-                .getOrThrow(subordinateId)
-                .requireComponents(["orders"]);
-
-              if (subordinate.cp.orders.value[0]?.type === "escort") {
-                attack(subordinate, parentEntity);
-              }
-            });
-          }
-
-          target.cooldowns.use(regenCooldown, 2);
-        }
+      if (!this.sim.entities.has(entity.cp.damage.targetId)) {
+        entity.cp.damage.targetId = null;
+        continue;
       }
+
+      const target = this.sim
+        .getOrThrow(entity.cp.damage.targetId)
+        .requireComponents(["position", "hitpoints"]);
+      const entityOrParent = findInAncestors(entity, "position");
+
+      if (
+        !isInDistance(entity, target) ||
+        Math.abs(
+          getAngleDiff(entityOrParent, [
+            target.cp.position.coord[0] - entityOrParent.cp.position.coord[0],
+            target.cp.position.coord[1] - entityOrParent.cp.position.coord[1],
+          ])
+        ) >
+          entity.cp.damage.angle / 2
+      )
+        continue;
+
+      entity.cooldowns.use(cdKey, entity.cp.damage.cooldown);
+      if (
+        !target.cp.movable ||
+        !target.cp.dockable ||
+        Math.random() >
+          getEvasionChance(target.cp.movable.velocity, target.cp.dockable.size)
+      ) {
+        changeHp(target, entity.cp.damage.value);
+        const parentEntity = entityOrParent;
+
+        if (target.hasComponents(["drive", "movable"])) {
+          stopCruise(target);
+        }
+        if (shouldAttackBack(entity, target)) {
+          if (target.cp.orders) {
+            attack(target.requireComponents(["orders"]), entity);
+          }
+        } else if (
+          target.cp.damage &&
+          !target.tags.has("role:military") &&
+          (!target.cp.damage.targetId ||
+            (this.sim.get(target.cp.damage.targetId) &&
+              !isInDistance(
+                target.requireComponents(["damage"]),
+                this.sim.get(target.cp.damage.targetId)!
+              )))
+        ) {
+          target.cp.damage.targetId = parentEntity.id;
+        }
+        target.cp.subordinates?.ids.forEach((subordinateId) => {
+          const subordinate = this.sim
+            .getOrThrow(subordinateId)
+            .requireComponents(["orders"]);
+
+          if (subordinate.cp.orders.value[0]?.type === "escort") {
+            attack(subordinate, parentEntity);
+          }
+        });
+      }
+
+      target.cooldowns.use(regenCooldown, 2);
     }
   };
 }

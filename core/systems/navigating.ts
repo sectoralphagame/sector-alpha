@@ -1,5 +1,5 @@
 import { random, norm } from "mathjs";
-import { normalizeAngle } from "@core/utils/misc";
+import { getAngleDiff } from "@core/utils/misc";
 import type { Position2D } from "@core/components/position";
 import type { Driveable } from "@core/utils/moving";
 import { clearTarget, startCruise, stopCruise } from "@core/utils/moving";
@@ -17,7 +17,7 @@ function hold(entity: Navigable) {
     if (entity.cp.owner) {
       if (
         entity.sim.getOrThrow(entity.cp.owner.id).cp.ai ||
-        entity.cp.orders.value[0].origin === "auto"
+        entity.cp.orders.value[0]?.origin === "auto"
       ) {
         entity.cp.orders.value = [];
       }
@@ -37,8 +37,8 @@ function getFormationPlace(
   const angle = commander.cp.position.angle;
   const distance = 0.1;
 
-  const x = (subordinateIndex - (subordinatesCount - 1) / 2) * 0.3;
-  const y = distance;
+  const x = distance;
+  const y = (subordinateIndex - (subordinatesCount - 1) / 2) * 0.3;
 
   return [
     x * Math.cos(angle) - y * Math.sin(angle) + commander.cp.position.coord[0],
@@ -47,17 +47,15 @@ function getFormationPlace(
 }
 
 export function getDeltaAngle(
-  targetAngle: number,
-  entityAngle: number,
+  dAngle: number,
   rotary: number,
   delta: number
 ): number {
-  const angleDiff = normalizeAngle(targetAngle - entityAngle);
-  const angleOffset = Math.abs(angleDiff);
+  const angleOffset = Math.abs(dAngle);
 
   return angleOffset > rotary * delta
-    ? rotary * delta * Math.sign(angleDiff)
-    : angleDiff;
+    ? rotary * delta * Math.sign(dAngle)
+    : dAngle + Math.random() * 0.02 * -Math.sign(dAngle);
 }
 
 const cruiseTimer = "cruise";
@@ -69,30 +67,31 @@ function setFlybyDrive(entity: Navigable, delta: number) {
   const targetEntity = entity.sim.get(drive.target!)!;
   const targetPosition = targetEntity.cp.position!;
 
-  const path = [
+  const path: Position2D = [
     targetPosition.coord[0] - entityPosition.coord[0],
     targetPosition.coord[1] - entityPosition.coord[1],
   ];
-
-  const entityAngle = normalizeAngle(
-    // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
-    entityPosition.angle - Math.PI / 2
-  );
-  const targetAngle = Math.atan2(path[1], path[0]);
+  const dAngle = getAngleDiff(entity, path);
 
   const distance = norm(path) as number;
-  const angleOffset = Math.abs(normalizeAngle(targetAngle - entityAngle));
-  const isInRange = (targetEntity.cp.damage?.range ?? 0) + 0.2 > distance;
+  const angleOffset = Math.abs(dAngle);
+  const isInRange =
+    (targetEntity.cp.damage?.range ?? 0) + 0.2 > distance &&
+    angleOffset < (entity.cp.damage?.angle || 0);
 
   const shieldsUp = entity.cp.hitpoints?.shield
     ? entity.cp.hitpoints.shield.value / entity.cp.hitpoints.shield.max > 0.5
     : true;
 
-  movable.rotary =
-    angleOffset > Math.PI * 0.85 &&
-    (isInRange || !shieldsUp || Math.random() > 0.3)
-      ? 0
-      : getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
+  if (Math.PI - Math.abs(dAngle) < 0.1) {
+    movable.rotary = drive.rotary * delta * Math.random() > 0.5 ? 1 : -1;
+  } else {
+    movable.rotary =
+      angleOffset > Math.PI * 0.85 &&
+      (isInRange || !shieldsUp || Math.random() > 0.3)
+        ? 0
+        : getDeltaAngle(dAngle, drive.rotary, delta);
+  }
 
   const canCruise =
     distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
@@ -115,7 +114,7 @@ function setFlybyDrive(entity: Navigable, delta: number) {
   const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
   const maxSpeedLimited = Math.min(drive.limit ?? defaultDriveLimit, maxSpeed);
   const deltaSpeedMultiplier =
-    angleOffset > Math.PI / 3 ? random(0.1, 0.55) : 1;
+    angleOffset > Math.PI / 3 ? random(0.55, 0.8) : 1;
   movable.velocity = Math.max(
     0,
     Math.min(
@@ -163,23 +162,19 @@ function setDrive(entity: Navigable, delta: number) {
     return;
   }
 
-  const path = [
+  const path: Position2D = [
     targetPosition[0] - entityPosition.coord[0],
     targetPosition[1] - entityPosition.coord[1],
   ];
 
-  const entityAngle = normalizeAngle(
-    // Offsetting so sprite (facing upwards) matches coords (facing rightwards)
-    entityPosition.angle - Math.PI / 2
-  );
-  const targetAngle = Math.atan2(path[1], path[0]);
+  const dAngle = getAngleDiff(entity, path);
 
   const distance = norm(path) as number;
-  const angleOffset = Math.abs(targetAngle - entityAngle);
+  const angleOffset = Math.abs(dAngle);
 
-  movable.rotary = getDeltaAngle(targetAngle, entityAngle, drive.rotary, delta);
+  movable.rotary = getDeltaAngle(dAngle, drive.rotary, delta);
 
-  if (distance < 0.1) {
+  if (distance <= drive.minimalDistance) {
     movable.velocity = 0;
     drive.targetReached = true;
     if (targetEntity.cp.disposable) {
@@ -214,14 +209,6 @@ function setDrive(entity: Navigable, delta: number) {
   } else {
     entity.cp.drive.limit = defaultDriveLimit;
 
-    if (distance <= drive.minimalDistance) {
-      movable.velocity = 0;
-      drive.targetReached = true;
-      if (targetEntity.cp.disposable) {
-        targetEntity.unregister();
-      }
-    }
-
     if (
       canCruise &&
       drive.state === "maneuver" &&
@@ -238,17 +225,16 @@ function setDrive(entity: Navigable, delta: number) {
 
   const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
   const maxSpeedLimited = Math.min(drive.limit ?? defaultDriveLimit, maxSpeed);
-  const speedMultiplier = angleOffset < Math.PI / 8 ? 1 : 0;
+  const speedMultiplier = angleOffset < Math.PI / 8 ? 1 : -1;
 
-  movable.velocity =
-    speedMultiplier *
-    Math.max(
-      0,
-      Math.min(
-        movable.velocity + maxSpeed * drive.acceleration * delta,
-        maxSpeedLimited
-      )
-    );
+  movable.velocity = Math.max(
+    0,
+    Math.min(
+      movable.velocity +
+        speedMultiplier * maxSpeed * drive.acceleration * delta,
+      maxSpeedLimited
+    )
+  );
 }
 
 export class NavigatingSystem extends System {
