@@ -33,6 +33,7 @@ import { tradingSystem } from "@core/systems/trading";
 import { undeployingSystem } from "@core/systems/undeploying";
 import { fogOfWarUpdatingSystem } from "@core/systems/fogOfWarUpdating";
 import { storageTransferringSystem } from "@core/systems/storageTransferring";
+import { sectorClaimingSystem } from "@core/systems/sectorClaiming";
 import type { SimConfig } from "./Sim";
 
 export const bootstrapSystems = [
@@ -77,6 +78,7 @@ export const createBaseConfig = async (): Promise<SimConfig> => {
       missionSystem,
       pirateSpawningSystem,
       fogOfWarUpdatingSystem,
+      sectorClaimingSystem,
     ],
   };
 

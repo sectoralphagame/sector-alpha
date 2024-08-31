@@ -321,5 +321,13 @@
       "time": 370
     },
     "crew": { "cost": 21 }
+  },
+  {
+    "name": "Tau Hive",
+    "type": "special",
+    "pac": {},
+    "slug": "tauHive",
+    "build": { "cost": { "tauMetal": 9700, "fuel": 1550 }, "time": 1080 },
+    "crew": { "cost": 0 }
   }
 ]

@@ -85,7 +85,6 @@ const FacilityBuilder: React.FC = () => {
         {modules.map((fm, fmIndex) => (
           <div className={styles.selectedModule} key={fm.slug + fmIndex}>
             <IconButton
-              disabled={initialModules.includes(fm.slug)}
               onClick={() => {
                 setModuleIds((pfm) => pfm.filter((_, i) => i !== fmIndex));
                 setModified(true);
@@ -103,7 +102,13 @@ const FacilityBuilder: React.FC = () => {
           </DropdownButton>
           <DropdownOptions>
             {facilityModules
-              .filter((fm) => !initialModules.includes(fm.slug))
+              .filter(
+                (fm) =>
+                  !(
+                    initialModules.includes(fm.slug) &&
+                    !modules.find((m) => m.slug === fm.slug)
+                  )
+              )
               .map((fm) => (
                 <DropdownOption
                   key={fm.slug}

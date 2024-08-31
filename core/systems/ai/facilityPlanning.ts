@@ -1,4 +1,4 @@
-import type { Position2D } from "@core/components/position";
+import type { Position, Position2D } from "@core/components/position";
 import { isDev } from "@core/settings";
 import type { RequireComponent } from "@core/tsHelpers";
 import { discriminate } from "@core/utils/maps";
@@ -30,6 +30,28 @@ import { System } from "../system";
 import facilityTemplatesData from "../../world/data/facilityTemplates.json";
 
 const facilityTemplates = keyBy(facilityTemplatesData, "slug");
+
+function createFacilityFromTemplate(
+  template: string,
+  sim: Sim,
+  input: { owner: Faction; position: Pick<Position, "sector" | "coord"> }
+) {
+  const facility = createFacility(sim, {
+    owner: input.owner,
+    position: input.position.coord,
+    sector: sim.getOrThrow(input.position.sector),
+  });
+  facility.cp.name.value = createFacilityName(
+    facility,
+    facilityTemplates[template].name
+  );
+
+  for (const m of facilityTemplates[template].modules) {
+    addFacilityModule(facility, facilityModules[m].create(sim, facility));
+  }
+
+  return facility;
+}
 
 function isAbleToBuild(
   pac: Partial<PAC>,
@@ -202,7 +224,11 @@ export class FacilityPlanningSystem extends System<"plan"> {
   };
 
   planHubs = (faction: Faction): void => {
-    if (faction.cp.name.slug === "TAU") return;
+    if (faction.cp.name.slug === "TAU") {
+      this.planHives(faction);
+      return;
+    }
+
     for (const sector of this.sim.index.sectors.getIt()) {
       if (sector.cp.owner?.id !== faction.id) continue;
 
@@ -238,6 +264,26 @@ export class FacilityPlanningSystem extends System<"plan"> {
       }
 
       addStartingCommodities(facility);
+    }
+  };
+
+  planHives = (faction: Faction): void => {
+    for (const sector of this.sim.index.sectors.getIt()) {
+      if (sector.cp.owner?.id !== faction.id) continue;
+
+      const coord: Position2D = [
+        random(-sectorSize / 50, sectorSize / 50),
+        random(-sectorSize / 50, sectorSize / 50),
+      ];
+
+      const hive = createFacilityFromTemplate("outpostHive", this.sim, {
+        position: {
+          coord,
+          sector: sector.id,
+        },
+        owner: faction,
+      });
+      hive.cp.render.texture = "fHub";
     }
   };
 
@@ -337,19 +383,13 @@ export class FacilityPlanningSystem extends System<"plan"> {
 
         if (!sectorWithSSF) return;
 
-        const ssf = createFacility(this.sim, {
+        createFacilityFromTemplate("baseFarm", this.sim, {
+          position: {
+            coord: getSectorPosition(sectorWithSSF),
+            sector: sectorWithSSF.id,
+          },
           owner: faction,
-          position: getSectorPosition(sectorWithSSF),
-          sector: sectorWithSSF,
         });
-        ssf.cp.name.value = createFacilityName(
-          ssf,
-          facilityTemplates.baseFarm.name
-        );
-
-        for (const m of facilityTemplates.baseFarm.modules) {
-          addFacilityModule(ssf, facilityModules[m].create(this.sim, ssf));
-        }
 
         this.sim.index.sectors
           .get()
