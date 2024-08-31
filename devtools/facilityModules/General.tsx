@@ -54,6 +54,7 @@ const FacilityModuleGeneralEditor: React.FC<{ index: number }> = ({
             <SelectOption value="habitat">Habitat</SelectOption>
             <SelectOption value="military">Military</SelectOption>
             <SelectOption value="hub">Hub</SelectOption>
+            <SelectOption value="special">Special</SelectOption>
           </SelectOptions>
         </Select>
       </TableCell>

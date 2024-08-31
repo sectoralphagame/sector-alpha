@@ -4,21 +4,33 @@ import { defaultIndexer } from "./utils/default";
 import { EntityIndex } from "./utils/entityIndex";
 
 export class SectorClaimingSystem extends System<"exec"> {
-  index = new EntityIndex(["parent"], ["facilityModuleType:hub"]);
+  hubIndex = new EntityIndex(["parent"], ["facilityModuleType:hub"]);
+  hiveIndex = new EntityIndex(
+    ["name", "parent"],
+    ["facilityModuleType:special"]
+  );
 
   apply = (sim: Sim): void => {
     super.apply(sim);
-    this.index.apply(sim);
+    this.hubIndex.apply(sim);
+    this.hiveIndex.apply(sim);
 
+    this.cooldowns.timers.exec = 2;
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (): void => {
-    if (this.cooldowns.canUse("exec")) {
-      this.cooldowns.use("exec", 1);
-
-      const hubs = this.index
+    this.cooldowns.doEvery("exec", 1, () => {
+      const hubs = this.hubIndex
         .get()
+        .map((e) =>
+          this.sim
+            .getOrThrow(e.cp.parent.id)
+            .requireComponents(["owner", "position"])
+        );
+      const hives = this.hiveIndex
+        .get()
+        .filter((e) => e.cp.name.slug === "tauHive")
         .map((e) =>
           this.sim
             .getOrThrow(e.cp.parent.id)
@@ -26,15 +38,29 @@ export class SectorClaimingSystem extends System<"exec"> {
         );
 
       for (const sector of defaultIndexer.sectors.getIt()) {
-        const hub = hubs.find((h) => h.cp.position.sector === sector.id);
+        if (sector.hasComponents(["owner"])) {
+          const hubOrHive = [...hubs, ...hives].find(
+            (h) =>
+              h.cp.position.sector === sector.id &&
+              h.cp.owner.id === sector.cp.owner.id
+          );
+          if (!hubOrHive) {
+            sector.removeComponent("owner");
+            sector.cp.renderGraphics.redraw = true;
+            return;
+          }
+        } else {
+          const hubOrHive = [...hubs, ...hives].find(
+            (h) => h.cp.position.sector === sector.id
+          );
 
-        if (!sector.cp.owner && hub) {
-          sector.addComponent({ name: "owner", id: hub.cp.owner.id });
-        } else if (!hub) {
-          sector.removeComponent("owner");
+          if (hubOrHive) {
+            sector.addComponent({ name: "owner", id: hubOrHive.cp.owner.id });
+            sector.cp.renderGraphics.redraw = true;
+          }
         }
       }
-    }
+    });
   };
 }
 

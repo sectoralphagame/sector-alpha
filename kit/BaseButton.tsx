@@ -13,12 +13,12 @@ export type BaseButtonProps = React.DetailedHTMLProps<
 
 export const defaultClickSound = new Howl({
   src: click,
-  volume: 0.5,
+  volume: 0.2,
 });
 
 export const popSound = new Howl({
   src: pop,
-  volume: 0.5,
+  volume: 0.2,
 });
 
 export const BaseButton: React.FC<BaseButtonProps> = ({

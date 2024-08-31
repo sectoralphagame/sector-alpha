@@ -15,5 +15,20 @@
       "farm",
       "farm"
     ]
+  },
+  {
+    "name": "Outpost Hive",
+    "slug": "outpostHive",
+    "modules": [
+      "tauHive",
+      "tauHive",
+      "tauHive",
+      "smallDefense",
+      "smallDefense",
+      "smallDefense",
+      "smallDefense",
+      "smallDefense",
+      "smallDefense"
+    ]
   }
 ]

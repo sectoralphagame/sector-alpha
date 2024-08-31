@@ -49,6 +49,9 @@ export interface MilitaryFacilityModuleInput extends FacilityModuleCommonInput {
   damage: Omit<Damage, "name">;
   type: "military";
 }
+export interface SpecialFacilityModuleInput extends FacilityModuleCommonInput {
+  type: "special";
+}
 export type FacilityModuleInput =
   | ProductionFacilityModuleInput
   | StorageFacilityModuleInput
@@ -56,7 +59,8 @@ export type FacilityModuleInput =
   | TeleportFacilityModuleInput
   | HabitatFacilityModuleInput
   | MilitaryFacilityModuleInput
-  | HubFacilityModuleInput;
+  | HubFacilityModuleInput
+  | SpecialFacilityModuleInput;
 
 export type FacilityModuleType = FacilityModuleInput["type"];
 export type FacilityModule = RequireComponent<"parent" | "name">;
@@ -76,6 +80,7 @@ export function createFacilityModule(
     .addComponent({
       name: "name",
       value: input.name,
+      slug: input.slug,
     })
     .addTag("facilityModule")
     .addTag(`facilityModuleType:${input.type}`);
