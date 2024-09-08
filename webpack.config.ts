@@ -102,8 +102,12 @@ const config = {
         use: ["./build/conversation-loader.ts"],
       },
       {
-        test: /\.(svg|png|jpe?g|wav)$/,
+        test: /\.(svg|png|jpe?g|wav|glb)$/,
         type: "asset/resource",
+      },
+      {
+        test: /\.glsl$/,
+        type: "asset/source",
       },
     ],
   },
