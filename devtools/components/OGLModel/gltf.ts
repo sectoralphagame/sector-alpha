@@ -1,6 +1,7 @@
+import { Program, Vec3 } from "ogl";
 import type { GLTF, OGLRenderingContext, Transform } from "ogl";
-import { Vec3 } from "ogl";
-import { createProgram } from "./program";
+import fragment from "./shader.frag.glsl";
+import vertex from "./shader.vert.glsl";
 
 export function addGLTF(
   gl: OGLRenderingContext,
@@ -14,7 +15,21 @@ export function addGLTF(
     root.setParent(scene);
     root.traverse((node) => {
       if (node?.program) {
-        node.program = createProgram(gl, node);
+        const material = node.program.gltfMaterial || {};
+        console.log(material);
+
+        node.program = new Program(gl, {
+          vertex,
+          fragment,
+          uniforms: {
+            tDiffuse: { value: material.baseColorTexture.texture },
+            tNormal: { value: material.normalTexture.texture },
+            lightColor: { value: new Vec3(1, 1, 1) },
+            lightDirection: { value: new Vec3(0, 1, 0) },
+            uNormalScale: { value: 1 },
+            uNormalUVScale: { value: 1 },
+          },
+        });
       }
     });
   });

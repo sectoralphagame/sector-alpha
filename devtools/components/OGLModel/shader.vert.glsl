@@ -8,11 +8,13 @@ in vec3 normal;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat3 normalMatrix;
+uniform mat4 modelMatrix;
 uniform vec3 lightColor;
 uniform vec3 lightDirection;
 
 out vec2 vUv;
 out vec3 vNormal;
+out vec3 vMPos;
 out vec3 vLighting;
 out vec3 FragPos;
 
@@ -20,14 +22,15 @@ void main() {
     FragPos = position;
     vUv = uv;
     vNormal = normalize(normalMatrix * normal);
+    vMPos = (modelMatrix * vec4(position, 1.0)).xyz;
 
-    highp vec3 ambientLight = vec3(0.04);
+    highp vec3 ambientLight = vec3(0.4);
     highp vec3 directionalVector = normalize(lightDirection);
 
     highp vec3 transformedNormal = normalMatrix * normal;
 
     highp float directional = max(dot(transformedNormal.xyz, lightDirection), 0.0);
-    vLighting = ambientLight + (lightColor * directional * 0.3);
+    vLighting = ambientLight + (lightColor * directional * 0.2);
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(FragPos, 1.0);
 }

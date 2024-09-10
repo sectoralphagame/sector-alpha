@@ -1,5 +1,5 @@
 import React from "react";
-import { Renderer, Camera, Transform, GLTFLoader } from "ogl";
+import { Renderer, Camera, Transform, GLTFLoader, Orbit } from "ogl";
 import sCiv1 from "@assets/models/ships/sCiv_1.glb";
 import { addGLTF } from "./gltf";
 
@@ -16,9 +16,12 @@ export const OGLModel: React.FC = () => {
     const gl = renderer.gl;
 
     const camera = new Camera(gl);
-    camera.position.x = 15;
-    camera.position.z = 15;
+    camera.position.x = 5;
+    camera.position.y = 5;
+    camera.position.z = 5;
     camera.lookAt([0, 0, 0]);
+
+    const control = new Orbit(camera);
 
     function resize() {
       renderer.setSize(
@@ -44,7 +47,8 @@ export const OGLModel: React.FC = () => {
 
       function update(_t: number) {
         model.meshes[0].primitives[0].rotation.y -= 0.01;
-        model.meshes[0].primitives[0].rotation.x += 0.007;
+
+        control.update();
 
         requestAnimationFrame(update);
         renderer.render({ scene, camera });
