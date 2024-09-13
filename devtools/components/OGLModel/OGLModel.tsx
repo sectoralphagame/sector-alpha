@@ -1,7 +1,7 @@
 import React from "react";
 import { Renderer, Camera, Transform, GLTFLoader, Orbit } from "ogl";
 import sCiv1 from "@assets/models/ships/sCiv_1.glb";
-import { addGLTF } from "./gltf";
+import { addBasic } from "@ogl-engine/loaders/basic/basic";
 
 export const OGLModel: React.FC = () => {
   const [canvas, setCanvas] = React.useState<HTMLCanvasElement | null>(null);
@@ -43,14 +43,14 @@ export const OGLModel: React.FC = () => {
     const scene = new Transform();
 
     GLTFLoader.load(gl, sCiv1).then((model) => {
-      addGLTF(gl, model, scene);
+      addBasic(gl, model, scene);
 
       function update(_t: number) {
-        model.meshes[0].primitives[0].rotation.y -= 0.01;
+        requestAnimationFrame(update);
 
         control.update();
+        model.meshes[0].primitives[0].rotation.y -= 0.01;
 
-        requestAnimationFrame(update);
         renderer.render({ scene, camera });
       }
       requestAnimationFrame(update);

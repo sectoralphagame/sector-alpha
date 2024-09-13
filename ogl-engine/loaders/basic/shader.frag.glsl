@@ -37,7 +37,7 @@ vec3 getNormal() {
 void main() {
     vec3 tex = texture(tDiffuse, vUv).rgb;
     vec3 normal = getNormal();
-    float shading = dot(normal, lightDirection) * 0.5;
+    float shading = max(dot(normal, lightDirection) * 0.1, 0.0);
 
     outColor = vec4((tex * vLighting) + shading, 1.0);
 }
