@@ -11,7 +11,7 @@ import type { Sector } from "@core/archetypes/sector";
 import { addBasic } from "@ogl-engine/loaders/basic/basic";
 import type { OGLCallback } from "@ogl-engine/OglCanvas";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
-import { MapControl } from "@ogl-engine/mapControl";
+import { MapControl } from "@ogl-engine/MapControl";
 
 const modelsToLoad = { sCiv };
 

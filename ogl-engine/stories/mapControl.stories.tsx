@@ -6,7 +6,7 @@ import { OglCanvas } from "ogl-engine/OglCanvas";
 import sCiv from "@assets/models/ships/sCiv_1.glb";
 import { AxesHelper, GLTFLoader } from "ogl";
 import { addBasic } from "@ogl-engine/loaders/basic/basic";
-import { MapControl } from "@ogl-engine/mapControl";
+import { MapControl } from "@ogl-engine/MapControl";
 
 const ModelStory: React.FC = () => {
   const controlRef = React.useRef<MapControl>();
