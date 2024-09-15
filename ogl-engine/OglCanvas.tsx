@@ -6,6 +6,7 @@ export type OGLCallback = (_opts: {
   gl: OGLRenderingContext;
   scene: Transform;
   camera: Camera;
+  canvas: HTMLCanvasElement;
 }) => void | Promise<void>;
 
 export interface OglCanvasProps {
@@ -13,63 +14,67 @@ export interface OglCanvasProps {
   onUpdate: OGLCallback;
 }
 
-export const OglCanvas: React.FC<OglCanvasProps> = ({ onInit, onUpdate }) => {
-  const [canvas, setCanvas] = React.useState<HTMLCanvasElement | null>(null);
-  const resizeObserver = React.useRef<ResizeObserver>();
+export const OglCanvas: React.FC<OglCanvasProps> = React.memo(
+  ({ onInit, onUpdate }) => {
+    const [canvas, setCanvas] = React.useState<HTMLCanvasElement | null>(null);
+    const resizeObserver = React.useRef<ResizeObserver>();
+    const frameIdRef = React.useRef<number>(0);
 
-  React.useEffect(() => {
-    const cleanup = () => {
-      resizeObserver.current?.disconnect();
-    };
-    if (!canvas) return cleanup;
+    React.useEffect(() => {
+      const cleanup = () => {
+        resizeObserver.current?.disconnect();
+        cancelAnimationFrame(frameIdRef.current);
+      };
+      if (!canvas) return cleanup;
 
-    const renderer = new Renderer({
-      canvas: canvas!,
-      dpr: 2,
-    });
-    const gl = renderer.gl;
-
-    const camera = new Camera(gl);
-    camera.position.x = 5;
-    camera.position.y = 5;
-    camera.position.z = 5;
-    camera.lookAt([0, 0, 0]);
-
-    function resize() {
-      renderer.setSize(
-        canvas!.parentElement!.clientWidth,
-        canvas!.parentElement!.clientHeight
-      );
-      camera.perspective({
-        aspect: gl.canvas.width / gl.canvas.height,
+      const renderer = new Renderer({
+        canvas: canvas!,
+        dpr: 2,
       });
-    }
-    resizeObserver.current = new ResizeObserver(resize);
-    resizeObserver.current.observe(canvas!.parentElement!);
+      const gl = renderer.gl;
 
-    setTimeout(resize, 1000);
+      const camera = new Camera(gl);
+      camera.position.x = 5;
+      camera.position.y = 5;
+      camera.position.z = 5;
+      camera.lookAt([0, 0, 0]);
 
-    const scene = new Transform();
+      function resize() {
+        renderer.setSize(
+          canvas!.parentElement!.clientWidth,
+          canvas!.parentElement!.clientHeight
+        );
+        camera.perspective({
+          aspect: gl.canvas.width / gl.canvas.height,
+        });
+      }
+      resizeObserver.current = new ResizeObserver(resize);
+      resizeObserver.current.observe(canvas!.parentElement!);
 
-    function update() {
-      requestAnimationFrame(update);
+      setTimeout(resize, 1000);
 
-      onUpdate({ gl, scene, camera });
+      const scene = new Transform();
 
-      renderer.render({ scene, camera });
-    }
+      function update() {
+        frameIdRef.current = requestAnimationFrame(update);
 
-    const ret = onInit({ gl, camera, scene });
-    if (ret) {
-      ret.then(() => {
+        onUpdate({ gl, scene, camera, canvas: canvas! });
+
+        renderer.render({ scene, camera });
+      }
+
+      const ret = onInit({ gl, camera, scene, canvas });
+      if (ret) {
+        ret.then(() => {
+          requestAnimationFrame(update);
+        });
+      } else {
         requestAnimationFrame(update);
-      });
-    } else {
-      requestAnimationFrame(update);
-    }
+      }
 
-    return cleanup;
-  }, [canvas, onInit, onUpdate]);
+      return cleanup;
+    }, [canvas, onInit, onUpdate]);
 
-  return <canvas ref={setCanvas} />;
-};
+    return <canvas ref={setCanvas} />;
+  }
+);

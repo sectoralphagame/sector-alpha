@@ -6,7 +6,7 @@ import type { OGLCallback } from "ogl-engine/OglCanvas";
 import { OglCanvas } from "ogl-engine/OglCanvas";
 import sCiv from "@assets/models/ships/sCiv_1.glb";
 import type { GLTF } from "ogl";
-import { GLTFLoader, Orbit } from "ogl";
+import { GLTFLoader, Orbit, Vec3 } from "ogl";
 import { addBasic } from "@ogl-engine/loaders/basic/basic";
 
 interface InstancingStoryProps {
@@ -49,6 +49,7 @@ const InstancingStory: React.FC<InstancingStoryProps> = ({ cubes }) => {
       size: 1,
       usage: gl.DYNAMIC_DRAW,
     });
+    model.meshes[0].primitives[0].scale = new Vec3(0.01);
   };
 
   const onUpdate: OGLCallback = () => {

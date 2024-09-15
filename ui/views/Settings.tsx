@@ -3,6 +3,7 @@ import { Button } from "@kit/Button";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { Slider } from "@kit/Slider";
+import { Howler } from "howler";
 import styles from "./Settings.scss";
 import useFullscreen from "../hooks/useFullscreen";
 import { View } from "../components/View";
@@ -49,6 +50,29 @@ export const Settings: React.FC = () => {
           max={14}
           min={6}
           step={0.5}
+        />
+      </div>
+      <hr />
+      <div className={styles.settingsRow}>
+        <div>UI Volume</div>
+        <Slider
+          value={settings.volume.ui}
+          onChange={(event) => {
+            const volume = Number(event.target.value);
+
+            setSettings((prevSettings) => ({
+              ...prevSettings,
+              volume: {
+                ...prevSettings.volume,
+                ui: volume,
+              },
+            }));
+
+            Howler.volume(volume);
+          }}
+          max={1}
+          min={0}
+          step={0.01}
         />
       </div>
       <hr />

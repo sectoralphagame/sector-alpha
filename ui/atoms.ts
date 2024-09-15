@@ -15,6 +15,7 @@ import type { NotificationProps } from "./components/Notifications";
 import type { Notification } from "./components/Notifications/types";
 import { useObservable } from "./hooks/useObservable";
 import type { ImmediateConversationDialogProps } from "./components/ImmediateConversation";
+import { useGameSettings } from "./hooks/useGameSettings";
 
 export const sim = atom<Sim>({
   key: "sim",
@@ -66,6 +67,7 @@ export const notificationsAtom = atom<Notification[]>({
   default: [],
 });
 export const useNotifications = () => {
+  const [settings] = useGameSettings();
   const [notifications, setNotifications] = useRecoilState(notificationsAtom);
 
   const removeNotification = (id: number) => {
@@ -83,6 +85,7 @@ export const useNotifications = () => {
       ...prevNotifications,
       { ...notification, id },
     ]);
+    notificationHowl.volume(settings.volume.ui);
     notificationHowl.play();
     if (notification.expires) {
       setTimeout(() => removeNotification(id), notification.expires);
