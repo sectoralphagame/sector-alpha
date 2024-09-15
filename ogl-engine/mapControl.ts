@@ -31,22 +31,22 @@ export class MapControl {
   zoomRange = [10, 1000];
 
   dragPrev: Vec2 | null = null;
-  dragMove: Vec2 = new Vec2();
+  mouse: Vec2 = new Vec2();
 
   constructor(camera: Camera) {
     this.camera = camera;
 
     document.addEventListener("pointerdown", (event) => {
       this.dragPrev = new Vec2(event.clientX, event.clientY);
-      this.dragMove.set(event.clientX, event.clientY);
+      this.mouse.set(event.clientX, event.clientY);
     });
     document.addEventListener("pointerup", () => {
       this.dragPrev = null;
-      this.dragMove.set(0, 0);
+      this.mouse.set(0, 0);
     });
     document.addEventListener("mousemove", (event) => {
       if (this.dragPrev) {
-        this.dragMove.set(event.clientX, event.clientY);
+        this.mouse.set(event.clientX, event.clientY);
       }
     });
     document.addEventListener("wheel", (event) => {
@@ -75,9 +75,9 @@ export class MapControl {
     const offset = new Vec3();
 
     if (this.dragPrev) {
-      const move = this.dragMove.clone().sub(this.dragPrev);
+      const move = this.mouse.clone().sub(this.dragPrev);
       offset.set(-move[1] / 100, 0, move[0] / 100);
-      this.dragPrev.set(this.dragMove);
+      this.dragPrev.set(this.mouse);
     }
 
     for (const key of this.keysPressed) {
