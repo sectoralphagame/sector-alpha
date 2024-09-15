@@ -67,8 +67,6 @@ export class MapControl {
     document.addEventListener("keyup", (event) => {
       this.keysPressed.delete(event.key);
     });
-
-    window.control = this;
   }
 
   update = () => {
