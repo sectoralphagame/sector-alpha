@@ -28,29 +28,38 @@ export class MapControl {
   azimuth = 0;
   distance = 10;
   keysPressed = new Set<string>();
-  zoomRange = [10, 1000];
+  zoomRange = [2, 1000];
 
   dragPrev: Vec2 | null = null;
   mouse: Vec2 = new Vec2();
 
+  onClick: ((_position: Vec2, _button: 0 | 2) => void) | null = null;
+
   constructor(camera: Camera) {
     this.camera = camera;
+    this.camera.lookAt(this.lookAt);
 
     document.addEventListener("pointerdown", (event) => {
-      this.dragPrev = new Vec2(event.clientX, event.clientY);
-      this.mouse.set(event.clientX, event.clientY);
+      this.dragPrev = new Vec2(this.mouse.x, this.mouse.y);
+
+      if (this.onClick) {
+        this.onClick(this.mouse, event.button as 0 | 2);
+      }
     });
     document.addEventListener("pointerup", () => {
       this.dragPrev = null;
-      this.mouse.set(0, 0);
     });
     document.addEventListener("mousemove", (event) => {
-      if (this.dragPrev) {
-        this.mouse.set(event.clientX, event.clientY);
-      }
+      this.mouse.set(event.clientX, event.clientY);
     });
     document.addEventListener("wheel", (event) => {
-      this.distance += event.deltaY / 10;
+      this.distance = Math.min(
+        Math.max(
+          this.zoomRange[0],
+          this.distance + (event.deltaY / 10) * (this.distance / 10)
+        ),
+        this.zoomRange[1]
+      );
     });
 
     document.addEventListener("keydown", (event) => {
@@ -118,7 +127,8 @@ export class MapControl {
     );
 
     this.lookAt.add(offset);
-    this.camera.lookAt(this.lookAt);
+    this.camera.rotation[1] = Math.PI / 2 - this.azimuth;
+
     this.camera.position.set(
       new Vec3(
         Math.cos(this.azimuth) * Math.cos(this.inclination) * this.distance,
