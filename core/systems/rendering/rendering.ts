@@ -12,6 +12,7 @@ import { hecsToCartesian, worldToHecs } from "@core/components/hecsPosition";
 import { deepEqual, subtract } from "mathjs";
 import { sectorSize, type Sector } from "@core/archetypes/sector";
 import { defaultClickSound } from "@kit/BaseButton";
+import { actionLoader } from "@core/actionLoader";
 import {
   createRenderGraphics,
   graphics,
@@ -122,7 +123,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
     this.initLayers();
     this.initListeners();
 
-    this.sim.actions.register(
+    actionLoader.register(
       {
         type: "basic",
         slug: "toggleGrid",
@@ -134,7 +135,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
       this.constructor.name
     );
 
-    this.sim.actions.register(
+    actionLoader.register(
       {
         type: "basic",
         slug: "displayRange",

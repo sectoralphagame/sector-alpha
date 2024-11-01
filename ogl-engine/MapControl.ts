@@ -28,7 +28,7 @@ export class MapControl {
   azimuth = 0;
   distance = 10;
   keysPressed = new Set<string>();
-  zoomRange = [2, 1000];
+  zoomRange = [1, 100];
 
   dragPrev: Vec2 | null = null;
   mouse: Vec2 = new Vec2();
@@ -37,6 +37,7 @@ export class MapControl {
 
   constructor(camera: Camera) {
     this.camera = camera;
+    this.camera.far = 1e5;
     this.camera.lookAt(this.lookAt);
 
     document.addEventListener("pointerdown", (event) => {

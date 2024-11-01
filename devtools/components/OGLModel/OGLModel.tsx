@@ -1,6 +1,6 @@
 import React from "react";
 import { Renderer, Camera, Transform, GLTFLoader, Orbit } from "ogl";
-import sCiv1 from "@assets/models/ships/sCiv_1.glb";
+import sCiv1 from "@assets/models/ships/sCiv.glb";
 import { addBasic } from "@ogl-engine/loaders/basic/basic";
 
 export const OGLModel: React.FC = () => {

@@ -2,12 +2,12 @@ import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import type { Position2D } from "@core/components/position";
-import type { OGLCallback } from "ogl-engine/OglCanvas";
 import { OglCanvas } from "ogl-engine/OglCanvas";
-import sCiv from "@assets/models/ships/sCiv_1.glb";
+import sCiv from "@assets/models/ship/sCiv.glb";
 import type { GLTF } from "ogl";
 import { GLTFLoader, Orbit, Vec3 } from "ogl";
 import { addBasic } from "@ogl-engine/loaders/basic/basic";
+import type { OGLCallback } from "@ogl-engine/useOgl";
 
 interface InstancingStoryProps {
   cubes: number;
@@ -34,7 +34,8 @@ const InstancingStory: React.FC<InstancingStoryProps> = ({ cubes }) => {
 
     const model = await GLTFLoader.load(gl, sCiv);
     modelRef.current = model;
-    addBasic(gl, model, scene, true);
+    // FIXME: addInstanced()
+    addBasic(gl, model, scene);
     model.meshes[0].primitives[0].geometry.addAttribute("offset", {
       instanced: true,
       count: 0,

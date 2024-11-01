@@ -107,7 +107,7 @@ const config = {
       },
       {
         test: /\.glsl$/,
-        type: "asset/source",
+        use: ["./build/shader-loader.ts"],
       },
     ],
   },

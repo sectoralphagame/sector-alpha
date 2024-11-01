@@ -6,17 +6,19 @@ import { System } from "./system";
 type Movable = RequireComponent<"movable" | "position">;
 
 function move(entity: Movable, delta: number) {
+  if (entity.cp.movable.velocity === 0 && entity.cp.movable.rotary === 0)
+    return;
   const entityPosition = entity.cp.position;
 
-  const moveVec = [
-    Math.cos(entityPosition.angle),
-    Math.sin(entityPosition.angle),
-  ];
   const dAngle = entity.cp.movable.rotary;
   const dPos = entity.cp.movable.velocity * delta;
+  const moveVec = [
+    Math.cos(entityPosition.angle) * dPos,
+    Math.sin(entityPosition.angle) * dPos,
+  ];
 
-  entityPosition.coord[0] += moveVec[0] * dPos;
-  entityPosition.coord[1] += moveVec[1] * dPos;
+  entityPosition.coord[0] += moveVec[0];
+  entityPosition.coord[1] += moveVec[1];
   entityPosition.angle += dAngle;
   entityPosition.moved = true;
 
@@ -25,8 +27,8 @@ function move(entity: Movable, delta: number) {
       .get(docked)!
       .requireComponents(["position"]).cp.position;
 
-    dockedPosition.coord[0] += moveVec[0] * dPos;
-    dockedPosition.coord[1] += moveVec[1] * dPos;
+    dockedPosition.coord[0] += moveVec[0];
+    dockedPosition.coord[1] += moveVec[1];
     dockedPosition.angle += dAngle;
     dockedPosition.moved = true;
   });

@@ -10,6 +10,7 @@ in vec3 normal;
     in float angle;  // Rotation angle for instanced rotation
 #endif
 
+uniform mat4 modelMatrix;
 uniform mat4 modelViewMatrix;  // Combines model and view matrix (but no instancing transforms)
 uniform mat4 projectionMatrix; // Projection matrix
 uniform mat3 normalMatrix;     // Normal matrix (inverse transpose of model matrix)
@@ -58,6 +59,7 @@ void main() {
 
     // Transform the normal using the normal matrix
     vNormal = normalize(normalMatrix * normal);
+    vMPos = (modelMatrix * vec4(position, 1.0)).xyz;
 
     // Lighting calculation
     highp vec3 ambientLight = vec3(0.1);  // Ambient light
@@ -70,3 +72,4 @@ void main() {
     // Final transformation to clip space (projection)
     gl_Position = projectionMatrix * mvPosition;
 }
+

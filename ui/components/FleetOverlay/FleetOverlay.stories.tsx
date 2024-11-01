@@ -40,6 +40,7 @@ const fleets = Array(3)
     commander.cp.render = {
       color: 0x00ff00,
       texture: "lMil",
+      model: "ship/lMil",
       defaultScale: 1,
       interactive: true,
       layer: "ship",
@@ -87,7 +88,8 @@ const fleets = Array(3)
                   };
                   subordinate.cp.render = {
                     color: 0x00ff00,
-                    texture: "sMil",
+                    texture: "sCiv",
+                    model: "ship/sCiv",
                     defaultScale: 1,
                     interactive: true,
                     layer: "ship",
@@ -132,6 +134,7 @@ const unassigned = Array(5)
     ship.cp.render = {
       color: 0x00ff00,
       texture: "lMil",
+      model: "ship/lMil",
       defaultScale: 1,
       interactive: true,
       layer: "ship",

@@ -1,0 +1,9 @@
+.fps {
+  position: absolute;
+  top: var(--spacing);
+  left: var(--spacing);
+  font-size: 2rem;
+  color: var(--palette-active);
+  pointer-events: none;
+  user-select: none;
+}
