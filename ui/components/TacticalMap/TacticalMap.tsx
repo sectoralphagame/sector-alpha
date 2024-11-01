@@ -88,6 +88,10 @@ export const TacticalMap: React.FC = React.memo(() => {
         if (ship.cp.dockable.size === "medium") {
           ship.cp.render.model = "ship/mCiv";
         }
+
+        if (ship.cp.dockable.size === "large") {
+          ship.cp.render.model = "ship/lMil";
+        }
       }
 
       if (!meshes.current.has(ship.id)) {
