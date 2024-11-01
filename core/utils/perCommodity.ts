@@ -1,7 +1,7 @@
 import { getCommodityCost } from "@core/economy/utils";
 import { max, min } from "@fxts/core";
 import type { Commodity } from "../economy/commodity";
-import { commoditiesArray } from "../economy/commodity";
+import { commodities } from "../economy/commodity";
 import modules from "../world/data/facilityModules.json";
 
 export function perCommodity<T>(
@@ -10,7 +10,7 @@ export function perCommodity<T>(
 ): Record<Commodity, T> {
   const ret = {} as Record<Commodity, T>;
 
-  for (const commodity of commoditiesArray) {
+  for (const commodity of commodities) {
     ret[commodity] = cb(commodity);
   }
 
