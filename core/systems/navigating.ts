@@ -55,7 +55,7 @@ export function getDeltaAngle(
 
   return angleOffset > rotary * delta
     ? rotary * delta * Math.sign(dAngle)
-    : dAngle + Math.random() * 0.02 * -Math.sign(dAngle);
+    : dAngle + Math.random() * 0.001 * -Math.sign(dAngle);
 }
 
 const cruiseTimer = "cruise";
