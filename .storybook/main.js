@@ -21,6 +21,7 @@ module.exports = {
       ...config,
       module: {
         ...config.module,
+
         rules: [
           ...config.module.rules.filter(({ test }) =>
             test ? !test.toString().includes(".css") : true
