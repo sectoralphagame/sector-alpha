@@ -1,4 +1,5 @@
 import custom from "../webpack.config.ts";
+import HtmlWebpackPlugin from "html-webpack-plugin";
 
 module.exports = {
   stories: [
@@ -33,7 +34,12 @@ module.exports = {
         ...config.resolve,
         plugins: custom.resolve.plugins,
       },
-      plugins: [...config.plugins, ...custom.plugins],
+      plugins: [
+        ...config.plugins,
+        ...custom.plugins.filter(
+          (plugin) => !(plugin instanceof HtmlWebpackPlugin)
+        ),
+      ],
     };
   },
 };
