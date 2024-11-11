@@ -68,7 +68,7 @@ const JournalWrapper: React.FC<
 
 export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
   const [isCollapsed, setCollapsed] = React.useState(
-    expanded === undefined ? false : !expanded
+    expanded === undefined ? true : !expanded
   );
 
   const [dialog, setDialog] = useGameDialog();

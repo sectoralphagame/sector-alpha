@@ -1,7 +1,8 @@
-import type { GLTF, OGLRenderingContext } from "ogl";
+import type { GLTF } from "ogl";
 import { Vec3, Transform, GLTFLoader, Program, TextureLoader, Mesh } from "ogl";
 import smoke from "@assets/textures/smoke.jpg";
 import starModel from "@assets/models/world/star.glb";
+import type { Engine } from "@ogl-engine/engine/engine";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 
@@ -10,14 +11,9 @@ export class Star {
   readonly transform: Transform;
   program: Program;
 
-  constructor(
-    gl: OGLRenderingContext,
-    scene: Transform,
-    gltfModel: GLTF,
-    color: Vec3
-  ) {
+  constructor(engine: Engine, gltfModel: GLTF, color: Vec3) {
     this.transform = new Transform();
-    this.initProgram(gl);
+    this.initProgram(engine);
     this.setColor(color);
 
     gltfModel.scenes[0].forEach((gltfScene) => {
@@ -29,26 +25,24 @@ export class Star {
       });
     });
 
-    scene.addChild(this.transform);
-    scene.updateMatrixWorld();
+    engine.scene.addChild(this.transform);
+    engine.scene.updateMatrixWorld();
   }
 
-  initProgram = (gl: OGLRenderingContext) => {
-    const tSmoke = TextureLoader.load(gl, {
+  initProgram = (engine: Engine) => {
+    const tSmoke = TextureLoader.load(engine.gl, {
       src: {
         jpg: smoke,
       },
-      wrapS: gl.REPEAT,
-      wrapT: gl.REPEAT,
+      wrapS: engine.gl.REPEAT,
+      wrapT: engine.gl.REPEAT,
     });
 
-    this.program = new Program(gl, {
+    this.program = new Program(engine.gl, {
       vertex,
       fragment,
       uniforms: {
-        uTime: {
-          value: 0,
-        },
+        uTime: engine.uniforms.uTime,
         tSmoke: { value: tSmoke },
         vColor: { value: new Vec3() },
       },
@@ -65,11 +59,7 @@ export class Star {
   }
 }
 
-export async function addStar(
-  gl: OGLRenderingContext,
-  scene: Transform,
-  color: Vec3
-) {
-  const gltfModel = await GLTFLoader.load(gl, starModel);
-  return new Star(gl, scene, gltfModel, color);
+export async function addStar(engine: Engine, color: Vec3) {
+  const gltfModel = await GLTFLoader.load(engine.gl, starModel);
+  return new Star(engine, gltfModel, color);
 }

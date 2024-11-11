@@ -8,9 +8,13 @@ varying vec2 vUv;
 void main() {
     vec4 tex = texture2D(tMap, vUv);
     vec4 emissive = texture2D(tEmissive, vUv);
-    float factor = step(uThreshold, length(tex.rgb) / 1.73205);
-    if(length(emissive) > 0.) {
-        factor = length(emissive);
+    float factor = length(emissive);
+    if(factor == 0.0) {
+        factor = step(uThreshold, length(tex.rgb) / 1.73205);
+        if(factor == 0.0) {
+            discard;
+        }
     }
+
     gl_FragColor = tex * factor;
 }

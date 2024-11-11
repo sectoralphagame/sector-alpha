@@ -1,10 +1,11 @@
 import { Mesh, Program, Vec3 } from "ogl";
-import type { GLTF, OGLRenderingContext, Transform } from "ogl";
+import type { GLTF } from "ogl";
+import type { Engine } from "@ogl-engine/engine/engine";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 
-export function createBasicProgram(gl: OGLRenderingContext, material: any) {
-  return new Program(gl, {
+export function createBasicProgram(engine: Engine, material: any) {
+  return new Program(engine.gl, {
     vertex,
     fragment,
     uniforms: {
@@ -14,28 +15,14 @@ export function createBasicProgram(gl: OGLRenderingContext, material: any) {
       lightDirection: { value: new Vec3(0, 1, 0) },
       uNormalScale: { value: 1 },
       uNormalUVScale: { value: 1 },
+      uTime: engine.uniforms.uTime,
     },
   });
 }
 
-export function addBasic(
-  gl: OGLRenderingContext,
-  model: GLTF,
-  scene: Transform
-) {
-  scene.children.forEach((child) => child.setParent(null));
-
-  const s = model.scene || model.scenes[0];
-  s.forEach((root) => {
-    root.setParent(scene);
-    root.traverse((node) => {
-      if (node instanceof Mesh && node?.program) {
-        const material = node.program.gltfMaterial || {};
-
-        node.program = createBasicProgram(gl, material);
-      }
-    });
+export function addBasic(engine: Engine, model: GLTF) {
+  return new Mesh(engine.renderer.gl, {
+    geometry: model.meshes[0].primitives[0].geometry,
+    program: createBasicProgram(engine, model.materials[0]),
   });
-
-  scene.updateMatrixWorld();
 }

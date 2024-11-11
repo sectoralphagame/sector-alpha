@@ -1,6 +1,6 @@
 import React from "react";
 import { Renderer, Camera, Transform, GLTFLoader, Orbit } from "ogl";
-import { addBasic } from "@ogl-engine/loaders/basic/basic";
+// import { addBasic } from "@ogl-engine/loaders/basic/basic";
 import models from "@assets/models";
 
 export const OGLModel: React.FC = () => {
@@ -43,7 +43,7 @@ export const OGLModel: React.FC = () => {
     const scene = new Transform();
 
     GLTFLoader.load(gl, models["ship/lMil"]).then((model) => {
-      addBasic(gl, model, scene);
+      // addBasic(engine, model);
 
       function update(_t: number) {
         requestAnimationFrame(update);

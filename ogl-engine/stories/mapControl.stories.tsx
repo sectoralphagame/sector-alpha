@@ -6,25 +6,34 @@ import sCiv from "@assets/models/ship/sCiv.glb";
 import { AxesHelper, GLTFLoader } from "ogl";
 import { addBasic } from "@ogl-engine/loaders/basic/basic";
 import { MapControl } from "@ogl-engine/MapControl";
-import type { OGLCallback } from "@ogl-engine/useOgl";
+import { Engine } from "@ogl-engine/engine/engine";
+import { Skybox } from "@ogl-engine/loaders/skybox/skybox";
 
 const ModelStory: React.FC = () => {
+  const engine = React.useMemo(() => new Engine(), []);
   const controlRef = React.useRef<MapControl>();
+  const skyboxRef = React.useRef<Skybox>();
 
-  const onInit: OGLCallback = async ({ gl, camera, scene }) => {
-    controlRef.current = new MapControl(camera);
-    camera.position.set(5, 5, 5);
-    const helper = new AxesHelper(gl, {});
-    helper.setParent(scene);
+  React.useEffect(() => {
+    engine.hooks.onInit.subscribe("MapControlStory", async () => {
+      controlRef.current = new MapControl(engine.camera);
+      const helper = new AxesHelper(engine.gl, {});
+      helper.setParent(engine.scene);
+      skyboxRef.current = new Skybox(
+        engine.renderer.gl,
+        engine.scene,
+        "example"
+      );
 
-    addBasic(gl, await GLTFLoader.load(gl, sCiv), scene);
-  };
+      addBasic(engine, await GLTFLoader.load(engine.gl, sCiv));
+    });
 
-  const onUpdate: OGLCallback = () => {
-    controlRef.current!.update();
-  };
+    engine.hooks.onUpdate.subscribe("MapControlStory", () => {
+      controlRef.current!.update();
+    });
+  }, [engine]);
 
-  return <OglCanvas onInit={onInit} onUpdate={onUpdate} />;
+  return <OglCanvas engine={engine} />;
 };
 
 export default {

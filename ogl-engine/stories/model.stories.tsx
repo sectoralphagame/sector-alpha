@@ -2,42 +2,57 @@ import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
-import { GLTFLoader, Mesh, Orbit } from "ogl";
-import { createBasicProgram } from "@ogl-engine/loaders/basic/basic";
+import type { Mesh } from "ogl";
+import { GLTFLoader, Orbit } from "ogl";
+import { addBasic } from "@ogl-engine/loaders/basic/basic";
 import models from "@assets/models";
 import { Skybox } from "@ogl-engine/loaders/skybox/skybox";
-import type { OGLCallback } from "@ogl-engine/useOgl";
+import { Engine } from "@ogl-engine/engine/engine";
 
 interface ModelStoryProps {
   model: string;
 }
 
 const ModelStory: React.FC<ModelStoryProps> = ({ model: modelName }) => {
+  const engine = React.useMemo(() => new Engine(), []);
   const meshRef = React.useRef<Mesh>();
   const skyboxRef = React.useRef<Skybox>();
   const controlRef = React.useRef<Orbit>();
 
-  const onInit: OGLCallback = async ({ gl, camera, scene }) => {
-    controlRef.current = new Orbit(camera);
-    camera.position.set(5, 5, 5);
-    camera.far = 1e5;
-    skyboxRef.current = new Skybox(gl, scene, "example");
+  React.useEffect(() => {
+    engine.hooks.onInit.subscribe("ModelStory", async () => {
+      controlRef.current = new Orbit(engine.camera, {
+        inertia: 0.8,
+      });
 
-    const model = await GLTFLoader.load(gl, models[modelName]);
-    meshRef.current = new Mesh(gl, {
-      geometry: model.meshes[0].primitives[0].geometry,
-      program: createBasicProgram(gl, model.materials[0]),
+      skyboxRef.current = new Skybox(
+        engine.renderer.gl,
+        engine.scene,
+        "example"
+      );
+
+      GLTFLoader.load(engine.renderer.gl, models[modelName]).then((model) => {
+        meshRef.current = addBasic(engine, model);
+        meshRef.current.setParent(engine.scene);
+      });
     });
-    meshRef.current.setParent(scene, true);
-  };
 
-  const onUpdate: OGLCallback = () => {
-    controlRef.current!.update();
+    engine.hooks.onUpdate.subscribe("ModelStory", () => {
+      controlRef.current!.update();
+    });
+  }, []);
 
-    meshRef.current!.rotation.y += 0.001;
-  };
+  React.useEffect(() => {
+    if (engine.initialized) {
+      meshRef.current?.parent?.removeChild(meshRef.current);
+      GLTFLoader.load(engine.renderer.gl, models[modelName]).then((model) => {
+        meshRef.current = addBasic(engine, model);
+        meshRef.current.setParent(engine.scene);
+      });
+    }
+  }, [modelName]);
 
-  return <OglCanvas onInit={onInit} onUpdate={onUpdate} />;
+  return <OglCanvas engine={engine} />;
 };
 
 export default {

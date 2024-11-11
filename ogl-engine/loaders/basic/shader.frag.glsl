@@ -9,6 +9,7 @@ in vec2 vUv;
 in vec3 vNormal;
 in vec3 vLighting;
 in vec3 vMPos;
+in float vFragDepth;
 
 uniform mat4 viewMatrix;
 uniform sampler2D tDiffuse;
@@ -23,6 +24,8 @@ vec3 lightColor = vec3(1);
 float lightPower = 0.05f;
 
 void main() {
+    gl_FragDepth = vFragDepth;
+
     vec3 tex = texture(tDiffuse, vUv).rgb;
     vec3 norm = viewNormal(vMPos, vUv, vNormal, tNormal, uNormalUVScale, uNormalScale, viewMatrix);
 

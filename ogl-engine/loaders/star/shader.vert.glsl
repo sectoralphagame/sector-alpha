@@ -1,5 +1,5 @@
 #version 300 es
-precision mediump float;
+precision highp float;
 
 #pragma glslify: snoise4 = require(glsl-noise/simplex/4d)
 
@@ -11,6 +11,7 @@ out vec3 vPosition;
 out vec3 vWorldNormal;
 out vec3 vViewDirection;
 out vec2 vUv;
+out float fCameraDistance;
 
 uniform float uTime;
 uniform mat4 modelMatrix;
@@ -24,8 +25,9 @@ void main() {
     vWorldNormal = normalize(modelMatrix * vec4(normal, 0.0f)).xyz;
     vViewDirection = normalize(cameraPosition - worldPosition.xyz);
     vUv = uv;
+    fCameraDistance = distance(cameraPosition, worldPosition.xyz);
 
-    float noise = snoise4(vec4(vPosition, uTime * 0.5f));
+    float noise = snoise4(vec4(vPosition, uTime * 0.2f));
 
     vec3 displacement = vPosition * noise * 0.08f;
 

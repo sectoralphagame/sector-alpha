@@ -7,13 +7,14 @@ import type { Star } from "@ogl-engine/loaders/star/star";
 import { addStar } from "@ogl-engine/loaders/star/star";
 import Color from "color";
 import { Skybox } from "@ogl-engine/loaders/skybox/skybox";
-import type { OGLCallback } from "@ogl-engine/useOgl";
+import { Engine } from "@ogl-engine/engine/engine";
 
 interface StarStoryProps {
   color: string;
 }
 
 const StarStory: React.FC<StarStoryProps> = ({ color: colorProp }) => {
+  const engine = React.useMemo(() => new Engine(), []);
   const starRef = React.useRef<Star>();
   const skyboxRef = React.useRef<Skybox>();
   const controlRef = React.useRef<Orbit>();
@@ -25,25 +26,28 @@ const StarStory: React.FC<StarStoryProps> = ({ color: colorProp }) => {
     starRef.current.program.uniforms.vColor.value = color;
   }, [color]);
 
-  const onInit: OGLCallback = React.useCallback(
-    async ({ gl, camera, scene }) => {
-      controlRef.current = new Orbit(camera);
-      camera.position.set(50, 50, 50);
-      camera.far = 1e5;
-      skyboxRef.current = new Skybox(gl, scene, "example");
+  useEffect(() => {
+    engine.hooks.onInit.subscribe("StarStory", async () => {
+      controlRef.current = new Orbit(engine.camera);
 
-      starRef.current = await addStar(gl, scene, color);
-    },
-    []
-  );
+      skyboxRef.current = new Skybox(
+        engine.renderer.gl,
+        engine.scene,
+        "example"
+      );
+      starRef.current = await addStar(engine, color);
+    });
 
-  const onUpdate: OGLCallback = React.useCallback(() => {
-    controlRef.current!.update();
+    engine.hooks.onUpdate.subscribe("StarStory", () => {
+      controlRef.current!.update();
 
-    starRef.current!.transform.rotation.y += 0.001;
+      if (starRef.current) {
+        starRef.current.transform.rotation.y += 0.001;
+      }
+    });
   }, []);
 
-  return <OglCanvas onInit={onInit} onUpdate={onUpdate} />;
+  return <OglCanvas engine={engine} />;
 };
 
 export default {
@@ -68,5 +72,5 @@ const Template: StoryFn<StarStoryProps> = ({ color }) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  color: "#ff6800",
+  color: "#8c422b",
 } as StarStoryProps;

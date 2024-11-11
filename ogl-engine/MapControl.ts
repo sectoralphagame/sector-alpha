@@ -84,7 +84,7 @@ export class MapControl {
 
     if (this.dragPrev) {
       const move = this.mouse.clone().sub(this.dragPrev);
-      offset.set(-move[1] / 100, 0, move[0] / 100);
+      offset.set(-move[1] / 100, 0, move[0] / 100).multiply(this.distance / 10);
       this.dragPrev.set(this.mouse);
     }
 

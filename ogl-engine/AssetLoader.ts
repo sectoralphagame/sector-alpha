@@ -1,6 +1,7 @@
 import models from "@assets/models";
 import type { Geometry, GLTFMaterial, OGLRenderingContext } from "ogl";
 import { GLTFLoader } from "ogl";
+import { fromEntries, keys, map, pipe } from "@fxts/core";
 
 export type ModelName = keyof typeof models;
 
@@ -15,6 +16,26 @@ class AssetLoader {
     }
   > = {};
 
+  // eslint-disable-next-line class-methods-use-this
+  preload = async (onModelLoad: (_progress: number) => void) => {
+    const state = pipe(
+      models,
+      keys,
+      map((model) => [model, false] as [string, boolean]),
+      fromEntries
+    );
+    return Promise.all(
+      Object.values(models).map(async (modelPath) => {
+        await fetch(modelPath);
+        state[modelPath] = true;
+        onModelLoad(
+          Object.values(state).filter(Boolean).length /
+            Object.values(state).length
+        );
+      })
+    );
+  };
+
   load = async (gl: OGLRenderingContext) => {
     this.readyPromise = Promise.all(
       Object.entries(models).map(([modelName, modelPath]) =>
@@ -23,6 +44,7 @@ class AssetLoader {
             geometry: model.meshes[0].primitives[0].geometry,
             material: model.materials?.[0],
           };
+          this.models[modelName].geometry.computeBoundingBox();
         })
       )
     ).then(() => {
