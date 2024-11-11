@@ -20,6 +20,14 @@ const keymap = {
   "-": { scale: dScale },
 };
 
+const MouseButton = {
+  Left: 0,
+  Middle: 1,
+  Right: 2,
+};
+// eslint-disable-next-line no-redeclare
+type MouseButton = (typeof MouseButton)[keyof typeof MouseButton];
+
 export class MapControl {
   camera: Camera;
   canvas: HTMLCanvasElement;
@@ -33,7 +41,7 @@ export class MapControl {
   dragPrev: Vec2 | null = null;
   mouse: Vec2 = new Vec2();
 
-  onClick: ((_position: Vec2, _button: 0 | 2) => void) | null = null;
+  onClick: ((_position: Vec2, _button: MouseButton) => void) | null = null;
 
   constructor(camera: Camera) {
     this.camera = camera;
@@ -41,10 +49,12 @@ export class MapControl {
     this.camera.lookAt(this.lookAt);
 
     document.addEventListener("pointerdown", (event) => {
-      this.dragPrev = new Vec2(this.mouse.x, this.mouse.y);
+      if (event.button === MouseButton.Left) {
+        this.dragPrev = new Vec2(this.mouse.x, this.mouse.y);
+      }
 
       if (this.onClick) {
-        this.onClick(this.mouse, event.button as 0 | 2);
+        this.onClick(this.mouse, event.button as MouseButton);
       }
     });
     document.addEventListener("pointerup", () => {
@@ -54,10 +64,14 @@ export class MapControl {
       this.mouse.set(event.clientX, event.clientY);
     });
     document.addEventListener("wheel", (event) => {
+      const delta =
+        Math.abs(event.deltaY) > 50
+          ? Math.sign(event.deltaY) * 8
+          : event.deltaY;
       this.distance = Math.min(
         Math.max(
           this.zoomRange[0],
-          this.distance + (event.deltaY / 10) * (this.distance / 10)
+          this.distance + (delta * this.distance) / 100
         ),
         this.zoomRange[1]
       );

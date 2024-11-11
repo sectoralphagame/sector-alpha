@@ -2,6 +2,7 @@ import models from "@assets/models";
 import type { Geometry, GLTFMaterial, OGLRenderingContext } from "ogl";
 import { GLTFLoader } from "ogl";
 import { fromEntries, keys, map, pipe } from "@fxts/core";
+import { skyboxes } from "@assets/textures/skybox";
 
 export type ModelName = keyof typeof models;
 
@@ -19,21 +20,30 @@ class AssetLoader {
   // eslint-disable-next-line class-methods-use-this
   preload = async (onModelLoad: (_progress: number) => void) => {
     const state = pipe(
-      models,
+      { ...models, ...skyboxes },
       keys,
       map((model) => [model, false] as [string, boolean]),
       fromEntries
     );
-    return Promise.all(
-      Object.values(models).map(async (modelPath) => {
+
+    return Promise.all([
+      ...Object.entries(models).map(async ([name, modelPath]) => {
         await fetch(modelPath);
-        state[modelPath] = true;
+        state[name] = true;
         onModelLoad(
           Object.values(state).filter(Boolean).length /
             Object.values(state).length
         );
-      })
-    );
+      }),
+      ...Object.entries(skyboxes).map(async ([name, imagePaths]) => {
+        await Promise.all(Object.values(imagePaths).map((p) => fetch(p)));
+        state[name] = true;
+        onModelLoad(
+          Object.values(state).filter(Boolean).length /
+            Object.values(state).length
+        );
+      }),
+    ]);
   };
 
   load = async (gl: OGLRenderingContext) => {
