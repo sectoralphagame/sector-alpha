@@ -3,6 +3,7 @@ import { Vec2, Mat4, Vec3 } from "ogl";
 
 const dPos = 0.05;
 const dScale = 0.2;
+const dRotation = 200;
 const keymap = {
   w: { x: 0, y: -dPos },
   ArrowUp: { x: 0, y: -dPos },
@@ -12,8 +13,8 @@ const keymap = {
   ArrowLeft: { x: -dPos, y: 0 },
   d: { x: dPos, y: 0 },
   ArrowRight: { x: dPos, y: 0 },
-  q: { rotate: Math.PI / 400 },
-  e: { rotate: -Math.PI / 400 },
+  q: { rotate: Math.PI / dRotation },
+  e: { rotate: -Math.PI / dRotation },
   x: { scale: -dScale },
   "=": { scale: -dScale },
   z: { scale: dScale },
@@ -33,10 +34,10 @@ export class MapControl {
   canvas: HTMLCanvasElement;
   lookAt: Vec3 = new Vec3();
   inclination = Math.PI / 6;
-  azimuth = 0;
+  azimuth = Math.PI / 2;
   distance = 10;
   keysPressed = new Set<string>();
-  zoomRange = [1, 100];
+  zoomRange = [0.8, 80];
 
   dragPrev: Vec2 | null = null;
   mouse: Vec2 = new Vec2();
