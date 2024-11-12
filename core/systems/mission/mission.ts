@@ -109,15 +109,16 @@ export class MissionSystem extends System<"generate" | "track"> {
 
     const player = this.sim.index.player.get()[0];
 
-    if (
-      !player.tags.has("mainQuestStarted") &&
-      player.cp.missions.offer === null
-    ) {
-      player.cp.missions.offer = this.handlers.mission[
-        "main.ffw.tutorial-miner"
-      ].generate(this.sim);
-      return;
-    }
+    // FIXME: Remove this debug code
+    // if (
+    //   !player.tags.has("mainQuestStarted") &&
+    //   player.cp.missions.offer === null
+    // ) {
+    //   player.cp.missions.offer = this.handlers.mission[
+    //     "main.ffw.tutorial-miner"
+    //   ].generate(this.sim);
+    //   return;
+    // }
 
     if (
       force ||
