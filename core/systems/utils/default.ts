@@ -18,7 +18,7 @@ export const defaultIndexer = {
   collectibles: new EntityIndex(collectibleComponents, ["collectible"]),
   disposable: new EntityIndex(["disposable"]),
   facilities: new EntityIndex(
-    ["modules", "position", "facilityModuleQueue", "subordinates"],
+    ["modules", "position", "facilityModuleQueue", "subordinates", "render"],
     [],
     true
   ),
