@@ -77,59 +77,41 @@ export const TacticalMap: React.FC = React.memo(() => {
     engine.hooks.onUpdate.subscribe("TacticalMap", () => {
       if (!assetLoader.ready) return;
 
-      for (const ship of defaultIndexer.ships.getIt()) {
-        if (ship.cp.position.sector !== activeSectorRef.current) continue;
+      for (const entity of defaultIndexer.renderable.getIt()) {
+        if (entity.cp.position.sector !== activeSectorRef.current) continue;
         // FIXME: Remove this debug code
-        if (!(ship.cp.render.model in assetLoader.models)) {
-          ship.cp.render.model = "ship/sCiv";
+        if (!(entity.cp.render.model in assetLoader.models)) {
+          if (entity.hasComponents(["dockable"])) {
+            entity.cp.render.model = "ship/sCiv";
 
-          if (ship.cp.dockable.size === "medium") {
-            ship.cp.render.model = "ship/mCiv";
-          }
+            if (entity.cp.dockable.size === "medium") {
+              entity.cp.render.model = "ship/mCiv";
+            }
 
-          if (ship.cp.dockable.size === "large") {
-            ship.cp.render.model = "ship/lMil";
+            if (entity.cp.dockable.size === "large") {
+              entity.cp.render.model = "ship/lMil";
+            }
+          } else if (entity.hasTags(["facility"])) {
+            entity.cp.render.model = "facility/default";
           }
         }
 
-        if (!meshes.current.has(ship.id)) {
-          const m = new EntityMesh(engine, ship);
+        if (!meshes.current.has(entity.id)) {
+          const m = new EntityMesh(engine, entity);
           engine.scene.addChild(m);
-          meshes.current.set(ship.id, m);
+          meshes.current.set(entity.id, m);
         }
 
-        const mesh = meshes.current.get(ship.id)!;
+        const mesh = meshes.current.get(entity.id)!;
 
         mesh.position.set(
-          ship.cp.position.coord[0] * scale,
+          entity.cp.position.coord[0] * scale,
           0,
-          ship.cp.position.coord[1] * scale
+          entity.cp.position.coord[1] * scale
         );
-        mesh.rotation.y = -ship.cp.position.angle;
-      }
+        mesh.rotation.y = -entity.cp.position.angle;
 
-      for (const facility of defaultIndexer.facilities.getIt()) {
-        if (facility.cp.position.sector !== activeSectorRef.current) continue;
-        // FIXME: Remove this debug code
-        if (!(facility.cp.render.model in assetLoader.models)) {
-          facility.cp.render.model = "facility/default";
-        }
-
-        if (!meshes.current.has(facility.id)) {
-          const m = new EntityMesh(engine, facility);
-          m.ring?.scale.set(3);
-          engine.scene.addChild(m);
-          meshes.current.set(facility.id, m);
-        }
-
-        const mesh = meshes.current.get(facility.id)!;
-
-        mesh.position.set(
-          facility.cp.position.coord[0] * scale,
-          0,
-          facility.cp.position.coord[1] * scale
-        );
-        mesh.rotation.y = -facility.cp.position.angle;
+        mesh.visible = !entity.cp.render.hidden;
       }
 
       controlRef.current!.update();

@@ -32,6 +32,7 @@ export const defaultIndexer = {
   orderable: new EntityIndex(["orders", "position", "model", "owner"]),
   player: new EntityIndex([...factionComponents, "missions"], ["player"], true),
   productionByModules: new EntityIndex(["production", "parent"]),
+  renderable: new EntityIndex(["render", "position"]),
   renderableGraphics: new EntityIndex(["renderGraphics"]),
   sectors: new EntityIndex(sectorComponents, [], true),
   selectable: new EntityIndex(["render", "position"], ["selection"]),
