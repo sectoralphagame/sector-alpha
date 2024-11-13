@@ -12,6 +12,7 @@ import { assetLoader } from "@ogl-engine/AssetLoader";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { Engine } from "@ogl-engine/engine/engine";
 import { selectingSystem } from "@core/systems/selecting";
+import { Path } from "@ogl-engine/utils/path";
 import { EntityMesh } from "./EntityMesh";
 
 const scale = 2;
@@ -23,6 +24,11 @@ export const TacticalMap: React.FC = React.memo(() => {
   const raycastRef = React.useRef(new Raycast());
   const skybox = React.useRef<Skybox>();
   const meshes = React.useRef<Map<number, EntityMesh>>(new Map());
+  const uiRef = React.useRef<
+    Partial<{
+      path: Path;
+    }>
+  >({});
   const settingsManagerRef = React.useRef<
     RequireComponent<"selectionManager" | "camera">
   >(first(sim.index.settings.getIt())!);
@@ -114,15 +120,35 @@ export const TacticalMap: React.FC = React.memo(() => {
         mesh.visible = !entity.cp.render.hidden;
       }
 
+      if (uiRef.current.path) {
+        uiRef.current.path.update(
+          Path.getPath(
+            sim
+              .getOrThrow(settingsManagerRef.current.cp.selectionManager.id!)
+              .requireComponents(["position", "orders"]),
+            scale
+          )
+        );
+      }
+
       controlRef.current!.update();
     });
 
     const onSelectedChange = ([prevId, id]: (number | null)[]) => {
       if (prevId) {
         meshes.current.get(prevId)?.setSelected(false);
+        if (uiRef.current.path) {
+          engine.scene.removeChild(uiRef.current.path);
+        }
       }
       if (id) {
         meshes.current.get(id)?.setSelected(true);
+        const entity = sim.getOrThrow(id);
+        if (entity.hasComponents(["position", "orders"])) {
+          const path = new Path(engine);
+          engine.scene.addChild(path);
+          uiRef.current.path = path;
+        }
       }
     };
     selectingSystem.hook.subscribe("TacticalMap", onSelectedChange);

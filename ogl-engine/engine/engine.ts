@@ -116,7 +116,7 @@ export class Engine {
         uDirection: { value: new Vec2(0, bloomSize) },
       },
     });
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 32; i++) {
       this.postProcessingLayers.bloom.passes.push(horizontalPass, verticalPass);
     }
 
