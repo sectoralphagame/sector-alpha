@@ -32,7 +32,7 @@ type MouseButton = (typeof MouseButton)[keyof typeof MouseButton];
 export class MapControl {
   camera: Camera;
   canvas: HTMLCanvasElement;
-  lookAt: Vec3 = new Vec3();
+  focusPoint: Vec3 = new Vec3();
   inclination = Math.PI / 6;
   azimuth = Math.PI / 2;
   distance = 10;
@@ -43,11 +43,12 @@ export class MapControl {
   mouse: Vec2 = new Vec2();
 
   onClick: ((_position: Vec2, _button: MouseButton) => void) | null = null;
+  onMove: (() => void) | null = null;
 
   constructor(camera: Camera) {
     this.camera = camera;
     this.camera.far = 1e5;
-    this.camera.lookAt(this.lookAt);
+    this.camera.lookAt(this.focusPoint);
 
     document.addEventListener("pointerdown", (event) => {
       if (event.button === MouseButton.Left) {
@@ -94,6 +95,12 @@ export class MapControl {
     });
   }
 
+  lookAt = (position: Vec3) => {
+    const offset = this.camera.position.clone().sub(this.focusPoint);
+    this.focusPoint.set(position);
+    this.camera.position.set(this.focusPoint.clone().add(offset));
+  };
+
   update = () => {
     const offset = new Vec3();
 
@@ -132,8 +139,9 @@ export class MapControl {
     const s = Math.sin(this.azimuth);
     const c = Math.cos(this.azimuth);
 
-    // prettier-ignore
-    offset.applyMatrix4(
+    if (offset.len()) {
+      // prettier-ignore
+      offset.applyMatrix4(
       new Mat4(
          c, 0, s, 0,
          0, 1, 0, 0,
@@ -142,7 +150,9 @@ export class MapControl {
       )
     );
 
-    this.lookAt.add(offset);
+      this.focusPoint.add(offset);
+      this.onMove?.();
+    }
     this.camera.rotation[1] = Math.PI / 2 - this.azimuth;
 
     this.camera.position.set(
@@ -150,7 +160,7 @@ export class MapControl {
         Math.cos(this.azimuth) * Math.cos(this.inclination) * this.distance,
         Math.sin(this.inclination) * this.distance,
         Math.sin(this.azimuth) * Math.cos(this.inclination) * this.distance
-      ).add(this.lookAt)
+      ).add(this.focusPoint)
     );
   };
 }

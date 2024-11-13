@@ -33,6 +33,7 @@ export const TacticalMap: React.FC = React.memo(() => {
     RequireComponent<"selectionManager" | "camera">
   >(first(sim.index.settings.getIt())!);
   const activeSectorRef = React.useRef(defaultIndexer.sectors.get()[9]!.id);
+  const lastClickedRef = React.useRef(0);
   const [, setMenu] = useContextMenu();
 
   React.useEffect(() => {
@@ -60,17 +61,20 @@ export const TacticalMap: React.FC = React.memo(() => {
                 hits[0].entityId;
               defaultClickSound.play();
 
-              // if (Date.now() - this.lastClicked < 200) {
-              //   settingsManagerRef.current.cp.selectionManager.focused = true;
-              // }
+              if (Date.now() - lastClickedRef.current < 200) {
+                settingsManagerRef.current.cp.selectionManager.focused = true;
+              }
 
-              // this.lastClicked = Date.now();
+              lastClickedRef.current = Date.now();
               break;
             case 2:
               settingsManagerRef.current.cp.selectionManager.secondaryId =
                 hits[0].entityId;
           }
         }
+      };
+      controlRef.current.onMove = () => {
+        settingsManagerRef.current.cp.selectionManager.focused = false;
       };
 
       sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
@@ -82,6 +86,9 @@ export const TacticalMap: React.FC = React.memo(() => {
 
     engine.hooks.onUpdate.subscribe("TacticalMap", () => {
       if (!assetLoader.ready) return;
+      const selectedEntity = sim.get(
+        settingsManagerRef.current.cp.selectionManager.id!
+      );
 
       for (const entity of defaultIndexer.renderable.getIt()) {
         if (entity.cp.position.sector !== activeSectorRef.current) continue;
@@ -120,17 +127,28 @@ export const TacticalMap: React.FC = React.memo(() => {
         mesh.visible = !entity.cp.render.hidden;
       }
 
-      if (uiRef.current.path) {
+      if (uiRef.current.path && selectedEntity) {
         uiRef.current.path.update(
           Path.getPath(
-            sim
-              .getOrThrow(settingsManagerRef.current.cp.selectionManager.id!)
-              .requireComponents(["position", "orders"]),
+            selectedEntity.requireComponents(["position", "orders"]),
             scale
           )
         );
       }
 
+      if (
+        settingsManagerRef.current.cp.selectionManager.focused &&
+        selectedEntity
+      ) {
+        const entity = selectedEntity.requireComponents(["position"]);
+        controlRef.current!.lookAt(
+          new Vec3(
+            entity.cp.position.coord[0] * scale,
+            0,
+            entity.cp.position.coord[1] * scale
+          )
+        );
+      }
       controlRef.current!.update();
     });
 
