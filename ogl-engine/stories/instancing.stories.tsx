@@ -6,7 +6,7 @@ import { OglCanvas } from "ogl-engine/OglCanvas";
 import sCiv from "@assets/models/ship/sCiv.glb";
 import type { GLTF } from "ogl";
 import { GLTFLoader, Orbit, Vec3 } from "ogl";
-import { addBasic } from "@ogl-engine/loaders/basic/basic";
+import { addBasic } from "@ogl-engine/materials/basic/basic";
 import { Engine } from "@ogl-engine/engine/engine";
 
 interface InstancingStoryProps {

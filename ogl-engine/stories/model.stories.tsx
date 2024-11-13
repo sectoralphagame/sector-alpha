@@ -4,9 +4,9 @@ import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
 import type { Mesh } from "ogl";
 import { GLTFLoader, Orbit } from "ogl";
-import { addBasic } from "@ogl-engine/loaders/basic/basic";
+import { addBasic } from "@ogl-engine/materials/basic/basic";
 import models from "@assets/models";
-import { Skybox } from "@ogl-engine/loaders/skybox/skybox";
+import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { Engine } from "@ogl-engine/engine/engine";
 
 interface ModelStoryProps {

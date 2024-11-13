@@ -2,8 +2,8 @@ import type { DockSize } from "@core/components/dockable";
 import type { RequireComponent } from "@core/tsHelpers";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import type { Engine } from "@ogl-engine/engine/engine";
-import { createBasicProgram } from "@ogl-engine/loaders/basic/basic";
-import { SelectionRing } from "@ogl-engine/loaders/ring/ring";
+import { createBasicProgram } from "@ogl-engine/materials/basic/basic";
+import { SelectionRing } from "@ogl-engine/materials/ring/ring";
 import { Mesh } from "ogl";
 
 export class EntityMesh extends Mesh {

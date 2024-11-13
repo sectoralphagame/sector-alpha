@@ -3,10 +3,10 @@ import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
 import { Orbit, Vec3 } from "ogl";
-import type { Star } from "@ogl-engine/loaders/star/star";
-import { addStar } from "@ogl-engine/loaders/star/star";
+import type { Star } from "@ogl-engine/materials/star/star";
+import { addStar } from "@ogl-engine/materials/star/star";
 import Color from "color";
-import { Skybox } from "@ogl-engine/loaders/skybox/skybox";
+import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { Engine } from "@ogl-engine/engine/engine";
 
 interface StarStoryProps {

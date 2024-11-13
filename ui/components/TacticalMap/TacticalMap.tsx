@@ -9,7 +9,7 @@ import { MapControl } from "@ogl-engine/MapControl";
 import type { RequireComponent } from "@core/tsHelpers";
 import { defaultClickSound } from "@kit/BaseButton";
 import { assetLoader } from "@ogl-engine/AssetLoader";
-import { Skybox } from "@ogl-engine/loaders/skybox/skybox";
+import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { Engine } from "@ogl-engine/engine/engine";
 import { selectingSystem } from "@core/systems/selecting";
 import { EntityMesh } from "./EntityMesh";

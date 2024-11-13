@@ -4,10 +4,10 @@ import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
 import sCiv from "@assets/models/ship/sCiv.glb";
 import { AxesHelper, GLTFLoader } from "ogl";
-import { addBasic } from "@ogl-engine/loaders/basic/basic";
+import { addBasic } from "@ogl-engine/materials/basic/basic";
 import { MapControl } from "@ogl-engine/MapControl";
 import { Engine } from "@ogl-engine/engine/engine";
-import { Skybox } from "@ogl-engine/loaders/skybox/skybox";
+import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 
 const ModelStory: React.FC = () => {
   const engine = React.useMemo(() => new Engine(), []);
