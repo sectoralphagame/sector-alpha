@@ -21,8 +21,8 @@ export class Engine {
   scene: Transform;
   renderer: Renderer;
   dpr: number = 2;
-  postProcessing = true;
-  fxaa = true;
+  postProcessing = false;
+  fxaa = false;
   initialized = false;
 
   uniforms: {

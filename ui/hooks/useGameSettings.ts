@@ -5,6 +5,10 @@ export interface GameSettings {
   scale: number;
   dev: boolean;
   volume: Record<"ui", number>;
+  graphics: {
+    postProcessing: boolean;
+    fxaa: boolean;
+  };
 }
 
 const defaultGameSttings: GameSettings = {
@@ -13,6 +17,10 @@ const defaultGameSttings: GameSettings = {
   dev: false,
   volume: {
     ui: 1,
+  },
+  graphics: {
+    postProcessing: false,
+    fxaa: false,
   },
 };
 

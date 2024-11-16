@@ -13,15 +13,18 @@ import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { Engine } from "@ogl-engine/engine/engine";
 import { selectingSystem } from "@core/systems/selecting";
 import { Path } from "@ogl-engine/utils/path";
+import { useGameSettings } from "@ui/hooks/useGameSettings";
 import { EntityMesh } from "./EntityMesh";
 
 const scale = 2;
 
 export const TacticalMap: React.FC = React.memo(() => {
   const [sim] = useSim();
+  const [gameSettings] = useGameSettings();
   const engine = React.useMemo(() => new Engine(), []);
   const controlRef = React.useRef<MapControl>();
   const raycastRef = React.useRef(new Raycast());
+  const raycastHitsRef = React.useRef<EntityMesh[]>([]);
   const skybox = React.useRef<Skybox>();
   const meshes = React.useRef<Map<number, EntityMesh>>(new Map());
   const uiRef = React.useRef<
@@ -43,22 +46,13 @@ export const TacticalMap: React.FC = React.memo(() => {
       skybox.current = new Skybox(engine.gl, engine.scene, "example");
 
       controlRef.current = new MapControl(engine.camera);
-      controlRef.current.onClick = async (pos, button) => {
-        const normalisedMousePos = new Vec2(
-          2.0 * (pos.x / engine.gl.renderer.width) - 1.0,
-          2.0 * (1.0 - pos.y / engine.gl.renderer.height) - 1.0
-        );
-        raycastRef.current.castMouse(engine.camera, normalisedMousePos);
-        const hits = raycastRef.current.intersectBounds([
-          ...meshes.current.values(),
-        ]) as EntityMesh[];
-
-        if (hits.length) {
+      controlRef.current.onClick = async (_, button) => {
+        if (raycastHitsRef.current.length) {
           // eslint-disable-next-line default-case
           switch (button) {
             case 0:
               settingsManagerRef.current.cp.selectionManager.id =
-                hits[0].entityId;
+                raycastHitsRef.current[0].entityId;
               defaultClickSound.play();
 
               if (Date.now() - lastClickedRef.current < 200) {
@@ -69,7 +63,7 @@ export const TacticalMap: React.FC = React.memo(() => {
               break;
             case 2:
               settingsManagerRef.current.cp.selectionManager.secondaryId =
-                hits[0].entityId;
+                raycastHitsRef.current[0].entityId;
           }
         }
       };
@@ -126,6 +120,20 @@ export const TacticalMap: React.FC = React.memo(() => {
 
         mesh.visible = !entity.cp.render.hidden;
       }
+
+      const normalisedMousePos = new Vec2(
+        2.0 * (controlRef.current!.mouse.x / engine.gl.renderer.width) - 1.0,
+        2.0 * (1.0 - controlRef.current!.mouse.y / engine.gl.renderer.height) -
+          1.0
+      );
+      raycastRef.current.castMouse(engine.camera, normalisedMousePos);
+      raycastHitsRef.current = raycastRef.current.intersectBounds([
+        ...meshes.current.values(),
+      ]) as EntityMesh[];
+
+      engine.canvas.style.cursor = raycastHitsRef.current.length
+        ? "pointer"
+        : "default";
 
       if (uiRef.current.path && selectedEntity) {
         uiRef.current.path.update(
@@ -195,6 +203,13 @@ export const TacticalMap: React.FC = React.memo(() => {
 
     window.addEventListener("contextmenu", onContextMenu);
   }, []);
+
+  React.useEffect(() => {
+    engine.fxaa = gameSettings.graphics.fxaa;
+  }, [gameSettings.graphics.fxaa]);
+  React.useEffect(() => {
+    engine.postProcessing = gameSettings.graphics.postProcessing;
+  }, [gameSettings.graphics.postProcessing]);
 
   return <OglCanvas engine={engine} />;
 });
