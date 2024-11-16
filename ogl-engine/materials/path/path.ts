@@ -7,5 +7,8 @@ export function createPathMaterialProgram(engine: Engine) {
   return new Program(engine.gl, {
     vertex,
     fragment,
+    uniforms: {
+      uColor: { value: [1, 1, 1] },
+    },
   });
 }

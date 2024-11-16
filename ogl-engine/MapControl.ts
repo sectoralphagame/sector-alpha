@@ -47,7 +47,6 @@ export class MapControl {
 
   constructor(camera: Camera) {
     this.camera = camera;
-    this.camera.near = 0.01;
     this.camera.far = 1e5;
     this.camera.lookAt(this.focusPoint);
 
