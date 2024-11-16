@@ -37,7 +37,7 @@ export class MapControl {
   azimuth = Math.PI / 2;
   distance = 10;
   keysPressed = new Set<string>();
-  zoomRange = [0.8, 80];
+  zoomRange = [0.2, 80];
 
   dragPrev: Vec2 | null = null;
   mouse: Vec2 = new Vec2();
@@ -47,6 +47,7 @@ export class MapControl {
 
   constructor(camera: Camera) {
     this.camera = camera;
+    this.camera.near = 0.01;
     this.camera.far = 1e5;
     this.camera.lookAt(this.focusPoint);
 
