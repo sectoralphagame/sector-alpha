@@ -3,17 +3,26 @@ import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
 import sCiv from "@assets/models/ship/sCiv.glb";
-import { Geometry, GLTFLoader, Mesh } from "ogl";
+import { GLTFLoader, Vec3 } from "ogl";
 import { addBasic } from "@ogl-engine/materials/basic/basic";
 import { MapControl } from "@ogl-engine/MapControl";
 import { Engine } from "@ogl-engine/engine/engine";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
-import { createPathMaterialProgram } from "@ogl-engine/materials/path/path";
+import type { PathColor } from "@ogl-engine/utils/path";
+import { Path } from "@ogl-engine/utils/path";
+
+const waypoints: [Vec3, PathColor][] = [
+  [new Vec3(0, 0, 0), "default"],
+  [new Vec3(1, 0, 0), "warning"],
+  [new Vec3(1, 0, 1), "default"],
+  [new Vec3(0, 0, 1), "default"],
+];
 
 const PathStory: React.FC = () => {
   const engine = React.useMemo(() => new Engine(), []);
   const controlRef = React.useRef<MapControl>();
   const skyboxRef = React.useRef<Skybox>();
+  const pathRef = React.useRef<Path>();
 
   React.useEffect(() => {
     engine.hooks.onInit.subscribe("MapControlStory", async () => {
@@ -26,29 +35,13 @@ const PathStory: React.FC = () => {
 
       addBasic(engine, await GLTFLoader.load(engine.gl, sCiv));
 
-      const path = new Mesh(engine.gl, {
-        geometry: new Geometry(engine.gl, {
-          position: {
-            size: 3,
-            data: new Float32Array(20).fill(0),
-            usage: engine.gl.DYNAMIC_DRAW,
-          },
-        }),
-        mode: engine.gl.LINES,
-        program: createPathMaterialProgram(engine),
-      });
-      engine.scene.addChild(path);
-
-      setTimeout(() => {
-        (path.geometry.attributes.position.data as Float32Array)
-          .fill(0)
-          .set([0, 0, 0, 1, 0, 1, -1, 0, 2]);
-
-        path.geometry.attributes.position.needsUpdate = true;
-      }, 1000);
+      pathRef.current = new Path(engine);
+      pathRef.current.update(waypoints);
+      engine.scene.addChild(pathRef.current);
     });
 
     engine.hooks.onUpdate.subscribe("MapControlStory", () => {
+      pathRef.current?.update(waypoints);
       controlRef.current!.update();
     });
   }, [engine]);
