@@ -125,7 +125,7 @@ export class Engine {
       uniforms: {
         uResolution: this.uniforms.resolution.base,
         tBloom: this.postProcessingLayers.bloom.uniform,
-        uBloomStrength: { value: 3.2 },
+        uBloomStrength: { value: 2 },
       },
     });
     this.postProcessingLayers.composite.addPass({
