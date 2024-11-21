@@ -3,7 +3,6 @@ import { Raycast, Vec2, Vec3 } from "ogl";
 import { useContextMenu, useSim } from "@ui/atoms";
 import { defaultIndexer } from "@core/systems/utils/default";
 import { first } from "@fxts/core";
-import { type Sector } from "@core/archetypes/sector";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
 import { MapControl } from "@ogl-engine/MapControl";
 import type { RequireComponent } from "@core/tsHelpers";
@@ -14,7 +13,10 @@ import { Engine } from "@ogl-engine/engine/engine";
 import { selectingSystem } from "@core/systems/selecting";
 import { Path } from "@ogl-engine/utils/path";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
+import { sectorObservable } from "@ui/state/sector";
+import type { SkyboxTexture } from "@assets/textures/skybox";
 import { EntityMesh } from "./EntityMesh";
+import mapData from "../../../core/world/data/map.json";
 
 const scale = 2;
 
@@ -35,15 +37,14 @@ export const TacticalMap: React.FC = React.memo(() => {
   const settingsManagerRef = React.useRef<
     RequireComponent<"selectionManager" | "camera">
   >(first(sim.index.settings.getIt())!);
-  const activeSectorRef = React.useRef(defaultIndexer.sectors.get()[9]!.id);
   const lastClickedRef = React.useRef(0);
   const [, setMenu] = useContextMenu();
 
   React.useEffect(() => {
+    sectorObservable.notify(defaultIndexer.sectors.get()[9]);
+
     engine.hooks.onInit.subscribe("TacticalMap", async () => {
       await assetLoader.load(engine.gl);
-
-      skybox.current = new Skybox(engine.gl, engine.scene, "example");
 
       controlRef.current = new MapControl(engine.camera);
       controlRef.current.onClick = async (_, button) => {
@@ -84,8 +85,24 @@ export const TacticalMap: React.FC = React.memo(() => {
         settingsManagerRef.current.cp.selectionManager.id!
       );
 
+      if (!skybox.current) {
+        skybox.current = new Skybox(
+          engine.gl,
+          engine.scene,
+          (mapData.sectors.find(
+            (s) => s.id === sectorObservable.value.cp.name.slug
+          )?.skybox as SkyboxTexture) ?? "example"
+        );
+      }
+
       for (const entity of defaultIndexer.renderable.getIt()) {
-        if (entity.cp.position.sector !== activeSectorRef.current) continue;
+        if (entity.cp.position.sector !== sectorObservable.value.id) {
+          if (meshes.current.has(entity.id)) {
+            engine.scene.removeChild(meshes.current.get(entity.id)!);
+            meshes.current.delete(entity.id);
+          }
+          continue;
+        }
         // FIXME: Remove this debug code
         if (!(entity.cp.render.model in assetLoader.models)) {
           if (entity.hasComponents(["dockable"])) {
@@ -160,6 +177,17 @@ export const TacticalMap: React.FC = React.memo(() => {
       controlRef.current!.update();
     });
 
+    sectorObservable.subscribe("TacticalMap", () => {
+      for (const mesh of meshes.current) {
+        engine.scene.removeChild(mesh[1]);
+      }
+      meshes.current.clear();
+      if (skybox.current) {
+        engine.scene.removeChild(skybox.current.transform);
+        skybox.current = undefined;
+      }
+    });
+
     const onSelectedChange = ([prevId, id]: (number | null)[]) => {
       if (prevId) {
         meshes.current.get(prevId)?.setSelected(false);
@@ -174,6 +202,8 @@ export const TacticalMap: React.FC = React.memo(() => {
           const path = new Path(engine);
           engine.scene.addChild(path);
           uiRef.current.path = path;
+        } else {
+          uiRef.current.path = undefined;
         }
       }
     };
@@ -195,7 +225,7 @@ export const TacticalMap: React.FC = React.memo(() => {
           active: true,
           position: [event.clientX, event.clientY],
           worldPosition,
-          sector: sim.getOrThrow<Sector>(activeSectorRef.current),
+          sector: sectorObservable.value,
         };
         setMenu(data);
       }, 40);

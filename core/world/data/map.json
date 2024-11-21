@@ -1,16 +1,17 @@
 {
   "sectors": [
     {
-      "name": "Terra",
+      "name": "Earth",
       "position": [0, 0],
-      "id": "terra",
+      "id": "earth",
       "resources": {
         "fuelium": 0,
         "goldOre": 6,
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "earth"
     },
     {
       "name": "Luna",
@@ -70,7 +71,8 @@
         "ice": 8,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "gaia"
     },
     {
       "name": "Arges",
@@ -106,7 +108,8 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "sectoralpha"
     },
     {
       "name": "Eris",
@@ -214,7 +217,8 @@
         "ice": 0,
         "ore": 12,
         "silica": 5
-      }
+      },
+      "skybox": "teegarden2"
     },
     {
       "name": "Tau Ceti e",
@@ -387,9 +391,9 @@
   ],
   "inactive": [],
   "links": [
-    { "sectors": ["terra", "luna"], "type": "accelerator" },
+    { "sectors": ["earth", "luna"], "type": "accelerator" },
     {
-      "sectors": ["terra", "mars"],
+      "sectors": ["earth", "mars"],
       "type": "accelerator",
       "draw": ["vertical", "horizontal"]
     },
@@ -420,9 +424,9 @@
     { "sectors": ["juno-3", "teegarden-1"], "type": "gate" },
     { "sectors": ["pontus", "wolf-1061-2"], "type": "gate" },
     { "sectors": ["teegarden-2", "gj-1002-1"], "type": "gate" },
-    { "sectors": ["terra", "eris"], "type": "gate" },
-    { "sectors": ["terra", "gaia"], "type": "gate" },
-    { "sectors": ["terra", "juno-2"], "type": "gate" },
+    { "sectors": ["earth", "eris"], "type": "gate" },
+    { "sectors": ["earth", "gaia"], "type": "gate" },
+    { "sectors": ["earth", "juno-2"], "type": "gate" },
     { "sectors": ["wolf-1061-1", "gj-625"], "type": "gate" },
     { "sectors": ["sedna", "gj-1002-3"], "type": "gate" },
     {
@@ -436,7 +440,7 @@
     {
       "name": "United Earth's Nations",
       "slug": "UEN",
-      "sectors": ["terra", "luna", "mars", "saturn", "eris", "discordis-c"],
+      "sectors": ["earth", "luna", "mars", "saturn", "eris", "discordis-c"],
       "blueprints": {
         "ships": [
           "courierA",
@@ -477,7 +481,7 @@
       "type": "territorial",
       "patrols": { "formation": { "fighters": 3 }, "perSector": 4 },
       "restrictions": { "mining": false },
-      "home": "terra"
+      "home": "earth"
     },
     {
       "name": "Alpha Centauri's Technocracy",

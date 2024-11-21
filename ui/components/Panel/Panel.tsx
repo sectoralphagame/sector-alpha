@@ -139,6 +139,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
         isCollapsed={isCollapsed}
         onCollapseToggle={toggleCollapse}
         onPlayerAssets={() => {
+          setCollapsed(false);
           sim.index.settings.get()[0].cp.selectionManager.id = null;
         }}
       >
