@@ -6,8 +6,8 @@ import { OglCanvas } from "ogl-engine/OglCanvas";
 import sCiv from "@assets/models/ship/sCiv.glb";
 import type { GLTF } from "ogl";
 import { GLTFLoader, Orbit, Vec3 } from "ogl";
-import { addBasic } from "@ogl-engine/materials/basic/basic";
 import { Engine } from "@ogl-engine/engine/engine";
+import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 
 interface InstancingStoryProps {
   cubes: number;
@@ -29,7 +29,8 @@ const InstancingStory: React.FC<InstancingStoryProps> = ({ cubes }) => {
       const model = await GLTFLoader.load(engine.gl, sCiv);
       modelRef.current = model;
       // FIXME: addInstanced()
-      addBasic(engine, model);
+      const mesh = BaseMesh.fromGltf(engine, model);
+      engine.scene.addChild(mesh);
       model.meshes[0].primitives[0].geometry.addAttribute("offset", {
         instanced: true,
         count: 0,

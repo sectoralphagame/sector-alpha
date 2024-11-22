@@ -4,10 +4,11 @@ import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
 import sCiv from "@assets/models/ship/sCiv.glb";
 import { AxesHelper, GLTFLoader } from "ogl";
-import { addBasic } from "@ogl-engine/materials/basic/basic";
 import { MapControl } from "@ogl-engine/MapControl";
 import { Engine } from "@ogl-engine/engine/engine";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
+import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
+import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
 
 const ModelStory: React.FC = () => {
   const engine = React.useMemo(() => new Engine(), []);
@@ -25,7 +26,10 @@ const ModelStory: React.FC = () => {
         "example"
       );
 
-      addBasic(engine, await GLTFLoader.load(engine.gl, sCiv));
+      const gltf = await GLTFLoader.load(engine.gl, sCiv);
+      const mesh = BaseMesh.fromGltf(engine, gltf);
+      mesh.applyMaterial(new SimplePbrMaterial(engine, gltf.materials[0]));
+      engine.scene.addChild(mesh);
     });
 
     engine.hooks.onUpdate.subscribe("MapControlStory", () => {

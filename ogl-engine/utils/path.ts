@@ -1,8 +1,9 @@
 import type { RequireComponent } from "@core/tsHelpers";
 import { findInAncestors } from "@core/utils/findInAncestors";
+import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import type { Engine } from "@ogl-engine/engine/engine";
-import { createPathMaterialProgram } from "@ogl-engine/materials/path/path";
-import { Mesh, Plane, Transform, Vec3 } from "ogl";
+import { ColorMaterial } from "@ogl-engine/materials/color/color";
+import { Plane, Transform, Vec3 } from "ogl";
 
 export type PathColor = "default" | "warning";
 const colors: Record<PathColor, Vec3> = {
@@ -18,6 +19,49 @@ export class Path extends Transform {
 
     this.engine = engine;
   }
+
+  createSegment = (): void => {
+    const plane = new BaseMesh(this.engine, {
+      geometry: new Plane(this.engine.gl),
+      material: new ColorMaterial(this.engine, colors.default),
+    });
+    plane.rotation.x = -Math.PI / 2;
+    plane.material.uniforms.fEmissive.value = 0.05;
+    this.addChild(plane);
+  };
+
+  update = (waypoints: [Vec3, PathColor][]) => {
+    for (let i = this.children.length; i < waypoints.length - 1; i++) {
+      this.createSegment();
+    }
+    for (let i = waypoints.length - 1; i < this.children.length; i++) {
+      this.removeChild(this.children[i]);
+    }
+    this.children.splice(
+      waypoints.length - 1,
+      this.children.length - (waypoints.length - 1)
+    );
+
+    for (let i = 0; i < waypoints.length - 1; i++) {
+      const distance = waypoints[i][0].distance(waypoints[i + 1][0]);
+      this.children[i].scale.set(
+        (0.023 * this.engine.camera.position.y) / 5,
+        distance,
+        0
+      );
+
+      this.children[i].position.set(
+        waypoints[i + 1][0].clone().add(waypoints[i][0]).divide(2)
+      );
+      this.children[i].rotation.y = Math.atan2(
+        waypoints[i][0].x - waypoints[i + 1][0].x,
+        waypoints[i][0].z - waypoints[i + 1][0].z
+      );
+      (
+        this.children[i] as BaseMesh<ColorMaterial>
+      ).material.uniforms.uColor.value = colors[waypoints[i + 1][1]];
+    }
+  };
 
   static getPath = (
     entity: RequireComponent<"position" | "orders">,
@@ -65,46 +109,5 @@ export class Path extends Transform {
     }
 
     return waypoints;
-  };
-
-  createSegment = (): void => {
-    const plane = new Mesh(this.engine.gl, {
-      geometry: new Plane(this.engine.gl),
-      program: createPathMaterialProgram(this.engine),
-    });
-    plane.rotation.x = -Math.PI / 2;
-    this.addChild(plane);
-  };
-
-  update = (waypoints: [Vec3, PathColor][]) => {
-    for (let i = this.children.length; i < waypoints.length - 1; i++) {
-      this.createSegment();
-    }
-    for (let i = waypoints.length - 1; i < this.children.length; i++) {
-      this.removeChild(this.children[i]);
-    }
-    this.children.splice(
-      waypoints.length - 1,
-      this.children.length - (waypoints.length - 1)
-    );
-
-    for (let i = 0; i < waypoints.length - 1; i++) {
-      const distance = waypoints[i][0].distance(waypoints[i + 1][0]);
-      this.children[i].scale.set(
-        (0.02 * this.engine.camera.position.y) / 5,
-        distance,
-        0
-      );
-
-      this.children[i].position.set(
-        waypoints[i + 1][0].clone().add(waypoints[i][0]).divide(2)
-      );
-      this.children[i].rotation.y = Math.atan2(
-        waypoints[i][0].x - waypoints[i + 1][0].x,
-        waypoints[i][0].z - waypoints[i + 1][0].z
-      );
-      (this.children[i] as Mesh).program.uniforms.uColor.value =
-        colors[waypoints[i + 1][1]];
-    }
   };
 }

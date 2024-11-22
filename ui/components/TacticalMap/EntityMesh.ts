@@ -2,24 +2,26 @@ import type { DockSize } from "@core/components/dockable";
 import type { RequireComponent } from "@core/tsHelpers";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import type { Engine } from "@ogl-engine/engine/engine";
-import { createBasicProgram } from "@ogl-engine/materials/basic/basic";
 import { SelectionRing } from "@ogl-engine/materials/ring/ring";
-import { Mesh } from "ogl";
+import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
+import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
 
-export class EntityMesh extends Mesh {
+export class EntityMesh extends BaseMesh {
   engine: Engine;
   entityId: number;
   ring: SelectionRing | null = null;
   selected = false;
 
   constructor(engine: Engine, entity: RequireComponent<"render">) {
-    super(engine.gl, {
+    super(engine, {
       geometry: assetLoader.model(entity.cp.render.model).geometry,
-      program: createBasicProgram(
+    });
+    this.applyMaterial(
+      new SimplePbrMaterial(
         engine,
         assetLoader.model(entity.cp.render.model).material
-      ),
-    });
+      )
+    );
 
     this.engine = engine;
     this.scale.set(1 / 220);

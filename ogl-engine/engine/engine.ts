@@ -7,13 +7,14 @@ import {
   RenderTarget,
   Texture,
   Vec2,
+  Vec3,
 } from "ogl";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
 import compositeFragment from "../post/composite.frag.glsl";
 
-const bloomSize = 1.5;
+const bloomSize = 1.2;
 
 export class Engine {
   camera: Camera;
@@ -22,10 +23,13 @@ export class Engine {
   renderer: Renderer;
   dpr: number = 2;
   postProcessing = false;
-  fxaa = false;
+  fxaa = true;
   initialized = false;
 
   uniforms: {
+    env: Record<"vLightColor" | "vLightDirection", { value: Vec3 }> & {
+      fLightPower: { value: number };
+    };
     resolution: { base: { value: Vec2 }; bloom: { value: Vec2 } };
     uTime: { value: number };
   };
@@ -87,6 +91,11 @@ export class Engine {
     };
 
     this.uniforms = {
+      env: {
+        vLightColor: { value: new Vec3(1, 1, 1) },
+        vLightDirection: { value: new Vec3(0, 1, 0) },
+        fLightPower: { value: 0.1 },
+      },
       resolution: {
         base: { value: new Vec2() },
         bloom: { value: new Vec2() },
@@ -125,7 +134,7 @@ export class Engine {
       uniforms: {
         uResolution: this.uniforms.resolution.base,
         tBloom: this.postProcessingLayers.bloom.uniform,
-        uBloomStrength: { value: 2 },
+        uBloomStrength: { value: 1 },
       },
     });
     this.postProcessingLayers.composite.addPass({

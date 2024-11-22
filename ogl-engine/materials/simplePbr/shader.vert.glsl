@@ -14,8 +14,8 @@ uniform mat4 modelMatrix;
 uniform mat4 modelViewMatrix;  // Combines model and view matrix (but no instancing transforms)
 uniform mat4 projectionMatrix; // Projection matrix
 uniform mat3 normalMatrix;     // Normal matrix (inverse transpose of model matrix)
-uniform vec3 lightColor;
-uniform vec3 lightDirection;
+uniform vec3 vLightColor;
+uniform vec3 vLightDirection;
 uniform float uTime;
 
 out vec2 vUv;
@@ -60,11 +60,11 @@ void main() {
 
     // Lighting calculation
     highp vec3 ambientLight = vec3(0.1f);  // Ambient light
-    highp vec3 directionalVector = normalize(lightDirection);  // Light direction (in world space)
+    highp vec3 directionalVector = normalize(vLightDirection);  // Light direction (in world space)
 
     // Compute diffuse lighting based on the transformed normal
     highp float directional = max(dot(vNormal, directionalVector), 0.0f);
-    vLighting = ambientLight + (lightColor * directional * 0.5f);
+    vLighting = ambientLight + (vLightColor * directional * 0.5f);
 
     // Final transformation to clip space (projection)
     gl_Position = projectionMatrix * mvPosition;

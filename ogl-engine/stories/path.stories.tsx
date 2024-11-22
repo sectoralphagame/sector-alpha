@@ -2,9 +2,7 @@ import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
-import sCiv from "@assets/models/ship/sCiv.glb";
-import { GLTFLoader, Vec3 } from "ogl";
-import { addBasic } from "@ogl-engine/materials/basic/basic";
+import { Vec3 } from "ogl";
 import { MapControl } from "@ogl-engine/MapControl";
 import { Engine } from "@ogl-engine/engine/engine";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
@@ -32,8 +30,6 @@ const PathStory: React.FC = () => {
         engine.scene,
         "example"
       );
-
-      addBasic(engine, await GLTFLoader.load(engine.gl, sCiv));
 
       pathRef.current = new Path(engine);
       pathRef.current.update(waypoints);

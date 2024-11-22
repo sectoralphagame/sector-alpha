@@ -16,12 +16,11 @@ uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
 uniform float uNormalScale;
 uniform float uNormalUVScale;
-uniform vec3 lightDirection;
+uniform vec3 vLightColor;
+uniform vec3 vLightDirection;
+uniform float fLightPower;
 
 out vec4 fragData[2];
-
-vec3 lightColor = vec3(1);
-float lightPower = 0.05f;
 
 void main() {
     gl_FragDepth = vFragDepth;
@@ -30,12 +29,12 @@ void main() {
     vec3 norm = viewNormal(vMPos, vUv, vNormal, tNormal, uNormalUVScale, uNormalScale, viewMatrix);
 
     // Diffuse shading (Lambertian)
-    float diff = max(dot(norm, lightDirection), 0.0f);
-    vec3 diffuse = diff * lightColor;
+    float diff = max(dot(norm, vLightDirection), 0.0f);
+    vec3 diffuse = diff * vLightColor;
 
-    vec3 specular = getSpecular(vMPos, FragPos, lightDirection, norm, lightColor);
+    vec3 specular = getSpecular(vMPos, FragPos, vLightDirection, norm, vLightColor);
 
-    float shading = max(dot(norm, lightDirection) * lightPower, 0.0f);
+    float shading = max(dot(norm, vLightDirection) * fLightPower, 0.0f);
 
     fragData[0].rgb = (specular + diffuse) * tex * vLighting + shading;
     fragData[0].a = 1.0f;

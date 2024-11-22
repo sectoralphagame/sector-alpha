@@ -2,12 +2,13 @@ import React, { useEffect } from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
-import { Orbit, Vec3 } from "ogl";
-import type { Star } from "@ogl-engine/materials/star/star";
-import { addStar } from "@ogl-engine/materials/star/star";
+import { GLTFLoader, Orbit, Vec3 } from "ogl";
+import { StarMaterial } from "@ogl-engine/materials/star/star";
 import Color from "color";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { Engine } from "@ogl-engine/engine/engine";
+import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
+import starModel from "@assets/models/world/star.glb";
 
 interface StarStoryProps {
   color: string;
@@ -15,7 +16,7 @@ interface StarStoryProps {
 
 const StarStory: React.FC<StarStoryProps> = ({ color: colorProp }) => {
   const engine = React.useMemo(() => new Engine(), []);
-  const starRef = React.useRef<Star>();
+  const starRef = React.useRef<BaseMesh<StarMaterial>>();
   const skyboxRef = React.useRef<Skybox>();
   const controlRef = React.useRef<Orbit>();
 
@@ -23,7 +24,7 @@ const StarStory: React.FC<StarStoryProps> = ({ color: colorProp }) => {
 
   useEffect(() => {
     if (!starRef.current) return;
-    starRef.current.program.uniforms.vColor.value = color;
+    starRef.current.material.setColor(color);
   }, [color]);
 
   useEffect(() => {
@@ -35,14 +36,20 @@ const StarStory: React.FC<StarStoryProps> = ({ color: colorProp }) => {
         engine.scene,
         "example"
       );
-      starRef.current = await addStar(engine, color);
+      starRef.current = BaseMesh.fromGltf<StarMaterial>(
+        engine,
+        await GLTFLoader.load(engine.gl, starModel)
+      );
+      engine.scene.addChild(starRef.current);
+      starRef.current.applyMaterial(new StarMaterial(engine));
+      starRef.current.material.setColor(color);
     });
 
     engine.hooks.onUpdate.subscribe("StarStory", () => {
       controlRef.current!.update();
 
       if (starRef.current) {
-        starRef.current.transform.rotation.y += 0.001;
+        starRef.current.rotation.y += 0.001;
       }
     });
   }, []);

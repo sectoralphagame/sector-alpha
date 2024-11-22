@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useCallback } from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
-import type { Mesh } from "ogl";
 import { GLTFLoader, Orbit } from "ogl";
-import { addBasic } from "@ogl-engine/materials/basic/basic";
 import models from "@assets/models";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { Engine } from "@ogl-engine/engine/engine";
+import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
+import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
 
 interface ModelStoryProps {
   model: string;
@@ -15,9 +15,19 @@ interface ModelStoryProps {
 
 const ModelStory: React.FC<ModelStoryProps> = ({ model: modelName }) => {
   const engine = React.useMemo(() => new Engine(), []);
-  const meshRef = React.useRef<Mesh>();
+  const meshRef = React.useRef<BaseMesh>();
   const skyboxRef = React.useRef<Skybox>();
   const controlRef = React.useRef<Orbit>();
+  const load = useCallback((m: keyof typeof models) => {
+    GLTFLoader.load(engine.renderer.gl, m).then((model) => {
+      meshRef.current = BaseMesh.fromGltf(engine, model, {
+        material: model.materials?.[0]
+          ? new SimplePbrMaterial(engine, model.materials[0])
+          : undefined,
+      });
+      meshRef.current.setParent(engine.scene);
+    });
+  }, []);
 
   React.useEffect(() => {
     engine.hooks.onInit.subscribe("ModelStory", async () => {
@@ -31,10 +41,7 @@ const ModelStory: React.FC<ModelStoryProps> = ({ model: modelName }) => {
         "example"
       );
 
-      GLTFLoader.load(engine.renderer.gl, models[modelName]).then((model) => {
-        meshRef.current = addBasic(engine, model);
-        meshRef.current.setParent(engine.scene);
-      });
+      load(models[modelName]);
     });
 
     engine.hooks.onUpdate.subscribe("ModelStory", () => {
@@ -45,10 +52,7 @@ const ModelStory: React.FC<ModelStoryProps> = ({ model: modelName }) => {
   React.useEffect(() => {
     if (engine.initialized) {
       meshRef.current?.parent?.removeChild(meshRef.current);
-      GLTFLoader.load(engine.renderer.gl, models[modelName]).then((model) => {
-        meshRef.current = addBasic(engine, model);
-        meshRef.current.setParent(engine.scene);
-      });
+      load(models[modelName]);
     }
   }, [modelName]);
 
