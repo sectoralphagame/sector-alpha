@@ -9,9 +9,10 @@ export class ColorMaterial extends Material {
   uniforms: Material["uniforms"] & {
     uColor: { value: Vec3 };
     fEmissive: { value: number };
+    bShaded: { value: boolean };
   };
 
-  constructor(engine: Engine, color: Vec3) {
+  constructor(engine: Engine, color: Vec3, shaded = true) {
     super(engine);
 
     this.program = new Program(engine.gl, {
@@ -21,6 +22,7 @@ export class ColorMaterial extends Material {
     });
     this.uniforms.uColor = { value: color };
     this.uniforms.fEmissive = { value: 0 };
+    this.uniforms.bShaded = { value: shaded };
   }
 
   setColor(color: Vec3) {

@@ -110,6 +110,7 @@
     "glsl-film-grain": "^1.0.4",
     "glsl-luma": "^1.0.1",
     "glsl-noise": "^0.0.0",
+    "glsl-specular-blinn-phong": "^1.0.2",
     "graphlib": "^2.1.8",
     "howler": "^2.2.4",
     "husky": "^8.0.3",
