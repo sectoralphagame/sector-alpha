@@ -29,6 +29,7 @@ export class BaseMesh<TMaterial extends Material = Material> extends Mesh {
   applyMaterial(material: TMaterial): BaseMesh<TMaterial> {
     this.material = material;
     this.material.apply(this);
+    this.program.cullFace = false;
 
     return this;
   }
@@ -48,6 +49,7 @@ export class BaseMesh<TMaterial extends Material = Material> extends Mesh {
     const uvs = this.geometry.attributes.uv.data!;
 
     const tangents = new Float32Array(vertices.length);
+    let degenerateUVs = 0;
 
     // calculate tangents and bitangents
     for (let i = 0; i < indices.length; i += 3) {
@@ -88,6 +90,19 @@ export class BaseMesh<TMaterial extends Material = Material> extends Mesh {
       tangents[i2 * 3 + 0] += tangent.x;
       tangents[i2 * 3 + 1] += tangent.y;
       tangents[i2 * 3 + 2] += tangent.z;
+
+      if (
+        deltaUV1.x === 0 &&
+        deltaUV1.y === 0 &&
+        deltaUV2.x === 0 &&
+        deltaUV2.y === 0
+      ) {
+        degenerateUVs++;
+      }
+    }
+
+    if (degenerateUVs > 0) {
+      console.warn(`BaseMesh: ${degenerateUVs} faces have degenerate UVs`);
     }
 
     this.geometry.addAttribute("tangent", {

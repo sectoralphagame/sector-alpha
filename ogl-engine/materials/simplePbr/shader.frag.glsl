@@ -6,7 +6,7 @@ precision highp float;
 
 in vec3 worldPosition;
 in vec2 vUv;
-in mat3 vTBN;
+in vec3 vTangent;
 in vec3 vNormal;
 
 uniform mat4 viewMatrix;
@@ -14,7 +14,7 @@ uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
 uniform vec3 cameraPosition;
 uniform vec3 ambient;
-uniform Light lights[16];   
+uniform Light lights[16];
 
 out vec4 fragData[2];
 
@@ -22,14 +22,17 @@ out vec4 fragData[2];
 
 void main() {
     vec3 tex = texture(tDiffuse, vUv).rgb;
-    vec3 normalMap = texture(tNormal, vUv).rgb * 2. - 1.;
+    vec3 normalMap = texture(tNormal, vUv).rgb * 2.f - 1.f;
+
+    vec3 tangent = vTangent - dot(vTangent, vNormal) * vNormal;
+    vec3 bitangent = cross(vNormal, tangent);
+    mat3 tbn = mat3(normalize(tangent), normalize(bitangent), normalize(vNormal));
 
     vec3 eyeDirection = normalize(cameraPosition - worldPosition);
     vec3 diffuse = vec3(0.0f);
     vec3 specular = vec3(0.0f);
 
-    vec3 norm = normalize(vTBN * normalMap);
-    // vec3 norm = normalize(vNormal);
+    vec3 norm = normalize(tbn * normalMap);
 
     for(int i = 0; i < lights.length(); i++) {
         if(lights[i].visible) {
@@ -40,7 +43,8 @@ void main() {
             } else {
                 vec3 d = lights[i].position.xyz - worldPosition;
                 lightDir = normalize(d);
-                intensity /= 1. + pow(length(d), 2.0f);
+                float dist = length(d);
+                intensity /= 1.0 + dist + pow(dist, 2.0f);
             }
             float diff = max(dot(norm, lightDir), 0.0f);
             vec3 color = lights[i].color * intensity;
@@ -49,7 +53,6 @@ void main() {
         }
     }
 
-    fragData[0].rgb = (diffuse + ambient + specular) * tex;
-    fragData[0].a = 1.0f;
+    fragData[0] = vec4((diffuse + ambient + specular) * tex, 1.0f);
     fragData[1] = vec4(0.f);
 }

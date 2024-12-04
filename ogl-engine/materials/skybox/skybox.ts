@@ -40,7 +40,7 @@ export class Skybox {
     this.loadTexture();
     this.transform.scale.set(1e3);
     scene.addChild(this.transform);
-    this.light = new Light(this.color, 12, new Vec3(0, -1, -0.4), true);
+    this.light = new Light(this.color, 0.12, new Vec3(0, -1, -0.4), true);
     this.engine.addLight(this.light);
   }
 

@@ -11,14 +11,17 @@ out vec3 vMPos;
 out vec3 worldPosition;
 
 uniform mat4 modelMatrix;
-uniform mat4 modelViewMatrix;
+uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat3 normalMatrix;
 
 void main() {
-    worldPosition = (modelMatrix * vec4(position, 1.0f)).xyz;
-    vUv = uv;
-    vNormal = normal;
+    vec4 mPosition = modelMatrix * vec4(position, 1.0f);
+    vec4 mvPosition = viewMatrix * mPosition;
+    worldPosition = mPosition.xyz;
 
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0f);
+    vUv = uv;
+    vNormal = mat3(modelMatrix) * normal;
+
+    gl_Position = projectionMatrix * mvPosition;
 }
