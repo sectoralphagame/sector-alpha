@@ -1,17 +1,11 @@
 import React from "react";
-import { getSelected } from "@core/components/selection";
 import Text from "@kit/Text";
-import { useSectorObservable } from "@ui/state/sector";
-import { useSim } from "../../atoms";
+import { useSelectedUnit, useUnitFocus } from "@ui/hooks/useUnitFocus";
 import styles from "./styles.scss";
 
 export const SelectedUnit: React.FC = () => {
-  const [sim] = useSim();
-  const selectedUnit = React.useMemo(
-    () => getSelected(sim),
-    [sim.index.settings.get()[0].cp.selectionManager.id]
-  );
-  const [sector, setSector] = useSectorObservable();
+  const selectedUnit = useSelectedUnit();
+  const focusUnit = useUnitFocus();
 
   if (!selectedUnit) {
     return null;
@@ -19,15 +13,7 @@ export const SelectedUnit: React.FC = () => {
 
   return (
     <div className={styles.root}>
-      <div
-        className={styles.panel}
-        onDoubleClick={() => {
-          if (sector.id !== selectedUnit.cp.position!.sector) {
-            setSector(sim.getOrThrow(selectedUnit.cp.position!.sector));
-          }
-          sim.index.settings.get()[0].cp.selectionManager.focused = true;
-        }}
-      >
+      <div className={styles.panel} onDoubleClick={focusUnit}>
         <Text variant="caption">
           {selectedUnit.cp.name?.value ??
             (selectedUnit.hasTags(["collectible"]) ? "Collectible" : "Unknown")}

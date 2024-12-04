@@ -4,6 +4,7 @@ import { filter, map, pipe, toArray } from "@fxts/core";
 import { useContextMenu, useGameOverlay, useSim } from "@ui/atoms";
 import React from "react";
 import type { Sim } from "@core/sim";
+import { useUnitFocus } from "@ui/hooks/useUnitFocus";
 import { useOverlayRegister } from "../Overlay/Overlay";
 import { FleetOverlayComponent } from "./FleetOverlayComponent";
 
@@ -26,13 +27,14 @@ export const FleetOverlay: React.FC = () => {
     getSelected(sim)?.id
   );
   const [, setMenu] = useContextMenu();
+  const focusUnit = useUnitFocus();
 
   const setSelected = (id: number) => {
     sim.index.settings.get()[0].cp.selectionManager.id = id;
     setSelectedState(id);
   };
   const onFocus = () => {
-    sim.index.settings.get()[0].cp.selectionManager.focused = true;
+    focusUnit();
     setOverlay(null);
   };
   const onTarget = (id: number) => {
