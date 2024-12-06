@@ -6,6 +6,8 @@ import { SelectionRing } from "@ogl-engine/materials/ring/ring";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
 
+export const entityScale = 1 / 220;
+
 export class EntityMesh extends BaseMesh {
   engine: Engine;
   entityId: number;
@@ -24,7 +26,7 @@ export class EntityMesh extends BaseMesh {
     );
 
     this.engine = engine;
-    this.scale.set(1 / 220);
+    this.scale.set(entityScale);
     this.position.y = Math.random() * 5;
     this.entityId = entity.id;
 

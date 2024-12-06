@@ -17,14 +17,10 @@ const ModelStory: React.FC = () => {
 
   React.useEffect(() => {
     engine.hooks.onInit.subscribe("MapControlStory", async () => {
-      controlRef.current = new MapControl(engine.camera);
+      controlRef.current = new MapControl(engine.camera, engine.canvas);
       const helper = new AxesHelper(engine.gl, {});
       helper.setParent(engine.scene);
-      skyboxRef.current = new Skybox(
-        engine.renderer.gl,
-        engine.scene,
-        "example"
-      );
+      skyboxRef.current = new Skybox(engine, engine.scene, "example");
 
       const gltf = await GLTFLoader.load(engine.gl, sCiv);
       const mesh = BaseMesh.fromGltf(engine, gltf);

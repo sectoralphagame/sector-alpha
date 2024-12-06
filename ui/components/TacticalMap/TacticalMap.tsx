@@ -2,7 +2,7 @@ import React from "react";
 import { Raycast, Vec2, Vec3 } from "ogl";
 import { useContextMenu, useSim } from "@ui/atoms";
 import { defaultIndexer } from "@core/systems/utils/default";
-import { first } from "@fxts/core";
+import { find, first } from "@fxts/core";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
 import { MapControl } from "@ogl-engine/MapControl";
 import type { RequireComponent } from "@core/tsHelpers";
@@ -15,10 +15,37 @@ import { Path } from "@ogl-engine/utils/path";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
 import { sectorObservable } from "@ui/state/sector";
 import type { SkyboxTexture } from "@assets/textures/skybox";
-import { EntityMesh } from "./EntityMesh";
+import { TintedTextureMaterial } from "@ogl-engine/materials/tintedTexture/tintedTexture";
+import { loadTexture } from "@ogl-engine/utils/texture";
+import arrowDownFat from "@assets/ui/icons/arrow_down_fat.svg";
+import { Billboard } from "@ogl-engine/utils/billboard";
 import mapData from "../../../core/world/data/map.json";
+import { EntityMesh } from "./EntityMesh";
 
 const scale = 2;
+
+async function drawArrow(engine: Engine, mesh: EntityMesh): Promise<Billboard> {
+  const arrow = new Billboard<TintedTextureMaterial>(
+    engine,
+    new Vec3(0.2),
+    true
+  );
+  arrow.applyMaterial(
+    new TintedTextureMaterial(
+      engine,
+      await loadTexture(engine, arrowDownFat),
+      getComputedStyle(document.querySelector("#root")!).getPropertyValue(
+        "--palette-primary"
+      )
+    )
+  );
+  arrow.material.uniforms.fEmissive.value = 0.1;
+  arrow.name = "arrow";
+  arrow.position = mesh.position;
+  arrow.setParent(engine.scene);
+
+  return arrow;
+}
 
 export const TacticalMap: React.FC = React.memo(() => {
   const [sim] = useSim();
@@ -32,8 +59,10 @@ export const TacticalMap: React.FC = React.memo(() => {
   const uiRef = React.useRef<
     Partial<{
       path: Path;
-    }>
-  >({});
+    }> & { billboards: Record<string, Billboard> }
+  >({
+    billboards: {},
+  });
   const settingsManagerRef = React.useRef<
     RequireComponent<"selectionManager" | "camera">
   >(first(sim.index.settings.getIt())!);
@@ -41,13 +70,18 @@ export const TacticalMap: React.FC = React.memo(() => {
   const [, setMenu] = useContextMenu();
 
   React.useEffect(() => {
-    sectorObservable.notify(defaultIndexer.sectors.get()[9]);
+    sectorObservable.notify(
+      find(
+        (s) => s.cp.name.value === "Teegarden's Star II",
+        sim.index.sectors.get()
+      )!
+    );
 
     engine.hooks.onInit.subscribe("TacticalMap", async () => {
       await assetLoader.load(engine.gl);
 
-      controlRef.current = new MapControl(engine.camera);
-      controlRef.current.onClick = async (_, button) => {
+      controlRef.current = new MapControl(engine.camera, engine.canvas);
+      controlRef.current.onClick = async (mousePosition, button) => {
         if (raycastHitsRef.current.length) {
           // eslint-disable-next-line default-case
           switch (button) {
@@ -67,14 +101,47 @@ export const TacticalMap: React.FC = React.memo(() => {
                 raycastHitsRef.current[0].entityId;
           }
         }
+
+        if (button === 2) {
+          const worldPos = raycastRef.current.intersectPlane({
+            origin: new Vec3(0),
+            normal: new Vec3(0, 1, 0),
+          });
+          const worldPosition = [worldPos.x / scale, worldPos.z / scale];
+
+          const data = {
+            active: true,
+            position: mousePosition.clone(),
+            worldPosition,
+            sector: sectorObservable.value,
+          };
+          setMenu(data);
+        }
       };
-      controlRef.current.onMove = () => {
+      controlRef.current.onPan = () => {
         settingsManagerRef.current.cp.selectionManager.focused = false;
       };
 
       sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
         if (meshes.current.has(entity.id)) {
-          engine.scene.removeChild(meshes.current.get(entity.id)!);
+          const m = meshes.current.get(entity.id)!;
+          engine.scene.removeChild(m);
+        }
+      });
+
+      sim.hooks.addTag.subscribe("TacticalMap", async ({ entity, tag }) => {
+        const m = meshes.current.get(entity.id);
+        if (tag === "ui:arrow" && m) {
+          const arrow = await drawArrow(engine, m);
+          uiRef.current.billboards.arrow = arrow;
+        }
+      });
+
+      sim.hooks.removeTag.subscribe("TacticalMap", ({ tag }) => {
+        if (tag === "ui:arrow" && uiRef.current.billboards.arrow) {
+          uiRef.current.billboards.arrow.setParent(null);
+          uiRef.current.billboards.arrow.visible = false;
+          delete uiRef.current.billboards.arrow;
         }
       });
     });
@@ -87,7 +154,7 @@ export const TacticalMap: React.FC = React.memo(() => {
 
       if (!skybox.current) {
         skybox.current = new Skybox(
-          engine.gl,
+          engine,
           engine.scene,
           (mapData.sectors.find(
             (s) => s.id === sectorObservable.value.cp.name.slug
@@ -106,7 +173,7 @@ export const TacticalMap: React.FC = React.memo(() => {
         // FIXME: Remove this debug code
         if (!(entity.cp.render.model in assetLoader.models)) {
           if (entity.hasComponents(["dockable"])) {
-            entity.cp.render.model = "ship/sCiv";
+            entity.cp.render.model = "ship/dart";
 
             if (entity.cp.dockable.size === "medium") {
               entity.cp.render.model = "ship/mCiv";
@@ -114,6 +181,10 @@ export const TacticalMap: React.FC = React.memo(() => {
 
             if (entity.cp.dockable.size === "large") {
               entity.cp.render.model = "ship/lMil";
+            }
+
+            if (entity.cp.model?.slug === "dart") {
+              entity.cp.render.model = "ship/dart";
             }
           } else if (entity.hasTags(["facility"])) {
             entity.cp.render.model = "facility/default";
@@ -124,6 +195,12 @@ export const TacticalMap: React.FC = React.memo(() => {
           const m = new EntityMesh(engine, entity);
           engine.scene.addChild(m);
           meshes.current.set(entity.id, m);
+
+          if (entity.tags.has("ui:arrow")) {
+            drawArrow(engine, m).then((arrow) => {
+              uiRef.current.billboards.arrow = arrow;
+            });
+          }
         }
 
         const mesh = meshes.current.get(entity.id)!;
@@ -175,6 +252,10 @@ export const TacticalMap: React.FC = React.memo(() => {
         );
       }
       controlRef.current!.update();
+
+      for (const billboard of Object.values(uiRef.current.billboards)) {
+        billboard.update();
+      }
     });
 
     sectorObservable.subscribe("TacticalMap", () => {
@@ -208,30 +289,6 @@ export const TacticalMap: React.FC = React.memo(() => {
       }
     };
     selectingSystem.hook.subscribe("TacticalMap", onSelectedChange);
-
-    const onContextMenu = (event: MouseEvent) => {
-      event.preventDefault();
-
-      setTimeout(() => {
-        if (controlRef.current?.dragPrev) return;
-
-        const worldPos = raycastRef.current.intersectPlane({
-          origin: new Vec3(0),
-          normal: new Vec3(0, 1, 0),
-        });
-        const worldPosition = [worldPos.x / scale, worldPos.z / scale];
-
-        const data = {
-          active: true,
-          position: [event.clientX, event.clientY],
-          worldPosition,
-          sector: sectorObservable.value,
-        };
-        setMenu(data);
-      }, 40);
-    };
-
-    window.addEventListener("contextmenu", onContextMenu);
   }, []);
 
   React.useEffect(() => {

@@ -29,7 +29,6 @@ export class BaseMesh<TMaterial extends Material = Material> extends Mesh {
   applyMaterial(material: TMaterial): BaseMesh<TMaterial> {
     this.material = material;
     this.material.apply(this);
-    this.program.cullFace = false;
 
     return this;
   }

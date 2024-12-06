@@ -1,18 +1,19 @@
-import type { Camera } from "ogl";
-import { Vec2, Mat4, Vec3 } from "ogl";
+import type { Camera, Mat4, Vec3 } from "ogl";
+import { Vec2 } from "ogl";
+import { MOUSE_BUTTONS, Orbit, STATE, tempVec3 } from "./Orbit";
 
-const dPos = 0.05;
+const dPos = 3;
 const dScale = 0.2;
 const dRotation = 200;
 const keymap = {
-  w: { x: 0, y: -dPos },
-  ArrowUp: { x: 0, y: -dPos },
-  s: { x: 0, y: dPos },
-  ArrowDown: { x: 0, y: dPos },
-  a: { x: -dPos, y: 0 },
-  ArrowLeft: { x: -dPos, y: 0 },
-  d: { x: dPos, y: 0 },
-  ArrowRight: { x: dPos, y: 0 },
+  w: { x: 0, y: dPos },
+  ArrowUp: { x: 0, y: dPos },
+  s: { x: 0, y: -dPos },
+  ArrowDown: { x: 0, y: -dPos },
+  a: { x: dPos, y: 0 },
+  ArrowLeft: { x: dPos, y: 0 },
+  d: { x: -dPos, y: 0 },
+  ArrowRight: { x: -dPos, y: 0 },
   q: { rotate: Math.PI / dRotation },
   e: { rotate: -Math.PI / dRotation },
   x: { scale: -dScale },
@@ -29,56 +30,33 @@ const MouseButton = {
 // eslint-disable-next-line no-redeclare
 type MouseButton = (typeof MouseButton)[keyof typeof MouseButton];
 
-export class MapControl {
+export class MapControl extends Orbit {
   camera: Camera;
-  canvas: HTMLCanvasElement;
-  focusPoint: Vec3 = new Vec3();
-  inclination = Math.PI / 6;
-  azimuth = Math.PI / 2;
-  distance = 10;
   keysPressed = new Set<string>();
-  zoomRange = [0.1, 80];
 
   dragPrev: Vec2 | null = null;
   mouse: Vec2 = new Vec2();
 
   onClick: ((_position: Vec2, _button: MouseButton) => void) | null = null;
-  onMove: (() => void) | null = null;
 
-  constructor(camera: Camera) {
-    this.camera = camera;
-    this.camera.lookAt(this.focusPoint);
+  constructor(camera: Camera, element: HTMLElement) {
+    super(camera, element);
 
-    document.addEventListener("pointerdown", (event) => {
-      if (event.button === MouseButton.Left) {
-        this.dragPrev = new Vec2(this.mouse.x, this.mouse.y);
-      }
+    this.minDistance = 0.1;
+    this.maxDistance = 100;
 
+    this.element.addEventListener("pointerdown", (event) => {
+      if (event.target !== this.element) return;
       if (this.onClick) {
-        this.onClick(this.mouse, event.button as MouseButton);
+        setTimeout(() => {
+          if (!this.moved) {
+            this.onClick!(this.mouse, event.button);
+          }
+        }, 100);
       }
     });
-    document.addEventListener("pointerup", () => {
-      this.dragPrev = null;
-    });
-    document.addEventListener("mousemove", (event) => {
-      this.mouse.set(event.clientX, event.clientY);
-    });
-    document.addEventListener("wheel", (event) => {
-      const delta =
-        Math.abs(event.deltaY) > 50
-          ? Math.sign(event.deltaY) * 8
-          : event.deltaY;
-      this.distance = Math.min(
-        Math.max(
-          this.zoomRange[0],
-          this.distance + (delta * this.distance) / 100
-        ),
-        this.zoomRange[1]
-      );
-    });
 
-    document.addEventListener("keydown", (event) => {
+    document.body.addEventListener("keydown", (event) => {
       // if (
       //   event.target !== document.body ||
       //   Number(this.overlay?.children.length) > 0
@@ -89,77 +67,53 @@ export class MapControl {
       }
       this.keysPressed.add(event.key);
     });
-    document.addEventListener("keyup", (event) => {
+    document.body.addEventListener("keyup", (event) => {
       this.keysPressed.delete(event.key);
     });
+    this.element.addEventListener("mousemove", this.onMouseMovePersistent);
   }
 
   lookAt = (position: Vec3) => {
-    const offset = this.camera.position.clone().sub(this.focusPoint);
-    this.focusPoint.set(position);
-    this.camera.position.set(this.focusPoint.clone().add(offset));
+    tempVec3.copy(this.camera.position).sub(position);
+    this.target.copy(position);
+    this.camera.position.copy(position).add(tempVec3);
   };
 
-  update = () => {
-    const offset = new Vec3();
+  override panUp = (distance: number, m: Mat4) => {
+    const i = 0;
+    tempVec3.set(m[i], m[i + 1], m[i + 2]);
+    tempVec3.cross(this.camera.up);
+    tempVec3.multiply(-distance);
+    this.panDelta.add(tempVec3);
+  };
 
-    if (this.dragPrev) {
-      const move = this.mouse.clone().sub(this.dragPrev);
-      offset.set(-move[1] / 100, 0, move[0] / 100).multiply(this.distance / 10);
-      this.dragPrev.set(this.mouse);
-    }
+  override onMouseDown = (e: MouseEvent) => {
+    if (this.keysPressed.has("Shift") && e.button === MOUSE_BUTTONS.ORBIT) {
+      this.setState(STATE.PAN);
+      this.panStart.set(e.clientX, e.clientY);
 
-    for (const key of this.keysPressed) {
-      if (keymap[key]?.x !== undefined) {
-        offset.z -= (keymap[key].x * this.distance) / 10;
-        offset.x += (keymap[key].y * this.distance) / 10;
-
-        // this.settingsManager.cp.selectionManager.focused = false;
-        // this.viewport.plugins.remove("follow");
+      if (this.state !== STATE.NONE) {
+        window.addEventListener("mousemove", this.onMouseMove, false);
+        window.addEventListener("mouseup", this.onMouseUp, false);
       }
-
-      if (keymap[key]?.scale !== undefined) {
-        this.distance = Math.min(
-          Math.max(
-            this.zoomRange[0],
-            this.distance + keymap[key].scale * (this.distance / 10)
-          ),
-          this.zoomRange[1]
-        );
-      }
-
-      if (keymap[key]?.rotate !== undefined) {
-        this.azimuth += keymap[key].rotate;
-      }
+    } else {
+      super.onMouseDown(e);
     }
+  };
 
-    // this.settingsManager.cp.camera.position = this.position;
+  override update = () => {
+    super.update();
+    this.keysPressed.forEach((key) => {
+      const action = keymap[key];
+      if (!action) return;
 
-    const s = Math.sin(this.azimuth);
-    const c = Math.cos(this.azimuth);
+      if (action.x || action.y) {
+        this.pan(action.x, action.y);
+      }
+    });
+  };
 
-    if (offset.len()) {
-      // prettier-ignore
-      offset.applyMatrix4(
-      new Mat4(
-         c, 0, s, 0,
-         0, 1, 0, 0,
-        -s, 0, c, 0,
-         0, 0, 0, 1
-      )
-    );
-
-      this.focusPoint.add(offset);
-      this.onMove?.();
-    }
-    this.camera.rotation[1] = Math.PI / 2 - this.azimuth;
-
-    this.camera.position.set(
-      new Vec3(
-        Math.cos(this.azimuth) * Math.cos(this.inclination) * this.distance,
-        Math.sin(this.inclination) * this.distance,
-        Math.sin(this.azimuth) * Math.cos(this.inclination) * this.distance
-      ).add(this.focusPoint)
-    );
+  onMouseMovePersistent = (e: MouseEvent) => {
+    this.mouse.set(e.clientX, e.clientY);
   };
 }
