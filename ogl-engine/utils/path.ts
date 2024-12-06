@@ -23,7 +23,7 @@ export class Path extends Transform {
   createSegment = (): void => {
     const plane = new BaseMesh(this.engine, {
       geometry: new Plane(this.engine.gl),
-      material: new ColorMaterial(this.engine, colors.default),
+      material: new ColorMaterial(this.engine, colors.default, false),
     });
     plane.rotation.x = -Math.PI / 2;
     plane.material.uniforms.fEmissive.value = 0.05;

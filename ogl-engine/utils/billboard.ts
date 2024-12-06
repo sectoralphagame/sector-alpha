@@ -21,14 +21,12 @@ export class Billboard<
 
   update = () => {
     this.lookAt(this.engine.camera.position);
+    this.rotation.x = 0;
+    this.rotation.z = 0;
 
     if (this.scaling) {
       this.scale
-        .set(
-          this.engine.camera.position.distance(this.position),
-          this.engine.camera.position.distance(this.position),
-          this.engine.camera.position.distance(this.position)
-        )
+        .set(this.engine.camera.position.distance(this.position))
         .multiply(this.meshScale);
     }
   };

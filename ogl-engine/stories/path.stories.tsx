@@ -24,12 +24,8 @@ const PathStory: React.FC = () => {
 
   React.useEffect(() => {
     engine.hooks.onInit.subscribe("MapControlStory", async () => {
-      controlRef.current = new MapControl(engine.camera);
-      skyboxRef.current = new Skybox(
-        engine.renderer.gl,
-        engine.scene,
-        "example"
-      );
+      controlRef.current = new MapControl(engine.camera, engine.canvas);
+      skyboxRef.current = new Skybox(engine, engine.scene, "example");
 
       pathRef.current = new Path(engine);
       pathRef.current.update(waypoints);

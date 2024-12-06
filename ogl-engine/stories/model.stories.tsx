@@ -15,18 +15,29 @@ import { Light } from "@ogl-engine/engine/Light";
 interface ModelStoryProps {
   model: string;
   skybox: keyof typeof skyboxes;
+  rotationSpeed: number;
+  intensity: number;
 }
-
-const intensity = 6;
 
 const ModelStory: React.FC<ModelStoryProps> = ({
   model: modelName,
   skybox: skyboxName,
+  rotationSpeed,
+  intensity,
 }) => {
   const engine = React.useMemo(() => new Engine(), []);
   const meshRef = React.useRef<BaseMesh>();
   const skyboxRef = React.useRef<Skybox>();
   const controlRef = React.useRef<Orbit>();
+  const rotationSpeedRef = React.useRef(rotationSpeed);
+  const lights = React.useRef<Light[]>([
+    new Light(new Vec3(1, 0, 0), intensity, new Vec3(1, 0, 0), false),
+    new Light(new Vec3(0, 1, 0), intensity, new Vec3(0, 1, 0), false),
+    new Light(new Vec3(0, 0, 1), intensity, new Vec3(0, 0, 1), false),
+    new Light(new Vec3(0, 1, 1), intensity, new Vec3(-1, 0, 0), false),
+    new Light(new Vec3(1, 0, 1), intensity, new Vec3(0, -1, 0), false),
+    new Light(new Vec3(1, 1, 0), intensity, new Vec3(0, 0, -1), false),
+  ]);
   const load = useCallback((m: keyof typeof models) => {
     GLTFLoader.load(engine.renderer.gl, m).then((model) => {
       meshRef.current = BaseMesh.fromGltf(engine, model, {
@@ -42,15 +53,7 @@ const ModelStory: React.FC<ModelStoryProps> = ({
   React.useEffect(() => {
     engine.hooks.onInit.subscribe("ModelStory", async () => {
       engine.camera.position.set(0.1);
-      engine.addLight(
-        new Light(new Vec3(1, 0, 0), intensity, new Vec3(1, 0, 0), false)
-      );
-      engine.addLight(
-        new Light(new Vec3(0, 1, 0), intensity, new Vec3(0, 1, 0), false)
-      );
-      engine.addLight(
-        new Light(new Vec3(0, 0, 1), intensity, new Vec3(0, 0, 1), false)
-      );
+      lights.current.forEach(engine.addLight);
 
       controlRef.current = new Orbit(engine.camera, {
         inertia: 0.8,
@@ -63,7 +66,7 @@ const ModelStory: React.FC<ModelStoryProps> = ({
 
     engine.hooks.onUpdate.subscribe("ModelStory", () => {
       if (meshRef.current) {
-        meshRef.current!.rotation.y += 0.004;
+        meshRef.current!.rotation.y += rotationSpeedRef.current * 0.001;
       }
       controlRef.current!.update();
     });
@@ -83,6 +86,16 @@ const ModelStory: React.FC<ModelStoryProps> = ({
     }
   }, [skyboxName]);
 
+  React.useEffect(() => {
+    rotationSpeedRef.current = rotationSpeed;
+  }, [rotationSpeed]);
+
+  React.useEffect(() => {
+    for (const light of lights.current) {
+      light.setIntensity(intensity);
+    }
+  }, [intensity]);
+
   return <OglCanvas engine={engine} />;
 };
 
@@ -94,6 +107,8 @@ export default {
   args: {
     model: Object.keys(models)[0],
     skybox: Object.keys(skyboxes)[0],
+    rotationSpeed: 1,
+    intensity: 6,
   },
   argTypes: {
     model: {
@@ -107,10 +122,20 @@ export default {
   },
 } as Meta;
 
-const Template: StoryFn<ModelStoryProps> = ({ model, skybox }) => (
+const Template: StoryFn<ModelStoryProps> = ({
+  model,
+  skybox,
+  rotationSpeed,
+  intensity,
+}) => (
   <div id="root">
     <Styles>
-      <ModelStory model={model.replace(/-/, "/")} skybox={skybox} />
+      <ModelStory
+        model={model.replace(/-/, "/")}
+        skybox={skybox}
+        rotationSpeed={rotationSpeed}
+        intensity={intensity}
+      />
     </Styles>
   </div>
 );
