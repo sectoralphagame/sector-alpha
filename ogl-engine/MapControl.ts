@@ -1,6 +1,7 @@
 import type { Camera, Mat4, Vec3 } from "ogl";
 import { Vec2 } from "ogl";
-import { MOUSE_BUTTONS, Orbit, STATE, tempVec3 } from "./Orbit";
+import type { MouseButton } from "./Orbit";
+import { Orbit, STATE, tempVec3 } from "./Orbit";
 
 const dPos = 3;
 const dScale = 0.2;
@@ -21,14 +22,6 @@ const keymap = {
   z: { scale: dScale },
   "-": { scale: dScale },
 };
-
-const MouseButton = {
-  Left: 0,
-  Middle: 1,
-  Right: 2,
-};
-// eslint-disable-next-line no-redeclare
-type MouseButton = (typeof MouseButton)[keyof typeof MouseButton];
 
 export class MapControl extends Orbit {
   camera: Camera;
@@ -88,9 +81,9 @@ export class MapControl extends Orbit {
   };
 
   override onMouseDown = (e: MouseEvent) => {
-    if (this.keysPressed.has("Shift") && e.button === MOUSE_BUTTONS.ORBIT) {
-      this.setState(STATE.PAN);
-      this.panStart.set(e.clientX, e.clientY);
+    if (this.keysPressed.has("Shift") && e.button === this.mouseButtons.PAN) {
+      this.setState(STATE.ROTATE);
+      this.rotateStart.set(e.clientX, e.clientY);
 
       if (this.state !== STATE.NONE) {
         window.addEventListener("mousemove", this.onMouseMove, false);

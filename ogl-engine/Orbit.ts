@@ -4,8 +4,14 @@
 import type { Camera, Mat4 } from "ogl";
 import { Vec2, Vec3 } from "ogl";
 
+export const MouseButton = {
+  Left: 0,
+  Middle: 1,
+  Right: 2,
+};
+// eslint-disable-next-line no-redeclare
+export type MouseButton = (typeof MouseButton)[keyof typeof MouseButton];
 export const STATE = { NONE: -1, ROTATE: 0, DOLLY: 1, PAN: 2, DOLLY_PAN: 3 };
-export const MOUSE_BUTTONS = { ORBIT: 0, ZOOM: 1, PAN: 2 };
 export const tempVec3 = new Vec3();
 const tempVec2a = new Vec2();
 const tempVec2b = new Vec2();
@@ -52,6 +58,11 @@ export class Orbit {
   state = STATE.NONE;
   onPan: (() => void) | null = null;
   onStateChange: ((_prevState: number, _state: number) => void) | null = null;
+  mouseButtons = {
+    ORBIT: MouseButton.Right,
+    ZOOM: MouseButton.Middle,
+    PAN: MouseButton.Left,
+  };
 
   constructor(camera: Camera, element: HTMLElement) {
     this.camera = camera;
@@ -264,17 +275,17 @@ export class Orbit {
 
     // eslint-disable-next-line default-case
     switch (e.button) {
-      case MOUSE_BUTTONS.ORBIT:
+      case this.mouseButtons.ORBIT:
         if (this.enableRotate === false) return;
         this.rotateStart.set(e.clientX, e.clientY);
         this.setState(STATE.ROTATE);
         break;
-      case MOUSE_BUTTONS.ZOOM:
+      case this.mouseButtons.ZOOM:
         if (this.enableZoom === false) return;
         this.dollyStart.set(e.clientX, e.clientY);
         this.setState(STATE.DOLLY);
         break;
-      case MOUSE_BUTTONS.PAN:
+      case this.mouseButtons.PAN:
         if (this.enablePan === false) return;
         this.panStart.set(e.clientX, e.clientY);
         this.setState(STATE.PAN);
