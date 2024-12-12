@@ -45,12 +45,13 @@ export class Engine {
 
   hooks: {
     onInit: Observable<void>;
-    onUpdate: Observable<void>;
+    onUpdate: Observable<number>;
     onError: Observable<Error>;
   };
 
   private postProcessingLayers: Record<"composite" | "bloom", Post>;
   private renderTarget: RenderTarget;
+  private lastFrameTime: number;
 
   constructor() {
     this.hooks = {
@@ -59,6 +60,7 @@ export class Engine {
       onError: new Observable("onError"),
     };
     this.scene = new Transform();
+    this.lastFrameTime = performance.now();
   }
 
   init = (canvas: HTMLCanvasElement) => {
@@ -190,9 +192,10 @@ export class Engine {
       throw new Error("Engine not initialized");
     }
 
-    this.hooks.onUpdate.notify();
-
-    this.uniforms.uTime.value += 0.01;
+    const now = performance.now();
+    const delta = (now - this.lastFrameTime) / 1000;
+    this.hooks.onUpdate.notify(delta);
+    this.uniforms.uTime.value += delta;
 
     try {
       if (this.postProcessing) {
@@ -204,6 +207,8 @@ export class Engine {
       this.hooks.onError.notify(err);
       throw err;
     }
+
+    this.lastFrameTime = now;
   };
 
   private renderSimple = () => {

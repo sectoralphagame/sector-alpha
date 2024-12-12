@@ -1,10 +1,24 @@
 import models from "@assets/models";
-import type { Geometry, GLTFMaterial, OGLRenderingContext } from "ogl";
+import type {
+  Geometry,
+  GLTFMaterial,
+  ImageRepresentation,
+  OGLRenderingContext,
+} from "ogl";
 import { GLTFLoader } from "ogl";
-import { fromEntries, keys, map, pipe } from "@fxts/core";
+import { chunk, entries, fromEntries, keys, map, pipe } from "@fxts/core";
 import { skyboxes } from "@assets/textures/skybox";
+import smoke from "@assets/textures/particle/smoke.png";
+import fire from "@assets/textures/particle/fire.png";
+import { loadTextureImage } from "./utils/texture";
 
 export type ModelName = keyof typeof models;
+
+const textures = {
+  "particle/smoke": smoke,
+  "particle/fire": fire,
+};
+export type TextureName = keyof typeof textures;
 
 class AssetLoader {
   ready: boolean = false;
@@ -16,34 +30,59 @@ class AssetLoader {
       material: GLTFMaterial;
     }
   > = {};
+  textures: Record<TextureName, ImageRepresentation> = {};
 
   // eslint-disable-next-line class-methods-use-this
-  preload = async (onModelLoad: (_progress: number) => void) => {
+  preload = async (onAssetLoad: (_progress: number) => void) => {
     const state = pipe(
-      { ...models, ...skyboxes },
+      { ...models, ...skyboxes, ...textures },
       keys,
       map((model) => [model, false] as [string, boolean]),
       fromEntries
     );
 
+    const updateProgress = () =>
+      onAssetLoad(
+        Object.values(state).filter(Boolean).length /
+          Object.values(state).length
+      );
+
     return Promise.all([
       ...Object.entries(models).map(async ([name, modelPath]) => {
         await fetch(modelPath);
         state[name] = true;
-        onModelLoad(
-          Object.values(state).filter(Boolean).length /
-            Object.values(state).length
-        );
+        updateProgress();
       }),
       ...Object.entries(skyboxes).map(async ([name, imagePaths]) => {
         await Promise.all(Object.values(imagePaths).map((p) => fetch(p)));
         state[name] = true;
-        onModelLoad(
-          Object.values(state).filter(Boolean).length /
-            Object.values(state).length
-        );
+        updateProgress();
+      }),
+      ...Object.entries(textures).map(async ([name, path]) => {
+        const texture = await loadTextureImage(path);
+        state[name] = true;
+        textures[name] = texture;
+        updateProgress();
       }),
     ]);
+  };
+
+  loadTextures = async (onAssetLoad: () => void) => {
+    const queue = pipe(
+      textures,
+      entries,
+      map(([name, path]) => async () => {
+        const image = await loadTextureImage(path);
+        this.textures[name] = image;
+      }),
+      chunk(3)
+    );
+
+    for (const batch of queue) {
+      // eslint-disable-next-line no-await-in-loop
+      await Promise.all(batch.map((fn) => fn()));
+      onAssetLoad();
+    }
   };
 
   load = async (gl: OGLRenderingContext) => {
