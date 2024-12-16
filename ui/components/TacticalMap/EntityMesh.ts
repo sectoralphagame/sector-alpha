@@ -6,10 +6,12 @@ import type { Engine } from "@ogl-engine/engine/engine";
 import { SelectionRing } from "@ogl-engine/materials/ring/ring";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
+import type { EngineParticleGenerator } from "@ogl-engine/particles";
 import { getParticleType, particleGenerator } from "@ogl-engine/particles";
 import { Light } from "@ogl-engine/engine/Light";
 import Color from "color";
 import { Vec3 } from "ogl";
+import { ship } from "@core/archetypes/ship";
 
 export const entityScale = 1 / 220;
 
@@ -71,16 +73,24 @@ export class EntityMesh extends BaseMesh {
   };
 
   addParticleGenerator(input: ParticleGeneratorInput) {
-    const PGen = particleGenerator[getParticleType(input.name)!];
+    const type = getParticleType(input.name)!;
+    const PGen = particleGenerator[type];
     const generator = new PGen(this.engine);
     generator.position.copy(input.position);
     generator.rotation.copy(input.rotation);
-    generator.scale.set(1 / entityScale);
+    generator.scale.copy(input.scale).multiply(1 / entityScale);
     generator.setParent(this);
     generator.updateMatrixWorld();
 
     this.onBeforeRender(() => {
       generator.update(this.engine.delta);
+
+      if (type === "engine") {
+        const gen = generator as any as EngineParticleGenerator;
+        const e = ship(window.sim.getOrThrow(this.entityId));
+
+        gen.setIntensity(e.cp.movable.velocity / e.cp.drive.maneuver);
+      }
     });
   }
 

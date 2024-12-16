@@ -26,6 +26,7 @@ export interface ParticleGeneratorInput {
   name: string;
   position: Vec3;
   rotation: Euler;
+  scale: Vec3;
 }
 
 class AssetLoader {
@@ -114,6 +115,7 @@ class AssetLoader {
                 name: node.name!,
                 position: node.position.clone().sub(model.nodes[0].position),
                 rotation: new Euler().copy(node.rotation),
+                scale: node.scale.clone(),
               });
             }
           }

@@ -142,6 +142,12 @@ export class ParticleGenerator extends Transform {
     const scale = this.mesh.geometry.attributes.scale.data!;
     const t = this.mesh.geometry.attributes.t.data!;
 
+    const sVec = new Vec3(
+      this.worldMatrix[0],
+      this.worldMatrix[4],
+      this.worldMatrix[8]
+    ).len();
+
     for (let i = 0; i < this.particles.length; i++) {
       const particle = this.particles[i];
 
@@ -165,7 +171,7 @@ export class ParticleGenerator extends Transform {
       }
 
       offset.set(particle.position, i * 3);
-      scale.set(particle.scale, i * 3);
+      scale.set(particle.scale.multiply(sVec), i * 3);
       t.set([particle.t], i);
     }
 
@@ -175,5 +181,7 @@ export class ParticleGenerator extends Transform {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  destroy() {}
+  destroy() {
+    this.mesh.setParent(null);
+  }
 }
