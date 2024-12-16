@@ -15,37 +15,12 @@ import { Path } from "@ogl-engine/utils/path";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
 import { sectorObservable } from "@ui/state/sector";
 import type { SkyboxTexture } from "@assets/textures/skybox";
-import { TintedTextureMaterial } from "@ogl-engine/materials/tintedTexture/tintedTexture";
-import { loadTexture } from "@ogl-engine/utils/texture";
-import arrowDownFat from "@assets/ui/icons/arrow_down_fat.svg";
-import { Billboard } from "@ogl-engine/utils/billboard";
+import { ParticleGenerator } from "@ogl-engine/ParticleGenerator";
+import { Scene } from "@ogl-engine/engine/Scene";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 
 const scale = 2;
-
-async function drawArrow(engine: Engine, mesh: EntityMesh): Promise<Billboard> {
-  const arrow = new Billboard<TintedTextureMaterial>(
-    engine,
-    new Vec3(0.2),
-    true
-  );
-  arrow.applyMaterial(
-    new TintedTextureMaterial(
-      engine,
-      await loadTexture(engine, arrowDownFat),
-      getComputedStyle(document.querySelector("#root")!).getPropertyValue(
-        "--palette-primary"
-      )
-    )
-  );
-  arrow.material.uniforms.fEmissive.value = 0.1;
-  arrow.name = "arrow";
-  arrow.position = mesh.position;
-  arrow.setParent(engine.scene);
-
-  return arrow;
-}
 
 export const TacticalMap: React.FC = React.memo(() => {
   const [sim] = useSim();
@@ -59,10 +34,8 @@ export const TacticalMap: React.FC = React.memo(() => {
   const uiRef = React.useRef<
     Partial<{
       path: Path;
-    }> & { billboards: Record<string, Billboard> }
-  >({
-    billboards: {},
-  });
+    }>
+  >({});
   const settingsManagerRef = React.useRef<
     RequireComponent<"selectionManager" | "camera">
   >(first(sim.index.settings.getIt())!);
@@ -76,6 +49,23 @@ export const TacticalMap: React.FC = React.memo(() => {
         sim.index.sectors.get()
       )!
     );
+
+    const changeSector = () => {
+      engine.scene.traverse((mesh) => {
+        // engine.scene.removeChild(mesh);
+        if (mesh instanceof ParticleGenerator || mesh instanceof EntityMesh) {
+          mesh.destroy();
+        }
+      });
+
+      meshes.current.clear();
+      if (skybox.current) {
+        engine.scene.removeChild(skybox.current.transform);
+        skybox.current = undefined;
+      }
+
+      engine.setScene(new Scene(engine));
+    };
 
     engine.hooks.onInit.subscribe("TacticalMap", async () => {
       await assetLoader.load(engine.gl);
@@ -128,22 +118,6 @@ export const TacticalMap: React.FC = React.memo(() => {
           engine.scene.removeChild(m);
         }
       });
-
-      sim.hooks.addTag.subscribe("TacticalMap", async ({ entity, tag }) => {
-        const m = meshes.current.get(entity.id);
-        if (tag === "ui:arrow" && m) {
-          const arrow = await drawArrow(engine, m);
-          uiRef.current.billboards.arrow = arrow;
-        }
-      });
-
-      sim.hooks.removeTag.subscribe("TacticalMap", ({ tag }) => {
-        if (tag === "ui:arrow" && uiRef.current.billboards.arrow) {
-          uiRef.current.billboards.arrow.setParent(null);
-          uiRef.current.billboards.arrow.visible = false;
-          delete uiRef.current.billboards.arrow;
-        }
-      });
     });
 
     engine.hooks.onUpdate.subscribe("TacticalMap", () => {
@@ -172,6 +146,8 @@ export const TacticalMap: React.FC = React.memo(() => {
         }
         // FIXME: Remove this debug code
         if (!(entity.cp.render.model in assetLoader.models)) {
+          // eslint-disable-next-line no-console
+          console.log("Missing model:", entity.cp.render.model);
           if (entity.hasComponents(["dockable"])) {
             entity.cp.render.model = "ship/dart";
 
@@ -187,7 +163,11 @@ export const TacticalMap: React.FC = React.memo(() => {
               entity.cp.render.model = "ship/dart";
             }
           } else if (entity.hasTags(["facility"])) {
-            entity.cp.render.model = "facility/default";
+            if (entity.tags.has("gateway")) {
+              entity.cp.render.model = "facility/gateway";
+            } else {
+              entity.cp.render.model = "facility/default";
+            }
           }
         }
 
@@ -195,12 +175,6 @@ export const TacticalMap: React.FC = React.memo(() => {
           const m = new EntityMesh(engine, entity);
           engine.scene.addChild(m);
           meshes.current.set(entity.id, m);
-
-          if (entity.tags.has("ui:arrow")) {
-            drawArrow(engine, m).then((arrow) => {
-              uiRef.current.billboards.arrow = arrow;
-            });
-          }
         }
 
         const mesh = meshes.current.get(entity.id)!;
@@ -250,24 +224,15 @@ export const TacticalMap: React.FC = React.memo(() => {
             entity.cp.position.coord[1] * scale
           )
         );
+
+        if (sectorObservable.value.id !== entity.cp.position.sector) {
+          sectorObservable.notify(sim.getOrThrow(entity.cp.position.sector));
+        }
       }
       controlRef.current!.update();
-
-      for (const billboard of Object.values(uiRef.current.billboards)) {
-        billboard.update();
-      }
     });
 
-    sectorObservable.subscribe("TacticalMap", () => {
-      for (const mesh of meshes.current) {
-        engine.scene.removeChild(mesh[1]);
-      }
-      meshes.current.clear();
-      if (skybox.current) {
-        engine.scene.removeChild(skybox.current.transform);
-        skybox.current = undefined;
-      }
-    });
+    sectorObservable.subscribe("TacticalMap", changeSector);
 
     const onSelectedChange = ([prevId, id]: (number | null)[]) => {
       if (prevId) {

@@ -9,7 +9,6 @@ export class OrbMaterial extends Material {
   uniforms: Material["uniforms"] & {
     uStart: { value: Vec4 };
     uEnd: { value: Vec4 };
-    uT: { value: number };
     fEmissive: { value: number };
   };
 
@@ -20,12 +19,10 @@ export class OrbMaterial extends Material {
       vertex,
       fragment,
       uniforms: this.uniforms,
-      transparent: true,
-      depthTest: false,
+      cullFace: false,
     });
     this.uniforms.uStart = { value: start };
     this.uniforms.uEnd = { value: end };
     this.uniforms.fEmissive = { value: 0 };
-    this.uniforms.uT = { value: 0 };
   }
 }

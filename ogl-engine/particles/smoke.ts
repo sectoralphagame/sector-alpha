@@ -1,54 +1,50 @@
 import type { Engine } from "@ogl-engine/engine/engine";
-import { SpritesheetMaterial } from "@ogl-engine/materials/spritesheet/spritesheet";
 import { ParticleGenerator } from "@ogl-engine/ParticleGenerator";
-import type { Billboard } from "@ogl-engine/utils/billboard";
-import { Texture, Vec3 } from "ogl";
+import { Vec3, Vec4 } from "ogl";
 import { random } from "mathjs";
 import { easeInOutSine } from "@ogl-engine/easing";
-import { assetLoader } from "@ogl-engine/AssetLoader";
+import { OrbMaterial } from "@ogl-engine/materials/orb/orb";
+import Color from "color";
 
-const particleSize = 0.4;
-const particleLife = 2;
+const particleSize = 0.2;
+const particleLife = 1.5;
 
 export class SmokeParticleGenerator extends ParticleGenerator {
   constructor(engine: Engine) {
-    super(engine, (particle) => {
-      particle.mesh.applyMaterial(
-        new SpritesheetMaterial(
-          engine,
-          new Texture(engine.gl, {
-            image: assetLoader.textures["particle/smoke"],
-          }),
-          4,
-          Math.floor(Math.random() * 16)
-        )
-      );
-
-      particle.acceleration = new Vec3(
-        random(-0.01, 0.01),
-        random(0.09, 0.1),
-        random(-0.01, 0.01)
-      );
-      particle.velocity = new Vec3(
-        random(-0.03, 0.03),
-        random(0.2, 0.3),
-        random(-0.03, 0.03)
-      );
-      particle.angularVelocity = random(-9, 9);
-      particle.life = particleLife;
-    });
+    super(
+      engine,
+      (particle) => {
+        particle.acceleration = new Vec3(
+          random(-8, 8),
+          random(-150, -80),
+          random(-8, 8)
+        ).divide(1000);
+        particle.velocity = new Vec3(
+          random(-0.8, 0.8),
+          random(2, 3),
+          random(-0.8, 0.8)
+        ).divide(10);
+        particle.life = particleLife;
+        particle.scale.set(1);
+      },
+      300
+    );
 
     this.spawnRate = 15;
-    this.max = 1000;
+
     this.onParticleUpdate = (particle) => {
-      particle.mesh.scale.set(
-        easeInOutSine(1 - particle.life / particleLife) * particleSize
-      );
-      (
-        particle.mesh as Billboard<SpritesheetMaterial>
-      ).material.uniforms.fAlpha.value = easeInOutSine(
-        particle.life / particleLife
-      );
+      particle.t = particle.life / particleLife;
+      const size =
+        easeInOutSine(1 - particle.life / particleLife) * particleSize;
+      particle.scale.set(size, size, size);
     };
+
+    const material = new OrbMaterial(
+      engine,
+      new Vec4(...Color("#1f1f1f").alpha(0.3).array()),
+      new Vec4(...Color("#a4a4a4").alpha(1).array())
+    );
+    material.uniforms.fEmissive.value = 1;
+    this.mesh.applyMaterial(material);
   }
 }

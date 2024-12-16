@@ -13,6 +13,7 @@ const tags = [
   "asteroid",
   "virtual",
   "collectible",
+  "gateway",
   "discovered",
   "mainQuestStarted",
   "busy",

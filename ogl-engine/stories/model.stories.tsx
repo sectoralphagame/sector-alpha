@@ -33,10 +33,10 @@ const ModelStory: React.FC<ModelStoryProps> = ({
   const lights = React.useRef<Light[]>([
     new Light(new Vec3(1, 0, 0), intensity, new Vec3(1, 0, 0), false),
     new Light(new Vec3(0, 1, 0), intensity, new Vec3(0, 1, 0), false),
-    new Light(new Vec3(0, 0, 1), intensity, new Vec3(0, 0, 1), false),
-    new Light(new Vec3(0, 1, 1), intensity, new Vec3(-1, 0, 0), false),
-    new Light(new Vec3(1, 0, 1), intensity, new Vec3(0, -1, 0), false),
-    new Light(new Vec3(1, 1, 0), intensity, new Vec3(0, 0, -1), false),
+    // new Light(new Vec3(0, 0, 1), intensity, new Vec3(0, 0, 1), false),
+    // new Light(new Vec3(0, 1, 1), intensity, new Vec3(-1, 0, 0), false),
+    // new Light(new Vec3(1, 0, 1), intensity, new Vec3(0, -1, 0), false),
+    // new Light(new Vec3(1, 1, 0), intensity, new Vec3(0, 0, -1), false),
   ]);
   const load = useCallback((m: keyof typeof models) => {
     GLTFLoader.load(engine.renderer.gl, m).then((model) => {

@@ -13,6 +13,7 @@ const sizes: Record<DockSize, Vec4> = {
 
 export class SelectionRing extends Mesh {
   engine: Engine;
+  name = "SelectionRing";
 
   color: Vec3;
   ringSizes: Vec4;
@@ -43,6 +44,7 @@ export class SelectionRing extends Mesh {
           uSelected: { value: 0 },
         },
         transparent: true,
+        cullFace: false,
       }),
     });
     this.engine = engine;

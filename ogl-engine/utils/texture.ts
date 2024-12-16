@@ -3,9 +3,10 @@ import type { ImageRepresentation } from "ogl";
 import { Texture } from "ogl";
 
 export async function loadTextureImage(
-  url: string
+  url: string,
+  imageArg?: HTMLImageElement
 ): Promise<ImageRepresentation> {
-  const image = new Image();
+  const image = imageArg ?? new Image();
   image.src = url;
 
   return new Promise((resolve) => {

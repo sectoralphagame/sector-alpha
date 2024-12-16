@@ -6,6 +6,7 @@ import type { Engine } from "./engine";
 
 export class BaseMesh<TMaterial extends Material = Material> extends Mesh {
   engine: Engine;
+  name = "BaseMesh";
   material: TMaterial;
 
   constructor(
@@ -101,6 +102,7 @@ export class BaseMesh<TMaterial extends Material = Material> extends Mesh {
     }
 
     if (degenerateUVs > 0) {
+      // eslint-disable-next-line no-console
       console.warn(`BaseMesh: ${degenerateUVs} faces have degenerate UVs`);
     }
 

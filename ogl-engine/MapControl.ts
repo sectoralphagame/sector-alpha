@@ -36,7 +36,7 @@ export class MapControl extends Orbit {
     super(camera, element);
 
     this.minDistance = 0.1;
-    this.maxDistance = 100;
+    this.maxDistance = 80;
 
     this.element.addEventListener("pointerdown", (event) => {
       if (event.target !== this.element) return;

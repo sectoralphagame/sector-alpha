@@ -1,10 +1,13 @@
 import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
-import { SmokeParticleGenerator } from "@ogl-engine/particles/smoke";
+import type { SmokeParticleGenerator } from "@ogl-engine/particles/smoke";
 import { merge } from "lodash";
 import { assetLoader } from "@ogl-engine/AssetLoader";
-import { FireParticleGenerator } from "@ogl-engine/particles/fire";
+import type { FireParticleGenerator } from "@ogl-engine/particles/fire";
+import type { Engine } from "@ogl-engine/engine/engine";
+import type { ParticleGeneratorType } from "@ogl-engine/particles";
+import { particleGenerator } from "@ogl-engine/particles";
 import type { Story3dArgs } from "./Story3d";
 import { Story3d, story3dMeta } from "./Story3d";
 
@@ -13,26 +16,40 @@ assetLoader.loadTextures(() => {});
 const ParticleGeneratorStory: React.FC<
   Story3dArgs & {
     particles: number;
-    type: "smoke" | "fire";
+    type: ParticleGeneratorType;
   }
 > = ({ postProcessing, skybox, particles, type }) => {
+  const engineRef = React.useRef<Engine>();
   const generatorRef = React.useRef<
     SmokeParticleGenerator | FireParticleGenerator
   >();
   const onInit = React.useCallback((engine) => {
+    engineRef.current = engine;
     engine.camera.position.set(1, 1, 1);
-    generatorRef.current = new (
-      type === "smoke" ? SmokeParticleGenerator : FireParticleGenerator
-    )(engine);
+    const constructor = particleGenerator[type];
+    generatorRef.current = new constructor(engine);
     generatorRef.current.spawnRate = particles;
+    engine.scene.addChild(generatorRef.current);
   }, []);
-  const onUpdate = React.useCallback((_, time) => {
-    generatorRef.current?.update(time);
+  const onUpdate = React.useCallback((_, delta) => {
+    if (generatorRef.current) {
+      generatorRef.current.update(delta);
+    }
   }, []);
 
   React.useEffect(() => {
     if (generatorRef.current) generatorRef.current.spawnRate = particles;
   }, [particles]);
+
+  React.useEffect(() => {
+    if (!engineRef.current) return;
+
+    generatorRef.current?.destroy();
+
+    const constructor = particleGenerator[type];
+    generatorRef.current = new constructor(engineRef.current);
+    generatorRef.current.spawnRate = particles;
+  }, [type]);
 
   return (
     <Story3d
@@ -49,12 +66,12 @@ export default {
   ...merge(
     {
       args: {
-        particles: 100,
+        particles: 10,
         type: "smoke",
       },
       argTypes: {
         type: {
-          options: ["smoke", "fire"],
+          options: Object.keys(particleGenerator),
           control: {
             type: "select",
           },

@@ -19,14 +19,15 @@ import compositeFragment from "../post/composite.frag.glsl";
 import type { Light } from "./Light";
 import { dummyLight } from "./Light";
 import { BaseMesh } from "./BaseMesh";
+import { Scene } from "./Scene";
 
 const bloomSize = 1.2;
-const lightsNum = 16;
+const lightsNum = 32;
 
 export class Engine {
   camera: Camera;
   canvas: HTMLCanvasElement;
-  scene: Transform;
+  scene: Scene;
   renderer: Renderer;
   dpr: number = 2;
   postProcessing = false;
@@ -53,13 +54,15 @@ export class Engine {
   private renderTarget: RenderTarget;
   private lastFrameTime: number;
 
+  public delta = 0;
+
   constructor() {
     this.hooks = {
       onInit: new Observable("onInit"),
       onUpdate: new Observable("onUpdate"),
       onError: new Observable("onError"),
     };
-    this.scene = new Transform();
+    this.scene = new Scene(this);
     this.lastFrameTime = performance.now();
   }
 
@@ -93,6 +96,7 @@ export class Engine {
 
   private initLightsContainer = () => {
     this.lightsContainer = new Transform();
+    this.lightsContainer.name = "Lights";
     this.scene.addChild(this.lightsContainer);
     this.lightsContainer.visible = false;
 
@@ -193,9 +197,9 @@ export class Engine {
     }
 
     const now = performance.now();
-    const delta = (now - this.lastFrameTime) / 1000;
-    this.hooks.onUpdate.notify(delta);
-    this.uniforms.uTime.value += delta;
+    this.delta = (now - this.lastFrameTime) / 1000;
+    this.hooks.onUpdate.notify(this.delta);
+    this.uniforms.uTime.value += this.delta;
 
     try {
       if (this.postProcessing) {
@@ -275,8 +279,11 @@ export class Engine {
     this.uniforms.resolution.bloom.value.set(w / 2, h / 2);
   };
 
-  setScene = (scene: Transform) => {
+  setScene = (scene: Scene) => {
     this.scene = scene;
+    if (this.lightsContainer) {
+      this.scene.addChild(this.lightsContainer);
+    }
   };
 
   addLight = (light: Light) => {

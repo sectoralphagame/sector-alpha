@@ -7,30 +7,25 @@ import { OrbMaterial } from "@ogl-engine/materials/orb/orb";
 import Color from "color";
 
 const particleSize = 0.2;
-const particleLife = 1.5;
+const particleLife = 0.8;
 
-export class FireParticleGenerator extends ParticleGenerator {
+export class EngineParticleGenerator extends ParticleGenerator {
   constructor(engine: Engine) {
     super(
       engine,
       (particle) => {
-        particle.acceleration = new Vec3(
-          random(-8, 8),
-          random(80, 100),
-          random(-8, 8)
-        ).divide(1000);
-        particle.velocity = new Vec3(
-          random(-0.8, 0.8),
-          random(3, 5),
-          random(-0.8, 0.8)
-        ).divide(10);
+        particle.position = new Vec3(random(-1, 1), 0, random(-1, 1)).divide(
+          90
+        );
+        particle.acceleration = new Vec3(0, random(60, 100), 0).divide(100);
+        particle.velocity = new Vec3(0, random(3, 5), 0).divide(10);
         particle.life = particleLife;
         particle.scale.set(1);
       },
-      300
+      100
     );
 
-    this.spawnRate = 15;
+    this.spawnRate = 100;
 
     this.onParticleUpdate = (particle) => {
       particle.t = particle.life / particleLife;
@@ -41,8 +36,8 @@ export class FireParticleGenerator extends ParticleGenerator {
 
     const material = new OrbMaterial(
       engine,
-      new Vec4(...Color("#ff250b").alpha(0.3).array()),
-      new Vec4(...Color("#fffd8c").alpha(1).array())
+      new Vec4(...Color("#1ff4ff").alpha(0.3).array()),
+      new Vec4(...Color("#ffffff").alpha(1).array())
     );
     material.uniforms.fEmissive.value = 1;
     this.mesh.applyMaterial(material);

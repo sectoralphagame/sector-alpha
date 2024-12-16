@@ -6,7 +6,7 @@ import { Engine } from "@ogl-engine/engine/engine";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { Billboard } from "@ogl-engine/utils/billboard";
 import arrowDownFat from "@assets/ui/icons/arrow_down_fat.svg";
-import { Orbit, Texture, Vec3 } from "ogl";
+import { Orbit, Texture } from "ogl";
 import { TintedTextureMaterial } from "@ogl-engine/materials/tintedTexture/tintedTexture";
 
 const BillboardStory: React.FC<{
@@ -25,7 +25,7 @@ const BillboardStory: React.FC<{
 
       const img = new Image();
       img.onload = () => {
-        billboardRef.current = new Billboard(engine, new Vec3(0.03), scaling);
+        billboardRef.current = new Billboard(engine);
         billboardRef.current.applyMaterial(
           new TintedTextureMaterial(
             engine,
@@ -40,7 +40,6 @@ const BillboardStory: React.FC<{
     });
 
     engine.hooks.onUpdate.subscribe("BillboardStory", () => {
-      billboardRef.current?.update();
       controlRef.current!.update();
     });
   }, [engine]);

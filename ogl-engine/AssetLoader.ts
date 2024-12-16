@@ -4,13 +4,15 @@ import type {
   GLTFMaterial,
   ImageRepresentation,
   OGLRenderingContext,
+  Vec3,
 } from "ogl";
-import { GLTFLoader } from "ogl";
+import { Euler, GLTFLoader } from "ogl";
 import { chunk, entries, fromEntries, keys, map, pipe } from "@fxts/core";
 import { skyboxes } from "@assets/textures/skybox";
 import smoke from "@assets/textures/particle/smoke.png";
 import fire from "@assets/textures/particle/fire.png";
 import { loadTextureImage } from "./utils/texture";
+import { getParticleType } from "./particles";
 
 export type ModelName = keyof typeof models;
 
@@ -20,6 +22,12 @@ const textures = {
 };
 export type TextureName = keyof typeof textures;
 
+export interface ParticleGeneratorInput {
+  name: string;
+  position: Vec3;
+  rotation: Euler;
+}
+
 class AssetLoader {
   ready: boolean = false;
   readyPromise: Promise<void>;
@@ -28,9 +36,13 @@ class AssetLoader {
     {
       geometry: Geometry;
       material: GLTFMaterial;
+      particles?: Array<ParticleGeneratorInput>;
     }
   > = {};
-  textures: Record<TextureName, ImageRepresentation> = {};
+  textures: Record<TextureName, ImageRepresentation> = {
+    "particle/smoke": new Image(),
+    "particle/fire": new Image(),
+  };
 
   // eslint-disable-next-line class-methods-use-this
   preload = async (onAssetLoad: (_progress: number) => void) => {
@@ -72,7 +84,7 @@ class AssetLoader {
       textures,
       entries,
       map(([name, path]) => async () => {
-        const image = await loadTextureImage(path);
+        const image = await loadTextureImage(path, textures[name]);
         this.textures[name] = image;
       }),
       chunk(3)
@@ -85,7 +97,7 @@ class AssetLoader {
     }
   };
 
-  load = async (gl: OGLRenderingContext) => {
+  load = (gl: OGLRenderingContext) => {
     this.readyPromise = Promise.all(
       Object.entries(models).map(([modelName, modelPath]) =>
         GLTFLoader.load(gl, modelPath).then((model) => {
@@ -93,6 +105,19 @@ class AssetLoader {
             geometry: model.meshes[0].primitives[0].geometry,
             material: model.materials?.[0],
           };
+
+          for (const node of model.nodes) {
+            const particleType = getParticleType(node.name!);
+            if (particleType) {
+              this.models[modelName].particles ??= [];
+              this.models[modelName].particles!.push({
+                name: node.name!,
+                position: node.position.clone().sub(model.nodes[0].position),
+                rotation: new Euler().copy(node.rotation),
+              });
+            }
+          }
+
           this.models[modelName].geometry.computeBoundingBox();
         })
       )
