@@ -12,6 +12,7 @@ import {
 } from "ogl";
 import settings from "@core/settings";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
+import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
@@ -320,4 +321,16 @@ export class Engine {
     ] as BaseMesh<ColorMaterial>;
     lightMesh.visible = false;
   };
+
+  getByEntityId(id: number) {
+    let mesh: EntityMesh | null = null;
+
+    this.scene.traverse((m) => {
+      if (m instanceof EntityMesh && m.entityId === id) {
+        mesh = m;
+      }
+    });
+
+    return mesh;
+  }
 }
