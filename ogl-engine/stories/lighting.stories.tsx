@@ -23,10 +23,7 @@ const LightingStory: React.FC<{
   const controlRef = React.useRef<Orbit>();
   const skyboxRef = React.useRef<Skybox>();
   const boxRef = React.useRef<BaseMesh<ColorMaterial>>();
-  const lightsRef = React.useRef([
-    new Light(new Vec3(0, 1, 1), intensity, new Vec3(1, 0, 0), false),
-    new Light(new Vec3(1, 1, 0), intensity, new Vec3(-1, 0, 0), false),
-  ]);
+  const lightsRef = React.useRef<Light[]>([]);
   const radiusRef = React.useRef(radius);
 
   React.useEffect(() => {
@@ -34,7 +31,12 @@ const LightingStory: React.FC<{
       engine.camera.position.set(2);
       controlRef.current = new Orbit(engine.camera);
       skyboxRef.current = new Skybox(engine, engine.scene, "example");
+      lightsRef.current.push(
+        new Light(new Vec3(0, 1, 1), intensity, false),
+        new Light(new Vec3(1, 1, 0), intensity, false)
+      );
       lightsRef.current.forEach((light) => {
+        engine.scene.addChild(light);
         engine.addLight(light);
       });
 

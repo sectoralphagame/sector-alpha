@@ -88,12 +88,29 @@ export class Engine {
       color: 2,
     });
 
-    this.initPostProcessing();
+    this.initUniforms();
     this.initLightsContainer();
+    this.initPostProcessing();
     window.renderer = this;
     this.hooks.onInit.notify();
     this.initialized = true;
   };
+
+  private initUniforms() {
+    this.uniforms = {
+      env: {
+        ambient: { value: new Vec3(0.08) },
+        lights: Array(lightsNum)
+          .fill(0)
+          .map(() => dummyLight.uniforms),
+      },
+      resolution: {
+        base: { value: new Vec2() },
+        bloom: { value: new Vec2() },
+      },
+      uTime: { value: 0 },
+    };
+  }
 
   private initLightsContainer = () => {
     this.lightsContainer = new Transform();
@@ -122,20 +139,6 @@ export class Engine {
         targetOnly: true,
         depth: false,
       }),
-    };
-
-    this.uniforms = {
-      env: {
-        ambient: { value: new Vec3(0.08) },
-        lights: Array(lightsNum)
-          .fill(0)
-          .map(() => dummyLight.uniforms),
-      },
-      resolution: {
-        base: { value: new Vec2() },
-        bloom: { value: new Vec2() },
-      },
-      uTime: { value: 0 },
     };
 
     this.postProcessingLayers.bloom.addPass({
