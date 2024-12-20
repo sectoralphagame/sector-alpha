@@ -53,7 +53,8 @@ export function createRender({
     name: "render",
     layer,
     texture,
-    model: "ship/sCiv",
+    // @ts-expect-error
+    model: "",
     hidden: 0,
     static: false,
     interactive: false,
