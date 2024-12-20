@@ -12,17 +12,18 @@ in vec3 vNormal;
 uniform mat4 viewMatrix;
 uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
+uniform sampler2D tRoughness;
 uniform vec3 cameraPosition;
 uniform vec3 ambient;
 uniform Light lights[16];
 
 out vec4 fragData[2];
 
-#define shininess 256.0f
 
 void main() {
     vec3 tex = texture(tDiffuse, vUv).rgb;
     vec3 normalMap = texture(tNormal, vUv).rgb * 2.f - 1.f;
+    float shininess = length(texture(tRoughness, vUv))*256.;
 
     vec3 tangent = vTangent - dot(vTangent, vNormal) * vNormal;
     vec3 bitangent = cross(vNormal, tangent);
