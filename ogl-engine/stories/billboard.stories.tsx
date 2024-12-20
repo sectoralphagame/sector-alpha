@@ -21,7 +21,7 @@ const BillboardStory: React.FC<{
   React.useEffect(() => {
     engine.hooks.onInit.subscribe("BillboardStory", async () => {
       controlRef.current = new Orbit(engine.camera);
-      skyboxRef.current = new Skybox(engine, engine.scene, "example");
+      skyboxRef.current = new Skybox(engine, "example");
 
       const img = new Image();
       img.onload = () => {

@@ -31,7 +31,7 @@ const StarStory: React.FC<StarStoryProps> = ({ color: colorProp }) => {
     engine.hooks.onInit.subscribe("StarStory", async () => {
       controlRef.current = new Orbit(engine.camera);
 
-      skyboxRef.current = new Skybox(engine, engine.scene, "example");
+      skyboxRef.current = new Skybox(engine, "example");
       starRef.current = BaseMesh.fromGltf<StarMaterial>(
         engine,
         await GLTFLoader.load(engine.gl, starModel)

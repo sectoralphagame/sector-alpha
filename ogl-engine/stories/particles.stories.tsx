@@ -3,15 +3,12 @@ import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import type { SmokeParticleGenerator } from "@ogl-engine/particles/smoke";
 import { merge } from "lodash";
-import { assetLoader } from "@ogl-engine/AssetLoader";
 import type { FireParticleGenerator } from "@ogl-engine/particles/fire";
 import type { Engine } from "@ogl-engine/engine/engine";
 import type { ParticleGeneratorType } from "@ogl-engine/particles";
 import { particleGenerator } from "@ogl-engine/particles";
 import type { Story3dArgs } from "./Story3d";
 import { Story3d, story3dMeta } from "./Story3d";
-
-assetLoader.loadTextures(() => {});
 
 const ParticleGeneratorStory: React.FC<
   Story3dArgs & {
