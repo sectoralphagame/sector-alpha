@@ -115,6 +115,9 @@ const config = {
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
     filename: "bundle.[hash].js",
+    assetModuleFilename: devMode
+      ? "[path][name][ext][query]"
+      : "assets/[hash][ext][query]",
   },
   plugins,
   devServer: {
