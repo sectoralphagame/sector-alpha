@@ -20,7 +20,8 @@ const ModelStory: React.FC = () => {
       controlRef.current = new MapControl(engine.camera, engine.canvas);
       const helper = new AxesHelper(engine.gl, {});
       helper.setParent(engine.scene);
-      skyboxRef.current = new Skybox(engine, engine.scene, "example");
+      skyboxRef.current = new Skybox(engine, "example");
+      skyboxRef.current.setParent(engine.scene);
 
       const gltf = await GLTFLoader.load(engine.gl, sCiv);
       const mesh = BaseMesh.fromGltf(engine, gltf);

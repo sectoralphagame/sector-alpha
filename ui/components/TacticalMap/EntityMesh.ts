@@ -34,6 +34,7 @@ export class EntityMesh extends BaseMesh {
     this.scale.set(entityScale);
     this.position.y = Math.random() * 5;
     this.entityId = entity.id;
+    this.name = `EntityMesh:${entity.id}`;
 
     if (gltf.particles) {
       for (const input of gltf.particles) {
@@ -41,16 +42,13 @@ export class EntityMesh extends BaseMesh {
 
         // FIXME: add this as a child after light refactor
         if (input.name.includes("hyperslingshot")) {
-          setTimeout(() => {
-            const light = new Light(
-              new Vec3(...Color("#fffd8c").array()),
-              0.1,
-              this.position.clone().applyMatrix4(this.worldMatrix),
-              false,
-              true
-            );
-            this.engine.addLight(light);
-          }, 1000);
+          const light = new Light(
+            new Vec3(...Color("#fffd8c").array()),
+            0.1,
+            false
+          );
+          this.addChild(light);
+          this.engine.addLight(light);
         }
       }
     }
@@ -98,11 +96,4 @@ export class EntityMesh extends BaseMesh {
     this.selected = selected;
     this.ring?.setSelected(selected);
   };
-
-  destroy() {
-    for (const child of this.children) {
-      // @ts-expect-error
-      child.destroy?.();
-    }
-  }
 }

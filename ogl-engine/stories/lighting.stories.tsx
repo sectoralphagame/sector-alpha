@@ -30,7 +30,7 @@ const LightingStory: React.FC<{
     engine.hooks.onInit.subscribe("LightingStory", async () => {
       engine.camera.position.set(2);
       controlRef.current = new Orbit(engine.camera);
-      skyboxRef.current = new Skybox(engine, engine.scene, "example");
+      skyboxRef.current = new Skybox(engine, "example");
       lightsRef.current.push(
         new Light(new Vec3(0, 1, 1), intensity, false),
         new Light(new Vec3(1, 1, 0), intensity, false)

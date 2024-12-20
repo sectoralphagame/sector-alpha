@@ -1,35 +1,28 @@
 import { skyboxes } from "@assets/textures/skybox";
-import type { Transform } from "ogl";
 import { Vec3, Box, Mesh, Program, Texture } from "ogl";
 import type { Engine } from "@ogl-engine/engine/engine";
 import { Light } from "@ogl-engine/engine/Light";
 import vertex from "./shader.vert.glsl";
 import fragment from "./shader.frag.glsl";
 
-export class Skybox {
-  private textureName: keyof typeof skyboxes;
-  private texture: Texture;
+export class Skybox extends Mesh {
   private color: Vec3;
   private light: Light;
+  name = "Skybox";
   engine: Engine;
-  transform: Transform;
 
-  constructor(engine: Engine, scene: Transform, name: keyof typeof skyboxes) {
-    const gl = engine.gl;
-
-    this.engine = engine;
-    this.textureName = name;
-    this.texture = new Texture(gl, {
-      target: gl.TEXTURE_CUBE_MAP,
-    });
-    this.color = new Vec3(1);
-    this.transform = new Mesh(gl, {
-      geometry: new Box(gl),
-      program: new Program(gl, {
+  constructor(engine: Engine, name: keyof typeof skyboxes) {
+    super(engine.gl, {
+      geometry: new Box(engine.gl),
+      program: new Program(engine.gl, {
         vertex,
         fragment,
         uniforms: {
-          tMap: { value: this.texture },
+          tMap: {
+            value: new Texture(engine.gl, {
+              target: engine.gl.TEXTURE_CUBE_MAP,
+            }),
+          },
           fCameraNear: { value: engine.camera.near },
           fCameraFar: { value: engine.camera.far },
         },
@@ -37,38 +30,37 @@ export class Skybox {
       }),
       frustumCulled: false,
     });
-    this.loadTexture();
-    this.transform.scale.set(1e3);
-    scene.addChild(this.transform);
-    this.light = new Light(this.color, 0.8, true);
+
+    this.loadTexture(name);
+    this.engine = engine;
+    this.color = new Vec3(1);
+    this.scale.set(1e3);
+    this.light = new Light(this.color, 0.5, true);
     this.light.position.set(0, -1, -0.4);
-    this.light.setParent(this.transform);
+    this.light.setParent(this);
     this.engine.addLight(this.light);
   }
 
-  async loadTexture() {
-    function loadImage(src: string): Promise<HTMLImageElement> {
-      return new Promise((res) => {
-        const img = new Image();
-        img.onload = () => res(img);
-        img.src = src;
-      });
-    }
-
-    this.texture.image = await Promise.all(
-      [
-        skyboxes[this.textureName].right,
-        skyboxes[this.textureName].left,
-        skyboxes[this.textureName].top,
-        skyboxes[this.textureName].bottom,
-        skyboxes[this.textureName].front,
-        skyboxes[this.textureName].back,
-      ].map(loadImage)
-    );
+  loadTexture(texture: keyof typeof skyboxes) {
+    this.program.uniforms.tMap.value.image = [
+      skyboxes[texture].right,
+      skyboxes[texture].left,
+      skyboxes[texture].top,
+      skyboxes[texture].bottom,
+      skyboxes[texture].front,
+      skyboxes[texture].back,
+    ].map((src) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        this.program.uniforms.tMap.value.needsUpdate = true;
+      };
+      return img;
+    });
   }
 
   destroy = () => {
     this.engine.removeLight(this.light);
-    this.transform.parent?.removeChild(this.transform);
+    // this.setParent(null);
   };
 }

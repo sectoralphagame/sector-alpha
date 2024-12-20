@@ -30,7 +30,8 @@ export const Story3d: React.FC<Story3dProps> = ({
       onEngineInit(engine);
 
       controlRef.current = new Orbit(engine.camera);
-      skyboxRef.current = new Skybox(engine, engine.scene, skybox);
+      skyboxRef.current = new Skybox(engine, skybox);
+      skyboxRef.current.setParent(engine.scene);
     });
 
     engine.hooks.onUpdate.subscribe("Story3d", (time) => {
@@ -46,7 +47,8 @@ export const Story3d: React.FC<Story3dProps> = ({
   React.useEffect(() => {
     if (engine.initialized) {
       skyboxRef.current?.destroy();
-      skyboxRef.current = new Skybox(engine, engine.scene, skybox);
+      skyboxRef.current = new Skybox(engine, skybox);
+      skyboxRef.current.setParent(engine.scene);
     }
   }, [engine, skybox]);
 

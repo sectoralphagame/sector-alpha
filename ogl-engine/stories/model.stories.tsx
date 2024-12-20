@@ -11,12 +11,24 @@ import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { skyboxes } from "@assets/textures/skybox";
 import { Light } from "@ogl-engine/engine/Light";
+import Color from "color";
 
 interface ModelStoryProps {
   model: string;
   skybox: keyof typeof skyboxes;
   rotationSpeed: number;
   intensity: number;
+}
+
+function createLights(intensity: number): Light[] {
+  const lights = [
+    new Light(new Vec3(...Color("#dafff1").array()), intensity, false),
+    new Light(new Vec3(...Color("#f9fae6").array()), intensity, false),
+  ];
+  lights[0].position.set(10, 0, 0);
+  lights[1].position.set(0, 10, 0);
+
+  return lights;
 }
 
 const ModelStory: React.FC<ModelStoryProps> = ({
@@ -30,14 +42,7 @@ const ModelStory: React.FC<ModelStoryProps> = ({
   const skyboxRef = React.useRef<Skybox>();
   const controlRef = React.useRef<Orbit>();
   const rotationSpeedRef = React.useRef(rotationSpeed);
-  const lights = React.useRef<Light[]>([
-    new Light(new Vec3(1, 0, 0), intensity, new Vec3(1, 0, 0), false),
-    new Light(new Vec3(0, 1, 0), intensity, new Vec3(0, 1, 0), false),
-    // new Light(new Vec3(0, 0, 1), intensity, new Vec3(0, 0, 1), false),
-    // new Light(new Vec3(0, 1, 1), intensity, new Vec3(-1, 0, 0), false),
-    // new Light(new Vec3(1, 0, 1), intensity, new Vec3(0, -1, 0), false),
-    // new Light(new Vec3(1, 1, 0), intensity, new Vec3(0, 0, -1), false),
-  ]);
+  const lights = React.useRef<Light[]>(createLights(intensity));
   const load = useCallback((m: keyof typeof models) => {
     GLTFLoader.load(engine.renderer.gl, m).then((model) => {
       meshRef.current = BaseMesh.fromGltf(engine, model, {
@@ -53,13 +58,15 @@ const ModelStory: React.FC<ModelStoryProps> = ({
   React.useEffect(() => {
     engine.hooks.onInit.subscribe("ModelStory", async () => {
       engine.camera.position.set(0.1);
+      lights.current.forEach((l) => engine.scene.addChild(l));
       lights.current.forEach(engine.addLight);
 
       controlRef.current = new Orbit(engine.camera, {
         inertia: 0.8,
       });
 
-      skyboxRef.current = new Skybox(engine, engine.scene, skyboxName);
+      skyboxRef.current = new Skybox(engine, skyboxName);
+      skyboxRef.current.setParent(engine.scene);
 
       load(models[modelName]);
     });
@@ -82,7 +89,8 @@ const ModelStory: React.FC<ModelStoryProps> = ({
   React.useEffect(() => {
     if (engine.initialized) {
       skyboxRef.current?.destroy();
-      skyboxRef.current = new Skybox(engine, engine.scene, skyboxName);
+      skyboxRef.current = new Skybox(engine, skyboxName);
+      skyboxRef.current.setParent(engine.scene);
     }
   }, [skyboxName]);
 

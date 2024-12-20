@@ -182,6 +182,6 @@ export class ParticleGenerator extends Transform {
 
   // eslint-disable-next-line class-methods-use-this
   destroy() {
-    this.mesh.setParent(null);
+    // this.mesh.setParent(null);
   }
 }

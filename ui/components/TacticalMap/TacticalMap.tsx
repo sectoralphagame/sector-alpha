@@ -52,17 +52,13 @@ export const TacticalMap: React.FC = React.memo(() => {
 
     const changeSector = () => {
       engine.scene.traverse((mesh) => {
-        // engine.scene.removeChild(mesh);
-        if (mesh instanceof ParticleGenerator || mesh instanceof EntityMesh) {
+        if (mesh instanceof ParticleGenerator || mesh instanceof Skybox) {
           mesh.destroy();
         }
       });
 
       meshes.current.clear();
-      if (skybox.current) {
-        engine.scene.removeChild(skybox.current.transform);
-        skybox.current = undefined;
-      }
+      skybox.current = undefined;
 
       engine.setScene(new Scene(engine));
     };
@@ -129,11 +125,11 @@ export const TacticalMap: React.FC = React.memo(() => {
       if (!skybox.current) {
         skybox.current = new Skybox(
           engine,
-          engine.scene,
           (mapData.sectors.find(
             (s) => s.id === sectorObservable.value.cp.name.slug
           )?.skybox as SkyboxTexture) ?? "example"
         );
+        skybox.current.setParent(engine.scene);
       }
 
       for (const entity of defaultIndexer.renderable.getIt()) {
