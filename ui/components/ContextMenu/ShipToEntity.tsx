@@ -8,7 +8,8 @@ import { isOwnedByPlayer } from "@core/utils/misc";
 import { addSubordinate } from "@core/components/subordinates";
 import { findInAncestors } from "@core/utils/findInAncestors";
 import type { Position2D } from "@core/components/position";
-import { useContextMenu, useGameDialog, useSim } from "../../atoms";
+import { useContextMenu } from "@ui/state/contextMenu";
+import { useGameDialog, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
 export const ShipToEntity: React.FC = () => {

@@ -13,6 +13,7 @@ const colors: Record<PathColor, Vec3> = {
 
 export class Path extends Transform {
   engine: Engine;
+  name = "Path";
 
   constructor(engine: Engine) {
     super();

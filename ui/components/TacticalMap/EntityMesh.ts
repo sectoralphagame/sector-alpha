@@ -14,15 +14,17 @@ import { Vec3 } from "ogl";
 import { ship } from "@core/archetypes/ship";
 
 export const entityScale = 1 / 220;
+const scale = 2;
 
 export class EntityMesh extends BaseMesh {
   engine: Engine;
   entityId: number;
+  entity: RequireComponent<"render" | "position">;
   name = "EntityMesh";
   ring: SelectionRing | null = null;
   selected = false;
 
-  constructor(engine: Engine, entity: RequireComponent<"render">) {
+  constructor(engine: Engine, entity: RequireComponent<"render" | "position">) {
     const gltf = assetLoader.model(entity.cp.render.model);
 
     super(engine, {
@@ -34,6 +36,7 @@ export class EntityMesh extends BaseMesh {
     this.scale.set(entityScale);
     this.position.y = Math.random() * 5;
     this.entityId = entity.id;
+    this.entity = entity;
     this.name = `EntityMesh:${entity.id}`;
 
     if (gltf.particles) {
@@ -53,9 +56,21 @@ export class EntityMesh extends BaseMesh {
       }
     }
 
+    this.updatePosition();
+
     if (entity.tags.has("selection")) {
       this.addRing(entity.cp.render.color, entity.cp.dockable?.size ?? "large");
     }
+  }
+
+  updatePosition() {
+    this.position.set(
+      this.entity.cp.position.coord[0] * scale,
+      0,
+      this.entity.cp.position.coord[1] * scale
+    );
+    this.rotation.y = -this.entity.cp.position.angle;
+    this.visible = !this.entity.cp.render.hidden;
   }
 
   addRing = (color: number, size: DockSize) => {

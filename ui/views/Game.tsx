@@ -21,12 +21,12 @@ import { useGameSettings } from "@ui/hooks/useGameSettings";
 import { SelectedUnit } from "@ui/components/SelectedUnit";
 import SimAvgTimeGraph from "@ui/components/dev/SimAvgTimeGraph/SimAvgTimeGraph";
 import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
+import { useContextMenu } from "@ui/state/contextMenu";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
 import type { GameOverlayProps } from "../atoms";
 import {
-  useContextMenu,
   useGameDialog,
   useGameOverlay,
   useNotifications,
@@ -167,7 +167,7 @@ const Game: React.FC = () => {
       any changes made by pixi, like cursor property. That's why rendering
       system creates own canvas here */}
       <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
-        <TacticalMap />
+        <TacticalMap sim={sim} />
         <SimAvgTimeGraph />
         <PlayerMoney />
         <SimControl />

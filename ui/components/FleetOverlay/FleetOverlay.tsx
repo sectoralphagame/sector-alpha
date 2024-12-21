@@ -1,10 +1,11 @@
 import type { Ship } from "@core/archetypes/ship";
 import { getSelected } from "@core/components/selection";
 import { filter, map, pipe, toArray } from "@fxts/core";
-import { useContextMenu, useGameOverlay, useSim } from "@ui/atoms";
+import { useGameOverlay, useSim } from "@ui/atoms";
 import React from "react";
 import type { Sim } from "@core/sim";
 import { useUnitFocus } from "@ui/hooks/useUnitFocus";
+import { useContextMenu } from "@ui/state/contextMenu";
 import { useOverlayRegister } from "../Overlay/Overlay";
 import { FleetOverlayComponent } from "./FleetOverlayComponent";
 

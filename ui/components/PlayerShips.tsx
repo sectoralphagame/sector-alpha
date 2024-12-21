@@ -6,7 +6,8 @@ import {
 } from "@kit/Collapsible";
 import { first } from "@fxts/core";
 import { getSelected } from "@core/components/selection";
-import { useContextMenu, useSim } from "../atoms";
+import { useContextMenu } from "@ui/state/contextMenu";
+import { useSim } from "../atoms";
 import { ShipButton } from "./ShipButton";
 
 export const PlayerShips: React.FC = () => {
