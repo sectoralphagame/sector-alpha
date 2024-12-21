@@ -42,10 +42,12 @@ const ParticleGeneratorStory: React.FC<
     if (!engineRef.current) return;
 
     generatorRef.current?.destroy();
+    generatorRef.current?.setParent(null);
 
     const constructor = particleGenerator[type];
     generatorRef.current = new constructor(engineRef.current);
     generatorRef.current.spawnRate = particles;
+    generatorRef.current.setParent(engineRef.current.scene);
   }, [type]);
 
   return (
