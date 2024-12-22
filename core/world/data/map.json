@@ -205,7 +205,8 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "teegarden1"
     },
     {
       "name": "Teegarden's Star II",
