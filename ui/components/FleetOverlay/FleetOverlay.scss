@@ -7,7 +7,7 @@
   &Commander {
     display: flex;
     align-items: center;
-    gap: var(--spacing-1);
+    gap: usesize(1);
   }
   &Expand {
     transform: rotate(-90deg);
@@ -17,14 +17,14 @@
     transform: rotate(0deg);
   }
   &Subordinates {
-    margin-left: calc(3 * var(--spacing));
+    margin-left: calc(3 * usesize(1));
   }
 }
 
 .hr {
-  margin: var(--spacing-4) 0;
+  margin: usesize(4) 0;
 }
 
 .shipMargin {
-  margin-left: calc(3 * var(--spacing-1));
+  margin-left: calc(3 * usesize(1));
 }

@@ -1,12 +1,12 @@
 .facilities {
-  margin-top: var(--spacing-1);
+  margin-top: usesize(1);
   height: 400px;
   line-height: 1.6;
   overflow-y: scroll;
 
   &Item {
     display: grid;
-    gap: var(--spacing-2);
+    gap: usesize(2);
     grid-template-columns: 1fr 80px 20px;
     align-items: center;
 

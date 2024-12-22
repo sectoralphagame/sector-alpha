@@ -1,17 +1,17 @@
 .editorContainer {
   overflow-y: scroll;
-  padding: var(--spacing-1);
+  padding: usesize(1);
 }
 .freightExpanded {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-3);
-  padding: var(--spacing-3) 0;
+  gap: usesize(3);
+  padding: usesize(3) 0;
 }
 .freightExpandedForm {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-2);
+  gap: usesize(2);
 }
 .root {
   display: grid;
@@ -23,17 +23,17 @@
 }
 .toolbar {
   display: flex;
-  gap: var(--spacing-1);
-  margin-bottom: var(--spacing-1);
+  gap: usesize(1);
+  margin-bottom: usesize(1);
 }
 .column {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-1);
-  padding: var(--spacing-1) 0;
+  gap: usesize(1);
+  padding: usesize(1) 0;
 }
 .hr {
-  margin-bottom: var(--spacing-1);
+  margin-bottom: usesize(1);
 }
 .rowExpander {
   transform: rotate(-90deg);
@@ -52,6 +52,6 @@
 .buildExpanded {
   display: grid;
   grid-template-columns: 200px 80px 32px;
-  gap: var(--spacing-1);
-  padding: var(--spacing-3) 0;
+  gap: usesize(1);
+  padding: usesize(3) 0;
 }

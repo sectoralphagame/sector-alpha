@@ -1,7 +1,7 @@
 .summary {
   align-items: center;
   display: flex;
-  gap: var(--spacing-2);
+  gap: usesize(2);
 }
 
 .icon {
@@ -15,7 +15,7 @@
 }
 
 .growth {
-  margin-left: var(--spacing);
+  margin-left: usesize(1);
 }
 
 .negative {

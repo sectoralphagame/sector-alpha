@@ -4,7 +4,7 @@
   right: 0;
   pointer-events: none;
   background-color: var(--palette-background);
-  padding: var(--spacing);
+  padding: usesize(1);
 
   canvas {
     width: 300px;

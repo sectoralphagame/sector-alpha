@@ -120,6 +120,7 @@ export const Styles: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     cssVariables.current!.innerHTML = `:root { ${[
       `--spacing: ${theme.spacing[1]};`,
+      `--size: ${theme.spacing[1]};`,
       ...getProperties(theme).map(
         ({ key, value }) => `--${key.replace(/\./g, "-")}: ${value};`
       ),

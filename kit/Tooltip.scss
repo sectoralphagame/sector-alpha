@@ -1,6 +1,6 @@
 .tooltip {
   text-align: left;
-  padding: calc(var(--spacing) / 2) var(--spacing);
+  padding: calc(usesize(1) / 2) usesize(1);
   background: var(--palette-background-active);
   border-radius: 4px;
   max-width: 300px;

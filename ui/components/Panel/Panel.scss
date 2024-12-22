@@ -1,8 +1,8 @@
 .iconBar {
   display: flex;
-  gap: var(--spacing-1);
-  margin-bottom: var(--spacing-2);
-  padding-bottom: var(--spacing-2);
+  gap: usesize(1);
+  margin-bottom: usesize(2);
+  padding-bottom: usesize(2);
   border-bottom: 1px solid var(--palette-border);
 }
 .iconBarCollapsed {
@@ -18,7 +18,7 @@
   border-bottom-right-radius: 8px;
   background: var(--palette-background);
   max-height: calc(100vh - 128px);
-  padding: var(--spacing-3);
+  padding: usesize(3);
   position: absolute;
   top: 64px;
   left: 0;
@@ -34,7 +34,7 @@
   }
   overflow-y: scroll;
   height: calc(100vh - 234px);
-  padding-bottom: var(--spacing-3);
+  padding-bottom: usesize(3);
 }
 .rotate {
   transform: rotate(180deg);
@@ -44,12 +44,12 @@
 }
 .tab {
   display: inline-block;
-  margin-top: var(--spacing-1);
-  margin-bottom: var(--spacing-2);
+  margin-top: usesize(1);
+  margin-bottom: usesize(2);
 }
 
 .manage {
-  margin-left: var(--spacing-1);
+  margin-left: usesize(1);
 }
 
 .turbo {

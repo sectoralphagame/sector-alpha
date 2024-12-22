@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-2);
+  gap: usesize(2);
 
   & > * {
     position: relative;
@@ -19,7 +19,7 @@
       width: 1px;
       position: absolute;
       top: 0;
-      right: calc(var(--spacing-1) * -1);
+      right: calc(usesize(1) * -1);
       background-color: var(--palette-border);
       display: block;
       content: "";

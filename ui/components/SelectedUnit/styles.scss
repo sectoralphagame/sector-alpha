@@ -16,7 +16,7 @@
   cursor: pointer;
   text-align: center;
   width: 250px;
-  padding: var(--spacing-1) var(--spacing-2);
+  padding: usesize(1) usesize(2);
   line-height: 1;
   pointer-events: all;
 }

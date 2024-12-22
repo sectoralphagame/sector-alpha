@@ -14,21 +14,21 @@
   border-left: 1px solid var(--palette-border);
   height: 100vh;
   overflow-y: scroll;
-  padding: 0 var(--spacing-4) var(--spacing-4);
+  padding: 0 usesize(4) usesize(4);
 
   h2 {
-    margin-top: var(--spacing-4);
+    margin-top: usesize(4);
   }
 }
 
 .addModule {
-  margin: var(--spacing-2) 0;
+  margin: usesize(2) 0;
 }
 
 .selectedModule {
   display: flex;
   align-items: center;
-  gap: var(--spacing);
+  gap: usesize(1);
 }
 
 .table {
@@ -48,7 +48,7 @@
 
   &Container {
     position: absolute;
-    bottom: var(--spacing-4);
+    bottom: usesize(4);
     display: flex;
     justify-content: center;
     width: 100%;

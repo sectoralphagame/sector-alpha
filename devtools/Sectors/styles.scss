@@ -1,6 +1,6 @@
 .editorContainer {
   overflow-y: scroll;
-  padding: var(--spacing-1);
+  padding: usesize(1);
 }
 .root {
   display: grid;
@@ -12,9 +12,9 @@
 }
 .toolbar {
   display: flex;
-  gap: var(--spacing-1);
-  margin-bottom: var(--spacing-1);
+  gap: usesize(1);
+  margin-bottom: usesize(1);
 }
 .hr {
-  margin-bottom: var(--spacing-1);
+  margin-bottom: usesize(1);
 }

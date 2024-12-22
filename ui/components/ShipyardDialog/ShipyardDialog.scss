@@ -3,7 +3,7 @@ $columnHeight: 364px;
 .root {
   display: grid;
   grid-template-columns: 200px 1fr 300px;
-  gap: var(--spacing-4);
+  gap: usesize(4);
 }
 
 .blueprints {
@@ -30,7 +30,7 @@ $columnHeight: 364px;
   position: relative;
 
   &Time {
-    margin-top: var(--spacing-4);
+    margin-top: usesize(4);
   }
   &Cost {
     line-height: 1.6;
@@ -42,7 +42,7 @@ $columnHeight: 364px;
     justify-content: space-between;
   }
   &Total {
-    margin-bottom: var(--spacing-1);
+    margin-bottom: usesize(1);
   }
 }
 
@@ -70,7 +70,7 @@ $columnHeight: 364px;
     &Remove {
       position: relative;
       top: 2px;
-      margin-left: var(--spacing-0-5);
+      margin-left: usesize(0.5);
     }
   }
   &Accept {

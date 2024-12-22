@@ -1,11 +1,11 @@
 .root {
   border: 1px var(--palette-border) solid;
   border-radius: 8px;
-  padding: var(--spacing-3);
+  padding: usesize(3);
 }
 
 .header {
   font-size: var(--typography-header2);
   font-weight: 600;
-  margin-bottom: var(--spacing-3);
+  margin-bottom: usesize(3);
 }

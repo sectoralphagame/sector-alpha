@@ -1,5 +1,5 @@
 .commodities {
-  margin-top: var(--spacing-2);
+  margin-top: usesize(2);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 }
@@ -7,12 +7,12 @@
   width: 100%;
 }
 .header {
-  margin-bottom: var(--spacing-1);
-  margin-top: var(--spacing-1);
+  margin-bottom: usesize(1);
+  margin-top: usesize(1);
 }
 .label {
   cursor: pointer;
-  margin-left: var(--spacing-0-5);
+  margin-left: usesize(0.5);
 }
 .labelContainer {
   display: inline-flex;

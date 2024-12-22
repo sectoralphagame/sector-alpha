@@ -12,7 +12,7 @@
   border: 1px solid var(--palette-border);
   color: var(--palette-text-1);
   height: 32px;
-  padding: var(--spacing-1);
+  padding: usesize(1);
   line-height: 1;
   font-size: var(--typography-button);
   font-weight: 600;
@@ -22,5 +22,5 @@
 .label {
   cursor: pointer;
   font-size: var(--typography-label);
-  margin-left: var(--spacing-0-5);
+  margin-left: usesize(0.5);
 }

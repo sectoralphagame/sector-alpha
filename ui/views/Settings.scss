@@ -1,6 +1,6 @@
 .button {
   &:not(:last-child) {
-    margin-bottom: var(--spacing-1);
+    margin-bottom: usesize(1);
   }
   width: 100%;
 }
@@ -10,6 +10,6 @@
     align-items: center;
     display: grid;
     grid-template-columns: 1fr 120px;
-    margin-bottom: var(--spacing-1);
+    margin-bottom: usesize(1);
   }
 }

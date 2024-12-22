@@ -32,7 +32,7 @@ export const Dialog: React.FC<
         left: "50%",
         right: "auto",
         bottom: "auto",
-        maxWidth: `calc(100vw - ${"var(--spacing-4)"})`,
+        maxWidth: `calc(100vw - ${"usesize(4)"})`,
         width: width ?? "300px",
         marginRight: "-50%",
         transform: "translate(-50%, -50%)",

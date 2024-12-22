@@ -1,8 +1,8 @@
 .root {
-  bottom: var(--spacing-2);
-  padding: var(--spacing-1);
+  bottom: usesize(2);
+  padding: usesize(1);
   position: absolute;
-  right: var(--spacing-2);
+  right: usesize(2);
   margin: auto;
   max-width: 300px;
 }
@@ -22,16 +22,16 @@
 
   &::before {
     content: "";
-    width: calc((100% + var(--spacing-2)) * var(--progress) / 24);
-    height: calc(100% + var(--spacing-2));
+    width: calc((100% + usesize(2)) * var(--progress) / 24);
+    height: calc(100% + usesize(2));
     position: absolute;
-    top: calc(-1 * var(--spacing-1));
-    left: calc(-1 * var(--spacing-1));
+    top: calc(-1 * usesize(1));
+    left: calc(-1 * usesize(1));
     background-color: rgba(255, 255, 255, 0.2);
   }
 
   &::after {
-    height: calc(100% + var(--spacing-2));
-    top: calc(-1 * var(--spacing-1));
+    height: calc(100% + usesize(2));
+    top: calc(-1 * usesize(1));
   }
 }

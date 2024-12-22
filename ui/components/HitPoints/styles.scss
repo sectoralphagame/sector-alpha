@@ -15,7 +15,7 @@
   span {
     display: inline-flex;
     align-items: center;
-    gap: var(--spacing);
-    margin-right: var(--spacing);
+    gap: usesize(1);
+    margin-right: usesize(1);
   }
 }

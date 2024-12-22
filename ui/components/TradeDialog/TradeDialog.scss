@@ -29,7 +29,7 @@ $btnHeight: 18px;
   }
 
   .actionBtn {
-    margin-left: var(--spacing-1);
+    margin-left: usesize(1);
     height: unset;
     padding: 2px 4px;
     font-size: var(--typography-table);
@@ -50,7 +50,7 @@ $btnHeight: 18px;
     position: absolute;
   }
   display: inline-block;
-  margin: 0 calc(var(--spacing-1) / 2);
+  margin: 0 calc(usesize(1) / 2);
   padding-left: 0.5rem;
   width: 3rem;
   text-align: center;
@@ -61,7 +61,7 @@ $btnHeight: 18px;
   td {
     text-align: right;
     font-size: var(--typography-header4);
-    padding-top: var(--spacing-3);
+    padding-top: usesize(3);
   }
 }
 td.total {

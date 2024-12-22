@@ -7,14 +7,14 @@
   border-radius: 4px;
   color: var(--palette-text-1);
   font-size: var(--typography-default);
-  margin-bottom: var(--spacing-1);
+  margin-bottom: usesize(1);
   outline: 0;
   height: 32px;
-  padding: var(--spacing-0-5) var(--spacing-1);
+  padding: usesize(0.5) usesize(1);
   transition: 200ms;
   width: 100%;
 }
 
 p.text {
-  margin-bottom: var(--spacing-2);
+  margin-bottom: usesize(2);
 }
