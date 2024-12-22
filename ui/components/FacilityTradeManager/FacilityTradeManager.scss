@@ -1,6 +1,6 @@
 .slider {
   width: 100%;
-  margin-top: usesize(2);
+  margin-top: usesize(1.6);
 }
 
 .input {
@@ -24,11 +24,11 @@
 }
 
 .grid {
-  margin-top: usesize(2);
+  margin-top: usesize(1.6);
   grid-template-columns: 1fr 2fr 60px 28px;
   display: grid;
-  gap: usesize(1);
-  row-gap: usesize(2);
+  gap: usesize(0.8);
+  row-gap: usesize(1.6);
 }
 
 .currency {

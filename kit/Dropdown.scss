@@ -23,7 +23,7 @@
   font-size: var(--typography-button);
   height: 32px;
   line-height: 1;
-  padding: usesize(1);
+  padding: usesize(0.8);
   outline: 0;
   text-align: left;
   width: 100%;
@@ -38,13 +38,13 @@
   max-height: 300px;
   overflow: scroll;
   outline: 0;
-  padding: usesize(1);
+  padding: usesize(0.8);
   position: absolute;
   width: 100%;
   z-index: 1;
 
   &Up {
-    bottom: calc(100% + usesize(1));
+    bottom: calc(100% + usesize(0.8));
   }
 }
 .option {
@@ -68,7 +68,7 @@
   font-size: var(--typography-button);
   min-height: 32px;
   line-height: 1;
-  padding: usesize(1);
+  padding: usesize(0.8);
   text-align: left;
   width: 100%;
 }

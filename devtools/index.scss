@@ -4,13 +4,13 @@
   justify-content: center;
   height: 100vh;
   width: 100vw;
-  padding: usesize(4);
+  padding: usesize(3.2);
 }
 
 .grid {
   max-width: 800px;
   display: grid;
-  gap: usesize(4);
+  gap: usesize(3.2);
   grid-template-columns: repeat(2, 1fr);
 }
 

@@ -2,11 +2,11 @@
   align-items: center;
   display: flex;
   font-size: var(--typography-label);
-  margin-bottom: usesize(0.5);
+  margin-bottom: usesize(0.4);
 
   &Color {
     width: 20px;
     height: 20px;
-    margin-right: usesize(1);
+    margin-right: usesize(0.8);
   }
 }

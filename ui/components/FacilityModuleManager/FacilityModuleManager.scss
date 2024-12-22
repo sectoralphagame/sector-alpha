@@ -1,7 +1,7 @@
 .root {
   display: grid;
   grid-template-columns: 200px 1fr 200px;
-  gap: usesize(4);
+  gap: usesize(3.2);
 }
 
 .sectionHeader {
@@ -33,7 +33,7 @@
   position: relative;
 
   &Time {
-    margin-top: usesize(4);
+    margin-top: usesize(3.2);
   }
   &Cost {
     line-height: 1.6;

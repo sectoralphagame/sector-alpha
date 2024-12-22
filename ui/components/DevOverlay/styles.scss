@@ -1,13 +1,13 @@
 .root {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: usesize(1);
+  gap: usesize(0.8);
 }
 
 .actions {
   display: flex;
   flex-direction: column;
-  gap: usesize(1);
+  gap: usesize(0.8);
 
   button {
     font-size: var(--typography-caption);

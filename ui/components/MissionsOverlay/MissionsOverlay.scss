@@ -1,11 +1,11 @@
 .grid {
   display: grid;
   grid-template-columns: 400px 1fr;
-  gap: usesize(4);
+  gap: usesize(3.2);
 }
 
 .divider {
-  margin: usesize(4) 0;
+  margin: usesize(3.2) 0;
 }
 
 .mission {
@@ -20,7 +20,7 @@
 
     border: 1px solid var(--palette-border);
     cursor: pointer;
-    padding: usesize(1);
+    padding: usesize(0.8);
     transition: 200ms;
   }
 }
@@ -28,7 +28,7 @@
 .rewards {
   display: grid;
   grid-template-columns: 1fr 200px;
-  gap: usesize(4);
+  gap: usesize(3.2);
 
   & > div {
     border-right: 1px solid var(--palette-border);
@@ -36,7 +36,7 @@
 }
 
 .references {
-  margin: usesize(4) 0;
+  margin: usesize(3.2) 0;
 
   button {
     appearance: none;
@@ -54,5 +54,5 @@
 }
 
 .progress {
-  margin: usesize(4) 0;
+  margin: usesize(3.2) 0;
 }

@@ -1,11 +1,11 @@
 .backButtonBar {
   display: flex;
   align-items: center;
-  gap: usesize(2);
-  margin-bottom: usesize(1);
+  gap: usesize(1.6);
+  margin-bottom: usesize(0.8);
 }
 .container {
-  padding: usesize(4);
+  padding: usesize(3.2);
   width: 420px;
 }
 .root {

@@ -20,7 +20,7 @@
 
   .content {
     background-color: var(--palette-background-active);
-    padding: usesize(1);
+    padding: usesize(0.8);
   }
 }
 
@@ -30,7 +30,7 @@
   cursor: pointer;
   color: var(--palette-text-1);
   outline: none;
-  padding: usesize(1);
+  padding: usesize(0.8);
   background-color: var(--palette-background);
 
   &Active,

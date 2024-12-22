@@ -1,7 +1,7 @@
 .title {
   display: flex;
   justify-content: space-between;
-  margin-bottom: usesize(3);
+  margin-bottom: usesize(2.4);
 }
 
 .titleText {
@@ -11,8 +11,8 @@
 .actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: usesize(3);
-  gap: usesize(1);
+  margin-top: usesize(2.4);
+  gap: usesize(0.8);
 }
 
 .close {

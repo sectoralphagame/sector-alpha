@@ -2,7 +2,7 @@
   background-color: #000000;
   height: 100vh;
   width: 100vw;
-  padding: usesize(4);
+  padding: usesize(3.2);
   z-index: 2;
   position: fixed;
   top: 0;
@@ -16,9 +16,9 @@
 .bar {
   align-items: center;
   display: flex;
-  gap: usesize(4);
-  padding-bottom: usesize(3);
-  margin-bottom: usesize(4);
+  gap: usesize(3.2);
+  padding-bottom: usesize(2.4);
+  margin-bottom: usesize(3.2);
   border-bottom: 1px solid var(--palette-border);
 
   h1,
@@ -33,7 +33,7 @@
       width: 1px;
       background-color: var(--palette-border);
       position: absolute;
-      right: calc(-1 * usesize(2));
+      right: calc(-1 * usesize(1.6));
       top: 6px;
     }
 

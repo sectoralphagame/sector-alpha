@@ -1,6 +1,6 @@
 .editorContainer {
   overflow-y: scroll;
-  padding: usesize(1);
+  padding: usesize(0.8);
 }
 .root {
   display: grid;
@@ -12,17 +12,17 @@
 }
 .toolbar {
   display: flex;
-  gap: usesize(1);
-  margin-bottom: usesize(1);
+  gap: usesize(0.8);
+  margin-bottom: usesize(0.8);
 }
 .column {
   display: flex;
   flex-direction: column;
-  gap: usesize(1);
-  padding: usesize(1) 0;
+  gap: usesize(0.8);
+  padding: usesize(0.8) 0;
 }
 .hr {
-  margin-bottom: usesize(1);
+  margin-bottom: usesize(0.8);
 }
 .rowExpander {
   transform: rotate(-90deg);
@@ -34,7 +34,7 @@
 .color {
   display: flex;
   align-items: center;
-  gap: usesize(1);
+  gap: usesize(0.8);
 
   &Input {
     text-align: right;

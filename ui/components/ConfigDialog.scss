@@ -1,14 +1,14 @@
 .backButton {
-  margin-bottom: usesize(1);
+  margin-bottom: usesize(0.8);
 }
 .buttonContainer {
   &:not(:last-child) {
-    margin-bottom: usesize(1);
+    margin-bottom: usesize(0.8);
   }
   width: 100%;
 }
 .input {
-  margin-bottom: usesize(1);
+  margin-bottom: usesize(0.8);
   width: 100%;
 }
 .saveContainer {
@@ -17,5 +17,5 @@
   }
   display: flex;
   align-items: center;
-  gap: usesize(1);
+  gap: usesize(0.8);
 }
