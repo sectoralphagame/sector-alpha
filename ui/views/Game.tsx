@@ -22,6 +22,8 @@ import { SelectedUnit } from "@ui/components/SelectedUnit";
 import SimAvgTimeGraph from "@ui/components/dev/SimAvgTimeGraph/SimAvgTimeGraph";
 import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
 import { useContextMenu } from "@ui/state/contextMenu";
+import { CurrentSector } from "@ui/components/CurrentSector/CurrentSector";
+import { useSectorObservable } from "@ui/state/sector";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -57,6 +59,7 @@ const Game: React.FC = () => {
     Entity | undefined
   >(selectedId ? sim.get(selectedId) : undefined);
   const player = sim.index.player.get()[0]!;
+  const [currentSector] = useSectorObservable();
 
   React.useEffect(() => {
     if (!sim) return () => undefined;
@@ -171,6 +174,9 @@ const Game: React.FC = () => {
         <SimAvgTimeGraph />
         <PlayerMoney />
         <SimControl />
+        {!overlay && (
+          <CurrentSector name={currentSector?.cp.name.value ?? ""} />
+        )}
         <SelectedUnit />
         <MapPanel
           tabs={
