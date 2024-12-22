@@ -2,12 +2,17 @@ import type { Material } from "@ogl-engine/materials/material";
 import type { Geometry, GLTF, MeshOptions } from "ogl";
 import { Mesh, Vec3 } from "ogl";
 import { MissingMaterial } from "@ogl-engine/materials/missing/missing";
+import type { Destroyable } from "@ogl-engine/types";
 import type { Engine } from "./engine";
 
-export class BaseMesh<TMaterial extends Material = Material> extends Mesh {
+export class BaseMesh<TMaterial extends Material = Material>
+  extends Mesh
+  implements Destroyable
+{
   engine: Engine;
   name = "BaseMesh";
   material: TMaterial;
+  onDestroyCallbacks: (() => void)[] = [];
 
   constructor(
     engine: Engine,
@@ -125,5 +130,12 @@ export class BaseMesh<TMaterial extends Material = Material> extends Mesh {
     });
 
     return mesh;
+  }
+
+  destroy() {
+    console.log("destroying", this.name);
+    for (const cb of this.onDestroyCallbacks) {
+      cb();
+    }
   }
 }

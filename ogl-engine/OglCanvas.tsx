@@ -13,6 +13,7 @@ export const OglCanvas: React.FC<OglCanvasProps> = React.memo(({ engine }) => {
   const resizeObserver = React.useRef<ResizeObserver>();
   const frameIdRef = React.useRef(0);
   const { fps, tick, enabled: fpsCounterEnabled } = useFps();
+  const [errorCount, setErrorCount] = React.useState(0);
 
   React.useEffect(() => {
     const cleanup = () => {
@@ -24,6 +25,9 @@ export const OglCanvas: React.FC<OglCanvasProps> = React.memo(({ engine }) => {
     engine.hooks.onUpdate.subscribe("OglCanvas", () => {
       tick();
       frameIdRef.current = requestAnimationFrame(engine.update);
+    });
+    engine.hooks.onError.subscribe("OglCanvas", () => {
+      setErrorCount((count) => count + 1);
     });
 
     engine.init(canvas);
@@ -37,6 +41,13 @@ export const OglCanvas: React.FC<OglCanvasProps> = React.memo(({ engine }) => {
 
     return cleanup;
   }, [canvas, engine]);
+
+  React.useEffect(() => {
+    if (errorCount > 10) {
+      engine.hooks.onError.notify(new Error("Error count exceeded"));
+      cancelAnimationFrame(frameIdRef.current);
+    }
+  }, [errorCount]);
 
   return (
     <>

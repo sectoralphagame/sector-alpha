@@ -95,8 +95,8 @@ export class EntityMesh extends BaseMesh {
     generator.setParent(this);
     generator.updateMatrixWorld();
 
-    this.onBeforeRender(() => {
-      generator.update(this.engine.delta);
+    const onUpdate = (delta: number) => {
+      generator.update(delta);
 
       if (type === "engine") {
         const gen = generator as any as EngineParticleGenerator;
@@ -104,6 +104,10 @@ export class EntityMesh extends BaseMesh {
 
         gen.setIntensity(e.cp.movable.velocity / e.cp.drive.maneuver);
       }
+    };
+    this.engine.hooks.onUpdate.subscribe(this.name, onUpdate);
+    this.onDestroyCallbacks.push(() => {
+      this.engine.hooks.onUpdate.unsubscribe(onUpdate);
     });
   }
 

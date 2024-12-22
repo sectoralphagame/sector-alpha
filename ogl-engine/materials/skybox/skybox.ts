@@ -2,10 +2,11 @@ import { skyboxes } from "@assets/textures/skybox";
 import { Vec3, Box, Mesh, Program, Texture } from "ogl";
 import type { Engine } from "@ogl-engine/engine/engine";
 import { Light } from "@ogl-engine/engine/Light";
+import type { Destroyable } from "@ogl-engine/types";
 import vertex from "./shader.vert.glsl";
 import fragment from "./shader.frag.glsl";
 
-export class Skybox extends Mesh {
+export class Skybox extends Mesh implements Destroyable {
   private color: Vec3;
   private light: Light;
   name = "Skybox";

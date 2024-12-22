@@ -1,4 +1,5 @@
 import React from "react";
+import type { Transform } from "ogl";
 import { Raycast, Vec2, Vec3 } from "ogl";
 import { defaultIndexer } from "@core/systems/utils/default";
 import { find, first } from "@fxts/core";
@@ -13,7 +14,6 @@ import { selectingSystem } from "@core/systems/selecting";
 import { Path } from "@ogl-engine/utils/path";
 import { sectorObservable } from "@ui/state/sector";
 import type { SkyboxTexture } from "@assets/textures/skybox";
-import { ParticleGenerator } from "@ogl-engine/ParticleGenerator";
 import { Scene } from "@ogl-engine/engine/Scene";
 import type { Sim } from "@core/sim";
 import { contextMenuObservable } from "@ui/state/contextMenu";
@@ -22,11 +22,16 @@ import type { GameSettings } from "@ui/hooks/useGameSettings";
 import type { MouseButton } from "@ogl-engine/Orbit";
 import { Asteroids } from "@ogl-engine/engine/Asteroids";
 import { fieldColors } from "@core/archetypes/asteroid";
+import type { Destroyable } from "@ogl-engine/types";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 
 // FIXME: This is just an ugly hotfix to keep distance between things larger
 const scale = 2;
+
+function isDestroyable(mesh: Transform): mesh is Transform & Destroyable {
+  return !!(mesh as any).destroy;
+}
 
 export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   engine: Engine;
@@ -75,7 +80,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
   onSectorChange() {
     this.engine.scene.traverse((mesh) => {
-      if (mesh instanceof ParticleGenerator || mesh instanceof Skybox) {
+      if (isDestroyable(mesh)) {
         mesh.destroy();
       }
     });
@@ -151,6 +156,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     for (const entity of defaultIndexer.renderable.getIt()) {
       if (entity.cp.position.sector !== sectorObservable.value.id) {
         if (this.meshes.has(entity.id)) {
+          this.meshes.get(entity.id)!.destroy();
           this.engine.scene.removeChild(this.meshes.get(entity.id)!);
           this.meshes.delete(entity.id);
         }

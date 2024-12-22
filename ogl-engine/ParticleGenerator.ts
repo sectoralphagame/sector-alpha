@@ -1,6 +1,7 @@
 import { Vec3, Transform, Plane } from "ogl";
 import type { Engine } from "./engine/engine";
 import { BaseMesh } from "./engine/BaseMesh";
+import type { Destroyable } from "./types";
 
 interface Particle {
   angularVelocity: number;
@@ -14,7 +15,7 @@ interface Particle {
 
 type GenerateParticleFn = (_particle: Particle) => void;
 
-export class ParticleGenerator extends Transform {
+export class ParticleGenerator extends Transform implements Destroyable {
   engine: Engine;
   name = "ParticleGenerator";
   particles: Particle[];
