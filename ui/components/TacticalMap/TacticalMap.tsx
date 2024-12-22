@@ -20,6 +20,8 @@ import { contextMenuObservable } from "@ui/state/contextMenu";
 import { storageHook } from "@core/hooks";
 import type { GameSettings } from "@ui/hooks/useGameSettings";
 import type { MouseButton } from "@ogl-engine/Orbit";
+import { Asteroids } from "@ogl-engine/engine/Asteroids";
+import { fieldColors } from "@core/archetypes/asteroid";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 
@@ -57,7 +59,11 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.engine.hooks.onUpdate.subscribe("TacticalMap", () =>
       this.onEngineUpdate()
     );
-    sectorObservable.subscribe("TacticalMap", () => this.onSectorChange());
+    sectorObservable.subscribe("TacticalMap", () => {
+      if (this.engine.initialized) {
+        this.onSectorChange();
+      }
+    });
     selectingSystem.hook.subscribe("TacticalMap", (...args) =>
       this.onSelectedChange(...args)
     );
@@ -75,6 +81,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     });
 
     this.engine.setScene(new Scene(this.engine));
+    this.loadSector();
   }
 
   async onControlClick(mousePosition: Vec2, button: MouseButton) {
@@ -132,6 +139,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     });
 
     this.updateEngineSettings();
+    this.loadSector();
   }
 
   async onEngineUpdate() {
@@ -139,8 +147,6 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     const selectedEntity = this.sim.get(
       this.settingsManager.cp.selectionManager.id!
     );
-
-    this.loadSkybox();
 
     for (const entity of defaultIndexer.renderable.getIt()) {
       if (entity.cp.position.sector !== sectorObservable.value.id) {
@@ -256,6 +262,11 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.engine.postProcessing = settings.graphics.postProcessing;
   }
 
+  loadSector() {
+    this.loadSkybox();
+    this.loadAsteroidFields();
+  }
+
   loadSkybox() {
     let skybox = this.engine.scene.children.find((c) => c instanceof Skybox);
     if (!skybox) {
@@ -266,6 +277,27 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         )?.skybox as SkyboxTexture) ?? "example"
       );
       skybox.setParent(this.engine.scene);
+    }
+  }
+
+  loadAsteroidFields() {
+    const fields = this.sim.index.asteroidFields.getIt();
+    for (const field of fields) {
+      if (field.cp.position.sector === sectorObservable.value.id) {
+        const fieldTransform = new Asteroids(
+          this.engine,
+          field.cp.asteroidSpawn.size,
+          1,
+          fieldColors[field.cp.asteroidSpawn.type]
+        );
+        fieldTransform.position.set(
+          field.cp.position.coord[0] * scale,
+          0,
+          field.cp.position.coord[1] * scale
+        );
+        fieldTransform.scale.set(scale);
+        this.engine.scene.addChild(fieldTransform);
+      }
     }
   }
 

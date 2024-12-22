@@ -105,6 +105,7 @@ class AssetLoader {
     }
 
     this.models[modelName].geometry.computeBoundingBox();
+    return this.models[modelName];
   }
 
   model(name: ModelName) {

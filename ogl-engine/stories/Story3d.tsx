@@ -47,6 +47,7 @@ export const Story3d: React.FC<Story3dProps> = ({
   React.useEffect(() => {
     if (engine.initialized) {
       skyboxRef.current?.destroy();
+      skyboxRef.current?.setParent(null);
       skyboxRef.current = new Skybox(engine, skybox);
       skyboxRef.current.setParent(engine.scene);
     }
