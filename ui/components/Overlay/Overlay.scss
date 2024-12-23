@@ -29,7 +29,7 @@
 
     &:after {
       display: block;
-      height: 1rem;
+      height: usesize(1.5);
       width: usesize(0.1);
       background-color: var(--palette-border);
       position: absolute;
