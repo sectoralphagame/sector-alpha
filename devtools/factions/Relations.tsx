@@ -1,6 +1,7 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { useThrottledFormState } from "@devtools/utils";
+import { usesize } from "@kit/theming/style";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import type { FactionInput, FormData, RelationInput } from "./utils";
 
@@ -53,10 +54,10 @@ export const RelationEditor: React.FC = () => {
   return (
     <Table>
       <colgroup>
-        <col style={{ width: "48px" }} />
-        <col style={{ width: "360px" }} />
-        <col style={{ width: "360px" }} />
-        <col style={{ width: "80px" }} />
+        <col style={{ width: usesize(4.8) }} />
+        <col style={{ width: usesize(36) }} />
+        <col style={{ width: usesize(36) }} />
+        <col style={{ width: usesize(8) }} />
         <col />
       </colgroup>
       <thead>

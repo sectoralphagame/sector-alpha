@@ -57,7 +57,7 @@ $columnHeight: usesize(36.4);
   flex-grow: 1;
   overflow-y: scroll;
   position: relative;
-  top: -usesize(0.4);
+  top: usesize(-0.4);
 
   &Item {
     align-items: center;

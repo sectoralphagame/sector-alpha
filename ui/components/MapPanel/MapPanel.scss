@@ -2,7 +2,7 @@
   display: flex;
   top: 0;
   position: absolute;
-  right: -usesize(0.1);
+  right: usesize(-0.1);
   margin: auto;
   text-align: left;
   width: fit-content;

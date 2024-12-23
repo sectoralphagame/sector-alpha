@@ -37,7 +37,7 @@ export const Settings: React.FC = () => {
         </Select>
       </div>
       <div className={styles.settingsRow}>
-        <div>UI icon scale</div>
+        <div>UI scale</div>
         <Slider
           value={settings.scale}
           onChange={(event) =>
@@ -46,9 +46,9 @@ export const Settings: React.FC = () => {
               scale: Number(event.target.value),
             }))
           }
-          max={2}
-          min={0.5}
-          step={0.1}
+          max={14}
+          min={6}
+          step={0.5}
         />
       </div>
       <hr />
