@@ -1,6 +1,6 @@
 .button {
   &:not(:last-child) {
-    margin-bottom: var(--spacing-1);
+    margin-bottom: usesize(0.8);
   }
   width: 100%;
 }
@@ -9,7 +9,7 @@
   &Row {
     align-items: center;
     display: grid;
-    grid-template-columns: 1fr 120px;
-    margin-bottom: var(--spacing-1);
+    grid-template-columns: 1fr usesize(12);
+    margin-bottom: usesize(0.8);
   }
 }

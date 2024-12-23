@@ -1,30 +1,30 @@
 .root {
   display: grid;
-  grid-template-columns: 400px 1fr;
+  grid-template-columns: usesize(40) 1fr;
 }
 
 .fleet {
   &Commander {
     display: flex;
     align-items: center;
-    gap: var(--spacing-1);
+    gap: usesize(0.8);
   }
   &Expand {
     transform: rotate(-90deg);
-    width: 16px;
+    width: usesize(1.6);
   }
   &Expanded {
     transform: rotate(0deg);
   }
   &Subordinates {
-    margin-left: calc(3 * var(--spacing));
+    margin-left: calc(3 * usesize(0.8));
   }
 }
 
 .hr {
-  margin: var(--spacing-4) 0;
+  margin: usesize(3.2) 0;
 }
 
 .shipMargin {
-  margin-left: calc(3 * var(--spacing-1));
+  margin-left: calc(3 * usesize(0.8));
 }

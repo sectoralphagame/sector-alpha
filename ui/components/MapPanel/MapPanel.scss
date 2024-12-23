@@ -2,14 +2,14 @@
   display: flex;
   top: 0;
   position: absolute;
-  right: -1px;
+  right: usesize(-0.1);
   margin: auto;
   text-align: left;
   width: fit-content;
   background: var(--palette-background);
-  border: 1px solid var(--palette-border);
+  border: usesize(0.1) solid var(--palette-border);
   border-top: none;
-  border-bottom-left-radius: 8px;
+  border-bottom-left-radius: usesize(0.8);
   line-height: 1;
   overflow: hidden;
 
@@ -20,7 +20,7 @@
 
   .content {
     background-color: var(--palette-background-active);
-    padding: var(--spacing-1);
+    padding: usesize(0.8);
   }
 }
 
@@ -30,7 +30,7 @@
   cursor: pointer;
   color: var(--palette-text-1);
   outline: none;
-  padding: var(--spacing-1);
+  padding: usesize(0.8);
   background-color: var(--palette-background);
 
   &Active,

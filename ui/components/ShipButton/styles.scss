@@ -7,7 +7,7 @@
   text-align: left;
   color: var(--palette-text);
   cursor: pointer;
-  padding: 3px 0;
+  padding: usesize(0.3) 0;
   width: fill-available;
   width: -webkit-fill-available;
 
@@ -21,8 +21,8 @@
   }
 
   &Icon {
-    height: 12px;
-    width: 16px;
+    height: usesize(1.2);
+    width: usesize(1.6);
     margin-right: $spacing;
 
     [fill="#fff"],

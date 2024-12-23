@@ -4,10 +4,10 @@
 }
 
 .cell {
-  padding: var(--spacing-0-5) 0;
+  padding: usesize(0.4) 0;
 }
 
 .header {
   font-size: var(--typography-label);
-  padding: var(--spacing-0-5) 0;
+  padding: usesize(0.5) 0;
 }

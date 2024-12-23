@@ -1,12 +1,12 @@
 .backButtonBar {
   display: flex;
   align-items: center;
-  gap: var(--spacing-2);
-  margin-bottom: var(--spacing-1);
+  gap: usesize(1.6);
+  margin-bottom: usesize(0.8);
 }
 .container {
-  padding: var(--spacing-4);
-  width: 420px;
+  padding: usesize(3.2);
+  width: usesize(42);
 }
 .root {
   align-items: center;

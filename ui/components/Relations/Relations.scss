@@ -1,26 +1,26 @@
 .root {
   display: flex;
-  gap: var(--spacing-2);
-  height: 242px;
+  gap: usesize(1.6);
+  height: usesize(24.2);
   position: relative;
 }
 
 .bar {
   background-color: currentColor;
   display: block;
-  width: 12px;
+  width: usesize(1.2);
   position: absolute;
-  left: 6px;
+  left: usesize(0.6);
 
   &Container {
     position: relative;
-    width: 30px;
+    width: usesize(3);
   }
 
   &Horizontal {
-    height: 2px;
+    height: usesize(0.2);
     background-color: #333333;
-    top: 99px;
+    top: usesize(9.9);
     position: absolute;
     width: 100%;
   }
@@ -29,7 +29,7 @@
 .label {
   display: inline-block;
   position: relative;
-  top: 210px;
+  top: usesize(21);
   text-align: center;
   width: 100%;
 }

@@ -9,8 +9,8 @@
 }
 .defaultFont {
   font-size: var(--typography-default);
-  margin-top: var(--spacing-1);
-  margin-bottom: var(--spacing-1);
+  margin-top: usesize(0.8);
+  margin-bottom: usesize(0.8);
 }
 .h2 {
   font-size: var(--typography-header2);
@@ -35,19 +35,19 @@
 
   &.h1 {
     font-size: var(--typography-header);
-    margin-bottom: var(--spacing-2);
-    text-shadow: currentColor 1px 0 10px;
+    margin-bottom: usesize(1.6);
+    text-shadow: currentColor usesize(0.1) 0 usesize(1);
   }
   &.h2,
   &.h3,
   &.h4,
   &.h5,
   &.h6 {
-    margin-bottom: var(--spacing-1);
-    text-shadow: currentColor 1px 0 10px;
+    margin-bottom: usesize(0.8);
+    text-shadow: currentColor usesize(0.1) 0 usesize(1);
   }
 }
 
 p.root {
-  margin-bottom: var(--spacing-0-5);
+  margin-bottom: usesize(0.5);
 }

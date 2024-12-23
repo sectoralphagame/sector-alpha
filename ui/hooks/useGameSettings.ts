@@ -8,7 +8,7 @@ export interface GameSettings {
 
 const defaultGameSttings: GameSettings = {
   pauseOnMissionOffer: true,
-  scale: 1,
+  scale: 10,
   dev: false,
 };
 

@@ -1,7 +1,7 @@
 .root {
   .content {
-    margin-top: var(--spacing-3);
-    margin-bottom: var(--spacing-3);
+    margin-top: usesize(2.4);
+    margin-bottom: usesize(2.4);
 
     .list {
       list-style: none;
@@ -9,7 +9,7 @@
       padding: 0;
 
       &Item {
-        margin-bottom: var(--spacing-0-5);
+        margin-bottom: usesize(0.5);
       }
     }
   }

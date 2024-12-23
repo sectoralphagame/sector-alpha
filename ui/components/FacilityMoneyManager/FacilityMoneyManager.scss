@@ -8,7 +8,7 @@
 
 .slider {
   width: 100%;
-  margin-top: var(--spacing-2);
+  margin-top: usesize(1.6);
 }
 
 .diff {
@@ -21,7 +21,7 @@
 }
 
 .input {
-  width: 120px;
+  width: usesize(12);
   border: none;
   display: inline-block;
   text-align: right;

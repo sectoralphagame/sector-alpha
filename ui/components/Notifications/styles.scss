@@ -2,14 +2,14 @@
   background-color: var(--palette-background);
   align-items: center;
   display: flex;
-  border: 1px solid var(--palette-border);
+  border: usesize(0.1) solid var(--palette-border);
   border-right: none;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
+  border-top-left-radius: usesize(0.8);
+  border-bottom-left-radius: usesize(0.8);
   overflow: hidden;
 
-  height: 56px;
-  transform: translateX(calc(100% - 56px));
+  height: usesize(5.6);
+  transform: translateX(calc(100% - usesize(5.6)));
   transition: 200ms;
   position: relative;
   cursor: pointer;
@@ -18,7 +18,7 @@
   &::before {
     content: "";
     display: block;
-    width: 3px;
+    width: usesize(0.3);
     height: 100%;
     top: 0;
     left: 0;
@@ -56,32 +56,32 @@
     white-space: nowrap;
     text-overflow: clip;
     margin: 0;
-    margin-left: 16px;
+    margin-left: usesize(1.6);
     color: var(--palette-text-1);
-    padding-right: 16px;
+    padding-right: usesize(1.6);
   }
 
   &Icon {
-    margin-left: 8px;
-    width: 32px;
-    height: 32px;
+    margin-left: usesize(0.8);
+    width: usesize(3.2);
+    height: usesize(3.2);
   }
 
   &Dismiss {
-    margin-right: 8px;
+    margin-right: usesize(0.8);
   }
 }
 
 .container {
   flex-direction: column;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: usesize(0.8);
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
   position: absolute;
-  bottom: 300px;
-  height: 400px;
+  bottom: usesize(30);
+  height: usesize(40);
   right: 0;
   pointer-events: none;
 }

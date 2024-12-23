@@ -90,7 +90,7 @@ const FleetComponent: React.FC<FleetComponentProps> = ({
         <div
           className={styles.fleetSubordinates}
           style={{
-            marginLeft: `calc(${3} * var(--spacing))`,
+            marginLeft: `calc(${3} * usesize(1))`,
           }}
         >
           {fleet.subordinates

@@ -1,11 +1,11 @@
 .table {
   tbody tr:not(.noBorder),
   thead tr:not(.noBorder) {
-    border-bottom: 1px var(--palette-disabled) solid;
+    border-bottom: usesize(0.1) var(--palette-disabled) solid;
   }
   tbody td,
   thead th {
-    padding: var(--spacing-0-75) var(--spacing-1);
+    padding: usesize(0.6) usesize(0.8);
   }
   tbody tr:not(.noBorder):last-child {
     border-bottom: none;
@@ -16,12 +16,12 @@
     }
     background: rgba(255, 255, 255, 0.1);
     border: none;
-    border-radius: 4px;
+    border-radius: usesize(0.4);
     color: var(--palette-text-1);
     font-size: var(--typography-default);
     outline: 0;
-    height: 32px;
-    padding: 4px 8px;
+    height: usesize(3.2);
+    padding: usesize(0.4) usesize(0.8);
     transition: 200ms;
     width: 100%;
   }
@@ -31,10 +31,10 @@
 }
 
 .cell {
-  padding: var(--spacing-0-5) 0;
+  padding: usesize(0.5) 0;
 }
 
 .header {
   font-size: var(--typography-label);
-  padding: var(--spacing-0-5) 0;
+  padding: usesize(0.5) 0;
 }

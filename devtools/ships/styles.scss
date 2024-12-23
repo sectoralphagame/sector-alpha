@@ -1,39 +1,39 @@
 .editorContainer {
   overflow-y: scroll;
-  padding: var(--spacing-1);
+  padding: usesize(0.8);
 }
 .freightExpanded {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-3);
-  padding: var(--spacing-3) 0;
+  gap: usesize(2.4);
+  padding: usesize(2.4) 0;
 }
 .freightExpandedForm {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-2);
+  gap: usesize(1.6);
 }
 .root {
   display: grid;
-  grid-template-columns: 1fr 120px;
+  grid-template-columns: 1fr usesize(12);
   height: 100vh;
 }
 .rootExpanded {
-  grid-template-columns: 1fr 350px;
+  grid-template-columns: 1fr usesize(35);
 }
 .toolbar {
   display: flex;
-  gap: var(--spacing-1);
-  margin-bottom: var(--spacing-1);
+  gap: usesize(0.8);
+  margin-bottom: usesize(0.8);
 }
 .column {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-1);
-  padding: var(--spacing-1) 0;
+  gap: usesize(0.8);
+  padding: usesize(0.8) 0;
 }
 .hr {
-  margin-bottom: var(--spacing-1);
+  margin-bottom: usesize(0.8);
 }
 .rowExpander {
   transform: rotate(-90deg);
@@ -46,12 +46,12 @@
   justify-content: space-between;
 }
 .texturePreview {
-  height: 16px;
-  width: 16px;
+  height: usesize(1.6);
+  width: usesize(1.6);
 }
 .buildExpanded {
   display: grid;
-  grid-template-columns: 200px 80px 32px;
-  gap: var(--spacing-1);
-  padding: var(--spacing-3) 0;
+  grid-template-columns: usesize(20) usesize(8) usesize(3.2);
+  gap: usesize(0.8);
+  padding: usesize(2.4) 0;
 }

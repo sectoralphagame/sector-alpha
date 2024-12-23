@@ -38,14 +38,14 @@
   padding: 0;
 }
 
-$padding: 4px;
+$padding: usesize(0.4);
 .opaque {
   position: relative;
   right: $padding;
 
   &::before {
     background-color: var(--palette-default);
-    border-radius: 2px;
+    border-radius: usesize(0.2);
     content: "";
     display: block;
     height: calc(1rem + $padding * 2);
@@ -85,10 +85,10 @@ $padding: 4px;
   }
 
   background: var(--palette-background);
-  border-radius: 4px;
-  border: 1px solid var(--palette-border);
+  border-radius: usesize(0.4);
+  border: usesize(0.1) solid var(--palette-border);
   color: var(--palette-default);
-  height: 32px;
-  padding: var(--spacing-1);
-  width: 32px;
+  height: usesize(3.2);
+  padding: usesize(0.8);
+  width: usesize(3.2);
 }

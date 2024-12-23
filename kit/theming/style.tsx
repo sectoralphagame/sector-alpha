@@ -4,12 +4,11 @@ import fromPairs from "lodash/fromPairs";
 import isObject from "lodash/isObject";
 
 import "./global.scss";
+import { useGameSettings } from "@ui/hooks/useGameSettings";
 
-const spacings = [0.25, 0.5, 0.75, 1, 2, 3, 4, 8] as const;
 const texts = [1, 2, 3, 4, 5] as const;
 
 export interface Theme {
-  spacing: Record<(typeof spacings)[number], string>;
   palette: {
     background: string;
     "background-active": string;
@@ -43,17 +42,17 @@ export interface Theme {
   };
 }
 
+export function usesize(size: number): string {
+  return `calc(var(--size) * ${size})`;
+}
+
 const getColor = (v: number): string =>
   Color.hsl(0, 0, (100 - (v - 1) * 20) * 0.85).hex();
 
-export function createTheme(scale: number): Theme {
-  const baseFontSize = 14 * scale;
-  const baseSpacing = 8 * scale;
+export function createTheme(): Theme {
+  const baseFontSize = 1.4;
 
   return {
-    spacing: fromPairs(
-      spacings.map((n) => [n, `${n * baseSpacing}px`])
-    ) as Record<(typeof spacings)[number], string>,
     palette: {
       background: "#080808",
       "background-active": "#1e1e1e",
@@ -73,17 +72,17 @@ export function createTheme(scale: number): Theme {
       "debug-error": "#ff5b4522",
     },
     typography: {
-      button: `${baseFontSize * 0.875}px`,
-      caption: `${baseFontSize * 0.75}px`,
-      label: `${baseFontSize * 0.875}px`,
-      table: `${baseFontSize * 0.8}px`,
-      default: `${baseFontSize}px`,
-      header: `${Math.ceil(baseFontSize * 1.3 ** 2)}px`,
-      header2: `${Math.ceil(baseFontSize * 1.3)}px`,
-      header3: `${Math.ceil(baseFontSize * 1.2)}px`,
-      header4: `${Math.ceil(baseFontSize * 1.1)}px`,
-      header5: `${Math.ceil(baseFontSize * 1.1)}px`,
-      header6: `${Math.ceil(baseFontSize * 1.1)}px`,
+      button: usesize(baseFontSize * 0.875),
+      caption: usesize(baseFontSize * 0.75),
+      label: usesize(baseFontSize * 0.875),
+      table: usesize(baseFontSize * 0.8),
+      default: usesize(baseFontSize),
+      header: usesize(Math.ceil(baseFontSize * 1.3 ** 2)),
+      header2: usesize(Math.ceil(baseFontSize * 1.3)),
+      header3: usesize(Math.ceil(baseFontSize * 1.2)),
+      header4: usesize(Math.ceil(baseFontSize * 1.1)),
+      header5: usesize(Math.ceil(baseFontSize * 1.1)),
+      header6: usesize(Math.ceil(baseFontSize * 1.1)),
     },
     z: {
       tooltip: 100,
@@ -104,8 +103,8 @@ function getProperties(
 }
 
 export const Styles: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [scale] = React.useState(1);
-  const theme = React.useMemo(() => createTheme(scale), [scale]);
+  const [settings] = useGameSettings();
+  const theme = React.useMemo(() => createTheme(), []);
   const cssVariables = React.useRef(
     document.querySelector("style[data-css-variables]")
   );
@@ -119,14 +118,15 @@ export const Styles: React.FC<React.PropsWithChildren> = ({ children }) => {
     }
 
     cssVariables.current!.innerHTML = `:root { ${[
-      `--spacing: ${theme.spacing[1]};`,
+      `--size: ${settings.scale}px;`,
       ...getProperties(theme).map(
         ({ key, value }) => `--${key.replace(/\./g, "-")}: ${value};`
       ),
     ].join(" ")} }`;
-  }, [theme]);
+  }, [theme, settings.scale]);
 
-  return children as any;
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return <>{children}</>;
 };
 
 const documentStyles = getComputedStyle(document.documentElement);

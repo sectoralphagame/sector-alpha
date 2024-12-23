@@ -1,11 +1,11 @@
 .grid {
   display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: var(--spacing-4);
+  grid-template-columns: usesize(40) 1fr;
+  gap: usesize(3.2);
 }
 
 .divider {
-  margin: var(--spacing-4) 0;
+  margin: usesize(3.2) 0;
 }
 
 .mission {
@@ -18,25 +18,25 @@
       background-color: var(--palette-background-active);
     }
 
-    border: 1px solid var(--palette-border);
+    border: usesize(0.1) solid var(--palette-border);
     cursor: pointer;
-    padding: var(--spacing-1);
+    padding: usesize(0.8);
     transition: 200ms;
   }
 }
 
 .rewards {
   display: grid;
-  grid-template-columns: 1fr 200px;
-  gap: var(--spacing-4);
+  grid-template-columns: 1fr usesize(20);
+  gap: usesize(3.2);
 
   & > div {
-    border-right: 1px solid var(--palette-border);
+    border-right: usesize(0.1) solid var(--palette-border);
   }
 }
 
 .references {
-  margin: var(--spacing-4) 0;
+  margin: usesize(3.2) 0;
 
   button {
     appearance: none;
@@ -54,5 +54,5 @@
 }
 
 .progress {
-  margin: var(--spacing-4) 0;
+  margin: usesize(3.2) 0;
 }

@@ -18,7 +18,7 @@ export default {
 const Template: StoryFn<typeof FleetOverlay> = (args) => (
   <div id="root">
     <Styles>
-      <div style={{ padding: "var(--spacing-4)" }}>
+      <div style={{ padding: "usesize(4)" }}>
         <FleetOverlay {...args} />
       </div>
     </Styles>

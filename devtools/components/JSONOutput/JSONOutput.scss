@@ -1,6 +1,6 @@
 .root {
-  border-left: 1px solid var(--palette-default);
-  padding: var(--spacing-1);
+  border-left: usesize(0.1) solid var(--palette-default);
+  padding: usesize(0.8);
   overflow-y: scroll;
   font-family: monospace;
   line-break: anywhere;
@@ -11,8 +11,8 @@
 
   & .toolbar {
     display: flex;
-    gap: var(--spacing-1);
-    margin-bottom: var(--spacing-1);
+    gap: usesize(0.8);
+    margin-bottom: usesize(0.8);
   }
 }
 

@@ -1,9 +1,9 @@
 .iconBar {
   display: flex;
-  gap: var(--spacing-1);
-  margin-bottom: var(--spacing-2);
-  padding-bottom: var(--spacing-2);
-  border-bottom: 1px solid var(--palette-border);
+  gap: usesize(0.8);
+  margin-bottom: usesize(1.6);
+  padding-bottom: usesize(1.6);
+  border-bottom: usesize(0.1) solid var(--palette-border);
 }
 .iconBarCollapsed {
   flex-direction: column;
@@ -12,29 +12,29 @@
   border-bottom: none;
 }
 .root {
-  border: 1px solid var(--palette-border);
+  border: usesize(0.1) solid var(--palette-border);
   border-left: none;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
+  border-top-right-radius: usesize(0.8);
+  border-bottom-right-radius: usesize(0.8);
   background: var(--palette-background);
-  max-height: calc(100vh - 128px);
-  padding: var(--spacing-3);
+  max-height: calc(100vh - usesize(12.8));
+  padding: usesize(2.4);
   position: absolute;
-  top: 64px;
+  top: usesize(6.4);
   left: 0;
-  width: 450px;
+  width: usesize(45);
   z-index: 1;
 }
 .rootCollapsed {
-  width: 80px;
+  width: usesize(8);
 }
 .scrollArea {
   &::-webkit-scrollbar {
     display: none;
   }
   overflow-y: scroll;
-  height: calc(100vh - 234px);
-  padding-bottom: var(--spacing-3);
+  height: calc(100vh - usesize(23.4));
+  padding-bottom: usesize(2.4);
 }
 .rotate {
   transform: rotate(180deg);
@@ -44,12 +44,12 @@
 }
 .tab {
   display: inline-block;
-  margin-top: var(--spacing-1);
-  margin-bottom: var(--spacing-2);
+  margin-top: usesize(0.8);
+  margin-bottom: usesize(1.6);
 }
 
 .manage {
-  margin-left: var(--spacing-1);
+  margin-left: usesize(0.8);
 }
 
 .turbo {

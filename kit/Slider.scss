@@ -1,9 +1,9 @@
 .root {
   &::-webkit-slider-thumb {
     appearance: none;
-    height: 15px;
-    width: 5px;
-    border-radius: 1px;
+    height: usesize(1.5);
+    width: usesize(0.5);
+    border-radius: usesize(0.1);
     background: var(--palette-default);
     position: relative;
     z-index: 2;
@@ -11,17 +11,17 @@
   &::-webkit-slider-runnable-track {
     background: transparent;
     padding: 0;
-    height: 15px;
+    height: usesize(1.5);
     margin: 0;
   }
   &::after {
-    border-radius: 1px;
+    border-radius: usesize(0.1);
     background: var(--palette-border);
     content: "";
     position: absolute;
-    top: 6px;
+    top: usesize(0.6);
     left: 0;
-    height: 3px;
+    height: usesize(0.3);
     width: 100%;
     z-index: 1;
   }

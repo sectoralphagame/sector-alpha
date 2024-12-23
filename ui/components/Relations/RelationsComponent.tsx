@@ -1,4 +1,5 @@
 import React from "react";
+import { usesize } from "@kit/theming/style";
 import styles from "./Relations.scss";
 
 export interface RelationsComponentProps {
@@ -20,8 +21,11 @@ export const RelationsComponent: React.FC<RelationsComponentProps> = ({
           className={styles.bar}
           style={{
             color,
-            height: Math.abs(relation) * 2,
-            top: relation > 0 ? 100 - relation * 2 : 100 - relation * 0,
+            height: usesize((Math.abs(relation) * 2) / 10),
+            top:
+              relation > 0
+                ? usesize((100 - relation * 2) / 10)
+                : usesize((100 - relation * 0) / 10),
           }}
         />
         <span className={styles.label}>

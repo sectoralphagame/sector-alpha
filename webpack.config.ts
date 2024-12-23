@@ -89,6 +89,7 @@ const config = {
               modules: true,
             },
           },
+          "./build/css-helpers-loader.ts",
           "sass-loader",
         ],
       },

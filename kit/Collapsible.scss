@@ -1,12 +1,12 @@
 .root {
-  margin-bottom: var(--spacing-1);
+  margin-bottom: usesize(0.8);
 }
 
 .header {
-  margin-bottom: var(--spacing-0-5);
+  margin-bottom: usesize(0.5);
   cursor: pointer;
 }
 
 .body {
-  margin-left: var(--spacing-3);
+  margin-left: usesize(2.4);
 }

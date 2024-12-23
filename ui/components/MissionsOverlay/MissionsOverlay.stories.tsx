@@ -17,7 +17,7 @@ export default {
 const Template: StoryFn<typeof MissionsOverlay> = (args) => (
   <div id="root">
     <Styles>
-      <div style={{ padding: "var(--spacing-4)" }}>
+      <div style={{ padding: "usesize(4)" }}>
         <MissionsOverlay {...args} />
       </div>
     </Styles>

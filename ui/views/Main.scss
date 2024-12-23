@@ -1,6 +1,6 @@
 .button {
   &:not(:last-child) {
-    margin-bottom: var(--spacing-1);
+    margin-bottom: usesize(0.8);
   }
   width: 100%;
 }

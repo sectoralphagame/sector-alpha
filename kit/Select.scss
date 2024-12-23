@@ -5,14 +5,14 @@
   appearance: none;
   background: rgba(255, 255, 255, 0.1);
   border: none;
-  border-radius: 4px;
+  border-radius: usesize(0.4);
   color: var(--palette-text-1);
   cursor: pointer;
   display: block;
   font-size: var(--typography-button);
-  height: 32px;
+  height: usesize(3.2);
   line-height: 1;
-  padding: var(--spacing-1);
+  padding: usesize(0.8);
   outline: 0;
   text-align: left;
   width: 100%;
@@ -22,12 +22,12 @@
 }
 .dropdown {
   background: var(--palette-background);
-  border: 1px var(--palette-border) solid;
-  border-radius: 8px;
-  max-height: 300px;
+  border: usesize(0.1) var(--palette-border) solid;
+  border-radius: usesize(0.8);
+  max-height: usesize(30);
   overflow: scroll;
   outline: 0;
-  padding: var(--spacing-1);
+  padding: usesize(0.8);
   position: absolute;
   width: 100%;
   z-index: 1;
@@ -36,13 +36,13 @@
   &:hover {
     background: rgba(255, 255, 255, 0.15);
   }
-  border-radius: 4px;
+  border-radius: usesize(0.4);
   cursor: pointer;
   display: block;
   font-size: var(--typography-button);
-  height: 32px;
+  height: usesize(3.2);
   line-height: 1;
-  padding: var(--spacing-1);
+  padding: usesize(0.8);
 }
 .optionActive {
   background: rgba(255, 255, 255, 0.15);

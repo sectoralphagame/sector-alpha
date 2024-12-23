@@ -150,7 +150,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
 
     this.initialized = true;
     this.scale = window.localStorage.getItem("gameSettings")
-      ? JSON.parse(window.localStorage.getItem("gameSettings")!).scale
+      ? JSON.parse(window.localStorage.getItem("gameSettings")!).scale / 10
       : 1;
     storageHook.subscribe("RenderingSystem", this.onSettingsChange);
   };
@@ -586,7 +586,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
 
   onSettingsChange = (key: string) => {
     if (key === "gameSettings") {
-      this.scale = JSON.parse(window.localStorage.getItem(key)!).scale;
+      this.scale = JSON.parse(window.localStorage.getItem(key)!).scale / 10;
       this.updateScaling();
     }
   };

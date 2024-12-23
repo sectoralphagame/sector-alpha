@@ -1,13 +1,13 @@
 .summary {
   align-items: center;
   display: flex;
-  gap: var(--spacing-2);
+  gap: usesize(1.6);
 }
 
 .icon {
   display: inline-block;
-  height: 16px;
-  width: 16px;
+  height: usesize(1.6);
+  width: usesize(1.6);
 }
 
 .warning {
@@ -15,7 +15,7 @@
 }
 
 .growth {
-  margin-left: var(--spacing);
+  margin-left: usesize(0.8);
 }
 
 .negative {

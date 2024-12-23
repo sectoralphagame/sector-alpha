@@ -8,7 +8,7 @@
 }
 .paginationButtons {
   display: flex;
-  gap: var(--spacing-1);
+  gap: usesize(0.8);
 }
 .list {
   margin: 0;
@@ -22,6 +22,6 @@
     border-bottom: none;
   }
   display: block;
-  padding: var(--spacing-2) 0;
-  border-bottom: 1px solid var(--palette-border);
+  padding: usesize(1.6) 0;
+  border-bottom: usesize(0.1) solid var(--palette-border);
 }

@@ -1,10 +1,10 @@
 .root {
-  bottom: var(--spacing-2);
-  padding: var(--spacing-1);
+  bottom: usesize(1.6);
+  padding: usesize(0.8);
   position: absolute;
-  right: var(--spacing-2);
+  right: usesize(1.6);
   margin: auto;
-  max-width: 300px;
+  max-width: usesize(30);
 }
 
 .turbo {
@@ -18,20 +18,20 @@
 #date {
   display: block;
   position: relative;
-  width: 120px;
+  width: usesize(12);
 
   &::before {
     content: "";
-    width: calc((100% + var(--spacing-2)) * var(--progress) / 24);
-    height: calc(100% + var(--spacing-2));
+    width: calc((100% + usesize(1.6)) * var(--progress) / 24);
+    height: calc(100% + usesize(1.6));
     position: absolute;
-    top: calc(-1 * var(--spacing-1));
-    left: calc(-1 * var(--spacing-1));
+    top: calc(-1 * usesize(0.8));
+    left: calc(-1 * usesize(0.8));
     background-color: rgba(255, 255, 255, 0.2);
   }
 
   &::after {
-    height: calc(100% + var(--spacing-2));
-    top: calc(-1 * var(--spacing-1));
+    height: calc(100% + usesize(1.6));
+    top: calc(-1 * usesize(0.8));
   }
 }
