@@ -1,6 +1,5 @@
 import React from "react";
 import ClickAwayListener from "react-click-away-listener";
-import { RenderingSystem } from "@core/systems/rendering";
 import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import type { Entity } from "@core/entity";
 import { MapView } from "@ui/components/MapView";
@@ -21,12 +20,15 @@ import DevOverlay from "@ui/components/DevOverlay/DevOverlay";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
 import { SelectedUnit } from "@ui/components/SelectedUnit";
 import SimAvgTimeGraph from "@ui/components/dev/SimAvgTimeGraph/SimAvgTimeGraph";
+import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
+import { useContextMenu } from "@ui/state/contextMenu";
+import { CurrentSector } from "@ui/components/CurrentSector/CurrentSector";
+import { useSectorObservable } from "@ui/state/sector";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
 import type { GameOverlayProps } from "../atoms";
 import {
-  useContextMenu,
   useGameDialog,
   useGameOverlay,
   useNotifications,
@@ -43,7 +45,7 @@ const overlayKeyCodes: Record<string, NonNullable<GameOverlayProps>> = {
 
 const Game: React.FC = () => {
   const [sim, setSim] = useSim();
-  const system = React.useRef<RenderingSystem>();
+  // const system = React.useRef<RenderingSystem>();
   const canvasRoot = React.useRef<HTMLDivElement>(null);
   const [menu, setMenu] = useContextMenu();
   const [dialog, setDialog] = useGameDialog();
@@ -57,14 +59,15 @@ const Game: React.FC = () => {
     Entity | undefined
   >(selectedId ? sim.get(selectedId) : undefined);
   const player = sim.index.player.get()[0]!;
+  const [currentSector] = useSectorObservable();
 
   React.useEffect(() => {
     if (!sim) return () => undefined;
 
     sim.start();
 
-    system.current = new RenderingSystem([menu, setMenu]);
-    system.current.apply(sim);
+    // system.current = new RenderingSystem([menu, setMenu]);
+    // system.current.apply(sim);
 
     const unmount = () => {
       setDialog(null);
@@ -167,9 +170,13 @@ const Game: React.FC = () => {
       any changes made by pixi, like cursor property. That's why rendering
       system creates own canvas here */}
       <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
+        <TacticalMap sim={sim} />
         <SimAvgTimeGraph />
         <PlayerMoney />
         <SimControl />
+        {!overlay && (
+          <CurrentSector name={currentSector?.cp.name.value ?? ""} />
+        )}
         <SelectedUnit />
         <MapPanel
           tabs={

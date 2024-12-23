@@ -102,8 +102,12 @@ const config = {
         use: ["./build/conversation-loader.ts"],
       },
       {
-        test: /\.(svg|png|jpe?g|wav)$/,
+        test: /\.(svg|png|jpe?g|wav|glb)$/,
         type: "asset/resource",
+      },
+      {
+        test: /\.glsl$/,
+        use: ["./build/shader-loader.ts"],
       },
     ],
   },
@@ -111,6 +115,9 @@ const config = {
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
     filename: "bundle.[hash].js",
+    assetModuleFilename: devMode
+      ? "[path][name][ext][query]"
+      : "assets/[hash][ext][query]",
   },
   plugins,
   devServer: {

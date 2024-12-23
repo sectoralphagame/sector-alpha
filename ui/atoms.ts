@@ -4,7 +4,6 @@ import { Observable } from "@core/utils/observer";
 import notificationSound from "@assets/ui/sounds/notification.wav";
 import { Howl } from "howler";
 import type { ConfigDialogProps } from "./components/ConfigDialog";
-import type { ContextMenu } from "./components/ContextMenu/types";
 import type { TradeDialogProps } from "./components/TradeDialog";
 import type { FacilityModuleManagerProps } from "./components/FacilityModuleManager";
 import type { FacilityMoneyManagerProps } from "./components/FacilityMoneyManager";
@@ -15,6 +14,7 @@ import type { NotificationProps } from "./components/Notifications";
 import type { Notification } from "./components/Notifications/types";
 import { useObservable } from "./hooks/useObservable";
 import type { ImmediateConversationDialogProps } from "./components/ImmediateConversation";
+import { useGameSettings } from "./hooks/useGameSettings";
 
 export const sim = atom<Sim>({
   key: "sim",
@@ -22,19 +22,6 @@ export const sim = atom<Sim>({
   dangerouslyAllowMutability: true,
 });
 export const useSim = () => useRecoilState(sim);
-
-export const contextMenu = atom<ContextMenu>({
-  key: "contextMenu",
-  default: {
-    active: false,
-    position: [0, 0],
-    worldPosition: [0, 0],
-    sector: null,
-  },
-  dangerouslyAllowMutability: true,
-});
-export const useContextMenu = () => useRecoilState(contextMenu);
-export type ContextMenuApi = ReturnType<typeof useRecoilState<ContextMenu>>;
 
 export type GameDialogProps =
   | TradeDialogProps
@@ -66,6 +53,7 @@ export const notificationsAtom = atom<Notification[]>({
   default: [],
 });
 export const useNotifications = () => {
+  const [settings] = useGameSettings();
   const [notifications, setNotifications] = useRecoilState(notificationsAtom);
 
   const removeNotification = (id: number) => {
@@ -83,6 +71,7 @@ export const useNotifications = () => {
       ...prevNotifications,
       { ...notification, id },
     ]);
+    notificationHowl.volume(settings.volume.ui);
     notificationHowl.play();
     if (notification.expires) {
       setTimeout(() => removeNotification(id), notification.expires);

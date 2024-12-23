@@ -7,6 +7,7 @@ import { BaseButton, defaultClickSound, popSound } from "./BaseButton";
 export const Select: React.FC<
   React.PropsWithChildren<{
     className?: string;
+    disabled?: boolean;
     value: string;
     // eslint-disable-next-line no-unused-vars
     onChange: (value: any) => void;

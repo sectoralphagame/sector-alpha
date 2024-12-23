@@ -8,7 +8,8 @@ import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
 import { isOwnedByPlayer } from "@core/utils/misc";
 import type { Position2D } from "@core/components/position";
-import { useContextMenu, useSim } from "../../atoms";
+import { useContextMenu } from "@ui/state/contextMenu";
+import { useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
 export const ShipToSpace: React.FC = () => {
