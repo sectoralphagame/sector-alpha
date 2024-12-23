@@ -17,6 +17,7 @@ out vec3 vTangent;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
+uniform mat3 normalMatrix;
 
 void main() {
     vec4 mPosition = modelMatrix * instanceMatrix * vec4(position, 1.0f);

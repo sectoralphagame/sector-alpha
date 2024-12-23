@@ -1,4 +1,4 @@
-import { Euler, Mat4, Plane, Quat, Transform } from "ogl";
+import { Euler, Mat3, Mat4, Plane, Quat, Transform } from "ogl";
 import type { ModelName } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
@@ -95,10 +95,20 @@ export class Asteroids extends Transform {
           .multiply(entityScale * Asteroids.getScale());
         s[15] = 1;
 
-        const trs = new Mat4().copy(t).multiply(r).multiply(s);
+        const trs = t.multiply(r).multiply(s);
         trs.toArray(instanceMatrix, i * 16);
 
-        const normalMatrix = new Mat4().copy(trs).inverse();
+        const normalMatrix = new Mat3(
+          r[0],
+          r[1],
+          r[2],
+          r[4],
+          r[5],
+          r[6],
+          r[8],
+          r[9],
+          r[10]
+        ).inverse();
         instanceNormalMatrix.set(
           [
             normalMatrix[0],

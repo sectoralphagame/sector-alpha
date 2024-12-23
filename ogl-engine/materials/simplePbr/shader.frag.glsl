@@ -46,6 +46,9 @@ void main() {
                 lightDir = normalize(d);
                 float dist = length(d);
                 intensity /= 1.0 + dist + pow(dist, 2.0f);
+                if(intensity < 0.01f) {
+                    continue;
+                }
             }
             float diff = max(dot(norm, lightDir), 0.0f);
             vec3 color = lights[i].color * intensity;
