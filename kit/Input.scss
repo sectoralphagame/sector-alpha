@@ -8,10 +8,10 @@
   }
   appearance: none;
   background: var(--palette-background);
-  border-radius: 4px;
-  border: 1px solid var(--palette-border);
+  border-radius: usesize(0.4);
+  border: usesize(0.1) solid var(--palette-border);
   color: var(--palette-text-1);
-  height: 32px;
+  height: usesize(3.2);
   padding: usesize(0.8);
   line-height: 1;
   font-size: var(--typography-button);

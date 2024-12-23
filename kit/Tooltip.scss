@@ -2,8 +2,8 @@
   text-align: left;
   padding: calc(usesize(0.8) / 2) usesize(0.8);
   background: var(--palette-background-active);
-  border-radius: 4px;
-  max-width: 300px;
+  border-radius: usesize(0.4);
+  max-width: usesize(30);
 }
 
 .container {

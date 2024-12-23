@@ -4,11 +4,11 @@
 }
 .root {
   display: grid;
-  grid-template-columns: 1fr 120px;
+  grid-template-columns: 1fr usesize(12);
   height: 100vh;
 }
 .rootExpanded {
-  grid-template-columns: 1fr 350px;
+  grid-template-columns: 1fr usesize(35);
 }
 .toolbar {
   display: flex;
@@ -41,16 +41,16 @@
   }
   &Swatch {
     flex-shrink: 0;
-    border-radius: 2px;
+    border-radius: usesize(0.2);
     display: inline-block;
-    width: 32px;
-    height: 32px;
+    width: usesize(3.2);
+    height: usesize(3.2);
   }
 }
 
 .blueprint {
   display: grid;
-  grid-template-columns: 1fr 16px;
+  grid-template-columns: 1fr usesize(1.6);
 
   label {
     cursor: pointer;

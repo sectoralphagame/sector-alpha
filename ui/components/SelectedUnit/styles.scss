@@ -8,14 +8,14 @@
 }
 
 .panel {
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  border: 1px solid var(--palette-border);
+  border-top-left-radius: usesize(0.4);
+  border-top-right-radius: usesize(0.4);
+  border: usesize(0.1) solid var(--palette-border);
   border-bottom: none;
   background-color: var(--palette-background-active);
   cursor: pointer;
   text-align: center;
-  width: 250px;
+  width: usesize(25);
   padding: usesize(0.8) usesize(1.6);
   line-height: 1;
   pointer-events: all;

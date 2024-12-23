@@ -4,12 +4,12 @@
   }
   background: rgba(255, 255, 255, 0.1);
   border: none;
-  border-radius: 4px;
+  border-radius: usesize(0.4);
   color: var(--palette-text-1);
   font-size: var(--typography-default);
   margin-bottom: usesize(0.8);
   outline: 0;
-  height: 32px;
+  height: usesize(3.2);
   padding: usesize(0.5) usesize(0.8);
   transition: 200ms;
   width: 100%;

@@ -5,8 +5,8 @@
   margin-bottom: usesize(0.4);
 
   &Color {
-    width: 20px;
-    height: 20px;
+    width: usesize(2);
+    height: usesize(2);
     margin-right: usesize(0.8);
   }
 }

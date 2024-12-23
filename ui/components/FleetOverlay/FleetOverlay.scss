@@ -1,6 +1,6 @@
 .root {
   display: grid;
-  grid-template-columns: 400px 1fr;
+  grid-template-columns: usesize(40) 1fr;
 }
 
 .fleet {
@@ -11,7 +11,7 @@
   }
   &Expand {
     transform: rotate(-90deg);
-    width: 16px;
+    width: usesize(1.6);
   }
   &Expanded {
     transform: rotate(0deg);

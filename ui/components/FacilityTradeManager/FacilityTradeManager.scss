@@ -25,7 +25,7 @@
 
 .grid {
   margin-top: usesize(1.6);
-  grid-template-columns: 1fr 2fr 60px 28px;
+  grid-template-columns: 1fr 2fr usesize(6) usesize(2.8);
   display: grid;
   gap: usesize(0.8);
   row-gap: usesize(1.6);

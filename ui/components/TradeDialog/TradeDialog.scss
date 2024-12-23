@@ -1,4 +1,4 @@
-$btnHeight: 18px;
+$btnHeight: usesize(1.8);
 
 .colName {
   &.colName {
@@ -20,10 +20,10 @@ $btnHeight: 18px;
   .input {
     border: none;
     font-size: var(--typography-label);
-    padding: 0 4px;
+    padding: 0 usesize(0.4);
     text-align: right;
     height: $btnHeight;
-    width: 50px;
+    width: usesize(5);
     font-size: var(--typography-table);
     font-weight: 400;
   }
@@ -31,14 +31,14 @@ $btnHeight: 18px;
   .actionBtn {
     margin-left: usesize(0.8);
     height: unset;
-    padding: 2px 4px;
+    padding: usesize(0.2) usesize(0.4);
     font-size: var(--typography-table);
     font-weight: 400;
-    width: 40px;
+    width: usesize(4);
   }
 
   &:not(:last-child) {
-    border-bottom: 1px solid var(--palette-border);
+    border-bottom: usesize(0.1) solid var(--palette-border);
   }
 
   font-size: var(--typography-label);
@@ -70,5 +70,5 @@ td.total {
 }
 
 .acceptBtn {
-  width: 112px;
+  width: usesize(11.2);
 }

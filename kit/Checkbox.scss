@@ -1,19 +1,19 @@
 .root {
   cursor: pointer;
   appearance: none;
-  width: 12px;
-  height: 12px;
-  border: 1px solid var(--palette-border);
-  border-radius: 2px;
-  margin: 2px;
+  width: usesize(1.2);
+  height: usesize(1.2);
+  border: usesize(0.1) solid var(--palette-border);
+  border-radius: usesize(0.2);
+  margin: usesize(0.2);
 
   &:checked:before {
     position: relative;
     content: "";
-    width: 6px;
-    height: 6px;
-    top: 2px;
-    left: 2px;
+    width: usesize(0.6);
+    height: usesize(0.6);
+    top: usesize(0.2);
+    left: usesize(0.2);
     display: block;
     background: var(--palette-default);
   }

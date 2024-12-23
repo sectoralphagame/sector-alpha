@@ -1,13 +1,13 @@
 .root {
   position: fixed;
-  top: 120px;
+  top: usesize(12);
   right: 0;
   pointer-events: none;
   background-color: var(--palette-background);
   padding: usesize(0.8);
 
   canvas {
-    width: 300px;
-    height: 100px;
+    width: usesize(30);
+    height: usesize(10);
   }
 }

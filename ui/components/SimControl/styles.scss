@@ -4,7 +4,7 @@
   position: absolute;
   right: usesize(1.6);
   margin: auto;
-  max-width: 300px;
+  max-width: usesize(30);
 }
 
 .turbo {
@@ -18,7 +18,7 @@
 #date {
   display: block;
   position: relative;
-  width: 120px;
+  width: usesize(12);
 
   &::before {
     content: "";

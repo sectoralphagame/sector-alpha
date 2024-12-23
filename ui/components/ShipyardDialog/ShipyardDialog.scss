@@ -1,8 +1,8 @@
-$columnHeight: 364px;
+$columnHeight: usesize(36.4);
 
 .root {
   display: grid;
-  grid-template-columns: 200px 1fr 300px;
+  grid-template-columns: usesize(20) 1fr usesize(30);
   gap: usesize(3.2);
 }
 
@@ -18,7 +18,7 @@ $columnHeight: 364px;
     text-transform: none;
     width: 100%;
     text-align: left;
-    height: 48px;
+    height: usesize(4.8);
 
     &Active {
       background-color: rgba(255, 255, 255, 0.15);
@@ -57,19 +57,19 @@ $columnHeight: 364px;
   flex-grow: 1;
   overflow-y: scroll;
   position: relative;
-  top: -4px;
+  top: -usesize(0.4);
 
   &Item {
     align-items: center;
     display: flex;
     justify-content: space-between;
     &:not(:last-child) {
-      border-bottom: 1px solid var(--palette-border);
+      border-bottom: usesize(0.1) solid var(--palette-border);
     }
 
     &Remove {
       position: relative;
-      top: 2px;
+      top: usesize(0.2);
       margin-left: usesize(0.5);
     }
   }
@@ -79,7 +79,7 @@ $columnHeight: 364px;
 }
 
 .input {
-  width: 48px;
+  width: usesize(4.8);
   border: none;
   text-align: right;
   background: none;

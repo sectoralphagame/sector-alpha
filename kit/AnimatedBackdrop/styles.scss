@@ -1,6 +1,6 @@
 @keyframes background {
   to {
-    background-position: 1000px 1000px;
+    background-position: usesize(100) usesize(100);
   }
 }
 

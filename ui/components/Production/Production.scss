@@ -9,6 +9,6 @@
 
 .haltedIcon {
   color: var(--palette-warning);
-  width: 16px;
-  height: 16px;
+  width: usesize(1.6);
+  height: usesize(1.6);
 }

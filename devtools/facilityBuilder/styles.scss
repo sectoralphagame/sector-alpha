@@ -1,5 +1,5 @@
 .root {
-  --sidebar-width: 400px;
+  --sidebar-width: usesize(40);
 
   display: grid;
   grid-template-columns: 1fr var(--sidebar-width);
@@ -11,7 +11,7 @@
 }
 
 .sidebar {
-  border-left: 1px solid var(--palette-border);
+  border-left: usesize(0.1) solid var(--palette-border);
   height: 100vh;
   overflow-y: scroll;
   padding: 0 usesize(3.2) usesize(3.2);
@@ -40,11 +40,11 @@
 }
 
 .total {
-  border-top: 1px solid var(--palette-border);
+  border-top: usesize(0.1) solid var(--palette-border);
 }
 
 .templateDropdown {
-  width: 300px;
+  width: usesize(30);
 
   &Container {
     position: absolute;

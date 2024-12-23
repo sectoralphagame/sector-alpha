@@ -1,5 +1,5 @@
 .root {
-  border-left: 1px solid var(--palette-default);
+  border-left: usesize(0.1) solid var(--palette-default);
   padding: usesize(0.8);
   overflow-y: scroll;
   font-family: monospace;

@@ -1,6 +1,6 @@
 .root {
   display: grid;
-  grid-template-columns: 200px 1fr 200px;
+  grid-template-columns: usesize(20) 1fr usesize(20);
   gap: usesize(3.2);
 }
 
@@ -10,7 +10,7 @@
 }
 
 .blueprints {
-  height: 364px;
+  height: usesize(36.4);
   overflow-y: scroll;
 
   &Item {
@@ -21,7 +21,7 @@
     text-transform: none;
     width: 100%;
     text-align: left;
-    height: 48px;
+    height: usesize(4.8);
 
     &Active {
       background-color: rgba(255, 255, 255, 0.15);

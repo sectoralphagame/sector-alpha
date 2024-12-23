@@ -1,13 +1,13 @@
 .facilities {
   margin-top: usesize(0.8);
-  height: 400px;
+  height: usesize(40);
   line-height: 1.6;
   overflow-y: scroll;
 
   &Item {
     display: grid;
     gap: usesize(1.6);
-    grid-template-columns: 1fr 80px 20px;
+    grid-template-columns: 1fr usesize(8) usesize(2);
     align-items: center;
 
     &Price {

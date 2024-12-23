@@ -1,6 +1,6 @@
 .editor {
   overflow-x: scroll;
-  height: calc(100vh - 58px);
+  height: calc(100vh - usesize(5.8));
 }
 .editorContainer {
   overflow-x: hidden;
@@ -19,11 +19,11 @@
 }
 .root {
   display: grid;
-  grid-template-columns: 1fr 120px;
+  grid-template-columns: 1fr usesize(12);
   height: 100vh;
 }
 .rootExpanded {
-  grid-template-columns: 1fr 350px;
+  grid-template-columns: 1fr usesize(35);
 }
 .toolbar {
   display: flex;
@@ -50,18 +50,18 @@
   justify-content: space-between;
 }
 .texturePreview {
-  height: 16px;
-  width: 16px;
+  height: usesize(1.6);
+  width: usesize(1.6);
 }
 .buildExpanded {
   display: grid;
-  grid-template-columns: 200px 80px 32px;
+  grid-template-columns: usesize(20) usesize(8) usesize(3.2);
   gap: usesize(0.8);
   padding: usesize(2.4) 0;
 }
 .productionExpanded {
   display: grid;
-  grid-template-columns: 164px 136px 136px 48px;
+  grid-template-columns: usesize(16.4) usesize(13.6) usesize(13.6) usesize(4.8);
   gap: usesize(1.6);
   padding: usesize(2.4) 0;
 }

@@ -19,7 +19,7 @@
   gap: usesize(3.2);
   padding-bottom: usesize(2.4);
   margin-bottom: usesize(3.2);
-  border-bottom: 1px solid var(--palette-border);
+  border-bottom: usesize(0.1) solid var(--palette-border);
 
   h1,
   h3 {
@@ -30,11 +30,11 @@
     &:after {
       display: block;
       height: 1rem;
-      width: 1px;
+      width: usesize(0.1);
       background-color: var(--palette-border);
       position: absolute;
       right: calc(-1 * usesize(1.6));
-      top: 6px;
+      top: usesize(0.6);
     }
 
     &:not(:last-child):after {
@@ -44,6 +44,6 @@
 
   h1:after {
     height: 1.5rem;
-    top: 8px;
+    top: usesize(0.8);
   }
 }

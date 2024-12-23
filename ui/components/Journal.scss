@@ -23,5 +23,5 @@
   }
   display: block;
   padding: usesize(1.6) 0;
-  border-bottom: 1px solid var(--palette-border);
+  border-bottom: usesize(0.1) solid var(--palette-border);
 }
