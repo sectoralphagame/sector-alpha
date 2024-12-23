@@ -1,6 +1,6 @@
 .root {
   position: absolute;
-  top: calc(var(--spacing-1) * 5);
+  top: usesize(4);
   display: flex;
   justify-content: center;
   text-align: center;

@@ -91,11 +91,14 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
   async onControlClick(mousePosition: Vec2, button: MouseButton) {
     if (this.raycastHits.length) {
+      let mesh = this.raycastHits[0];
+      if (this.settingsManager.cp.selectionManager.id === mesh.entityId) {
+        mesh = this.raycastHits[1];
+      }
       // eslint-disable-next-line default-case
       switch (button) {
         case 0:
-          this.settingsManager.cp.selectionManager.id =
-            this.raycastHits[0].entityId;
+          this.settingsManager.cp.selectionManager.id = mesh.entityId;
           defaultClickSound.play();
 
           if (Date.now() - this.lastClicked < 200) {
@@ -105,8 +108,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
           this.lastClicked = Date.now();
           break;
         case 2:
-          this.settingsManager.cp.selectionManager.secondaryId =
-            this.raycastHits[0].entityId;
+          this.settingsManager.cp.selectionManager.secondaryId = mesh.entityId;
       }
     }
 

@@ -1,7 +1,7 @@
 .fps {
   position: absolute;
-  top: var(--spacing);
-  left: var(--spacing);
+  top: usesize(0.8);
+  left: usesize(0.8);
   font-size: 2rem;
   color: var(--palette-active);
   pointer-events: none;

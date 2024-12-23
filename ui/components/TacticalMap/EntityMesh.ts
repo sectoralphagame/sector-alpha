@@ -10,11 +10,30 @@ import type { EngineParticleGenerator } from "@ogl-engine/particles";
 import { getParticleType, particleGenerator } from "@ogl-engine/particles";
 import { Light } from "@ogl-engine/engine/Light";
 import Color from "color";
-import { Vec3 } from "ogl";
+import { Plane, Vec3 } from "ogl";
 import { ship } from "@core/archetypes/ship";
+import { EntityIndicatorMaterial } from "@ogl-engine/materials/entityIndicator/entityIndicator";
 
 export const entityScale = 1 / 220;
+// FIXME: Remove after distance rebalancing
 const scale = 2;
+
+export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
+  name = "EntityIndicator";
+  parent: EntityMesh;
+
+  constructor(engine: Engine) {
+    super(engine, {
+      geometry: new Plane(engine.gl),
+    });
+    this.applyMaterial(new EntityIndicatorMaterial(engine));
+    this.frustumCulled = false;
+  }
+
+  override setParent(parent: EntityMesh) {
+    super.setParent(parent);
+  }
+}
 
 export class EntityMesh extends BaseMesh {
   engine: Engine;
@@ -23,6 +42,7 @@ export class EntityMesh extends BaseMesh {
   name = "EntityMesh";
   ring: SelectionRing | null = null;
   selected = false;
+  indicator: EntityIndicator;
 
   constructor(engine: Engine, entity: RequireComponent<"render" | "position">) {
     const gltf = assetLoader.model(entity.cp.render.model);
@@ -61,6 +81,11 @@ export class EntityMesh extends BaseMesh {
     if (entity.tags.has("selection")) {
       this.addRing(entity.cp.render.color, entity.cp.dockable?.size ?? "large");
     }
+
+    this.indicator = new EntityIndicator(engine);
+    this.indicator.setParent(this);
+    this.indicator.material.setColor(entity.cp.render.color);
+    this.indicator.material.setSize(entity.cp.dockable?.size ?? "large");
   }
 
   updatePosition() {
