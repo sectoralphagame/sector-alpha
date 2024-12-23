@@ -24,6 +24,7 @@ import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
 import { useContextMenu } from "@ui/state/contextMenu";
 import { CurrentSector } from "@ui/components/CurrentSector/CurrentSector";
 import { useSectorObservable } from "@ui/state/sector";
+import type { Faction } from "@core/archetypes/faction";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -175,7 +176,21 @@ const Game: React.FC = () => {
         <PlayerMoney />
         <SimControl />
         {!overlay && (
-          <CurrentSector name={currentSector?.cp.name.value ?? ""} />
+          <CurrentSector
+            name={currentSector?.cp.name.value ?? ""}
+            owner={
+              currentSector?.cp.owner?.id
+                ? sim.getOrThrow<Faction>(currentSector.cp.owner.id).cp.name
+                    .value
+                : undefined
+            }
+            color={
+              currentSector?.cp.owner?.id
+                ? sim.getOrThrow<Faction>(currentSector.cp.owner.id).cp.color
+                    .value
+                : undefined
+            }
+          />
         )}
         <SelectedUnit />
         <MapPanel
