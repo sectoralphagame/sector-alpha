@@ -9,7 +9,7 @@ out vec4 fragData[2];
 uniform mat4 modelMatrix;
 uniform vec4 uColor;
 
-#define width 0.04f
+#define width 0.1f
 
 void main() {
     float dist = distance(vUv, vec2(0.5f, 0.5f));

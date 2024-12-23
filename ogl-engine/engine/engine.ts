@@ -1,7 +1,6 @@
 import { Observable } from "@core/utils/observer";
 import {
   Transform,
-  Camera,
   Post,
   Renderer,
   RenderTarget,
@@ -14,7 +13,6 @@ import settings from "@core/settings";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
 import type { FolderApi } from "tweakpane";
-import { pane } from "@ui/context/Pane";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
@@ -23,6 +21,7 @@ import type { Light } from "./Light";
 import { dummyLight } from "./Light";
 import { BaseMesh } from "./BaseMesh";
 import { Scene } from "./Scene";
+import { Camera } from "./Camera";
 
 const bloomSize = 1.2;
 const lightsNum = 32;
@@ -82,7 +81,7 @@ export class Engine {
       dpr: this.dpr,
     });
     const gl = this.renderer.gl;
-    this.camera = new Camera(gl);
+    this.camera = new Camera(this);
     this.camera.position.set(50, 50, 50);
     this.camera.lookAt([0, 0, 0]);
     this.camera.near = settings.camera.near;
@@ -95,7 +94,6 @@ export class Engine {
     this.initUniforms();
     this.initLightsContainer();
     this.initPostProcessing();
-    this.initPane();
     window.renderer = this;
     this.hooks.onInit.notify();
     this.initialized = true;
@@ -187,22 +185,6 @@ export class Engine {
       },
     });
   };
-
-  private initPane() {
-    this.paneFolder = pane.addFolder({
-      title: "Engine",
-    });
-    const p = this.paneFolder.addBinding(this.camera, "position");
-    const r = this.paneFolder.addBinding(this.camera, "rotation");
-    this.paneFolder
-      .addButton({
-        title: "refresh",
-      })
-      .on("click", () => {
-        p.refresh();
-        r.refresh();
-      });
-  }
 
   get gl() {
     return this.renderer.gl;
