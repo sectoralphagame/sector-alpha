@@ -1,6 +1,6 @@
 import type { Engine } from "@ogl-engine/engine/engine";
 import { ParticleGenerator } from "@ogl-engine/ParticleGenerator";
-import { Vec3, Vec4 } from "ogl";
+import { Vec4 } from "ogl";
 import { random } from "mathjs";
 import { loopToZero } from "@ogl-engine/easing";
 import { OrbMaterial } from "@ogl-engine/materials/orb/orb";
@@ -16,13 +16,11 @@ export class EngineParticleGenerator extends ParticleGenerator {
     super(
       engine,
       (particle) => {
-        particle.position = new Vec3(
-          random(-1, 1),
-          random(-0.4, 0.4),
-          random(-1, 1)
-        ).divide(90);
-        particle.acceleration = new Vec3(0, random(30, 60), 0).divide(100);
-        particle.velocity = new Vec3(0, random(1, 2.5), 0).divide(10);
+        particle.position
+          .set(random(-1, 1), random(-0.4, 0.4), random(-1, 1))
+          .divide(90);
+        particle.acceleration.set(0, random(30, 60), 0).divide(100);
+        particle.velocity.set(0, random(1, 2.5), 0).divide(10);
         particle.life = particleLife;
         particle.scale.set(1);
       },

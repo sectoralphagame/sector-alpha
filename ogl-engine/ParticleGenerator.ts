@@ -3,6 +3,8 @@ import type { Engine } from "./engine/engine";
 import { BaseMesh } from "./engine/BaseMesh";
 import type { Destroyable } from "./types";
 
+const tempVec3 = new Vec3();
+
 interface Particle {
   angularVelocity: number;
   velocity: Vec3;
@@ -61,9 +63,9 @@ export class ParticleGenerator extends Transform implements Destroyable {
       }
     }
 
-    particle.acceleration = new Vec3(0);
-    particle.velocity = new Vec3(0);
-    particle.position = new Vec3(0);
+    particle.acceleration.set(0);
+    particle.velocity.set(0);
+    particle.position.set(0);
     particle.angularVelocity = 0;
     particle.t = 0;
 
@@ -143,11 +145,9 @@ export class ParticleGenerator extends Transform implements Destroyable {
     const scale = this.mesh.geometry.attributes.scale.data!;
     const t = this.mesh.geometry.attributes.t.data!;
 
-    const sVec = new Vec3(
-      this.worldMatrix[0],
-      this.worldMatrix[4],
-      this.worldMatrix[8]
-    ).len();
+    const sVec = tempVec3
+      .set(this.worldMatrix[0], this.worldMatrix[4], this.worldMatrix[8])
+      .len();
 
     for (let i = 0; i < this.particles.length; i++) {
       const particle = this.particles[i];

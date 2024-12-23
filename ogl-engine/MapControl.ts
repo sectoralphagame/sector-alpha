@@ -7,20 +7,20 @@ const dPos = 3;
 const dScale = 0.2;
 const dRotation = 200;
 const keymap = {
-  w: { x: 0, y: dPos },
+  KeyW: { x: 0, y: dPos },
   ArrowUp: { x: 0, y: dPos },
-  s: { x: 0, y: -dPos },
+  KeyS: { x: 0, y: -dPos },
   ArrowDown: { x: 0, y: -dPos },
-  a: { x: dPos, y: 0 },
+  KeyA: { x: dPos, y: 0 },
   ArrowLeft: { x: dPos, y: 0 },
-  d: { x: -dPos, y: 0 },
+  KeyD: { x: -dPos, y: 0 },
   ArrowRight: { x: -dPos, y: 0 },
-  q: { rotate: Math.PI / dRotation },
-  e: { rotate: -Math.PI / dRotation },
-  x: { scale: -dScale },
-  "=": { scale: -dScale },
-  z: { scale: dScale },
-  "-": { scale: dScale },
+  KeyQ: { rotate: Math.PI / dRotation },
+  KeyE: { rotate: -Math.PI / dRotation },
+  KeyX: { scale: -dScale },
+  Equal: { scale: -dScale },
+  KeyZ: { scale: dScale },
+  Minus: { scale: dScale },
 };
 
 export class MapControl extends Orbit {
@@ -55,13 +55,13 @@ export class MapControl extends Orbit {
       //   Number(this.overlay?.children.length) > 0
       // )
       //   return;
-      if (event.key in keymap) {
+      if (event.code in keymap) {
         event.stopPropagation();
       }
-      this.keysPressed.add(event.key);
+      this.keysPressed.add(event.code);
     });
     document.body.addEventListener("keyup", (event) => {
-      this.keysPressed.delete(event.key);
+      this.keysPressed.delete(event.code);
     });
     this.element.addEventListener("mousemove", this.onMouseMovePersistent);
   }
@@ -81,7 +81,10 @@ export class MapControl extends Orbit {
   };
 
   override onMouseDown = (e: MouseEvent) => {
-    if (this.keysPressed.has("Shift") && e.button === this.mouseButtons.PAN) {
+    if (
+      this.keysPressed.has("ShiftLeft") &&
+      e.button === this.mouseButtons.PAN
+    ) {
       this.setState(STATE.ROTATE);
       this.rotateStart.set(e.clientX, e.clientY);
 

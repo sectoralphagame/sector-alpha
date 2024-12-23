@@ -92,7 +92,10 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   async onControlClick(mousePosition: Vec2, button: MouseButton) {
     if (this.raycastHits.length) {
       let mesh = this.raycastHits[0];
-      if (this.settingsManager.cp.selectionManager.id === mesh.entityId) {
+      if (
+        this.settingsManager.cp.selectionManager.id === mesh.entityId &&
+        this.raycastHits.length > 1
+      ) {
         mesh = this.raycastHits[1];
       }
       // eslint-disable-next-line default-case
@@ -141,7 +144,9 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
       if (this.meshes.has(entity.id)) {
         const m = this.meshes.get(entity.id)!;
+        if (isDestroyable(m)) m.destroy();
         this.engine.scene.removeChild(m);
+        this.meshes.delete(entity.id);
       }
     });
 
