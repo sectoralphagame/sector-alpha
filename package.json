@@ -33,6 +33,7 @@
     "@storybook/react": "^8.4.1",
     "@storybook/react-webpack5": "^8.4.1",
     "@storybook/test": "^8.4.1",
+    "@tweakpane/core": "^2.0.5",
     "@types/graphlib": "^2.1.8",
     "@types/howler": "^2.2.11",
     "@types/jest": "^27.0.2",
@@ -138,7 +139,8 @@
     "reflect-metadata": "^0.1.13",
     "sharp": "^0.32.0",
     "simplebar-react": "^3.2.4",
-    "spritesmith": "^3.4.1"
+    "spritesmith": "^3.4.1",
+    "tweakpane": "^4.0.5"
   },
   "lint-staged": {
     "*.{ts,tsx,js}": [

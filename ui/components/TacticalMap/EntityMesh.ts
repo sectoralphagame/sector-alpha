@@ -72,10 +72,6 @@ export class EntityMesh extends BaseMesh {
           );
           this.addChild(light);
           this.engine.addLight(light);
-
-          this.onDestroyCallbacks.push(() => {
-            this.engine.removeLight(light);
-          });
         }
       }
     }

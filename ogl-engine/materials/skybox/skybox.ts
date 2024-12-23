@@ -1,16 +1,47 @@
+import type { SkyboxTexture } from "@assets/textures/skybox";
 import { skyboxes } from "@assets/textures/skybox";
 import { Vec3, Box, Mesh, Program, Texture } from "ogl";
 import type { Engine } from "@ogl-engine/engine/engine";
 import { Light } from "@ogl-engine/engine/Light";
 import type { Destroyable } from "@ogl-engine/types";
+import { pane } from "@ui/context/Pane";
+import type { FolderApi } from "tweakpane";
+import Color from "color";
 import vertex from "./shader.vert.glsl";
 import fragment from "./shader.frag.glsl";
+
+const settings: Partial<
+  Record<
+    SkyboxTexture,
+    {
+      ambient: number;
+      color: string;
+      intensity: number;
+      direction: [number, number, number];
+    }
+  >
+> = {
+  teegarden2: {
+    ambient: 0,
+    color: "#ffc4f1",
+    intensity: 0.93,
+    direction: [-1.7, -3.2, -7.6],
+  },
+  sectoralpha: {
+    ambient: 0.15,
+    color: "#fff6c5",
+    intensity: 0.8,
+    direction: [4.2, -1, 2.9],
+  },
+};
 
 export class Skybox extends Mesh implements Destroyable {
   private color: Vec3;
   private light: Light;
   name = "Skybox";
   engine: Engine;
+
+  paneFolder: FolderApi;
 
   constructor(engine: Engine, name: keyof typeof skyboxes) {
     super(engine.gl, {
@@ -40,6 +71,19 @@ export class Skybox extends Mesh implements Destroyable {
     this.light.position.set(0, -1, -0.4);
     this.light.setParent(this);
     this.engine.addLight(this.light);
+
+    if (settings[name]) {
+      this.loadConfig(name);
+    }
+
+    this.createPaneFolder();
+  }
+
+  loadConfig(name: keyof typeof settings) {
+    this.light.setColor(settings[name]!.color);
+    this.light.setIntensity(settings[name]!.intensity);
+    this.light.position.set(...settings[name]!.direction);
+    this.engine.uniforms.env.ambient.value.set(settings[name]!.ambient);
   }
 
   loadTexture(texture: keyof typeof skyboxes) {
@@ -60,8 +104,56 @@ export class Skybox extends Mesh implements Destroyable {
     });
   }
 
+  createPaneFolder() {
+    const params = {
+      ambient: this.engine.uniforms.env.ambient.value[0],
+      color: Color.rgb(
+        ...this.light.uniforms.color.value.clone().multiply(255)
+      ).hex(),
+      direction: {
+        x: this.light.position.x,
+        y: this.light.position.y,
+        z: this.light.position.z,
+      },
+      intensity: this.light.uniforms.intensity.value,
+    };
+
+    this.paneFolder = pane.addFolder({
+      title: "Skybox",
+    });
+
+    this.paneFolder
+      .addBinding(params, "ambient", {
+        min: 0,
+        max: 0.5,
+      })
+      .on("change", ({ value }) => {
+        this.engine.uniforms.env.ambient.value.set(value);
+      });
+    this.paneFolder
+      .addBinding(params, "color", {
+        view: "color",
+      })
+      .on("change", ({ value }) => {
+        this.light.setColor(value);
+      });
+    this.paneFolder
+      .addBinding(params, "intensity", {
+        min: 0,
+        max: 2,
+      })
+      .on("change", ({ value }) => {
+        this.light.setIntensity(value);
+      });
+    this.paneFolder
+      .addBinding(params, "direction")
+      .on("change", ({ value }) => {
+        this.light.position.set(value.x, value.y, value.z);
+      });
+  }
+
   destroy = () => {
     this.engine.removeLight(this.light);
-    // this.setParent(null);
+    this.paneFolder.dispose();
   };
 }

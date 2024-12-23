@@ -13,6 +13,8 @@ import {
 import settings from "@core/settings";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
+import type { FolderApi } from "tweakpane";
+import { pane } from "@ui/context/Pane";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
@@ -57,6 +59,8 @@ export class Engine {
 
   public delta = 0;
 
+  private paneFolder: FolderApi;
+
   constructor() {
     this.hooks = {
       onInit: new Observable("onInit"),
@@ -91,6 +95,7 @@ export class Engine {
     this.initUniforms();
     this.initLightsContainer();
     this.initPostProcessing();
+    this.initPane();
     window.renderer = this;
     this.hooks.onInit.notify();
     this.initialized = true;
@@ -182,6 +187,22 @@ export class Engine {
       },
     });
   };
+
+  private initPane() {
+    this.paneFolder = pane.addFolder({
+      title: "Engine",
+    });
+    const p = this.paneFolder.addBinding(this.camera, "position");
+    const r = this.paneFolder.addBinding(this.camera, "rotation");
+    this.paneFolder
+      .addButton({
+        title: "refresh",
+      })
+      .on("click", () => {
+        p.refresh();
+        r.refresh();
+      });
+  }
 
   get gl() {
     return this.renderer.gl;

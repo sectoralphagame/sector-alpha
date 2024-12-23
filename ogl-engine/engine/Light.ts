@@ -1,3 +1,4 @@
+import Color from "color";
 import { Transform, Vec3, Vec4 } from "ogl";
 
 const tempVec3 = new Vec3();
@@ -42,8 +43,9 @@ export class Light extends Transform {
     this.uniforms.intensity.value = intensity;
   }
 
-  setColor(color: Vec3) {
-    this.uniforms.color.value = color;
+  setColor(color: string) {
+    const c = Color(color).array();
+    this.uniforms.color.value.set(c[0], c[1], c[2]).divide(255);
   }
 
   updateMatrixWorld(force?: boolean): void {
