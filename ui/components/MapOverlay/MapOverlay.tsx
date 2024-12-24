@@ -1,29 +1,18 @@
 import React from "react";
-import { RenderingSystem } from "@core/systems/rendering";
-import { useContextMenu } from "@ui/state/contextMenu";
 import { useGameOverlay, useSim } from "@ui/atoms";
 import { useOverlayRegister } from "../Overlay/Overlay";
 import { StrategicMap } from "./StrategicMap";
 
 export const MapOverlay: React.FC = () => {
   useOverlayRegister("map");
-  const [overlay] = useGameOverlay();
-  const system = React.useRef<RenderingSystem>();
-  const [menu, setMenu] = useContextMenu();
+  const [overlay, setOverlay] = useGameOverlay();
   const [sim] = useSim();
 
-  React.useEffect(() => {
-    if (overlay === "map") {
-      system.current = new RenderingSystem([menu, setMenu]);
-      system.current.apply(sim);
-    }
-
-    return () => {
-      system.current?.destroy();
-    };
-  }, [overlay]);
+  const close = React.useCallback(() => {
+    setOverlay(null);
+  }, [setOverlay]);
 
   if (overlay !== "map") return null;
 
-  return <StrategicMap />;
+  return <StrategicMap sim={sim} close={close} />;
 };

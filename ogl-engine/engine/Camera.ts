@@ -31,4 +31,8 @@ export class Camera extends BaseCamera {
         r.refresh();
       });
   }
+
+  disablePane() {
+    this.paneFolder.dispose();
+  }
 }

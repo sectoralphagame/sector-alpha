@@ -69,7 +69,7 @@ export const Overlay: React.FC<OverlayProps> = ({
                 </Text>
               ))}
             </div>
-            <div>{children}</div>
+            <div style={{ height: "100%" }}>{children}</div>
           </>
         ) : (
           children
