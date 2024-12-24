@@ -37,7 +37,7 @@ export type GameDialogProps =
 export const gameDialog = new Observable<GameDialogProps>("gameDialog");
 export const useGameDialog = () => useObservable(gameDialog);
 
-export type GameOverlayProps = "fleet" | "missions" | "dev" | null;
+export type GameOverlayProps = "fleet" | "missions" | "map" | "dev" | null;
 
 export const gameOverlay = atom<GameOverlayProps>({
   key: "gameOverlay",

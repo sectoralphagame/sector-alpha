@@ -101,7 +101,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
     this.overlay = document.querySelector("#overlay");
     const root = document.querySelector("#root")!;
     const canvasRoot = document.querySelector(
-      "#canvasRoot"
+      "#map-overlay"
     )! as HTMLCanvasElement;
 
     if (!(root || canvasRoot)) return;
@@ -116,7 +116,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
       width: root.clientWidth,
       height: window.innerHeight,
       view: canvas,
-      backgroundColor: Color("#080808").rgbNumber(),
+      backgroundColor: Color("#000").rgbNumber(),
     });
 
     this.initViewport(root, canvasRoot);
@@ -370,6 +370,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
         if (!sprite) {
           sprite = new PIXI.Sprite();
           setTexture(entity, sprite, entityRender.texture);
+          sprite.cullable = true;
           this.sprites.set(entity, sprite);
           this.viewport.addChild(sprite);
           if (entity.tags.has("selection")) {

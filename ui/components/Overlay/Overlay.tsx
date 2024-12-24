@@ -26,6 +26,7 @@ export interface OverlayProps extends DialogProps {
 const overlayNames: Record<NonNullable<GameOverlayProps>, string> = {
   fleet: "Fleet Management",
   missions: "Active Missions",
+  map: "Strategic Map",
   dev: "Developer Tools",
 };
 
