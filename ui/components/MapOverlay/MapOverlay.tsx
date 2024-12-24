@@ -3,6 +3,7 @@ import { RenderingSystem } from "@core/systems/rendering";
 import { useContextMenu } from "@ui/state/contextMenu";
 import { useGameOverlay, useSim } from "@ui/atoms";
 import { useOverlayRegister } from "../Overlay/Overlay";
+import { StrategicMap } from "./StrategicMap";
 
 export const MapOverlay: React.FC = () => {
   useOverlayRegister("map");
@@ -24,5 +25,5 @@ export const MapOverlay: React.FC = () => {
 
   if (overlay !== "map") return null;
 
-  return <div id="map-overlay" />;
+  return <StrategicMap />;
 };

@@ -1,6 +1,6 @@
-import type { Engine } from "@ogl-engine/engine/engine";
 import type { Vec4 } from "ogl";
 import { Program } from "ogl";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 import { Material } from "../material";
@@ -12,7 +12,7 @@ export class OrbMaterial extends Material {
     fEmissive: { value: number };
   };
 
-  constructor(engine: Engine, start: Vec4, end: Vec4) {
+  constructor(engine: Engine3D, start: Vec4, end: Vec4) {
     super(engine);
 
     this.program = new Program(engine.gl, {

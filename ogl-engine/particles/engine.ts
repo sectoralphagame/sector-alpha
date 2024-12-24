@@ -1,10 +1,10 @@
-import type { Engine } from "@ogl-engine/engine/engine";
 import { ParticleGenerator } from "@ogl-engine/ParticleGenerator";
 import { Vec4 } from "ogl";
 import { random } from "mathjs";
 import { loopToZero } from "@ogl-engine/easing";
 import { OrbMaterial } from "@ogl-engine/materials/orb/orb";
 import Color from "color";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 
 const particleLife = 0.15;
 const baseSpawn = 600;
@@ -12,7 +12,7 @@ const baseSpawn = 600;
 export class EngineParticleGenerator extends ParticleGenerator {
   particleSize = 0.08;
 
-  constructor(engine: Engine) {
+  constructor(engine: Engine3D) {
     super(
       engine,
       (particle) => {

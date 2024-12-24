@@ -1,7 +1,7 @@
 import type { Texture } from "ogl";
 import { Vec3, Program, TextureLoader } from "ogl";
 import smoke from "@assets/textures/smoke.jpg";
-import type { Engine } from "@ogl-engine/engine/engine";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 import { Material } from "../material";
@@ -12,7 +12,7 @@ export class StarMaterial extends Material {
     tSmoke: { value: Texture };
   };
 
-  constructor(engine: Engine) {
+  constructor(engine: Engine3D) {
     super(engine);
 
     const tSmoke = TextureLoader.load(engine.gl, {

@@ -1,7 +1,7 @@
 import { Program, Vec4 } from "ogl";
-import type { Engine } from "@ogl-engine/engine/engine";
 import Color from "color";
 import type { DockSize } from "@core/components/dockable";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 import { Material } from "../material";
@@ -12,7 +12,7 @@ export class EntityIndicatorMaterial extends Material {
     uColor: { value: Vec4 };
   };
 
-  constructor(engine: Engine) {
+  constructor(engine: Engine3D) {
     super(engine);
 
     this.program = new Program(engine.gl, {

@@ -1,6 +1,6 @@
 import { Program } from "ogl";
 import type { GLTFMaterial, Texture } from "ogl";
-import type { Engine } from "@ogl-engine/engine/engine";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "../simplePbr/shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 import { Material } from "../material";
@@ -12,7 +12,7 @@ export class InstancedPhongMaterial extends Material {
     tRoughness: { value: Texture };
   };
 
-  constructor(engine: Engine, gltfMaterial: GLTFMaterial) {
+  constructor(engine: Engine3D, gltfMaterial: GLTFMaterial) {
     super(engine);
 
     this.program = new Program(engine.gl, {

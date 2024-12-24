@@ -1,6 +1,6 @@
-import type { Engine } from "@ogl-engine/engine/engine";
 import type { Texture } from "ogl";
 import { Program, Vec4 } from "ogl";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { Material } from "../material";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
@@ -15,7 +15,7 @@ export class SpritesheetMaterial extends Material {
   index: number;
 
   constructor(
-    engine: Engine,
+    engine: Engine3D,
     spritesheet: Texture,
     size: number,
     index: number

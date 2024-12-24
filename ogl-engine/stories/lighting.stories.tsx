@@ -2,13 +2,13 @@ import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
-import { Engine } from "@ogl-engine/engine/engine";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import arrowDownFat from "@assets/ui/icons/arrow_down_fat.svg";
 import { Orbit, Sphere, Vec3 } from "ogl";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { Light } from "@ogl-engine/engine/Light";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
+import { Engine3D } from "@ogl-engine/engine/engine3d";
 
 /**
  * There is an additional specular reflection on the top. It comes form skybox
@@ -19,7 +19,7 @@ const LightingStory: React.FC<{
   intensity: number;
   radius: number;
 }> = ({ postProcessing, intensity, radius }) => {
-  const engine = React.useMemo(() => new Engine(), []);
+  const engine = React.useMemo(() => new Engine3D(), []);
   const controlRef = React.useRef<Orbit>();
   const skyboxRef = React.useRef<Skybox>();
   const boxRef = React.useRef<BaseMesh<ColorMaterial>>();

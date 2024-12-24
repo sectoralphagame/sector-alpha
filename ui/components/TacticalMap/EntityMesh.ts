@@ -2,7 +2,6 @@ import type { DockSize } from "@core/components/dockable";
 import type { RequireComponent } from "@core/tsHelpers";
 import type { ParticleGeneratorInput } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
-import type { Engine } from "@ogl-engine/engine/engine";
 import { SelectionRing } from "@ogl-engine/materials/ring/ring";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
@@ -13,6 +12,7 @@ import Color from "color";
 import { Plane, Vec3 } from "ogl";
 import { ship } from "@core/archetypes/ship";
 import { EntityIndicatorMaterial } from "@ogl-engine/materials/entityIndicator/entityIndicator";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 
 export const entityScale = 1 / 220;
 // FIXME: Remove after distance rebalancing
@@ -22,7 +22,7 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
   name = "EntityIndicator";
   parent: EntityMesh;
 
-  constructor(engine: Engine) {
+  constructor(engine: Engine3D) {
     super(engine, {
       geometry: new Plane(engine.gl),
     });
@@ -36,7 +36,7 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
 }
 
 export class EntityMesh extends BaseMesh {
-  engine: Engine;
+  engine: Engine3D;
   entityId: number;
   entity: RequireComponent<"render" | "position">;
   name = "EntityMesh";
@@ -44,7 +44,10 @@ export class EntityMesh extends BaseMesh {
   selected = false;
   indicator: EntityIndicator;
 
-  constructor(engine: Engine, entity: RequireComponent<"render" | "position">) {
+  constructor(
+    engine: Engine3D,
+    entity: RequireComponent<"render" | "position">
+  ) {
     const gltf = assetLoader.model(entity.cp.render.model);
 
     super(engine, {

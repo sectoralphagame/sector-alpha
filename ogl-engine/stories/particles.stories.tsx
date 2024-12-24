@@ -4,9 +4,9 @@ import { Styles } from "@kit/theming/style";
 import type { SmokeParticleGenerator } from "@ogl-engine/particles/smoke";
 import { merge } from "lodash";
 import type { FireParticleGenerator } from "@ogl-engine/particles/fire";
-import type { Engine } from "@ogl-engine/engine/engine";
 import type { ParticleGeneratorType } from "@ogl-engine/particles";
 import { particleGenerator } from "@ogl-engine/particles";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Story3dArgs } from "./Story3d";
 import { Story3d, story3dMeta } from "./Story3d";
 
@@ -16,7 +16,7 @@ const ParticleGeneratorStory: React.FC<
     type: ParticleGeneratorType;
   }
 > = ({ postProcessing, skybox, particles, type }) => {
-  const engineRef = React.useRef<Engine>();
+  const engineRef = React.useRef<Engine3D>();
   const generatorRef = React.useRef<
     SmokeParticleGenerator | FireParticleGenerator
   >();

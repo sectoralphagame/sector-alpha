@@ -6,16 +6,16 @@ import { GLTFLoader, Orbit, Vec3 } from "ogl";
 import { StarMaterial } from "@ogl-engine/materials/star/star";
 import Color from "color";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
-import { Engine } from "@ogl-engine/engine/engine";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import starModel from "@assets/models/world/star.glb";
+import { Engine3D } from "@ogl-engine/engine/engine3d";
 
 interface StarStoryProps {
   color: string;
 }
 
 const StarStory: React.FC<StarStoryProps> = ({ color: colorProp }) => {
-  const engine = React.useMemo(() => new Engine(), []);
+  const engine = React.useMemo(() => new Engine3D(), []);
   const starRef = React.useRef<BaseMesh<StarMaterial>>();
   const skyboxRef = React.useRef<Skybox>();
   const controlRef = React.useRef<Orbit>();

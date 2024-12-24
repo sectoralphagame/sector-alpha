@@ -9,7 +9,6 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { defaultClickSound } from "@kit/BaseButton";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
-import { Engine } from "@ogl-engine/engine/engine";
 import { selectingSystem } from "@core/systems/selecting";
 import { Path } from "@ogl-engine/utils/path";
 import { sectorObservable } from "@ui/state/sector";
@@ -23,6 +22,7 @@ import type { MouseButton } from "@ogl-engine/Orbit";
 import { Asteroids } from "@ogl-engine/engine/Asteroids";
 import { fieldColors } from "@core/archetypes/asteroid";
 import type { Destroyable } from "@ogl-engine/types";
+import { Engine3D } from "@ogl-engine/engine/engine3d";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 
@@ -34,7 +34,7 @@ function isDestroyable(mesh: Transform): mesh is Transform & Destroyable {
 }
 
 export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
-  engine: Engine;
+  engine: Engine3D;
   sim: Sim;
   raycast = new Raycast();
   raycastHits: EntityMesh[] = [];
@@ -46,7 +46,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   constructor(props) {
     super(props);
     this.sim = props.sim;
-    this.engine = new Engine();
+    this.engine = new Engine3D();
     this.settingsManager = first(this.sim.index.settings.getIt())!;
   }
 

@@ -1,7 +1,7 @@
 import type { Texture } from "ogl";
 import { Vec3, Program } from "ogl";
-import type { Engine } from "@ogl-engine/engine/engine";
 import Color from "color";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 import { Material } from "../material";
@@ -13,7 +13,7 @@ export class TintedTextureMaterial extends Material {
     fEmissive: { value: number };
   };
 
-  constructor(engine: Engine, texture: Texture, color?: string) {
+  constructor(engine: Engine3D, texture: Texture, color?: string) {
     super(engine);
 
     this.program = new Program(engine.gl, {

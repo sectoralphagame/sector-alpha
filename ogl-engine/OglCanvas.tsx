@@ -24,7 +24,7 @@ export const OglCanvas: React.FC<OglCanvasProps> = React.memo(({ engine }) => {
 
     engine.hooks.onUpdate.subscribe("OglCanvas", () => {
       tick();
-      frameIdRef.current = requestAnimationFrame(engine.update);
+      frameIdRef.current = requestAnimationFrame(engine.update.bind(engine));
     });
     engine.hooks.onError.subscribe("OglCanvas", () => {
       setErrorCount((count) => count + 1);
@@ -35,9 +35,9 @@ export const OglCanvas: React.FC<OglCanvasProps> = React.memo(({ engine }) => {
     resizeObserver.current = new ResizeObserver(engine.resize);
     resizeObserver.current.observe(canvas!.parentElement!);
 
-    frameIdRef.current = requestAnimationFrame(engine.update);
+    frameIdRef.current = requestAnimationFrame(engine.update.bind(engine));
 
-    setTimeout(engine.resize, 1000);
+    setTimeout(engine.resize.bind(engine), 1000);
 
     return cleanup;
   }, [canvas, engine]);

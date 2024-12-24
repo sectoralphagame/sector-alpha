@@ -1,7 +1,7 @@
 import type { RequireComponent } from "@core/tsHelpers";
 import { findInAncestors } from "@core/utils/findInAncestors";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
-import type { Engine } from "@ogl-engine/engine/engine";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
 import { Plane, Transform, Vec3 } from "ogl";
 
@@ -12,10 +12,10 @@ const colors: Record<PathColor, Vec3> = {
 };
 
 export class Path extends Transform {
-  engine: Engine;
+  engine: Engine3D;
   name = "Path";
 
-  constructor(engine: Engine) {
+  constructor(engine: Engine3D) {
     super();
 
     this.engine = engine;

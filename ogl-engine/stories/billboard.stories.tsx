@@ -2,18 +2,18 @@ import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
-import { Engine } from "@ogl-engine/engine/engine";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { Billboard } from "@ogl-engine/utils/billboard";
 import arrowDownFat from "@assets/ui/icons/arrow_down_fat.svg";
 import { Orbit, Texture } from "ogl";
 import { TintedTextureMaterial } from "@ogl-engine/materials/tintedTexture/tintedTexture";
+import { Engine3D } from "@ogl-engine/engine/engine3d";
 
 const BillboardStory: React.FC<{
   postProcessing: boolean;
   scaling: boolean;
 }> = ({ postProcessing, scaling }) => {
-  const engine = React.useMemo(() => new Engine(), []);
+  const engine = React.useMemo(() => new Engine3D(), []);
   const controlRef = React.useRef<Orbit>();
   const skyboxRef = React.useRef<Skybox>();
   const billboardRef = React.useRef<Billboard<TintedTextureMaterial>>();

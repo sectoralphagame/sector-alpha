@@ -1,12 +1,12 @@
 import type { SkyboxTexture } from "@assets/textures/skybox";
 import { skyboxes } from "@assets/textures/skybox";
 import { Vec3, Box, Mesh, Program, Texture } from "ogl";
-import type { Engine } from "@ogl-engine/engine/engine";
 import { Light } from "@ogl-engine/engine/Light";
 import type { Destroyable } from "@ogl-engine/types";
 import { pane } from "@ui/context/Pane";
 import type { FolderApi } from "tweakpane";
 import Color from "color";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import vertex from "./shader.vert.glsl";
 import fragment from "./shader.frag.glsl";
 
@@ -23,7 +23,7 @@ const settings: Partial<
 > = {
   teegarden2: {
     ambient: 0,
-    color: "#ffc4f1",
+    color: "#f2a0ae",
     intensity: 0.93,
     direction: [-1.7, -3.2, -7.6],
   },
@@ -39,11 +39,11 @@ export class Skybox extends Mesh implements Destroyable {
   private color: Vec3;
   private light: Light;
   name = "Skybox";
-  engine: Engine;
+  engine: Engine3D;
 
   paneFolder: FolderApi;
 
-  constructor(engine: Engine, name: keyof typeof skyboxes) {
+  constructor(engine: Engine3D, name: keyof typeof skyboxes) {
     super(engine.gl, {
       geometry: new Box(engine.gl),
       program: new Program(engine.gl, {

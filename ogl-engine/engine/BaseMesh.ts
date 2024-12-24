@@ -3,19 +3,19 @@ import type { Geometry, GLTF, MeshOptions } from "ogl";
 import { Mesh, Vec3 } from "ogl";
 import { MissingMaterial } from "@ogl-engine/materials/missing/missing";
 import type { Destroyable } from "@ogl-engine/types";
-import type { Engine } from "./engine";
+import type { Engine3D } from "./engine3d";
 
 export class BaseMesh<TMaterial extends Material = Material>
   extends Mesh
   implements Destroyable
 {
-  engine: Engine;
+  engine: Engine3D;
   name = "BaseMesh";
   material: TMaterial;
   onDestroyCallbacks: (() => void)[] = [];
 
   constructor(
-    engine: Engine,
+    engine: Engine3D,
     options: Partial<MeshOptions & { material: TMaterial; name: string }>
   ) {
     super(engine.gl, options);
@@ -119,7 +119,7 @@ export class BaseMesh<TMaterial extends Material = Material>
 
   // eslint-disable-next-line no-shadow
   static fromGltf<TMaterial extends Material>(
-    engine: Engine,
+    engine: Engine3D,
     gltf: GLTF,
     options?: Partial<MeshOptions & { material: TMaterial }>
   ): BaseMesh<TMaterial> {
@@ -133,7 +133,6 @@ export class BaseMesh<TMaterial extends Material = Material>
   }
 
   destroy() {
-    console.log("destroying", this.name);
     for (const cb of this.onDestroyCallbacks) {
       cb();
     }

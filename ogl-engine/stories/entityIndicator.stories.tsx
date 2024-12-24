@@ -39,6 +39,7 @@ const EntityIndicatorStory: React.FC<
 
     const indicator = new EntityIndicator(engine);
     indicator.material.setColor(Color(color).rgbNumber());
+    // @ts-expect-error
     indicator.setParent(ship);
   }, []);
 
@@ -47,7 +48,7 @@ const EntityIndicatorStory: React.FC<
 
     const indicator = engineRef.current.scene.children.find(
       (c) => c instanceof EntityIndicator
-    );
+    ) as EntityIndicator | undefined;
     indicator?.material.setColor(Color(color).rgbNumber());
   }, [color]);
 

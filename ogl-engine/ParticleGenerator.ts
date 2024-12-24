@@ -1,7 +1,7 @@
 import { Vec3, Transform, Plane } from "ogl";
-import type { Engine } from "./engine/engine";
 import { BaseMesh } from "./engine/BaseMesh";
 import type { Destroyable } from "./types";
+import type { Engine3D } from "./engine/engine3d";
 
 const tempVec3 = new Vec3();
 
@@ -18,7 +18,7 @@ interface Particle {
 type GenerateParticleFn = (_particle: Particle) => void;
 
 export class ParticleGenerator extends Transform implements Destroyable {
-  engine: Engine;
+  engine: Engine3D;
   name = "ParticleGenerator";
   particles: Particle[];
 
@@ -36,7 +36,7 @@ export class ParticleGenerator extends Transform implements Destroyable {
 
   protected generate: GenerateParticleFn;
 
-  constructor(engine: Engine, generate: GenerateParticleFn, max = 1000) {
+  constructor(engine: Engine3D, generate: GenerateParticleFn, max = 1000) {
     super();
     this.engine = engine;
     this.max = max;

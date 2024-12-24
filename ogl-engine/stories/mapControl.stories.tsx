@@ -5,13 +5,13 @@ import { OglCanvas } from "ogl-engine/OglCanvas";
 import sCiv from "@assets/models/ship/sCiv.glb";
 import { AxesHelper, GLTFLoader } from "ogl";
 import { MapControl } from "@ogl-engine/MapControl";
-import { Engine } from "@ogl-engine/engine/engine";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
+import { Engine3D } from "@ogl-engine/engine/engine3d";
 
 const ModelStory: React.FC = () => {
-  const engine = React.useMemo(() => new Engine(), []);
+  const engine = React.useMemo(() => new Engine3D(), []);
   const controlRef = React.useRef<MapControl>();
   const skyboxRef = React.useRef<Skybox>();
 

@@ -1,6 +1,6 @@
-import type { Engine } from "@ogl-engine/engine/engine";
 import type { Vec3 } from "ogl";
 import { Program } from "ogl";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 import { Material } from "../material";
@@ -12,7 +12,7 @@ export class ColorMaterial extends Material {
     bShaded: { value: boolean };
   };
 
-  constructor(engine: Engine, color: Vec3, shaded = true) {
+  constructor(engine: Engine3D, color: Vec3, shaded = true) {
     super(engine);
 
     this.program = new Program(engine.gl, {

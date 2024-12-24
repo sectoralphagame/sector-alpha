@@ -1,5 +1,5 @@
 import { skyboxes } from "@assets/textures/skybox";
-import { Engine } from "@ogl-engine/engine/engine";
+import { Engine3D } from "@ogl-engine/engine/engine3d";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
 import { Orbit } from "ogl";
@@ -11,8 +11,8 @@ export interface Story3dArgs {
 }
 
 interface Story3dProps extends Story3dArgs {
-  onEngineInit: (_engine: Engine) => void;
-  onEngineUpdate: (_engine: Engine, _time: number) => void;
+  onEngineInit: (_engine: Engine3D) => void;
+  onEngineUpdate: (_engine: Engine3D, _time: number) => void;
 }
 
 export const Story3d: React.FC<Story3dProps> = ({
@@ -21,7 +21,7 @@ export const Story3d: React.FC<Story3dProps> = ({
   onEngineInit,
   onEngineUpdate,
 }) => {
-  const engine = React.useMemo(() => new Engine(), []);
+  const engine = React.useMemo(() => new Engine3D(), []);
   const controlRef = React.useRef<Orbit>();
   const skyboxRef = React.useRef<Skybox>();
 

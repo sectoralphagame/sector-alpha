@@ -2,13 +2,13 @@ import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { merge } from "lodash";
-import type { Engine } from "@ogl-engine/engine/engine";
 import { Asteroids } from "@ogl-engine/engine/Asteroids";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import models from "@assets/models";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { Story3d, story3dMeta } from "./Story3d";
 import type { Story3dArgs } from "./Story3d";
 
@@ -19,7 +19,7 @@ const AsteroidsStory: React.FC<
     color: string;
   }
 > = ({ postProcessing, skybox, size, density, color }) => {
-  const engineRef = React.useRef<Engine>();
+  const engineRef = React.useRef<Engine3D>();
   const onInit = React.useCallback(async (engine) => {
     engineRef.current = engine;
     engine.camera.position.set(1, 1, 1);

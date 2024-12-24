@@ -5,13 +5,13 @@ import { OglCanvas } from "ogl-engine/OglCanvas";
 import { GLTFLoader, Orbit, Vec3 } from "ogl";
 import models from "@assets/models";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
-import { Engine } from "@ogl-engine/engine/engine";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { skyboxes } from "@assets/textures/skybox";
 import { Light } from "@ogl-engine/engine/Light";
 import Color from "color";
+import { Engine3D } from "@ogl-engine/engine/engine3d";
 
 interface ModelStoryProps {
   model: string;
@@ -37,14 +37,14 @@ const ModelStory: React.FC<ModelStoryProps> = ({
   rotationSpeed,
   intensity,
 }) => {
-  const engine = React.useMemo(() => new Engine(), []);
+  const engine = React.useMemo(() => new Engine3D(), []);
   const meshRef = React.useRef<BaseMesh>();
   const skyboxRef = React.useRef<Skybox>();
   const controlRef = React.useRef<Orbit>();
   const rotationSpeedRef = React.useRef(rotationSpeed);
   const lights = React.useRef<Light[]>(createLights(intensity));
   const load = useCallback((m: keyof typeof models) => {
-    GLTFLoader.load(engine.renderer.gl, m).then((model) => {
+    GLTFLoader.load(engine.gl, m).then((model) => {
       meshRef.current = BaseMesh.fromGltf(engine, model, {
         material: model.materials?.[0]
           ? new SimplePbrMaterial(engine, model.materials[0])

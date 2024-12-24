@@ -5,16 +5,16 @@ import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { random } from "mathjs";
 import { InstancedPhongMaterial } from "@ogl-engine/materials/instancedPhong/instancedPhong";
 import { AsteroidFieldRingMaterial } from "@ogl-engine/materials/asteroidFieldRing/asteroidFieldRing";
-import type { Engine } from "./engine";
 import { BaseMesh } from "./BaseMesh";
+import type { Engine3D } from "./engine3d";
 
 export class Asteroids extends Transform {
   name = "Asteroids";
   size: number;
   density: number;
-  engine: Engine;
+  engine: Engine3D;
 
-  constructor(engine: Engine, size: number, density: number, color: string) {
+  constructor(engine: Engine3D, size: number, density: number, color: string) {
     super();
 
     this.engine = engine;

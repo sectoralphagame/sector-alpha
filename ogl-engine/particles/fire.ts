@@ -1,16 +1,16 @@
-import type { Engine } from "@ogl-engine/engine/engine";
 import { ParticleGenerator } from "@ogl-engine/ParticleGenerator";
 import { Vec3, Vec4 } from "ogl";
 import { random } from "mathjs";
 import { loopToZero } from "@ogl-engine/easing";
 import { OrbMaterial } from "@ogl-engine/materials/orb/orb";
 import Color from "color";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
 
 const particleSize = 0.2;
 const particleLife = 1.5;
 
 export class FireParticleGenerator extends ParticleGenerator {
-  constructor(engine: Engine) {
+  constructor(engine: Engine3D) {
     super(
       engine,
       (particle) => {
