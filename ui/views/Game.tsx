@@ -25,6 +25,8 @@ import { useContextMenu } from "@ui/state/contextMenu";
 import { CurrentSector } from "@ui/components/CurrentSector/CurrentSector";
 import { useSectorObservable } from "@ui/state/sector";
 import type { Faction } from "@core/archetypes/faction";
+import { MapOverlay } from "@ui/components/MapOverlay/MapOverlay";
+import { pane } from "@ui/context/Pane";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -42,11 +44,11 @@ const overlayKeyCodes: Record<string, NonNullable<GameOverlayProps>> = {
   Backslash: "dev",
   KeyF: "fleet",
   KeyJ: "missions",
+  KeyM: "map",
 };
 
 const Game: React.FC = () => {
   const [sim, setSim] = useSim();
-  // const system = React.useRef<RenderingSystem>();
   const canvasRoot = React.useRef<HTMLDivElement>(null);
   const [menu, setMenu] = useContextMenu();
   const [dialog, setDialog] = useGameDialog();
@@ -66,9 +68,6 @@ const Game: React.FC = () => {
     if (!sim) return () => undefined;
 
     sim.start();
-
-    // system.current = new RenderingSystem([menu, setMenu]);
-    // system.current.apply(sim);
 
     const unmount = () => {
       setDialog(null);
@@ -126,6 +125,13 @@ const Game: React.FC = () => {
       if (event.code === "Space") {
         if (sim.speed === 0) sim.unpause();
         else sim.pause();
+      }
+      if (
+        event.code === "KeyK" &&
+        pressedKeys.current.has("MetaLeft") &&
+        gameSettings.dev
+      ) {
+        pane.hidden = !pane.hidden;
       }
 
       if (
@@ -222,6 +228,7 @@ const Game: React.FC = () => {
       >
         <FleetOverlay />
         <MissionsOverlay />
+        <MapOverlay />
         {gameSettings.dev && <DevOverlay />}
       </Overlay>
       {menu.active && (!!menu.sector || menu.overlay) && (
