@@ -9,6 +9,8 @@ import type { RequireComponent } from "../tsHelpers";
 import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
+const tempPosition: Position2D = [0, 0];
+
 type Navigable = Driveable & RequireComponent<"position">;
 
 function hold(entity: Navigable) {
@@ -67,10 +69,9 @@ function setFlybyDrive(entity: Navigable, delta: number) {
   const targetEntity = entity.sim.get(drive.target!)!;
   const targetPosition = targetEntity.cp.position!;
 
-  const path: Position2D = [
-    targetPosition.coord[0] - entityPosition.coord[0],
-    targetPosition.coord[1] - entityPosition.coord[1],
-  ];
+  const path: Position2D = tempPosition;
+  path[0] = targetPosition.coord[0] - entityPosition.coord[0];
+  path[1] = targetPosition.coord[1] - entityPosition.coord[1];
   const dAngle = getAngleDiff(entity, path);
 
   const distance = norm(path) as number;
@@ -162,10 +163,9 @@ function setDrive(entity: Navigable, delta: number) {
     return;
   }
 
-  const path: Position2D = [
-    targetPosition[0] - entityPosition.coord[0],
-    targetPosition[1] - entityPosition.coord[1],
-  ];
+  const path: Position2D = tempPosition;
+  path[0] = targetPosition[0] - entityPosition.coord[0];
+  path[1] = targetPosition[1] - entityPosition.coord[1];
 
   const dAngle = getAngleDiff(entity, path);
 

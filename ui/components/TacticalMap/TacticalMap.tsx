@@ -140,6 +140,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.control.onPan = () => {
       this.settingsManager.cp.selectionManager.focused = false;
     };
+    this.control.isFocused = () =>
+      document.querySelector("#overlay")?.getAttribute("data-open") === "false";
 
     this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
       if (this.meshes.has(entity.id)) {

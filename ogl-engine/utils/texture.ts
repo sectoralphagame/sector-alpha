@@ -1,5 +1,5 @@
 import type { Engine } from "@ogl-engine/engine/engine";
-import type { ImageRepresentation } from "ogl";
+import type { ImageRepresentation, TextureOptions } from "ogl";
 import { Texture } from "ogl";
 
 export async function loadTextureImage(
@@ -18,8 +18,9 @@ export async function loadTextureImage(
 
 export async function loadTexture(
   engine: Engine,
-  url: string
+  url: string,
+  opts: Partial<TextureOptions> = {}
 ): Promise<Texture> {
   const image = await loadTextureImage(url);
-  return new Texture(engine.gl, { image });
+  return new Texture(engine.gl, { image, ...opts });
 }

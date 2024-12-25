@@ -83,7 +83,7 @@ export class Orbit {
     this.forcePosition();
   }
 
-  protected setState(state: number) {
+  public setState(state: number) {
     if (this.onStateChange) {
       this.onStateChange(this.state, state);
     }

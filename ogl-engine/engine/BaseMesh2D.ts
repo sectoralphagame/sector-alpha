@@ -1,11 +1,11 @@
-import type { Material2D } from "@ogl-engine/materials/material";
+import type { Material2D, MaterialAny } from "@ogl-engine/materials/material";
 import type { GLTF, MeshOptions } from "ogl";
 import { Mesh } from "ogl";
 import type { Destroyable } from "@ogl-engine/types";
 import { ColorMaterial2D } from "@ogl-engine/materials/color/color";
 import type { Engine2D } from "./engine2d";
 
-export class BaseMesh2D<TMaterial extends Material2D = Material2D>
+export class BaseMesh2D<TMaterial extends Material2D | MaterialAny = Material2D>
   extends Mesh
   implements Destroyable
 {

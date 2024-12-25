@@ -29,8 +29,11 @@ export class MapControl extends Orbit {
 
   dragPrev: Vec2 | null = null;
   mouse: Vec2 = new Vec2();
+  moved = false;
 
   onClick: ((_position: Vec2, _button: MouseButton) => void) | null = null;
+  // eslint-disable-next-line class-methods-use-this
+  isFocused: () => boolean = () => true;
 
   constructor(camera: Camera, element: HTMLElement) {
     super(camera, element);
@@ -50,11 +53,7 @@ export class MapControl extends Orbit {
     });
 
     document.body.addEventListener("keydown", (event) => {
-      // if (
-      //   event.target !== document.body ||
-      //   Number(this.overlay?.children.length) > 0
-      // )
-      //   return;
+      if (event.target !== document.body) return;
       if (event.code in keymap) {
         event.stopPropagation();
       }
@@ -99,6 +98,11 @@ export class MapControl extends Orbit {
 
   override update = () => {
     super.update();
+
+    if (!this.isFocused()) {
+      return;
+    }
+
     this.keysPressed.forEach((key) => {
       const action = keymap[key];
       if (!action) return;
@@ -110,6 +114,13 @@ export class MapControl extends Orbit {
   };
 
   onMouseMovePersistent = (e: MouseEvent) => {
-    this.mouse.set(e.clientX, e.clientY);
+    this.moved = false;
+    const x = e.clientX - this.element.offsetLeft;
+    const y = e.clientY - this.element.offsetTop;
+
+    if (x !== this.mouse.x || y !== this.mouse.y) {
+      this.moved = true;
+      this.mouse.set(x, y);
+    }
   };
 }

@@ -36,12 +36,27 @@ export const Overlay: React.FC<OverlayProps> = ({
   onClose,
   children,
 }) => {
+  const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
   const [overlays, setOverlays] = React.useState<GameOverlayProps[]>([]);
-  const [, setOverlay] = useGameOverlay();
+  const [activeOverlay, setOverlay] = useGameOverlay();
   const register = React.useCallback(
     (name: GameOverlayProps) => setOverlays((prev) => uniq([...prev, name])),
     []
   );
+
+  React.useEffect(() => {
+    if (!container) return () => {};
+
+    container.classList.add(open ? styles.fadeIn : styles.fadeOut);
+    const onAnimationEnd = () => {
+      container.classList.remove(styles.fadeIn, styles.fadeOut);
+    };
+    container.addEventListener("animationend", onAnimationEnd);
+
+    return () => {
+      container.removeEventListener("animationend", onAnimationEnd);
+    };
+  }, [open]);
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -51,29 +66,26 @@ export const Overlay: React.FC<OverlayProps> = ({
           [styles.active]: open,
         })}
         id="overlay"
+        data-open={open}
+        data-active={activeOverlay ?? "none"}
+        ref={setContainer}
       >
-        {open ? (
-          <>
-            <div className={styles.bar}>
-              <Button type="button" onClick={onClose}>
-                Back
-              </Button>
-              {overlays.map((slug) => (
-                <Text
-                  variant="h3"
-                  color={active === slug ? "primary" : "default"}
-                  onClick={() => setOverlay(slug)}
-                  key={slug}
-                >
-                  {overlayNames[slug ?? ""]}
-                </Text>
-              ))}
-            </div>
-            <div style={{ height: "100%" }}>{children}</div>
-          </>
-        ) : (
-          children
-        )}
+        <div className={styles.bar}>
+          <Button type="button" onClick={onClose}>
+            Back
+          </Button>
+          {overlays.map((slug) => (
+            <Text
+              variant="h3"
+              color={active === slug ? "primary" : "default"}
+              onClick={() => setOverlay(slug)}
+              key={slug}
+            >
+              {overlayNames[slug ?? ""]}
+            </Text>
+          ))}
+        </div>
+        {children}
       </div>
     </OverlayContext.Provider>
   );

@@ -1,6 +1,7 @@
 import { Renderer } from "ogl";
 import settings from "@core/settings";
 import type { Scene } from "./Scene";
+import { StrategicMapScene } from "./Scene";
 import { Camera } from "./Camera";
 import { Engine } from "./engine";
 
@@ -36,6 +37,20 @@ export class Engine2D extends Engine {
   };
 
   setScene = (scene: Scene) => {
+    this.scene = scene;
+  };
+}
+
+export class StrategicMapEngine extends Engine2D {
+  scene: StrategicMapScene;
+
+  constructor() {
+    super();
+
+    this.scene = new StrategicMapScene(this);
+  }
+
+  setScene = (scene: StrategicMapScene) => {
     this.scene = scene;
   };
 }

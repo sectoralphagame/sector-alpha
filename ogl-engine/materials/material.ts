@@ -1,4 +1,5 @@
 import settings from "@core/settings";
+import type { Engine } from "@ogl-engine/engine/engine";
 import type { Engine2D } from "@ogl-engine/engine/engine2d";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Light } from "@ogl-engine/engine/Light";
@@ -45,6 +46,21 @@ export abstract class Material2D {
       fCameraNear: { value: settings.camera.near },
       fCameraFar: { value: settings.camera.far },
     };
+  }
+
+  apply(mesh: Mesh) {
+    mesh.program = this.program;
+  }
+}
+
+export abstract class MaterialAny {
+  engine: Engine;
+  protected program: Program;
+  protected uniforms: {};
+
+  constructor(engine: Engine) {
+    this.engine = engine;
+    this.uniforms = {};
   }
 
   apply(mesh: Mesh) {
