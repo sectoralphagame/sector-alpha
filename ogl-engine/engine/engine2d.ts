@@ -16,6 +16,7 @@ export class Engine2D extends Engine {
     this.renderer = new Renderer({
       canvas,
       dpr: this.dpr,
+      antialias: true,
     });
     this.camera = new Camera(this);
     this.camera.disablePane();

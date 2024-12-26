@@ -1,11 +1,11 @@
 import {
   Transform,
   Post,
-  RenderTarget,
   Texture,
   Vec2,
   Vec3,
   Sphere,
+  RenderTarget,
 } from "ogl";
 import settings from "@core/settings";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
@@ -52,6 +52,8 @@ export class Engine3D extends Engine {
 
     this.renderTarget = new RenderTarget(gl, {
       color: 2,
+      width: gl.canvas.width * this.dpr,
+      height: gl.canvas.height * this.dpr,
     });
 
     this.initUniforms();
@@ -65,7 +67,7 @@ export class Engine3D extends Engine {
   private initUniforms() {
     this.uniforms = {
       env: {
-        ambient: { value: new Vec3(0.08) },
+        ambient: { value: new Vec3(0) },
         lights: Array(lightsNum)
           .fill(0)
           .map(() => dummyLight.uniforms),
@@ -222,7 +224,7 @@ export class Engine3D extends Engine {
     // Update post classes
     this.postProcessingLayers.composite.resize();
     this.postProcessingLayers.bloom.resize();
-    this.renderTarget.setSize(w, h);
+    this.renderTarget.setSize(w * this.dpr, h * this.dpr);
 
     // Update uniforms
     this.uniforms.resolution.base.value.set(w, h);

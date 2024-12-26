@@ -16,7 +16,7 @@ export abstract class Engine {
   public scene: Scene;
 
   protected renderer: Renderer;
-  protected dpr = 2;
+  protected dpr = window.devicePixelRatio;
   protected lastFrameTime: number;
 
   public delta = 0;
@@ -40,6 +40,7 @@ export abstract class Engine {
     this.renderer = new Renderer({
       canvas,
       dpr: this.dpr,
+      antialias: true,
     });
   }
 
