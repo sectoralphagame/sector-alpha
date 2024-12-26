@@ -11,7 +11,6 @@ import { assetLoader } from "@ogl-engine/AssetLoader";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { selectingSystem } from "@core/systems/selecting";
 import { Path } from "@ogl-engine/utils/path";
-import { sectorObservable } from "@ui/state/sector";
 import type { SkyboxTexture } from "@assets/textures/skybox";
 import { Scene } from "@ogl-engine/engine/Scene";
 import type { Sim } from "@core/sim";
@@ -23,6 +22,8 @@ import { Asteroids } from "@ogl-engine/engine/Asteroids";
 import { fieldColors } from "@core/archetypes/asteroid";
 import type { Destroyable } from "@ogl-engine/types";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
+import { gameStore } from "@ui/state/game";
+import { reaction } from "mobx";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 
@@ -43,6 +44,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   control: MapControl;
   meshes: Map<number, EntityMesh> = new Map();
 
+  onUnmountCallbacks: (() => void)[] = [];
+
   constructor(props) {
     super(props);
     this.sim = props.sim;
@@ -51,7 +54,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   }
 
   componentDidMount(): void {
-    sectorObservable.notify(
+    gameStore.setSector(
       find(
         (s) => s.cp.name.value === "Teegarden's Star II",
         this.sim.index.sectors.get()
@@ -64,11 +67,15 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.engine.hooks.onUpdate.subscribe("TacticalMap", () =>
       this.onEngineUpdate()
     );
-    sectorObservable.subscribe("TacticalMap", () => {
-      if (this.engine.initialized) {
-        this.onSectorChange();
+    const disposer = reaction(
+      () => gameStore.sector,
+      () => {
+        if (this.engine.initialized) {
+          this.onSectorChange();
+        }
       }
-    });
+    );
+    this.onUnmountCallbacks.push(disposer);
     selectingSystem.hook.subscribe("TacticalMap", (...args) =>
       this.onSelectedChange(...args)
     );
@@ -78,15 +85,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     });
   }
 
-  onSectorChange() {
-    this.engine.scene.traverse((mesh) => {
-      if (isDestroyable(mesh)) {
-        mesh.destroy();
-      }
-    });
-
-    this.engine.setScene(new Scene(this.engine));
-    this.loadSector();
+  componentWillUnmount(): void {
+    this.onUnmountCallbacks.forEach((cb) => cb());
   }
 
   async onControlClick(mousePosition: Vec2, button: MouseButton) {
@@ -126,34 +126,10 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         active: true,
         position: mousePosition.clone(),
         worldPosition,
-        sector: sectorObservable.value,
+        sector: gameStore.sector,
       };
       contextMenuObservable.notify(data);
     }
-  }
-
-  async onEngineInit() {
-    await assetLoader.load(this.engine.gl);
-
-    this.control = new MapControl(this.engine.camera, this.engine.canvas);
-    this.control.onClick = this.onControlClick.bind(this);
-    this.control.onPan = () => {
-      this.settingsManager.cp.selectionManager.focused = false;
-    };
-    this.control.isFocused = () =>
-      document.querySelector("#overlay")?.getAttribute("data-open") === "false";
-
-    this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
-      if (this.meshes.has(entity.id)) {
-        const m = this.meshes.get(entity.id)!;
-        if (isDestroyable(m)) m.destroy();
-        this.engine.scene.removeChild(m);
-        this.meshes.delete(entity.id);
-      }
-    });
-
-    this.updateEngineSettings();
-    this.loadSector();
   }
 
   async onEngineUpdate() {
@@ -163,7 +139,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     );
 
     for (const entity of defaultIndexer.renderable.getIt()) {
-      if (entity.cp.position.sector !== sectorObservable.value.id) {
+      if (entity.cp.position.sector !== gameStore.sector.id) {
         if (this.meshes.has(entity.id)) {
           this.meshes.get(entity.id)!.destroy();
           this.engine.scene.removeChild(this.meshes.get(entity.id)!);
@@ -243,11 +219,46 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         )
       );
 
-      if (sectorObservable.value.id !== entity.cp.position.sector) {
-        sectorObservable.notify(this.sim.getOrThrow(entity.cp.position.sector));
+      if (gameStore.sector.id !== entity.cp.position.sector) {
+        gameStore.setSector(this.sim.getOrThrow(entity.cp.position.sector));
       }
     }
     this.control!.update();
+  }
+
+  async onEngineInit() {
+    await assetLoader.load(this.engine.gl);
+
+    this.control = new MapControl(this.engine.camera, this.engine.canvas);
+    this.control.onClick = this.onControlClick.bind(this);
+    this.control.onPan = () => {
+      this.settingsManager.cp.selectionManager.focused = false;
+    };
+    this.control.isFocused = () =>
+      document.querySelector("#overlay")?.getAttribute("data-open") === "false";
+
+    this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
+      if (this.meshes.has(entity.id)) {
+        const m = this.meshes.get(entity.id)!;
+        if (isDestroyable(m)) m.destroy();
+        this.engine.scene.removeChild(m);
+        this.meshes.delete(entity.id);
+      }
+    });
+
+    this.updateEngineSettings();
+    this.loadSector();
+  }
+
+  onSectorChange() {
+    this.engine.scene.traverse((mesh) => {
+      if (isDestroyable(mesh)) {
+        mesh.destroy();
+      }
+    });
+
+    this.engine.setScene(new Scene(this.engine));
+    this.loadSector();
   }
 
   onSelectedChange([prevId, id]: (number | null)[]) {
@@ -287,9 +298,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     if (!skybox) {
       skybox = new Skybox(
         this.engine,
-        (mapData.sectors.find(
-          (s) => s.id === sectorObservable.value.cp.name.slug
-        )?.skybox as SkyboxTexture) ?? "example"
+        (mapData.sectors.find((s) => s.id === gameStore.sector.cp.name.slug)
+          ?.skybox as SkyboxTexture) ?? "example"
       );
       skybox.setParent(this.engine.scene);
     }
@@ -298,7 +308,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   loadAsteroidFields() {
     const fields = this.sim.index.asteroidFields.getIt();
     for (const field of fields) {
-      if (field.cp.position.sector === sectorObservable.value.id) {
+      if (field.cp.position.sector === gameStore.sector.id) {
         const fieldTransform = new Asteroids(
           this.engine,
           field.cp.asteroidSpawn.size,

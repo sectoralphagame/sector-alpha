@@ -1,11 +1,12 @@
-import { useGameOverlay, useSim } from "@ui/atoms";
+import { useSim } from "@ui/atoms";
 import React from "react";
+import { useGameStore } from "@ui/state/game";
 import { useOverlayRegister } from "../Overlay/Overlay";
 import { MissionsOverlayComponent } from "./MissionsOverlayComponent";
 
 export const MissionsOverlay: React.FC = () => {
   const [sim] = useSim();
-  const [overlay, setOverlay] = useGameOverlay();
+  const [overlay, gameStore] = useGameStore((store) => store.overlay);
   useOverlayRegister("missions");
 
   if (overlay !== "missions") return null;
@@ -17,7 +18,7 @@ export const MissionsOverlay: React.FC = () => {
       missions={player.cp.missions.value}
       onMissionCancel={(index) => player.cp.missions.value.splice(index, 1)}
       onReferenceClick={(id) => {
-        setOverlay(null);
+        gameStore.closeOverlay();
         const settingsManager = sim.index.settings.get()[0];
         settingsManager.cp.selectionManager.id = id;
         setTimeout(() => {

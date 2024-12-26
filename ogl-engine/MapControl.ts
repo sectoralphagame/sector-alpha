@@ -29,7 +29,7 @@ export class MapControl extends Orbit {
 
   dragPrev: Vec2 | null = null;
   mouse: Vec2 = new Vec2();
-  moved = false;
+  cursorMoved = false;
 
   onClick: ((_position: Vec2, _button: MouseButton) => void) | null = null;
   // eslint-disable-next-line class-methods-use-this
@@ -44,11 +44,7 @@ export class MapControl extends Orbit {
     this.element.addEventListener("pointerdown", (event) => {
       if (event.target !== this.element) return;
       if (this.onClick) {
-        setTimeout(() => {
-          if (!this.moved) {
-            this.onClick!(this.mouse, event.button);
-          }
-        }, 100);
+        this.onClick!(this.mouse, event.button);
       }
     });
 
@@ -114,12 +110,13 @@ export class MapControl extends Orbit {
   };
 
   onMouseMovePersistent = (e: MouseEvent) => {
-    this.moved = false;
-    const x = e.clientX - this.element.offsetLeft;
-    const y = e.clientY - this.element.offsetTop;
+    this.cursorMoved = false;
+    const bb = this.element.getBoundingClientRect();
+    const x = e.clientX - bb.left;
+    const y = e.clientY - bb.top;
 
     if (x !== this.mouse.x || y !== this.mouse.y) {
-      this.moved = true;
+      this.cursorMoved = true;
       this.mouse.set(x, y);
     }
   };

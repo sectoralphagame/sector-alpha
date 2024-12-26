@@ -23,24 +23,19 @@ import SimAvgTimeGraph from "@ui/components/dev/SimAvgTimeGraph/SimAvgTimeGraph"
 import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
 import { useContextMenu } from "@ui/state/contextMenu";
 import { CurrentSector } from "@ui/components/CurrentSector/CurrentSector";
-import { useSectorObservable } from "@ui/state/sector";
 import type { Faction } from "@core/archetypes/faction";
 import { MapOverlay } from "@ui/components/MapOverlay/MapOverlay";
 import { pane } from "@ui/context/Pane";
+import type { GameOverlayType } from "@ui/state/game";
+import { useGameStore } from "@ui/state/game";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
-import type { GameOverlayProps } from "../atoms";
-import {
-  useGameDialog,
-  useGameOverlay,
-  useNotifications,
-  useSim,
-} from "../atoms";
+import { useGameDialog, useNotifications, useSim } from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
 import { PlayerMoney } from "../components/PlayerMoney";
 
-const overlayKeyCodes: Record<string, NonNullable<GameOverlayProps>> = {
+const overlayKeyCodes: Record<string, NonNullable<GameOverlayType>> = {
   Backslash: "dev",
   KeyF: "fleet",
   KeyJ: "missions",
@@ -52,7 +47,6 @@ const Game: React.FC = () => {
   const canvasRoot = React.useRef<HTMLDivElement>(null);
   const [menu, setMenu] = useContextMenu();
   const [dialog, setDialog] = useGameDialog();
-  const [overlay, setOverlay] = useGameOverlay();
   const { addNotification } = useNotifications();
   const [gameSettings] = useGameSettings();
   const pressedKeys = React.useRef(new Set<string>());
@@ -62,7 +56,10 @@ const Game: React.FC = () => {
     Entity | undefined
   >(selectedId ? sim.get(selectedId) : undefined);
   const player = sim.index.player.get()[0]!;
-  const [currentSector] = useSectorObservable();
+  const [[currentSector, overlay], gameStore] = useGameStore((store) => [
+    store.sector,
+    store.overlay,
+  ]);
 
   React.useEffect(() => {
     if (!sim) return () => undefined;
@@ -104,7 +101,7 @@ const Game: React.FC = () => {
 
       if (event.code === "Escape") {
         if (overlay) {
-          setOverlay(null);
+          gameStore.setOverlay(null);
         } else {
           setDialog(dialog ? null : { type: "config" });
         }
@@ -116,11 +113,11 @@ const Game: React.FC = () => {
         event.code in overlayKeyCodes &&
         (overlayKeyCodes[event.code] !== "dev" || gameSettings.dev)
       ) {
-        setOverlay((prev) =>
-          prev === overlayKeyCodes[event.code]
-            ? null
-            : overlayKeyCodes[event.code]
-        );
+        if (gameStore.overlay === overlayKeyCodes[event.code]) {
+          gameStore.closeOverlay();
+        } else {
+          gameStore.setOverlay(overlayKeyCodes[event.code]);
+        }
       }
       if (event.code === "Space") {
         if (sim.speed === 0) sim.unpause();
@@ -224,7 +221,7 @@ const Game: React.FC = () => {
       <Overlay
         active={overlay}
         open={!!overlay}
-        onClose={() => setOverlay(null)}
+        onClose={gameStore.closeOverlay}
       >
         <FleetOverlay />
         <MissionsOverlay />

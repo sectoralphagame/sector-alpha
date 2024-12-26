@@ -16,12 +16,12 @@ import { useObservable } from "./hooks/useObservable";
 import type { ImmediateConversationDialogProps } from "./components/ImmediateConversation";
 import { useGameSettings } from "./hooks/useGameSettings";
 
-export const sim = atom<Sim>({
+export const simAtom = atom<Sim>({
   key: "sim",
   default: window.sim as Sim,
   dangerouslyAllowMutability: true,
 });
-export const useSim = () => useRecoilState(sim);
+export const useSim = () => useRecoilState(simAtom);
 
 export type GameDialogProps =
   | TradeDialogProps
@@ -36,14 +36,6 @@ export type GameDialogProps =
 
 export const gameDialog = new Observable<GameDialogProps>("gameDialog");
 export const useGameDialog = () => useObservable(gameDialog);
-
-export type GameOverlayProps = "fleet" | "missions" | "map" | "dev" | null;
-
-export const gameOverlay = atom<GameOverlayProps>({
-  key: "gameOverlay",
-  default: null,
-});
-export const useGameOverlay = () => useRecoilState(gameOverlay);
 
 const notificationHowl = new Howl({
   src: notificationSound,

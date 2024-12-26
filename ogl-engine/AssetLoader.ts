@@ -1,10 +1,17 @@
 import models from "@assets/models";
-import type { Geometry, GLTFMaterial, OGLRenderingContext, Vec3 } from "ogl";
+import type {
+  Geometry,
+  GLTFMaterial,
+  ImageRepresentation,
+  OGLRenderingContext,
+  Vec3,
+} from "ogl";
 import { Euler, GLTFLoader } from "ogl";
 import { chunk, fromEntries, keys, map, pipe, values } from "@fxts/core";
 import { skyboxes } from "@assets/textures/skybox";
 import smoke from "@assets/textures/particle/smoke.png";
 import fire from "@assets/textures/particle/fire.png";
+import spaceMonoTexture from "@assets/fonts/SpaceMono/SpaceMono-Regular.png";
 import { getParticleType } from "./particles";
 
 export type ModelName = keyof typeof models;
@@ -12,6 +19,7 @@ export type ModelName = keyof typeof models;
 const textures = {
   "particle/smoke": smoke,
   "particle/fire": fire,
+  "font/spaceMono": spaceMonoTexture,
 };
 export type TextureName = keyof typeof textures;
 
@@ -33,6 +41,7 @@ class AssetLoader {
       particles?: Array<ParticleGeneratorInput>;
     }
   > = {};
+  textures: Partial<Record<TextureName, ImageRepresentation>> = {};
 
   // eslint-disable-next-line class-methods-use-this
   async preload(onAssetLoad: (_progress: number) => void) {
@@ -110,6 +119,27 @@ class AssetLoader {
 
   model(name: ModelName) {
     return this.models[name];
+  }
+
+  addTexture(name: TextureName, image: ImageRepresentation) {
+    this.textures[name] = image;
+  }
+
+  addTextureByUrl(url: string, image: ImageRepresentation) {
+    for (const [textureName, textureUrl] of Object.entries(textures)) {
+      if (url === textureUrl) {
+        this.textures[textureName] = image;
+      }
+    }
+  }
+
+  getTexture(name: TextureName) {
+    if (!this.textures[name]) {
+      const image = new Image();
+      image.src = textures[name];
+      this.textures[name] = image;
+    }
+    return this.textures[name];
   }
 }
 

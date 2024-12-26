@@ -1,3 +1,4 @@
+import { assetLoader } from "@ogl-engine/AssetLoader";
 import type { Engine } from "@ogl-engine/engine/engine";
 import type { ImageRepresentation, TextureOptions } from "ogl";
 import { Texture } from "ogl";
@@ -12,6 +13,7 @@ export async function loadTextureImage(
   return new Promise((resolve) => {
     image.onload = () => {
       resolve(image);
+      assetLoader.addTextureByUrl(url, image);
     };
   });
 }

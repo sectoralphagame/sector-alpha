@@ -1,55 +1,21 @@
-import type { Faction } from "@core/archetypes/faction";
 // import type { Sector } from "@core/archetypes/sector";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { Sim } from "@core/sim";
 import { defaultIndexer } from "@core/systems/utils/default";
-import { BaseMesh2D } from "@ogl-engine/engine/BaseMesh2D";
 import { StrategicMapEngine } from "@ogl-engine/engine/engine2d";
 import { MapControl } from "@ogl-engine/MapControl";
-import type { ColorMaterial2D } from "@ogl-engine/materials/color/color";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
 // import type { MouseButton } from "@ogl-engine/Orbit";
 // import { contextMenuObservable } from "@ui/state/contextMenu";
 // import { sectorObservable } from "@ui/state/sector";
-import type { OGLRenderingContext } from "ogl";
-import { Vec2, Geometry, Raycast, Vec3, Text } from "ogl";
+import { Vec2, Raycast, Vec3 } from "ogl";
 import React from "react";
-import spaceMono from "@assets/fonts/SpaceMono/SpaceMono-Regular.json";
-import spaceMonoTexture from "@assets/fonts/SpaceMono/SpaceMono-Regular.png";
-import { loadTexture } from "@ogl-engine/utils/texture";
-import { MSDFMaterial } from "@ogl-engine/materials/msdf/msdf";
+import { SectorMesh } from "@ogl-engine/engine/Sector";
+import { STATE, type MouseButton } from "@ogl-engine/Orbit";
+import { strategicMapStore } from "@ui/state/strategicMap";
 
 const tempVec2 = new Vec2();
 // const tempVec3 = new Vec3();
-
-class SectorGeometry extends Geometry {
-  constructor(gl: OGLRenderingContext) {
-    super(gl);
-
-    const position = new Float32Array(12 * 3);
-    for (let i = 0; i < 6; i++) {
-      const angle = (i / 6) * Math.PI * 2;
-      position.set([Math.cos(angle), 0, Math.sin(angle)], i * 3);
-    }
-    for (let i = 0; i < 6; i++) {
-      const angle = (i / 6) * Math.PI * 2;
-      const r = 0.98;
-      position.set([Math.cos(angle) * r, 0, Math.sin(angle) * r], 18 + i * 3);
-    }
-
-    this.addAttribute("position", {
-      size: 3,
-      data: position,
-    });
-    this.addAttribute("index", {
-      data: new Uint16Array([
-        0, 1, 6, 1, 2, 7, 2, 3, 8, 3, 4, 9, 4, 5, 10, 5, 0, 11,
-
-        6, 7, 1, 7, 8, 2, 8, 9, 3, 9, 10, 4, 10, 11, 5, 11, 6, 0,
-      ]),
-    });
-  }
-}
 
 function sign(p1: Vec2, p2: Vec2, p3: Vec2) {
   return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
@@ -100,6 +66,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
   control: MapControl;
   sim: Sim;
   raycast = new Raycast();
+  mouseWorldPos = new Vec2();
   // raycastHits: BaseMesh2D[];
 
   constructor(props: StrategicMapProps) {
@@ -132,137 +99,98 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     this.control.minDistance = 1;
     this.control.maxDistance = 20;
 
-    const fontTexture = await loadTexture(this.engine, spaceMonoTexture, {
-      generateMipmaps: false,
-    });
-
     for (const sector of this.sim.index.sectors.getIt()) {
-      const sectorMesh = new BaseMesh2D<ColorMaterial2D>(this.engine, {
-        geometry: new SectorGeometry(this.engine.gl),
-      });
-      sectorMesh.name = `Sector:${sector.id}`;
-      sectorMesh.geometry.computeBoundingBox();
-      let color = "#1f1f1f";
-      if (sector.cp.owner) {
-        color = this.sim.getOrThrow<Faction>(sector.cp.owner.id).cp.color.value;
-      }
-      sectorMesh.material.setColor(color);
-      const hecsPos = hecsToCartesian(sector.cp.hecsPosition.value, 1);
-
-      sectorMesh.position.set(hecsPos[0], 0, hecsPos[1]);
+      const sectorMesh = new SectorMesh(this.engine, sector);
       sectorMesh.setParent(this.engine.scene.sectors);
-
-      const text = new Text({
-        font: spaceMono,
-        text: sector.cp.name.value,
-        // text: sector.cp.name.value,
-        width: 40,
-        align: "center",
-        letterSpacing: 0.05,
-        size: 1,
-        lineHeight: 1.1,
-      });
-
-      const sectorNameMesh = new BaseMesh2D<MSDFMaterial>(this.engine, {
-        geometry: new Geometry(this.engine.gl, {
-          position: { size: 3, data: text.buffers.position },
-          uv: { size: 2, data: text.buffers.uv },
-          id: { size: 1, data: text.buffers.id },
-          index: { data: text.buffers.index },
-        }),
-      });
-      sectorNameMesh.position.z -= 0.85;
-      sectorNameMesh.rotation.set(-Math.PI / 2, 0, 0);
-      sectorNameMesh.scale.set(0.08);
-      sectorNameMesh.applyMaterial(new MSDFMaterial(this.engine, fontTexture));
-      sectorNameMesh.setParent(sectorMesh);
     }
 
-    // this.control.onClick = this.onClick.bind(this);
+    this.control.onClick = this.onClick.bind(this);
   }
 
-  // onClick(mousePosition: Vec2, button: MouseButton) {
-  // const scale = 1;
-  // if (button === 2) {
-  //   const worldPos = this.raycast.intersectPlane({
-  //     origin: new Vec3(0),
-  //     normal: new Vec3(0, 1, 0),
-  //   });
-  //   console.log(this.raycast.origin);
-  //   const worldPosition = [worldPos.x / scale, worldPos.z / scale];
+  onClick(_mousePosition: Vec2, button: MouseButton) {
+    // if (button === 2) {
+    //   const worldPos = this.raycast.intersectPlane({
+    //     origin: new Vec3(0),
+    //     normal: new Vec3(0, 1, 0),
+    //   });
+    //   console.log(this.raycast.origin);
+    //   const worldPosition = [worldPos.x / scale, worldPos.z / scale];
 
-  //   const data = {
-  //     active: true,
-  //     position: mousePosition.clone(),
-  //     worldPosition,
-  //     // sector: sectorObservable.value,
-  //   };
-  //   contextMenuObservable.notify(data);
-  // }
+    //   const data = {
+    //     active: true,
+    //     position: mousePosition.clone(),
+    //     worldPosition,
+    //     // sector: sectorObservable.value,
+    //   };
+    //   contextMenuObservable.notify(data);
+    // }
 
-  // const ray = this.engine.camera.getRay(position);
-  // const hits = this.engine.scene.raycast(ray);
-  // if (hits.length > 0) {
-  //   const sector = pipe(
-  //     hits,
-  //     sortBy((hit) => hit.distance),
-  //     first
-  //   ).object as BaseMesh2D;
-  //   const sectorId = sector.name.split(":")[1];
-  //   this.changeSector(this.sim.getOrThrow<Sector>(sectorId));
-  // }
-  // }
+    if (button === 0) {
+      if (this.control.state !== STATE.NONE) return;
+
+      let selected = false;
+      for (const sector of defaultIndexer.sectors.getIt()) {
+        const sectorWorldPos = new Vec2(
+          ...hecsToCartesian(sector.cp.hecsPosition.value, 1)
+        );
+
+        const pos = sectorWorldPos.sub(this.mouseWorldPos).multiply(-1);
+
+        const mesh = this.engine.scene.getSector(sector.id) as SectorMesh;
+
+        mesh.setSelected(isInHexagon(pos));
+        if (mesh.selected) selected = true;
+      }
+
+      if (!selected && strategicMapStore.selected) {
+        const sectorMesh = this.engine.scene.getSector(
+          strategicMapStore.selected.id
+        ) as SectorMesh;
+        sectorMesh.setSelected(true);
+      }
+    }
+  }
 
   onUpdate() {
     this.control.update();
-    this.updateRaycast();
+    this.updateRaycast(this.control.mouse);
 
     this.updateHover();
   }
 
-  updateRaycast() {
-    const normalisedMousePos = new Vec2(
-      2.0 * (this.control!.mouse.x / this.engine.gl.renderer.width) - 1.0,
-      2.0 * (1.0 - this.control!.mouse.y / this.engine.gl.renderer.height) - 1.0
-    );
-    this.raycast.castMouse(this.engine.camera, normalisedMousePos);
-  }
-
   updateHover() {
-    if (!this.control.moved) return;
+    if (!this.control.cursorMoved) return;
 
     const mouseWorldPos = this.raycast.intersectPlane({
       origin: new Vec3(0),
       normal: new Vec3(0, 1, 0),
     }) as Vec3 | 0;
 
-    if (mouseWorldPos === 0) return;
+    if (mouseWorldPos === 0) {
+      this.mouseWorldPos.set(Infinity, Infinity);
+      return;
+    }
 
     for (const sector of defaultIndexer.sectors.getIt()) {
-      const sectorWorldPos = new Vec2(
+      const sectorWorldPos = tempVec2.set(
         ...hecsToCartesian(sector.cp.hecsPosition.value, 1)
       );
 
-      const mouseWorldPos2 = tempVec2.set(mouseWorldPos.x, mouseWorldPos.z);
-      const pos = mouseWorldPos2.sub(sectorWorldPos);
+      this.mouseWorldPos.set(mouseWorldPos.x, mouseWorldPos.z);
+      const pos = sectorWorldPos.sub(this.mouseWorldPos).multiply(-1);
 
-      if (isInHexagon(pos)) {
-        const sectorMesh = this.engine.scene.getSector(
-          sector.id
-        ) as BaseMesh2D<ColorMaterial2D>;
-        sectorMesh.material.setColor("#f1f1f1");
-      } else {
-        const sectorMesh = this.engine.scene.getSector(
-          sector.id
-        ) as BaseMesh2D<ColorMaterial2D>;
-        let color = "#1f1f1f";
-        if (sector.cp.owner) {
-          color = this.sim.getOrThrow<Faction>(sector.cp.owner.id).cp.color
-            .value;
-        }
-        sectorMesh.material.setColor(color);
-      }
+      const mesh = this.engine.scene.getSector(sector.id) as SectorMesh;
+
+      mesh.setHovered(isInHexagon(pos));
     }
+  }
+
+  updateRaycast(mousePosition: Vec2) {
+    const normalisedMousePos = new Vec2(
+      2.0 * (mousePosition.x / this.engine.gl.renderer.width) - 1.0,
+      2.0 * (1.0 - mousePosition.y / this.engine.gl.renderer.height) - 1.0
+    );
+    this.raycast.castMouse(this.engine.camera, normalisedMousePos);
   }
 
   // changeSector(sector: Sector) {
