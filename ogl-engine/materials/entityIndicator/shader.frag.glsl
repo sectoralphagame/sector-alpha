@@ -26,5 +26,4 @@ void main() {
 
     fragData[0] = uColor;
     fragData[0].a = alpha;
-    fragData[1] = fragData[0] * 0.5f;
 }

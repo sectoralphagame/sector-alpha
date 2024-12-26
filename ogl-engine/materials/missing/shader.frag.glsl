@@ -7,5 +7,4 @@ out vec4 fragData[2];
 
 void main() {
     fragData[0] = vec4(color, 1.0f);
-    fragData[1] = vec4(0.f);
 }

@@ -58,5 +58,4 @@ void main() {
     }
 
     fragData[0] = vec4((diffuse + ambient + specular) * tex, 1.0f);
-    fragData[1] = vec4(0.f);
 }

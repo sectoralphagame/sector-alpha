@@ -20,5 +20,4 @@ void main() {
     }
 
     fragData[0] = vec4(uColor.r, uColor.g, uColor.b, 1.0f - smoothstep(0.5f - offset, 0.5f, dist));
-    fragData[1] = fragData[0] * 0.3f;
 }

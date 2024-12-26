@@ -22,6 +22,4 @@ void main() {
     } else {
         discard;
     }
-
-    fragData[1] = fragData[0] * 0.2f;
 }
