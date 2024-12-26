@@ -25,7 +25,7 @@ const lightsNum = 32;
 
 export class Engine3D extends Engine {
   postProcessing = false;
-  fxaa = true;
+  fxaa = false;
   lightsContainer: Transform;
 
   uniforms: {
@@ -222,8 +222,16 @@ export class Engine3D extends Engine {
     const h = this.canvas!.parentElement!.clientHeight;
 
     // Update post classes
-    this.postProcessingLayers.composite.resize();
-    this.postProcessingLayers.bloom.resize();
+    this.postProcessingLayers.composite.resize({
+      width: w,
+      height: h,
+      dpr: this.dpr,
+    });
+    this.postProcessingLayers.bloom.resize({
+      width: w,
+      height: h,
+      dpr: this.dpr / 2,
+    });
     this.renderTarget.setSize(w * this.dpr, h * this.dpr);
 
     // Update uniforms
