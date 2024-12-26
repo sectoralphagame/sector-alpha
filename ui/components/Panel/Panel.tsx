@@ -9,6 +9,7 @@ import { isOwnedByPlayer } from "@core/utils/misc";
 import { getRequiredCrew } from "@core/utils/crew";
 import { find } from "@fxts/core";
 import { ConfigIcon } from "@assets/ui/icons";
+import { actionLoader } from "@core/actionLoader";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
 import EntityName from "../EntityName";
@@ -67,7 +68,7 @@ const JournalWrapper: React.FC<
 
 export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
   const [isCollapsed, setCollapsed] = React.useState(
-    expanded === undefined ? false : !expanded
+    expanded === undefined ? true : !expanded
   );
 
   const [dialog, setDialog] = useGameDialog();
@@ -76,7 +77,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
 
   const [sim] = useSim();
   React.useEffect(() => {
-    sim.actions.register(
+    actionLoader.register(
       {
         category: "core",
         description: "Show all entity data like they were owned by player",
@@ -138,6 +139,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
         isCollapsed={isCollapsed}
         onCollapseToggle={toggleCollapse}
         onPlayerAssets={() => {
+          setCollapsed(false);
           sim.index.settings.get()[0].cp.selectionManager.id = null;
         }}
       >

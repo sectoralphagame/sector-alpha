@@ -9,6 +9,8 @@ export class Observable<T> {
   observers: Map<ObserverFn<T>, string> = new Map();
   value: T;
 
+  onError: Array<(_err: Error) => void> = [];
+
   constructor(name: string, boundary = true) {
     this.name = name;
     this.boundary = boundary;
@@ -32,6 +34,9 @@ export class Observable<T> {
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error(`Error in observer ${this.name} calling for ${origin}`);
+          for (const onError of this.onError) {
+            onError(err);
+          }
           throw err;
         }
       } else {

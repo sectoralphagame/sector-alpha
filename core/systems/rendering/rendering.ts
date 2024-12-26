@@ -7,11 +7,12 @@ import type { Sim } from "@core/sim";
 import { isHeadless } from "@core/settings";
 import { first } from "@fxts/core";
 import { storageHook } from "@core/hooks";
-import type { ContextMenuApi } from "@ui/atoms";
 import { hecsToCartesian, worldToHecs } from "@core/components/hecsPosition";
 import { deepEqual, subtract } from "mathjs";
 import { sectorSize, type Sector } from "@core/archetypes/sector";
 import { defaultClickSound } from "@kit/BaseButton";
+import { actionLoader } from "@core/actionLoader";
+import type { ContextMenuApi } from "@ui/state/contextMenu";
 import {
   createRenderGraphics,
   graphics,
@@ -100,7 +101,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
     this.overlay = document.querySelector("#overlay");
     const root = document.querySelector("#root")!;
     const canvasRoot = document.querySelector(
-      "#canvasRoot"
+      "#map-overlay"
     )! as HTMLCanvasElement;
 
     if (!(root || canvasRoot)) return;
@@ -115,14 +116,14 @@ export class RenderingSystem extends SystemWithHooks<never> {
       width: root.clientWidth,
       height: window.innerHeight,
       view: canvas,
-      backgroundColor: Color("#080808").rgbNumber(),
+      backgroundColor: Color("#000").rgbNumber(),
     });
 
     this.initViewport(root, canvasRoot);
     this.initLayers();
     this.initListeners();
 
-    this.sim.actions.register(
+    actionLoader.register(
       {
         type: "basic",
         slug: "toggleGrid",
@@ -134,7 +135,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
       this.constructor.name
     );
 
-    this.sim.actions.register(
+    actionLoader.register(
       {
         type: "basic",
         slug: "displayRange",
@@ -369,6 +370,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
         if (!sprite) {
           sprite = new PIXI.Sprite();
           setTexture(entity, sprite, entityRender.texture);
+          sprite.cullable = true;
           this.sprites.set(entity, sprite);
           this.viewport.addChild(sprite);
           if (entity.tags.has("selection")) {

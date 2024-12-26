@@ -2,6 +2,7 @@ import React from "react";
 import { Howl } from "howler";
 import click from "@assets/ui/sounds/click.wav";
 import pop from "@assets/ui/sounds/pop.wav";
+import { useGameSettings } from "@ui/hooks/useGameSettings";
 
 export type BaseButtonProps = React.DetailedHTMLProps<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -28,6 +29,7 @@ export const BaseButton: React.FC<BaseButtonProps> = ({
   enterSound,
   ...props
 }) => {
+  const [settings] = useGameSettings();
   const ref = React.useRef<HTMLButtonElement>(null);
 
   return (
@@ -36,13 +38,18 @@ export const BaseButton: React.FC<BaseButtonProps> = ({
       {...props}
       ref={ref}
       onClick={(event) => {
-        (clickSound ?? defaultClickSound).play();
+        const sound = clickSound ?? defaultClickSound;
+        sound.volume(settings.volume.ui);
+
+        sound.play();
         if (onClick) {
           onClick(event);
         }
       }}
       onMouseEnter={(event) => {
-        (enterSound ?? popSound).play();
+        const sound = enterSound ?? popSound;
+        sound.volume(settings.volume.ui);
+        sound.play();
         if (onMouseEnter) {
           onMouseEnter(event);
         }

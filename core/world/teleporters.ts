@@ -46,7 +46,7 @@ export function createLink(
       },
       sim
     );
-    facility.addTag("discovered");
+    facility.addTag("discovered").addTag("gateway");
 
     const teleporter = sim
       .getOrThrow(facility.cp.modules.ids[0])

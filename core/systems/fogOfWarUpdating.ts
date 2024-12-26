@@ -5,6 +5,7 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { sectorSize } from "@core/archetypes/sector";
 import type { Position2D } from "@core/components/position";
 import { HideReason } from "@core/components/render";
+import { actionLoader } from "@core/actionLoader";
 import { System } from "./system";
 import { EntityIndex } from "./utils/entityIndex";
 
@@ -40,7 +41,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       }
     }, 300) as unknown as number;
 
-    sim.actions.register(
+    actionLoader.register(
       {
         category: "drawing",
         type: "basic",
@@ -60,7 +61,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       this.constructor.name
     );
 
-    sim.actions.register(
+    actionLoader.register(
       {
         category: "core",
         type: "basic",

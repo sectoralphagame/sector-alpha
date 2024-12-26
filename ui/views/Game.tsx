@@ -1,6 +1,5 @@
 import React from "react";
 import ClickAwayListener from "react-click-away-listener";
-import { RenderingSystem } from "@core/systems/rendering";
 import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import type { Entity } from "@core/entity";
 import { MapView } from "@ui/components/MapView";
@@ -21,33 +20,33 @@ import DevOverlay from "@ui/components/DevOverlay/DevOverlay";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
 import { SelectedUnit } from "@ui/components/SelectedUnit";
 import SimAvgTimeGraph from "@ui/components/dev/SimAvgTimeGraph/SimAvgTimeGraph";
+import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
+import { useContextMenu } from "@ui/state/contextMenu";
+import { CurrentSector } from "@ui/components/CurrentSector/CurrentSector";
+import type { Faction } from "@core/archetypes/faction";
+import { MapOverlay } from "@ui/components/MapOverlay/MapOverlay";
+import { pane } from "@ui/context/Pane";
+import type { GameOverlayType } from "@ui/state/game";
+import { useGameStore } from "@ui/state/game";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
-import type { GameOverlayProps } from "../atoms";
-import {
-  useContextMenu,
-  useGameDialog,
-  useGameOverlay,
-  useNotifications,
-  useSim,
-} from "../atoms";
+import { useGameDialog, useNotifications, useSim } from "../atoms";
 import { ContextMenu } from "../components/ContextMenu";
 import { PlayerMoney } from "../components/PlayerMoney";
 
-const overlayKeyCodes: Record<string, NonNullable<GameOverlayProps>> = {
+const overlayKeyCodes: Record<string, NonNullable<GameOverlayType>> = {
   Backslash: "dev",
   KeyF: "fleet",
   KeyJ: "missions",
+  KeyM: "map",
 };
 
 const Game: React.FC = () => {
   const [sim, setSim] = useSim();
-  const system = React.useRef<RenderingSystem>();
   const canvasRoot = React.useRef<HTMLDivElement>(null);
   const [menu, setMenu] = useContextMenu();
   const [dialog, setDialog] = useGameDialog();
-  const [overlay, setOverlay] = useGameOverlay();
   const { addNotification } = useNotifications();
   const [gameSettings] = useGameSettings();
   const pressedKeys = React.useRef(new Set<string>());
@@ -57,14 +56,15 @@ const Game: React.FC = () => {
     Entity | undefined
   >(selectedId ? sim.get(selectedId) : undefined);
   const player = sim.index.player.get()[0]!;
+  const [[currentSector, overlay], gameStore] = useGameStore((store) => [
+    store.sector,
+    store.overlay,
+  ]);
 
   React.useEffect(() => {
     if (!sim) return () => undefined;
 
     sim.start();
-
-    system.current = new RenderingSystem([menu, setMenu]);
-    system.current.apply(sim);
 
     const unmount = () => {
       setDialog(null);
@@ -101,7 +101,7 @@ const Game: React.FC = () => {
 
       if (event.code === "Escape") {
         if (overlay) {
-          setOverlay(null);
+          gameStore.setOverlay(null);
         } else {
           setDialog(dialog ? null : { type: "config" });
         }
@@ -113,15 +113,22 @@ const Game: React.FC = () => {
         event.code in overlayKeyCodes &&
         (overlayKeyCodes[event.code] !== "dev" || gameSettings.dev)
       ) {
-        setOverlay((prev) =>
-          prev === overlayKeyCodes[event.code]
-            ? null
-            : overlayKeyCodes[event.code]
-        );
+        if (gameStore.overlay === overlayKeyCodes[event.code]) {
+          gameStore.closeOverlay();
+        } else {
+          gameStore.setOverlay(overlayKeyCodes[event.code]);
+        }
       }
       if (event.code === "Space") {
         if (sim.speed === 0) sim.unpause();
         else sim.pause();
+      }
+      if (
+        event.code === "KeyK" &&
+        pressedKeys.current.has("MetaLeft") &&
+        gameSettings.dev
+      ) {
+        pane.hidden = !pane.hidden;
       }
 
       if (
@@ -167,9 +174,27 @@ const Game: React.FC = () => {
       any changes made by pixi, like cursor property. That's why rendering
       system creates own canvas here */}
       <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
+        <TacticalMap sim={sim} />
         <SimAvgTimeGraph />
         <PlayerMoney />
         <SimControl />
+        {!overlay && (
+          <CurrentSector
+            name={currentSector?.cp.name.value ?? ""}
+            owner={
+              currentSector?.cp.owner?.id
+                ? sim.getOrThrow<Faction>(currentSector.cp.owner.id).cp.name
+                    .value
+                : undefined
+            }
+            color={
+              currentSector?.cp.owner?.id
+                ? sim.getOrThrow<Faction>(currentSector.cp.owner.id).cp.color
+                    .value
+                : undefined
+            }
+          />
+        )}
         <SelectedUnit />
         <MapPanel
           tabs={
@@ -196,10 +221,11 @@ const Game: React.FC = () => {
       <Overlay
         active={overlay}
         open={!!overlay}
-        onClose={() => setOverlay(null)}
+        onClose={gameStore.closeOverlay}
       >
         <FleetOverlay />
         <MissionsOverlay />
+        <MapOverlay />
         {gameSettings.dev && <DevOverlay />}
       </Overlay>
       {menu.active && (!!menu.sector || menu.overlay) && (
