@@ -17,6 +17,9 @@ export class Camera extends BaseCamera {
   }
 
   private initPane() {
+    if (pane.children.find((child) => (child as FolderApi).title === "Camera"))
+      return;
+
     this.paneFolder = pane.addFolder({
       title: "Camera",
     });
@@ -33,6 +36,6 @@ export class Camera extends BaseCamera {
   }
 
   disablePane() {
-    this.paneFolder.dispose();
+    this.paneFolder?.dispose();
   }
 }
