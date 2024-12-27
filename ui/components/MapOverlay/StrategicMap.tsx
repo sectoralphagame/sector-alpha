@@ -117,6 +117,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     }
 
     this.control.onClick = this.onClick.bind(this);
+    this.control.onKeyDown = this.onKeyDown.bind(this);
 
     this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
       const mesh = this.engine.scene.getEntity(entity.id);
@@ -178,6 +179,14 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
         ) as SectorMesh;
         sectorMesh.setSelected(true);
       }
+    }
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    if (event.code === "KeyR") {
+      this.control.lookAt(
+        this.engine.scene.getSector(gameStore.sector.id)!.position
+      );
     }
   }
 
