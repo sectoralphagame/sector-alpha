@@ -59,8 +59,8 @@ export class Orbit {
   onPan: (() => void) | null = null;
   onStateChange: ((_prevState: number, _state: number) => void) | null = null;
   mouseButtons = {
-    ORBIT: MouseButton.Right,
-    ZOOM: MouseButton.Middle,
+    ORBIT: MouseButton.Middle,
+    ZOOM: null,
     PAN: MouseButton.Left,
   };
 
