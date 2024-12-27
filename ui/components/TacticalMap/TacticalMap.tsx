@@ -133,7 +133,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   }
 
   async onEngineUpdate() {
-    if (!assetLoader.ready) return;
+    if (!(assetLoader.ready && this.engine.isFocused())) return;
+
     const selectedEntity = this.sim.get(
       this.settingsManager.cp.selectionManager.id!
     );
@@ -234,17 +235,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.control.onPan = () => {
       this.settingsManager.cp.selectionManager.focused = false;
     };
-    this.control.isFocused = () =>
-      document.querySelector("#overlay")?.getAttribute("data-open") === "false";
-
-    this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
-      if (this.meshes.has(entity.id)) {
-        const m = this.meshes.get(entity.id)!;
-        if (isDestroyable(m)) m.destroy();
-        this.engine.scene.removeChild(m);
-        this.meshes.delete(entity.id);
-      }
-    });
+    this.control.isFocused = this.engine.isFocused.bind(this.engine);
 
     this.updateEngineSettings();
     this.loadSector();

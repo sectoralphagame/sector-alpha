@@ -8,12 +8,22 @@ import { OglCanvas } from "@ogl-engine/OglCanvas";
 // import type { MouseButton } from "@ogl-engine/Orbit";
 // import { contextMenuObservable } from "@ui/state/contextMenu";
 // import { sectorObservable } from "@ui/state/sector";
-import { Vec2, Raycast, Vec3 } from "ogl";
+import type { Transform } from "ogl";
+import { Vec2, Raycast, Vec3, Box } from "ogl";
 import React from "react";
 import { SectorMesh } from "@ogl-engine/engine/Sector";
 import { STATE, type MouseButton } from "@ogl-engine/Orbit";
 import { strategicMapStore } from "@ui/state/strategicMap";
 import { gameStore } from "@ui/state/game";
+import { BaseMesh2D } from "@ogl-engine/engine/BaseMesh2D";
+import { ColorMaterial2D } from "@ogl-engine/materials/color/color";
+import type { Faction } from "@core/archetypes/faction";
+import { sectorSize, type Sector } from "@core/archetypes/sector";
+import type { Destroyable } from "@ogl-engine/types";
+
+function isDestroyable(mesh: Transform): mesh is Transform & Destroyable {
+  return !!(mesh as any).destroy;
+}
 
 const tempVec2 = new Vec2();
 // const tempVec3 = new Vec3();
@@ -107,6 +117,14 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     }
 
     this.control.onClick = this.onClick.bind(this);
+
+    this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
+      const mesh = this.engine.scene.getEntity(entity.id);
+      if (mesh) {
+        if (isDestroyable(mesh)) mesh.destroy();
+        this.engine.scene.removeChild(mesh);
+      }
+    });
   }
 
   onClick(_mousePosition: Vec2, button: MouseButton) {
@@ -164,10 +182,13 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
   }
 
   onUpdate() {
+    if (!this.engine.isFocused()) return;
+
     this.control.update();
     this.updateRaycast(this.control.mouse);
 
     this.updateHover();
+    this.updateRenderables();
   }
 
   updateHover() {
@@ -211,6 +232,55 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
   //   // eslint-disable-next-line react/destructuring-assignment
   //   this.props.close();
   // }
+
+  updateRenderables() {
+    for (const renderable of this.sim.index.renderable.getIt()) {
+      let mesh = this.engine.scene.getEntity(renderable.id);
+      if (!mesh) {
+        const owner = renderable.cp.owner
+          ? this.sim.getOrThrow<Faction>(renderable.cp.owner.id)
+          : null;
+        mesh = new BaseMesh2D(this.engine, {
+          geometry: new Box(this.engine.gl, { width: 1, height: 1 }),
+          material: new ColorMaterial2D(
+            this.engine,
+            owner?.cp.color.value ?? "#ff00ff"
+          ),
+        });
+        mesh.name = `Entity:${renderable.id}`;
+        mesh.scale.set(
+          {
+            extraLarge: 0.04,
+            large: 0.02,
+            medium: 0.01,
+            small: 0.005,
+          }[renderable.cp.dockable?.size ?? "extraLarge"]
+        );
+        mesh.setParent(this.engine.scene.entities);
+      }
+
+      if (renderable.cp.render.hidden) {
+        mesh.visible = false;
+        continue;
+      } else {
+        mesh.visible = true;
+      }
+
+      const sector = this.sim.getOrThrow<Sector>(renderable.cp.position.sector);
+      const pos = hecsToCartesian(
+        sector.cp.hecsPosition.value,
+        sectorSize / 10
+      );
+      mesh.position
+        .set(
+          renderable.cp.position.coord[0] + pos[0],
+          1,
+          renderable.cp.position.coord[1] + pos[1]
+        )
+        .divide(sectorSize / 10);
+      mesh.rotation.y = renderable.cp.position.angle;
+    }
+  }
 
   render() {
     return <OglCanvas engine={this.engine} fpsCounter={false} />;

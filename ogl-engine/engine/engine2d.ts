@@ -1,5 +1,6 @@
 import { Renderer } from "ogl";
 import settings from "@core/settings";
+import { gameStore } from "@ui/state/game";
 import type { Scene } from "./Scene";
 import { StrategicMapScene } from "./Scene";
 import { Camera } from "./Camera";
@@ -40,6 +41,11 @@ export class Engine2D extends Engine {
   setScene = (scene: Scene) => {
     this.scene = scene;
   };
+
+  // eslint-disable-next-line class-methods-use-this
+  override isFocused(): boolean {
+    return true;
+  }
 }
 
 export class StrategicMapEngine extends Engine2D {
@@ -54,4 +60,9 @@ export class StrategicMapEngine extends Engine2D {
   setScene = (scene: StrategicMapScene) => {
     this.scene = scene;
   };
+
+  // eslint-disable-next-line class-methods-use-this
+  override isFocused(): boolean {
+    return gameStore.overlay === "map";
+  }
 }

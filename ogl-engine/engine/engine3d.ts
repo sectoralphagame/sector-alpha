@@ -10,6 +10,7 @@ import {
 import settings from "@core/settings";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
+import { gameStore } from "@ui/state/game";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
@@ -157,6 +158,11 @@ export class Engine3D extends Engine {
 
   private get compositePass() {
     return this.postProcessingLayers.composite.passes.at(-2)!;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  override isFocused(): boolean {
+    return gameStore.overlay === null;
   }
 
   update(): void {

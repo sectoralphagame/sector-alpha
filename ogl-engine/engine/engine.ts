@@ -31,6 +31,8 @@ export abstract class Engine {
     this.lastFrameTime = performance.now();
   }
 
+  abstract isFocused(): boolean;
+
   init(canvas: HTMLCanvasElement): void {
     if (this.initialized) {
       throw new Error("Engine already initialized");
@@ -66,7 +68,9 @@ export abstract class Engine {
     this.hooks.onUpdate.notify(this.delta);
 
     try {
-      this.render();
+      if (this.isFocused()) {
+        this.render();
+      }
     } catch (err) {
       this.hooks.onError.notify(err);
       throw err;
