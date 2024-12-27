@@ -16,7 +16,7 @@ export interface SectorOverviewProps {}
 
 export const SectorOverview: React.FC<SectorOverviewProps> = memo(() => {
   const [sim] = useSim();
-  const [currentSector] = useStrategicMapStore((store) => store.selected);
+  const [[currentSector]] = useStrategicMapStore((store) => [store.selected]);
   const knownFacilities = useMemo(() => {
     if (!currentSector) return [];
 

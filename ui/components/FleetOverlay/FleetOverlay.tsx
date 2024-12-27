@@ -23,7 +23,7 @@ function getSubordinateTree(commander: Ship, sim: Sim) {
 
 export const FleetOverlay: React.FC = () => {
   const [sim] = useSim();
-  const [overlay, gameStore] = useGameStore((store) => store.overlay);
+  const [[overlay], gameStore] = useGameStore((store) => [store.overlay]);
   useOverlayRegister("fleet");
   const [selected, setSelectedState] = React.useState<number | undefined>(
     getSelected(sim)?.id

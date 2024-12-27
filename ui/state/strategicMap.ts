@@ -25,6 +25,6 @@ export class StrategicMapStore {
 }
 
 export const strategicMapStore = new StrategicMapStore();
-export const useStrategicMapStore = <TResult>(
+export const useStrategicMapStore = <TResult extends Array<any>>(
   selector: (_store: StrategicMapStore) => TResult
 ) => useMobx(strategicMapStore, selector);

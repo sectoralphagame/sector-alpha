@@ -15,7 +15,7 @@ export function useSelectedUnit() {
 export function useUnitFocus() {
   const [sim] = useSim();
   const selectedUnit = useSelectedUnit();
-  const [sector, gameStore] = useGameStore((store) => store.sector);
+  const [[sector], gameStore] = useGameStore((store) => [store.sector]);
 
   const focusUnit = useCallback(() => {
     if (!selectedUnit) return;

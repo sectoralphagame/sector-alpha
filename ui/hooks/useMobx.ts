@@ -1,7 +1,7 @@
 import { reaction, isObservable } from "mobx";
 import { useEffect, useState } from "react";
 
-export function useMobx<T extends object, TResult>(
+export function useMobx<T extends object, TResult extends Array<any>>(
   store: T,
   selector: (_store: T) => TResult
 ): [TResult, T] {
@@ -14,10 +14,18 @@ export function useMobx<T extends object, TResult>(
       );
     }
 
-    const disposer = reaction(() => selector(store), setData);
+    const disposer = reaction(() => selector(store), setData, {
+      equals: (a, b) => {
+        for (let i = 0; i < a.length; i++) {
+          if (a[i] !== b[i]) return false;
+        }
+        return true;
+      },
+      fireImmediately: true,
+    });
 
     return disposer;
-  }, [store, selector]);
+  }, []);
 
   return [data, store];
 }

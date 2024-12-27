@@ -9,7 +9,7 @@ import styles from "./styles.scss";
 
 export const MapOverlay: React.FC = () => {
   useOverlayRegister("map");
-  const [overlay, gameStore] = useGameStore((store) => store.overlay);
+  const [[overlay], gameStore] = useGameStore((store) => [store.overlay]);
   const [sim] = useSim();
   const engine = React.useRef<StrategicMapEngine>();
 

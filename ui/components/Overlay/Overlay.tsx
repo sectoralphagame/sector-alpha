@@ -38,7 +38,7 @@ export const Overlay: React.FC<OverlayProps> = ({
 }) => {
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
   const [overlays, setOverlays] = React.useState<GameOverlayType[]>([]);
-  const [activeOverlay, gameStore] = useGameStore((store) => store.overlay);
+  const [[activeOverlay], gameStore] = useGameStore((store) => [store.overlay]);
   const register = React.useCallback(
     (name: GameOverlayType) => setOverlays((prev) => uniq([...prev, name])),
     []

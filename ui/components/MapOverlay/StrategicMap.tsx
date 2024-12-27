@@ -13,6 +13,7 @@ import React from "react";
 import { SectorMesh } from "@ogl-engine/engine/Sector";
 import { STATE, type MouseButton } from "@ogl-engine/Orbit";
 import { strategicMapStore } from "@ui/state/strategicMap";
+import { gameStore } from "@ui/state/game";
 
 const tempVec2 = new Vec2();
 // const tempVec3 = new Vec3();
@@ -67,6 +68,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
   sim: Sim;
   raycast = new Raycast();
   mouseWorldPos = new Vec2();
+  lastClick: number;
   // raycastHits: BaseMesh2D[];
 
   constructor(props: StrategicMapProps) {
@@ -126,6 +128,10 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     // }
 
     if (button === 0) {
+      const now = performance.now();
+      const isDoubleClick = now - this.lastClick < 300;
+      this.lastClick = now;
+
       if (this.control.state !== STATE.NONE) return;
 
       let selected = false;
@@ -139,7 +145,13 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
         const mesh = this.engine.scene.getSector(sector.id) as SectorMesh;
 
         mesh.setSelected(isInHexagon(pos));
-        if (mesh.selected) selected = true;
+        if (mesh.selected) {
+          if (isDoubleClick && strategicMapStore.selected === sector) {
+            gameStore.setSector(sector);
+            gameStore.closeOverlay();
+          }
+          selected = true;
+        }
       }
 
       if (!selected && strategicMapStore.selected) {

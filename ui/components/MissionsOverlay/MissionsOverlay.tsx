@@ -6,7 +6,7 @@ import { MissionsOverlayComponent } from "./MissionsOverlayComponent";
 
 export const MissionsOverlay: React.FC = () => {
   const [sim] = useSim();
-  const [overlay, gameStore] = useGameStore((store) => store.overlay);
+  const [[overlay], gameStore] = useGameStore((store) => [store.overlay]);
   useOverlayRegister("missions");
 
   if (overlay !== "missions") return null;

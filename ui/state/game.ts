@@ -15,6 +15,7 @@ export class GameStore {
 
       overlay: observable,
       setOverlay: action.bound,
+      closeOverlay: action.bound,
     });
   }
 
@@ -32,6 +33,6 @@ export class GameStore {
 }
 
 export const gameStore = new GameStore();
-export const useGameStore = <TResult>(
+export const useGameStore = <TResult extends Array<any>>(
   selector: (_store: GameStore) => TResult
 ) => useMobx(gameStore, selector);

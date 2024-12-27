@@ -9,7 +9,7 @@ import { DevOverlayComponent } from "./DevOverlayComponent";
 const DevOverlay: React.FC = () => {
   const [sim] = useSim();
   const [actions, setActions] = React.useState<DevAction[]>(actionLoader.all());
-  const [overlay, gameStore] = useGameStore((store) => store.overlay);
+  const [[overlay], gameStore] = useGameStore((store) => [store.overlay]);
   useOverlayRegister("dev");
 
   if (overlay !== "dev") {
