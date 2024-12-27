@@ -1,6 +1,6 @@
 import React from "react";
 import { createWaypoint } from "@core/archetypes/waypoint";
-import { getSelected, getSelectedSecondary } from "@core/components/selection";
+import { getSelectedSecondary } from "@core/components/selection";
 import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
 import { relationThresholds } from "@core/components/relations";
@@ -9,13 +9,14 @@ import { addSubordinate } from "@core/components/subordinates";
 import { findInAncestors } from "@core/utils/findInAncestors";
 import type { Position2D } from "@core/components/position";
 import { useContextMenu } from "@ui/state/contextMenu";
+import { useGameStore } from "@ui/state/game";
 import { useGameDialog, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
 export const ShipToEntity: React.FC = () => {
   const [sim] = useSim();
   const [menu] = useContextMenu();
-  const selected = getSelected(sim)!;
+  const [[selected]] = useGameStore((store) => [store.selectedUnit]);
 
   if (!selected) {
     return null;

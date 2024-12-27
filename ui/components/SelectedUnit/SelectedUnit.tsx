@@ -1,11 +1,12 @@
 import React from "react";
 import Text from "@kit/Text";
-import { useSelectedUnit, useUnitFocus } from "@ui/hooks/useUnitFocus";
+import { useGameStore } from "@ui/state/game";
 import styles from "./styles.scss";
 
 export const SelectedUnit: React.FC = () => {
-  const selectedUnit = useSelectedUnit();
-  const focusUnit = useUnitFocus();
+  const [[selectedUnit], gameStore] = useGameStore((store) => [
+    store.selectedUnit,
+  ]);
 
   if (!selectedUnit) {
     return null;
@@ -13,7 +14,7 @@ export const SelectedUnit: React.FC = () => {
 
   return (
     <div className={styles.root}>
-      <div className={styles.panel} onDoubleClick={focusUnit}>
+      <div className={styles.panel} onDoubleClick={gameStore.focusUnit}>
         <Text variant="caption">
           {selectedUnit.cp.name?.value ??
             (selectedUnit.hasTags(["collectible"]) ? "Collectible" : "Unknown")}

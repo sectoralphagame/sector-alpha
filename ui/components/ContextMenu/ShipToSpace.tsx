@@ -3,19 +3,19 @@ import React from "react";
 import type { AsteroidField } from "@core/archetypes/asteroidField";
 import { createWaypoint } from "@core/archetypes/waypoint";
 import { mineAction } from "@core/components/orders";
-import { getSelected } from "@core/components/selection";
 import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
 import { isOwnedByPlayer } from "@core/utils/misc";
 import type { Position2D } from "@core/components/position";
 import { useContextMenu } from "@ui/state/contextMenu";
+import { useGameStore } from "@ui/state/game";
 import { useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
 export const ShipToSpace: React.FC = () => {
   const [sim] = useSim();
   const [menu] = useContextMenu();
-  const selected = getSelected(sim)!;
+  const [[selected]] = useGameStore((store) => [store.selectedUnit]);
 
   if (!selected) {
     return null;

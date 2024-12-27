@@ -93,7 +93,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     if (this.raycastHits.length) {
       let mesh = this.raycastHits[0];
       if (
-        this.settingsManager.cp.selectionManager.id === mesh.entityId &&
+        gameStore.selectedUnit?.id === mesh.entityId &&
         this.raycastHits.length > 1
       ) {
         mesh = this.raycastHits[1];
@@ -101,12 +101,12 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       // eslint-disable-next-line default-case
       switch (button) {
         case 0:
-          this.settingsManager.cp.selectionManager.focused = false;
-          this.settingsManager.cp.selectionManager.id = mesh.entityId;
+          gameStore.unfocusUnit();
+          gameStore.setSelectedUnit(this.sim.getOrThrow(mesh.entityId));
           defaultClickSound.play();
 
           if (Date.now() - this.lastClicked < 200) {
-            this.settingsManager.cp.selectionManager.focused = true;
+            gameStore.focusUnit();
           }
 
           this.lastClicked = Date.now();
@@ -135,10 +135,6 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
   async onEngineUpdate() {
     if (!(assetLoader.ready && this.engine.isFocused())) return;
-
-    const selectedEntity = this.sim.get(
-      this.settingsManager.cp.selectionManager.id!
-    );
 
     for (const entity of defaultIndexer.renderable.getIt()) {
       if (entity.cp.position.sector !== gameStore.sector.id) {
@@ -202,17 +198,17 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     const path = this.engine.scene.children.find((c) => c instanceof Path) as
       | Path
       | undefined;
-    if (path && selectedEntity) {
+    if (path && gameStore.selectedUnit) {
       path.update(
         Path.getPath(
-          selectedEntity.requireComponents(["position", "orders"]),
+          gameStore.selectedUnit.requireComponents(["position", "orders"]),
           scale
         )
       );
     }
 
-    if (this.settingsManager.cp.selectionManager.focused && selectedEntity) {
-      const entity = selectedEntity.requireComponents(["position"]);
+    if (gameStore.unitFocused && gameStore.selectedUnit) {
+      const entity = gameStore.selectedUnit.requireComponents(["position"]);
       this.control!.lookAt(
         new Vec3(
           entity.cp.position.coord[0] * scale,
@@ -234,7 +230,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.control = new MapControl(this.engine.camera, this.engine.canvas);
     this.control.onClick = this.onControlClick.bind(this);
     this.control.onPan = () => {
-      this.settingsManager.cp.selectionManager.focused = false;
+      gameStore.unfocusUnit();
     };
     this.control.isFocused = this.engine.isFocused.bind(this.engine);
     this.control.onKeyDown = this.onKeyDown.bind(this);
@@ -244,9 +240,9 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   }
 
   onKeyDown(event: KeyboardEvent) {
-    const selectedEntity = this.sim
-      .get(this.settingsManager.cp.selectionManager.id!)
-      ?.requireComponents(["position"]);
+    const selectedEntity = gameStore.selectedUnit?.requireComponents([
+      "position",
+    ]);
 
     if (event.code === "KeyR" && selectedEntity) {
       if (selectedEntity.cp.position.sector !== gameStore.sector.id) {

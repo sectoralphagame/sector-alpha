@@ -1,7 +1,6 @@
 import React from "react";
 import ClickAwayListener from "react-click-away-listener";
 import { Dropdown, DropdownOptions } from "@kit/Dropdown";
-import type { Entity } from "@core/entity";
 import { MapView } from "@ui/components/MapView";
 import { useRerender } from "@ui/hooks/useRerender";
 import { MapPanel } from "@ui/components/MapPanel";
@@ -51,15 +50,10 @@ const Game: React.FC = () => {
   const [gameSettings] = useGameSettings();
   const pressedKeys = React.useRef(new Set<string>());
 
-  const selectedId = sim.index.settings.get()[0]!.cp.selectionManager.id;
-  const [selectedEntity, setSelectedEntity] = React.useState<
-    Entity | undefined
-  >(selectedId ? sim.get(selectedId) : undefined);
   const player = sim.index.player.get()[0]!;
-  const [[currentSector, overlay], gameStore] = useGameStore((store) => [
-    store.sector,
-    store.overlay,
-  ]);
+  const [[currentSector, overlay, selectedEntity], gameStore] = useGameStore(
+    (store) => [store.sector, store.overlay, store.selectedUnit]
+  );
 
   React.useEffect(() => {
     if (!sim) return () => undefined;
@@ -72,8 +66,8 @@ const Game: React.FC = () => {
     };
 
     sim.hooks.removeEntity.subscribe("Game", (entity) => {
-      if (entity.id === selectedId) {
-        setSelectedEntity(undefined);
+      if (entity.id === selectedEntity?.id) {
+        gameStore.unselectUnit();
       }
     });
     sim.hooks.destroy.subscribe("Game", unmount);
@@ -82,12 +76,6 @@ const Game: React.FC = () => {
 
     return unmount;
   }, [sim]);
-
-  React.useEffect(() => {
-    if (selectedEntity?.id !== selectedId) {
-      setSelectedEntity(selectedId ? sim.get(selectedId) : undefined);
-    }
-  });
 
   React.useEffect(() => {
     if (!menu.active) {

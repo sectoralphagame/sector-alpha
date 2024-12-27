@@ -1,8 +1,9 @@
 import React from "react";
 import { shipComponents } from "@core/archetypes/ship";
-import { getSelected, getSelectedSecondary } from "@core/components/selection";
+import { getSelectedSecondary } from "@core/components/selection";
 import { defaultClickSound } from "@kit/BaseButton";
 import { useContextMenu } from "@ui/state/contextMenu";
+import { useGameStore } from "@ui/state/game";
 import { useSim } from "../../atoms";
 import { ShipToSpace } from "./ShipToSpace";
 import { NoAvailableActions } from "./NoAvailableActions";
@@ -12,7 +13,7 @@ export const ContextMenu: React.FC = () => {
   const [sim] = useSim();
   const [menu] = useContextMenu();
 
-  const selectedEntity = getSelected(sim);
+  const [[selectedUnit]] = useGameStore((store) => [store.selectedUnit]);
   const actionable = getSelectedSecondary(sim);
 
   React.useEffect(() => {
@@ -25,7 +26,7 @@ export const ContextMenu: React.FC = () => {
     return <ShipToEntity />;
   }
 
-  if (selectedEntity?.hasComponents(shipComponents)) {
+  if (selectedUnit?.hasComponents(shipComponents)) {
     return <ShipToSpace />;
   }
 

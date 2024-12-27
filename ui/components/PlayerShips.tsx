@@ -5,8 +5,8 @@ import {
   CollapsibleSummary,
 } from "@kit/Collapsible";
 import { first } from "@fxts/core";
-import { getSelected } from "@core/components/selection";
 import { useContextMenu } from "@ui/state/contextMenu";
+import { useGameStore } from "@ui/state/game";
 import { useSim } from "../atoms";
 import { ShipButton } from "./ShipButton";
 
@@ -17,18 +17,9 @@ export const PlayerShips: React.FC = () => {
     .get()
     .filter((ship) => ship.cp.owner?.id === player.id);
 
-  const [selected, setSelectedState] = React.useState<number | undefined>(
-    getSelected(sim)?.id
-  );
+  const [[selected], gameStore] = useGameStore((store) => [store.selectedUnit]);
   const [, setMenu] = useContextMenu();
 
-  const onSelect = (id: number) => {
-    sim.index.settings.get()[0].cp.selectionManager.id = id;
-    setSelectedState(id);
-  };
-  const onFocus = () => {
-    sim.index.settings.get()[0].cp.selectionManager.focused = true;
-  };
   const onTarget = (id: number) => {
     sim.index.settings.get()[0].cp.selectionManager.secondaryId = id;
   };
@@ -38,7 +29,7 @@ export const PlayerShips: React.FC = () => {
   ) => {
     event.preventDefault();
     onTarget(id);
-    if (id !== selected) {
+    if (id !== selected?.id) {
       setMenu({
         active: true,
         position: [event.clientX, event.clientY],
@@ -60,9 +51,9 @@ export const PlayerShips: React.FC = () => {
             <ShipButton
               key={ship.id}
               ship={ship}
-              selected={selected}
-              onFocus={onFocus}
-              onSelect={onSelect}
+              selected={selected?.id}
+              onFocus={gameStore.focusUnit}
+              onSelect={(id) => gameStore.setSelectedUnit(sim.getOrThrow(id))}
               onContextMenu={onContextMenu}
             />
           ))

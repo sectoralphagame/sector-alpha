@@ -1,10 +1,8 @@
 import type { Ship } from "@core/archetypes/ship";
-import { getSelected } from "@core/components/selection";
 import { filter, map, pipe, toArray } from "@fxts/core";
 import { useSim } from "@ui/atoms";
 import React from "react";
 import type { Sim } from "@core/sim";
-import { useUnitFocus } from "@ui/hooks/useUnitFocus";
 import { useContextMenu } from "@ui/state/contextMenu";
 import { useGameStore } from "@ui/state/game";
 import { useOverlayRegister } from "../Overlay/Overlay";
@@ -23,20 +21,18 @@ function getSubordinateTree(commander: Ship, sim: Sim) {
 
 export const FleetOverlay: React.FC = () => {
   const [sim] = useSim();
-  const [[overlay], gameStore] = useGameStore((store) => [store.overlay]);
+  const [[overlay, selectedUnit], gameStore] = useGameStore((store) => [
+    store.overlay,
+    store.selectedUnit,
+  ]);
   useOverlayRegister("fleet");
-  const [selected, setSelectedState] = React.useState<number | undefined>(
-    getSelected(sim)?.id
-  );
   const [, setMenu] = useContextMenu();
-  const focusUnit = useUnitFocus();
 
   const setSelected = (id: number) => {
-    sim.index.settings.get()[0].cp.selectionManager.id = id;
-    setSelectedState(id);
+    gameStore.setSelectedUnit(sim.getOrThrow(id));
   };
   const onFocus = () => {
-    focusUnit();
+    gameStore.focusUnit();
     gameStore.closeOverlay();
   };
   const onTarget = (id: number) => {
@@ -48,7 +44,7 @@ export const FleetOverlay: React.FC = () => {
   ) => {
     event.preventDefault();
     onTarget(id);
-    if (id !== selected) {
+    if (id !== selectedUnit?.id) {
       setMenu({
         active: true,
         position: [event.clientX, event.clientY],
@@ -96,7 +92,7 @@ export const FleetOverlay: React.FC = () => {
     <FleetOverlayComponent
       fleets={fleets}
       unassigned={unassigned}
-      selected={selected}
+      selected={selectedUnit?.id}
       onContextMenu={onContextMenu}
       onSelect={setSelected}
       onFocus={onFocus}

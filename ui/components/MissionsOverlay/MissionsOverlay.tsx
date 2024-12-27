@@ -6,7 +6,10 @@ import { MissionsOverlayComponent } from "./MissionsOverlayComponent";
 
 export const MissionsOverlay: React.FC = () => {
   const [sim] = useSim();
-  const [[overlay], gameStore] = useGameStore((store) => [store.overlay]);
+  const [[overlay], gameStore] = useGameStore((store) => [
+    store.overlay,
+    store.selectedUnit,
+  ]);
   useOverlayRegister("missions");
 
   if (overlay !== "missions") return null;
@@ -19,11 +22,8 @@ export const MissionsOverlay: React.FC = () => {
       onMissionCancel={(index) => player.cp.missions.value.splice(index, 1)}
       onReferenceClick={(id) => {
         gameStore.closeOverlay();
-        const settingsManager = sim.index.settings.get()[0];
-        settingsManager.cp.selectionManager.id = id;
-        setTimeout(() => {
-          settingsManager.cp.selectionManager.focused = true;
-        }, 100);
+        gameStore.setSelectedUnit(sim.getOrThrow(id));
+        setTimeout(gameStore.focusUnit, 100);
       }}
     />
   );
