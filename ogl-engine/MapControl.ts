@@ -32,6 +32,7 @@ export class MapControl extends Orbit {
   cursorMoved = false;
 
   onClick: ((_position: Vec2, _button: MouseButton) => void) | null = null;
+  onKeyDown: ((_event: KeyboardEvent) => void) | null = null;
   // eslint-disable-next-line class-methods-use-this
   isFocused: () => boolean = () => true;
 
@@ -53,6 +54,7 @@ export class MapControl extends Orbit {
       if (event.code in keymap) {
         event.stopPropagation();
       }
+      this.onKeyDown?.(event);
       this.keysPressed.add(event.code);
     });
     document.body.addEventListener("keyup", (event) => {

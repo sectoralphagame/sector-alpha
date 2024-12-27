@@ -101,6 +101,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       // eslint-disable-next-line default-case
       switch (button) {
         case 0:
+          this.settingsManager.cp.selectionManager.focused = false;
           this.settingsManager.cp.selectionManager.id = mesh.entityId;
           defaultClickSound.play();
 
@@ -236,9 +237,31 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       this.settingsManager.cp.selectionManager.focused = false;
     };
     this.control.isFocused = this.engine.isFocused.bind(this.engine);
+    this.control.onKeyDown = this.onKeyDown.bind(this);
 
     this.updateEngineSettings();
     this.loadSector();
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    const selectedEntity = this.sim
+      .get(this.settingsManager.cp.selectionManager.id!)
+      ?.requireComponents(["position"]);
+
+    if (event.code === "KeyR" && selectedEntity) {
+      if (selectedEntity.cp.position.sector !== gameStore.sector.id) {
+        gameStore.setSector(
+          this.sim.getOrThrow(selectedEntity.cp.position.sector)
+        );
+      }
+      this.control.lookAt(
+        new Vec3(
+          selectedEntity.cp.position.coord[0] * scale,
+          0,
+          selectedEntity.cp.position.coord[1] * scale
+        )
+      );
+    }
   }
 
   onSectorChange() {
