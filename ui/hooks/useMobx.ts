@@ -9,6 +9,7 @@ export function useMobx<T extends object, TResult extends Array<any>>(
 
   useEffect(() => {
     if (!isObservable(store)) {
+      // eslint-disable-next-line no-console
       console.warn(
         "The store is not observable. Make sure it is properly marked as observable."
       );
