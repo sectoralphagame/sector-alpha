@@ -1,4 +1,4 @@
-import { Euler, Mat3, Mat4, Plane, Quat, Transform } from "ogl";
+import { Euler, Geometry, Mat3, Mat4, Plane, Quat, Transform } from "ogl";
 import type { ModelName } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
@@ -21,6 +21,7 @@ export class Asteroids extends Transform {
     this.size = size;
     this.density = density;
 
+    this.visible = false;
     this.createAsteroids();
     this.createRing(color);
   }
@@ -32,7 +33,7 @@ export class Asteroids extends Transform {
     if (t < 0.75) return random(0.5, 3.5);
     if (t < 0.9) return random(9, 15);
 
-    return random(20, 40);
+    return random(20, 50);
   }
 
   private createRing(color: string) {
@@ -64,7 +65,7 @@ export class Asteroids extends Transform {
       const gltf = assetLoader.model(model);
 
       const asteroid = new BaseMesh(this.engine, {
-        geometry: gltf.geometry,
+        geometry: new Geometry(this.engine.gl, { ...gltf.geometry.attributes }),
       });
       asteroid.applyMaterial(
         new InstancedPhongMaterial(this.engine, gltf.material)
@@ -142,5 +143,7 @@ export class Asteroids extends Transform {
       asteroid.frustumCulled = false;
       asteroid.setParent(this);
     }
+
+    this.visible = true;
   }
 }
