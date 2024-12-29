@@ -35,11 +35,13 @@ export class GameStore {
   setSelectedUnit(unit: Entity) {
     unit.sim.index.settings.get()[0].cp.selectionManager.id = unit.id;
     this.selectedUnit = unit;
+    window.selected = unit;
   }
 
   unselectUnit() {
     this.selectedUnit = null;
     this.unitFocused = false;
+    window.selected = null;
   }
 
   focusUnit() {

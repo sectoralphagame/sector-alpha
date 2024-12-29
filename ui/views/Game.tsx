@@ -20,13 +20,13 @@ import { useGameSettings } from "@ui/hooks/useGameSettings";
 import { SelectedUnit } from "@ui/components/SelectedUnit";
 import SimAvgTimeGraph from "@ui/components/dev/SimAvgTimeGraph/SimAvgTimeGraph";
 import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
-import { useContextMenu } from "@ui/state/contextMenu";
 import { CurrentSector } from "@ui/components/CurrentSector/CurrentSector";
 import type { Faction } from "@core/archetypes/faction";
 import { MapOverlay } from "@ui/components/MapOverlay/MapOverlay";
 import { pane } from "@ui/context/Pane";
 import type { GameOverlayType } from "@ui/state/game";
 import { useGameStore } from "@ui/state/game";
+import { useContextMenuStore } from "@ui/state/contextMenu";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -44,7 +44,9 @@ const overlayKeyCodes: Record<string, NonNullable<GameOverlayType>> = {
 const Game: React.FC = () => {
   const [sim, setSim] = useSim();
   const canvasRoot = React.useRef<HTMLDivElement>(null);
-  const [menu, setMenu] = useContextMenu();
+  const [[menu], contextMenuStore] = useContextMenuStore((store) => [
+    store.state,
+  ]);
   const [dialog, setDialog] = useGameDialog();
   const { addNotification } = useNotifications();
   const [gameSettings] = useGameSettings();
@@ -76,12 +78,6 @@ const Game: React.FC = () => {
 
     return unmount;
   }, [sim]);
-
-  React.useEffect(() => {
-    if (!menu.active) {
-      sim.index.settings.get()[0].cp.selectionManager.secondaryId = null;
-    }
-  }, [menu.active]);
 
   React.useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -216,16 +212,16 @@ const Game: React.FC = () => {
         <MapOverlay />
         {gameSettings.dev && <DevOverlay />}
       </Overlay>
-      {menu.active && (!!menu.sector || menu.overlay) && (
+      {menu.active && (
         <ClickAwayListener
           mouseEvent="mousedown"
-          onClickAway={() => setMenu({ ...menu, active: false })}
+          onClickAway={contextMenuStore.close}
         >
           <div
             className={styles.menu}
             style={{ top: menu.position[1], left: menu.position[0] }}
           >
-            <Dropdown onClick={() => setMenu({ ...menu, active: false })}>
+            <Dropdown onClick={contextMenuStore.close}>
               <DropdownOptions static>
                 <ContextMenu />
               </DropdownOptions>

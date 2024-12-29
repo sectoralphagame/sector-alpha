@@ -5,8 +5,8 @@ import {
   CollapsibleSummary,
 } from "@kit/Collapsible";
 import { first } from "@fxts/core";
-import { useContextMenu } from "@ui/state/contextMenu";
 import { useGameStore } from "@ui/state/game";
+import { useContextMenuStore } from "@ui/state/contextMenu";
 import { useSim } from "../atoms";
 import { ShipButton } from "./ShipButton";
 
@@ -18,24 +18,18 @@ export const PlayerShips: React.FC = () => {
     .filter((ship) => ship.cp.owner?.id === player.id);
 
   const [[selected], gameStore] = useGameStore((store) => [store.selectedUnit]);
-  const [, setMenu] = useContextMenu();
+  const [, contextMenuStore] = useContextMenuStore(() => []);
 
-  const onTarget = (id: number) => {
-    sim.index.settings.get()[0].cp.selectionManager.secondaryId = id;
-  };
   const onContextMenu = (
     id: number,
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
-    onTarget(id);
     if (id !== selected?.id) {
-      setMenu({
-        active: true,
+      contextMenuStore.open({
         position: [event.clientX, event.clientY],
         worldPosition: undefined!,
         sector: null,
-        overlay: true,
       });
     }
   };

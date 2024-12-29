@@ -2,10 +2,9 @@ import React from "react";
 import type { Transform } from "ogl";
 import { Raycast, Vec2, Vec3 } from "ogl";
 import { defaultIndexer } from "@core/systems/utils/default";
-import { find, first } from "@fxts/core";
+import { find } from "@fxts/core";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
 import { MapControl } from "@ogl-engine/MapControl";
-import type { RequireComponent } from "@core/tsHelpers";
 import { defaultClickSound } from "@kit/BaseButton";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
@@ -14,7 +13,7 @@ import { Path } from "@ogl-engine/utils/path";
 import type { SkyboxTexture } from "@assets/textures/skybox";
 import { Scene } from "@ogl-engine/engine/Scene";
 import type { Sim } from "@core/sim";
-import { contextMenuObservable } from "@ui/state/contextMenu";
+import { contextMenuStore } from "@ui/state/contextMenu";
 import { storageHook } from "@core/hooks";
 import type { GameSettings } from "@ui/hooks/useGameSettings";
 import type { MouseButton } from "@ogl-engine/Orbit";
@@ -24,6 +23,7 @@ import type { Destroyable } from "@ogl-engine/types";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
 import { gameStore } from "@ui/state/game";
 import { reaction } from "mobx";
+import type { Position2D } from "@core/components/position";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 
@@ -39,7 +39,6 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   sim: Sim;
   raycast = new Raycast();
   raycastHits: EntityMesh[] = [];
-  settingsManager: RequireComponent<"selectionManager" | "camera">;
   lastClicked = 0;
   control: MapControl;
   meshes: Map<number, EntityMesh> = new Map();
@@ -50,7 +49,6 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     super(props);
     this.sim = props.sim;
     this.engine = new Engine3D();
-    this.settingsManager = first(this.sim.index.settings.getIt())!;
   }
 
   componentDidMount(): void {
@@ -90,6 +88,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   }
 
   async onControlClick(mousePosition: Vec2, button: MouseButton) {
+    let targetId;
     if (this.raycastHits.length) {
       let mesh = this.raycastHits[0];
       if (
@@ -112,7 +111,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
           this.lastClicked = Date.now();
           break;
         case 2:
-          this.settingsManager.cp.selectionManager.secondaryId = mesh.entityId;
+          targetId = mesh.entityId;
       }
     }
 
@@ -121,15 +120,17 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         origin: new Vec3(0),
         normal: new Vec3(0, 1, 0),
       });
-      const worldPosition = [worldPos.x / scale, worldPos.z / scale];
+      const worldPosition: Position2D = [
+        worldPos.x / scale,
+        worldPos.z / scale,
+      ];
 
-      const data = {
-        active: true,
-        position: mousePosition.clone(),
+      contextMenuStore.open({
+        position: mousePosition.clone().toArray() as Position2D,
         worldPosition,
         sector: gameStore.sector,
-      };
-      contextMenuObservable.notify(data);
+        target: targetId ? this.sim.getOrThrow(targetId) : null,
+      });
     }
   }
 

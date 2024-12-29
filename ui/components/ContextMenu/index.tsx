@@ -1,20 +1,17 @@
 import React from "react";
 import { shipComponents } from "@core/archetypes/ship";
-import { getSelectedSecondary } from "@core/components/selection";
 import { defaultClickSound } from "@kit/BaseButton";
-import { useContextMenu } from "@ui/state/contextMenu";
 import { useGameStore } from "@ui/state/game";
-import { useSim } from "../../atoms";
+import { useContextMenuStore } from "@ui/state/contextMenu";
 import { ShipToSpace } from "./ShipToSpace";
 import { NoAvailableActions } from "./NoAvailableActions";
 import { ShipToEntity } from "./ShipToEntity";
 
 export const ContextMenu: React.FC = () => {
-  const [sim] = useSim();
-  const [menu] = useContextMenu();
-
+  const [[menu]] = useContextMenuStore((store) => [store.state]);
   const [[selectedUnit]] = useGameStore((store) => [store.selectedUnit]);
-  const actionable = getSelectedSecondary(sim);
+
+  console.log("i rerendered");
 
   React.useEffect(() => {
     if (menu.active) {
@@ -22,7 +19,9 @@ export const ContextMenu: React.FC = () => {
     }
   }, [menu.active]);
 
-  if (actionable) {
+  if (!menu.active) return null;
+
+  if (menu.target) {
     return <ShipToEntity />;
   }
 

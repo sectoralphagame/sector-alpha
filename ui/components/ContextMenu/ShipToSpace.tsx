@@ -7,14 +7,14 @@ import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
 import { isOwnedByPlayer } from "@core/utils/misc";
 import type { Position2D } from "@core/components/position";
-import { useContextMenu } from "@ui/state/contextMenu";
 import { useGameStore } from "@ui/state/game";
+import { useContextMenuStore } from "@ui/state/contextMenu";
 import { useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 
 export const ShipToSpace: React.FC = () => {
   const [sim] = useSim();
-  const [menu] = useContextMenu();
+  const [[menu]] = useContextMenuStore((store) => [store.state]);
   const [[selected]] = useGameStore((store) => [store.selectedUnit]);
 
   if (!selected) {

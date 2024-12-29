@@ -2,7 +2,7 @@ import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
 import { first } from "@fxts/core";
 import { Observable } from "@core/utils/observer";
-import { clearFocus } from "../components/selection";
+import { gameStore } from "@ui/state/game";
 import { isHeadless } from "../settings";
 import { SystemWithHooks } from "./utils/hooks";
 
@@ -30,7 +30,7 @@ export class SelectingSystem extends SystemWithHooks {
     if (this.manager.cp.selectionManager.id && selected) {
       window.selected = selected;
     } else {
-      clearFocus(this.manager.cp.selectionManager);
+      gameStore.unfocusUnit();
     }
   };
 

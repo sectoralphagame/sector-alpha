@@ -3,7 +3,7 @@ import { filter, map, pipe, toArray } from "@fxts/core";
 import { useSim } from "@ui/atoms";
 import React from "react";
 import type { Sim } from "@core/sim";
-import { useContextMenu } from "@ui/state/contextMenu";
+import { useContextMenuStore } from "@ui/state/contextMenu";
 import { useGameStore } from "@ui/state/game";
 import { useOverlayRegister } from "../Overlay/Overlay";
 import { FleetOverlayComponent } from "./FleetOverlayComponent";
@@ -26,7 +26,7 @@ export const FleetOverlay: React.FC = () => {
     store.selectedUnit,
   ]);
   useOverlayRegister("fleet");
-  const [, setMenu] = useContextMenu();
+  const [, contextMenuStore] = useContextMenuStore(() => []);
 
   const setSelected = (id: number) => {
     gameStore.setSelectedUnit(sim.getOrThrow(id));
@@ -35,22 +35,18 @@ export const FleetOverlay: React.FC = () => {
     gameStore.focusUnit();
     gameStore.closeOverlay();
   };
-  const onTarget = (id: number) => {
-    sim.index.settings.get()[0].cp.selectionManager.secondaryId = id;
-  };
   const onContextMenu = (
     id: number,
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
-    onTarget(id);
     if (id !== selectedUnit?.id) {
-      setMenu({
-        active: true,
+      console.log("huh");
+      contextMenuStore.open({
         position: [event.clientX, event.clientY],
         worldPosition: undefined!,
         sector: null,
-        overlay: true,
+        target: sim.getOrThrow(id),
       });
     }
   };

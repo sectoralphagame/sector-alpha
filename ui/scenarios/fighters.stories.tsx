@@ -37,7 +37,7 @@ const Game: React.FC<{ factions: number; fighters: number }> = ({
 }) => {
   React.useEffect(() => {
     settings.bootTime = 0;
-    const renderingSystem = new RenderingSystem([undefined!, () => {}]);
+    const renderingSystem = new RenderingSystem();
     renderingSystem.enableResizing = false;
     const sim = new Sim({
       systems: [

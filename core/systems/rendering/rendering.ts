@@ -7,19 +7,15 @@ import type { Sim } from "@core/sim";
 import { isHeadless } from "@core/settings";
 import { first } from "@fxts/core";
 import { storageHook } from "@core/hooks";
-import { hecsToCartesian, worldToHecs } from "@core/components/hecsPosition";
-import { deepEqual, subtract } from "mathjs";
+import { hecsToCartesian } from "@core/components/hecsPosition";
 import { sectorSize, type Sector } from "@core/archetypes/sector";
-import { defaultClickSound } from "@kit/BaseButton";
 import { actionLoader } from "@core/actionLoader";
-import type { ContextMenuApi } from "@ui/state/contextMenu";
 import {
   createRenderGraphics,
   graphics,
 } from "../../components/renderGraphics";
 import type { RequireComponent } from "../../tsHelpers";
 import { SystemWithHooks } from "../utils/hooks";
-import { clearFocus } from "../../components/selection";
 import type { Layer, Textures } from "../../components/render";
 import { SectorIndex } from "../utils/sectorIndex";
 import { drawHpBars } from "./hpBars";
@@ -77,13 +73,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
   graphics: Map<Entity, PIXI.Graphics> = new Map();
   displayRange: boolean;
   scale: number;
-  contextMenuApi: ContextMenuApi;
   lastClicked: number;
-
-  constructor(contextMenuApi: ContextMenuApi) {
-    super();
-    this.contextMenuApi = contextMenuApi;
-  }
 
   apply = (sim: Sim) => {
     super.apply(sim);
@@ -173,7 +163,6 @@ export class RenderingSystem extends SystemWithHooks<never> {
       if (this.toolbar) {
         this.toolbar.style.pointerEvents = "none";
       }
-      this.settingsManager.cp.selectionManager.focused = false;
       this.viewport.plugins.remove("follow");
       this.dragging = true;
     });
@@ -182,20 +171,6 @@ export class RenderingSystem extends SystemWithHooks<never> {
       setTimeout(() => {
         this.dragging = false;
       }, 10);
-    });
-
-    this.viewport.on("pointerup", (event) => {
-      if (this.toolbar) {
-        this.toolbar.style.pointerEvents = "unset";
-      }
-      if (
-        event.target === event.currentTarget &&
-        !this.dragging &&
-        // Do not clear on right click
-        event.buttons !== 0
-      ) {
-        clearFocus(this.settingsManager.cp.selectionManager);
-      }
     });
 
     this.viewport.sortableChildren = true;
@@ -262,50 +237,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
 
     this.sim.hooks.removeEntity.subscribe("RenderingSystem", (entity) => {
       this.clearEntity(entity);
-
-      if (entity.id === this.settingsManager.cp.selectionManager.id) {
-        clearFocus(this.settingsManager.cp.selectionManager);
-      }
-      if (entity.id === this.settingsManager.cp.selectionManager.secondaryId) {
-        this.settingsManager.cp.selectionManager.secondaryId = null;
-      }
     });
-
-    const onContextMenu = (event: MouseEvent) => {
-      event.preventDefault();
-
-      setTimeout(() => {
-        if (this.dragging) return;
-
-        const [, setMenu] = this.contextMenuApi;
-
-        const { x: worldX, y: worldY } = this.viewport.toWorld(
-          event.offsetX,
-          event.offsetY
-        );
-        const worldPosition = [worldX / 10, worldY / 10];
-        const sector =
-          this.sim.index.sectors.get().find((s) => {
-            const ww = worldToHecs([worldPosition[0], worldPosition[1]]);
-            return deepEqual(s.cp.hecsPosition.value, ww);
-          }) ?? null;
-
-        const data = {
-          active: true,
-          position: [event.clientX, event.clientY],
-          worldPosition: sector
-            ? subtract(
-                worldPosition,
-                hecsToCartesian(sector.cp.hecsPosition.value, sectorSize / 10)
-              )
-            : [0, 0],
-          sector,
-        };
-        setMenu(data);
-      }, 40);
-    };
-
-    window.addEventListener("contextmenu", onContextMenu);
   };
 
   clearEntity = (entity: Entity, render = true, renderGraphics = true) => {
@@ -373,25 +305,6 @@ export class RenderingSystem extends SystemWithHooks<never> {
           sprite.cullable = true;
           this.sprites.set(entity, sprite);
           this.viewport.addChild(sprite);
-          if (entity.tags.has("selection")) {
-            sprite.interactive = true;
-            sprite.addEventListener("pointerdown", (event) => {
-              if (event.button === 0) {
-                this.settingsManager.cp.selectionManager.id = entity.id;
-                defaultClickSound.play();
-
-                if (Date.now() - this.lastClicked < 200) {
-                  this.settingsManager.cp.selectionManager.focused = true;
-                }
-
-                this.lastClicked = Date.now();
-              }
-            });
-            sprite.addEventListener("rightdown", () => {
-              this.settingsManager.cp.selectionManager.secondaryId = entity.id;
-            });
-            sprite.cursor = "pointer";
-          }
 
           sprite.tint = entityRender.color;
           this.layers[entityRender.layer].addChild(sprite);
@@ -424,45 +337,6 @@ export class RenderingSystem extends SystemWithHooks<never> {
         }
       }
     }
-  };
-
-  updateSelection = (previousValue: number) => {
-    this.settingsManager.cp.selectionManager.focused = false;
-    this.viewport.plugins.remove("follow");
-    const previousSelected = this.sim.get(previousValue);
-    if (
-      ["pathWithRange", "path"].includes(
-        previousSelected?.cp.renderGraphics?.draw
-      )
-    ) {
-      previousSelected!.removeComponent("renderGraphics");
-    }
-
-    for (const entity of this.sectorIndex.all()) {
-      const entityRender = entity.cp.render;
-      const sprite = this.sprites.get(entity);
-      const selected =
-        entity.id === this.settingsManager.cp.selectionManager.id;
-
-      if (!sprite) return;
-
-      if (selected && sprite.tint === entityRender.color) {
-        sprite.tint = Color(sprite.tint).lighten(0.23).rgbNumber();
-        sprite.parent?.removeChild(sprite);
-        this.layers.selection.addChild(sprite);
-
-        if (entity.cp.orders) {
-          entity.addComponent(
-            createRenderGraphics(this.displayRange ? "pathWithRange" : "path")
-          );
-        }
-      } else if (!selected && sprite.tint !== entityRender.color) {
-        sprite.tint = entityRender.color;
-        sprite.parent?.removeChild(sprite);
-        this.layers[entityRender.layer].addChild(sprite);
-      }
-    }
-    this.updateScaling();
   };
 
   updateEntityScaling = (entity: RequireComponent<"render">) => {
@@ -520,9 +394,6 @@ export class RenderingSystem extends SystemWithHooks<never> {
           this.viewport.center.x + keymap[key].x / this.viewport.scale.x,
           this.viewport.center.y + keymap[key].y / this.viewport.scale.x
         );
-
-        this.settingsManager.cp.selectionManager.focused = false;
-        this.viewport.plugins.remove("follow");
       }
 
       if (keymap[key]?.scale !== undefined) {
@@ -560,24 +431,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
 
     this.settingsManager = first(this.sim.index.settings.getIt())!;
 
-    this.onChange(
-      this.settingsManager.cp.selectionManager.id,
-      this.updateSelection
-    );
     this.onChange(this.viewport.scale.x, this.updateScaling);
-
-    if (this.settingsManager.cp.selectionManager.focused) {
-      const entity = this.sim.getOrThrow(
-        this.settingsManager.cp.selectionManager.id!
-      );
-      if (entity.hasComponents(["render"])) {
-        this.viewport.follow(this.sprites.get(entity)!);
-      } else if (entity.hasComponents(["renderGraphics"])) {
-        this.viewport.follow(this.graphics.get(entity)!);
-      } else {
-        this.settingsManager.cp.selectionManager.focused = false;
-      }
-    }
 
     setTimeout(() => {
       this.updateGraphics();
