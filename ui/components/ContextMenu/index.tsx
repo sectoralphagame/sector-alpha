@@ -11,8 +11,6 @@ export const ContextMenu: React.FC = () => {
   const [[menu]] = useContextMenuStore((store) => [store.state]);
   const [[selectedUnit]] = useGameStore((store) => [store.selectedUnit]);
 
-  console.log("i rerendered");
-
   React.useEffect(() => {
     if (menu.active) {
       defaultClickSound.play();

@@ -41,7 +41,6 @@ export const FleetOverlay: React.FC = () => {
   ) => {
     event.preventDefault();
     if (id !== selectedUnit?.id) {
-      console.log("huh");
       contextMenuStore.open({
         position: [event.clientX, event.clientY],
         worldPosition: undefined!,
