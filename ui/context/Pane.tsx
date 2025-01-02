@@ -3,6 +3,8 @@ import type { GameSettings } from "@ui/hooks/useGameSettings";
 import { Pane } from "tweakpane";
 
 export const pane = new Pane();
+pane.hidden = !process.env.STORYBOOK;
+
 storageHook.subscribe("Pane", (key) => {
   if (key === "gameSettings") {
     const settings = JSON.parse(
