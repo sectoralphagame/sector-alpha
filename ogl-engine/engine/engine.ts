@@ -1,9 +1,9 @@
 import { Observable } from "@core/utils/observer";
 import { Renderer } from "ogl";
-import { Scene } from "./Scene";
+import type { Scene } from "./Scene";
 import type { Camera } from "./Camera";
 
-export abstract class Engine {
+export abstract class Engine<TScene extends Scene = Scene> {
   public hooks: {
     onInit: Observable<void>;
     onUpdate: Observable<number>;
@@ -13,7 +13,7 @@ export abstract class Engine {
   public camera: Camera;
   public canvas: HTMLCanvasElement;
   public initialized = false;
-  public scene: Scene;
+  public scene: TScene;
 
   protected renderer: Renderer;
   protected dpr = window.devicePixelRatio;
@@ -27,7 +27,6 @@ export abstract class Engine {
       onUpdate: new Observable("onUpdate"),
       onError: new Observable("onError"),
     };
-    this.scene = new Scene(this);
     this.lastFrameTime = performance.now();
   }
 
@@ -81,7 +80,7 @@ export abstract class Engine {
 
   abstract render(): void;
 
-  setScene(scene: Scene) {
+  setScene(scene: TScene) {
     this.scene = scene;
   }
 

@@ -1,79 +1,56 @@
-import React, { useEffect } from "react";
+import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
-import { OglCanvas } from "ogl-engine/OglCanvas";
-import { GLTFLoader, Orbit, Vec3 } from "ogl";
-import { StarMaterial } from "@ogl-engine/materials/star/star";
-import Color from "color";
-import { Skybox } from "@ogl-engine/materials/skybox/skybox";
-import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
-import starModel from "@assets/models/world/star.glb";
-import { Engine3D } from "@ogl-engine/engine/engine3d";
+import { Orbit } from "ogl";
+import type { Engine3D } from "@ogl-engine/engine/engine3d";
+import { merge } from "lodash";
+import { Star } from "@ogl-engine/engine/Star";
+import type { Story3dArgs } from "./Story3d";
+import { Story3d, story3dMeta } from "./Story3d";
 
-interface StarStoryProps {
-  color: string;
-}
+interface StarStoryProps extends Story3dArgs {}
 
-const StarStory: React.FC<StarStoryProps> = ({ color: colorProp }) => {
-  const engine = React.useMemo(() => new Engine3D(), []);
-  const starRef = React.useRef<BaseMesh<StarMaterial>>();
-  const skyboxRef = React.useRef<Skybox>();
+const StarStory: React.FC<StarStoryProps> = ({ postProcessing, skybox }) => {
+  const engineRef = React.useRef<Engine3D>();
+  const starRef = React.useRef<Star>();
   const controlRef = React.useRef<Orbit>();
 
-  const color = new Vec3(...Color(colorProp).rgb().array()).divide(255);
-
-  useEffect(() => {
-    if (!starRef.current) return;
-    starRef.current.material.setColor(color);
-  }, [color]);
-
-  useEffect(() => {
-    engine.hooks.onInit.subscribe("StarStory", async () => {
-      controlRef.current = new Orbit(engine.camera);
-
-      skyboxRef.current = new Skybox(engine, "example");
-      starRef.current = BaseMesh.fromGltf<StarMaterial>(
-        engine,
-        await GLTFLoader.load(engine.gl, starModel)
-      );
-      engine.scene.addChild(starRef.current);
-      starRef.current.applyMaterial(new StarMaterial(engine));
-      starRef.current.material.setColor(color);
-    });
-
-    engine.hooks.onUpdate.subscribe("StarStory", () => {
-      controlRef.current!.update();
-
-      if (starRef.current) {
-        starRef.current.rotation.y += 0.001;
-      }
+  const onInit = React.useCallback(async (engine: Engine3D) => {
+    engineRef.current = engine;
+    starRef.current = new Star(engine, "#f2a0ae");
+    starRef.current.setParent(engine.scene);
+    starRef.current.createPaneFolder();
+    controlRef.current = new Orbit(engine.camera, {
+      inertia: 0.8,
     });
   }, []);
 
-  return <OglCanvas engine={engine} />;
+  const onUpdate = React.useCallback(() => {
+    controlRef.current!.update();
+  }, []);
+
+  return (
+    <Story3d
+      postProcessing={postProcessing}
+      onEngineInit={onInit}
+      onEngineUpdate={onUpdate}
+      skybox={skybox}
+    />
+  );
 };
 
 export default {
   title: "OGL / Star",
-  parameters: {
-    layout: "fullscreen",
-  },
-  argTypes: {
-    color: {
-      control: { type: "color" },
-    },
-  },
+  ...merge({}, story3dMeta),
 } as Meta;
 
-const Template: StoryFn<StarStoryProps> = ({ color }) => (
+const Template: StoryFn<StarStoryProps> = ({ postProcessing, skybox }) => (
   <div id="root">
     <Styles>
-      <StarStory color={color} />
+      <StarStory postProcessing={postProcessing} skybox={skybox} />
     </Styles>
   </div>
 );
 
 export const Default = Template.bind({});
-Default.args = {
-  color: "#8c422b",
-} as StarStoryProps;
+Default.args = {} as StarStoryProps;

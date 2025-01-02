@@ -1,14 +1,5 @@
-import {
-  Transform,
-  Post,
-  Texture,
-  Vec2,
-  Vec3,
-  Sphere,
-  RenderTarget,
-} from "ogl";
+import { Post, Texture, Vec2, Vec3, RenderTarget } from "ogl";
 import settings from "@core/settings";
-import { ColorMaterial } from "@ogl-engine/materials/color/color";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
 import { gameStore } from "@ui/state/game";
 import brightPassFragment from "../post/brightPass.frag.glsl";
@@ -17,17 +8,17 @@ import fxaaFragment from "../post/fxaa.frag.glsl";
 import compositeFragment from "../post/composite.frag.glsl";
 import type { Light } from "./Light";
 import { dummyLight } from "./Light";
-import { BaseMesh } from "./BaseMesh";
 import { Camera } from "./Camera";
 import { Engine } from "./engine";
+import type { Scene } from "./Scene";
 
 const bloomSize = 1.2;
 const lightsNum = 32;
 
-export class Engine3D extends Engine {
+export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   postProcessing = false;
   fxaa = false;
-  lightsContainer: Transform;
+  scene: TScene;
 
   uniforms: {
     env: {
@@ -58,7 +49,6 @@ export class Engine3D extends Engine {
     });
 
     this.initUniforms();
-    this.initLightsContainer();
     this.initPostProcessing();
     window.renderer = this;
     this.hooks.onInit.notify();
@@ -81,30 +71,13 @@ export class Engine3D extends Engine {
     };
   }
 
-  private initLightsContainer = () => {
-    this.lightsContainer = new Transform();
-    this.lightsContainer.name = "Lights";
-    this.scene.addChild(this.lightsContainer);
-    this.lightsContainer.visible = false;
-
-    for (let i = 0; i < lightsNum; i++) {
-      const light = new BaseMesh<ColorMaterial>(this, {
-        geometry: new Sphere(this.gl, { radius: 0.01 }),
-      });
-      light.applyMaterial(new ColorMaterial(this, new Vec3(1, 1, 1), false));
-      light.material.uniforms.fEmissive.value = 1;
-      light.visible = false;
-      this.lightsContainer.addChild(light);
-    }
-  };
-
   private initPostProcessing = () => {
     const gl = this.renderer.gl;
 
     this.postProcessingLayers = {
       composite: new Post(gl),
       bloom: new Post(gl, {
-        dpr: this.dpr / 2,
+        dpr: this.dpr / 4,
         targetOnly: true,
         depth: false,
       }),
@@ -122,7 +95,7 @@ export class Engine3D extends Engine {
       fragment: blurFragment,
       uniforms: {
         uResolution: this.uniforms.resolution.bloom,
-        uDirection: { value: new Vec2(bloomSize, 0) },
+        uDirection: { value: new Vec2(bloomSize * 2, 0) },
       },
     });
     const verticalPass = this.postProcessingLayers.bloom.addPass({
@@ -132,7 +105,7 @@ export class Engine3D extends Engine {
         uDirection: { value: new Vec2(0, bloomSize) },
       },
     });
-    for (let i = 0; i < 32; i++) {
+    for (let i = 0; i < 24; i++) {
       this.postProcessingLayers.bloom.passes.push(horizontalPass, verticalPass);
     }
 
@@ -250,16 +223,6 @@ export class Engine3D extends Engine {
       if (this.uniforms.env.lights[i] === dummyLight.uniforms) {
         this.uniforms.env.lights[i] = light.uniforms;
 
-        const lightMesh = this.lightsContainer.children[
-          i
-        ] as BaseMesh<ColorMaterial>;
-        lightMesh.visible = true;
-        lightMesh.material.setColor(
-          light.uniforms.color.value.clone().multiply(255)
-        );
-        // @ts-ignore it ensures binding between light and lightMesh
-        lightMesh.position = light.uniforms.position.value;
-
         return;
       }
     }
@@ -274,10 +237,6 @@ export class Engine3D extends Engine {
     }
 
     this.uniforms.env.lights[index] = dummyLight.uniforms;
-    const lightMesh = this.lightsContainer.children[
-      index
-    ] as BaseMesh<ColorMaterial>;
-    lightMesh.visible = false;
   };
 
   getByEntityId(id: number) {

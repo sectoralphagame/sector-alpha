@@ -3,7 +3,9 @@ import type { Engine } from "@ogl-engine/engine/engine";
 import type { Engine2D } from "@ogl-engine/engine/engine2d";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Light } from "@ogl-engine/engine/Light";
-import type { Vec3, Mesh, Program } from "ogl";
+import Color from "color";
+import { type Vec3, type Mesh, type Program, Texture } from "ogl";
+import type { FolderApi } from "tweakpane";
 
 export abstract class Material {
   engine: Engine3D;
@@ -29,6 +31,44 @@ export abstract class Material {
 
   apply(mesh: Mesh) {
     mesh.program = this.program;
+  }
+
+  createPaneSettings(folder: FolderApi) {
+    for (const uniform of Object.keys(this.uniforms)) {
+      console.log(uniform);
+      if (
+        ["ambient", "lights", "uTime", "fCameraNear", "fCameraFar"].includes(
+          uniform
+        )
+      )
+        continue;
+
+      if (this.uniforms[uniform].value instanceof Texture) continue;
+
+      if (uniform.match(/[cC]olor/)) {
+        const color = Color.rgb(
+          this.uniforms[uniform].value.toArray().map((v) => v * 255)
+        ).hex();
+        folder
+          .addBinding({ color }, "color", {
+            label: uniform,
+            view: "color",
+          })
+          .on("change", ({ value }) => {
+            Material.colorToVec3(value, this.uniforms[uniform]);
+          });
+      } else {
+        folder.addBinding(this.uniforms[uniform], "value", {
+          label: uniform,
+          view: uniform.match(/[cC]olor/) ? "color" : undefined,
+        });
+      }
+    }
+  }
+
+  static colorToVec3(color: string, uniform: { value: Vec3 }) {
+    const c = Color(color).rgb().array();
+    uniform.value.set(c[0], c[1], c[2]).divide(255);
   }
 }
 

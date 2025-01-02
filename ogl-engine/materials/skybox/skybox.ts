@@ -117,8 +117,12 @@ export class Skybox extends Mesh implements Destroyable {
   }
 
   createPaneFolder() {
-    if (pane.children.find((child) => (child as FolderApi).title === "Skybox"))
-      return;
+    const existingFolder = pane.children.find(
+      (child) => (child as FolderApi).title === "Skybox"
+    );
+    if (existingFolder) {
+      existingFolder.dispose();
+    }
 
     const params = {
       ambient: this.engine.uniforms.env.ambient.value[0],

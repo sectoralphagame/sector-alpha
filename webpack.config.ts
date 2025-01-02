@@ -19,6 +19,7 @@ const plugins = [
     NODE_ENV: "development",
     BUGSNAG_API_KEY: "",
     BUILD_ENV: "local",
+    STORYBOOK: false,
   }),
   new MiniCssExtractPlugin({
     filename: devMode ? "[name].css" : "[name].[contenthash].css",

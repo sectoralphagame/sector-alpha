@@ -1,5 +1,6 @@
 import { skyboxes } from "@assets/textures/skybox";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
+import { TacticalMapScene } from "@ogl-engine/engine/Scene";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
 import { Orbit } from "ogl";
@@ -21,7 +22,12 @@ export const Story3d: React.FC<Story3dProps> = ({
   onEngineInit,
   onEngineUpdate,
 }) => {
-  const engine = React.useMemo(() => new Engine3D(), []);
+  const engine = React.useMemo(() => {
+    const e = new Engine3D<TacticalMapScene>();
+    e.setScene(new TacticalMapScene(e));
+
+    return e;
+  }, []);
   const controlRef = React.useRef<Orbit>();
   const skyboxRef = React.useRef<Skybox>();
 

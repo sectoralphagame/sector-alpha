@@ -46,7 +46,7 @@ export const OglCanvas: React.FC<OglCanvasProps> = React.memo(
 
     React.useEffect(() => {
       if (errorCount > 10) {
-        engine.hooks.onError.notify(new Error("Error count exceeded"));
+        console.error("Too many errors, stopping rendering");
         cancelAnimationFrame(frameIdRef.current);
       }
     }, [errorCount]);

@@ -51,7 +51,7 @@ export class Asteroids extends Transform {
   }
 
   private async createAsteroids() {
-    const numAsteroids = this.size ** 2 * this.density * 4;
+    const numAsteroids = this.size ** 2 * this.density * 6;
 
     await assetLoader.load(this.engine.gl);
     const asteroidModels: ModelName[] = [
@@ -79,7 +79,9 @@ export class Asteroids extends Transform {
 
         const t = new Mat4().identity();
         t[12] = Math.cos(angle) * radius;
-        t[13] = random(-this.size / 10, this.size / 10);
+        t[13] =
+          Math.cos(((radius / this.size) * Math.PI) / 2) ** 2 *
+          random(-this.size / 10, this.size / 10);
         t[14] = Math.sin(angle) * radius;
 
         const r = new Mat4().fromQuaternion(

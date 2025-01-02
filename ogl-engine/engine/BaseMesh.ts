@@ -24,7 +24,9 @@ export class BaseMesh<TMaterial extends Material = Material>
       this.name = options.name;
     }
 
-    this.calculateTangents();
+    if (this.geometry) {
+      this.calculateTangents();
+    }
 
     this.engine = engine;
     this.applyMaterial(

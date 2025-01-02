@@ -11,7 +11,8 @@
         "ore": 0,
         "silica": 0
       },
-      "skybox": "earth"
+      "skybox": "earth",
+      "props": []
     },
     {
       "name": "Luna",
@@ -23,7 +24,9 @@
         "ice": 17,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Mars",
@@ -35,7 +38,9 @@
         "ice": 0,
         "ore": 15,
         "silica": 13
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Saturn",
@@ -47,7 +52,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Sedna",
@@ -59,7 +66,9 @@
         "ice": 0,
         "ore": 20,
         "silica": 13
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Gaia",
@@ -72,7 +81,8 @@
         "ore": 0,
         "silica": 0
       },
-      "skybox": "gaia"
+      "skybox": "gaia",
+      "props": []
     },
     {
       "name": "Arges",
@@ -84,7 +94,9 @@
         "ice": 0,
         "ore": 10,
         "silica": 10
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Pontus",
@@ -96,7 +108,9 @@
         "ice": 18,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Sector Alpha",
@@ -109,7 +123,8 @@
         "ore": 0,
         "silica": 0
       },
-      "skybox": "sectoralpha"
+      "skybox": "sectoralpha",
+      "props": []
     },
     {
       "name": "Eris",
@@ -121,7 +136,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Discordis c",
@@ -133,7 +150,9 @@
         "ice": 0,
         "ore": 10,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Juno II",
@@ -145,7 +164,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Juno III",
@@ -157,7 +178,9 @@
         "ice": 18,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Juno IV",
@@ -169,7 +192,9 @@
         "ice": 0,
         "ore": 16,
         "silica": 12
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Therr",
@@ -181,7 +206,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "GJ 229 II",
@@ -193,7 +220,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Teegarden's Star I",
@@ -206,7 +235,8 @@
         "ore": 0,
         "silica": 0
       },
-      "skybox": "teegarden1"
+      "skybox": "teegarden1",
+      "props": []
     },
     {
       "name": "Teegarden's Star II",
@@ -219,7 +249,18 @@
         "ore": 12,
         "silica": 5
       },
-      "skybox": "teegarden2"
+      "skybox": "teegarden2",
+      "props": [
+        {
+          "type": "star",
+          "position": [10000, 1.3659098494, 0.24],
+          "scale": 381,
+          "color": "#b84545",
+          "noise": 2.5,
+          "noisePower": 0.5,
+          "name": "Star"
+        }
+      ]
     },
     {
       "name": "Tau Ceti e",
@@ -231,7 +272,9 @@
         "ice": 0,
         "ore": 14,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Tau Ceti f",
@@ -243,7 +286,9 @@
         "ice": 8,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "The Hive",
@@ -255,7 +300,9 @@
         "ice": 4,
         "ore": 12,
         "silica": 8
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "GJ 1002 I",
@@ -267,7 +314,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "GJ 1002 II",
@@ -279,7 +328,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "GJ 1002 III",
@@ -291,7 +342,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Ross 128 I",
@@ -303,7 +356,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Ross 128 II",
@@ -315,7 +370,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Ross 128 III",
@@ -327,7 +384,9 @@
         "ice": 18,
         "ore": 14,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Ross 128 IV",
@@ -339,7 +398,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Wolf 1061 I",
@@ -351,7 +412,9 @@
         "ice": 0,
         "ore": 0,
         "silica": 9
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Wolf 1061 II",
@@ -363,7 +426,9 @@
         "ice": 4,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "Wolf 1061 III",
@@ -375,7 +440,9 @@
         "ice": 4,
         "ore": 9,
         "silica": 8
-      }
+      },
+      "skybox": "example",
+      "props": []
     },
     {
       "name": "GJ 625",
@@ -387,7 +454,9 @@
         "ice": 3,
         "ore": 0,
         "silica": 0
-      }
+      },
+      "skybox": "example",
+      "props": []
     }
   ],
   "inactive": [],
