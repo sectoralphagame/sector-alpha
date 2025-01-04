@@ -8,8 +8,7 @@ import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
 import type { EngineParticleGenerator } from "@ogl-engine/particles";
 import { getParticleType, particleGenerator } from "@ogl-engine/particles";
 import { Light } from "@ogl-engine/engine/Light";
-import Color from "color";
-import { Plane, Vec3 } from "ogl";
+import { Plane } from "ogl";
 import { ship } from "@core/archetypes/ship";
 import { EntityIndicatorMaterial } from "@ogl-engine/materials/entityIndicator/entityIndicator";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
@@ -68,11 +67,14 @@ export class EntityMesh extends BaseMesh {
 
         // FIXME: add this as a child after light refactor
         if (input.name.includes("hyperslingshot")) {
-          const light = new Light(
-            new Vec3(...Color("#fffd8c").array()),
-            0.1,
-            false
-          );
+          const light = new Light(2, false);
+          light.setColor("#fffd8c");
+          this.addChild(light);
+          this.engine.addLight(light);
+        }
+        if (input.name.includes("engine")) {
+          const light = new Light(0.2, false);
+          light.setColor("#1ff4ff");
           this.addChild(light);
           this.engine.addLight(light);
         }
@@ -98,7 +100,7 @@ export class EntityMesh extends BaseMesh {
       this.entity.cp.position.coord[1] * scale
     );
     this.rotation.y = -this.entity.cp.position.angle;
-    this.visible = !this.entity.cp.render.hidden;
+    this.setVisibility(!this.entity.cp.render.hidden);
   }
 
   addRing = (color: number, size: DockSize) => {

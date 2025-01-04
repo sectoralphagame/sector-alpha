@@ -4,6 +4,7 @@ import { Mesh, Vec3 } from "ogl";
 import { MissingMaterial } from "@ogl-engine/materials/missing/missing";
 import type { Destroyable } from "@ogl-engine/types";
 import type { Engine3D } from "./engine3d";
+import { Light } from "./Light";
 
 export class BaseMesh<TMaterial extends Material = Material>
   extends Mesh
@@ -48,6 +49,16 @@ export class BaseMesh<TMaterial extends Material = Material>
     if (!this.geometry.attributes.tangent) {
       this.calculateTangents();
     }
+  }
+
+  setVisibility(visible: boolean): void {
+    this.visible = visible;
+
+    this.traverse((child) => {
+      if (child instanceof Light) {
+        child.setVisibility(visible);
+      }
+    });
   }
 
   private calculateTangents(): void {

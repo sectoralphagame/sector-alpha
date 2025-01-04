@@ -12,31 +12,26 @@ export class Light extends Transform {
     visible: { value: number };
   };
   frustumCulled = false;
-  program = {
-    transparent: false,
-    depthTest: false,
-  };
+  /**
+   * Used to sort lights by distance to the camera
+   */
+  zDepth = 0;
 
-  constructor(
-    color: Vec3,
-    intensity: number,
-    directional: boolean,
-    visible = true
-  ) {
+  constructor(intensity: number, directional: boolean, visible = true) {
     super();
 
     this.uniforms = {
       position: {
         value: new Vec4(0, 0, 0, directional ? 0 : 1),
       },
-      color: { value: color },
+      color: { value: new Vec3(1) },
       intensity: { value: intensity },
       visible: { value: visible ? 1 : 0 },
     };
   }
 
-  draw() {
-    this.updateMatrixWorld();
+  isDirectional() {
+    return this.uniforms.position.value.w === 0;
   }
 
   setIntensity(intensity: number) {
@@ -46,6 +41,11 @@ export class Light extends Transform {
   setColor(color: string) {
     const c = Color(color).array();
     this.uniforms.color.value.set(c[0], c[1], c[2]).divide(255);
+  }
+
+  setVisibility(visible: boolean) {
+    this.uniforms.visible.value = visible ? 1 : 0;
+    this.visible = visible;
   }
 
   updateMatrixWorld(force?: boolean): void {
@@ -63,4 +63,4 @@ export class Light extends Transform {
   }
 }
 
-export const dummyLight = new Light(new Vec3(0), 0, false, false);
+export const dummyLight = new Light(0, false, false);

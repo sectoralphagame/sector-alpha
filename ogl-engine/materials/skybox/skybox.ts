@@ -1,6 +1,6 @@
 import type { SkyboxTexture } from "@assets/textures/skybox";
 import { skyboxes } from "@assets/textures/skybox";
-import { Vec3, Box, Mesh, Program, Texture } from "ogl";
+import { Box, Mesh, Program, Texture } from "ogl";
 import { Light } from "@ogl-engine/engine/Light";
 import type { Destroyable } from "@ogl-engine/types";
 import { pane } from "@ui/context/Pane";
@@ -48,7 +48,6 @@ const settings: Partial<
 };
 
 export class Skybox extends Mesh implements Destroyable {
-  private color: Vec3;
   private light: Light;
   name = "Skybox";
   engine: Engine3D;
@@ -77,9 +76,8 @@ export class Skybox extends Mesh implements Destroyable {
 
     this.loadTexture(name);
     this.engine = engine;
-    this.color = new Vec3(1);
     this.scale.set(1e3);
-    this.light = new Light(this.color, 0.5, true);
+    this.light = new Light(0.5, true);
     this.light.position.set(0, -1, -0.4);
     this.light.setParent(this);
     this.engine.addLight(this.light);

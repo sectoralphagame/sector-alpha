@@ -122,4 +122,17 @@ export class MapControl extends Orbit {
       this.mouse.set(x, y);
     }
   };
+
+  override addHandlers() {
+    this.element.addEventListener("contextmenu", this.onContextMenu, false);
+    this.element.addEventListener("mousedown", this.onMouseDown, false);
+    this.element.addEventListener("wheel", this.onMouseWheel, {
+      passive: false,
+    });
+    // this.element.addEventListener("touchstart", this.onTouchStart, {
+    //   passive: false,
+    // });
+    // this.element.addEventListener("touchend", this.onTouchEnd, false);
+    // this.element.addEventListener("touchmove", this.onTouchMove, { passive: false });
+  }
 }

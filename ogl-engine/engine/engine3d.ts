@@ -13,7 +13,9 @@ import { Engine } from "./engine";
 import type { Scene } from "./Scene";
 
 const bloomSize = 1.2;
-const lightsNum = 32;
+const lightsNum = 16;
+
+const tempVec3 = new Vec3();
 
 export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   postProcessing = false;
@@ -29,6 +31,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     uTime: { value: number };
   };
 
+  private lights: Light[] = [];
   private postProcessingLayers: Record<"composite" | "bloom", Post>;
   private renderTarget: RenderTarget;
 
@@ -59,9 +62,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.uniforms = {
       env: {
         ambient: { value: new Vec3(0) },
-        lights: Array(lightsNum)
-          .fill(0)
-          .map(() => dummyLight.uniforms),
+        lights: [],
       },
       resolution: {
         base: { value: new Vec2() },
@@ -144,6 +145,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   }
 
   render() {
+    this.prepareLighting();
+
     if (this.postProcessing) {
       this.renderComposite();
     } else {
@@ -219,24 +222,16 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   };
 
   addLight = (light: Light) => {
-    for (let i = 0; i < this.uniforms.env.lights.length; i++) {
-      if (this.uniforms.env.lights[i] === dummyLight.uniforms) {
-        this.uniforms.env.lights[i] = light.uniforms;
-
-        return;
-      }
-    }
-
-    throw new Error("No more light slots available");
+    this.lights.push(light);
   };
 
   removeLight = (light: Light) => {
-    const index = this.uniforms.env.lights.indexOf(light.uniforms);
+    const index = this.lights.indexOf(light);
     if (index === -1) {
       throw new Error("Light not found");
     }
 
-    this.uniforms.env.lights[index] = dummyLight.uniforms;
+    this.lights.splice(index, 1);
   };
 
   getByEntityId(id: number) {
@@ -249,5 +244,36 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     });
 
     return mesh;
+  }
+
+  prepareLighting() {
+    const lightsToRender: Light[] = [];
+    const point: Light[] = [];
+
+    for (let i = 0; i < this.lights.length; i++) {
+      this.lights[i].updateMatrixWorld();
+
+      if (!this.lights[i].visible) continue;
+
+      if (this.lights[i].isDirectional()) {
+        lightsToRender.push(this.lights[i]);
+      } else {
+        point.push(this.lights[i]);
+        this.lights[i].worldMatrix.getTranslation(tempVec3);
+        tempVec3.applyMatrix4(this.camera.projectionViewMatrix);
+        this.lights[i].zDepth = tempVec3.z;
+      }
+    }
+
+    point.sort((a, b) => a.zDepth - b.zDepth);
+
+    lightsToRender.push(...point.slice(0, lightsNum - lightsToRender.length));
+    while (lightsNum > lightsToRender.length) {
+      lightsToRender.push(dummyLight);
+    }
+
+    for (let i = 0; i < lightsNum; i++) {
+      this.uniforms.env.lights[i] = lightsToRender[i].uniforms;
+    }
   }
 }

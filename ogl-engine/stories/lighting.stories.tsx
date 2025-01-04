@@ -32,9 +32,11 @@ const LightingStory: React.FC<{
       controlRef.current = new Orbit(engine.camera);
       skyboxRef.current = new Skybox(engine, "example");
       lightsRef.current.push(
-        new Light(new Vec3(0, 1, 1), intensity, false),
-        new Light(new Vec3(1, 1, 0), intensity, false)
+        new Light(intensity, false),
+        new Light(intensity, false)
       );
+      lightsRef.current[0].setColor("#ff0000");
+      lightsRef.current[1].setColor("#0000ff");
       lightsRef.current.forEach((light) => {
         engine.scene.addChild(light);
         engine.addLight(light);

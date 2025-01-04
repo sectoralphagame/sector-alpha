@@ -20,6 +20,7 @@ export class Orbit {
   camera: Camera;
   element: HTMLElement;
   enabled = true;
+  initialized = false;
 
   autoRotate = false;
   autoRotateSpeed = 1.0;
@@ -91,6 +92,10 @@ export class Orbit {
   }
 
   public update() {
+    if (!this.initialized) {
+      this.addHandlers();
+      this.initialized = true;
+    }
     if (this.autoRotate) {
       this.handleAutoRotate();
     }
@@ -143,8 +148,6 @@ export class Orbit {
 
     // Reset scale every frame to avoid applying scale multiple times
     this.sphericalDelta.radius = 1;
-
-    this.addHandlers();
   }
 
   // Updates internals with new position
@@ -394,7 +397,7 @@ export class Orbit {
     e.preventDefault();
   };
 
-  addHandlers = () => {
+  addHandlers() {
     this.element.addEventListener("contextmenu", this.onContextMenu, false);
     this.element.addEventListener("mousedown", this.onMouseDown, false);
     this.element.addEventListener("wheel", this.onMouseWheel, {
@@ -405,7 +408,7 @@ export class Orbit {
     // });
     // this.element.addEventListener("touchend", this.onTouchEnd, false);
     // this.element.addEventListener("touchmove", this.onTouchMove, { passive: false });
-  };
+  }
 
   remove = () => {
     this.element.removeEventListener("contextmenu", this.onContextMenu);
