@@ -296,7 +296,11 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     const path = this.engine.scene.ui.children.find(
       (c) => c instanceof Path
     ) as Path | undefined;
-    if (path && gameStore.selectedUnit) {
+    if (
+      path &&
+      gameStore.selectedUnit &&
+      gameStore.selectedUnit.hasComponents(["position", "orders"])
+    ) {
       path.update(
         Path.getPath(
           gameStore.selectedUnit.requireComponents(["position", "orders"]),
