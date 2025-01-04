@@ -253,7 +253,10 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
           geometry: new Box(this.engine.gl, { width: 1, height: 1 }),
           material: new ColorMaterial2D(
             this.engine,
-            owner?.cp.color.value ?? "#ff00ff"
+            owner?.cp.color.value ??
+              window
+                .getComputedStyle(document.body)
+                .getPropertyValue("--palette-disabled")
           ),
         });
         mesh.name = `Entity:${renderable.id}`;

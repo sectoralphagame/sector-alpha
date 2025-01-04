@@ -1,14 +1,12 @@
 import React, { useCallback } from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
-import { GLTFLoader, Orbit, Vec3 } from "ogl";
+import { GLTFLoader, Orbit } from "ogl";
 import models from "@assets/models";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { skyboxes } from "@assets/textures/skybox";
-import { Light } from "@ogl-engine/engine/Light";
-import Color from "color";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { merge } from "lodash";
 import type { Story3dArgs } from "./Story3d";
@@ -17,32 +15,18 @@ import { Story3d, story3dMeta } from "./Story3d";
 interface ModelStoryProps extends Story3dArgs {
   model: string;
   rotationSpeed: number;
-  intensity: number;
-}
-
-function createLights(intensity: number): Light[] {
-  const lights = [
-    new Light(new Vec3(...Color("#dafff1").array()), intensity, false),
-    new Light(new Vec3(...Color("#f9fae6").array()), intensity, false),
-  ];
-  lights[0].position.set(10, 0, 0);
-  lights[1].position.set(0, 10, 0);
-
-  return lights;
 }
 
 const ModelStory: React.FC<ModelStoryProps> = ({
   model: modelName,
   skybox,
   rotationSpeed,
-  intensity,
   postProcessing,
 }) => {
   const engineRef = React.useRef<Engine3D>();
   const meshRef = React.useRef<BaseMesh>();
   const controlRef = React.useRef<Orbit>();
   const rotationSpeedRef = React.useRef(rotationSpeed);
-  const lights = React.useRef<Light[]>(createLights(intensity));
   const load = useCallback((m: keyof typeof models, engine: Engine3D) => {
     GLTFLoader.load(engine.gl, m).then((model) => {
       meshRef.current = BaseMesh.fromGltf(engine, model, {
@@ -58,8 +42,6 @@ const ModelStory: React.FC<ModelStoryProps> = ({
   const onInit = useCallback(async (engine: Engine3D) => {
     engineRef.current = engine;
     engine.camera.position.set(0.1);
-    lights.current.forEach((l) => engine.scene.addChild(l));
-    lights.current.forEach(engine.addLight);
 
     controlRef.current = new Orbit(engine.camera, {
       inertia: 0.8,
@@ -86,12 +68,6 @@ const ModelStory: React.FC<ModelStoryProps> = ({
     rotationSpeedRef.current = rotationSpeed;
   }, [rotationSpeed]);
 
-  React.useEffect(() => {
-    for (const light of lights.current) {
-      light.setIntensity(intensity);
-    }
-  }, [intensity]);
-
   return (
     <Story3d
       postProcessing={postProcessing}
@@ -110,7 +86,6 @@ export default {
         model: Object.keys(models)[0],
         skybox: Object.keys(skyboxes)[0],
         rotationSpeed: 1,
-        intensity: 6,
       },
       argTypes: {
         model: {
@@ -131,7 +106,6 @@ const Template: StoryFn<ModelStoryProps> = ({
   model,
   skybox,
   rotationSpeed,
-  intensity,
   postProcessing,
 }) => (
   <div id="root">
@@ -140,7 +114,6 @@ const Template: StoryFn<ModelStoryProps> = ({
         model={model.replace(/-/, "/")}
         skybox={skybox}
         rotationSpeed={rotationSpeed}
-        intensity={intensity}
         postProcessing={postProcessing}
       />
     </Styles>

@@ -1,5 +1,7 @@
 import sCiv from "@assets/models/ship/sCiv.glb";
 import mCiv from "@assets/models/ship/mCiv.glb";
+import mMinExample from "@assets/models/ship/m_min_example.glb";
+import axe from "@assets/models/ship/m_mil_axe.glb";
 import dart from "@assets/models/ship/dart.glb";
 import facility from "@assets/models/facility.glb";
 import gateway from "@assets/models/gateway.glb";
@@ -13,8 +15,10 @@ import star from "@assets/models/world/star.glb";
 export default {
   "ship/sCiv": sCiv,
   "ship/mCiv": mCiv,
+  "ship/mMinExample": mMinExample,
   "ship/lMil": lMil,
   "ship/dart": dart,
+  "ship/axe": axe,
   "facility/default": facility,
   "facility/gateway": gateway,
   "world/asteroid1": asteroid1,
