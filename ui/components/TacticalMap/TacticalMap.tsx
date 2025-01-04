@@ -197,6 +197,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
           selectedEntity.cp.position.coord[1] * scale
         )
       );
+      gameStore.focusUnit();
     }
   }
 
