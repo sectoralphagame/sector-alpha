@@ -8,7 +8,6 @@ import { MapControl } from "@ogl-engine/MapControl";
 import { defaultClickSound } from "@kit/BaseButton";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
-import { selectingSystem } from "@core/systems/selecting";
 import { Path } from "@ogl-engine/utils/path";
 import type { SkyboxTexture } from "@assets/textures/skybox";
 import { TacticalMapScene } from "@ogl-engine/engine/Scene";
@@ -26,6 +25,7 @@ import { reaction } from "mobx";
 import type { Position2D } from "@core/components/position";
 import { Star } from "@ogl-engine/engine/Star";
 import { Light } from "@ogl-engine/engine/Light";
+import type { Entity } from "@core/entity";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 
@@ -77,8 +77,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       }
     );
     this.onUnmountCallbacks.push(disposer);
-    selectingSystem.hook.subscribe("TacticalMap", (...args) =>
-      this.onSelectedChange(...args)
+    this.onUnmountCallbacks.push(
+      reaction(() => gameStore.selectedUnit, this.onSelectedChange.bind(this))
     );
     storageHook.subscribe("TacticalMap", (key) => {
       if (key !== "gameSettings") return;
@@ -216,17 +216,16 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.loadSector();
   }
 
-  onSelectedChange([prevId, id]: (number | null)[]) {
-    if (prevId) {
-      this.meshes.get(prevId)?.setSelected(false);
+  onSelectedChange(entity: Entity | null, prevEntity: Entity | null) {
+    if (prevEntity) {
+      this.meshes.get(prevEntity.id)?.setSelected(false);
       const path = this.engine.scene.ui.children.find((c) => c instanceof Path);
       if (path) {
         this.engine.scene.ui.removeChild(path);
       }
     }
-    if (id) {
-      this.meshes.get(id)?.setSelected(true);
-      const entity = this.sim.getOrThrow(id);
+    if (entity) {
+      this.meshes.get(entity.id)?.setSelected(true);
       if (entity.hasComponents(["position", "orders"])) {
         const path = new Path(this.engine);
         this.engine.scene.ui.addChild(path);

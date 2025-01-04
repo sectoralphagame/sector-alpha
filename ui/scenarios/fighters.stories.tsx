@@ -28,7 +28,6 @@ import {
   changeRelations,
   relationThresholds,
 } from "@core/components/relations";
-import { selectingSystem } from "@core/systems/selecting";
 import settings from "@core/settings";
 
 const Game: React.FC<{ factions: number; fighters: number }> = ({
@@ -52,7 +51,6 @@ const Game: React.FC<{ factions: number; fighters: number }> = ({
         attackingSystem,
         deadUnregisteringSystem,
         renderingSystem,
-        selectingSystem,
       ],
     });
     sim.init();
