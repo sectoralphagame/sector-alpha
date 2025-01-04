@@ -125,12 +125,17 @@ export class EntityMesh extends BaseMesh {
 
     const onUpdate = (delta: number) => {
       generator.update(delta);
+      const entity = window.sim.get(this.entityId);
+
+      if (!entity) return;
 
       if (type === "engine") {
         const gen = generator as any as EngineParticleGenerator;
-        const e = ship(window.sim.getOrThrow(this.entityId));
+        const shipEntity = ship(entity);
 
-        gen.setIntensity(e.cp.movable.velocity / e.cp.drive.maneuver);
+        gen.setIntensity(
+          shipEntity.cp.movable.velocity / shipEntity.cp.drive.maneuver
+        );
       }
     };
     this.engine.hooks.onUpdate.subscribe(this.name, onUpdate);

@@ -83,6 +83,17 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       if (key !== "gameSettings") return;
       this.updateEngineSettings();
     });
+    this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
+      if (this.meshes.has(entity.id)) {
+        const mesh = this.meshes.get(entity.id)!;
+        mesh.destroy();
+        this.engine.scene.entities.removeChild(mesh);
+        this.meshes.delete(entity.id);
+        if (gameStore.selectedUnit?.id === entity.id) {
+          gameStore.unselectUnit();
+        }
+      }
+    });
   }
 
   componentWillUnmount(): void {
