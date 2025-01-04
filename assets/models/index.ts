@@ -10,7 +10,6 @@ import asteroid1 from "@assets/models/world/asteroid_1.glb";
 import asteroid2 from "@assets/models/world/asteroid_2.glb";
 import asteroid3 from "@assets/models/world/asteroid_3.glb";
 import asteroid4 from "@assets/models/world/asteroid_4.glb";
-import star from "@assets/models/world/star.glb";
 
 export default {
   "ship/sCiv": sCiv,
@@ -25,5 +24,4 @@ export default {
   "world/asteroid2": asteroid2,
   "world/asteroid3": asteroid3,
   "world/asteroid4": asteroid4,
-  "world/star": star,
 };

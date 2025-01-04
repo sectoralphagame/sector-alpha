@@ -172,7 +172,6 @@ export class Skybox extends Mesh implements Destroyable {
   }
 
   destroy = () => {
-    this.engine.removeLight(this.light);
     this.paneFolder?.dispose();
   };
 }

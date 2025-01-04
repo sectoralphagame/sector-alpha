@@ -25,6 +25,7 @@ import { gameStore } from "@ui/state/game";
 import { reaction } from "mobx";
 import type { Position2D } from "@core/components/position";
 import { Star } from "@ogl-engine/engine/Star";
+import { Light } from "@ogl-engine/engine/Light";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 
@@ -206,6 +207,9 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       if (isDestroyable(mesh)) {
         mesh.destroy();
       }
+      if (mesh instanceof Light) {
+        this.engine.removeLight(mesh);
+      }
     });
 
     this.engine.setScene(new TacticalMapScene(this.engine));
@@ -274,11 +278,13 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
             entity.cp.render.model = "ship/dart";
           }
         } else if (entity.hasTags(["facility"])) {
+          entity.cp.render.model = "facility/default";
           if (entity.tags.has("gateway")) {
             entity.cp.render.model = "facility/gateway";
-          } else {
-            entity.cp.render.model = "facility/default";
           }
+        } else {
+          // FIXME: This is just a placeholder for now
+          entity.cp.render.model = "world/asteroid1";
         }
       }
 
