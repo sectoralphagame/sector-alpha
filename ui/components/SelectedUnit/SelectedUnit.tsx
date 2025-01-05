@@ -14,7 +14,7 @@ export const SelectedUnit: React.FC = () => {
 
   return (
     <div className={styles.root}>
-      <div className={styles.panel} onDoubleClick={gameStore.focusUnit}>
+      <div className={styles.panel} onDoubleClick={gameStore.focus}>
         <Text variant="caption">
           {selectedUnit.cp.name?.value ??
             (selectedUnit.hasTags(["collectible"]) ? "Collectible" : "Unknown")}

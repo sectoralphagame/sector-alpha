@@ -23,7 +23,7 @@ export const MissionsOverlay: React.FC = () => {
       onReferenceClick={(id) => {
         gameStore.closeOverlay();
         gameStore.setSelectedUnit(sim.getOrThrow(id));
-        setTimeout(gameStore.focusUnit, 100);
+        setTimeout(gameStore.focus, 100);
       }}
     />
   );

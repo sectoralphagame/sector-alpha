@@ -83,7 +83,7 @@ export const TradeFinder: React.FC = () => {
                   onClick={() => {
                     gameStore.setSelectedUnit(entity);
                   }}
-                  onDoubleClick={gameStore.focusUnit}
+                  onDoubleClick={gameStore.focus}
                 >
                   <RedoIcon />
                 </IconButton>

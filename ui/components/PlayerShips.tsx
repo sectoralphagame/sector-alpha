@@ -46,7 +46,7 @@ export const PlayerShips: React.FC = () => {
               key={ship.id}
               ship={ship}
               selected={selected?.id}
-              onFocus={gameStore.focusUnit}
+              onFocus={gameStore.focus}
               onSelect={(id) => gameStore.setSelectedUnit(sim.getOrThrow(id))}
               onContextMenu={onContextMenu}
             />

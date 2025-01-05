@@ -26,7 +26,7 @@ export const Commander: React.FC<CommanderProps> = ({ commander, ship }) => {
           className={styles.btn}
           onClick={() => {
             gameStore.setSelectedUnit(commander);
-            gameStore.focusUnit();
+            gameStore.focus();
           }}
         >
           <RedoIcon />

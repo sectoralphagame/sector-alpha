@@ -32,7 +32,7 @@ export const FleetOverlay: React.FC = () => {
     gameStore.setSelectedUnit(sim.getOrThrow(id));
   };
   const onFocus = () => {
-    gameStore.focusUnit();
+    gameStore.focus();
     gameStore.closeOverlay();
   };
   const onContextMenu = (

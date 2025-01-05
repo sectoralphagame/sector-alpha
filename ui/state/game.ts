@@ -8,7 +8,7 @@ export type GameOverlayType = "fleet" | "missions" | "map" | "dev" | null;
 export class GameStore {
   sector: Sector = undefined!;
   selectedUnit: Entity | null = null;
-  unitFocused = false;
+  focused = false;
   overlay: GameOverlayType = null;
 
   constructor() {
@@ -19,8 +19,9 @@ export class GameStore {
       selectedUnit: observable,
       setSelectedUnit: action.bound,
       unselectUnit: action.bound,
-      unitFocused: observable,
-      focusUnit: action.bound,
+      focused: observable,
+      focus: action.bound,
+      unfocus: action.bound,
 
       overlay: observable,
       setOverlay: action.bound,
@@ -40,21 +41,21 @@ export class GameStore {
 
   unselectUnit() {
     this.selectedUnit = null;
-    this.unitFocused = false;
+    this.focused = false;
     window.selected = null;
   }
 
-  focusUnit() {
+  focus() {
     if (!this.selectedUnit) return;
 
-    this.unitFocused = true;
+    this.focused = true;
     this.setSector(
       this.selectedUnit.sim.getOrThrow(this.selectedUnit.cp.position!.sector)
     );
   }
 
-  unfocusUnit() {
-    this.unitFocused = false;
+  unfocus() {
+    this.focused = false;
   }
 
   setOverlay(overlay: GameOverlayType) {

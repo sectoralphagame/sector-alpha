@@ -29,7 +29,7 @@ export const Undeploy: React.FC<UndeployProps> = ({ facility, deployable }) => {
               className={styles.btn}
               onClick={() => {
                 gameStore.setSelectedUnit(deployable);
-                gameStore.focusUnit();
+                gameStore.focus();
               }}
             >
               <RedoIcon />

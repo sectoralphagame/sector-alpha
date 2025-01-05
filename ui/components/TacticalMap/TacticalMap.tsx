@@ -115,12 +115,12 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         mesh = this.raycastHits[1];
       }
       const isDoubleClick = Date.now() - this.lastClicked < 200;
-      gameStore.unfocusUnit();
+      gameStore.unfocus();
       gameStore.setSelectedUnit(this.sim.getOrThrow(mesh.entityId));
       defaultClickSound.play();
 
       if (isDoubleClick) {
-        gameStore.focusUnit();
+        gameStore.focus();
       }
 
       this.lastClicked = Date.now();
@@ -181,7 +181,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.control.onPointerDown = this.onControlClick.bind(this);
     this.control.onRightClick = this.onRightClick.bind(this);
     this.control.onPan = () => {
-      gameStore.unfocusUnit();
+      gameStore.unfocus();
     };
     this.control.isFocused = this.engine.isFocused.bind(this.engine);
     this.control.onKeyDown = this.onKeyDown.bind(this);
@@ -232,7 +232,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
           selectedEntity.cp.position.coord[1] * scale
         )
       );
-      gameStore.focusUnit();
+      gameStore.focus();
     }
   }
 
@@ -359,7 +359,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   }
 
   updateSelection() {
-    if (gameStore.unitFocused && gameStore.selectedUnit) {
+    if (gameStore.focused && gameStore.selectedUnit) {
       const entity = gameStore.selectedUnit.requireComponents(["position"]);
       this.control!.lookAt(
         new Vec3(

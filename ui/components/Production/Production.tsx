@@ -104,7 +104,7 @@ export const Production: React.FC<ProductionProps> = ({ entity }) => {
                               gameStore.setSelectedUnit(
                                 entity.sim.getOrThrow(teleport.cp.parent!.id)
                               );
-                              gameStore.focusUnit();
+                              gameStore.focus();
                             }}
                           >
                             <LocationIcon />
