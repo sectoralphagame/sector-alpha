@@ -9,7 +9,6 @@ import type { Parent } from "./parent";
 import type { FacilityModuleBonus } from "./facilityModuleBonus";
 import type { Modules } from "./modules";
 import type { Name } from "./name";
-import type { SelectionManager } from "./selection";
 import type { Render } from "./render";
 import type { RenderGraphics } from "./renderGraphics";
 import type { AutoOrder } from "./autoOrder";
@@ -92,7 +91,6 @@ export interface CoreComponents {
   render: Render;
   renderGraphics: RenderGraphics<any>;
   sectorStats: SectorStats;
-  selectionManager: SelectionManager;
   shipyard: Shipyard;
   simpleCommodityStorage: SimpleCommodityStorage;
   storage: CommodityStorage;

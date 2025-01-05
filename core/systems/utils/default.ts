@@ -37,7 +37,7 @@ export const defaultIndexer = {
   sectors: new EntityIndex(sectorComponents, [], true),
   selectable: new EntityIndex(["render", "position"], ["selection"]),
   settings: new EntityIndex(
-    ["selectionManager", "systemManager", "inflationStats", "camera"],
+    ["systemManager", "inflationStats", "camera"],
     [],
     true
   ),

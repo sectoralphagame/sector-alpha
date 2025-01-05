@@ -34,7 +34,6 @@ export class GameStore {
   }
 
   setSelectedUnit(unit: Entity) {
-    unit.sim.index.settings.get()[0].cp.selectionManager.id = unit.id;
     this.selectedUnit = unit;
     window.selected = unit;
   }

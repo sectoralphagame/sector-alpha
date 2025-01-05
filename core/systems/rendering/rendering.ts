@@ -56,7 +56,7 @@ export function setTexture(
 
 export class RenderingSystem extends SystemWithHooks<never> {
   rendering: true;
-  settingsManager: RequireComponent<"selectionManager" | "camera">;
+  settingsManager: RequireComponent<"camera">;
   viewport: Viewport;
   app: PIXI.Application;
   initialized = false;
@@ -342,7 +342,7 @@ export class RenderingSystem extends SystemWithHooks<never> {
   updateEntityScaling = (entity: RequireComponent<"render">) => {
     const entityRender = entity.cp.render;
     const sprite = this.sprites.get(entity);
-    const selected = entity.id === this.settingsManager.cp.selectionManager.id;
+    const selected = false;
     const scale = this.viewport.scale.x;
 
     if (!sprite) return;

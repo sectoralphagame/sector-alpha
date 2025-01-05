@@ -4,7 +4,6 @@ import { add } from "mathjs";
 import type { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
 import { spottingRadius } from "@core/systems/ai/spotting";
-import { first } from "@fxts/core";
 import { FogOfWarUpdatingSystem } from "@core/systems/fogOfWarUpdating";
 import type { Sector } from "../archetypes/sector";
 import { sectorSize } from "../archetypes/sector";
@@ -287,10 +286,6 @@ export const graphics: Graphics = {
     textGraphics.anchor.set(0.5, 0.5);
     textGraphics.position.set(textPos[0], textPos[1]);
     textGraphics.interactive = true;
-    textGraphics.on("pointerdown", () => {
-      first(entity.sim.index.settings.getIt())!.cp.selectionManager.id =
-        entity.id;
-    });
     textGraphics.cursor = "pointer";
     g.position.set(pos[0], pos[1]);
     g.addChild(textGraphics);

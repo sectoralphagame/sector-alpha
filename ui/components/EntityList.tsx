@@ -3,6 +3,7 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { IconButton } from "@kit/IconButton";
 import { Table, TableCell } from "@kit/Table";
 import { RedoIcon } from "@assets/ui/icons";
+import { gameStore } from "@ui/state/game";
 import styles from "./EntityList.scss";
 
 export interface EntityListProps {
@@ -21,9 +22,7 @@ export const EntityList: React.FC<EntityListProps> = ({ entities }) => (
             <TableCell className={styles.colAction}>
               <IconButton
                 onClick={() => {
-                  const { selectionManager } =
-                    entity.sim.index.settings.get()[0].cp;
-                  selectionManager.id = entity.id;
+                  gameStore.setSelectedUnit(entity);
                 }}
               >
                 <RedoIcon />

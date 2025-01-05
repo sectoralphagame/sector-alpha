@@ -110,10 +110,6 @@ export class Sim extends BaseSim {
     const settingsEntity = new Entity(this);
     settingsEntity
       .addComponent({
-        id: null,
-        name: "selectionManager",
-      })
-      .addComponent({
         name: "systemManager",
         lastStatUpdate: 0,
         lastInflationStatUpdate: 0,
