@@ -65,6 +65,9 @@ export class Orbit {
     PAN: MouseButton.Left,
   };
 
+  // eslint-disable-next-line class-methods-use-this
+  cleanupListeners: () => void = () => {};
+
   constructor(camera: Camera, element: HTMLElement) {
     this.camera = camera;
     this.element = element;
@@ -296,8 +299,14 @@ export class Orbit {
     }
 
     if (this.state !== STATE.NONE) {
-      window.addEventListener("mousemove", this.onMouseMove, false);
-      window.addEventListener("mouseup", this.onMouseUp, false);
+      const onMouseMove = this.onMouseMove.bind(this);
+      const onMouseUp = this.onMouseUp.bind(this);
+      window.addEventListener("mousemove", onMouseMove, false);
+      window.addEventListener("mouseup", onMouseUp, false);
+      this.cleanupListeners = () => {
+        window.removeEventListener("mousemove", onMouseMove, false);
+        window.removeEventListener("mouseup", onMouseUp, false);
+      };
     }
   }
 
@@ -324,12 +333,12 @@ export class Orbit {
     }
   };
 
-  onMouseUp = () => {
-    window.removeEventListener("mousemove", this.onMouseMove, false);
-    window.removeEventListener("mouseup", this.onMouseUp, false);
+  onMouseUp(_e: MouseEvent) {
+    this.cleanupListeners();
+    this.cleanupListeners = () => {};
     this.setState(STATE.NONE);
     this.moved = false;
-  };
+  }
 
   onMouseWheel = (e: WheelEvent) => {
     if (
@@ -398,9 +407,17 @@ export class Orbit {
   };
 
   addHandlers() {
-    this.element.addEventListener("contextmenu", this.onContextMenu, false);
-    this.element.addEventListener("mousedown", this.onMouseDown, false);
-    this.element.addEventListener("wheel", this.onMouseWheel, {
+    this.element.addEventListener(
+      "contextmenu",
+      this.onContextMenu.bind(this),
+      false
+    );
+    this.element.addEventListener(
+      "mousedown",
+      this.onMouseDown.bind(this),
+      false
+    );
+    this.element.addEventListener("wheel", this.onMouseWheel.bind(this), {
       passive: false,
     });
     // this.element.addEventListener("touchstart", this.onTouchStart, {

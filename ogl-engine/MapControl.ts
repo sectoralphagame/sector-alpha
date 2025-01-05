@@ -1,7 +1,6 @@
 import type { Camera, Mat4, Vec3 } from "ogl";
 import { Vec2 } from "ogl";
-import type { MouseButton } from "./Orbit";
-import { Orbit, STATE, tempVec3 } from "./Orbit";
+import { MouseButton, Orbit, STATE, tempVec3 } from "./Orbit";
 
 const dPos = 3;
 const dScale = 0.2;
@@ -30,9 +29,15 @@ export class MapControl extends Orbit {
   dragPrev: Vec2 | null = null;
   mouse: Vec2 = new Vec2();
   cursorMoved = false;
+  mouseButtons = {
+    ORBIT: MouseButton.Right,
+    ZOOM: null,
+    PAN: MouseButton.Middle,
+  };
 
   onClick: ((_position: Vec2, _button: MouseButton) => void) | null = null;
   onKeyDown: ((_event: KeyboardEvent) => void) | null = null;
+  onRightClick: ((_event: MouseEvent) => void) | null = null;
   // eslint-disable-next-line class-methods-use-this
   isFocused: () => boolean = () => true;
 
@@ -78,21 +83,29 @@ export class MapControl extends Orbit {
   };
 
   override onMouseDown = (e: MouseEvent) => {
-    if (
-      this.keysPressed.has("ShiftLeft") &&
-      e.button === this.mouseButtons.PAN
-    ) {
+    if (this.keysPressed.has("ShiftLeft") && e.button === MouseButton.Left) {
       this.setState(STATE.ROTATE);
       this.rotateStart.set(e.clientX, e.clientY);
 
       if (this.state !== STATE.NONE) {
-        window.addEventListener("mousemove", this.onMouseMove, false);
-        window.addEventListener("mouseup", this.onMouseUp, false);
+        const onMouseMove = this.onMouseMove.bind(this);
+        const onMouseUp = this.onMouseUp.bind(this);
+        window.addEventListener("mousemove", onMouseMove, false);
+        window.addEventListener("mouseup", onMouseUp, false);
+        this.cleanupListeners = () => {
+          window.removeEventListener("mousemove", onMouseMove, false);
+          window.removeEventListener("mouseup", onMouseUp, false);
+        };
       }
     } else {
       super.onMouseDown(e);
     }
   };
+
+  override onMouseUp(e: MouseEvent) {
+    if (!this.moved && e.button === MouseButton.Right) this.onRightClick?.(e);
+    super.onMouseUp(e);
+  }
 
   override update = () => {
     super.update();
@@ -122,17 +135,4 @@ export class MapControl extends Orbit {
       this.mouse.set(x, y);
     }
   };
-
-  override addHandlers() {
-    this.element.addEventListener("contextmenu", this.onContextMenu, false);
-    this.element.addEventListener("mousedown", this.onMouseDown, false);
-    this.element.addEventListener("wheel", this.onMouseWheel, {
-      passive: false,
-    });
-    // this.element.addEventListener("touchstart", this.onTouchStart, {
-    //   passive: false,
-    // });
-    // this.element.addEventListener("touchend", this.onTouchEnd, false);
-    // this.element.addEventListener("touchmove", this.onTouchMove, { passive: false });
-  }
 }

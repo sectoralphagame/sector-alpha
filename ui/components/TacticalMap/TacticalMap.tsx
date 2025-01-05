@@ -15,7 +15,7 @@ import type { Sim } from "@core/sim";
 import { contextMenuStore } from "@ui/state/contextMenu";
 import { storageHook } from "@core/hooks";
 import type { GameSettings } from "@ui/hooks/useGameSettings";
-import type { MouseButton } from "@ogl-engine/Orbit";
+import { MouseButton } from "@ogl-engine/Orbit";
 import { Asteroids } from "@ogl-engine/engine/Asteroids";
 import { fieldColors } from "@core/archetypes/asteroid";
 import type { Destroyable } from "@ogl-engine/types";
@@ -68,15 +68,16 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.engine.hooks.onUpdate.subscribe("TacticalMap", () =>
       this.onEngineUpdate()
     );
-    const disposer = reaction(
-      () => gameStore.sector,
-      () => {
-        if (this.engine.initialized) {
-          this.onSectorChange();
+    this.onUnmountCallbacks.push(
+      reaction(
+        () => gameStore.sector,
+        () => {
+          if (this.engine.initialized) {
+            this.onSectorChange();
+          }
         }
-      }
+      )
     );
-    this.onUnmountCallbacks.push(disposer);
     this.onUnmountCallbacks.push(
       reaction(() => gameStore.selectedUnit, this.onSelectedChange.bind(this))
     );
@@ -101,10 +102,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.onUnmountCallbacks.forEach((cb) => cb());
   }
 
-  async onControlClick(mousePosition: Vec2, button: MouseButton) {
-    let targetId: number | null = null;
-
-    if (this.raycastHits.length) {
+  async onControlClick(_mousePosition: Vec2, button: MouseButton) {
+    if (this.raycastHits.length && button === MouseButton.Left) {
       let mesh = this.raycastHits[0];
       if (
         gameStore.selectedUnit?.id === mesh.entityId &&
@@ -113,40 +112,15 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         mesh = this.raycastHits[1];
       }
       const isDoubleClick = Date.now() - this.lastClicked < 200;
-      // eslint-disable-next-line default-case
-      switch (button) {
-        case 0:
-          gameStore.unfocusUnit();
-          gameStore.setSelectedUnit(this.sim.getOrThrow(mesh.entityId));
-          defaultClickSound.play();
+      gameStore.unfocusUnit();
+      gameStore.setSelectedUnit(this.sim.getOrThrow(mesh.entityId));
+      defaultClickSound.play();
 
-          if (isDoubleClick) {
-            gameStore.focusUnit();
-          }
-
-          this.lastClicked = Date.now();
-          break;
-        case 2:
-          targetId = mesh.entityId;
+      if (isDoubleClick) {
+        gameStore.focusUnit();
       }
-    }
 
-    if (button === 2) {
-      const worldPos = this.raycast.intersectPlane({
-        origin: new Vec3(0),
-        normal: new Vec3(0, 1, 0),
-      });
-      const worldPosition: Position2D = [
-        worldPos.x / scale,
-        worldPos.z / scale,
-      ];
-
-      contextMenuStore.open({
-        position: mousePosition.clone().toArray() as Position2D,
-        worldPosition,
-        sector: gameStore.sector,
-        target: targetId ? this.sim.getOrThrow(targetId) : null,
-      });
+      this.lastClicked = Date.now();
     }
   }
 
@@ -165,11 +139,30 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.control!.update();
   }
 
+  onRightClick() {
+    const targetId = this.raycastHits.length
+      ? this.raycastHits[0].entityId
+      : null;
+    const worldPos = this.raycast.intersectPlane({
+      origin: new Vec3(0),
+      normal: new Vec3(0, 1, 0),
+    });
+    const worldPosition: Position2D = [worldPos.x / scale, worldPos.z / scale];
+
+    contextMenuStore.open({
+      position: this.control.mouse.clone().toArray() as Position2D,
+      worldPosition,
+      sector: gameStore.sector,
+      target: targetId ? this.sim.getOrThrow(targetId) : null,
+    });
+  }
+
   async onEngineInit() {
     await assetLoader.load(this.engine.gl);
 
     this.control = new MapControl(this.engine.camera, this.engine.canvas);
     this.control.onClick = this.onControlClick.bind(this);
+    this.control.onRightClick = this.onRightClick.bind(this);
     this.control.onPan = () => {
       gameStore.unfocusUnit();
     };

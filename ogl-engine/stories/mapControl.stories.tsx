@@ -9,14 +9,16 @@ import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
+import { TacticalMapScene } from "@ogl-engine/engine/Scene";
 
 const ModelStory: React.FC = () => {
-  const engine = React.useMemo(() => new Engine3D(), []);
+  const engine = React.useMemo(() => new Engine3D<TacticalMapScene>(), []);
   const controlRef = React.useRef<MapControl>();
   const skyboxRef = React.useRef<Skybox>();
 
   React.useEffect(() => {
     engine.hooks.onInit.subscribe("MapControlStory", async () => {
+      engine.setScene(new TacticalMapScene(engine));
       controlRef.current = new MapControl(engine.camera, engine.canvas);
       const helper = new AxesHelper(engine.gl, {});
       helper.setParent(engine.scene);
