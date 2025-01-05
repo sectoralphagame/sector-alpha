@@ -199,7 +199,6 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       this.dragStart &&
       this.dragStart!.distance(position) > 0.1
     ) {
-      console.log("i was dragged");
       this.removeSelectionBox();
     } else if (button === MouseButton.Left) {
       this.handleEntityClick();
@@ -211,7 +210,6 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     if (button === MouseButton.Left) {
       this.dragStart = mousePosition.clone();
       this.drawSelectionBox();
-      console.log("draw selection box");
     }
   }
 
