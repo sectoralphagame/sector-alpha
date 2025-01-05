@@ -26,6 +26,7 @@ import type { Position2D } from "@core/components/position";
 import { Star } from "@ogl-engine/engine/Star";
 import { Light } from "@ogl-engine/engine/Light";
 import type { Entity } from "@core/entity";
+import { SelectionBox } from "@ogl-engine/engine/SelectionBox";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 
@@ -44,6 +45,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   lastClicked = 0;
   control: MapControl;
   meshes: Map<number, EntityMesh> = new Map();
+  dragStart: Vec2 | null = null;
+  selectionBox: SelectionBox;
 
   onUnmountCallbacks: (() => void)[] = [];
 
@@ -102,8 +105,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.onUnmountCallbacks.forEach((cb) => cb());
   }
 
-  async onControlClick(_mousePosition: Vec2, button: MouseButton) {
-    if (this.raycastHits.length && button === MouseButton.Left) {
+  handleEntityClick() {
+    if (this.raycastHits.length) {
       let mesh = this.raycastHits[0];
       if (
         gameStore.selectedUnit?.id === mesh.entityId &&
@@ -127,6 +130,19 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   async onEngineUpdate() {
     if (!(assetLoader.ready && this.engine.isFocused())) return;
 
+    if (this.dragStart) {
+      const normalisedDragStart = new Vec2(
+        2.0 * (this.dragStart.x / this.engine.gl.renderer.width) - 1.0,
+        2.0 * (1.0 - this.dragStart.y / this.engine.gl.renderer.height) - 1.0
+      );
+
+      const normalisedMousePos = new Vec2(
+        2.0 * (this.control!.mouse.x / this.engine.gl.renderer.width) - 1.0,
+        2.0 * (1.0 - this.control!.mouse.y / this.engine.gl.renderer.height) -
+          1.0
+      );
+      this.selectionBox.updateGeometry(normalisedDragStart, normalisedMousePos);
+    }
     this.updateRenderables();
     this.updateRaycast();
 
@@ -161,7 +177,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     await assetLoader.load(this.engine.gl);
 
     this.control = new MapControl(this.engine.camera, this.engine.canvas);
-    this.control.onClick = this.onControlClick.bind(this);
+    this.control.onPointerUp = this.onPointerUp.bind(this);
+    this.control.onPointerDown = this.onControlClick.bind(this);
     this.control.onRightClick = this.onRightClick.bind(this);
     this.control.onPan = () => {
       gameStore.unfocusUnit();
@@ -169,8 +186,32 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.control.isFocused = this.engine.isFocused.bind(this.engine);
     this.control.onKeyDown = this.onKeyDown.bind(this);
 
+    this.selectionBox = new SelectionBox(this.engine);
+    this.selectionBox.setParent(this.engine.scene.ui);
+
     this.updateEngineSettings();
     this.loadSector();
+  }
+
+  onPointerUp(position: Vec2, button: MouseButton) {
+    if (
+      button === MouseButton.Left &&
+      this.dragStart!.distance(position) > 0.1
+    ) {
+      console.log("i was dragged");
+      this.removeSelectionBox();
+    } else if (button === MouseButton.Left) {
+      this.handleEntityClick();
+    }
+    this.dragStart = null;
+  }
+
+  async onControlClick(mousePosition: Vec2, button: MouseButton) {
+    if (button === MouseButton.Left) {
+      this.dragStart = mousePosition.clone();
+      this.drawSelectionBox();
+      console.log("draw selection box");
+    }
   }
 
   onKeyDown(event: KeyboardEvent) {
@@ -224,6 +265,14 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         this.engine.scene.ui.addChild(path);
       }
     }
+  }
+
+  drawSelectionBox() {
+    this.selectionBox.setVisibility(true);
+  }
+
+  removeSelectionBox() {
+    this.selectionBox.setVisibility(false);
   }
 
   updateRaycast() {

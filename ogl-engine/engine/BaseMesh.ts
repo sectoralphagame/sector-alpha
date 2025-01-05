@@ -17,7 +17,13 @@ export class BaseMesh<TMaterial extends Material = Material>
 
   constructor(
     engine: Engine3D,
-    options: Partial<MeshOptions & { material: TMaterial; name: string }>
+    options: Partial<
+      MeshOptions & {
+        material: TMaterial;
+        name: string;
+        calculateTangents: boolean;
+      }
+    >
   ) {
     super(engine.gl, options);
 
@@ -25,7 +31,7 @@ export class BaseMesh<TMaterial extends Material = Material>
       this.name = options.name;
     }
 
-    if (this.geometry) {
+    if (this.geometry && !this.geometry.attributes.tangent) {
       this.calculateTangents();
     }
 

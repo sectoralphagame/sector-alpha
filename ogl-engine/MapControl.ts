@@ -35,7 +35,9 @@ export class MapControl extends Orbit {
     PAN: MouseButton.Middle,
   };
 
-  onClick: ((_position: Vec2, _button: MouseButton) => void) | null = null;
+  onPointerUp: ((_position: Vec2, _button: MouseButton) => void) | null = null;
+  onPointerDown: ((_position: Vec2, _button: MouseButton) => void) | null =
+    null;
   onKeyDown: ((_event: KeyboardEvent) => void) | null = null;
   onRightClick: ((_event: MouseEvent) => void) | null = null;
   // eslint-disable-next-line class-methods-use-this
@@ -49,9 +51,7 @@ export class MapControl extends Orbit {
 
     this.element.addEventListener("pointerup", (event) => {
       if (event.target !== this.element) return;
-      if (this.onClick) {
-        this.onClick!(this.mouse, event.button);
-      }
+      this.onPointerUp?.(this.mouse, event.button);
     });
 
     document.body.addEventListener("keydown", (event) => {
@@ -83,6 +83,8 @@ export class MapControl extends Orbit {
   };
 
   override onMouseDown = (e: MouseEvent) => {
+    this.onPointerDown?.(this.mouse, e.button);
+
     if (this.keysPressed.has("ShiftLeft") && e.button === MouseButton.Left) {
       this.setState(STATE.ROTATE);
       this.rotateStart.set(e.clientX, e.clientY);
