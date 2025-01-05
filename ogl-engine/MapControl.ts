@@ -47,7 +47,7 @@ export class MapControl extends Orbit {
     this.minDistance = 0.1;
     this.maxDistance = 80;
 
-    this.element.addEventListener("pointerdown", (event) => {
+    this.element.addEventListener("pointerup", (event) => {
       if (event.target !== this.element) return;
       if (this.onClick) {
         this.onClick!(this.mouse, event.button);
