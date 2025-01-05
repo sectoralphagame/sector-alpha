@@ -196,6 +196,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   onPointerUp(position: Vec2, button: MouseButton) {
     if (
       button === MouseButton.Left &&
+      this.dragStart &&
       this.dragStart!.distance(position) > 0.1
     ) {
       console.log("i was dragged");

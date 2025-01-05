@@ -83,8 +83,6 @@ export class MapControl extends Orbit {
   };
 
   override onMouseDown = (e: MouseEvent) => {
-    this.onPointerDown?.(this.mouse, e.button);
-
     if (this.keysPressed.has("ShiftLeft") && e.button === MouseButton.Left) {
       this.setState(STATE.ROTATE);
       this.rotateStart.set(e.clientX, e.clientY);
@@ -100,6 +98,7 @@ export class MapControl extends Orbit {
         };
       }
     } else {
+      this.onPointerDown?.(this.mouse, e.button);
       super.onMouseDown(e);
     }
   };
