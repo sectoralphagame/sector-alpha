@@ -1,5 +1,6 @@
 import { Transform } from "ogl";
 import type { Skybox } from "@ogl-engine/materials/skybox/skybox";
+import type { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
 import type { Engine } from "./engine";
 import type { BaseMesh2D } from "./BaseMesh2D";
 
@@ -15,7 +16,7 @@ export class Scene extends Transform {
 }
 
 export class TacticalMapScene extends Scene {
-  entities: Transform & { children: BaseMesh2D[] };
+  entities: Transform & { children: EntityMesh[] };
   props: Transform;
   ui: Transform;
   skybox: Skybox;
@@ -24,7 +25,7 @@ export class TacticalMapScene extends Scene {
     super(engine);
 
     this.entities = new Transform() as Omit<Transform, "children"> & {
-      children: BaseMesh2D[];
+      children: EntityMesh[];
     };
     this.entities.name = "Entities";
     this.entities.setParent(this);

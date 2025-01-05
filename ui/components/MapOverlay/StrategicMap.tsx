@@ -116,7 +116,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
       sectorMesh.setParent(this.engine.scene.sectors);
     }
 
-    this.control.onClick = this.onClick.bind(this);
+    this.control.onPointerUp = this.onClick.bind(this);
     this.control.onKeyDown = this.onKeyDown.bind(this);
 
     this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
