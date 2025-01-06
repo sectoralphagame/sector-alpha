@@ -81,7 +81,7 @@ export const TradeFinder: React.FC = () => {
                 <IconButton
                   variant="naked"
                   onClick={() => {
-                    gameStore.setSelectedUnit(entity);
+                    gameStore.setSelectedUnits([entity]);
                   }}
                   onDoubleClick={gameStore.focus}
                 >

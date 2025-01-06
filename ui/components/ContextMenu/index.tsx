@@ -9,7 +9,7 @@ import { ShipToEntity } from "./ShipToEntity";
 
 export const ContextMenu: React.FC = () => {
   const [[menu]] = useContextMenuStore((store) => [store.state]);
-  const [[selectedUnit]] = useGameStore((store) => [store.selectedUnit]);
+  const [[selectedUnits]] = useGameStore((store) => [store.selectedUnits]);
 
   React.useEffect(() => {
     if (menu.active) {
@@ -23,7 +23,7 @@ export const ContextMenu: React.FC = () => {
     return <ShipToEntity />;
   }
 
-  if (selectedUnit?.hasComponents(shipComponents)) {
+  if (selectedUnits.every((unit) => unit.hasComponents(shipComponents))) {
     return <ShipToSpace />;
   }
 

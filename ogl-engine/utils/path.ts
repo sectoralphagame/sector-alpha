@@ -1,8 +1,10 @@
+import type { Entity } from "@core/entity";
 import type { RequireComponent } from "@core/tsHelpers";
 import { findInAncestors } from "@core/utils/findInAncestors";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
+import { gameStore } from "@ui/state/game";
 import { Plane, Transform, Vec3 } from "ogl";
 
 export type PathColor = "default" | "warning";
@@ -14,11 +16,13 @@ const colors: Record<PathColor, Vec3> = {
 export class Path extends Transform {
   engine: Engine3D;
   name = "Path";
+  owner: Entity;
 
-  constructor(engine: Engine3D) {
+  constructor(engine: Engine3D, owner: Entity) {
     super();
 
     this.engine = engine;
+    this.owner = owner;
   }
 
   createSegment = (): void => {
@@ -35,13 +39,11 @@ export class Path extends Transform {
     for (let i = this.children.length; i < waypoints.length - 1; i++) {
       this.createSegment();
     }
-    for (let i = waypoints.length - 1; i < this.children.length; i++) {
-      this.removeChild(this.children[i]);
+    if (waypoints.length) {
+      for (let i = waypoints.length - 1; i < this.children.length; i++) {
+        this.removeChild(this.children[i]);
+      }
     }
-    this.children.splice(
-      waypoints.length - 1,
-      this.children.length - (waypoints.length - 1)
-    );
 
     for (let i = 0; i < waypoints.length - 1; i++) {
       const distance = waypoints[i][0].distance(waypoints[i + 1][0]);
@@ -69,16 +71,19 @@ export class Path extends Transform {
     scale: number
   ): [Vec3, PathColor][] => {
     const origin = findInAncestors(entity, "position");
-    const waypoints: [Vec3, PathColor][] = [
-      [
-        new Vec3(
-          origin.cp.position.coord[0] * scale,
-          0,
-          origin.cp.position.coord[1] * scale
-        ),
-        "default",
-      ],
-    ];
+    const waypoints: [Vec3, PathColor][] =
+      origin.cp.position.sector === gameStore.sector.id
+        ? [
+            [
+              new Vec3(
+                origin.cp.position.coord[0] * scale,
+                0,
+                origin.cp.position.coord[1] * scale
+              ),
+              "default" as PathColor,
+            ],
+          ]
+        : [];
 
     for (const order of entity.cp.orders.value) {
       for (const action of order.actions) {
@@ -93,7 +98,7 @@ export class Path extends Transform {
           continue;
 
         const target = entity.sim.get(action.targetId);
-        if (!target || target.cp.position!.sector !== origin.cp.position.sector)
+        if (!target || target.cp.position!.sector !== gameStore.sector.id)
           continue;
 
         const targetWithPosition = findInAncestors(target!, "position");

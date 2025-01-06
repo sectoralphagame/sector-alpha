@@ -7,9 +7,9 @@ import { DevOverlayComponent } from "./DevOverlayComponent";
 
 const DevOverlay: React.FC = () => {
   const [actions, setActions] = React.useState<DevAction[]>(actionLoader.all());
-  const [[overlay, selectedUnit], gameStore] = useGameStore((store) => [
+  const [[overlay, selectedUnits], gameStore] = useGameStore((store) => [
     store.overlay,
-    store.selectedUnit,
+    store.selectedUnits,
   ]);
   useOverlayRegister("dev");
 
@@ -20,7 +20,7 @@ const DevOverlay: React.FC = () => {
   return (
     <DevOverlayComponent
       actions={actions}
-      target={selectedUnit?.id ?? null}
+      target={selectedUnits.length ? selectedUnits[0].id : null}
       onReload={() => setActions(actionLoader.all())}
       onClose={gameStore.closeOverlay}
     />

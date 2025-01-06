@@ -148,7 +148,7 @@ const unassigned = Array(5)
 Default.args = {
   fleets,
   unassigned,
-  selected: 0,
+  selected: [0],
   onSelect: action("onSelect"),
   onContextMenu: action("onContextMenu"),
   onFocus: action("onFocus"),

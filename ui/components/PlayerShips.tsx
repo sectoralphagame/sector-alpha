@@ -17,7 +17,9 @@ export const PlayerShips: React.FC = () => {
     .get()
     .filter((ship) => ship.cp.owner?.id === player.id);
 
-  const [[selected], gameStore] = useGameStore((store) => [store.selectedUnit]);
+  const [[selected], gameStore] = useGameStore((store) => [
+    store.selectedUnits,
+  ]);
   const [, contextMenuStore] = useContextMenuStore(() => []);
 
   const onContextMenu = (
@@ -25,7 +27,7 @@ export const PlayerShips: React.FC = () => {
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
-    if (id !== selected?.id) {
+    if (!selected.some((unit) => unit.id)) {
       contextMenuStore.open({
         position: [event.clientX, event.clientY],
         worldPosition: undefined!,
@@ -45,9 +47,11 @@ export const PlayerShips: React.FC = () => {
             <ShipButton
               key={ship.id}
               ship={ship}
-              selected={selected?.id}
+              selected={selected.includes(ship)}
               onFocus={gameStore.focus}
-              onSelect={(id) => gameStore.setSelectedUnit(sim.getOrThrow(id))}
+              onSelect={(id) =>
+                gameStore.setSelectedUnits([sim.getOrThrow(id)])
+              }
               onContextMenu={onContextMenu}
             />
           ))

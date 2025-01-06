@@ -166,6 +166,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
         mesh.setSelected(isInHexagon(pos));
         if (mesh.selected) {
           if (isDoubleClick && strategicMapStore.selected === sector) {
+            gameStore.unfocus();
             gameStore.setSector(sector);
             gameStore.closeOverlay();
           }

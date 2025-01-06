@@ -18,17 +18,22 @@ export const EntityList: React.FC<EntityListProps> = ({ entities }) => (
           <TableCell className={styles.colName}>
             {entity.cp.name?.value}
           </TableCell>
-          {entity.tags.has("selection") && (
-            <TableCell className={styles.colAction}>
-              <IconButton
-                onClick={() => {
-                  gameStore.setSelectedUnit(entity);
-                }}
-              >
-                <RedoIcon />
-              </IconButton>
-            </TableCell>
-          )}
+          {entity.tags.has("selection") &&
+            entity.hasComponents(["position"]) && (
+              <TableCell className={styles.colAction}>
+                <IconButton
+                  onClick={(event) => {
+                    if (event.shiftKey) {
+                      gameStore.addSelectedUnit(entity);
+                    } else {
+                      gameStore.setSelectedUnits([entity]);
+                    }
+                  }}
+                >
+                  <RedoIcon />
+                </IconButton>
+              </TableCell>
+            )}
         </tr>
       ))}
     </tbody>

@@ -1,13 +1,14 @@
 import type { Sector } from "@core/archetypes/sector";
-import type { Entity } from "@core/entity";
+import type { RequireComponent } from "@core/tsHelpers";
 import { useMobx } from "@ui/hooks/useMobx";
 import { action, makeObservable, observable } from "mobx";
 
 export type GameOverlayType = "fleet" | "missions" | "map" | "dev" | null;
+export type Selectable = RequireComponent<"position">;
 
 export class GameStore {
   sector: Sector = undefined!;
-  selectedUnit: Entity | null = null;
+  selectedUnits: Selectable[] = [];
   focused = false;
   overlay: GameOverlayType = null;
 
@@ -16,9 +17,11 @@ export class GameStore {
       sector: observable,
       setSector: action.bound,
 
-      selectedUnit: observable,
-      setSelectedUnit: action.bound,
+      selectedUnits: observable,
+      setSelectedUnits: action.bound,
+      addSelectedUnit: action.bound,
       unselectUnit: action.bound,
+      clearSelection: action.bound,
       focused: observable,
       focus: action.bound,
       unfocus: action.bound,
@@ -33,23 +36,43 @@ export class GameStore {
     this.sector = sector;
   }
 
-  setSelectedUnit(unit: Entity) {
-    this.selectedUnit = unit;
-    window.selected = unit;
+  setSelectedUnits(units: Selectable[]) {
+    this.unfocus();
+    this.selectedUnits = units;
+    window.selected = this.selectedUnits[0];
   }
 
-  unselectUnit() {
-    this.selectedUnit = null;
-    this.focused = false;
+  addSelectedUnit(unit: Selectable) {
+    if (this.selectedUnits.includes(unit)) return;
+
+    this.selectedUnits = [...this.selectedUnits, unit];
+    window.selected = this.selectedUnits[0];
+  }
+
+  unselectUnit(unit: Selectable) {
+    this.selectedUnits = this.selectedUnits.filter((e) => e !== unit);
+    window.selected = this.selectedUnits[0];
+  }
+
+  clearSelection() {
+    this.selectedUnits = [];
     window.selected = null;
+    this.unfocus();
   }
 
   focus() {
-    if (!this.selectedUnit) return;
+    if (!this.selectedUnits.length) return;
+
+    const inTheSameSector = this.selectedUnits.every(
+      (e) => e.cp.position?.sector === this.selectedUnits[0].cp.position!.sector
+    );
+    if (!inTheSameSector) return;
 
     this.focused = true;
     this.setSector(
-      this.selectedUnit.sim.getOrThrow(this.selectedUnit.cp.position!.sector)
+      this.selectedUnits[0].sim.getOrThrow(
+        this.selectedUnits[0].cp.position!.sector
+      )
     );
   }
 

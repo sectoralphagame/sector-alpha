@@ -10,7 +10,6 @@ import { getRequiredCrew } from "@core/utils/crew";
 import { find } from "@fxts/core";
 import { ConfigIcon } from "@assets/ui/icons";
 import { actionLoader } from "@core/actionLoader";
-import { gameStore } from "@ui/state/game";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
 import EntityName from "../EntityName";
@@ -141,7 +140,6 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
         onCollapseToggle={toggleCollapse}
         onPlayerAssets={() => {
           setCollapsed(false);
-          gameStore.unselectUnit();
         }}
       >
         {!isCollapsed &&
@@ -262,7 +260,10 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                 {showSensitive && <Subordinates entity={entity} />}
                 {entity.hasComponents(["deployable"]) && showSensitive && (
                   <Undeploy
-                    deployable={entity.requireComponents(["deployable"])}
+                    deployable={entity.requireComponents([
+                      "deployable",
+                      "position",
+                    ])}
                     facility={
                       entity.cp.builder?.targetId
                         ? sim.get(entity.cp.builder.targetId)

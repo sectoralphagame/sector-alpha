@@ -2,7 +2,7 @@ import React from "react";
 import type { Transform } from "ogl";
 import { Raycast, Vec2, Vec3 } from "ogl";
 import { defaultIndexer } from "@core/systems/utils/default";
-import { find } from "@fxts/core";
+import { find, map, pipe, reduce, toArray } from "@fxts/core";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
 import { MapControl } from "@ogl-engine/MapControl";
 import { defaultClickSound } from "@kit/BaseButton";
@@ -82,7 +82,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       )
     );
     this.onUnmountCallbacks.push(
-      reaction(() => gameStore.selectedUnit, this.onSelectedChange.bind(this))
+      reaction(() => gameStore.selectedUnits, this.onSelectedChange.bind(this))
     );
     storageHook.subscribe("TacticalMap", (key) => {
       if (key !== "gameSettings") return;
@@ -94,8 +94,11 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         mesh.destroy();
         this.engine.scene.entities.removeChild(mesh);
         this.meshes.delete(entity.id);
-        if (gameStore.selectedUnit?.id === entity.id) {
-          gameStore.unselectUnit();
+        if (
+          entity.hasComponents(["position"]) &&
+          gameStore.selectedUnits.includes(entity)
+        ) {
+          gameStore.unselectUnit(entity);
         }
       }
     });
@@ -105,18 +108,33 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.onUnmountCallbacks.forEach((cb) => cb());
   }
 
-  handleEntityClick() {
+  handleEntityClick(multiple: boolean) {
     if (this.raycastHits.length) {
       let mesh = this.raycastHits[0];
       if (
-        gameStore.selectedUnit?.id === mesh.entityId &&
+        gameStore.selectedUnits[0]?.id === mesh.entityId &&
         this.raycastHits.length > 1
       ) {
         mesh = this.raycastHits[1];
       }
       const isDoubleClick = Date.now() - this.lastClicked < 200;
-      gameStore.unfocus();
-      gameStore.setSelectedUnit(this.sim.getOrThrow(mesh.entityId));
+
+      const entity = this.sim
+        .getOrThrow(mesh.entityId)
+        .requireComponents(["position"]);
+      if (
+        multiple &&
+        entity.cp.owner?.id === this.sim.index.player.get()[0].id
+      ) {
+        if (gameStore.selectedUnits.includes(entity)) {
+          gameStore.unselectUnit(entity);
+        } else {
+          gameStore.addSelectedUnit(entity);
+        }
+      } else {
+        gameStore.setSelectedUnits([entity]);
+        gameStore.unfocus();
+      }
       defaultClickSound.play();
 
       if (isDoubleClick) {
@@ -124,6 +142,9 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       }
 
       this.lastClicked = Date.now();
+    } else if (!this.control.keysPressed.has("ShiftLeft")) {
+      gameStore.unfocus();
+      gameStore.clearSelection();
     }
   }
 
@@ -151,7 +172,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       : "default";
 
     this.updateUIElements();
-    this.updateSelection();
+    this.updateFocus();
     this.control!.update();
   }
 
@@ -186,9 +207,6 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.control.isFocused = this.engine.isFocused.bind(this.engine);
     this.control.onKeyDown = this.onKeyDown.bind(this);
 
-    this.selectionBox = new SelectionBox(this.engine);
-    this.selectionBox.setParent(this.engine.scene.ui);
-
     this.updateEngineSettings();
     this.loadSector();
   }
@@ -200,9 +218,16 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       this.dragStart!.distance(position) > 0.1
     ) {
       this.removeSelectionBox();
-      console.log(this.selectionBox.getEntitiesInSelection());
+      gameStore.setSelectedUnits(
+        this.selectionBox
+          .getEntitiesInSelection()
+          .map(({ entityId }) =>
+            this.sim.getOrThrow(entityId).requireComponents(["position"])
+          )
+          .filter((e) => e.cp.owner?.id === this.sim.index.player.get()[0].id)
+      );
     } else if (button === MouseButton.Left) {
-      this.handleEntityClick();
+      this.handleEntityClick(this.control.keysPressed.has("ShiftLeft"));
     }
     this.dragStart = null;
   }
@@ -214,24 +239,9 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   onKeyDown(event: KeyboardEvent) {
-    const selectedEntity = gameStore.selectedUnit?.requireComponents([
-      "position",
-    ]);
-
-    if (event.code === "KeyR" && selectedEntity) {
-      if (selectedEntity.cp.position.sector !== gameStore.sector.id) {
-        gameStore.setSector(
-          this.sim.getOrThrow(selectedEntity.cp.position.sector)
-        );
-      }
-      this.control.lookAt(
-        new Vec3(
-          selectedEntity.cp.position.coord[0] * scale,
-          0,
-          selectedEntity.cp.position.coord[1] * scale
-        )
-      );
+    if (event.code === "KeyR" && gameStore.selectedUnits.length) {
       gameStore.focus();
     }
   }
@@ -250,18 +260,21 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.loadSector();
   }
 
-  onSelectedChange(entity: Entity | null, prevEntity: Entity | null) {
-    if (prevEntity) {
-      this.meshes.get(prevEntity.id)?.setSelected(false);
-      const path = this.engine.scene.ui.children.find((c) => c instanceof Path);
+  onSelectedChange(entities: Entity[], prevEntities: Entity[]) {
+    for (const entity of prevEntities) {
+      this.meshes.get(entity.id)?.setSelected(false);
+      const path = this.engine.scene.ui.children.find(
+        (c) => c instanceof Path && c.owner === entity
+      );
       if (path) {
         this.engine.scene.ui.removeChild(path);
       }
     }
-    if (entity) {
+
+    for (const entity of entities) {
       this.meshes.get(entity.id)?.setSelected(true);
       if (entity.hasComponents(["position", "orders"])) {
-        const path = new Path(this.engine);
+        const path = new Path(this.engine, entity);
         this.engine.scene.ui.addChild(path);
       }
     }
@@ -341,37 +354,51 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   }
 
   updateUIElements() {
-    const path = this.engine.scene.ui.children.find(
+    for (const path of this.engine.scene.ui.children.filter(
       (c) => c instanceof Path
-    ) as Path | undefined;
-    if (
-      path &&
-      gameStore.selectedUnit &&
-      gameStore.selectedUnit.hasComponents(["position", "orders"])
-    ) {
+    ) as Path[]) {
       path.update(
         Path.getPath(
-          gameStore.selectedUnit.requireComponents(["position", "orders"]),
+          path.owner.requireComponents(["position", "orders"]),
           scale
         )
       );
     }
   }
 
-  updateSelection() {
-    if (gameStore.focused && gameStore.selectedUnit) {
-      const entity = gameStore.selectedUnit.requireComponents(["position"]);
-      this.control!.lookAt(
-        new Vec3(
-          entity.cp.position.coord[0] * scale,
-          0,
-          entity.cp.position.coord[1] * scale
-        )
+  updateFocus() {
+    if (
+      gameStore.focused &&
+      gameStore.selectedUnits.length &&
+      gameStore.selectedUnits.every(
+        (e) =>
+          e.cp.position.sector === gameStore.selectedUnits[0].cp.position.sector
+      )
+    ) {
+      if (
+        gameStore.sector.id !==
+          gameStore.selectedUnits[0]?.cp.position!.sector &&
+        gameStore.selectedUnits.length === 1
+      ) {
+        gameStore.setSector(
+          this.sim.getOrThrow(gameStore.selectedUnits[0].cp.position!.sector)
+        );
+      }
+
+      const centerPoint = pipe(
+        gameStore.selectedUnits,
+        map((e) => e.requireComponents(["position"]).cp.position.coord),
+        reduce((acc, val) => [acc[0] + val[0], acc[1] + val[1]]),
+        (acc) => [
+          acc[0] / gameStore.selectedUnits.length,
+          acc[1] / gameStore.selectedUnits.length,
+        ],
+        toArray
       );
 
-      if (gameStore.sector.id !== entity.cp.position.sector) {
-        gameStore.setSector(this.sim.getOrThrow(entity.cp.position.sector));
-      }
+      this.control!.lookAt(
+        new Vec3(centerPoint[0] * scale, 0, centerPoint[1] * scale)
+      );
     }
   }
 
@@ -388,6 +415,9 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.loadSkybox();
     this.loadAsteroidFields();
     this.loadProps();
+
+    this.selectionBox = new SelectionBox(this.engine);
+    this.selectionBox.setParent(this.engine.scene.ui);
   }
 
   loadSkybox() {

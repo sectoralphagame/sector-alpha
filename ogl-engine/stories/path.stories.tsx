@@ -8,6 +8,7 @@ import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import type { PathColor } from "@ogl-engine/utils/path";
 import { Path } from "@ogl-engine/utils/path";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
+import { Entity } from "@core/entity";
 
 const waypoints: [Vec3, PathColor][] = [
   [new Vec3(0, 0, 0), "default"],
@@ -28,7 +29,7 @@ const PathStory: React.FC = () => {
       skyboxRef.current = new Skybox(engine, "example");
       skyboxRef.current.setParent(engine.scene);
 
-      pathRef.current = new Path(engine);
+      pathRef.current = new Path(engine, new Entity());
       pathRef.current.update(waypoints);
       engine.scene.addChild(pathRef.current);
     });

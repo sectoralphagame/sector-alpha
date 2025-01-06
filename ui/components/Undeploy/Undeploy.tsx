@@ -11,7 +11,7 @@ import styles from "./Undeploy.scss";
 
 export interface UndeployProps {
   facility: Entity | undefined;
-  deployable: RequireComponent<"deployable">;
+  deployable: RequireComponent<"deployable" | "position">;
 }
 
 export const Undeploy: React.FC<UndeployProps> = ({ facility, deployable }) => {
@@ -28,7 +28,7 @@ export const Undeploy: React.FC<UndeployProps> = ({ facility, deployable }) => {
             <IconButton
               className={styles.btn}
               onClick={() => {
-                gameStore.setSelectedUnit(deployable);
+                gameStore.setSelectedUnits([deployable]);
                 gameStore.focus();
               }}
             >

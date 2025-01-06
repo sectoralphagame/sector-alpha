@@ -53,8 +53,8 @@ const Game: React.FC = () => {
   const pressedKeys = React.useRef(new Set<string>());
 
   const player = sim.index.player.get()[0]!;
-  const [[currentSector, overlay, selectedEntity], gameStore] = useGameStore(
-    (store) => [store.sector, store.overlay, store.selectedUnit]
+  const [[currentSector, overlay, selectedUnits], gameStore] = useGameStore(
+    (store) => [store.sector, store.overlay, store.selectedUnits]
   );
 
   React.useEffect(() => {
@@ -68,8 +68,11 @@ const Game: React.FC = () => {
     };
 
     sim.hooks.removeEntity.subscribe("Game", (entity) => {
-      if (entity.id === selectedEntity?.id) {
-        gameStore.unselectUnit();
+      if (
+        entity.hasComponents(["position"]) &&
+        selectedUnits.includes(entity)
+      ) {
+        gameStore.unselectUnit(entity);
       }
     });
     sim.hooks.destroy.subscribe("Game", unmount);
@@ -200,7 +203,7 @@ const Game: React.FC = () => {
           </MapPanelTabContent>
         </MapPanel>
       </div>
-      <Panel entity={selectedEntity} />
+      <Panel entity={selectedUnits[0]} />
       <Notifications />
       <Overlay
         active={overlay}

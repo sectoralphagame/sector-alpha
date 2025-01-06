@@ -21,15 +21,15 @@ function getSubordinateTree(commander: Ship, sim: Sim) {
 
 export const FleetOverlay: React.FC = () => {
   const [sim] = useSim();
-  const [[overlay, selectedUnit], gameStore] = useGameStore((store) => [
+  const [[overlay, selectedUnits], gameStore] = useGameStore((store) => [
     store.overlay,
-    store.selectedUnit,
+    store.selectedUnits,
   ]);
   useOverlayRegister("fleet");
   const [, contextMenuStore] = useContextMenuStore(() => []);
 
   const setSelected = (id: number) => {
-    gameStore.setSelectedUnit(sim.getOrThrow(id));
+    gameStore.setSelectedUnits([sim.getOrThrow(id)]);
   };
   const onFocus = () => {
     gameStore.focus();
@@ -40,7 +40,7 @@ export const FleetOverlay: React.FC = () => {
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
-    if (id !== selectedUnit?.id) {
+    if (!selectedUnits.some((unit) => unit.id === id)) {
       contextMenuStore.open({
         position: [event.clientX, event.clientY],
         worldPosition: undefined!,
@@ -87,7 +87,7 @@ export const FleetOverlay: React.FC = () => {
     <FleetOverlayComponent
       fleets={fleets}
       unassigned={unassigned}
-      selected={selectedUnit?.id}
+      selected={selectedUnits.map((unit) => unit.id)}
       onContextMenu={onContextMenu}
       onSelect={setSelected}
       onFocus={onFocus}
