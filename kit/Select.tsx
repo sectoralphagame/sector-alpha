@@ -1,8 +1,9 @@
 import { Listbox } from "@headlessui/react";
 import clsx from "clsx";
 import React from "react";
+import sounds from "@assets/ui/sounds";
 import styles from "./Select.scss";
-import { BaseButton, defaultClickSound, popSound } from "./BaseButton";
+import { BaseButton } from "./BaseButton";
 
 export const Select: React.FC<
   React.PropsWithChildren<{
@@ -47,13 +48,13 @@ export const SelectOption: React.FC<
       })
     }
     onClick={(event) => {
-      defaultClickSound.play();
+      sounds.click.play();
       if (onClick) {
         onClick(event);
       }
     }}
     onMouseEnter={(event) => {
-      popSound.play();
+      sounds.pop.play();
       if (onMouseEnter) {
         onMouseEnter(event);
       }

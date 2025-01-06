@@ -5,7 +5,6 @@ import { defaultIndexer } from "@core/systems/utils/default";
 import { find, map, pipe, reduce, toArray } from "@fxts/core";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
 import { MapControl } from "@ogl-engine/MapControl";
-import { defaultClickSound } from "@kit/BaseButton";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { Path } from "@ogl-engine/utils/path";
@@ -27,6 +26,7 @@ import { Star } from "@ogl-engine/engine/Star";
 import { Light } from "@ogl-engine/engine/Light";
 import type { Entity } from "@core/entity";
 import { SelectionBox } from "@ogl-engine/engine/SelectionBox";
+import sounds from "@assets/ui/sounds";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 
@@ -135,7 +135,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         gameStore.setSelectedUnits([entity]);
         gameStore.unfocus();
       }
-      defaultClickSound.play();
+      sounds.click.play();
 
       if (isDoubleClick) {
         gameStore.focus();

@@ -1,8 +1,8 @@
 import React from "react";
 import { shipComponents } from "@core/archetypes/ship";
-import { defaultClickSound } from "@kit/BaseButton";
 import { useGameStore } from "@ui/state/game";
 import { useContextMenuStore } from "@ui/state/contextMenu";
+import sounds from "@assets/ui/sounds";
 import { ShipToSpace } from "./ShipToSpace";
 import { NoAvailableActions } from "./NoAvailableActions";
 import { ShipToEntity } from "./ShipToEntity";
@@ -13,7 +13,7 @@ export const ContextMenu: React.FC = () => {
 
   React.useEffect(() => {
     if (menu.active) {
-      defaultClickSound.play();
+      sounds.click.play();
     }
   }, [menu.active]);
 
