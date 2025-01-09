@@ -35,9 +35,12 @@ export class MapControl extends Orbit {
     PAN: MouseButton.Middle,
   };
 
-  onPointerUp: ((_position: Vec2, _button: MouseButton) => void) | null = null;
-  onPointerDown: ((_position: Vec2, _button: MouseButton) => void) | null =
-    null;
+  onPointerUp:
+    | ((_position: Vec2, _button: MouseButton, _isTarget: boolean) => void)
+    | null = null;
+  onPointerDown:
+    | ((_position: Vec2, _button: MouseButton, _isTarget: boolean) => void)
+    | null = null;
   onKeyDown: ((_event: KeyboardEvent) => void) | null = null;
   onRightClick: ((_event: MouseEvent) => void) | null = null;
   // eslint-disable-next-line class-methods-use-this
@@ -49,9 +52,12 @@ export class MapControl extends Orbit {
     this.minDistance = 0.1;
     this.maxDistance = 80;
 
-    this.element.addEventListener("pointerup", (event) => {
-      if (event.target !== this.element) return;
-      this.onPointerUp?.(this.mouse, event.button);
+    document.addEventListener("pointerup", (event) => {
+      this.onPointerUp?.(
+        this.mouse,
+        event.button,
+        event.target === this.element
+      );
     });
 
     document.body.addEventListener("keydown", (event) => {
@@ -65,7 +71,7 @@ export class MapControl extends Orbit {
     document.body.addEventListener("keyup", (event) => {
       this.keysPressed.delete(event.code);
     });
-    this.element.addEventListener("mousemove", this.onMouseMovePersistent);
+    document.addEventListener("mousemove", this.onMouseMovePersistent);
   }
 
   lookAt = (position: Vec3) => {
@@ -98,7 +104,7 @@ export class MapControl extends Orbit {
         };
       }
     } else {
-      this.onPointerDown?.(this.mouse, e.button);
+      this.onPointerDown?.(this.mouse, e.button, e.target === this.element);
       super.onMouseDown(e);
     }
   };

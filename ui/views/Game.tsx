@@ -53,9 +53,13 @@ const Game: React.FC = () => {
   const pressedKeys = React.useRef(new Set<string>());
 
   const player = sim.index.player.get()[0]!;
-  const [[currentSector, overlay, selectedUnits], gameStore] = useGameStore(
-    (store) => [store.sector, store.overlay, store.selectedUnits]
-  );
+  const [[currentSector, overlay, selectedUnits, selectionBox], gameStore] =
+    useGameStore((store) => [
+      store.sector,
+      store.overlay,
+      store.selectedUnits,
+      store.selectionBox,
+    ]);
 
   React.useEffect(() => {
     if (!sim) return () => undefined;
@@ -156,7 +160,11 @@ const Game: React.FC = () => {
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-    <div id="game-root" data-debug={window.dev}>
+    <div
+      id="game-root"
+      data-debug={window.dev}
+      style={{ pointerEvents: selectionBox ? "none" : undefined }}
+    >
       {/* This div is managed by react so each render would override
       any changes made by pixi, like cursor property. That's why rendering
       system creates own canvas here */}

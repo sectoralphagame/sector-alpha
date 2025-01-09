@@ -58,6 +58,7 @@ export const OglCanvas: React.FC<OglCanvasProps> = React.memo(
           onContextMenu={(event) => {
             event.preventDefault();
           }}
+          style={{ pointerEvents: "all" }}
         />
         {fpsCounterEnabled && fpsCounter && (
           <div className={styles.fps}>{fps}</div>

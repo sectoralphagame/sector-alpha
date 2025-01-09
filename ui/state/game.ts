@@ -7,6 +7,7 @@ export type GameOverlayType = "fleet" | "missions" | "map" | "dev" | null;
 export type Selectable = RequireComponent<"position">;
 
 export class GameStore {
+  selectionBox: boolean = false;
   sector: Sector = undefined!;
   selectedUnits: Selectable[] = [];
   focused = false;
@@ -29,6 +30,9 @@ export class GameStore {
       overlay: observable,
       setOverlay: action.bound,
       closeOverlay: action.bound,
+
+      selectionBox: observable,
+      setSelectionBoxState: action.bound,
     });
   }
 
@@ -86,6 +90,10 @@ export class GameStore {
 
   closeOverlay() {
     this.overlay = null;
+  }
+
+  setSelectionBoxState(state: boolean) {
+    this.selectionBox = state;
   }
 }
 

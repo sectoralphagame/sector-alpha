@@ -29,16 +29,15 @@ export const BaseButton: React.FC<BaseButtonProps> = ({
       onClick={(event) => {
         const sound = clickSoundProp ?? sounds.click;
         sound.volume(settings.volume.ui);
-
         sound.play();
-        if (onClick) {
-          onClick(event);
-        }
+
+        onClick?.(event);
       }}
       onMouseEnter={(event) => {
         const sound = enterSound ?? sounds.pop;
         sound.volume(settings.volume.ui);
         sound.play();
+
         if (onMouseEnter) {
           onMouseEnter(event);
         }

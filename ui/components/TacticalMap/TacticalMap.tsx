@@ -211,12 +211,13 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.loadSector();
   }
 
-  onPointerUp(position: Vec2, button: MouseButton) {
+  onPointerUp(position: Vec2, button: MouseButton, isTarget: boolean) {
     if (
       button === MouseButton.Left &&
       this.dragStart &&
       this.dragStart!.distance(position) > 0.1
     ) {
+      gameStore.setSelectionBoxState(false);
       this.removeSelectionBox();
       gameStore.setSelectedUnits(
         this.selectionBox
@@ -226,7 +227,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
           )
           .filter((e) => e.cp.owner?.id === this.sim.index.player.get()[0].id)
       );
-    } else if (button === MouseButton.Left) {
+    } else if (button === MouseButton.Left && isTarget) {
       this.handleEntityClick(this.control.keysPressed.has("ShiftLeft"));
     }
     this.dragStart = null;
@@ -236,6 +237,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     if (button === MouseButton.Left) {
       this.dragStart = mousePosition.clone();
       this.drawSelectionBox();
+      gameStore.setSelectionBoxState(true);
     }
   }
 

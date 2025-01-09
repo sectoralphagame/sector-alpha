@@ -128,7 +128,9 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     });
   }
 
-  onClick(_mousePosition: Vec2, button: MouseButton) {
+  onClick(_mousePosition: Vec2, button: MouseButton, isTarget: boolean) {
+    if (!isTarget) return;
+
     // if (button === 2) {
     //   const worldPos = this.raycast.intersectPlane({
     //     origin: new Vec3(0),
