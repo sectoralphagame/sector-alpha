@@ -1,8 +1,6 @@
-import type { DockSize } from "@core/components/dockable";
 import type { RequireComponent } from "@core/tsHelpers";
 import type { ParticleGeneratorInput } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
-import { SelectionRing } from "@ogl-engine/materials/ring/ring";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
 import type { EngineParticleGenerator } from "@ogl-engine/particles";
@@ -39,8 +37,8 @@ export class EntityMesh extends BaseMesh {
   entityId: number;
   entity: RequireComponent<"render" | "position">;
   name = "EntityMesh";
-  ring: SelectionRing | null = null;
   selected = false;
+  hovered = false;
   indicator: EntityIndicator;
 
   constructor(
@@ -84,13 +82,11 @@ export class EntityMesh extends BaseMesh {
     this.updatePosition();
 
     if (entity.tags.has("selection")) {
-      this.addRing(entity.cp.render.color, entity.cp.dockable?.size ?? "large");
+      this.indicator = new EntityIndicator(engine);
+      this.indicator.setParent(this);
+      this.indicator.material.setColor(entity.cp.render.color);
+      this.indicator.material.setSize(entity.cp.dockable?.size ?? "large");
     }
-
-    this.indicator = new EntityIndicator(engine);
-    this.indicator.setParent(this);
-    this.indicator.material.setColor(entity.cp.render.color);
-    this.indicator.material.setSize(entity.cp.dockable?.size ?? "large");
   }
 
   updatePosition() {
@@ -102,18 +98,6 @@ export class EntityMesh extends BaseMesh {
     this.rotation.y = -this.entity.cp.position.angle;
     this.setVisibility(!this.entity.cp.render.hidden);
   }
-
-  addRing = (color: number, size: DockSize) => {
-    this.ring = new SelectionRing(
-      this.engine,
-      color,
-      Math.max(...this.geometry.bounds.max) * 1.8,
-      size
-    );
-    this.ring.position.set(this.geometry.bounds.center);
-    this.ring.position.y -= 10;
-    this.addChild(this.ring);
-  };
 
   addParticleGenerator(input: ParticleGeneratorInput) {
     const type = getParticleType(input.name)!;
@@ -146,8 +130,13 @@ export class EntityMesh extends BaseMesh {
     });
   }
 
-  setSelected = (selected: boolean) => {
+  setSelected(selected: boolean) {
     this.selected = selected;
-    this.ring?.setSelected(selected);
-  };
+    this.indicator?.material.setSelected(selected);
+  }
+
+  setHovered(hovered: boolean) {
+    this.hovered = hovered;
+    this.indicator?.material.setHovered(hovered);
+  }
 }

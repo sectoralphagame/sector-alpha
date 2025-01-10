@@ -10,6 +10,7 @@ export class EntityIndicatorMaterial extends Material {
   uniforms: Material["uniforms"] & {
     uSize: { value: number };
     uColor: { value: Vec4 };
+    uState: { value: number };
   };
 
   constructor(engine: Engine3D) {
@@ -24,6 +25,7 @@ export class EntityIndicatorMaterial extends Material {
     });
     this.uniforms.uColor = { value: new Vec4(1) };
     this.uniforms.uSize = { value: 1 };
+    this.uniforms.uState = { value: 0 };
   }
 
   setColor(color: number) {
@@ -33,9 +35,25 @@ export class EntityIndicatorMaterial extends Material {
 
   setSize(size: DockSize) {
     this.uniforms.uSize.value = {
-      small: 1,
-      medium: 2,
-      large: 4,
+      small: 2.5,
+      medium: 4,
+      large: 7,
     }[size];
+  }
+
+  setSelected(selected: boolean) {
+    if (selected) {
+      this.uniforms.uState.value |= 1 << 0;
+    } else {
+      this.uniforms.uState.value &= ~(1 << 0);
+    }
+  }
+
+  setHovered(hovered: boolean) {
+    if (hovered) {
+      this.uniforms.uState.value |= 1 << 1;
+    } else {
+      this.uniforms.uState.value &= ~(1 << 1);
+    }
   }
 }

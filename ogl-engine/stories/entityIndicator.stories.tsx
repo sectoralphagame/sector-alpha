@@ -18,8 +18,10 @@ import type { Story3dArgs } from "./Story3d";
 const EntityIndicatorStory: React.FC<
   Story3dArgs & {
     color: string;
+    hovered: boolean;
+    selected: boolean;
   }
-> = ({ postProcessing, skybox, color }) => {
+> = ({ postProcessing, skybox, color, hovered, selected }) => {
   const engineRef = React.useRef<Engine>();
   const onInit = React.useCallback(async (engine) => {
     engineRef.current = engine;
@@ -46,11 +48,18 @@ const EntityIndicatorStory: React.FC<
   React.useEffect(() => {
     if (!engineRef.current) return;
 
-    const indicator = engineRef.current.scene.children.find(
-      (c) => c instanceof EntityIndicator
-    ) as EntityIndicator | undefined;
+    let indicator: EntityIndicator | undefined;
+
+    engineRef.current.scene.traverse((child) => {
+      if (child instanceof EntityIndicator) {
+        indicator = child;
+      }
+    });
+
     indicator?.material.setColor(Color(color).rgbNumber());
-  }, [color]);
+    indicator?.material.setHovered(hovered);
+    indicator?.material.setSelected(selected);
+  }, [color, hovered, selected]);
 
   return (
     <Story3d
@@ -75,19 +84,37 @@ export default {
             type: "color",
           },
         },
+        hovered: {
+          control: {
+            type: "boolean",
+          },
+        },
+        selected: {
+          control: {
+            type: "boolean",
+          },
+        },
       },
     },
     story3dMeta
   ),
 } as Meta;
 
-const Template: StoryFn = ({ postProcessing, skybox, color }) => (
+const Template: StoryFn = ({
+  postProcessing,
+  skybox,
+  color,
+  hovered,
+  selected,
+}) => (
   <div id="root">
     <Styles>
       <EntityIndicatorStory
         postProcessing={postProcessing}
         skybox={skybox}
         color={color}
+        hovered={hovered}
+        selected={selected}
       />
     </Styles>
   </div>

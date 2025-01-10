@@ -44,7 +44,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   raycastHits: EntityMesh[] = [];
   lastClicked = 0;
   control: MapControl;
-  meshes: Map<number, EntityMesh> = new Map();
+  meshes: WeakMap<Entity, EntityMesh> = new Map();
   dragStart: Vec2 | null = null;
   selectionBox: SelectionBox;
 
@@ -89,11 +89,11 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       this.updateEngineSettings();
     });
     this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
-      if (this.meshes.has(entity.id)) {
-        const mesh = this.meshes.get(entity.id)!;
+      if (this.meshes.has(entity)) {
+        const mesh = this.meshes.get(entity)!;
         mesh.destroy();
         this.engine.scene.entities.removeChild(mesh);
-        this.meshes.delete(entity.id);
+        this.meshes.delete(entity);
         if (
           entity.hasComponents(["position"]) &&
           gameStore.selectedUnits.includes(entity)
@@ -117,6 +117,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       ) {
         mesh = this.raycastHits[1];
       }
+
       const isDoubleClick = Date.now() - this.lastClicked < 200;
 
       const entity = this.sim
@@ -264,7 +265,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
   onSelectedChange(entities: Entity[], prevEntities: Entity[]) {
     for (const entity of prevEntities) {
-      this.meshes.get(entity.id)?.setSelected(false);
+      this.meshes.get(entity)?.setSelected(false);
       const path = this.engine.scene.ui.children.find(
         (c) => c instanceof Path && c.owner === entity
       );
@@ -274,7 +275,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     }
 
     for (const entity of entities) {
-      this.meshes.get(entity.id)?.setSelected(true);
+      this.meshes.get(entity)?.setSelected(true);
       if (entity.hasComponents(["position", "orders"])) {
         const path = new Path(this.engine, entity);
         this.engine.scene.ui.addChild(path);
@@ -296,18 +297,24 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       2.0 * (1.0 - this.control!.mouse.y / this.engine.gl.renderer.height) - 1.0
     );
     this.raycast.castMouse(this.engine.camera, normalisedMousePos);
-    this.raycastHits = this.raycast.intersectBounds([
-      ...this.meshes.values(),
-    ]) as EntityMesh[];
+    this.raycastHits = this.raycast.intersectBounds(
+      this.engine.scene.entities.children
+    ) as EntityMesh[];
+
+    for (const entity of this.engine.scene.entities.children) {
+      if (entity instanceof EntityMesh) {
+        entity.setHovered(this.raycastHits.includes(entity));
+      }
+    }
   }
 
   updateRenderables() {
     for (const entity of defaultIndexer.renderable.getIt()) {
       if (entity.cp.position.sector !== gameStore.sector.id) {
-        if (this.meshes.has(entity.id)) {
-          this.meshes.get(entity.id)!.destroy();
-          this.engine.scene.entities.removeChild(this.meshes.get(entity.id)!);
-          this.meshes.delete(entity.id);
+        if (this.meshes.has(entity)) {
+          this.meshes.get(entity)!.destroy();
+          this.engine.scene.entities.removeChild(this.meshes.get(entity)!);
+          this.meshes.delete(entity);
         }
         continue;
       }
@@ -344,13 +351,13 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         }
       }
 
-      if (!this.meshes.has(entity.id)) {
+      if (!this.meshes.has(entity)) {
         const mesh = new EntityMesh(this.engine, entity);
         this.engine.scene.entities.addChild(mesh);
-        this.meshes.set(entity.id, mesh);
+        this.meshes.set(entity, mesh);
       }
 
-      const mesh = this.meshes.get(entity.id)!;
+      const mesh = this.meshes.get(entity)!;
       mesh.updatePosition();
     }
   }
