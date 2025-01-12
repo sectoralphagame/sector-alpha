@@ -9,6 +9,7 @@ import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { Light } from "@ogl-engine/engine/Light";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
+import { Scene } from "@ogl-engine/engine/Scene";
 
 /**
  * There is an additional specular reflection on the top. It comes form skybox
@@ -28,6 +29,7 @@ const LightingStory: React.FC<{
 
   React.useEffect(() => {
     engine.hooks.onInit.subscribe("LightingStory", async () => {
+      engine.setScene(new Scene(engine));
       engine.camera.position.set(2);
       controlRef.current = new Orbit(engine.camera);
       skyboxRef.current = new Skybox(engine, "example");

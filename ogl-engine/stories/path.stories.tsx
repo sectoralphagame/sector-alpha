@@ -9,6 +9,7 @@ import type { PathColor } from "@ogl-engine/utils/path";
 import { Path } from "@ogl-engine/utils/path";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
 import { Entity } from "@core/entity";
+import { Scene } from "@ogl-engine/engine/Scene";
 
 const waypoints: [Vec3, PathColor][] = [
   [new Vec3(0, 0, 0), "default"],
@@ -25,6 +26,7 @@ const PathStory: React.FC = () => {
 
   React.useEffect(() => {
     engine.hooks.onInit.subscribe("MapControlStory", async () => {
+      engine.setScene(new Scene(engine));
       controlRef.current = new MapControl(engine.camera, engine.canvas);
       skyboxRef.current = new Skybox(engine, "example");
       skyboxRef.current.setParent(engine.scene);
