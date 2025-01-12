@@ -54,6 +54,7 @@ export class ActionLoader {
     }
     this.actions.push({ ...action, origin });
     if (!isHeadless) {
+      window.cheats ??= {};
       if (!window.cheats[action.category]) {
         window.cheats[action.category] = {};
       }

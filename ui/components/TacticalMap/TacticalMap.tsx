@@ -62,12 +62,14 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       find(
         (s) => s.cp.name.value === "Teegarden's Star II",
         this.sim.index.sectors.get()
-      )!
+      ) ?? this.sim.index.sectors.get()[0]
     );
 
-    this.engine.hooks.onInit.subscribe("TacticalMap", () =>
-      this.onEngineInit()
-    );
+    console.log("subscribing to hooks");
+    this.engine.hooks.onInit.subscribe("TacticalMap", () => {
+      console.log("onInit");
+      this.onEngineInit();
+    });
     this.engine.hooks.onUpdate.subscribe("TacticalMap", () =>
       this.onEngineUpdate()
     );
@@ -414,7 +416,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   updateEngineSettings() {
     const settings: GameSettings = JSON.parse(
       localStorage.getItem("gameSettings")!
-    );
+    ) || { graphics: { fxaa: false, postProcessing: true } };
 
     this.engine.fxaa = settings.graphics.fxaa;
     this.engine.postProcessing = settings.graphics.postProcessing;
@@ -431,6 +433,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
   loadSkybox() {
     if (!this.engine.scene.skybox) {
+      console.log("Loading skybox");
       this.engine.scene.addSkybox(
         new Skybox(
           this.engine,

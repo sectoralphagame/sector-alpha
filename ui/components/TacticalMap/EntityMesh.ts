@@ -111,7 +111,7 @@ export class EntityMesh extends BaseMesh {
 
     const onUpdate = (delta: number) => {
       generator.update(delta);
-      const entity = window.sim.get(this.entityId);
+      const entity = this.entity.sim.get(this.entityId);
 
       if (!entity) return;
 

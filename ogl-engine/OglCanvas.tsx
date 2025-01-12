@@ -32,7 +32,9 @@ export const OglCanvas: React.FC<OglCanvasProps> = React.memo(
         setErrorCount((count) => count + 1);
       });
 
+      console.log("calling init");
       engine.init(canvas);
+      console.log("init finished");
 
       resizeObserver.current = new ResizeObserver(engine.resize);
       resizeObserver.current.observe(canvas!.parentElement!);
