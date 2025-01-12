@@ -13,6 +13,8 @@ import smoke from "@assets/textures/particle/smoke.png";
 import fire from "@assets/textures/particle/fire.png";
 import spaceMonoTexture from "@assets/fonts/SpaceMono/SpaceMono-Regular.png";
 import { getParticleType } from "./particles";
+import { TextureEngine } from "./engine/engine2d";
+import smokeShader from "./procedural/smoke.frag.glsl";
 
 export type ModelName = keyof typeof models;
 
@@ -21,7 +23,7 @@ const textures = {
   "particle/fire": fire,
   "font/spaceMono": spaceMonoTexture,
 };
-export type TextureName = keyof typeof textures;
+export type TextureName = keyof typeof textures | `prop/smoke_${number}`;
 
 export interface ParticleGeneratorInput {
   name: string;
@@ -45,6 +47,8 @@ class AssetLoader {
 
   // eslint-disable-next-line class-methods-use-this
   async preload(onAssetLoad: (_progress: number) => void) {
+    await this.generateTextures();
+
     const resources = pipe(
       {
         ...models,
@@ -77,6 +81,25 @@ class AssetLoader {
       // eslint-disable-next-line no-await-in-loop
       await Promise.all(jobChunk.map((job) => job()));
       updateProgress();
+    }
+  }
+
+  async generateTextures() {
+    const textureEngine = new TextureEngine();
+    textureEngine.size = 1024 * 4;
+    textureEngine.init(new OffscreenCanvas(512, 512));
+    textureEngine.setShader(smokeShader);
+    textureEngine.update();
+    for (let i = 0; i < 16; i++) {
+      const name = `prop/smoke_${i + 1}`;
+
+      textureEngine.seed();
+      textureEngine.render();
+      const img = new Image();
+      // eslint-disable-next-line no-await-in-loop
+      await textureEngine.image(img);
+      this.addTexture(name as TextureName, img);
+      console.log(`Generated ${name}`);
     }
   }
 

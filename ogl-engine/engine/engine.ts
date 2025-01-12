@@ -11,7 +11,7 @@ export abstract class Engine<TScene extends Scene = Scene> {
   };
 
   public camera: Camera;
-  public canvas: HTMLCanvasElement;
+  public canvas: HTMLCanvasElement | OffscreenCanvas;
   public initialized = false;
   public scene: TScene;
 
@@ -46,7 +46,7 @@ export abstract class Engine<TScene extends Scene = Scene> {
   }
 
   resize(): void {
-    if (!this.canvas) return;
+    if (!this.canvas || this.canvas instanceof OffscreenCanvas) return;
 
     const w = this.canvas!.parentElement!.clientWidth;
     const h = this.canvas!.parentElement!.clientHeight;

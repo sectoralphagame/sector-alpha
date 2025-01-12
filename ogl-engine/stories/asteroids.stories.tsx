@@ -21,6 +21,7 @@ const AsteroidsStory: React.FC<
 > = ({ postProcessing, skybox, size, density, color }) => {
   const engineRef = React.useRef<Engine3D>();
   const onInit = React.useCallback(async (engine) => {
+    await assetLoader.generateTextures();
     engineRef.current = engine;
     engine.camera.position.set(1, 1, 1);
 

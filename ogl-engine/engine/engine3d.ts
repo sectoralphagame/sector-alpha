@@ -29,6 +29,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     };
     resolution: { base: { value: Vec2 }; bloom: { value: Vec2 } };
     uTime: { value: number };
+    uSeed: { value: number };
   };
 
   private lights: Light[] = [];
@@ -69,6 +70,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         bloom: { value: new Vec2() },
       },
       uTime: { value: 0 },
+      uSeed: { value: Math.random() },
     };
   }
 

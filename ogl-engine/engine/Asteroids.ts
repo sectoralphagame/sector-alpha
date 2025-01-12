@@ -5,6 +5,7 @@ import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { random } from "mathjs";
 import { InstancedPhongMaterial } from "@ogl-engine/materials/instancedPhong/instancedPhong";
 import { AsteroidFieldRingMaterial } from "@ogl-engine/materials/asteroidFieldRing/asteroidFieldRing";
+import { AsteroidDustMaterial } from "@ogl-engine/materials/asteroidDust/asteroidDust";
 import { BaseMesh } from "./BaseMesh";
 import type { Engine3D } from "./engine3d";
 
@@ -24,6 +25,7 @@ export class Asteroids extends Transform {
     this.visible = false;
     this.createAsteroids();
     this.createRing(color);
+    this.createDust();
   }
 
   static getScale() {
@@ -147,5 +149,27 @@ export class Asteroids extends Transform {
     }
 
     this.visible = true;
+  }
+
+  createDust() {
+    for (let i = 0; i < 16 * 3; i++) {
+      const plane = new BaseMesh(this.engine, {
+        geometry: new Plane(this.engine.gl),
+        material: new AsteroidDustMaterial(
+          this.engine,
+          `prop/smoke_${(i % 16) + 1}`
+        ),
+      });
+      plane.position.set(
+        random(-this.size, this.size),
+        random(-1, 1),
+        random(-this.size, this.size)
+      );
+      plane.rotation.x = -Math.PI / 2 + random(-0.1, 0.1);
+      plane.rotation.z = random(-Math.PI, Math.PI);
+      plane.rotation.y = random(-0.1, 0.1);
+      plane.scale.set(random(3, 10));
+      plane.setParent(this);
+    }
   }
 }
