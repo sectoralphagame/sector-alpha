@@ -18,6 +18,7 @@ const lightsNum = 16;
 const tempVec3 = new Vec3();
 
 export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
+  canvas: HTMLCanvasElement;
   postProcessing = false;
   fxaa = false;
   scene: TScene;

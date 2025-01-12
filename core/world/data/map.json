@@ -12,7 +12,19 @@
         "silica": 0
       },
       "skybox": "earth",
-      "props": []
+      "props": [
+        {
+          "type": "star",
+          "position": [10000, 1.3659098494, 0.24],
+          "scale": 381,
+          "color": "#c89716",
+          "color2": "#e13636",
+          "noise": 2.5,
+          "noisePower": 0.5,
+          "emissive": 0.3,
+          "name": "Sun"
+        }
+      ]
     },
     {
       "name": "Luna",
@@ -256,8 +268,10 @@
           "position": [10000, 1.3659098494, 0.24],
           "scale": 381,
           "color": "#b84545",
+          "color2": "#ffb986",
           "noise": 2.5,
           "noisePower": 0.5,
+          "emissive": 0.8,
           "name": "Star"
         }
       ]

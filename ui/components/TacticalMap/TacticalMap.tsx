@@ -465,6 +465,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   loadProp(data: (typeof mapData)["sectors"][number]["props"][number]) {
     if (data.type === "star") {
       const star = new Star(this.engine, data.color);
+      star.body.material.setColor2(data.color2);
       star.updatePositionFromSphericalCoords(
         data.position[0],
         data.position[1],

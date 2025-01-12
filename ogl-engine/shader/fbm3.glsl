@@ -13,4 +13,4 @@ float fbm3(vec3 st, int octaves) {
     return value;
 }
 
-#pragma glslify: export(fbm2)
+#pragma glslify: export(fbm3)

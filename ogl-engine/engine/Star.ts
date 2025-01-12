@@ -40,7 +40,7 @@ export class Star extends Transform {
       geometry: new Plane(engine.gl),
       material: new StarCoronaMaterial(
         engine,
-        this.body.material.uniforms.vColor.value
+        this.body.material.uniforms.uColor.value
       ),
       frustumCulled: false,
     });
