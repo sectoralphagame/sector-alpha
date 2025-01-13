@@ -83,6 +83,18 @@ export class EntityMesh extends BaseMesh {
 
     if (entity.tags.has("selection")) {
       this.indicator = new EntityIndicator(engine);
+      this.indicator.onBeforeRender(() => {
+        if (!this.entity.cp.hitpoints) return;
+
+        this.indicator.material.uniforms.uHp.value =
+          this.entity.cp.hitpoints.hp.value / this.entity.cp.hitpoints.hp.max;
+
+        if (this.entity.cp.hitpoints.shield) {
+          this.indicator.material.uniforms.uShield.value =
+            this.entity.cp.hitpoints.shield.value /
+            this.entity.cp.hitpoints.shield.max;
+        }
+      });
       this.indicator.setParent(this);
       this.indicator.material.setColor(entity.cp.render.color);
       this.indicator.material.setSize(entity.cp.dockable?.size ?? "large");
@@ -109,25 +121,16 @@ export class EntityMesh extends BaseMesh {
     generator.setParent(this);
     generator.updateMatrixWorld();
 
-    const onUpdate = (delta: number) => {
-      generator.update(delta);
-      const entity = this.entity.sim.get(this.entityId);
-
-      if (!entity) return;
-
-      if (type === "engine") {
+    if (type === "engine") {
+      this.onBeforeRender(() => {
         const gen = generator as any as EngineParticleGenerator;
-        const shipEntity = ship(entity);
+        const shipEntity = ship(this.entity);
 
         gen.setIntensity(
           shipEntity.cp.movable.velocity / shipEntity.cp.drive.maneuver
         );
-      }
-    };
-    this.engine.hooks.onUpdate.subscribe(this.name, onUpdate);
-    this.onDestroyCallbacks.push(() => {
-      this.engine.hooks.onUpdate.unsubscribe(onUpdate);
-    });
+      });
+    }
   }
 
   setSelected(selected: boolean) {

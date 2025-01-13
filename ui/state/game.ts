@@ -1,7 +1,9 @@
 import type { Sector } from "@core/archetypes/sector";
 import type { RequireComponent } from "@core/tsHelpers";
+import { pane } from "@ui/context/Pane";
 import { useMobx } from "@ui/hooks/useMobx";
 import { action, makeObservable, observable } from "mobx";
+import type { FolderApi } from "tweakpane";
 
 export type GameOverlayType = "fleet" | "missions" | "map" | "dev" | null;
 export type Selectable = RequireComponent<"position">;
@@ -12,6 +14,8 @@ export class GameStore {
   selectedUnits: Selectable[] = [];
   focused = false;
   overlay: GameOverlayType = null;
+
+  paneFolder: FolderApi | null;
 
   constructor() {
     makeObservable(this, {
@@ -44,6 +48,25 @@ export class GameStore {
     this.unfocus();
     this.selectedUnits = units;
     window.selected = this.selectedUnits[0];
+
+    if (units.length === 1) {
+      this.paneFolder = pane.addFolder({
+        title: units[0].cp.name?.value || "Unit",
+      });
+
+      if (units[0].hasComponents(["hitpoints"])) {
+        this.paneFolder.addBinding(units[0].cp.hitpoints.hp, "value", {
+          max: units[0].cp.hitpoints.hp.max,
+          min: 0,
+        });
+        this.paneFolder.addBinding(units[0].cp.hitpoints.hp, "max", {
+          min: 0,
+        });
+      }
+    } else {
+      this.paneFolder?.dispose();
+      this.paneFolder = null;
+    }
   }
 
   addSelectedUnit(unit: Selectable) {
@@ -62,6 +85,8 @@ export class GameStore {
     this.selectedUnits = [];
     window.selected = null;
     this.unfocus();
+    this.paneFolder?.dispose();
+    this.paneFolder = null;
   }
 
   focus() {

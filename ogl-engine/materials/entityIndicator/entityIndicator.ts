@@ -11,6 +11,8 @@ export class EntityIndicatorMaterial extends Material {
     uSize: { value: number };
     uColor: { value: Vec4 };
     uState: { value: number };
+    uHp: { value: number };
+    uShield: { value: number };
   };
 
   constructor(engine: Engine3D) {
@@ -26,6 +28,8 @@ export class EntityIndicatorMaterial extends Material {
     this.uniforms.uColor = { value: new Vec4(1) };
     this.uniforms.uSize = { value: 1 };
     this.uniforms.uState = { value: 0 };
+    this.uniforms.uHp = { value: 0 };
+    this.uniforms.uShield = { value: 0 };
   }
 
   setColor(color: number) {

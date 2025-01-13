@@ -237,7 +237,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.lights.splice(index, 1);
   };
 
-  getByEntityId(id: number) {
+  getByEntityId(id: number): EntityMesh | null {
     let mesh: EntityMesh | null = null;
 
     this.scene.traverse((m) => {

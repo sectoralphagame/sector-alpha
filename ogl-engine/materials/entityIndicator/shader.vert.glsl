@@ -16,7 +16,7 @@ uniform vec3 cameraPosition;
 uniform float uSize;
 
 void main() {
-    vec3 worldPosition = billboard(position, viewMatrix) * distance(cameraPosition, modelMatrix[3].xyz) / 110.f * uSize + modelMatrix[3].xyz;
+    vec3 worldPosition = billboard(position, viewMatrix) * distance(cameraPosition, modelMatrix[3].xyz) / 60.f * uSize + modelMatrix[3].xyz;
     vec4 viewPosition = viewMatrix * vec4(worldPosition, 1.0f);
 
     vUv = uv;
