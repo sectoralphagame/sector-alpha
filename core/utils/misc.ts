@@ -57,3 +57,14 @@ export function getGameDate(timeOffset: number): string {
 export function fromPolar(angle: number, distance: number): Position2D {
   return [distance * Math.cos(angle), distance * Math.sin(angle)];
 }
+
+export function compareDistance(
+  origin: Position2D,
+  a: Position2D,
+  b: Position2D
+): number {
+  const aDistance = (a[0] - origin[0]) ** 2 + (a[1] - origin[1]) ** 2;
+  const bDistance = (b[0] - origin[0]) ** 2 + (b[1] - origin[1]) ** 2;
+
+  return aDistance - bDistance;
+}

@@ -27,6 +27,7 @@ import { Light } from "@ogl-engine/engine/Light";
 import type { Entity } from "@core/entity";
 import { SelectionBox } from "@ogl-engine/engine/SelectionBox";
 import sounds from "@assets/ui/sounds";
+import { transport3D } from "@ui/state/transport3d";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 
@@ -55,6 +56,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.sim = props.sim;
     this.engine = new Engine3D<TacticalMapScene>();
     this.engine.setScene(new TacticalMapScene(this.engine));
+    transport3D.assign(this.engine);
+    this.onUnmountCallbacks.push(transport3D.unassign.bind(transport3D));
   }
 
   componentDidMount(): void {
@@ -65,9 +68,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       ) ?? this.sim.index.sectors.get()[0]
     );
 
-    console.log("subscribing to hooks");
     this.engine.hooks.onInit.subscribe("TacticalMap", () => {
-      console.log("onInit");
       this.onEngineInit();
     });
     this.engine.hooks.onUpdate.subscribe("TacticalMap", () =>
@@ -228,7 +229,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
           .map(({ entityId }) =>
             this.sim.getOrThrow(entityId).requireComponents(["position"])
           )
-          .filter((e) => e.cp.owner?.id === this.sim.index.player.get()[0].id)
+          .filter((e) => e.cp.owner?.id === this.sim.index.player.get()[0]?.id)
       );
     } else if (button === MouseButton.Left && isTarget) {
       this.handleEntityClick(this.control.keysPressed.has("ShiftLeft"));
@@ -433,7 +434,6 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
   loadSkybox() {
     if (!this.engine.scene.skybox) {
-      console.log("Loading skybox");
       this.engine.scene.addSkybox(
         new Skybox(
           this.engine,

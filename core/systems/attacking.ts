@@ -7,7 +7,8 @@ import { distance } from "mathjs";
 import type { DockSize } from "@core/components/dockable";
 import type { Entity } from "@core/entity";
 import { stopCruise } from "@core/utils/moving";
-import { getAngleDiff } from "@core/utils/misc";
+import { transport3D } from "@ui/state/transport3d";
+import type { Position2D } from "@core/components/position";
 import { regenCooldown } from "./hitpointsRegenerating";
 import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
@@ -33,6 +34,27 @@ export function isInDistance(
       target.cp.position.coord
     ) as number) <= r
   );
+}
+
+export function isInRange(
+  entity: RequireComponent<"damage">,
+  target: RequireComponent<"position">
+) {
+  const inDistance = isInDistance(entity, target);
+  if (!inDistance) return false;
+
+  const parentWithPosition = findInAncestors(entity, "position");
+  const targetVector: Position2D = [
+    target.cp.position.coord[0] - parentWithPosition.cp.position.coord[0],
+    target.cp.position.coord[1] - parentWithPosition.cp.position.coord[1],
+  ];
+
+  const angleDiff = Math.abs(
+    Math.atan2(targetVector[1], targetVector[0]) -
+      (parentWithPosition.cp.position.angle % (2 * Math.PI))
+  );
+
+  return angleDiff <= entity.cp.damage.angle / 2;
 }
 
 function shouldAttackBack(
@@ -91,22 +113,16 @@ export class AttackingSystem extends System {
         continue;
       }
 
+      if (entity.cp.drive?.state === "cruise") {
+        continue;
+      }
+
       const target = this.sim
         .getOrThrow(entity.cp.damage.targetId)
         .requireComponents(["position", "hitpoints"]);
       const entityOrParent = findInAncestors(entity, "position");
 
-      if (
-        !isInDistance(entity, target) ||
-        Math.abs(
-          getAngleDiff(entityOrParent, [
-            target.cp.position.coord[0] - entityOrParent.cp.position.coord[0],
-            target.cp.position.coord[1] - entityOrParent.cp.position.coord[1],
-          ])
-        ) >
-          entity.cp.damage.angle / 2
-      )
-        continue;
+      if (!isInRange(entity, target)) continue;
 
       entity.cooldowns.use(cdKey, entity.cp.damage.cooldown);
       if (
@@ -115,6 +131,7 @@ export class AttackingSystem extends System {
         Math.random() >
           getEvasionChance(target.cp.movable.velocity, target.cp.dockable.size)
       ) {
+        transport3D.shoot(entity.requireComponents(["position", "damage"]));
         changeHp(target, entity.cp.damage.value);
         const parentEntity = entityOrParent;
 

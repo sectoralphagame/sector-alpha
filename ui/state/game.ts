@@ -62,6 +62,16 @@ export class GameStore {
         this.paneFolder.addBinding(units[0].cp.hitpoints.hp, "max", {
           min: 0,
         });
+
+        if (units[0].cp.hitpoints.shield) {
+          this.paneFolder.addBinding(units[0].cp.hitpoints.shield, "value", {
+            max: units[0].cp.hitpoints.shield.max,
+            min: 0,
+          });
+          this.paneFolder.addBinding(units[0].cp.hitpoints.shield, "max", {
+            min: 0,
+          });
+        }
       }
     } else {
       this.paneFolder?.dispose();

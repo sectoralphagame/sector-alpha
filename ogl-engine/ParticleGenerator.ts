@@ -22,7 +22,7 @@ export class ParticleGenerator extends Transform implements Destroyable {
   name = "ParticleGenerator";
   particles: Particle[];
 
-  private max: number;
+  protected max: number;
   spawnRate = 1;
 
   mesh: BaseMesh;
@@ -95,6 +95,8 @@ export class ParticleGenerator extends Transform implements Destroyable {
     mesh.frustumCulled = false;
     mesh.setParent(this);
     mesh.geometry.setInstancedCount(this.max);
+
+    mesh.onBeforeRender(() => this.update(this.engine.delta));
 
     return mesh;
   }
@@ -184,5 +186,28 @@ export class ParticleGenerator extends Transform implements Destroyable {
   // eslint-disable-next-line class-methods-use-this
   destroy() {
     // this.mesh.setParent(null);
+  }
+}
+
+export abstract class OneShotParticleGenerator extends ParticleGenerator {
+  private count = 0;
+
+  override generateParticle(): void {
+    if (this.count >= this.max) return;
+
+    super.generateParticle();
+    this.count++;
+  }
+
+  override update(time: number) {
+    super.update(time);
+    if (this.count > 0 && this.particles.every((p) => p.life <= 0)) {
+      this.destroy();
+    }
+  }
+
+  override destroy() {
+    this.setParent(null);
+    this.mesh.setParent(null);
   }
 }

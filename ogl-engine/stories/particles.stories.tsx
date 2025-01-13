@@ -28,11 +28,7 @@ const ParticleGeneratorStory: React.FC<
     generatorRef.current.spawnRate = particles;
     engine.scene.addChild(generatorRef.current);
   }, []);
-  const onUpdate = React.useCallback((_, delta) => {
-    if (generatorRef.current) {
-      generatorRef.current.update(delta);
-    }
-  }, []);
+  const onUpdate = React.useCallback((_, _delta) => {}, []);
 
   React.useEffect(() => {
     if (generatorRef.current) generatorRef.current.spawnRate = particles;

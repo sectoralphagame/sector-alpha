@@ -54,6 +54,16 @@ const Game: React.FC<{ factions: number; fighters: number }> = ({
     });
     xSim.init();
 
+    document.addEventListener("keydown", (e) => {
+      if (e.key === " ") {
+        if (xSim.speed > 0) {
+          xSim.pause();
+        } else {
+          xSim.setSpeed(xSim.prevSpeed);
+        }
+      }
+    });
+
     const sector = createSector(xSim, {
       position: [0, 0, 0],
       name: "Sector",

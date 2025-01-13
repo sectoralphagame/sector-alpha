@@ -27,6 +27,8 @@ export interface SimConfig {
 
 @Exclude()
 export class Sim extends BaseSim {
+  delta = 0;
+
   @Expose()
   entityIdCounter: number = 1;
   hooks: {
@@ -96,6 +98,8 @@ export class Sim extends BaseSim {
   };
 
   next = (delta: number) => {
+    this.delta = delta;
+
     this.hooks.phase.start.notify(delta);
     this.hooks.phase.init.notify(delta);
     this.hooks.phase.update.notify(delta);

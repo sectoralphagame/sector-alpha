@@ -1,38 +1,35 @@
-import { ParticleGenerator } from "@ogl-engine/ParticleGenerator";
+import { OneShotParticleGenerator } from "@ogl-engine/ParticleGenerator";
 import { Vec4 } from "ogl";
 import { random } from "mathjs";
-import { loopToZero } from "@ogl-engine/easing";
 import { OrbMaterial } from "@ogl-engine/materials/orb/orb";
 import Color from "color";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 
-const particleSize = 0.2;
-const particleLife = 1.5;
+const particleSize = 0.8;
+const particleLife = 6;
+const spread = 0.015;
 
-export class FireParticleGenerator extends ParticleGenerator {
+export class KineticGunParticleGenerator extends OneShotParticleGenerator {
   constructor(engine: Engine3D) {
     super(
       engine,
       (particle) => {
-        particle.acceleration
-          .set(random(-8, 8), random(80, 100), random(-8, 8))
-          .divide(1000);
-        particle.velocity
-          .set(random(-0.8, 0.8), random(3, 5), random(-0.8, 0.8))
-          .divide(10);
+        particle.acceleration.set(0);
+        particle.velocity.set(
+          random(700, 750),
+          random(-spread, spread),
+          random(-spread, spread)
+        );
         particle.life = particleLife;
-        particle.scale.set(1);
       },
-      300
+      10
     );
 
-    this.spawnRate = 15;
+    this.spawnRate = 40;
 
     this.onParticleUpdate = (particle) => {
       particle.t = particle.life / particleLife;
-      const size =
-        (loopToZero(particle.life / particleLife) * particleSize) / 2;
-      particle.scale.set(size, size, size);
+      particle.scale.set(particleSize);
     };
 
     const material = new OrbMaterial(
