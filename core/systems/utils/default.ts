@@ -53,4 +53,5 @@ export const defaultIndexer = {
   teleports: new EntityIndex(["teleport"], [], true),
   trading: new EntityIndex(tradeComponents),
   sectorTrading: new SectorIndex(tradeComponents),
+  sectorShips: new SectorIndex(shipComponents),
 };

@@ -7,6 +7,7 @@ import type { FireParticleGenerator } from "@ogl-engine/particles/fire";
 import type { ParticleGeneratorType } from "@ogl-engine/particles";
 import { particleGenerator } from "@ogl-engine/particles";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
+import { OneShotParticleGenerator } from "@ogl-engine/ParticleGenerator";
 import type { Story3dArgs } from "./Story3d";
 import { Story3d, story3dMeta } from "./Story3d";
 
@@ -25,13 +26,19 @@ const ParticleGeneratorStory: React.FC<
     engine.camera.position.set(1, 1, 1);
     const constructor = particleGenerator[type];
     generatorRef.current = new constructor(engine);
-    generatorRef.current.spawnRate = particles;
+    if (!(generatorRef.current instanceof OneShotParticleGenerator)) {
+      generatorRef.current.spawnRate = particles;
+    }
     engine.scene.addChild(generatorRef.current);
   }, []);
   const onUpdate = React.useCallback((_, _delta) => {}, []);
 
   React.useEffect(() => {
-    if (generatorRef.current) generatorRef.current.spawnRate = particles;
+    if (
+      generatorRef.current &&
+      !(generatorRef.current instanceof OneShotParticleGenerator)
+    )
+      generatorRef.current.spawnRate = particles;
   }, [particles]);
 
   React.useEffect(() => {

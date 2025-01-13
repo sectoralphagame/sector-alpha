@@ -3,6 +3,7 @@ import { FireParticleGenerator } from "./fire";
 import { EngineParticleGenerator } from "./engine";
 import { HyperSlingshotParticleGenerator } from "./hyperslingshot";
 import { KineticGunParticleGenerator } from "./kineticGun";
+import { ExplosionParticleGenerator } from "./explosion";
 
 export {
   SmokeParticleGenerator,
@@ -16,6 +17,7 @@ export const particleGenerator = {
   engine: EngineParticleGenerator,
   hyperslingshot: HyperSlingshotParticleGenerator,
   kineticGun: KineticGunParticleGenerator,
+  explosion: ExplosionParticleGenerator,
 };
 export type ParticleGeneratorType = keyof typeof particleGenerator;
 

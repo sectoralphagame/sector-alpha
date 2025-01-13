@@ -71,12 +71,8 @@ export function attackAction(
     entity.cp.orders.value[0].origin === "auto"
   ) {
     const potentialTarget = pipe(
-      defaultIndexer.ships.getIt(),
-      filter(
-        (s) =>
-          s.cp.position.sector === entity.cp.position.sector &&
-          isInRange(entity, s)
-      ),
+      defaultIndexer.sectorShips.getIt(entity.cp.position.sector),
+      filter((s) => isInRange(entity, s)),
       sort((a, b) =>
         compareDistance(
           entity.cp.position.coord,

@@ -100,6 +100,11 @@ export class Sim extends BaseSim {
   next = (delta: number) => {
     this.delta = delta;
 
+    if (delta === 0) {
+      this.updateTimer(delta);
+      return;
+    }
+
     this.hooks.phase.start.notify(delta);
     this.hooks.phase.init.notify(delta);
     this.hooks.phase.update.notify(delta);
