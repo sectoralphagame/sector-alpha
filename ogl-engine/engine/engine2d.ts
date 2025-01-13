@@ -48,6 +48,7 @@ export class Engine2D extends Engine {
 }
 
 export class StrategicMapEngine extends Engine2D {
+  canvas: HTMLCanvasElement;
   scene: StrategicMapScene;
 
   constructor() {

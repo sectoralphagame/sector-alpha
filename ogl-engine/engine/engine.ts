@@ -11,7 +11,7 @@ export abstract class Engine<TScene extends Scene = Scene> {
   };
 
   public camera: Camera;
-  public canvas: HTMLCanvasElement | OffscreenCanvas;
+  protected canvas: HTMLCanvasElement | OffscreenCanvas;
   public initialized = false;
   public scene: TScene;
 
@@ -32,14 +32,14 @@ export abstract class Engine<TScene extends Scene = Scene> {
 
   abstract isFocused(): boolean;
 
-  init(canvas: HTMLCanvasElement): void {
+  init(canvas: HTMLCanvasElement | OffscreenCanvas): void {
     if (this.initialized) {
       throw new Error("Engine already initialized");
     }
 
     this.canvas = canvas;
     this.renderer = new Renderer({
-      canvas,
+      canvas: canvas as any, // Works for both HTMLCanvasElement and OffscreenCanvas
       dpr: this.dpr,
       antialias: true,
     });
