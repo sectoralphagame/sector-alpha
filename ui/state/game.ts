@@ -44,8 +44,14 @@ export class GameStore {
     this.sector = sector;
   }
 
+  private clearSelectedPane() {
+    this.paneFolder?.dispose();
+    this.paneFolder = null;
+  }
+
   setSelectedUnits(units: Selectable[]) {
     this.unfocus();
+    this.clearSelectedPane();
     this.selectedUnits = units;
     window.selected = this.selectedUnits[0];
 
@@ -73,9 +79,6 @@ export class GameStore {
           });
         }
       }
-    } else {
-      this.paneFolder?.dispose();
-      this.paneFolder = null;
     }
   }
 
@@ -87,6 +90,7 @@ export class GameStore {
   }
 
   unselectUnit(unit: Selectable) {
+    this.clearSelectedPane();
     this.selectedUnits = this.selectedUnits.filter((e) => e !== unit);
     window.selected = this.selectedUnits[0];
   }
@@ -95,8 +99,7 @@ export class GameStore {
     this.selectedUnits = [];
     window.selected = null;
     this.unfocus();
-    this.paneFolder?.dispose();
-    this.paneFolder = null;
+    this.clearSelectedPane();
   }
 
   focus() {
