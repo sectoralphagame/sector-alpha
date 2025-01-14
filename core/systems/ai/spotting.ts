@@ -35,7 +35,7 @@ export class SpottingSystem extends System<"exec"> {
     const cacheKey = [
       entity.cp.owner!.id,
       entity.cp.position.sector,
-      entity.cp.orders?.value[0].type === "pillage" ? "pillage" : "default",
+      entity.cp.orders?.value[0]?.type === "pillage" ? "pillage" : "default",
     ].join(":");
     const enemies =
       cache[cacheKey] ??
@@ -45,7 +45,7 @@ export class SpottingSystem extends System<"exec"> {
           const isMiningOnRestrictedArea =
             entityOwner.cp.ai?.restrictions.mining && e.cp.mining?.entityId;
           const isSubjectToPillaging =
-            entity.cp.orders?.value[0].type === "pillage" &&
+            entity.cp.orders?.value[0]?.type === "pillage" &&
             entityOwner.cp.relations.values[e.cp.owner.id]! <= 0 &&
             (e.tags.has("role:transport") || e.tags.has("role:mining")) &&
             (e.cp.dockable?.size === "small" ||
