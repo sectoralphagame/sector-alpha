@@ -67,8 +67,10 @@ export function attackAction(
   action: AttackAction
 ): boolean {
   if (
-    entity.cp.orders.value[0].type !== "attack" ||
-    entity.cp.orders.value[0].origin === "auto"
+    entity.tags.has("role:military") &&
+    entity.cp.dockable?.size === "small" &&
+    (entity.cp.orders.value[0].type !== "attack" ||
+      entity.cp.orders.value[0].origin === "auto")
   ) {
     const potentialTarget = pipe(
       defaultIndexer.sectorShips.getIt(entity.cp.position.sector),

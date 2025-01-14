@@ -19,7 +19,7 @@ function move(entity: Movable, delta: number) {
 
   entityPosition.coord[0] += moveVec[0];
   entityPosition.coord[1] += moveVec[1];
-  entityPosition.angle += dAngle;
+  entityPosition.angle = (entityPosition.angle + dAngle) % (2 * Math.PI);
   entityPosition.moved = true;
 
   entity.cp.docks?.docked.forEach((docked) => {
@@ -29,7 +29,7 @@ function move(entity: Movable, delta: number) {
 
     dockedPosition.coord[0] += moveVec[0];
     dockedPosition.coord[1] += moveVec[1];
-    dockedPosition.angle += dAngle;
+    dockedPosition.angle += (entityPosition.angle + dAngle) % (2 * Math.PI);
     dockedPosition.moved = true;
   });
 }

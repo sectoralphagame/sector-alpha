@@ -23,6 +23,25 @@ export function getEvasionChance(speed: number, size: DockSize): number {
   return Math.max(0, ((b / speed) * 10 * a + c) / 100);
 }
 
+function getAngleDiff(
+  origin: RequireComponent<"position">,
+  target: RequireComponent<"position">
+): number {
+  const targetVector: Position2D = [
+    target.cp.position.coord[0] - origin.cp.position.coord[0],
+    target.cp.position.coord[1] - origin.cp.position.coord[1],
+  ];
+
+  const angle =
+    Math.atan2(targetVector[1], targetVector[0]) - origin.cp.position.angle;
+
+  return angle > Math.PI
+    ? angle - 2 * Math.PI
+    : angle < -Math.PI
+    ? angle + 2 * Math.PI
+    : angle;
+}
+
 export function isInDistance(
   entity: RequireComponent<"damage">,
   target: RequireComponent<"position">,
@@ -44,15 +63,7 @@ export function isInRange(
   if (!inDistance) return false;
 
   const parentWithPosition = findInAncestors(entity, "position");
-  const targetVector: Position2D = [
-    target.cp.position.coord[0] - parentWithPosition.cp.position.coord[0],
-    target.cp.position.coord[1] - parentWithPosition.cp.position.coord[1],
-  ];
-
-  const angleDiff = Math.abs(
-    Math.atan2(targetVector[1], targetVector[0]) -
-      (parentWithPosition.cp.position.angle % (2 * Math.PI))
-  );
+  const angleDiff = getAngleDiff(parentWithPosition, target);
 
   return angleDiff <= entity.cp.damage.angle / 2;
 }
