@@ -223,6 +223,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     ) {
       gameStore.setSelectionBoxState(false);
       this.removeSelectionBox();
+
       gameStore.setSelectedUnits(
         this.selectionBox
           .getEntitiesInSelection()
@@ -232,6 +233,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
           .filter((e) => e.cp.owner?.id === this.sim.index.player.get()[0]?.id)
       );
     } else if (button === MouseButton.Left && isTarget) {
+      gameStore.setSelectionBoxState(false);
+      this.removeSelectionBox();
       this.handleEntityClick(this.control.keysPressed.has("ShiftLeft"));
     }
     this.dragStart = null;

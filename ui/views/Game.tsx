@@ -218,10 +218,10 @@ const Game: React.FC = () => {
         open={!!overlay}
         onClose={gameStore.closeOverlay}
       >
+        {gameSettings.dev && <DevOverlay />}
         <FleetOverlay />
         <MissionsOverlay />
         <MapOverlay />
-        {gameSettings.dev && <DevOverlay />}
       </Overlay>
       {menu.active && (
         <ClickAwayListener

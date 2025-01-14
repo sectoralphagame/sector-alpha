@@ -32,7 +32,7 @@
     display: none;
   }
   overflow-y: scroll;
-  height: calc(100vh - usesize(23.4));
+  height: calc(59 * var(--size));
   padding-bottom: usesize(2.4);
 }
 .rotate {

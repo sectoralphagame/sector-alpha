@@ -2,23 +2,25 @@ import { actionLoader } from "@core/actionLoader";
 import { isDev } from "@core/settings";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export function useFps() {
+export function useFps(register?: boolean) {
   const framesCounterRef = useRef(0);
   const [fps, setFps] = useState(0);
   const [enabled, setEnabled] = useState(isDev);
 
   useEffect(() => {
-    actionLoader.register(
-      {
-        category: "drawing",
-        description: "Toggle FPS counter",
-        slug: "fps",
-        fn: () => setEnabled((v) => !v),
-        name: "FPS Counter",
-        type: "basic",
-      },
-      "OglCanvas"
-    );
+    if (register) {
+      actionLoader.register(
+        {
+          category: "drawing",
+          description: "Toggle FPS counter",
+          slug: "fps",
+          fn: () => setEnabled((v) => !v),
+          name: "FPS Counter",
+          type: "basic",
+        },
+        "OglCanvas"
+      );
+    }
 
     const ticker = setInterval(() => {
       setFps(framesCounterRef.current);

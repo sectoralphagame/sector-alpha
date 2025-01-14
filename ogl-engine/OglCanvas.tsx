@@ -14,7 +14,7 @@ export const OglCanvas: React.FC<OglCanvasProps> = React.memo(
     const [canvas, setCanvas] = React.useState<HTMLCanvasElement | null>(null);
     const resizeObserver = React.useRef<ResizeObserver>();
     const frameIdRef = React.useRef(0);
-    const { fps, tick, enabled: fpsCounterEnabled } = useFps();
+    const { fps, tick, enabled: fpsCounterEnabled } = useFps(fpsCounter);
     const [errorCount, setErrorCount] = React.useState(0);
 
     React.useEffect(() => {
