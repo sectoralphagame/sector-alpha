@@ -2,6 +2,7 @@ import { Post, Texture, Vec2, Vec3, RenderTarget } from "ogl";
 import settings from "@core/settings";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
 import { gameStore } from "@ui/state/game";
+import { pane } from "@ui/context/Pane";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
@@ -11,6 +12,7 @@ import { dummyLight } from "./Light";
 import { Camera } from "./Camera";
 import { Engine } from "./engine";
 import type { Scene } from "./Scene";
+import { Star } from "./Star";
 
 const bloomSize = 1.2;
 const lightsNum = 16;
@@ -119,6 +121,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         uResolution: this.uniforms.resolution.base,
         tBloom: this.postProcessingLayers.bloom.uniform,
         uBloomStrength: { value: 1 },
+        uSunPos: { value: new Vec2(0, 0) },
+        uDensity: { value: 1.3 },
+        uWeight: { value: 0.01 },
+        uDecay: { value: 0.99 },
+        uExposure: { value: 1.6 },
       },
     });
     this.postProcessingLayers.composite.addPass({
@@ -126,6 +133,27 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       uniforms: {
         uResolution: this.uniforms.resolution.base,
       },
+    });
+
+    const folder = pane.addFolder({
+      title: "Post Processing",
+    });
+    folder.addBinding(this.compositePass.uniforms.uWeight, "value", {
+      label: "God Rays Weight",
+    });
+    folder.addBinding(this.compositePass.uniforms.uDensity, "value", {
+      label: "God Rays Density",
+    });
+    folder.addBinding(this.compositePass.uniforms.uDecay, "value", {
+      label: "God Rays Decay",
+      max: 1,
+      min: 0.9,
+    });
+    folder.addBinding(this.compositePass.uniforms.uExposure, "value", {
+      label: "God Rays Exposure",
+    });
+    folder.addBinding(this.compositePass.uniforms.uBloomStrength, "value", {
+      label: "Bloom Strength",
     });
   };
 
@@ -165,6 +193,20 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   };
 
   private renderComposite = () => {
+    this.compositePass.uniforms.uSunPos.value.set(-1, -1);
+
+    this.scene.traverse((m) => {
+      if (m instanceof Star) {
+        const v = m.position
+          .clone()
+          .applyMatrix4(this.camera.projectionViewMatrix);
+        this.compositePass.uniforms.uSunPos.value.set(
+          v.x / 2 + 0.5,
+          v.y / 2 + 0.5
+        );
+      }
+    });
+
     // Disable compositePass pass, so this post will just render the scene for now
     this.compositePass.enabled = false;
     this.fxaaPass.enabled = false;

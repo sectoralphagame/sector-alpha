@@ -1,10 +1,11 @@
 import settings from "@core/settings";
 import type { Engine } from "@ogl-engine/engine/engine";
 import type { Engine2D } from "@ogl-engine/engine/engine2d";
+import { entries, join, map, pipe } from "@fxts/core";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Light } from "@ogl-engine/engine/Light";
 import Color from "color";
-import { type Vec3, type Mesh, type Program, Texture } from "ogl";
+import { type Vec3, type Mesh, Program, Texture } from "ogl";
 import type { FolderApi } from "tweakpane";
 
 export abstract class Material {
@@ -63,6 +64,34 @@ export abstract class Material {
         });
       }
     }
+  }
+
+  createProgram(
+    vertex: string,
+    fragment: string,
+    defines: Record<string, string> = {}
+  ) {
+    this.program = new Program(this.engine.gl, {
+      vertex: vertex.replace(
+        /#pragma defines/g,
+        pipe(
+          defines,
+          entries,
+          map(([key, value]) => `#define ${key} ${value}`),
+          join("\n")
+        )
+      ),
+      fragment: fragment.replace(
+        /#pragma defines/g,
+        pipe(
+          defines,
+          entries,
+          map(([key, value]) => `#define ${key} ${value}`),
+          join("\n")
+        )
+      ),
+      uniforms: this.uniforms,
+    });
   }
 
   static colorToVec3(color: string, uniform: { value: Vec3 }) {

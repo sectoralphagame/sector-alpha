@@ -45,6 +45,12 @@ const settings: Partial<
     intensity: 0.75,
     direction: [0, -1, -0.4],
   },
+  gaia: {
+    ambient: 0.05,
+    color: "#ebad7f",
+    intensity: 0.39,
+    direction: [0, -1, -0.4],
+  },
 };
 
 export class Skybox extends Mesh implements Destroyable {

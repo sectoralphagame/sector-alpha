@@ -74,6 +74,5 @@ void main() {
         discard;
     }
 
-    fragData[0] = vec4(color, alpha);
-    fragData[0].a = alpha;
+    fragData[0] = vec4(color, alpha / 2.f);
 }

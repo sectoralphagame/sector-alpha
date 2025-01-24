@@ -1,4 +1,3 @@
-import { Program } from "ogl";
 import type { GLTFMaterial, Texture } from "ogl";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "./shader.frag.glsl";
@@ -10,6 +9,8 @@ export class SimplePbrMaterial extends Material {
     tDiffuse: { value: Texture };
     tNormal: { value: Texture };
     tRoughness: { value: Texture };
+    uShininess: { value: number };
+    tEmissive: { value: Texture };
     uNormalScale: { value: number };
     uNormalUVScale: { value: number };
   };
@@ -17,20 +18,27 @@ export class SimplePbrMaterial extends Material {
   constructor(engine: Engine3D, gltfMaterial: GLTFMaterial) {
     super(engine);
 
-    this.program = new Program(engine.gl, {
-      vertex,
-      fragment,
-      uniforms: this.uniforms,
-    });
+    const defines: Record<string, string> = {};
+
     this.uniforms.tDiffuse = { value: gltfMaterial.baseColorTexture.texture };
     this.uniforms.tNormal = { value: gltfMaterial.normalTexture.texture };
-    this.uniforms.tRoughness = {
-      value:
-        gltfMaterial.metallicRoughnessTexture?.texture ??
-        // FIXME: This is a hack to make the material work with the current model data
-        gltfMaterial.normalTexture.texture,
-    };
-    this.uniforms.uNormalScale = { value: 1 };
-    this.uniforms.uNormalUVScale = { value: 1 };
+
+    if (gltfMaterial.metallicRoughnessTexture) {
+      this.uniforms.tRoughness = {
+        value: gltfMaterial.metallicRoughnessTexture.texture,
+      };
+      defines.USE_ROUGHNESS = "1";
+    } else {
+      this.uniforms.uShininess = { value: gltfMaterial.roughnessFactor };
+    }
+
+    if (gltfMaterial.emissiveTexture) {
+      this.uniforms.tEmissive = {
+        value: gltfMaterial.emissiveTexture.texture,
+      };
+      defines.USE_EMISSIVE = "1";
+    }
+
+    this.createProgram(vertex, fragment, defines);
   }
 }

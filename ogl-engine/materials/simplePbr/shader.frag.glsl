@@ -4,6 +4,8 @@ precision highp float;
 #pragma glslify: Light = require("./ogl-engine/shader/light");
 #pragma glslify: blinnPhongSpec = require(glsl-specular-blinn-phong)
 
+#pragma defines
+
 in vec3 worldPosition;
 in vec2 vUv;
 in vec3 vTangent;
@@ -12,10 +14,19 @@ in vec3 vNormal;
 uniform mat4 viewMatrix;
 uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
-uniform sampler2D tRoughness;
 uniform vec3 cameraPosition;
 uniform vec3 ambient;
 uniform Light lights[16];
+
+#ifdef USE_ROUGHNESS
+uniform sampler2D tRoughness;
+#else
+uniform float uShininess;
+#endif
+
+#ifdef USE_EMISSIVE
+uniform sampler2D tEmissive;
+#endif
 
 out vec4 fragData[2];
 
@@ -23,7 +34,6 @@ out vec4 fragData[2];
 void main() {
     vec3 tex = texture(tDiffuse, vUv).rgb;
     vec3 normalMap = texture(tNormal, vUv).rgb * 2.f - 1.f;
-    float shininess = length(texture(tRoughness, vUv))*256.;
 
     vec3 tangent = vTangent - dot(vTangent, vNormal) * vNormal;
     vec3 bitangent = cross(vNormal, tangent);
@@ -34,6 +44,19 @@ void main() {
     vec3 specular = vec3(0.0f);
 
     vec3 norm = normalize(tbn * normalMap);
+
+    #ifdef USE_EMISSIVE
+    vec3 emissive = texture(tEmissive, vUv).rgb;
+    #else
+    vec3 emissive = vec3(0.0f);
+    #endif
+
+    #ifdef USE_ROUGHNESS
+    float shininess = length(texture(tRoughness, vUv))*256.f;
+    #else
+    float shininess = uShininess * 256.f;
+    #endif
+
 
     for(int i = 0; i < lights.length(); i++) {
         if(lights[i].visible) {
@@ -57,5 +80,6 @@ void main() {
         }
     }
 
-    fragData[0] = vec4((diffuse + ambient + specular) * tex, 1.0f);
+    fragData[0] = vec4((diffuse + ambient + specular) * tex + emissive, 1.0f);
+    fragData[1].r = length(emissive);
 }
