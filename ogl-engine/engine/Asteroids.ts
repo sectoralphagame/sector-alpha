@@ -29,9 +29,7 @@ export class Asteroids extends Transform {
   static getScale() {
     const t = Math.random();
 
-    if (t < 0.5) return random(0.08, 0.2);
-    if (t < 0.75) return random(0.5, 3.5);
-    if (t < 0.9) return random(9, 15);
+    if (t < 0.8) return random(9, 15);
 
     return random(20, 50);
   }
@@ -51,7 +49,7 @@ export class Asteroids extends Transform {
   }
 
   private async createAsteroids() {
-    const numAsteroids = this.size ** 2 * this.density * 6;
+    const numAsteroids = this.size ** 2 * this.density * 0.75;
 
     await assetLoader.load(this.engine.gl);
     const asteroidModels: ModelName[] = [

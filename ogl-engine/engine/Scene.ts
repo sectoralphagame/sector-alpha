@@ -1,8 +1,11 @@
 import { Transform } from "ogl";
 import type { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import type { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
+import type { FolderApi } from "tweakpane";
+import { pane } from "@ui/context/Pane";
 import type { Engine } from "./engine";
 import type { BaseMesh2D } from "./BaseMesh2D";
+import type { Engine3D } from "./engine3d";
 
 export class Scene extends Transform {
   engine: Engine<any>;
@@ -16,10 +19,13 @@ export class Scene extends Transform {
 }
 
 export class TacticalMapScene extends Scene {
+  engine: Engine3D;
   entities: Transform & { children: EntityMesh[] };
   props: Transform;
   ui: Transform;
   skybox: Skybox;
+
+  pane: FolderApi;
 
   constructor(engine: Engine<TacticalMapScene>) {
     super(engine);
@@ -37,6 +43,8 @@ export class TacticalMapScene extends Scene {
     this.ui = new Transform();
     this.ui.name = "UI";
     this.ui.setParent(this);
+
+    this.initPane();
   }
 
   getEntity(id: number) {
@@ -52,6 +60,53 @@ export class TacticalMapScene extends Scene {
   addSkybox(skybox: Skybox) {
     this.skybox = skybox;
     this.skybox.setParent(this);
+  }
+
+  initPane() {
+    this.pane = pane.addFolder({
+      title: "Post Processing",
+    });
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.godrays.uWeight,
+      "value",
+      {
+        label: "God Rays Weight",
+      }
+    );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.godrays.uDensity,
+      "value",
+      {
+        label: "God Rays Density",
+      }
+    );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.godrays.uDecay,
+      "value",
+      {
+        label: "God Rays Decay",
+        max: 1,
+        min: 0.2,
+      }
+    );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.godrays.uExposure,
+      "value",
+      {
+        label: "God Rays Exposure",
+      }
+    );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.bloom.uBloomStrength,
+      "value",
+      {
+        label: "Bloom Strength",
+      }
+    );
+  }
+
+  destroy() {
+    this.pane.dispose();
   }
 }
 

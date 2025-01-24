@@ -2,7 +2,6 @@ import { Post, Texture, Vec2, Vec3, RenderTarget } from "ogl";
 import settings from "@core/settings";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
 import { gameStore } from "@ui/state/game";
-import { pane } from "@ui/context/Pane";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
@@ -11,7 +10,7 @@ import type { Light } from "./Light";
 import { dummyLight } from "./Light";
 import { Camera } from "./Camera";
 import { Engine } from "./engine";
-import type { Scene } from "./Scene";
+import { TacticalMapScene, type Scene } from "./Scene";
 import { Star } from "./Star";
 
 const bloomSize = 1.2;
@@ -29,6 +28,17 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     env: {
       ambient: { value: Vec3 };
       lights: Light["uniforms"][];
+      postProcessing: {
+        godrays: {
+          uDensity: { value: number };
+          uWeight: { value: number };
+          uDecay: { value: number };
+          uExposure: { value: number };
+        };
+        bloom: {
+          uBloomStrength: { value: number };
+        };
+      };
     };
     resolution: { base: { value: Vec2 }; bloom: { value: Vec2 } };
     uTime: { value: number };
@@ -38,6 +48,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   private lights: Light[] = [];
   private postProcessingLayers: Record<"composite" | "bloom", Post>;
   private renderTarget: RenderTarget;
+
+  constructor() {
+    super();
+    this.initUniforms();
+  }
 
   init = (canvas: HTMLCanvasElement) => {
     super.init(canvas);
@@ -55,7 +70,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       height: gl.canvas.height * this.dpr,
     });
 
-    this.initUniforms();
     this.initPostProcessing();
     window.renderer = this;
     this.hooks.onInit.notify();
@@ -67,6 +81,17 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       env: {
         ambient: { value: new Vec3(0) },
         lights: [],
+        postProcessing: {
+          godrays: {
+            uDensity: { value: 0.8 },
+            uWeight: { value: 1 },
+            uDecay: { value: 0.86 },
+            uExposure: { value: 0.9 },
+          },
+          bloom: {
+            uBloomStrength: { value: 1.1 },
+          },
+        },
       },
       resolution: {
         base: { value: new Vec2() },
@@ -101,7 +126,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       fragment: blurFragment,
       uniforms: {
         uResolution: this.uniforms.resolution.bloom,
-        uDirection: { value: new Vec2(bloomSize * 2, 0) },
+        uDirection: { value: new Vec2(bloomSize * 1.2, 0) },
       },
     });
     const verticalPass = this.postProcessingLayers.bloom.addPass({
@@ -120,12 +145,12 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       uniforms: {
         uResolution: this.uniforms.resolution.base,
         tBloom: this.postProcessingLayers.bloom.uniform,
-        uBloomStrength: { value: 1 },
-        uSunPos: { value: new Vec2(0, 0) },
-        uDensity: { value: 1.3 },
-        uWeight: { value: 0.01 },
-        uDecay: { value: 0.99 },
-        uExposure: { value: 1.6 },
+        uBloomStrength: this.uniforms.env.postProcessing.bloom.uBloomStrength,
+        uSunPos: { value: new Vec2() },
+        uDensity: this.uniforms.env.postProcessing.godrays.uDensity,
+        uWeight: this.uniforms.env.postProcessing.godrays.uWeight,
+        uDecay: this.uniforms.env.postProcessing.godrays.uDecay,
+        uExposure: this.uniforms.env.postProcessing.godrays.uExposure,
       },
     });
     this.postProcessingLayers.composite.addPass({
@@ -133,27 +158,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       uniforms: {
         uResolution: this.uniforms.resolution.base,
       },
-    });
-
-    const folder = pane.addFolder({
-      title: "Post Processing",
-    });
-    folder.addBinding(this.compositePass.uniforms.uWeight, "value", {
-      label: "God Rays Weight",
-    });
-    folder.addBinding(this.compositePass.uniforms.uDensity, "value", {
-      label: "God Rays Density",
-    });
-    folder.addBinding(this.compositePass.uniforms.uDecay, "value", {
-      label: "God Rays Decay",
-      max: 1,
-      min: 0.9,
-    });
-    folder.addBinding(this.compositePass.uniforms.uExposure, "value", {
-      label: "God Rays Exposure",
-    });
-    folder.addBinding(this.compositePass.uniforms.uBloomStrength, "value", {
-      label: "Bloom Strength",
     });
   };
 
@@ -193,7 +197,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   };
 
   private renderComposite = () => {
-    this.compositePass.uniforms.uSunPos.value.set(-1, -1);
+    this.compositePass.uniforms.uSunPos.value.set(0.5, 0.5);
 
     this.scene.traverse((m) => {
       if (m instanceof Star) {
@@ -320,5 +324,13 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     for (let i = 0; i < lightsNum; i++) {
       this.uniforms.env.lights[i] = lightsToRender[i].uniforms;
     }
+  }
+
+  override setScene(scene: TScene) {
+    if (this.scene instanceof TacticalMapScene) {
+      this.scene.destroy();
+    }
+
+    super.setScene(scene);
   }
 }

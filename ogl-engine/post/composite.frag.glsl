@@ -17,7 +17,7 @@ uniform float uExposure;
 varying vec2 vUv;
 
 void main() {
-    vec4 godraysLayer = vec4(godrays(uDensity, uWeight, uDecay, uExposure, 100, tBloom, uSunPos, vUv), 1.0);
+    vec4 godraysLayer = vec4(godrays(uDensity, uWeight, uDecay, uExposure, 10, tBloom, uSunPos, vUv), 1.0);
     gl_FragColor = texture2D(tMap, vUv) + texture2D(tBloom, vUv) * uBloomStrength + godraysLayer;
     // gl_FragColor = texture2D(tMap, vUv) + texture2D(tBloom, vUv) * uBloomStrength;
 }
