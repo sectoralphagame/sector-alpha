@@ -26,6 +26,11 @@ export class ParticleGenerator extends Transform implements Destroyable {
   spawnRate = 1;
 
   mesh: BaseMesh;
+  /**
+   * If true, particles will be spawned in world space, meaning they will not be
+   * affected by future generator movements.
+   */
+  global = true;
 
   currentWindowTimestamp: number;
   currentWindowSpawned = 0;
@@ -120,7 +125,9 @@ export class ParticleGenerator extends Transform implements Destroyable {
 
     this.generate(particle);
 
-    particle.position.applyMatrix4(this.worldMatrix);
+    if (this.global) {
+      particle.position.applyMatrix4(this.worldMatrix);
+    }
     particle.acceleration.scaleRotateMatrix4(this.worldMatrix);
     particle.velocity.scaleRotateMatrix4(this.worldMatrix);
   }
@@ -185,7 +192,7 @@ export class ParticleGenerator extends Transform implements Destroyable {
 
   // eslint-disable-next-line class-methods-use-this
   destroy() {
-    // this.mesh.setParent(null);
+    this.mesh.setParent(null);
   }
 }
 
@@ -208,6 +215,5 @@ export abstract class OneShotParticleGenerator extends ParticleGenerator {
 
   override destroy() {
     this.setParent(null);
-    this.mesh.setParent(null);
   }
 }

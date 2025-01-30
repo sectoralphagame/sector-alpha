@@ -5,9 +5,9 @@ import { OrbMaterial } from "@ogl-engine/materials/orb/orb";
 import Color from "color";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 
-const particleSize = 0.8;
+const particleSize = 0.6;
 const particleLife = 6;
-const spread = 0.015;
+const spread = 0.025;
 
 export class KineticGunParticleGenerator extends OneShotParticleGenerator {
   constructor(engine: Engine3D) {
@@ -22,7 +22,7 @@ export class KineticGunParticleGenerator extends OneShotParticleGenerator {
         );
         particle.life = particleLife;
       },
-      10
+      5
     );
 
     this.spawnRate = 40;
