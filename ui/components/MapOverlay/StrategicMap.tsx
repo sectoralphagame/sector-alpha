@@ -123,7 +123,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
       const mesh = this.engine.scene.getEntity(entity.id);
       if (mesh) {
         if (isDestroyable(mesh)) mesh.destroy();
-        this.engine.scene.removeChild(mesh);
+        this.engine.scene.removeEntity(entity.id);
       }
     });
   }
@@ -271,7 +271,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
             small: 0.005,
           }[renderable.cp.dockable?.size ?? "extraLarge"]
         );
-        mesh.setParent(this.engine.scene.entities);
+        this.engine.scene.addEntity(mesh, renderable.id);
       }
 
       if (renderable.cp.render.hidden) {
@@ -293,7 +293,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
           renderable.cp.position.coord[1] + pos[1]
         )
         .divide(sectorSize / 10);
-      mesh.rotation.y = renderable.cp.position.angle;
+      mesh.rotation.y = -renderable.cp.position.angle;
     }
   }
 

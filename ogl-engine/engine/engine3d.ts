@@ -289,7 +289,10 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.scene.traverse((m) => {
       if (m instanceof EntityMesh && m.entityId === id) {
         mesh = m;
+        return true;
       }
+
+      return false;
     });
 
     return mesh;

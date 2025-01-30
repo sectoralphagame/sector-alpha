@@ -117,6 +117,8 @@ export class StrategicMapScene extends Transform {
   entities: Transform & { children: BaseMesh2D[] };
   sectors: Transform;
 
+  private entityMap = new Map<number, BaseMesh2D>();
+
   constructor(engine: Engine<StrategicMapScene>) {
     super();
 
@@ -138,9 +140,20 @@ export class StrategicMapScene extends Transform {
     );
   }
 
+  addEntity(entity: BaseMesh2D, id: number) {
+    this.entities.addChild(entity);
+    this.entityMap[id] = entity;
+  }
+
+  removeEntity(id: number) {
+    const mesh = this.getEntity(id);
+    if (mesh) {
+      mesh.setParent(null);
+    }
+    this.entityMap.delete(id);
+  }
+
   getEntity(id: number) {
-    return this.entities.children.find(
-      (entity) => entity.name === `Entity:${id}`
-    );
+    return this.entityMap[id];
   }
 }
