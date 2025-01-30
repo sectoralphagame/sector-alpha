@@ -324,6 +324,11 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         }
         continue;
       }
+
+      // if (!(entity.cp.render.model in assetLoader.models)) {
+      //   entity.cp.render.model = `ship/${entity.cp.model?.slug}` as any;
+      // }
+
       // FIXME: Remove this debug code
       if (!(entity.cp.render.model in assetLoader.models)) {
         // eslint-disable-next-line no-console
@@ -333,7 +338,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
           if (entity.cp.dockable.size === "medium") {
             entity.cp.render.model = entity.tags.has("role:mining")
-              ? "ship/mMinExample"
+              ? "ship/marble"
               : entity.tags.has("role:military")
               ? "ship/axe"
               : "ship/mCiv";

@@ -234,8 +234,8 @@
     }
   },
   {
-    "name": "Miner A",
-    "slug": "minerA",
+    "name": "Marble",
+    "slug": "marble",
     "storage": 160,
     "mining": 1,
     "texture": "mMin",
