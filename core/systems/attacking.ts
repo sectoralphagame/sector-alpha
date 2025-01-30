@@ -65,7 +65,7 @@ export function isInRange(
   const parentWithPosition = findInAncestors(entity, "position");
   const angleDiff = getAngleDiff(parentWithPosition, target);
 
-  return angleDiff <= entity.cp.damage.angle / 2;
+  return Math.abs(angleDiff) <= entity.cp.damage.angle / 2;
 }
 
 function shouldAttackBack(
