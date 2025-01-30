@@ -22,19 +22,6 @@ class Transport3D {
 
     if (shooter) {
       const generator = new KineticGunParticleGenerator(this.engine);
-      generator.mesh.onBeforeRender(() => {
-        const target = this.engine!.getByEntityId(entity.cp.damage.targetId!);
-
-        if (!target) {
-          return;
-        }
-
-        generator.lookAt(target.position);
-        generator.rotation.x -= shooter.rotation.x;
-        generator.rotation.y -= shooter.rotation.y;
-        generator.rotation.z -= shooter.rotation.z;
-        generator.updateMatrix();
-      });
       generator.setParent(shooter);
     }
   }
@@ -46,9 +33,9 @@ class Transport3D {
     if (mesh) {
       const explosion = new ExplosionParticleGenerator(this.engine!);
       explosion.scale.set(
-        mesh.geometry.bounds.max.sub(mesh.geometry.bounds.min).len() *
-          entityScale *
-          1.5
+        (mesh.geometry.bounds.max.sub(mesh.geometry.bounds.min).len() *
+          entityScale) /
+          2
       );
       explosion.setParent(this.engine.scene);
       explosion.position.copy(mesh.position);

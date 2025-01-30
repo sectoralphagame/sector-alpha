@@ -56,28 +56,36 @@ export class GameStore {
     window.selected = this.selectedUnits[0];
 
     if (units.length === 1) {
+      const unit = units[0];
+
       this.paneFolder = pane.addFolder({
-        title: units[0].cp.name?.value || "Unit",
+        title: unit.cp.name?.value || "Unit",
       });
 
-      if (units[0].hasComponents(["hitpoints"])) {
-        this.paneFolder.addBinding(units[0].cp.hitpoints.hp, "value", {
-          max: units[0].cp.hitpoints.hp.max,
+      if (unit.hasComponents(["hitpoints"])) {
+        this.paneFolder.addBinding(unit.cp.hitpoints.hp, "value", {
+          max: unit.cp.hitpoints.hp.max,
           min: 0,
         });
-        this.paneFolder.addBinding(units[0].cp.hitpoints.hp, "max", {
+        this.paneFolder.addBinding(unit.cp.hitpoints.hp, "max", {
           min: 0,
         });
 
-        if (units[0].cp.hitpoints.shield) {
-          this.paneFolder.addBinding(units[0].cp.hitpoints.shield, "value", {
-            max: units[0].cp.hitpoints.shield.max,
+        if (unit.cp.hitpoints.shield) {
+          this.paneFolder.addBinding(unit.cp.hitpoints.shield, "value", {
+            max: unit.cp.hitpoints.shield.max,
             min: 0,
           });
-          this.paneFolder.addBinding(units[0].cp.hitpoints.shield, "max", {
+          this.paneFolder.addBinding(unit.cp.hitpoints.shield, "max", {
             min: 0,
           });
         }
+      }
+
+      if (unit.hasComponents(["position"])) {
+        this.paneFolder.addBinding(unit.cp.position, "angle", {
+          interval: 200,
+        });
       }
     }
   }
