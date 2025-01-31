@@ -7,7 +7,6 @@ import type {
 import type { RequireComponent } from "@core/tsHelpers";
 import { clearTarget, moveToActions, setTarget } from "@core/utils/moving";
 import { filter, first, pipe, sort } from "@fxts/core";
-import { compareDistance } from "@core/utils/misc";
 import { isInDistance, isInRange } from "../attacking";
 import { defaultIndexer } from "../utils/default";
 
@@ -75,12 +74,10 @@ export function attackAction(
     const potentialTarget = pipe(
       defaultIndexer.sectorShips.getIt(entity.cp.position.sector),
       filter((s) => isInRange(entity, s)),
-      sort((a, b) =>
-        compareDistance(
-          entity.cp.position.coord,
-          a.cp.position.coord,
-          b.cp.position.coord
-        )
+      sort(
+        (a, b) =>
+          entity.cp.position.coord.squaredDistance(a.cp.position.coord) -
+          entity.cp.position.coord.squaredDistance(b.cp.position.coord)
       ),
       first
     );

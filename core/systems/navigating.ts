@@ -1,15 +1,15 @@
-import { random, norm } from "mathjs";
+import { random } from "mathjs";
 import { getAngleDiff } from "@core/utils/misc";
-import type { Position2D } from "@core/components/position";
 import type { Driveable } from "@core/utils/moving";
 import { clearTarget, startCruise, stopCruise } from "@core/utils/moving";
+import { Vec2 } from "ogl";
 import { defaultDriveLimit } from "../components/drive";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
-const tempPosition: Position2D = [0, 0];
+const tempPosition = new Vec2();
 
 type Navigable = Driveable & RequireComponent<"position">;
 
@@ -30,7 +30,7 @@ function hold(entity: Navigable) {
 function getFormationPlace(
   commander: RequireComponent<"subordinates" | "position">,
   entity: RequireComponent<"position">
-): Position2D {
+): Vec2 {
   const subordinates = commander.cp.subordinates.ids;
   const subordinateIndex = subordinates.findIndex(
     (subordinateId) => subordinateId === entity.id
@@ -42,10 +42,10 @@ function getFormationPlace(
   const x = distance;
   const y = (subordinateIndex - (subordinatesCount - 1) / 2) * 0.3;
 
-  return [
-    x * Math.cos(angle) - y * Math.sin(angle) + commander.cp.position.coord[0],
-    x * Math.sin(angle) + y * Math.cos(angle) + commander.cp.position.coord[1],
-  ];
+  return new Vec2(
+    x * Math.cos(angle) - y * Math.sin(angle) + commander.cp.position.coord.x,
+    x * Math.sin(angle) + y * Math.cos(angle) + commander.cp.position.coord.y
+  );
 }
 
 export function getDeltaAngle(
@@ -69,12 +69,12 @@ function setFlybyDrive(entity: Navigable, delta: number) {
   const targetEntity = entity.sim.get(drive.target!)!;
   const targetPosition = targetEntity.cp.position!;
 
-  const path: Position2D = tempPosition;
-  path[0] = targetPosition.coord[0] - entityPosition.coord[0];
-  path[1] = targetPosition.coord[1] - entityPosition.coord[1];
+  const path = tempPosition
+    .copy(targetPosition.coord)
+    .sub(entityPosition.coord);
   const dAngle = getAngleDiff(entity, path);
 
-  const distance = norm(path) as number;
+  const distance = path.len();
   const angleOffset = Math.abs(dAngle);
   const isInRange =
     (targetEntity.cp.damage?.range ?? 0) + 0.2 > distance &&
@@ -163,13 +163,11 @@ function setDrive(entity: Navigable, delta: number) {
     return;
   }
 
-  const path: Position2D = tempPosition;
-  path[0] = targetPosition[0] - entityPosition.coord[0];
-  path[1] = targetPosition[1] - entityPosition.coord[1];
+  const path = tempPosition.copy(targetPosition).sub(entityPosition.coord);
 
   const dAngle = getAngleDiff(entity, path);
 
-  const distance = norm(path) as number;
+  const distance = path.len();
   const angleOffset = Math.abs(dAngle);
 
   movable.rotary = getDeltaAngle(dAngle, drive.rotary, delta);

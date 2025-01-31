@@ -5,6 +5,7 @@ import React from "react";
 import type { Sim } from "@core/sim";
 import { useContextMenuStore } from "@ui/state/contextMenu";
 import { useGameStore } from "@ui/state/game";
+import { Vec2 } from "ogl";
 import { useOverlayRegister } from "../Overlay/Overlay";
 import { FleetOverlayComponent } from "./FleetOverlayComponent";
 
@@ -42,7 +43,7 @@ export const FleetOverlay: React.FC = () => {
     event.preventDefault();
     if (!selectedUnits.some((unit) => unit.id === id)) {
       contextMenuStore.open({
-        position: [event.clientX, event.clientY],
+        position: new Vec2(event.clientX, event.clientY),
         worldPosition: undefined!,
         sector: null,
         target: sim.getOrThrow(id),

@@ -165,9 +165,6 @@ const Game: React.FC = () => {
       data-debug={window.dev}
       style={{ pointerEvents: selectionBox ? "none" : undefined }}
     >
-      {/* This div is managed by react so each render would override
-      any changes made by pixi, like cursor property. That's why rendering
-      system creates own canvas here */}
       <div className={styles.canvasRoot} ref={canvasRoot} id="canvasRoot">
         <TacticalMap sim={sim} />
         <SimAvgTimeGraph />

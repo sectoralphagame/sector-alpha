@@ -1,13 +1,13 @@
 import type { Sector } from "@core/archetypes/sector";
-import type { Position2D } from "@core/components/position";
 import type { Entity } from "@core/entity";
 import { useMobx } from "@ui/hooks/useMobx";
 import { action, computed, makeObservable, observable } from "mobx";
+import { Vec2 } from "ogl";
 
 export class ContextMenuStore {
   active = false;
-  position = [0, 0];
-  worldPosition = [0, 0];
+  position = new Vec2(0, 0);
+  worldPosition = new Vec2(0, 0);
   sector: Sector | null = null;
   target: Entity | null = null;
 
@@ -30,8 +30,8 @@ export class ContextMenuStore {
     target,
     worldPosition,
   }: {
-    position: Position2D;
-    worldPosition: Position2D;
+    position: Vec2;
+    worldPosition: Vec2;
     sector: Sector | null;
     target?: Entity | null;
   }) {

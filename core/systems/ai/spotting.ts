@@ -1,7 +1,6 @@
 import { filter, map, pipe, sort, toArray } from "@fxts/core";
 import type { Faction } from "@core/archetypes/faction";
 import { relationThresholds } from "@core/components/relations";
-import { distance } from "mathjs";
 import type { RequireComponent } from "@core/tsHelpers";
 import { pickRandom } from "@core/utils/generators";
 import { System } from "../system";
@@ -69,10 +68,7 @@ export class SpottingSystem extends System<"exec"> {
       enemies,
       map((e) => ({
         entity: e,
-        distance: distance(
-          e.cp.position.coord,
-          entity.cp.position.coord
-        ) as number,
+        distance: e.cp.position.coord.distance(entity.cp.position.coord),
       })),
       sort((a, b) => (a.distance > b.distance ? 1 : -1)),
       toArray

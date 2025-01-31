@@ -30,6 +30,7 @@ import {
 import settings from "@core/settings";
 import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
 import { gameStore } from "@ui/state/game";
+import { Vec2 } from "ogl";
 
 const Game: React.FC<{ factions: number; fighters: number }> = ({
   factions,
@@ -97,7 +98,7 @@ const Game: React.FC<{ factions: number; fighters: number }> = ({
             actions: moveToActions(
               fighter,
               createWaypoint(xSim, {
-                value: [0, 0],
+                value: new Vec2(0, 0),
                 sector: sector.id,
                 owner: faction.id,
               }),

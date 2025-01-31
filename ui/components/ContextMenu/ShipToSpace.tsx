@@ -6,7 +6,6 @@ import { mineAction } from "@core/components/orders";
 import { moveToActions } from "@core/utils/moving";
 import { DropdownOption } from "@kit/Dropdown";
 import { isOwnedByPlayer } from "@core/utils/misc";
-import type { Position2D } from "@core/components/position";
 import { useGameStore } from "@ui/state/game";
 import { useContextMenuStore } from "@ui/state/contextMenu";
 import { useSim } from "../../atoms";
@@ -50,7 +49,7 @@ export const ShipToSpace: React.FC = () => {
           unit,
           createWaypoint(sim, {
             sector: menu.sector!.id,
-            value: menu.worldPosition as Position2D,
+            value: menu.worldPosition,
             owner: unit.id,
           })
         ),
@@ -84,7 +83,7 @@ export const ShipToSpace: React.FC = () => {
           unit,
           createWaypoint(sim, {
             sector: menu.sector!.id,
-            value: menu.worldPosition as Position2D,
+            value: menu.worldPosition,
             owner: unit.id,
           })
         ),

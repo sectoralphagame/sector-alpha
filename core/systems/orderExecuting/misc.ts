@@ -1,5 +1,4 @@
 import { clearTarget, setTarget, stop, teleport } from "@core/utils/moving";
-import { distance } from "mathjs";
 import { HideReason } from "@core/components/render";
 import { waypoint } from "../../archetypes/waypoint";
 import { defaultDriveLimit } from "../../components/drive";
@@ -67,8 +66,7 @@ export function undockAction(
     .requireComponents(["position"]);
   entity.cp.position.angle = facility.cp.position.angle + Math.PI;
   const undocked =
-    (distance(entity.cp.position.coord, facility.cp.position.coord) as number) >
-    0.4;
+    entity.cp.position.coord.distance(facility.cp.position.coord) > 0.4;
 
   if (undocked) {
     undockShip(entity);

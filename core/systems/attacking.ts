@@ -3,12 +3,11 @@ import settings from "@core/settings";
 import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
 import { findInAncestors } from "@core/utils/findInAncestors";
-import { distance } from "mathjs";
 import type { DockSize } from "@core/components/dockable";
 import type { Entity } from "@core/entity";
 import { stopCruise } from "@core/utils/moving";
 import { transport3D } from "@ui/state/transport3d";
-import type { Position2D } from "@core/components/position";
+import { Vec2 } from "ogl";
 import { regenCooldown } from "./hitpointsRegenerating";
 import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
@@ -27,10 +26,9 @@ function getAngleDiff(
   origin: RequireComponent<"position">,
   target: RequireComponent<"position">
 ): number {
-  const targetVector: Position2D = [
-    target.cp.position.coord[0] - origin.cp.position.coord[0],
-    target.cp.position.coord[1] - origin.cp.position.coord[1],
-  ];
+  const targetVector = new Vec2()
+    .copy(target.cp.position.coord)
+    .sub(origin.cp.position.coord);
 
   const angle =
     Math.atan2(targetVector[1], targetVector[0]) - origin.cp.position.angle;
@@ -48,10 +46,9 @@ export function isInDistance(
   r: number = entity.cp.damage.range
 ): boolean {
   return (
-    (distance(
-      findInAncestors(entity, "position").cp.position.coord,
+    findInAncestors(entity, "position").cp.position.coord.distance(
       target.cp.position.coord
-    ) as number) <= r
+    ) <= r
   );
 }
 

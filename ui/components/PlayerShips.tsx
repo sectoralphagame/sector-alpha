@@ -7,6 +7,7 @@ import {
 import { first } from "@fxts/core";
 import { useGameStore } from "@ui/state/game";
 import { useContextMenuStore } from "@ui/state/contextMenu";
+import { Vec2 } from "ogl";
 import { useSim } from "../atoms";
 import { ShipButton } from "./ShipButton";
 
@@ -29,7 +30,7 @@ export const PlayerShips: React.FC = () => {
     event.preventDefault();
     if (!selected.some((unit) => unit.id)) {
       contextMenuStore.open({
-        position: [event.clientX, event.clientY],
+        position: new Vec2(event.clientX, event.clientY),
         worldPosition: undefined!,
         sector: null,
       });

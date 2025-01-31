@@ -218,7 +218,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
 
     for (const sector of defaultIndexer.sectors.getIt()) {
       const sectorWorldPos = tempVec2.set(
-        ...hecsToCartesian(sector.cp.hecsPosition.value, 1)
+        hecsToCartesian(sector.cp.hecsPosition.value, 1)
       );
 
       this.mouseWorldPos.set(mouseWorldPos.x, mouseWorldPos.z);

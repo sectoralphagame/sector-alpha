@@ -6,7 +6,6 @@ import { relationThresholds } from "@core/components/relations";
 import { isOwnedByPlayer } from "@core/utils/misc";
 import { addSubordinate } from "@core/components/subordinates";
 import { findInAncestors } from "@core/utils/findInAncestors";
-import type { Position2D } from "@core/components/position";
 import { useGameStore } from "@ui/state/game";
 import { useContextMenuStore } from "@ui/state/contextMenu";
 import { useGameDialog, useSim } from "../../atoms";
@@ -52,7 +51,7 @@ export const ShipToEntity: React.FC = () => {
             unit,
             createWaypoint(sim, {
               sector: menu.sector!.id,
-              value: menu.worldPosition as Position2D,
+              value: menu.worldPosition,
               owner: unit.id,
             })
           ),

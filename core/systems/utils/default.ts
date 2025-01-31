@@ -1,10 +1,10 @@
 import { shipComponents } from "@core/archetypes/ship";
 import { collectibleComponents } from "@core/archetypes/collectible";
-import { asteroidFieldComponents } from "../../archetypes/asteroidField";
-import { facilityComponents } from "../../archetypes/facility";
-import { factionComponents } from "../../archetypes/faction";
-import { sectorComponents } from "../../archetypes/sector";
-import { tradeComponents } from "../../economy/utils";
+import { asteroidFieldComponents } from "@core/archetypes/asteroidField";
+import { facilityComponents } from "@core/archetypes/facility";
+import { factionComponents } from "@core/archetypes/faction";
+import { sectorComponents } from "@core/archetypes/sector";
+import { tradeComponents } from "@core/economy/utils";
 import { SectorIndex } from "./sectorIndex";
 import { EntityIndex } from "./entityIndex";
 
@@ -33,7 +33,6 @@ export const defaultIndexer = {
   player: new EntityIndex([...factionComponents, "missions"], ["player"], true),
   productionByModules: new EntityIndex(["production", "parent"]),
   renderable: new EntityIndex(["render", "position"]),
-  renderableGraphics: new EntityIndex(["renderGraphics"]),
   sectors: new EntityIndex(sectorComponents, [], true),
   selectable: new EntityIndex(["render", "position"], ["selection"]),
   settings: new EntityIndex(

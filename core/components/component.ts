@@ -10,7 +10,6 @@ import type { FacilityModuleBonus } from "./facilityModuleBonus";
 import type { Modules } from "./modules";
 import type { Name } from "./name";
 import type { Render } from "./render";
-import type { RenderGraphics } from "./renderGraphics";
 import type { AutoOrder } from "./autoOrder";
 import type { Drive } from "./drive";
 import type { Mining } from "./mining";
@@ -89,7 +88,6 @@ export interface CoreComponents {
   production: Production;
   relations: Relations;
   render: Render;
-  renderGraphics: RenderGraphics<any>;
   sectorStats: SectorStats;
   shipyard: Shipyard;
   simpleCommodityStorage: SimpleCommodityStorage;

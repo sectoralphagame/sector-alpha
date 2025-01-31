@@ -21,7 +21,6 @@ import type { Destroyable } from "@ogl-engine/types";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
 import { gameStore } from "@ui/state/game";
 import { reaction } from "mobx";
-import type { Position2D } from "@core/components/position";
 import { Star } from "@ogl-engine/engine/Star";
 import { Light } from "@ogl-engine/engine/Light";
 import type { Entity } from "@core/entity";
@@ -188,10 +187,10 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       origin: new Vec3(0),
       normal: new Vec3(0, 1, 0),
     });
-    const worldPosition: Position2D = [worldPos.x / scale, worldPos.z / scale];
+    const worldPosition = new Vec2(worldPos.x / scale, worldPos.z / scale);
 
     contextMenuStore.open({
-      position: this.control.mouse.clone().toArray() as Position2D,
+      position: this.control.mouse.clone(),
       worldPosition,
       sector: gameStore.sector,
       target: targetId ? this.sim.getOrThrow(targetId) : null,

@@ -15,6 +15,7 @@ import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
 import { gameStore } from "@ui/state/game";
 import { System } from "@core/systems/system";
 import { defaultIndexer } from "@core/systems/utils/default";
+import { Vec2 } from "ogl";
 
 class MovingSystem extends System {
   apply(sim: Sim) {
@@ -64,7 +65,7 @@ const Game: React.FC<{ fighters: number }> = ({ fighters }) => {
       const fighter = createShip(xSim, {
         ...shipClasses.find(({ slug }) => slug === "dart")!,
         angle: 0,
-        position: [0, 0],
+        position: new Vec2(0, 0),
         owner: faction,
         sector,
       });

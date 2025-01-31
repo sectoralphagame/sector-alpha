@@ -15,6 +15,8 @@ import LZString from "lz-string";
 import { actionLoader } from "@core/actionLoader";
 import { Observable } from "@core/utils/observer";
 import { defaultIndexer } from "@core/systems/utils/default";
+import { Vec2 } from "ogl";
+import { isVec2 } from "@core/utils/misc";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -130,7 +132,7 @@ export class Sim extends BaseSim {
       .addComponent({
         name: "camera",
         zoom: 1,
-        position: [0, 0],
+        position: new Vec2(0, 0),
       });
   };
 
@@ -211,15 +213,28 @@ export class Sim extends BaseSim {
   }
 
   static load(config: SimConfig, data: string) {
-    const save = JSON.parse(data, (k, v) =>
-      typeof k === "string" && k.startsWith("BigInt:")
-        ? BigInt(k.split("BigInt:")[1])
-        : v
-    );
+    const save = JSON.parse(data, (_k, v) => {
+      if (!v) return v;
+
+      if (typeof v === "string" && v.startsWith("BigInt:")) {
+        return BigInt(v.split("BigInt:")[1]);
+      }
+      if (typeof v === "object" && isVec2(v)) {
+        const value = new Vec2(...v.value);
+        return value;
+      }
+
+      return v;
+    });
+
     const sim = plainToInstance(Sim, save);
     const entityMap = new Map();
 
     sim.entities.forEach((entity) => {
+      Object.assign(
+        entity.components,
+        save.entities.find((e) => e.id === entity.id)!.components
+      );
       entityMap.set(entity.id, entity);
       entity.sim = sim;
 
@@ -263,8 +278,14 @@ export class Sim extends BaseSim {
   }
 }
 
-// BigInt serialization monkeypatch
+// Serialization monkeypatches
+
 // eslint-disable-next-line func-names
 (BigInt.prototype as any).toJSON = function () {
   return `BigInt:${this.toString()}`;
+};
+
+// eslint-disable-next-line func-names
+(Vec2.prototype as any).toJSON = function () {
+  return { isVec2: true, value: this.toArray() };
 };
