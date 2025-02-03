@@ -2,7 +2,7 @@
   "name": "sector-alpha",
   "version": "0.1.1",
   "description": "Browser-based economic sim set in space",
-  "main": "index.js",
+  "main": "gateway/index.tsx",
   "scripts": {
     "start": "NODE_ENV=development webpack serve",
     "release": "release-it",
@@ -50,6 +50,7 @@
     "@typescript-eslint/parser": "^7.4.0",
     "ajv": "^8.12.0",
     "babel-loader": "^8.3.0",
+    "circular-dependency-plugin": "^5.2.2",
     "cli-progress": "^3.12.0",
     "css-loader": "^6.7.1",
     "dart-sass": "^1.25.0",

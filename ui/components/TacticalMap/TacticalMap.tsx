@@ -26,9 +26,11 @@ import { Light } from "@ogl-engine/engine/Light";
 import type { Entity } from "@core/entity";
 import { SelectionBox } from "@ogl-engine/engine/SelectionBox";
 import sounds from "@assets/ui/sounds";
-import { transport3D } from "@ui/state/transport3d";
+import { transport3D } from "@core/systems/transport3d";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
+import { createShootHandler } from "./events/shoot";
+import { createExplodeHandler } from "./events/explode";
 
 // FIXME: This is just an ugly hotfix to keep distance between things larger
 const scale = 2;
@@ -55,8 +57,15 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.sim = props.sim;
     this.engine = new Engine3D<TacticalMapScene>();
     this.engine.setScene(new TacticalMapScene(this.engine));
-    transport3D.assign(this.engine);
-    this.onUnmountCallbacks.push(transport3D.unassign.bind(transport3D));
+    transport3D.hooks.shoot.subscribe(
+      "TacticalMap",
+      createShootHandler(this.engine)
+    );
+    transport3D.hooks.explode.subscribe(
+      "TacticalMap",
+      createExplodeHandler(this.engine)
+    );
+    this.onUnmountCallbacks.push(transport3D.reset.bind(transport3D));
   }
 
   componentDidMount(): void {

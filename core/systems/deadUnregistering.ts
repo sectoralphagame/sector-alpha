@@ -1,9 +1,9 @@
 import type { Sim } from "@core/sim";
 import { dumpCargo } from "@core/components/storage";
 import type { Faction } from "@core/archetypes/faction";
-import { transport3D } from "@ui/state/transport3d";
 import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
+import { transport3D } from "./transport3d";
 
 export class DeadUnregisteringSystem extends System {
   index = new EntityIndex(["hitpoints"]);
@@ -30,7 +30,8 @@ export class DeadUnregisteringSystem extends System {
             time: this.sim.getTime(),
           });
         }
-        if (entity.hasComponents(["position"])) transport3D.explode(entity);
+        if (entity.hasComponents(["position"]))
+          transport3D.hooks.explode.notify(entity);
         entity.unregister();
       }
     }

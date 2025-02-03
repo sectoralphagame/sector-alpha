@@ -6,11 +6,11 @@ import { findInAncestors } from "@core/utils/findInAncestors";
 import type { DockSize } from "@core/components/dockable";
 import type { Entity } from "@core/entity";
 import { stopCruise } from "@core/utils/moving";
-import { transport3D } from "@ui/state/transport3d";
 import { Vec2 } from "ogl";
 import { regenCooldown } from "./hitpointsRegenerating";
 import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
+import { transport3D } from "./transport3d";
 
 const sizeMultipliers: Record<DockSize, [number, number, number]> = {
   large: [0.1, -5, 10],
@@ -139,7 +139,9 @@ export class AttackingSystem extends System {
         Math.random() >
           getEvasionChance(target.cp.movable.velocity, target.cp.dockable.size)
       ) {
-        transport3D.shoot(entity.requireComponents(["position", "damage"]));
+        transport3D.hooks.shoot.notify(
+          entity.requireComponents(["position", "damage"])
+        );
         changeHp(target, entity.cp.damage.value);
         const parentEntity = entityOrParent;
 

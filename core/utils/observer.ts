@@ -1,4 +1,4 @@
-type ObserverFn<T> = (_value: T) => void;
+export type ObserverFn<T> = (_value: T) => void;
 
 export class Observable<T> {
   /**

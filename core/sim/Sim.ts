@@ -12,7 +12,6 @@ import type { CoreComponents } from "@core/components/component";
 import type { EntityTag } from "@core/tags";
 import { componentMask } from "@core/components/masks";
 import LZString from "lz-string";
-import { actionLoader } from "@core/actionLoader";
 import { Observable } from "@core/utils/observer";
 import { defaultIndexer } from "@core/systems/utils/default";
 import { Vec2 } from "ogl";
@@ -62,7 +61,6 @@ export class Sim extends BaseSim {
   constructor({ systems }: SimConfig = { systems: [] }) {
     super();
 
-    actionLoader.link(this);
     this.entities = new Map();
     this.hooks = {
       addComponent: new Observable("addComponent"),
@@ -174,7 +172,6 @@ export class Sim extends BaseSim {
   destroy = () => {
     this.stop();
     this.hooks.destroy.notify();
-    actionLoader.reset();
     if (!isHeadless) {
       window.sim = undefined!;
       window.selected = undefined!;
