@@ -154,9 +154,8 @@ export class ParticleGenerator extends Transform implements Destroyable {
     const scale = this.mesh.geometry.attributes.scale.data!;
     const t = this.mesh.geometry.attributes.t.data!;
 
-    const sVec = tempVec3
-      .set(this.worldMatrix[0], this.worldMatrix[4], this.worldMatrix[8])
-      .len();
+    this.worldMatrix.getScaling(tempVec3);
+    const sVec = tempVec3;
 
     for (let i = 0; i < this.particles.length; i++) {
       const particle = this.particles[i];

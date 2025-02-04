@@ -34,7 +34,8 @@ class MovingSystem extends System {
         ship.cp.position.coord[0] = euclidean[0];
         ship.cp.position.coord[1] = euclidean[1];
         ship.cp.position.angle =
-          (angle + (2 * Math.PI) / shipsNum + Math.PI / 2) % (Math.PI * 2);
+          ((angle + (2 * Math.PI) / shipsNum + Math.PI / 2) % (Math.PI * 2)) +
+          Math.PI / 12;
       }
     });
   }
