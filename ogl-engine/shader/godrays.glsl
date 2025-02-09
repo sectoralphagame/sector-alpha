@@ -13,7 +13,7 @@ vec3 godrays(
 
     vec3 fragColor = vec3(0.0, 0.0, 0.0);
 
-    vec2 deltaTextCoord = vec2(uv - screenSpaceLightPos.xy);
+    vec2 deltaTextCoord = uv - screenSpaceLightPos;
 
     vec2 textCoo = uv.xy;
     deltaTextCoord *= (1.0 / float(numSamples)) * density;

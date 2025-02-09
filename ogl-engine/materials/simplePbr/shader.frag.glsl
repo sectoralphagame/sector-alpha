@@ -28,6 +28,8 @@ uniform float uShininess;
 uniform sampler2D tEmissive;
 #endif
 
+#define EPSILON 0.001f
+
 out vec4 fragData[2];
 
 
@@ -80,6 +82,6 @@ void main() {
         }
     }
 
-    fragData[0] = vec4((diffuse + ambient + specular) * tex + emissive, 1.0f);
+    fragData[0] = vec4((diffuse + ambient + specular) * (tex + EPSILON) + emissive, 1.0f);
     fragData[1].r = length(emissive);
 }
