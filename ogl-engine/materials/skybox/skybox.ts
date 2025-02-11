@@ -22,7 +22,7 @@ const settings: Partial<
   >
 > = {
   teegarden2: {
-    ambient: 0,
+    ambient: 0.08,
     color: "#f2a0ae",
     intensity: 0.93,
     direction: [-1.7, -3.2, -7.6],
@@ -99,7 +99,9 @@ export class Skybox extends Mesh implements Destroyable {
     this.light.setColor(settings[name]!.color);
     this.light.setIntensity(settings[name]!.intensity);
     this.light.position.set(...settings[name]!.direction);
-    this.engine.uniforms.env.ambient.value.set(settings[name]!.ambient);
+    this.engine.uniforms.env.ambient.value
+      .copy(this.light.uniforms.color.value)
+      .multiply(settings[name]!.ambient);
   }
 
   loadTexture(texture: keyof typeof skyboxes) {
@@ -151,7 +153,9 @@ export class Skybox extends Mesh implements Destroyable {
         max: 0.5,
       })
       .on("change", ({ value }) => {
-        this.engine.uniforms.env.ambient.value.set(value);
+        this.engine.uniforms.env.ambient.value.set(
+          this.light.uniforms.color.value.clone().multiply(value)
+        );
       });
     this.paneFolder
       .addBinding(params, "color", {
