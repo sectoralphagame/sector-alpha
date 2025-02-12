@@ -31,6 +31,7 @@ import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 import { createShootHandler } from "./events/shoot";
 import { createExplodeHandler } from "./events/explode";
+import { createDeployFacilityHandler } from "./events/deployFacility";
 
 // FIXME: This is just an ugly hotfix to keep distance between things larger
 const scale = 2;
@@ -64,6 +65,10 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     transport3D.hooks.explode.subscribe(
       "TacticalMap",
       createExplodeHandler(this.engine)
+    );
+    transport3D.hooks.deployFacility.subscribe(
+      "TacticalMap",
+      createDeployFacilityHandler(this.engine, this.meshes)
     );
     this.onUnmountCallbacks.push(transport3D.reset.bind(transport3D));
   }

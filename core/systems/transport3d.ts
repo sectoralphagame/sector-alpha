@@ -5,12 +5,14 @@ export class Transport3D {
   hooks: {
     shoot: Observable<RequirePureComponent<"position" | "damage">>;
     explode: Observable<RequirePureComponent<"position">>;
+    deployFacility: Observable<RequirePureComponent<"position">>;
   };
 
   constructor() {
     this.hooks = {
       shoot: new Observable("shoot"),
       explode: new Observable("explode"),
+      deployFacility: new Observable("deployFacility"),
     };
   }
 
