@@ -1,4 +1,4 @@
 /* @generated */
 /* prettier-ignore */
 /* eslint-disable */
-export const canvasRoot: string;
+export const menu: string;

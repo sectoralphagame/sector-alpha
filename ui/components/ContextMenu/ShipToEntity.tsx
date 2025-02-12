@@ -10,6 +10,7 @@ import { useGameStore } from "@ui/state/game";
 import { useContextMenuStore } from "@ui/state/contextMenu";
 import { useGameDialog, useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
+import { Wrapper } from "./Wrapper";
 
 export const ShipToEntity: React.FC = () => {
   const [sim] = useSim();
@@ -26,7 +27,11 @@ export const ShipToEntity: React.FC = () => {
   const [, setDialog] = useGameDialog();
 
   if (!canBeOrdered) {
-    return <NoAvailableActions />;
+    return (
+      <Wrapper>
+        <NoAvailableActions />
+      </Wrapper>
+    );
   }
 
   const actionableRelationship = menu.target!.cp.owner?.id
@@ -174,11 +179,15 @@ export const ShipToEntity: React.FC = () => {
   };
 
   if (teleportModule) {
-    return <DropdownOption onClick={onTeleport}>Jump</DropdownOption>;
+    return (
+      <Wrapper>
+        <DropdownOption onClick={onTeleport}>Jump</DropdownOption>
+      </Wrapper>
+    );
   }
 
   return (
-    <>
+    <Wrapper>
       {menu.target!.hasComponents(["trade"]) &&
         actionableRelationship > relationThresholds.trade &&
         selected.length === 1 && (
@@ -217,7 +226,7 @@ export const ShipToEntity: React.FC = () => {
         menu.target!.hasComponents(["simpleCommodityStorage"]) && (
           <DropdownOption onClick={onCollect}>Collect</DropdownOption>
         )}
-    </>
+    </Wrapper>
   );
 };
 

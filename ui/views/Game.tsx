@@ -1,6 +1,4 @@
 import React from "react";
-import ClickAwayListener from "react-click-away-listener";
-import { Dropdown, DropdownOptions } from "@kit/Dropdown";
 import { MapView } from "@ui/components/MapView";
 import { useRerender } from "@ui/hooks/useRerender";
 import { MapPanel } from "@ui/components/MapPanel";
@@ -26,7 +24,6 @@ import { MapOverlay } from "@ui/components/MapOverlay/MapOverlay";
 import { pane } from "@ui/context/Pane";
 import type { GameOverlayType } from "@ui/state/game";
 import { useGameStore } from "@ui/state/game";
-import { useContextMenuStore } from "@ui/state/contextMenu";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -44,9 +41,6 @@ const overlayKeyCodes: Record<string, NonNullable<GameOverlayType>> = {
 const Game: React.FC = () => {
   const [sim, setSim] = useSim();
   const canvasRoot = React.useRef<HTMLDivElement>(null);
-  const [[menu], contextMenuStore] = useContextMenuStore((store) => [
-    store.state,
-  ]);
   const [dialog, setDialog] = useGameDialog();
   const { addNotification } = useNotifications();
   const [gameSettings] = useGameSettings();
@@ -220,23 +214,7 @@ const Game: React.FC = () => {
         <MissionsOverlay />
         <MapOverlay />
       </Overlay>
-      {menu.active && (
-        <ClickAwayListener
-          mouseEvent="mousedown"
-          onClickAway={contextMenuStore.close}
-        >
-          <div
-            className={styles.menu}
-            style={{ top: menu.position[1], left: menu.position[0] }}
-          >
-            <Dropdown onClick={contextMenuStore.close}>
-              <DropdownOptions static>
-                <ContextMenu />
-              </DropdownOptions>
-            </Dropdown>
-          </div>
-        </ClickAwayListener>
-      )}
+      <ContextMenu />
     </div>
   );
 };

@@ -10,23 +10,17 @@ import { useGameStore } from "@ui/state/game";
 import { useContextMenuStore } from "@ui/state/contextMenu";
 import { useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
+import { Wrapper } from "./Wrapper";
 
 export const ShipToSpace: React.FC = () => {
   const [sim] = useSim();
-  const [[menu]] = useContextMenuStore((store) => [store.state]);
+  const [[menu], menuStore] = useContextMenuStore((store) => [store.state]);
   const [[selected]] = useGameStore((store) => [store.selectedUnits]);
 
-  if (!selected.length) {
-    return null;
-  }
-
   const canBeOrdered =
+    selected.length > 0 &&
     isOwnedByPlayer(selected[0]) &&
     selected.every((unit) => unit.hasComponents(["orders", "position"]));
-
-  if (!canBeOrdered) {
-    return <NoAvailableActions />;
-  }
 
   const fieldsToMine = selected.every((unit) => unit.hasComponents(["mining"]))
     ? sim.index.asteroidFields
@@ -94,8 +88,27 @@ export const ShipToSpace: React.FC = () => {
     });
   };
 
+  React.useEffect(() => {
+    if (
+      canBeOrdered &&
+      fieldsToMine.length === 0 &&
+      selected.every((unit) => !unit.cp.deployable)
+    ) {
+      onMove();
+      menuStore.close();
+    }
+  }, []);
+
+  if (!canBeOrdered) {
+    return (
+      <Wrapper>
+        <NoAvailableActions />
+      </Wrapper>
+    );
+  }
+
   return (
-    <>
+    <Wrapper>
       <DropdownOption onClick={onMove}>Move</DropdownOption>
       {fieldsToMine.length > 0 &&
         fieldsToMine.map((field) => (
@@ -109,7 +122,7 @@ export const ShipToSpace: React.FC = () => {
             Deploy Facility
           </DropdownOption>
         )}
-    </>
+    </Wrapper>
   );
 };
 

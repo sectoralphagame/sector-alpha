@@ -6,6 +6,7 @@ import sounds from "@assets/ui/sounds";
 import { ShipToSpace } from "./ShipToSpace";
 import { NoAvailableActions } from "./NoAvailableActions";
 import { ShipToEntity } from "./ShipToEntity";
+import { Wrapper } from "./Wrapper";
 
 export const ContextMenu: React.FC = () => {
   const [[menu]] = useContextMenuStore((store) => [store.state]);
@@ -27,7 +28,11 @@ export const ContextMenu: React.FC = () => {
     return <ShipToSpace />;
   }
 
-  return <NoAvailableActions />;
+  return (
+    <Wrapper>
+      <NoAvailableActions />
+    </Wrapper>
+  );
 };
 
 ContextMenu.displayName = "ContextMenu";
