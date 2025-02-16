@@ -145,19 +145,42 @@ export const Settings: React.FC = () => {
       </div>
       <hr />
       <div className={styles.settingsRow}>
-        <div>Camera Speed</div>
+        <div>Camera Pan Speed</div>
         <Slider
-          value={settings.cameraSpeed ?? 1}
+          value={settings.camera?.pan ?? 1}
           onChange={(event) => {
-            const cameraSpeed = Number(event.target.value);
+            const pan = Number(event.target.value);
 
             setSettings((prevSettings) => ({
               ...prevSettings,
-              cameraSpeed,
+              camera: {
+                ...prevSettings.camera,
+                pan,
+              },
             }));
           }}
-          max={2}
-          min={0.5}
+          max={4}
+          min={0.25}
+          step={0.01}
+        />
+      </div>
+      <div className={styles.settingsRow}>
+        <div>Camera Zoom Speed</div>
+        <Slider
+          value={settings.camera?.zoom ?? 1}
+          onChange={(event) => {
+            const zoom = Number(event.target.value);
+
+            setSettings((prevSettings) => ({
+              ...prevSettings,
+              camera: {
+                ...prevSettings.camera,
+                zoom,
+              },
+            }));
+          }}
+          max={4}
+          min={0.25}
           step={0.01}
         />
       </div>

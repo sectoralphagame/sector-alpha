@@ -9,7 +9,10 @@ export interface GameSettings {
     postProcessing: boolean;
     fxaa: boolean;
   };
-  cameraSpeed: number;
+  camera: {
+    pan: number;
+    zoom: number;
+  };
 }
 
 const defaultGameSttings: GameSettings = {
@@ -23,7 +26,10 @@ const defaultGameSttings: GameSettings = {
     postProcessing: false,
     fxaa: false,
   },
-  cameraSpeed: 1,
+  camera: {
+    pan: 1,
+    zoom: 1,
+  },
 };
 
 export const useGameSettings = () =>

@@ -36,7 +36,6 @@ export class MapControl extends Orbit {
     ZOOM: null,
     PAN: MouseButton.Middle,
   };
-  panSpeed = 1;
 
   onPointerUp:
     | ((_position: Vec2, _button: MouseButton, _isTarget: boolean) => void)
@@ -55,10 +54,10 @@ export class MapControl extends Orbit {
     this.minDistance = 0.1;
     this.maxDistance = 80;
 
-    this.updatePanSpeed();
+    this.updateSettings();
     storageHook.subscribe("MapControl", (key) => {
       if (key === "gameSettings") {
-        this.updatePanSpeed();
+        this.updateSettings();
       }
     });
 
@@ -84,13 +83,17 @@ export class MapControl extends Orbit {
     document.addEventListener("mousemove", this.onMouseMovePersistent);
   }
 
-  updatePanSpeed() {
+  updateSettings() {
     const settings = JSON.parse(
       localStorage.getItem("gameSettings")!
     ) as GameSettings;
 
-    if (settings.cameraSpeed) {
-      this.panSpeed = Number(settings.cameraSpeed);
+    if (settings.camera?.pan) {
+      this.panSpeed = Number(settings.camera.pan);
+    }
+
+    if (settings.camera?.zoom) {
+      this.zoomSpeed = Number(settings.camera.zoom);
     }
   }
 

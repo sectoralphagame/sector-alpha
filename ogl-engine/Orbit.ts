@@ -38,7 +38,7 @@ export class Orbit {
   minPolarAngle = 0;
   maxPolarAngle = Math.PI;
 
-  panSpeed = 0.8;
+  panSpeed = 1;
   rotateSpeed = 0.35;
   target: Vec3;
 
