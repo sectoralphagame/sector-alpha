@@ -36,9 +36,9 @@ const PathStory: React.FC = () => {
       engine.scene.addChild(pathRef.current);
     });
 
-    engine.hooks.onUpdate.subscribe("MapControlStory", () => {
+    engine.hooks.onUpdate.subscribe("MapControlStory", (delta) => {
       pathRef.current?.update(waypoints);
-      controlRef.current!.update();
+      controlRef.current!.update(delta);
     });
   }, [engine]);
 
