@@ -1,8 +1,10 @@
 import type { Camera, Mat4, Vec3 } from "ogl";
 import { Vec2 } from "ogl";
+import { storageHook } from "@core/hooks";
+import type { GameSettings } from "@ui/hooks/useGameSettings";
 import { MouseButton, Orbit, STATE, tempVec3 } from "./Orbit";
 
-const dPos = 3;
+const dPos = 360;
 const dScale = 0.2;
 const dRotation = 200;
 const keymap = {
@@ -34,6 +36,7 @@ export class MapControl extends Orbit {
     ZOOM: null,
     PAN: MouseButton.Middle,
   };
+  panSpeed = 1;
 
   onPointerUp:
     | ((_position: Vec2, _button: MouseButton, _isTarget: boolean) => void)
@@ -51,6 +54,13 @@ export class MapControl extends Orbit {
 
     this.minDistance = 0.1;
     this.maxDistance = 80;
+
+    this.updatePanSpeed();
+    storageHook.subscribe("MapControl", (key) => {
+      if (key === "gameSettings") {
+        this.updatePanSpeed();
+      }
+    });
 
     document.addEventListener("pointerup", (event) => {
       this.onPointerUp?.(
@@ -72,6 +82,16 @@ export class MapControl extends Orbit {
       this.keysPressed.delete(event.code);
     });
     document.addEventListener("mousemove", this.onMouseMovePersistent);
+  }
+
+  updatePanSpeed() {
+    const settings = JSON.parse(
+      localStorage.getItem("gameSettings")!
+    ) as GameSettings;
+
+    if (settings.cameraSpeed) {
+      this.panSpeed = Number(settings.cameraSpeed);
+    }
   }
 
   lookAt = (position: Vec3) => {
@@ -114,8 +134,8 @@ export class MapControl extends Orbit {
     super.onMouseUp(e);
   }
 
-  override update = () => {
-    super.update();
+  override update = (delta: number) => {
+    super.update(delta);
 
     if (!this.isFocused()) {
       return;
@@ -126,7 +146,10 @@ export class MapControl extends Orbit {
       if (!action) return;
 
       if (action.x || action.y) {
-        this.pan(action.x, action.y);
+        this.pan(
+          action.x * delta * this.panSpeed,
+          action.y * delta * this.panSpeed
+        );
       }
     });
   };

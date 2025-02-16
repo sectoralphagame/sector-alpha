@@ -94,7 +94,7 @@ export class Orbit {
     this.state = state;
   }
 
-  public update() {
+  public update(_delta: number) {
     if (!this.initialized) {
       this.addHandlers();
       this.initialized = true;

@@ -143,6 +143,24 @@ export const Settings: React.FC = () => {
           </SelectOptions>
         </Select>
       </div>
+      <hr />
+      <div className={styles.settingsRow}>
+        <div>Camera Speed</div>
+        <Slider
+          value={settings.cameraSpeed ?? 1}
+          onChange={(event) => {
+            const cameraSpeed = Number(event.target.value);
+
+            setSettings((prevSettings) => ({
+              ...prevSettings,
+              cameraSpeed,
+            }));
+          }}
+          max={2}
+          min={0.5}
+          step={0.01}
+        />
+      </div>
     </div>
   );
 };

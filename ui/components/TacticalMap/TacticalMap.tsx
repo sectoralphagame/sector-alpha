@@ -190,7 +190,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
     this.updateUIElements();
     this.updateFocus();
-    this.control!.update();
+    this.control!.update(this.engine.delta);
   }
 
   onRightClick() {

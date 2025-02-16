@@ -193,10 +193,10 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     }
   }
 
-  onUpdate() {
+  onUpdate(delta: number) {
     if (!this.engine.isFocused()) return;
 
-    this.control.update();
+    this.control.update(delta);
     this.updateRaycast(this.control.mouse);
 
     this.updateHover();

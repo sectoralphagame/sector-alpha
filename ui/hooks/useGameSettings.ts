@@ -9,6 +9,7 @@ export interface GameSettings {
     postProcessing: boolean;
     fxaa: boolean;
   };
+  cameraSpeed: number;
 }
 
 const defaultGameSttings: GameSettings = {
@@ -22,6 +23,7 @@ const defaultGameSttings: GameSettings = {
     postProcessing: false,
     fxaa: false,
   },
+  cameraSpeed: 1,
 };
 
 export const useGameSettings = () =>
