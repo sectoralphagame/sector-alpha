@@ -88,11 +88,11 @@ export class MapControl extends Orbit {
       localStorage.getItem("gameSettings")!
     ) as GameSettings;
 
-    if (settings.camera?.pan) {
+    if (settings?.camera?.pan) {
       this.panSpeed = Number(settings.camera.pan);
     }
 
-    if (settings.camera?.zoom) {
+    if (settings?.camera?.zoom) {
       this.zoomSpeed = Number(settings.camera.zoom);
     }
   }

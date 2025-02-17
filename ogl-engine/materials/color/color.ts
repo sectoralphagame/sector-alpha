@@ -22,6 +22,7 @@ export class ColorMaterial extends Material {
       vertex,
       fragment,
       uniforms: this.uniforms,
+      cullFace: false,
     });
     this.uniforms.uColor = { value: color };
     this.uniforms.fEmissive = { value: 0 };

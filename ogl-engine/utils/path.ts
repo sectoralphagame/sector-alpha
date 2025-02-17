@@ -5,7 +5,7 @@ import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
 import { gameStore } from "@ui/state/game";
-import { Plane, Transform, Vec3 } from "ogl";
+import { Geometry, Transform, Vec3 } from "ogl";
 
 export type PathColor = "default" | "warning";
 const colors: Record<PathColor, Vec3> = {
@@ -26,11 +26,80 @@ export class Path extends Transform {
   }
 
   createSegment = (): void => {
+    const geometry = new Geometry(this.engine.gl, {
+      index: {
+        size: 1,
+        data: new Uint16Array([
+          0,
+          2,
+          1,
+          2,
+          3,
+          1, // First plane
+          4,
+          6,
+          5,
+          6,
+          7,
+          5, // Second plane
+        ]),
+      },
+      position: {
+        size: 3,
+        data: new Float32Array([
+          // First Plane (XY)
+          -0.5,
+          0.5,
+          0.0, // 0
+          0.5,
+          0.5,
+          0.0, // 1
+          -0.5,
+          -0.5,
+          0.0, // 2
+          0.5,
+          -0.5,
+          0.0, // 3
+
+          // Second Plane (XZ) - Interlocking
+          0.0,
+          -0.5,
+          -0.5, // 4
+          0.0,
+          0.5,
+          -0.5, // 5
+          0.0,
+          -0.5,
+          0.5, // 6
+          0.0,
+          0.5,
+          0.5, // 7
+        ]),
+      },
+      uv: {
+        size: 2,
+        data: new Float32Array([
+          // First Plane UVs
+          0, 1, 1, 1, 0, 0, 1, 0,
+          // Second Plane UVs
+          0, 1, 1, 1, 0, 0, 1, 0,
+        ]),
+      },
+      normal: {
+        size: 3,
+        data: new Float32Array([
+          // First Plane normals (facing +Z)
+          0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+          // Second Plane normals (facing +X)
+          1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+        ]),
+      },
+    });
     const plane = new BaseMesh(this.engine, {
-      geometry: new Plane(this.engine.gl),
+      geometry,
       material: new ColorMaterial(this.engine, colors.default, false),
     });
-    plane.rotation.x = -Math.PI / 2;
+    plane.rotation.x = Math.PI / 2;
     plane.material.uniforms.fEmissive.value = 0.05;
     this.addChild(plane);
   };
@@ -47,11 +116,10 @@ export class Path extends Transform {
 
     for (let i = 0; i < waypoints.length - 1; i++) {
       const distance = waypoints[i][0].distance(waypoints[i + 1][0]);
-      this.children[i].scale.set(
-        (0.023 * this.engine.camera.position.y) / 5,
-        distance,
-        0
-      );
+      const focusPoint = this.engine.camera.distanceFromFocus();
+      const scale = focusPoint.distance(this.engine.camera.position) * 0.001;
+
+      this.children[i].scale.set(scale, distance, scale);
 
       this.children[i].position.set(
         waypoints[i + 1][0].clone().add(waypoints[i][0]).divide(2)

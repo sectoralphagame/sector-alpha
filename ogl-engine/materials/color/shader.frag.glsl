@@ -5,15 +5,12 @@ precision highp float;
 #pragma glslify: Light = require("./ogl-engine/shader/light");
 
 in vec3 worldPosition;
-in vec2 vUv;
 in vec3 vNormal;
 
 out vec4 fragData[2];
 
 uniform vec3 uColor;
 uniform bool bShaded;
-uniform mat4 viewMatrix;
-uniform sampler2D tNormal;
 uniform vec3 cameraPosition;
 uniform float fEmissive;
 uniform vec3 ambient;

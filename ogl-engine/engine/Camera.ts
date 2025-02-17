@@ -1,7 +1,9 @@
 import type { FolderApi } from "tweakpane";
-import { Camera as BaseCamera } from "ogl";
+import { Camera as BaseCamera, Vec3 } from "ogl";
 import { pane } from "@ui/context/Pane";
 import type { Engine } from "./engine";
+
+const tempVec3 = new Vec3();
 
 export class Camera extends BaseCamera {
   name = "Camera";
@@ -37,5 +39,22 @@ export class Camera extends BaseCamera {
 
   disablePane() {
     this.paneFolder?.dispose();
+  }
+
+  distanceFromFocus() {
+    const cameraPos = this.engine.camera.position;
+    const cameraDir = tempVec3.set(
+      -this.engine.camera.viewMatrix[2], // X
+      -this.engine.camera.viewMatrix[6], // Y
+      -this.engine.camera.viewMatrix[10] // Z
+    );
+
+    const t = -cameraPos.y / cameraDir.y; // Find intersection with XZ plane
+
+    return new Vec3(
+      cameraPos.x + t * cameraDir.x,
+      0,
+      cameraPos.z + t * cameraDir.z
+    );
   }
 }
