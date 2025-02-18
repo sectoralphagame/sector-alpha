@@ -32,7 +32,7 @@ export class ParticleGenerator extends Transform implements Destroyable {
    */
   global = true;
 
-  currentWindowTimestamp: number;
+  currentWindow: number;
   currentWindowSpawned = 0;
   lastKilled: number | null = 0;
 
@@ -47,7 +47,7 @@ export class ParticleGenerator extends Transform implements Destroyable {
     this.max = max;
     this.particles = [];
     this.generate = generate;
-    this.currentWindowTimestamp = performance.now();
+    this.currentWindow = 0;
     this.mesh = this.createParticleMesh();
     this.generateParticles();
   }
@@ -133,13 +133,13 @@ export class ParticleGenerator extends Transform implements Destroyable {
   }
 
   update(time: number) {
-    const now = performance.now();
-    if (now - this.currentWindowTimestamp >= 1000) {
-      this.currentWindowTimestamp = now;
+    this.currentWindow += time;
+    if (this.currentWindow >= 1000) {
+      this.currentWindow = 0;
       this.currentWindowSpawned = 0;
     }
 
-    const percentage = (now - this.currentWindowTimestamp) / 1000;
+    const percentage = this.currentWindow;
     const particlesToSpawn = Math.ceil(
       this.spawnRate * percentage - this.currentWindowSpawned
     );

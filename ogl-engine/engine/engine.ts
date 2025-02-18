@@ -19,7 +19,9 @@ export abstract class Engine<TScene extends Scene = Scene> {
   protected dpr = window.devicePixelRatio;
   protected lastFrameTime: number;
 
+  public originalDelta = 0;
   public delta = 0;
+  private deltaMultiplier = 1;
 
   constructor() {
     this.hooks = {
@@ -63,8 +65,9 @@ export abstract class Engine<TScene extends Scene = Scene> {
     }
 
     const now = performance.now();
-    this.delta = (now - this.lastFrameTime) / 1000;
-    this.hooks.onUpdate.notify(this.delta);
+    this.originalDelta = (now - this.lastFrameTime) / 1000;
+    this.delta = this.originalDelta * this.deltaMultiplier;
+    this.hooks.onUpdate.notify(this.originalDelta);
 
     try {
       if (this.isFocused()) {
@@ -82,6 +85,10 @@ export abstract class Engine<TScene extends Scene = Scene> {
 
   setScene(scene: TScene) {
     this.scene = scene;
+  }
+
+  setDeltaMultiplier(value: number) {
+    this.deltaMultiplier = value;
   }
 
   get gl() {

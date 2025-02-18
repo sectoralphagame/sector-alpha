@@ -21,12 +21,12 @@ export class BaseSim {
     this.timeOffset = 0;
   }
 
-  setSpeed = (value: number) => {
+  setSpeed(value: number) {
     this.prevSpeed = this.speed;
     this.speed = value;
-  };
+  }
 
-  start = () => {
+  start() {
     if (this.intervalHandle) return;
 
     this.intervalHandle = setInterval(() => {
@@ -53,7 +53,7 @@ export class BaseSim {
       }
     }, 1e3 / settings.global.targetFps) as unknown as number;
     this.lastTick = Date.now();
-  };
+  }
 
   updateTimer = (delta: number) => {
     this.timeOffset += delta;

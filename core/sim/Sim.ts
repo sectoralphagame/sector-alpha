@@ -50,6 +50,7 @@ export class Sim extends BaseSim {
       "start" | "init" | "update" | "render" | "cleanup" | "end",
       Observable<number>
     >;
+    onSpeedChange: Observable<number>;
   };
 
   @Expose()
@@ -77,6 +78,7 @@ export class Sim extends BaseSim {
         cleanup: new Observable("phase.cleanup", false),
         end: new Observable("phase.end", false),
       },
+      onSpeedChange: new Observable("onSpeedChange", false),
     };
 
     this.index = defaultIndexer;
@@ -114,6 +116,11 @@ export class Sim extends BaseSim {
 
     this.updateTimer(delta);
   };
+
+  override setSpeed(value: number) {
+    super.setSpeed(value);
+    this.hooks.onSpeedChange.notify(value);
+  }
 
   init = () => {
     const settingsEntity = new Entity(this);

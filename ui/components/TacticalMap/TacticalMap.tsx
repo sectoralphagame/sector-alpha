@@ -70,7 +70,13 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       "TacticalMap",
       createDeployFacilityHandler(this.engine, this.meshes)
     );
-    this.onUnmountCallbacks.push(transport3D.reset.bind(transport3D));
+    const onSpeedChange = (speed: number) => {
+      this.engine.setDeltaMultiplier(speed);
+    };
+    this.sim.hooks.onSpeedChange.subscribe("TacticalMap", onSpeedChange);
+    this.onUnmountCallbacks.push(transport3D.reset.bind(transport3D), () => {
+      this.sim.hooks.onSpeedChange.unsubscribe(onSpeedChange);
+    });
   }
 
   componentDidMount(): void {
@@ -190,7 +196,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
     this.updateUIElements();
     this.updateFocus();
-    this.control!.update(this.engine.delta);
+    this.control!.update(this.engine.originalDelta);
   }
 
   onRightClick() {

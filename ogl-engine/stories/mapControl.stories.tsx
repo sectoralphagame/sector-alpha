@@ -31,8 +31,8 @@ const ModelStory: React.FC = () => {
       engine.scene.addChild(mesh);
     });
 
-    engine.hooks.onUpdate.subscribe("MapControlStory", (delta) => {
-      controlRef.current!.update(delta);
+    engine.hooks.onUpdate.subscribe("MapControlStory", () => {
+      controlRef.current!.update(engine.originalDelta);
     });
   }, [engine]);
 
