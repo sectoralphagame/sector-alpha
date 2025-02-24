@@ -5,6 +5,7 @@ import { gameStore } from "@ui/state/game";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
+import godraysFragment from "../post/godrays.frag.glsl";
 import compositeFragment from "../post/composite.frag.glsl";
 import type { Light } from "./Light";
 import { dummyLight } from "./Light";
@@ -22,6 +23,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   canvas: HTMLCanvasElement;
   postProcessing = false;
   fxaa = false;
+  godrays = false;
   scene: TScene;
 
   uniforms: {
@@ -146,6 +148,12 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         uResolution: this.uniforms.resolution.base,
         tBloom: this.postProcessingLayers.bloom.uniform,
         uBloomStrength: this.uniforms.env.postProcessing.bloom.uBloomStrength,
+      },
+    });
+    this.postProcessingLayers.composite.addPass({
+      fragment: godraysFragment,
+      uniforms: {
+        tBloom: this.postProcessingLayers.bloom.uniform,
         uSunPos: { value: new Vec2() },
         uDensity: this.uniforms.env.postProcessing.godrays.uDensity,
         uWeight: this.uniforms.env.postProcessing.godrays.uWeight,
@@ -165,8 +173,12 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     return this.postProcessingLayers.composite.passes.at(-1)!;
   }
 
-  private get compositePass() {
+  private get godraysPass() {
     return this.postProcessingLayers.composite.passes.at(-2)!;
+  }
+
+  private get compositePass() {
+    return this.postProcessingLayers.composite.passes.at(-3)!;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -197,14 +209,14 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   };
 
   private renderComposite = () => {
-    this.compositePass.uniforms.uSunPos.value.set(0.5, 0.5);
+    this.godraysPass.uniforms.uSunPos.value.set(0.5, 0.5);
 
     this.scene.traverse((m) => {
       if (m instanceof Star) {
         const v = m.position
           .clone()
           .applyMatrix4(this.camera.projectionViewMatrix);
-        this.compositePass.uniforms.uSunPos.value.set(
+        this.godraysPass.uniforms.uSunPos.value.set(
           v.x / 2 + 0.5,
           v.y / 2 + 0.5
         );
@@ -213,6 +225,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
     // Disable compositePass pass, so this post will just render the scene for now
     this.compositePass.enabled = false;
+    this.godraysPass.enabled = false;
     this.fxaaPass.enabled = false;
     // `targetOnly` prevents post from rendering to the canvas
     this.postProcessingLayers.composite.targetOnly = true;
@@ -235,6 +248,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     });
     // Re-enable composite pass
     this.compositePass.enabled = true;
+    this.godraysPass.enabled = this.godrays;
     this.fxaaPass.enabled = this.fxaa;
     // Allow post to render to canvas upon its last pass
     this.postProcessingLayers.composite.targetOnly = false;

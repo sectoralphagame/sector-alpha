@@ -13,7 +13,6 @@ import { TacticalMapScene } from "@ogl-engine/engine/Scene";
 import type { Sim } from "@core/sim";
 import { contextMenuStore } from "@ui/state/contextMenu";
 import { storageHook } from "@core/hooks";
-import type { GameSettings } from "@ui/hooks/useGameSettings";
 import { MouseButton } from "@ogl-engine/Orbit";
 import { Asteroids } from "@ogl-engine/engine/Asteroids";
 import { fieldColors } from "@core/archetypes/asteroid";
@@ -27,6 +26,9 @@ import type { Entity } from "@core/entity";
 import { SelectionBox } from "@ogl-engine/engine/SelectionBox";
 import sounds from "@assets/ui/sounds";
 import { transport3D } from "@core/systems/transport3d";
+import type { GameSettings } from "@core/settings";
+import { defaultGameSttings } from "@core/settings";
+import merge from "lodash/merge";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 import { createShootHandler } from "./events/shoot";
@@ -442,11 +444,14 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   }
 
   updateEngineSettings() {
-    const settings: GameSettings = JSON.parse(
-      localStorage.getItem("gameSettings")!
-    ) || { graphics: { fxaa: false, postProcessing: true } };
+    const settings: GameSettings = merge(
+      {},
+      defaultGameSttings,
+      JSON.parse(localStorage.getItem("gameSettings")!)
+    );
 
     this.engine.fxaa = settings.graphics.fxaa;
+    this.engine.godrays = settings.graphics.godrays;
     this.engine.postProcessing = settings.graphics.postProcessing;
   }
 

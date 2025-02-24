@@ -1,5 +1,5 @@
 import { storageHook } from "@core/hooks";
-import type { GameSettings } from "@ui/hooks/useGameSettings";
+import type { GameSettings } from "@core/settings";
 import { Pane } from "tweakpane";
 
 export const pane = new Pane();

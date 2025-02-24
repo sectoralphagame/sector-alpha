@@ -124,6 +124,30 @@ export const Settings: React.FC = () => {
           </SelectOptions>
         </Select>
       </div>
+      <div className={styles.settingsRow}>
+        <div>Volumetric Light Scattering</div>
+        <Select
+          disabled={!settings.graphics?.postProcessing}
+          onChange={(value) =>
+            setSettings((prevSettings) =>
+              merge({}, prevSettings, {
+                graphics: {
+                  godrays: value === "true",
+                },
+              })
+            )
+          }
+          value={(settings.graphics?.godrays ?? false).toString()}
+        >
+          <SelectButton>
+            {settings.graphics?.godrays ? "Enabled" : "Disabled"}
+          </SelectButton>
+          <SelectOptions>
+            <SelectOption value="true">Enabled</SelectOption>
+            <SelectOption value="false">Disabled</SelectOption>
+          </SelectOptions>
+        </Select>
+      </div>
       <hr />
       <div className={styles.settingsRow}>
         <div>Developer tools</div>

@@ -1,7 +1,7 @@
 import type { Camera, Mat4, Vec3 } from "ogl";
 import { Vec2 } from "ogl";
 import { storageHook } from "@core/hooks";
-import type { GameSettings } from "@ui/hooks/useGameSettings";
+import type { GameSettings } from "@core/settings";
 import { MouseButton, Orbit, STATE, tempVec3 } from "./Orbit";
 
 const dPos = 360;
