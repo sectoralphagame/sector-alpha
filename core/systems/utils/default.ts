@@ -53,4 +53,5 @@ export const defaultIndexer = {
   trading: new EntityIndex(tradeComponents),
   sectorTrading: new SectorIndex(tradeComponents),
   sectorShips: new SectorIndex(shipComponents),
+  sectorRenderable: new SectorIndex(["render", "position"]),
 };

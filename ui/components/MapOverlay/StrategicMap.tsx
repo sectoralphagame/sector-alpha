@@ -79,7 +79,10 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
   raycast = new Raycast();
   mouseWorldPos = new Vec2();
   lastClick: number;
+  sectorSizes: Record<string, number> = {};
   // raycastHits: BaseMesh2D[];
+
+  onUnmountCallbacks: (() => void)[] = [];
 
   constructor(props: StrategicMapProps) {
     super(props);
@@ -89,11 +92,30 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
   }
 
   componentDidMount(): void {
-    this.engine.hooks.onInit.subscribe("StrategicMap", this.onInit.bind(this));
-    this.engine.hooks.onUpdate.subscribe(
-      "StrategicMap",
-      this.onUpdate.bind(this)
+    const onInit = this.onInit.bind(this);
+    const onUpdate = this.onUpdate.bind(this);
+
+    this.engine.hooks.onInit.subscribe("StrategicMap", onInit);
+    this.engine.hooks.onUpdate.subscribe("StrategicMap", onUpdate);
+
+    this.updateSectorSizes();
+    const sectorSizeInterval = setInterval(
+      this.updateSectorSizes.bind(this),
+      1000
     );
+
+    this.onUnmountCallbacks.push(() => {
+      this.engine.hooks.onInit.unsubscribe(onInit);
+      this.engine.hooks.onUpdate.unsubscribe(onUpdate);
+
+      clearInterval(sectorSizeInterval);
+    });
+  }
+
+  componentWillUnmount(): void {
+    for (const cb of this.onUnmountCallbacks) {
+      cb();
+    }
   }
 
   async onInit() {
@@ -203,6 +225,18 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     this.updateRenderables();
   }
 
+  updateSectorSizes() {
+    for (const sector of defaultIndexer.sectors.getIt()) {
+      let maxR = sectorSize / 10;
+
+      for (const entity of defaultIndexer.sectorRenderable.getIt(sector.id)) {
+        maxR = Math.max(maxR, entity.cp.position.coord.squaredLen());
+      }
+
+      this.sectorSizes[sector.id] = Math.sqrt(maxR) * 1.4;
+    }
+  }
+
   updateHover() {
     if (!this.control.cursorMoved) return;
 
@@ -284,7 +318,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
       const sector = this.sim.getOrThrow<Sector>(renderable.cp.position.sector);
       const pos = hecsToCartesian(
         sector.cp.hecsPosition.value,
-        sectorSize / 10
+        this.sectorSizes[sector.id]
       );
       mesh.position
         .set(
@@ -292,7 +326,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
           1,
           renderable.cp.position.coord[1] + pos[1]
         )
-        .divide(sectorSize / 10);
+        .divide(this.sectorSizes[sector.id]);
       mesh.rotation.y = -renderable.cp.position.angle;
     }
   }
