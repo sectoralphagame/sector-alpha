@@ -11,6 +11,7 @@ export class InstancedPhongMaterial extends Material {
     tRoughness: { value: Texture };
     uShininess: { value: number };
     tEmissive: { value: Texture };
+    uMetallic: { value: number };
   };
 
   constructor(engine: Engine3D, gltfMaterial: GLTFMaterial) {
@@ -20,6 +21,7 @@ export class InstancedPhongMaterial extends Material {
 
     this.uniforms.tDiffuse = { value: gltfMaterial.baseColorTexture.texture };
     this.uniforms.tNormal = { value: gltfMaterial.normalTexture.texture };
+    this.uniforms.uMetallic = { value: gltfMaterial.metallicFactor };
 
     if (gltfMaterial.metallicRoughnessTexture) {
       this.uniforms.tRoughness = {

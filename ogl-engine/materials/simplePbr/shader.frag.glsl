@@ -3,6 +3,7 @@ precision highp float;
 
 #pragma glslify: Light = require("./ogl-engine/shader/light");
 #pragma glslify: blinnPhongSpec = require(glsl-specular-blinn-phong)
+#pragma glslify: luma = require(glsl-luma)
 
 #pragma defines
 
@@ -17,6 +18,7 @@ uniform sampler2D tNormal;
 uniform vec3 cameraPosition;
 uniform vec3 ambient;
 uniform Light lights[16];
+uniform float uMetallic;
 
 #ifdef USE_ROUGHNESS
 uniform sampler2D tRoughness;
@@ -32,9 +34,8 @@ uniform sampler2D tEmissive;
 
 out vec4 fragData[2];
 
-
 void main() {
-    vec3 tex = texture(tDiffuse, vUv).rgb;
+    vec3 tex = pow(texture(tDiffuse, vUv).rgb, vec3(1.f / 2.2f));
     vec3 normalMap = texture(tNormal, vUv).rgb * 2.f - 1.f;
 
     vec3 tangent = vTangent - dot(vTangent, vNormal) * vNormal;
@@ -54,11 +55,10 @@ void main() {
     #endif
 
     #ifdef USE_ROUGHNESS
-    float shininess = length(texture(tRoughness, vUv))*256.f;
+    float shininess = mix(2., 32., texture(tRoughness, vUv).r);
     #else
     float shininess = uShininess * 256.f;
     #endif
-
 
     for(int i = 0; i < lights.length(); i++) {
         if(lights[i].visible) {
@@ -82,6 +82,11 @@ void main() {
         }
     }
 
-    fragData[0] = vec4((diffuse + ambient + specular) * (tex + EPSILON) + emissive, 1.0f);
-    fragData[1].r = length(emissive);
+    float specularPower = luma(specular);
+    if(specularPower < 0.9) {
+        specularPower = 0.;
+    }
+
+    fragData[0] = vec4(mix((diffuse + ambient + specular) * (tex + EPSILON), specular, uMetallic) + emissive, 1.0f);
+    fragData[1].r = luma(emissive) + specularPower / 5.;
 }

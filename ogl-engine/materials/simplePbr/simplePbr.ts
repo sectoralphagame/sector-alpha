@@ -11,6 +11,7 @@ export class SimplePbrMaterial extends Material {
     tRoughness: { value: Texture };
     uShininess: { value: number };
     tEmissive: { value: Texture };
+    uMetallic: { value: number };
     uNormalScale: { value: number };
     uNormalUVScale: { value: number };
   };
@@ -22,6 +23,7 @@ export class SimplePbrMaterial extends Material {
 
     this.uniforms.tDiffuse = { value: gltfMaterial.baseColorTexture.texture };
     this.uniforms.tNormal = { value: gltfMaterial.normalTexture.texture };
+    this.uniforms.uMetallic = { value: gltfMaterial.metallicFactor };
 
     if (gltfMaterial.metallicRoughnessTexture) {
       this.uniforms.tRoughness = {
