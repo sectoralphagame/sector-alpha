@@ -23,7 +23,7 @@ uniform float uMetallic;
 #ifdef USE_ROUGHNESS
 uniform sampler2D tRoughness;
 #else
-uniform float uShininess;
+uniform float uRoughness;
 #endif
 
 #ifdef USE_EMISSIVE
@@ -31,11 +31,12 @@ uniform sampler2D tEmissive;
 #endif
 
 #define EPSILON 0.001f
+#define MAX_SHININESS 256.0f
 
 out vec4 fragData[2];
 
 void main() {
-    vec3 tex = pow(texture(tDiffuse, vUv).rgb, vec3(1.f / 2.2f));
+    vec3 tex = max(vec3(EPSILON), pow(texture(tDiffuse, vUv).rgb, vec3(1.f / 2.2f)));  
     vec3 normalMap = texture(tNormal, vUv).rgb * 2.f - 1.f;
 
     vec3 tangent = vTangent - dot(vTangent, vNormal) * vNormal;
@@ -55,9 +56,11 @@ void main() {
     #endif
 
     #ifdef USE_ROUGHNESS
-    float shininess = mix(2., 32., texture(tRoughness, vUv).r);
+    float roughness = texture(tRoughness, vUv).g;
+    float shininess = (1.f - roughness) * MAX_SHININESS;
     #else
-    float shininess = uShininess * 256.f;
+    float roughness = uRoughness;
+    float shininess = uRoughness * MAX_SHININESS;
     #endif
 
     for(int i = 0; i < lights.length(); i++) {
@@ -78,7 +81,7 @@ void main() {
             float diff = max(dot(norm, lightDir), 0.0f);
             vec3 color = lights[i].color * intensity;
             diffuse += diff * color;
-            specular += blinnPhongSpec(lightDir, eyeDirection, norm, shininess) * color;
+            specular += blinnPhongSpec(lightDir, eyeDirection, norm, shininess) * color * (1. - roughness);
         }
     }
 
@@ -87,6 +90,6 @@ void main() {
         specularPower = 0.;
     }
 
-    fragData[0] = vec4(mix((diffuse + ambient + specular) * (tex + EPSILON), specular, uMetallic) + emissive, 1.0f);
+    fragData[0] = vec4((diffuse * (1. - uMetallic) + ambient + specular) * tex + emissive, 1.0f);
     fragData[1].r = luma(emissive) + specularPower / 5.;
 }

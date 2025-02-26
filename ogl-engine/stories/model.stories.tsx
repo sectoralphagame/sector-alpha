@@ -9,6 +9,7 @@ import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { skyboxes } from "@assets/textures/skybox";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { merge } from "lodash";
+import { pane } from "@ui/context/Pane";
 import type { Story3dArgs } from "./Story3d";
 import { Story3d, story3dMeta } from "./Story3d";
 
@@ -36,6 +37,7 @@ const ModelStory: React.FC<ModelStoryProps> = ({
       });
       meshRef.current.setParent(engine.scene);
       meshRef.current.scale.set(entityScale);
+      meshRef.current.material.createPaneSettings(pane);
     });
   }, []);
 
