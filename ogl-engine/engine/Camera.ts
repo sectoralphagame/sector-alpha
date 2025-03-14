@@ -19,10 +19,7 @@ export class Camera extends BaseCamera {
   }
 
   private initPane() {
-    if (pane.children.find((child) => (child as FolderApi).title === "Camera"))
-      return;
-
-    this.paneFolder = pane.addFolder({
+    this.paneFolder = pane.addOrReplaceFolder({
       title: "Camera",
     });
     const p = this.paneFolder.addBinding(this, "position");

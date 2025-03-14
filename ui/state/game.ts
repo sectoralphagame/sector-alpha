@@ -58,8 +58,8 @@ export class GameStore {
     if (units.length === 1) {
       const unit = units[0];
 
-      this.paneFolder = pane.addFolder({
-        title: unit.cp.name?.value || "Unit",
+      this.paneFolder = pane.addOrReplaceFolder({
+        title: "Selected Unit",
       });
 
       if (unit.hasComponents(["hitpoints"])) {

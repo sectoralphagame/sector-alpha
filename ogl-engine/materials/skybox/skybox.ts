@@ -22,27 +22,27 @@ const settings: Partial<
   >
 > = {
   teegarden2: {
-    ambient: 0.08,
+    ambient: 0.01,
     color: "#f2a0ae",
-    intensity: 0.93,
+    intensity: 1.26,
     direction: [-1.7, -3.2, -7.6],
   },
   sectoralpha: {
-    ambient: 0.15,
+    ambient: 0.3,
     color: "#fff6c5",
-    intensity: 0.8,
+    intensity: 1.8,
     direction: [4.2, -1, 2.9],
   },
   example: {
-    ambient: 0.02,
+    ambient: 0.19,
     color: "#d0bdff",
-    intensity: 1.2,
+    intensity: 2.4,
     direction: [2.04, -3.04, 0.28],
   },
   earth: {
-    ambient: 0.09,
+    ambient: 0.19,
     color: "#fffcdb",
-    intensity: 0.75,
+    intensity: 1.47,
     direction: [0, -1, -0.4],
   },
   gaia: {
@@ -143,14 +143,13 @@ export class Skybox extends Mesh implements Destroyable {
       intensity: this.light.uniforms.intensity.value,
     };
 
-    this.paneFolder = pane.addFolder({
+    this.paneFolder = pane.addOrReplaceFolder({
       title: "Skybox",
     });
 
     this.paneFolder
       .addBinding(params, "ambient", {
         min: 0,
-        max: 0.5,
       })
       .on("change", ({ value }) => {
         this.engine.uniforms.env.ambient.value.set(
@@ -167,7 +166,6 @@ export class Skybox extends Mesh implements Destroyable {
     this.paneFolder
       .addBinding(params, "intensity", {
         min: 0,
-        max: 2,
       })
       .on("change", ({ value }) => {
         this.light.setIntensity(value);

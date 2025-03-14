@@ -9,7 +9,7 @@ export class InstancedPhongMaterial extends Material {
     tDiffuse: { value: Texture };
     tNormal: { value: Texture };
     tRoughness: { value: Texture };
-    uShininess: { value: number };
+    uRoughness: { value: number };
     tEmissive: { value: Texture };
     uMetallic: { value: number };
   };
@@ -29,7 +29,7 @@ export class InstancedPhongMaterial extends Material {
       };
       defines.USE_ROUGHNESS = "1";
     } else {
-      this.uniforms.uShininess = { value: gltfMaterial.roughnessFactor };
+      this.uniforms.uRoughness = { value: gltfMaterial.roughnessFactor };
     }
 
     if (gltfMaterial.emissiveTexture) {

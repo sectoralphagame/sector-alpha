@@ -65,6 +65,11 @@ th {
   font-size: var(--typography-default);
 }
 
+:global(.tp-lblv_l),
+:global(.tp-fldv_t) {
+  user-select: none;
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   appearance: none;

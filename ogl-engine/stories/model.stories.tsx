@@ -37,7 +37,9 @@ const ModelStory: React.FC<ModelStoryProps> = ({
       });
       meshRef.current.setParent(engine.scene);
       meshRef.current.scale.set(entityScale);
-      meshRef.current.material.createPaneSettings(pane);
+
+      const materialFolder = pane.addOrReplaceFolder({ title: "Material" });
+      meshRef.current.material.createPaneSettings(materialFolder);
     });
   }, []);
 

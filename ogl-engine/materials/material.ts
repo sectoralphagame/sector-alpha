@@ -37,9 +37,16 @@ export abstract class Material {
   createPaneSettings(folder: FolderApi) {
     for (const uniform of Object.keys(this.uniforms)) {
       if (
-        ["ambient", "lights", "uTime", "fCameraNear", "fCameraFar"].includes(
-          uniform
-        )
+        [
+          "ambient",
+          "lights",
+          "uTime",
+          "fCameraNear",
+          "fCameraFar",
+          "modelMatrix",
+          "viewMatrix",
+          "modelViewMatrix",
+        ].includes(uniform)
       )
         continue;
 

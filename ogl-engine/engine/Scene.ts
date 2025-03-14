@@ -63,7 +63,7 @@ export class TacticalMapScene extends Scene {
   }
 
   initPane() {
-    this.pane = pane.addFolder({
+    this.pane = pane.addOrReplaceFolder({
       title: "Post Processing",
     });
     this.pane.addBinding(

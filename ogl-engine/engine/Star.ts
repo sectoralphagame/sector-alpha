@@ -53,13 +53,7 @@ export class Star extends Transform {
   }
 
   createPaneFolder() {
-    const existingPaneFolder = pane.children.find(
-      (child) => (child as FolderApi).title === this.name
-    );
-    if (existingPaneFolder) {
-      existingPaneFolder.dispose();
-    }
-    this.paneFolder = pane.addFolder({
+    this.paneFolder = pane.addOrReplaceFolder({
       title: this.name,
     });
 
