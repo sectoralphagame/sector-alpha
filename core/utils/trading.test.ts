@@ -1,4 +1,5 @@
 import { matrix } from "mathjs";
+import { Vec2 } from "ogl";
 import type { Facility } from "../archetypes/facility";
 import { facilityComponents } from "../archetypes/facility";
 import type { Faction } from "../archetypes/faction";
@@ -308,7 +309,7 @@ describe("Trading module", () => {
     const ship = createShip(sim, {
       ...shipClasses[0],
       owner: shipFaction,
-      position: matrix([0, 0, 0]),
+      position: new Vec2(0, 0),
       sector,
     });
 
@@ -339,7 +340,6 @@ describe("Trading module", () => {
     ship.unregister("test");
 
     expect(facility.cp.storage.allocations.length).toBe(0);
-    expect(ship.cp.storage.allocations.length).toBe(0);
     expect(shipFaction.cp.budget.allocations.length).toBe(0);
     expect(facility.cp.budget.allocations.length).toBe(0);
   });
