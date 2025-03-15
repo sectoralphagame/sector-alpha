@@ -3,10 +3,10 @@ import { getAngleDiff } from "@core/utils/misc";
 import type { Driveable } from "@core/utils/moving";
 import { clearTarget, startCruise, stopCruise } from "@core/utils/moving";
 import { Vec2 } from "ogl";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { defaultDriveLimit } from "../components/drive";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
-import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
 const tempPosition = new Vec2();
@@ -176,7 +176,7 @@ function setDrive(entity: Navigable, delta: number) {
     movable.velocity = 0;
     drive.targetReached = true;
     if (targetEntity.cp.disposable) {
-      targetEntity.unregister();
+      targetEntity.unregister("disposed");
     }
     return;
   }
@@ -237,20 +237,23 @@ function setDrive(entity: Navigable, delta: number) {
 
 export class NavigatingSystem extends System {
   entities: Navigable[];
-  index = new EntityIndex(["drive", "movable", "position"]);
 
   apply = (sim: Sim): void => {
     super.apply(sim);
-    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
-    for (const entity of this.index.getIt()) {
+  // eslint-disable-next-line class-methods-use-this
+  exec(delta: number): void {
+    for (const entity of entityIndexer.search([
+      "drive",
+      "movable",
+      "position",
+    ])) {
       setDrive(entity, delta);
     }
-  };
+  }
 }
 
 export const navigatingSystem = new NavigatingSystem();

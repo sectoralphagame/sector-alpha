@@ -16,11 +16,15 @@ import { Observable } from "@core/utils/observer";
 import { defaultIndexer } from "@core/systems/utils/default";
 import { Vec2 } from "ogl";
 import { isVec2 } from "@core/utils/misc";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
+import { defaultLogger } from "@core/log";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
 import { MissingEntityError } from "../errors";
 import { openDb } from "../db";
+
+const logger = defaultLogger.sub("sim");
 
 export interface SimConfig {
   systems: System[];
@@ -43,7 +47,7 @@ export class Sim extends BaseSim {
     }>;
     addTag: Observable<{ entity: Entity; tag: EntityTag }>;
     removeTag: Observable<{ entity: Entity; tag: EntityTag }>;
-    removeEntity: Observable<Entity>;
+    removeEntity: Observable<{ entity: Entity; reason: string }>;
     destroy: Observable<void>;
 
     phase: Record<
@@ -56,6 +60,9 @@ export class Sim extends BaseSim {
   @Expose()
   @Type(() => Entity)
   entities: Map<number, Entity>;
+  /**
+   * @deprecated
+   */
   index: typeof defaultIndexer;
   paths: Record<string, Record<string, Path>>;
 
@@ -83,8 +90,25 @@ export class Sim extends BaseSim {
 
     this.index = defaultIndexer;
     for (const index of Object.values(defaultIndexer)) {
-      index.apply(this);
+      index.apply();
     }
+
+    this.hooks.addComponent.subscribe("EntityIndexer", ({ entity }) =>
+      entityIndexer.updateMask(entity)
+    );
+    this.hooks.removeComponent.subscribe("EntityIndexer", ({ entity }) =>
+      entityIndexer.updateMask(entity)
+    );
+    this.hooks.removeEntity.subscribe("EntityIndexer", ({ entity, reason }) => {
+      logger.log(
+        `Removing entity ${entity.id} ${entity.cp.name?.value ?? ""} ${reason}`
+      );
+      entityIndexer.remove(entity);
+    });
+    this.hooks.destroy.subscribe("EntityIndexer", () => {
+      entityIndexer.clear();
+    });
+
     systems.forEach((system) => system.apply(this));
   }
 
@@ -94,8 +118,8 @@ export class Sim extends BaseSim {
     this.entityIdCounter += 1;
   };
 
-  unregisterEntity = (entity: Entity) => {
-    this.hooks.removeEntity.notify(entity);
+  unregisterEntity = (entity: Entity, reason: string) => {
+    this.hooks.removeEntity.notify({ entity, reason });
     this.entities.delete(entity.id);
   };
 
@@ -255,8 +279,8 @@ export class Sim extends BaseSim {
 
     sim.entities = entityMap;
 
-    for (const index of Object.values(defaultIndexer)) {
-      index.apply(sim);
+    for (const entity of sim.entities.values()) {
+      entityIndexer.insert(entity);
     }
     config.systems.forEach((system) => system.apply(sim));
 

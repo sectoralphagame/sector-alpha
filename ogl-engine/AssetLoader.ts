@@ -12,6 +12,7 @@ import { skyboxes } from "@assets/textures/skybox";
 import smoke from "@assets/textures/particle/smoke.png";
 import fire from "@assets/textures/particle/fire.png";
 import spaceMonoTexture from "@assets/fonts/SpaceMono/SpaceMono-Regular.png";
+import { renderLogger } from "@core/log";
 import { getParticleType } from "./particles";
 import { TextureEngine } from "./engine/engine2d";
 import smokeShader from "./procedural/smoke.frag.glsl";
@@ -44,6 +45,7 @@ class AssetLoader {
     }
   > = {};
   textures: Partial<Record<TextureName, ImageRepresentation>> = {};
+  logger = renderLogger.sub("assetLoader");
 
   // eslint-disable-next-line class-methods-use-this
   async preload(onAssetLoad: (_progress: number) => void) {
@@ -71,7 +73,7 @@ class AssetLoader {
       keys,
       map((path) => async () => {
         await fetch(path);
-        console.log(`Loaded ${path}`);
+        this.logger.log(`Loaded ${path}`);
         resources[path] = true;
       }),
       chunk(3)
@@ -99,7 +101,7 @@ class AssetLoader {
       // eslint-disable-next-line no-await-in-loop
       await textureEngine.image(img);
       this.addTexture(name as TextureName, img);
-      console.log(`Generated ${name}`);
+      this.logger.log(`Generated ${name}`);
     }
   }
 

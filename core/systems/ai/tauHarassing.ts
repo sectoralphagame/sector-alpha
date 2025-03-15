@@ -1,4 +1,4 @@
-import type { Ship } from "@core/archetypes/ship";
+import { shipComponents, type Ship } from "@core/archetypes/ship";
 import { relationThresholds } from "@core/components/relations";
 import type { Entity } from "@core/entity";
 import type { Sim } from "@core/sim";
@@ -32,27 +32,24 @@ export class TauHarassingSystem extends System<"exec"> {
       shipyard.cp.shipyard.building,
       ...shipyard.cp.shipyard.queue,
     ];
-    let commander = this.sim.index.ships
-      .get()
-      .find(
-        (entity) =>
-          entity.cp.owner.id === faction.id &&
-          entity.hasTags(["role:military", "ai:attack-force"]) &&
-          entity.cp.dockable?.size === "medium"
-      );
+    const ships = [...this.sim.index.ships.getIt()];
+    let commander = ships.find(
+      (entity) =>
+        entity.cp.owner.id === faction.id &&
+        entity.hasTags(["role:military", "ai:attack-force"]) &&
+        entity.cp.dockable?.size === "medium"
+    );
 
     if (!commander) {
-      const spareFrigates: Entity[] = this.sim.index.ships
-        .get()
-        .filter(
-          (ship) =>
-            ship.cp.owner?.id === faction.id &&
-            !ship.cp.commander &&
-            ship.cp.dockable?.size === "medium" &&
-            ship.tags.has("role:military") &&
-            !ship.tags.has("ai:attack-force") &&
-            ship.cp.orders.value.length === 0
-        );
+      const spareFrigates: Entity[] = ships.filter(
+        (ship) =>
+          ship.cp.owner?.id === faction.id &&
+          !ship.cp.commander &&
+          ship.cp.dockable?.size === "medium" &&
+          ship.tags.has("role:military") &&
+          !ship.tags.has("ai:attack-force") &&
+          ship.cp.orders.value.length === 0
+      );
 
       const frigatesInShipyards = fullQueue.filter(
         (queued) =>
@@ -61,9 +58,7 @@ export class TauHarassingSystem extends System<"exec"> {
       );
 
       if (spareFrigates.length > 0) {
-        commander = spareFrigates
-          .pop()!
-          .requireComponents(this.sim.index.ships.requiredComponents);
+        commander = spareFrigates.pop()!.requireComponents(shipComponents);
         commander.addTag("ai:attack-force");
       } else if (frigatesInShipyards.length > 0) {
         frigatesInShipyards.pop();
@@ -82,17 +77,15 @@ export class TauHarassingSystem extends System<"exec"> {
       return null;
     }
 
-    const spareFighters = this.sim.index.ships
-      .get()
-      .filter(
-        (ship) =>
-          ship.cp.owner?.id === faction.id &&
-          !ship.cp.commander &&
-          ship.cp.dockable?.size === "small" &&
-          ship.tags.has("role:military") &&
-          !ship.tags.has("ai:attack-force") &&
-          (ship.cp.orders.value.length === 0 || ship.tags.has("ai:spare"))
-      );
+    const spareFighters = ships.filter(
+      (ship) =>
+        ship.cp.owner?.id === faction.id &&
+        !ship.cp.commander &&
+        ship.cp.dockable?.size === "small" &&
+        ship.tags.has("role:military") &&
+        !ship.tags.has("ai:attack-force") &&
+        (ship.cp.orders.value.length === 0 || ship.tags.has("ai:spare"))
+    );
 
     const fightersInShipyards = fullQueue.filter(
       (queued) =>

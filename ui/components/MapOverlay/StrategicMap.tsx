@@ -20,6 +20,7 @@ import { ColorMaterial2D } from "@ogl-engine/materials/color/color";
 import type { Faction } from "@core/archetypes/faction";
 import { sectorSize, type Sector } from "@core/archetypes/sector";
 import type { Destroyable } from "@ogl-engine/types";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 
 function isDestroyable(mesh: Transform): mesh is Transform & Destroyable {
   return !!(mesh as any).destroy;
@@ -141,7 +142,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     this.control.onPointerUp = this.onClick.bind(this);
     this.control.onKeyDown = this.onKeyDown.bind(this);
 
-    this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
+    this.sim.hooks.removeEntity.subscribe("TacticalMap", ({ entity }) => {
       const mesh = this.engine.scene.getEntity(entity.id);
       if (mesh) {
         if (isDestroyable(mesh)) mesh.destroy();
@@ -280,7 +281,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
   // }
 
   updateRenderables() {
-    for (const renderable of this.sim.index.renderable.getIt()) {
+    for (const renderable of entityIndexer.search(["render", "position"])) {
       let mesh = this.engine.scene.getEntity(renderable.id);
       if (!mesh) {
         const owner = renderable.cp.owner

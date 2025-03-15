@@ -43,10 +43,10 @@ export class ProducingSystem extends System<"exec"> {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    this.sim.hooks.removeEntity.subscribe("ProducingSystem", (entity) => {
+    this.sim.hooks.removeEntity.subscribe("ProducingSystem", ({ entity }) => {
       if (entity.cp.modules) {
         entity.cp.modules.ids.forEach((id) =>
-          this.sim.getOrThrow(id).unregister()
+          this.sim.getOrThrow(id).unregister("parent destroyed")
         );
       }
     });

@@ -5,8 +5,8 @@ import { facilityComponents } from "@core/archetypes/facility";
 import { factionComponents } from "@core/archetypes/faction";
 import { sectorComponents } from "@core/archetypes/sector";
 import { tradeComponents } from "@core/economy/utils";
-import { SectorIndex } from "./sectorIndex";
 import { EntityIndex } from "./entityIndex";
+import { SectorIndex } from "./sectorIndex";
 
 export const defaultIndexer = {
   ai: new EntityIndex([...factionComponents, "ai"]),

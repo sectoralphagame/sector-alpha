@@ -1,6 +1,6 @@
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
-import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
 type Movable = RequireComponent<"movable" | "position">;
@@ -36,22 +36,21 @@ function move(entity: Movable, delta: number) {
 
 export class MovingSystem extends System {
   entities: Movable[];
-  index = new EntityIndex(["movable", "position"]);
 
   apply = (sim: Sim): void => {
     super.apply(sim);
-    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
-  exec = (delta: number): void => {
+  // eslint-disable-next-line class-methods-use-this
+  exec(delta: number): void {
     if (delta > 0) {
-      for (const entity of this.index.getIt()) {
+      for (const entity of entityIndexer.search(["movable", "position"])) {
         move(entity, delta);
       }
     }
-  };
+  }
 }
 
 export const movingSystem = new MovingSystem();

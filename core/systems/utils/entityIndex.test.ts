@@ -45,7 +45,7 @@ describe("EntityIndex", () => {
     entityIndex.apply(sim);
     const entity = new Entity(sim);
     entity.addComponent({ name: "name", value: "test" });
-    entity.unregister();
+    entity.unregister("test");
     expect(entityIndex.entities.size).toBe(0);
   });
 

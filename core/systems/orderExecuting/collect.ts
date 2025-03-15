@@ -15,7 +15,7 @@ export function collectAction(
     false
   );
 
-  collectible.unregister();
+  collectible.unregister("collected");
 
   return true;
 }

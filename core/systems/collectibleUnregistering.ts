@@ -11,7 +11,7 @@ export class CollectibleUnregisteringSystem extends System {
   exec = (): void => {
     for (const entity of this.sim.index.collectibles.getIt()) {
       if (entity.cp.creationDate.date + 3600 < this.sim.getTime()) {
-        entity.unregister();
+        entity.unregister("expired");
       }
     }
   };

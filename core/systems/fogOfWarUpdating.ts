@@ -3,15 +3,13 @@ import { sectorSize } from "@core/archetypes/sector";
 import { HideReason } from "@core/components/render";
 import { actionLoader } from "@core/actionLoader";
 import type { Vec2 } from "ogl";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { System } from "./system";
-import { EntityIndex } from "./utils/entityIndex";
 
 let sectorMaps: Record<number, Uint8Array> = {};
 const divisions = 2 ** 6;
 
 export class FogOfWarUpdatingSystem extends System<"exec"> {
-  entitiesWithInfluence = new EntityIndex(["position", "owner"]);
-  entitiesToHide = new EntityIndex(["position", "render"]);
   enabled = true;
   intervalHandle: number | null = null;
 
@@ -37,9 +35,6 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       this.constructor.name
     );
 
-    this.entitiesToHide.apply(sim);
-    this.entitiesWithInfluence.apply(sim);
-
     sim.hooks.phase.init.subscribe(this.constructor.name, this.updateFog);
   };
 
@@ -55,7 +50,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
 
       const player = this.sim.index.player.get()[0];
 
-      for (const entity of this.entitiesWithInfluence.getIt()) {
+      for (const entity of entityIndexer.search(["position", "owner"])) {
         const position = entity.cp.position;
         const owner = entity.cp.owner;
         if (owner.id !== player.id) continue;
@@ -77,7 +72,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
         }
       }
 
-      for (const entity of this.entitiesToHide.getIt()) {
+      for (const entity of entityIndexer.search(["position", "render"])) {
         if (entity.cp.dockable?.dockedIn || entity.cp.owner?.id === player.id)
           continue;
 

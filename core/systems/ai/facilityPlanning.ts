@@ -287,8 +287,6 @@ export class FacilityPlanningSystem extends System<"plan"> {
     const modulesToBuild: Array<
       (typeof facilityModules)[keyof typeof facilityModules]
     > = [];
-    this.sim.index.facilityWithProduction.clear();
-    this.sim.index.facilityWithProduction.collect();
     const facilities = this.sim.index.facilityWithProduction
       .get()
       .filter((facility) => facility.cp.owner?.id === faction.id);

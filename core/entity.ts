@@ -122,9 +122,9 @@ export class Entity {
     return tags.every((tag) => this.tags.has(tag));
   }
 
-  unregister() {
+  unregister(reason: string): void {
     this.deleted = true;
-    this.sim.unregisterEntity(this);
+    this.sim.unregisterEntity(this, reason);
   }
 
   toJSON() {

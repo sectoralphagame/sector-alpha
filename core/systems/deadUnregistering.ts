@@ -1,22 +1,19 @@
 import type { Sim } from "@core/sim";
 import { dumpCargo } from "@core/components/storage";
 import type { Faction } from "@core/archetypes/faction";
-import { EntityIndex } from "./utils/entityIndex";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { System } from "./system";
 import { transport3D } from "./transport3d";
 
 export class DeadUnregisteringSystem extends System {
-  index = new EntityIndex(["hitpoints"]);
-
   apply = (sim: Sim) => {
     super.apply(sim);
-    this.index.apply(sim);
 
     sim.hooks.phase.cleanup.subscribe(this.constructor.name, this.exec);
   };
 
   exec = (): void => {
-    for (const entity of this.index.getIt()) {
+    for (const entity of entityIndexer.search(["hitpoints"])) {
       if (entity.cp.hitpoints.hp.value <= 0) {
         if (entity.cp.storage) {
           dumpCargo(entity.requireComponents(["storage"]));
@@ -32,7 +29,7 @@ export class DeadUnregisteringSystem extends System {
         }
         if (entity.hasComponents(["position"]))
           transport3D.hooks.explode.notify(entity);
-        entity.unregister();
+        entity.unregister("dead");
       }
     }
   };

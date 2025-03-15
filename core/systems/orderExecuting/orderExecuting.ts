@@ -174,28 +174,27 @@ function cleanupDocks(entity: Entity): void {
 }
 
 function cleanupChildren(entity: Entity): void {
-  entity.cp.subordinates?.ids.forEach((id) => {
-    const ship =
-      entity.sim.getOrThrow<
-        RequireComponent<"commander" | "orders" | "autoOrder">
-      >(id);
+  if (entity.hasComponents(["subordinates"])) {
+    entity.cp.subordinates?.ids.forEach((id) => {
+      const ship =
+        entity.sim.getOrThrow<
+          RequireComponent<"commander" | "orders" | "autoOrder">
+        >(id);
 
-    removeCommander(ship);
-    if (ship.cp.orders.value.length > 0) {
-      orderFns[ship.cp.orders.value[0].type]?.onCompleted(
-        ship,
-        ship.cp.orders.value[0]
-      );
-    }
-    ship.cp.orders.value = [];
-    ship.cp.autoOrder.default = { type: "hold" };
-  });
+      removeSubordinate(entity, ship);
+      if (ship.cp.orders.value.length > 0) {
+        orderFns[ship.cp.orders.value[0].type]?.onCompleted(
+          ship,
+          ship.cp.orders.value[0]
+        );
+      }
+      ship.cp.orders.value = [];
+      ship.cp.autoOrder.default = { type: "hold" };
+    });
+  }
 
-  if (entity.cp.commander) {
-    removeSubordinate(
-      entity.sim.getOrThrow(entity.cp.commander.id),
-      entity.requireComponents(["commander", "orders"])
-    );
+  if (entity.hasComponents(["commander", "orders"])) {
+    removeCommander(entity);
   }
 
   if (
@@ -205,7 +204,7 @@ function cleanupChildren(entity: Entity): void {
 
   for (const child of entity.sim.index.children.getIt()) {
     if (child.cp.parent.id === entity.id) {
-      child.unregister();
+      child.unregister("parent destroyed");
     }
   }
 }
@@ -252,19 +251,19 @@ export class OrderExecutingSystem extends System {
 
     sim.hooks.removeEntity.subscribe(
       "OrderExecutingSystem-allocations",
-      cleanupAllocations
+      ({ entity }) => cleanupAllocations(entity)
     );
     sim.hooks.removeEntity.subscribe(
       "OrderExecutingSystem-orders",
-      cleanupOrders
+      ({ entity }) => cleanupOrders(entity)
     );
     sim.hooks.removeEntity.subscribe(
       "OrderExecutingSystem-children",
-      cleanupChildren
+      ({ entity }) => cleanupChildren(entity)
     );
     sim.hooks.removeEntity.subscribe(
       "OrderExecutingSystem-docks",
-      cleanupDocks
+      ({ entity }) => cleanupDocks(entity)
     );
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

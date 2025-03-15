@@ -7,8 +7,8 @@ import type { DockSize } from "@core/components/dockable";
 import type { Entity } from "@core/entity";
 import { stopCruise } from "@core/utils/moving";
 import { Vec2 } from "ogl";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { regenCooldown } from "./hitpointsRegenerating";
-import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 import { transport3D } from "./transport3d";
 
@@ -100,11 +100,8 @@ function attack(attacker: RequireComponent<"orders">, target: Entity) {
 const cdKey = "attack";
 
 export class AttackingSystem extends System {
-  index = new EntityIndex(["damage"]);
-
   apply = (sim: Sim) => {
     super.apply(sim);
-    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
@@ -112,7 +109,7 @@ export class AttackingSystem extends System {
   exec = (): void => {
     if (this.sim.getTime() < settings.bootTime) return;
 
-    for (const entity of this.index.getIt()) {
+    for (const entity of entityIndexer.search(["damage"])) {
       if (!(entity.cp.damage.targetId && entity.cooldowns.canUse(cdKey)))
         continue;
 

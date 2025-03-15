@@ -3,9 +3,9 @@ import type { Faction } from "@core/archetypes/faction";
 import { relationThresholds } from "@core/components/relations";
 import type { RequireComponent } from "@core/tsHelpers";
 import { pickRandom } from "@core/utils/generators";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { System } from "../system";
 import type { Sim } from "../../sim";
-import { SectorIndex } from "../utils/sectorIndex";
 
 export const spottingRadius = 7;
 
@@ -15,17 +15,16 @@ export type EnemyArrayCache = Record<
 >;
 
 export class SpottingSystem extends System<"exec"> {
-  index = new SectorIndex(["hitpoints", "owner", "position"]);
-
   apply = (sim: Sim) => {
     super.apply(sim);
-    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   static getEnemies(
-    potentialEnemies: RequireComponent<"hitpoints" | "owner" | "position">[],
+    potentialEnemies: Iterable<
+      RequireComponent<"hitpoints" | "owner" | "position">
+    >,
     cache: EnemyArrayCache,
     entity: RequireComponent<"owner" | "position">
   ) {
@@ -101,7 +100,11 @@ export class SpottingSystem extends System<"exec"> {
 
       const enemy = pickRandom(
         SpottingSystem.getEnemies(
-          this.index.get(entity.cp.position.sector),
+          entityIndexer.searchBySector(entity.cp.position.sector, [
+            "hitpoints",
+            "owner",
+            "position",
+          ]),
           cache,
           entity
         ).slice(0, 3)

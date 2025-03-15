@@ -24,7 +24,7 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
             )
           )
         ) {
-          entity.unregister();
+          entity.unregister("disposed");
         }
       }
     }

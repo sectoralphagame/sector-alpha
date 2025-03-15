@@ -25,7 +25,9 @@ export function addSubordinate(
   subordinate: Entity
 ) {
   checkCyclicCommandChain(subordinate, entity.id);
-  entity.cp.subordinates.ids.push(subordinate.id);
+  if (!entity.cp.subordinates.ids.includes(subordinate.id)) {
+    entity.cp.subordinates.ids.push(subordinate.id);
+  }
   if (!subordinate.cp.commander) {
     subordinate.addComponent({ name: "commander", id: entity.id });
   } else {

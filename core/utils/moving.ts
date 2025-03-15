@@ -1,7 +1,7 @@
 import { find } from "@fxts/core";
 import type { RequireComponent } from "@core/tsHelpers";
-import { SectorIndex } from "@core/systems/utils/sectorIndex";
 import type { Vec2 } from "ogl";
+import { teleportHook } from "@core/hooks";
 import type { Waypoint } from "../archetypes/waypoint";
 import type { Action } from "../components/orders";
 import { findInAncestors } from "./findInAncestors";
@@ -101,10 +101,14 @@ export function teleport(
       sector,
       moved: true,
     };
-    SectorIndex.notify(prevSector, sector, docked);
+    teleportHook.notify({
+      prevSectorId: prevSector,
+      sectorId: sector,
+      entity: docked,
+    });
   });
 
-  SectorIndex.notify(prevSector, sector, entity);
+  teleportHook.notify({ prevSectorId: prevSector, sectorId: sector, entity });
 }
 
 export type Driveable = RequireComponent<"drive" | "movable">;

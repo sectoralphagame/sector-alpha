@@ -59,7 +59,7 @@ describe("SectorIndex", () => {
     entity
       .addComponent({ name: "name", value: "test" })
       .addComponent(defaultPosition);
-    entity.unregister();
+    entity.unregister("test");
     expect(index.sectors[1].size).toBe(0);
   });
 

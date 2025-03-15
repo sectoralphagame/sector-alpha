@@ -1,10 +1,10 @@
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { faction } from "../archetypes/faction";
 import { transferMoney } from "../components/budget";
 import type { WithTrade } from "../economy/utils";
 import { getPlannedBudget } from "../economy/utils";
 import type { Sim } from "../sim";
 import { limitMax } from "../utils/limit";
-import { EntityIndex } from "./utils/entityIndex";
 import { System } from "./system";
 
 function settleBudget(entity: WithTrade) {
@@ -28,11 +28,8 @@ function settleBudget(entity: WithTrade) {
 }
 
 export class BudgetPlanningSystem extends System<"exec"> {
-  index = new EntityIndex(["budget", "owner", "trade"]);
-
   apply = (sim: Sim): void => {
     super.apply(sim);
-    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
@@ -40,8 +37,7 @@ export class BudgetPlanningSystem extends System<"exec"> {
   exec = (): void => {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 5 * 60);
-      this.index
-        .get()
+      [...entityIndexer.search(["budget", "owner", "trade"])]
         .filter((entity) => entity.sim.getOrThrow(entity.cp.owner.id).cp.ai)
         .forEach(settleBudget);
     }

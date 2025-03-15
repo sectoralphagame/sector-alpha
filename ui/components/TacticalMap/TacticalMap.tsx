@@ -29,6 +29,7 @@ import { transport3D } from "@core/systems/transport3d";
 import type { GameSettings } from "@core/settings";
 import { defaultGameSttings } from "@core/settings";
 import merge from "lodash/merge";
+import { renderLogger } from "@core/log";
 import mapData from "../../../core/world/data/map.json";
 import { EntityMesh } from "./EntityMesh";
 import { createShootHandler } from "./events/shoot";
@@ -52,6 +53,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   meshes: WeakMap<Entity, EntityMesh> = new Map();
   dragStart: Vec2 | null = null;
   selectionBox: SelectionBox;
+  logger = renderLogger.sub("tactical");
 
   onUnmountCallbacks: (() => void)[] = [];
 
@@ -112,7 +114,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       if (key !== "gameSettings") return;
       this.updateEngineSettings();
     });
-    this.sim.hooks.removeEntity.subscribe("TacticalMap", (entity) => {
+    this.sim.hooks.removeEntity.subscribe("TacticalMap", ({ entity }) => {
       if (this.meshes.has(entity)) {
         const mesh = this.meshes.get(entity)!;
         mesh.destroy();
@@ -353,7 +355,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       // FIXME: Remove this debug code
       if (!(entity.cp.render.model in assetLoader.models)) {
         // eslint-disable-next-line no-console
-        console.log("Missing model:", entity.cp.render.model);
+        this.logger.log(`Missing model: ${entity.cp.render.model}`, "warn");
         if (entity.hasComponents(["dockable"])) {
           entity.cp.render.model = "ship/dart";
 

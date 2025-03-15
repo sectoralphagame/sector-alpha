@@ -336,7 +336,7 @@ describe("Trading module", () => {
     expect(facility.cp.budget.allocations.length).toBe(0);
     expect(shipFaction.cp.budget.allocations.length).toBe(1);
 
-    ship.unregister();
+    ship.unregister("test");
 
     expect(facility.cp.storage.allocations.length).toBe(0);
     expect(ship.cp.storage.allocations.length).toBe(0);
