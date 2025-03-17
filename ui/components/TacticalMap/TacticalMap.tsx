@@ -464,6 +464,10 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
     this.selectionBox = new SelectionBox(this.engine);
     this.selectionBox.setParent(this.engine.scene.ui);
+
+    if (!gameStore.focused) {
+      this.control.lookAt(new Vec3(0, 0, 0));
+    }
   }
 
   loadSkybox() {
