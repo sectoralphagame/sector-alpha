@@ -4,7 +4,7 @@ import { Styles } from "@kit/theming/style";
 import { GLTFLoader, Orbit } from "ogl";
 import models from "@assets/models";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
-import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
+import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { skyboxes } from "@assets/textures/skybox";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
@@ -32,7 +32,7 @@ const ModelStory: React.FC<ModelStoryProps> = ({
     GLTFLoader.load(engine.gl, m).then((model) => {
       meshRef.current = BaseMesh.fromGltf(engine, model, {
         material: model.materials?.[0]
-          ? new SimplePbrMaterial(engine, model.materials[0])
+          ? new PbrMaterial(engine, model.materials[0])
           : undefined,
       });
       meshRef.current.setParent(engine.scene);

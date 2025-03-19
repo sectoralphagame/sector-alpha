@@ -7,7 +7,7 @@ import { AxesHelper, GLTFLoader } from "ogl";
 import { MapControl } from "@ogl-engine/MapControl";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
-import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
+import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
 import { TacticalMapScene } from "@ogl-engine/engine/Scene";
 
@@ -27,7 +27,7 @@ const ModelStory: React.FC = () => {
 
       const gltf = await GLTFLoader.load(engine.gl, sCiv);
       const mesh = BaseMesh.fromGltf(engine, gltf);
-      mesh.applyMaterial(new SimplePbrMaterial(engine, gltf.materials[0]));
+      mesh.applyMaterial(new PbrMaterial(engine, gltf.materials[0]));
       engine.scene.addChild(mesh);
     });
 

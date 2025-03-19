@@ -2,7 +2,7 @@ import type { RequireComponent } from "@core/tsHelpers";
 import type { ParticleGeneratorInput } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
-import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
+import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
 import type { EngineParticleGenerator } from "@ogl-engine/particles";
 import { getParticleType, particleGenerator } from "@ogl-engine/particles";
 import { Light } from "@ogl-engine/engine/Light";
@@ -50,7 +50,7 @@ export class EntityMesh extends BaseMesh {
     super(engine, {
       geometry: gltf.geometry,
     });
-    this.applyMaterial(new SimplePbrMaterial(engine, gltf.material));
+    this.applyMaterial(new PbrMaterial(engine, gltf.material));
 
     this.engine = engine;
     this.scale.set(entityScale);

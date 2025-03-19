@@ -119,7 +119,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.postProcessingLayers.bloom.addPass({
       fragment: brightPassFragment,
       uniforms: {
-        uThreshold: { value: 0.9 },
+        uThreshold: { value: 0.95 },
         tEmissive: { value: new Texture(gl) },
       },
     });
@@ -281,7 +281,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
     // Update uniforms
     this.uniforms.resolution.base.value.set(w, h);
-    this.uniforms.resolution.bloom.value.set(w / 2, h / 2);
+    this.uniforms.resolution.bloom.value.set(w / 5, h / 2);
   };
 
   addLight = (light: Light) => {

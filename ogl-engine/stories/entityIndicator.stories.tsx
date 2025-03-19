@@ -5,7 +5,7 @@ import { merge } from "lodash";
 import type { Engine } from "@ogl-engine/engine/engine";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { assetLoader } from "@ogl-engine/AssetLoader";
-import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
+import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
 import {
   EntityIndicator,
   entityScale,
@@ -35,7 +35,7 @@ const EntityIndicatorStory: React.FC<
     const ship = new BaseMesh(engine, {
       geometry: model.geometry,
     });
-    ship.applyMaterial(new SimplePbrMaterial(engine, model.material));
+    ship.applyMaterial(new PbrMaterial(engine, model.material));
     ship.scale.set(entityScale);
     ship.setParent(engine.scene);
 

@@ -1,10 +1,10 @@
 import type { GLTFMaterial, Texture } from "ogl";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
-import fragment from "./shader.frag.glsl";
+import fragment from "../pbr/shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 import { Material } from "../material";
 
-export class SimplePbrMaterial extends Material {
+export class InstancedPbrMaterial extends Material {
   uniforms: Material["uniforms"] & {
     tDiffuse: { value: Texture };
     tNormal: { value: Texture };
@@ -12,8 +12,6 @@ export class SimplePbrMaterial extends Material {
     uRoughness: { value: number };
     tEmissive: { value: Texture };
     uMetallic: { value: number };
-    uNormalScale: { value: number };
-    uNormalUVScale: { value: number };
   };
 
   constructor(engine: Engine3D, gltfMaterial: GLTFMaterial) {

@@ -5,7 +5,7 @@ import { merge } from "lodash";
 import { Asteroids } from "@ogl-engine/engine/Asteroids";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { assetLoader } from "@ogl-engine/AssetLoader";
-import { SimplePbrMaterial } from "@ogl-engine/materials/simplePbr/simplePbr";
+import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import models from "@assets/models";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
@@ -36,7 +36,7 @@ const AsteroidsStory: React.FC<
     const ship = new BaseMesh(engine, {
       geometry: model.geometry,
     });
-    ship.applyMaterial(new SimplePbrMaterial(engine, model.material));
+    ship.applyMaterial(new PbrMaterial(engine, model.material));
     ship.scale.set(entityScale);
     ship.setParent(engine.scene);
   }, []);

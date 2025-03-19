@@ -3,7 +3,7 @@ import type { ModelName } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { random } from "mathjs";
-import { InstancedPhongMaterial } from "@ogl-engine/materials/instancedPhong/instancedPhong";
+import { InstancedPbrMaterial } from "@ogl-engine/materials/instancedPbr/instancedPbr";
 import { AsteroidFieldRingMaterial } from "@ogl-engine/materials/asteroidFieldRing/asteroidFieldRing";
 import { BaseMesh } from "./BaseMesh";
 import type { Engine3D } from "./engine3d";
@@ -66,7 +66,7 @@ export class Asteroids extends Transform {
         geometry: new Geometry(this.engine.gl, { ...gltf.geometry.attributes }),
       });
       asteroid.applyMaterial(
-        new InstancedPhongMaterial(this.engine, gltf.material)
+        new InstancedPbrMaterial(this.engine, gltf.material)
       );
       const instanceMatrix = new Float32Array(numAsteroids * 16);
       const instanceNormalMatrix = new Float32Array(numAsteroids * 9);
