@@ -17,6 +17,7 @@ export abstract class Material {
     uTime: { value: number };
     fCameraNear: { value: number };
     fCameraFar: { value: number };
+    tEnvMap: { value: Texture };
   };
 
   constructor(engine: Engine3D) {
@@ -27,6 +28,7 @@ export abstract class Material {
       uTime: engine.uniforms.uTime,
       fCameraNear: { value: settings.camera.near },
       fCameraFar: { value: settings.camera.far },
+      tEnvMap: engine.uniforms.env.tEnvMap,
     };
   }
 

@@ -87,6 +87,7 @@ export class Skybox extends Mesh implements Destroyable {
     this.light.position.set(0, -1, -0.4);
     this.light.setParent(this);
     this.engine.addLight(this.light);
+    this.engine.uniforms.env.tEnvMap.value = this.program.uniforms.tMap.value;
 
     if (settings[name]) {
       this.loadConfig(name);

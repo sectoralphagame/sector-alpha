@@ -30,6 +30,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     env: {
       ambient: { value: Vec3 };
       lights: Light["uniforms"][];
+      tEnvMap: { value: Texture };
       postProcessing: {
         godrays: {
           uDensity: { value: number };
@@ -72,6 +73,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       height: gl.canvas.height * this.dpr,
     });
 
+    this.uniforms.env.tEnvMap.value = new Texture(this.renderer.gl);
+
     this.initPostProcessing();
     window.renderer = this;
     this.hooks.onInit.notify();
@@ -83,6 +86,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       env: {
         ambient: { value: new Vec3(0) },
         lights: [],
+        tEnvMap: { value: null! },
         postProcessing: {
           godrays: {
             uDensity: { value: 0.8 },

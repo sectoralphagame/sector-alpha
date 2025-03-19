@@ -19,6 +19,7 @@ uniform sampler2D tNormal;
 uniform vec3 cameraPosition;
 uniform vec3 ambient;
 uniform Light lights[16];
+uniform samplerCube tEnvMap;
 
 uniform float uMetallic;
 
@@ -96,6 +97,9 @@ void main() {
         specularPower = 0.;
     }
 
-    fragData[0] = vec4((diffuse * (1. - metallic) + ambient + specular) * tex + emissive, 1.0f);
+    vec3 reflectedDir = reflect(eyeDirection, norm);
+    vec3 reflectionColor = texture(tEnvMap, -reflectedDir).rgb;
+
+    fragData[0] = vec4((diffuse * (1. - metallic) + ambient + specular) * tex + emissive + reflectionColor * metallic * roughness, 1.0f);
     fragData[1].r = luma(emissive) + specularPower / 5.;
 }

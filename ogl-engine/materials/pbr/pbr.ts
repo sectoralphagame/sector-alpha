@@ -12,8 +12,6 @@ export class PbrMaterial extends Material {
     uRoughness: { value: number };
     tEmissive: { value: Texture };
     uMetallic: { value: number };
-    uNormalScale: { value: number };
-    uNormalUVScale: { value: number };
   };
 
   constructor(engine: Engine3D, gltfMaterial: GLTFMaterial) {
