@@ -3,6 +3,7 @@ precision highp float;
 
 #pragma glslify: Light = require("./ogl-engine/shader/light");
 #pragma glslify: blinnPhongSpec = require(glsl-specular-blinn-phong)
+#pragma glslify: cookTorranceSpec = require(glsl-specular-cook-torrance)
 #pragma glslify: luma = require(glsl-luma)
 
 #pragma defines
@@ -18,6 +19,7 @@ uniform sampler2D tNormal;
 uniform vec3 cameraPosition;
 uniform vec3 ambient;
 uniform Light lights[16];
+
 uniform float uMetallic;
 
 #ifdef USE_ROUGHNESS
@@ -31,7 +33,6 @@ uniform sampler2D tEmissive;
 #endif
 
 #define EPSILON 0.001f
-#define MAX_SHININESS 256.0f
 
 out vec4 fragData[2];
 
@@ -56,12 +57,17 @@ void main() {
     #endif
 
     #ifdef USE_ROUGHNESS
-    float roughness = texture(tRoughness, vUv).g;
-    float shininess = (1.f - roughness) * MAX_SHININESS;
+    vec4 mr = texture(tRoughness, vUv);
+    // float metallic = mr.r; // TODO: Make blender export metallic too
+    float metallic = uMetallic;
+    float roughness = mr.g;
     #else
+    float metallic = uMetallic;
     float roughness = uRoughness;
-    float shininess = uRoughness * MAX_SHININESS;
     #endif
+
+    vec3 F0 = vec3(0.04f, 0.04f, 0.04f);
+    F0 = mix(F0, tex, metallic);
 
     for(int i = 0; i < lights.length(); i++) {
         if(lights[i].visible) {
@@ -81,7 +87,7 @@ void main() {
             float diff = max(dot(norm, lightDir), 0.0f);
             vec3 color = lights[i].color * intensity;
             diffuse += diff * color;
-            specular += blinnPhongSpec(lightDir, eyeDirection, norm, shininess) * color * (1. - roughness);
+            specular += cookTorranceSpec(lightDir, eyeDirection, norm, roughness, luma(F0)) * color;
         }
     }
 
@@ -90,6 +96,6 @@ void main() {
         specularPower = 0.;
     }
 
-    fragData[0] = vec4((diffuse * (1. - uMetallic) + ambient + specular) * tex + emissive, 1.0f);
+    fragData[0] = vec4((diffuse * (1. - metallic) + ambient + specular) * tex + emissive, 1.0f);
     fragData[1].r = luma(emissive) + specularPower / 5.;
 }
