@@ -87,6 +87,8 @@ class AssetLoader {
   }
 
   async generateTextures() {
+    this.logger.log("Generating textures");
+    const start = performance.now();
     const textureEngine = new TextureEngine();
     textureEngine.size = 1024 * 4;
     textureEngine.init(new OffscreenCanvas(512, 512));
@@ -103,6 +105,7 @@ class AssetLoader {
       this.addTexture(name as TextureName, img);
       this.logger.log(`Generated ${name}`);
     }
+    this.logger.log(`Textures generated in ${performance.now() - start}ms`);
   }
 
   load(gl: OGLRenderingContext) {
