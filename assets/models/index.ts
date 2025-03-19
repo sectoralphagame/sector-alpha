@@ -1,5 +1,5 @@
 import sCiv from "@assets/models/ship/sCiv.glb";
-import mCiv from "@assets/models/ship/mCiv.glb";
+import mCiv from "@assets/models/ship/m_civ.glb";
 import mMinExample from "@assets/models/ship/m_min_example.glb";
 import axe from "@assets/models/ship/m_mil_axe.glb";
 import dart from "@assets/models/ship/dart.glb";
@@ -11,6 +11,7 @@ import asteroid1 from "@assets/models/world/asteroid_1.glb";
 import asteroid2 from "@assets/models/world/asteroid_2.glb";
 import asteroid3 from "@assets/models/world/asteroid_3.glb";
 import asteroid4 from "@assets/models/world/asteroid_4.glb";
+// import asteroidIce1 from "@assets/models/world/asteroid_ice_1.glb";
 
 export default {
   "ship/sCiv": sCiv,
@@ -26,4 +27,5 @@ export default {
   "world/asteroid2": asteroid2,
   "world/asteroid3": asteroid3,
   "world/asteroid4": asteroid4,
+  // "world/asteroidIce1": asteroidIce1,
 };
