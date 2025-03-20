@@ -49,7 +49,7 @@ export class Asteroids extends Transform {
   }
 
   private async createAsteroids() {
-    const numAsteroids = this.size ** 2 * this.density * 0.75;
+    const numAsteroids = Math.ceil(this.size ** 2 * this.density * 0.75);
 
     await assetLoader.load(this.engine.gl);
     const asteroidModels: ModelName[] = [
