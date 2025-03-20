@@ -1,6 +1,6 @@
 import type { FolderApi } from "tweakpane";
 import { Camera as BaseCamera, Vec3 } from "ogl";
-import { pane } from "@ui/context/Pane";
+import { getPane } from "@ui/context/Pane";
 import type { Engine } from "./engine";
 
 const tempVec3 = new Vec3();
@@ -11,15 +11,17 @@ export class Camera extends BaseCamera {
 
   private paneFolder: FolderApi;
 
-  constructor(engine: Engine) {
+  constructor(engine: Engine, initPane = true) {
     super(engine.gl);
     this.engine = engine;
 
-    this.initPane();
+    if (initPane) {
+      this.initPane();
+    }
   }
 
   private initPane() {
-    this.paneFolder = pane.addOrReplaceFolder({
+    this.paneFolder = getPane().addOrReplaceFolder({
       title: "Camera",
     });
     const p = this.paneFolder.addBinding(this, "position");

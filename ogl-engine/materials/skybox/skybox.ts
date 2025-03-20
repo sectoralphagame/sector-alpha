@@ -3,7 +3,7 @@ import { skyboxes } from "@assets/textures/skybox";
 import { Box, Mesh, Program, Texture } from "ogl";
 import { Light } from "@ogl-engine/engine/Light";
 import type { Destroyable } from "@ogl-engine/types";
-import { pane } from "@ui/context/Pane";
+import { getPane } from "@ui/context/Pane";
 import type { FolderApi } from "tweakpane";
 import Color from "color";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
@@ -124,7 +124,7 @@ export class Skybox extends Mesh implements Destroyable {
   }
 
   createPaneFolder() {
-    const existingFolder = pane.children.find(
+    const existingFolder = getPane().children.find(
       (child) => (child as FolderApi).title === "Skybox"
     );
     if (existingFolder) {
@@ -144,7 +144,7 @@ export class Skybox extends Mesh implements Destroyable {
       intensity: this.light.uniforms.intensity.value,
     };
 
-    this.paneFolder = pane.addOrReplaceFolder({
+    this.paneFolder = getPane().addOrReplaceFolder({
       title: "Skybox",
     });
 

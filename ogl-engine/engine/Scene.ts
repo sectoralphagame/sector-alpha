@@ -2,7 +2,7 @@ import { Transform } from "ogl";
 import type { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import type { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
 import type { FolderApi } from "tweakpane";
-import { pane } from "@ui/context/Pane";
+import { getPane } from "@ui/context/Pane";
 import type { Engine } from "./engine";
 import type { BaseMesh2D } from "./BaseMesh2D";
 import type { Engine3D } from "./engine3d";
@@ -63,7 +63,7 @@ export class TacticalMapScene extends Scene {
   }
 
   initPane() {
-    this.pane = pane.addOrReplaceFolder({
+    this.pane = getPane().addOrReplaceFolder({
       title: "Post Processing",
     });
     this.pane.addBinding(

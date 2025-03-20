@@ -1,0 +1,40 @@
+$handleHeight: 0.2;
+$handleContainerHeight: 2;
+
+.container {
+  display: block;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.handle {
+  width: 100%;
+  height: usesize($handleContainerHeight);
+  display: block;
+  background: transparent;
+  border: none;
+  padding: 0;
+
+  &:before,
+  &:after {
+    content: "";
+    display: block;
+    width: calc(100% - usesize(2));
+    height: usesize($handleHeight);
+    background-color: var(--palette-text-3);
+    border-radius: usesize(0.5);
+    transition: 200ms;
+    left: usesize(1);
+    top: usesize($handleContainerHeight / 5 * 2 - $handleHeight / 2);
+    position: absolute;
+
+    &:hover {
+      background-color: var(--palette-text-1);
+    }
+  }
+
+  &:after {
+    top: usesize($handleContainerHeight / 5 * 3 - $handleHeight / 2);
+  }
+}

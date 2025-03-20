@@ -279,7 +279,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.postProcessingLayers.bloom.resize({
       width: w,
       height: h,
-      dpr: this.dpr / 2,
+      dpr: this.dpr / 4,
     });
     this.renderTarget.setSize(w * this.dpr, h * this.dpr);
 

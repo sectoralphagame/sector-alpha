@@ -1,8 +1,8 @@
 import { StarMaterial } from "@ogl-engine/materials/star/star";
 import { Plane, Sphere, Transform } from "ogl";
 import type { FolderApi } from "tweakpane";
-import { pane } from "@ui/context/Pane";
 import { StarCoronaMaterial } from "@ogl-engine/materials/starCorona/starCorona";
+import { getPane } from "@ui/context/Pane";
 import type { Engine3D } from "./engine3d";
 import { BaseMesh } from "./BaseMesh";
 import type { Engine } from "./engine";
@@ -53,7 +53,7 @@ export class Star extends Transform {
   }
 
   createPaneFolder() {
-    this.paneFolder = pane.addOrReplaceFolder({
+    this.paneFolder = getPane().addOrReplaceFolder({
       title: this.name,
     });
 

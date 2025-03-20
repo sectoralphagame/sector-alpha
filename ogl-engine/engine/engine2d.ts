@@ -18,7 +18,7 @@ export class Engine2D extends Engine {
       dpr: this.dpr,
       antialias: true,
     });
-    this.camera = new Camera(this);
+    this.camera = new Camera(this, false);
     this.camera.disablePane();
     this.camera.orthographic();
     this.camera.position.set(0, 50, 0);

@@ -21,9 +21,9 @@ import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
 import { CurrentSector } from "@ui/components/CurrentSector/CurrentSector";
 import type { Faction } from "@core/archetypes/faction";
 import { MapOverlay } from "@ui/components/MapOverlay/MapOverlay";
-import { pane } from "@ui/context/Pane";
 import type { GameOverlayType } from "@ui/state/game";
 import { useGameStore } from "@ui/state/game";
+import { getPane } from "@ui/context/Pane";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -113,7 +113,7 @@ const Game: React.FC = () => {
         pressedKeys.current.has("MetaLeft") &&
         gameSettings.dev
       ) {
-        pane.hidden = !pane.hidden;
+        getPane().hidden = !getPane().hidden;
       }
 
       if (

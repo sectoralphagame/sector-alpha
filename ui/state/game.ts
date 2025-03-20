@@ -1,6 +1,6 @@
 import type { Sector } from "@core/archetypes/sector";
 import type { RequireComponent } from "@core/tsHelpers";
-import { pane } from "@ui/context/Pane";
+import { getPane } from "@ui/context/Pane";
 import { useMobx } from "@ui/hooks/useMobx";
 import { action, makeObservable, observable } from "mobx";
 import type { FolderApi } from "tweakpane";
@@ -58,7 +58,7 @@ export class GameStore {
     if (units.length === 1) {
       const unit = units[0];
 
-      this.paneFolder = pane.addOrReplaceFolder({
+      this.paneFolder = getPane().addOrReplaceFolder({
         title: "Selected Unit",
       });
 

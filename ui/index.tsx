@@ -8,6 +8,7 @@ import { Main } from "./views/Main";
 import { NewGame } from "./views/NewGame";
 import { SettingsView } from "./views/Settings";
 import useFullscreen from "./hooks/useFullscreen";
+import { DraggablePane } from "./context/Pane";
 
 const viewComponents: Record<View, React.FC> = {
   game: Game,
@@ -42,6 +43,7 @@ export const Root: React.FC = () => {
           <Component />
         </LocationContext.Provider>
       </RecoilRoot>
+      <DraggablePane />
     </div>
   );
 };
