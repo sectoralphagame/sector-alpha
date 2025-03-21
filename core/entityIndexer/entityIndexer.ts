@@ -5,6 +5,7 @@ import { componentMask } from "@core/components/masks";
 import type { Entity } from "@core/entity";
 import { teleportHook } from "@core/hooks";
 import type { EntityTag } from "@core/tags";
+import { isHeadless } from "@core/settings";
 import { BitwiseTrie } from "./bitwiseTrie";
 
 function getMask(components: readonly (keyof CoreComponents)[]): bigint {
@@ -60,6 +61,9 @@ export class EntityIndexer {
     for (const sectorId of this.entityToSector.keys()) {
       this.entityToSector.get(sectorId)!.delete(entity);
     }
+    if (!this.entityToSector.has(entity.cp.position.sector)) {
+      this.entityToSector.set(entity.cp.position.sector, new Set());
+    }
     this.entityToSector.get(entity.cp.position.sector)!.add(entity);
   }
 
@@ -91,6 +95,6 @@ export class EntityIndexer {
 }
 
 export const entityIndexer = new EntityIndexer();
-if (window) {
+if (!isHeadless && window) {
   window.indexer = entityIndexer as any;
 }

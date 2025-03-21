@@ -10,6 +10,7 @@ import { getRequiredCrew } from "@core/utils/crew";
 import { find } from "@fxts/core";
 import { ConfigIcon } from "@assets/ui/icons";
 import { actionLoader } from "@core/actionLoader";
+import type { FacilityModule } from "@core/archetypes/facilityModule";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
 import EntityName from "../EntityName";
@@ -40,6 +41,7 @@ import { HitPointsInfo } from "../HitPoints";
 import { Docks } from "../Docks";
 import ShipBuildingQueue from "../ShipBuildingQueue";
 import { Production } from "../Production";
+import { Teleport } from "../Teleport/Teleport";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -257,6 +259,22 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                     growth={growth!}
                   />
                 )}
+                {entity.hasComponents(["modules"]) &&
+                  entity.cp.modules.ids.some((m) =>
+                    sim
+                      .getOrThrow<FacilityModule>(m)
+                      .hasComponents(["teleport"])
+                  ) && (
+                    <Teleport
+                      entity={sim.getOrThrow(
+                        entity.cp.modules.ids.find((m) =>
+                          sim
+                            .getOrThrow<FacilityModule>(m)
+                            .hasComponents(["teleport"])
+                        )!
+                      )}
+                    />
+                  )}
                 {showSensitive && <Subordinates entity={entity} />}
                 {entity.hasComponents(["deployable"]) && showSensitive && (
                   <Undeploy

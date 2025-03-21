@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
-import settings from "@core/settings";
-import { Sim } from "@core/sim";
 import { bootstrapSystems } from "@core/sim/baseConfig";
 import { getFixedWorld as world } from "@core/world";
 import fs from "fs";
 import progress from "cli-progress";
+import { settings } from "@core/settings";
+import { Sim } from "../core/sim/Sim";
 
 const sim = new Sim({
   systems: bootstrapSystems,

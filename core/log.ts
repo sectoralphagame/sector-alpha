@@ -1,3 +1,5 @@
+import { isHeadless } from "./settings";
+
 type Severity = "debug" | "info" | "warn" | "error";
 const levels: Record<Severity, number> = {
   debug: 0,
@@ -76,7 +78,7 @@ class Logger {
 }
 
 export const defaultLogger = new Logger();
-if (window) {
+if (!isHeadless && window) {
   window.log = defaultLogger;
 }
 

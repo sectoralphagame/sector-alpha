@@ -42,12 +42,12 @@ export function createLink(sim: Sim, sectors: Sector[], position?: Vec2[]) {
       sim
     );
     facility.addTag("discovered").addTag("gateway");
+    facility.cp.name.value = "Gateway";
 
     const teleporter = sim
       .getOrThrow(facility.cp.modules.ids[0])
       .requireComponents(["teleport"]);
 
-    facility.removeTag("selection");
     return teleporter;
   });
 
