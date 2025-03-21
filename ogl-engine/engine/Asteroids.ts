@@ -1,4 +1,4 @@
-import { Euler, Geometry, Mat3, Mat4, Plane, Quat, Transform } from "ogl";
+import { Euler, Geometry, Mat3, Mat4, Plane, Quat, Transform, Vec3 } from "ogl";
 import type { ModelName } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
@@ -7,6 +7,8 @@ import { InstancedPbrMaterial } from "@ogl-engine/materials/instancedPbr/instanc
 import { AsteroidFieldRingMaterial } from "@ogl-engine/materials/asteroidFieldRing/asteroidFieldRing";
 import { BaseMesh } from "./BaseMesh";
 import type { Engine3D } from "./engine3d";
+
+const axis = new Vec3();
 
 export class Asteroids extends Transform {
   name = "Asteroids";
@@ -100,31 +102,8 @@ export class Asteroids extends Transform {
         const trs = t.multiply(r).multiply(s);
         trs.toArray(instanceMatrix, i * 16);
 
-        const normalMatrix = new Mat3(
-          r[0],
-          r[1],
-          r[2],
-          r[4],
-          r[5],
-          r[6],
-          r[8],
-          r[9],
-          r[10]
-        ).inverse();
-        instanceNormalMatrix.set(
-          [
-            normalMatrix[0],
-            normalMatrix[3],
-            normalMatrix[6],
-            normalMatrix[1],
-            normalMatrix[4],
-            normalMatrix[7],
-            normalMatrix[2],
-            normalMatrix[5],
-            normalMatrix[8],
-          ],
-          i * 9
-        );
+        const normalMatrix = new Mat3().getNormalMatrix(trs);
+        instanceNormalMatrix.set(normalMatrix, i * 9);
       }
 
       asteroid.geometry.addAttribute("instanceMatrix", {
@@ -142,6 +121,26 @@ export class Asteroids extends Transform {
 
       asteroid.frustumCulled = false;
       asteroid.setParent(this);
+
+      asteroid.onBeforeRender(() => {
+        for (let i = 0; i < numAsteroids; i++) {
+          const trs = new Mat4().fromArray(
+            asteroid.geometry.attributes.instanceMatrix.data!.slice(
+              16 * i,
+              16 * i + 16
+            )
+          );
+          axis.set(Math.sin(i), Math.cos(i), Math.sin(-i)).normalize();
+          trs.rotate(this.engine.delta * 0.02 * ((i % 6) + 1), axis);
+          trs.toArray(asteroid.geometry.attributes.instanceMatrix.data, i * 16);
+
+          const normalMatrix = new Mat3().getNormalMatrix(trs);
+          instanceNormalMatrix.set(normalMatrix, i * 9);
+        }
+
+        asteroid.geometry.attributes.instanceMatrix.needsUpdate = true;
+        asteroid.geometry.attributes.instanceNormalMatrix.needsUpdate = true;
+      });
     }
 
     this.visible = true;
