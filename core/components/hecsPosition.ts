@@ -1,6 +1,5 @@
 import { add, matrix, multiply, subtract, sum } from "mathjs";
 import { Vec2 } from "ogl";
-import { sectorSize } from "../archetypes/sector";
 import type { BaseComponent } from "./component";
 
 export const transforms = {
@@ -89,8 +88,4 @@ export function cartesianToHecs(position: Vec2, scale: number): PositionHex {
       scale
     ).toArray() as PositionAxial
   );
-}
-
-export function worldToHecs(coords: Vec2): PositionHex {
-  return hecsRound(cartesianToHecs(coords, 10 / sectorSize));
 }
