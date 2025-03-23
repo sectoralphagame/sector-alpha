@@ -5,10 +5,10 @@ import { filter, find, groupBy, map, pipe, some } from "@fxts/core";
 import { facilityModules } from "@core/archetypes/facilityModule";
 import type { RequireComponent } from "@core/tsHelpers";
 import { getRequiredCrew } from "@core/utils/crew";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import type { Sim } from "../sim";
 import { System } from "./system";
 import { ProducingSystem, timeMultiplier } from "./producing";
-import { EntityIndex } from "./utils/entityIndex";
 
 function getHubModule(facility: RequireComponent<"modules">) {
   return pipe(
@@ -19,15 +19,8 @@ function getHubModule(facility: RequireComponent<"modules">) {
 }
 
 export class CrewGrowingSystem extends System<"exec"> {
-  crewable = new EntityIndex(
-    ["modules", "position", "facilityModuleQueue", "subordinates", "crew"],
-    [],
-    true
-  );
-
   apply = (sim: Sim): void => {
     super.apply(sim);
-    this.crewable.apply(sim);
 
     // Execute every day at the start of the day
     const offset =
@@ -39,9 +32,17 @@ export class CrewGrowingSystem extends System<"exec"> {
   exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
 
-    const facilities = this.crewable.get();
+    const facilities = [
+      ...entityIndexer.search([
+        "modules",
+        "position",
+        "facilityModuleQueue",
+        "subordinates",
+        "crew",
+      ]),
+    ];
     const sectorHubs = pipe(
-      this.crewable.getIt(),
+      facilities,
       filter((facility) =>
         some(
           (facilityModuleId) =>

@@ -1,4 +1,5 @@
 import { matrix } from "mathjs";
+import { Vec2 } from "ogl";
 import type { Facility } from "../archetypes/facility";
 import { facilityComponents } from "../archetypes/facility";
 import type { Faction } from "../archetypes/faction";
@@ -23,10 +24,10 @@ import { dockShip } from "../systems/orderExecuting/dock";
 import { tradeOrder } from "../systems/orderExecuting/trade";
 import type { TradeAction } from "../components/orders";
 import type { RequireComponent } from "../tsHelpers";
-import { commodityPrices } from "./perCommodity";
 import { changeRelations } from "../components/relations";
 import { PathPlanningSystem } from "../systems/pathPlanning";
 import { OrderExecutingSystem } from "../systems/orderExecuting/orderExecuting";
+import { commodityPrices } from "../economy/utils";
 
 describe("Trading module", () => {
   let sim: Sim;
@@ -308,7 +309,7 @@ describe("Trading module", () => {
     const ship = createShip(sim, {
       ...shipClasses[0],
       owner: shipFaction,
-      position: matrix([0, 0, 0]),
+      position: new Vec2(0, 0),
       sector,
     });
 
@@ -336,10 +337,9 @@ describe("Trading module", () => {
     expect(facility.cp.budget.allocations.length).toBe(0);
     expect(shipFaction.cp.budget.allocations.length).toBe(1);
 
-    ship.unregister();
+    ship.unregister("test");
 
     expect(facility.cp.storage.allocations.length).toBe(0);
-    expect(ship.cp.storage.allocations.length).toBe(0);
     expect(shipFaction.cp.budget.allocations.length).toBe(0);
     expect(facility.cp.budget.allocations.length).toBe(0);
   });

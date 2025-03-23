@@ -9,6 +9,8 @@ import { isOwnedByPlayer } from "@core/utils/misc";
 import { getRequiredCrew } from "@core/utils/crew";
 import { find } from "@fxts/core";
 import { ConfigIcon } from "@assets/ui/icons";
+import { actionLoader } from "@core/actionLoader";
+import type { FacilityModule } from "@core/archetypes/facilityModule";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
 import EntityName from "../EntityName";
@@ -39,10 +41,11 @@ import { HitPointsInfo } from "../HitPoints";
 import { Docks } from "../Docks";
 import ShipBuildingQueue from "../ShipBuildingQueue";
 import { Production } from "../Production";
+import { Teleport } from "../Teleport/Teleport";
 
 export interface PanelProps {
   expanded?: boolean;
-  entity: Entity | undefined;
+  entity: Entity | null;
 }
 
 const JournalWrapper: React.FC<
@@ -67,7 +70,7 @@ const JournalWrapper: React.FC<
 
 export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
   const [isCollapsed, setCollapsed] = React.useState(
-    expanded === undefined ? false : !expanded
+    expanded === undefined ? true : !expanded
   );
 
   const [dialog, setDialog] = useGameDialog();
@@ -76,7 +79,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
 
   const [sim] = useSim();
   React.useEffect(() => {
-    sim.actions.register(
+    actionLoader.register(
       {
         category: "core",
         description: "Show all entity data like they were owned by player",
@@ -138,7 +141,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
         isCollapsed={isCollapsed}
         onCollapseToggle={toggleCollapse}
         onPlayerAssets={() => {
-          sim.index.settings.get()[0].cp.selectionManager.id = null;
+          setCollapsed(false);
         }}
       >
         {!isCollapsed &&
@@ -256,10 +259,29 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                     growth={growth!}
                   />
                 )}
+                {entity.hasComponents(["modules"]) &&
+                  entity.cp.modules.ids.some((m) =>
+                    sim
+                      .getOrThrow<FacilityModule>(m)
+                      .hasComponents(["teleport"])
+                  ) && (
+                    <Teleport
+                      entity={sim.getOrThrow(
+                        entity.cp.modules.ids.find((m) =>
+                          sim
+                            .getOrThrow<FacilityModule>(m)
+                            .hasComponents(["teleport"])
+                        )!
+                      )}
+                    />
+                  )}
                 {showSensitive && <Subordinates entity={entity} />}
                 {entity.hasComponents(["deployable"]) && showSensitive && (
                   <Undeploy
-                    deployable={entity.requireComponents(["deployable"])}
+                    deployable={entity.requireComponents([
+                      "deployable",
+                      "position",
+                    ])}
                     facility={
                       entity.cp.builder?.targetId
                         ? sim.get(entity.cp.builder.targetId)

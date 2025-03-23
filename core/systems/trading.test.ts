@@ -1,4 +1,4 @@
-import { matrix } from "mathjs";
+import { Vec2 } from "ogl";
 import type { Facility } from "../archetypes/facility";
 import { createFaction, factionComponents } from "../archetypes/faction";
 import { createSector } from "../archetypes/sector";
@@ -9,6 +9,7 @@ import { Sim } from "../sim";
 import { createFarm } from "../world/facilities";
 import { settleStorageQuota } from "./storageQuotaPlanning";
 import { TradingSystem } from "./trading";
+import { PathPlanningSystem } from "./pathPlanning";
 
 describe("Trading system", () => {
   let sim: Sim;
@@ -18,7 +19,7 @@ describe("Trading system", () => {
   beforeEach(() => {
     system = new TradingSystem();
     sim = new Sim({
-      systems: [system],
+      systems: [system, new PathPlanningSystem()],
     });
     facility = createFarm(
       {
@@ -33,8 +34,12 @@ describe("Trading system", () => {
             restrictions: { mining: false },
           })
           .requireComponents(factionComponents),
-        position: matrix([0, 0]),
-        sector: createSector(sim, { name: "", position: matrix([0, 0, 0]) }),
+        position: new Vec2(0, 0),
+        sector: createSector(sim, {
+          name: "",
+          position: [0, 0, 0],
+          slug: "sector",
+        }),
       },
       sim
     );

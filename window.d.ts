@@ -1,3 +1,7 @@
+interface Logger {
+  logs: string[];
+}
+
 // eslint-disable-next-line no-unused-vars
 interface Window {
   sim: {
@@ -17,6 +21,14 @@ interface Window {
   } | null;
   dev: boolean;
   cheats: Record<string, any>;
+  indexer: {
+    search(_components: readonly string[]): Iterable<any>;
+    searchBySector(
+      _sectorId: number,
+      _components: readonly string[],
+      _tags: readonly string[]
+    ): Iterable<any>;
+  };
   notify: (_notification: {
     dismissable?: boolean;
     expires?: number;
@@ -25,4 +37,5 @@ interface Window {
     type: "success" | "warning" | "error";
     onClick: () => void;
   }) => void;
+  log: Logger;
 }

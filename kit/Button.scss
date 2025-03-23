@@ -1,9 +1,8 @@
 .root {
-  &:hover,
-  &:focus {
+  &:hover {
     background: rgba(255, 255, 255, 0.15);
   }
-  &:active {
+  &:active:focus {
     background: rgba(255, 255, 255, 0.3);
   }
   &[disabled] {
@@ -30,8 +29,4 @@
   font-weight: 600;
   transition: 200ms;
   outline: 0;
-}
-
-.active {
-  background: "rgba(255, 255, 255, 0.2)";
 }

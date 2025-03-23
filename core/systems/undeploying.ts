@@ -3,7 +3,7 @@ import type { DeployableType } from "@core/components/deployable";
 import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
 import { removeSubordinate } from "@core/components/subordinates";
-import { EntityIndex } from "./utils/entityIndex";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { System } from "./system";
 
 const handlers: Partial<
@@ -47,11 +47,8 @@ const handlers: Partial<
 };
 
 export class UndeployingSystem extends System<"exec"> {
-  index = new EntityIndex(["deployable"]);
-
   apply = (sim: Sim) => {
     super.apply(sim);
-    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
@@ -59,11 +56,11 @@ export class UndeployingSystem extends System<"exec"> {
   exec = (): void => {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 1);
-      this.index.get().forEach((entity) => {
+      for (const entity of entityIndexer.search(["deployable"])) {
         if (entity.cp.deployable.cancel) {
           handlers[entity.cp.deployable.type]?.(entity);
         }
-      });
+      }
     }
   };
 }

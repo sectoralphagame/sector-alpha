@@ -24,7 +24,7 @@ const destroy: TargetAction<[]> = {
   variants: [],
   fn: (sim, targetId: number) => {
     const entity = sim.getOrThrow(targetId);
-    entity.unregister();
+    entity.unregister("manual");
   },
 };
 

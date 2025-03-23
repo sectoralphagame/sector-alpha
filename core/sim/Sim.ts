@@ -12,14 +12,19 @@ import type { CoreComponents } from "@core/components/component";
 import type { EntityTag } from "@core/tags";
 import { componentMask } from "@core/components/masks";
 import LZString from "lz-string";
-import { ActionLoader } from "@core/actionLoader";
 import { Observable } from "@core/utils/observer";
 import { defaultIndexer } from "@core/systems/utils/default";
+import { Vec2 } from "ogl";
+import { isVec2 } from "@core/utils/misc";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
+import { defaultLogger } from "@core/log";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
 import { MissingEntityError } from "../errors";
 import { openDb } from "../db";
+
+const logger = defaultLogger.sub("sim");
 
 export interface SimConfig {
   systems: System[];
@@ -27,6 +32,8 @@ export interface SimConfig {
 
 @Exclude()
 export class Sim extends BaseSim {
+  delta = 0;
+
   @Expose()
   entityIdCounter: number = 1;
   hooks: {
@@ -40,27 +47,28 @@ export class Sim extends BaseSim {
     }>;
     addTag: Observable<{ entity: Entity; tag: EntityTag }>;
     removeTag: Observable<{ entity: Entity; tag: EntityTag }>;
-    removeEntity: Observable<Entity>;
+    removeEntity: Observable<{ entity: Entity; reason: string }>;
     destroy: Observable<void>;
 
     phase: Record<
       "start" | "init" | "update" | "render" | "cleanup" | "end",
       Observable<number>
     >;
+    onSpeedChange: Observable<number>;
   };
 
   @Expose()
   @Type(() => Entity)
   entities: Map<number, Entity>;
+  /**
+   * @deprecated
+   */
   index: typeof defaultIndexer;
   paths: Record<string, Record<string, Path>>;
-
-  actions: ActionLoader;
 
   constructor({ systems }: SimConfig = { systems: [] }) {
     super();
 
-    this.actions = new ActionLoader(this);
     this.entities = new Map();
     this.hooks = {
       addComponent: new Observable("addComponent"),
@@ -77,12 +85,30 @@ export class Sim extends BaseSim {
         cleanup: new Observable("phase.cleanup", false),
         end: new Observable("phase.end", false),
       },
+      onSpeedChange: new Observable("onSpeedChange", false),
     };
 
     this.index = defaultIndexer;
     for (const index of Object.values(defaultIndexer)) {
-      index.apply(this);
+      index.apply();
     }
+
+    this.hooks.addComponent.subscribe("EntityIndexer", ({ entity }) =>
+      entityIndexer.updateMask(entity)
+    );
+    this.hooks.removeComponent.subscribe("EntityIndexer", ({ entity }) =>
+      entityIndexer.updateMask(entity)
+    );
+    this.hooks.removeEntity.subscribe("EntityIndexer", ({ entity, reason }) => {
+      logger.log(
+        `Removing entity ${entity.id} ${entity.cp.name?.value ?? ""} ${reason}`
+      );
+      entityIndexer.remove(entity);
+    });
+    this.hooks.destroy.subscribe("EntityIndexer", () => {
+      entityIndexer.clear();
+    });
+
     systems.forEach((system) => system.apply(this));
   }
 
@@ -92,12 +118,19 @@ export class Sim extends BaseSim {
     this.entityIdCounter += 1;
   };
 
-  unregisterEntity = (entity: Entity) => {
-    this.hooks.removeEntity.notify(entity);
+  unregisterEntity = (entity: Entity, reason: string) => {
+    this.hooks.removeEntity.notify({ entity, reason });
     this.entities.delete(entity.id);
   };
 
   next = (delta: number) => {
+    this.delta = delta;
+
+    if (delta === 0) {
+      this.updateTimer(delta);
+      return;
+    }
+
     this.hooks.phase.start.notify(delta);
     this.hooks.phase.init.notify(delta);
     this.hooks.phase.update.notify(delta);
@@ -108,15 +141,14 @@ export class Sim extends BaseSim {
     this.updateTimer(delta);
   };
 
+  override setSpeed(value: number) {
+    super.setSpeed(value);
+    this.hooks.onSpeedChange.notify(value);
+  }
+
   init = () => {
     const settingsEntity = new Entity(this);
     settingsEntity
-      .addComponent({
-        id: null,
-        secondaryId: null,
-        focused: false,
-        name: "selectionManager",
-      })
       .addComponent({
         name: "systemManager",
         lastStatUpdate: 0,
@@ -129,7 +161,7 @@ export class Sim extends BaseSim {
       .addComponent({
         name: "camera",
         zoom: 1,
-        position: [0, 0],
+        position: new Vec2(0, 0),
       });
   };
 
@@ -174,7 +206,6 @@ export class Sim extends BaseSim {
     if (!isHeadless) {
       window.sim = undefined!;
       window.selected = undefined!;
-      window.cheats = undefined!;
     }
   };
 
@@ -210,15 +241,28 @@ export class Sim extends BaseSim {
   }
 
   static load(config: SimConfig, data: string) {
-    const save = JSON.parse(data, (k, v) =>
-      typeof k === "string" && k.startsWith("BigInt:")
-        ? BigInt(k.split("BigInt:")[1])
-        : v
-    );
+    const save = JSON.parse(data, (_k, v) => {
+      if (!v) return v;
+
+      if (typeof v === "string" && v.startsWith("BigInt:")) {
+        return BigInt(v.split("BigInt:")[1]);
+      }
+      if (typeof v === "object" && isVec2(v)) {
+        const value = new Vec2(...v.value);
+        return value;
+      }
+
+      return v;
+    });
+
     const sim = plainToInstance(Sim, save);
     const entityMap = new Map();
 
     sim.entities.forEach((entity) => {
+      Object.assign(
+        entity.components,
+        save.entities.find((e) => e.id === entity.id)!.components
+      );
       entityMap.set(entity.id, entity);
       entity.sim = sim;
 
@@ -235,8 +279,8 @@ export class Sim extends BaseSim {
 
     sim.entities = entityMap;
 
-    for (const index of Object.values(defaultIndexer)) {
-      index.apply(sim);
+    for (const entity of sim.entities.values()) {
+      entityIndexer.insert(entity);
     }
     config.systems.forEach((system) => system.apply(sim));
 
@@ -262,8 +306,14 @@ export class Sim extends BaseSim {
   }
 }
 
-// BigInt serialization monkeypatch
+// Serialization monkeypatches
+
 // eslint-disable-next-line func-names
 (BigInt.prototype as any).toJSON = function () {
   return `BigInt:${this.toString()}`;
+};
+
+// eslint-disable-next-line func-names
+(Vec2.prototype as any).toJSON = function () {
+  return { isVec2: true, value: this.toArray() };
 };

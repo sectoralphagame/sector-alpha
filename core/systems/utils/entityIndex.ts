@@ -1,207 +1,32 @@
-import { filter } from "@fxts/core";
 import type { EntityTag } from "@core/tags";
 
-import { componentMask } from "@core/components/masks";
-import { Observable } from "@core/utils/observer";
-
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import type { CoreComponents } from "../../components/component";
-import type { Entity } from "../../entity";
-import type { Sim } from "../../sim";
-import type { RequireComponent } from "../../tsHelpers";
-import type { SimIndex } from "./simIndex";
 
-export class IndexNotAppliedError extends Error {
-  constructor() {
-    super("Index not applied to the sim");
-  }
-}
-
-export type IndexEntities<T extends keyof CoreComponents> = Array<
-  RequireComponent<T>
->;
-
-export abstract class BaseEntityIndex<T extends keyof CoreComponents>
-  implements SimIndex<Entity>
-{
-  hooks: {
-    add: Observable<RequireComponent<T>>;
-    remove: Observable<{ id: number; entity: Entity }>;
-  };
-  requiredComponents: readonly (keyof CoreComponents)[];
-  requiredComponentsMask: bigint;
-  requiredTags: readonly EntityTag[];
-  sim: Sim | null = null;
+/**
+ * @deprecated
+ */
+export class EntityIndex<T extends keyof CoreComponents> {
+  components: readonly T[];
+  tags: readonly EntityTag[] = [];
 
   constructor(
-    requiredComponents: readonly T[],
-    requiredTags: readonly EntityTag[] = []
+    components: readonly T[],
+    tags?: readonly EntityTag[],
+    _isStatic?: boolean
   ) {
-    this.requiredComponents = requiredComponents;
-    this.requiredTags = requiredTags;
-
-    this.requiredComponentsMask = requiredComponents.reduce(
-      (mask, name) => mask | componentMask[name],
-      BigInt(0)
-    );
+    this.components = components;
+    if (tags) this.tags = tags;
   }
 
-  apply(sim: Sim): void {
-    this.sim = sim;
-    this.enableHooks();
-    this.collect();
-
-    // Calling this way as method is overridden in child classes and therefore
-    // pointer to function is not the same
-    this.sim.hooks.destroy.subscribe("BaseEntityIndex", () => {
-      this.reset();
-    });
+  getIt() {
+    return entityIndexer.search(this.components, this.tags);
   }
 
-  abstract clear(): void;
-  abstract reset(): void;
-
-  enableHooks = () => {
-    if (this.sim === null) {
-      throw new IndexNotAppliedError();
-    }
-
-    this.hooks = {
-      add: new Observable("indexAdd"),
-      remove: new Observable("indexRemove"),
-    };
-
-    this.sim.hooks.addComponent.subscribe(
-      "BaseEntityIndex",
-      ({ entity, component }) => {
-        if (
-          this.requiredComponents.includes(component) &&
-          this.canBeAdded(entity)
-        ) {
-          this.add(entity as RequireComponent<T>);
-        }
-      }
-    );
-
-    this.sim.hooks.removeComponent.subscribe(
-      "BaseEntityIndex",
-      ({ component, entity }) => {
-        if (this.requiredComponents.includes(component)) {
-          this.remove(entity);
-        }
-      }
-    );
-
-    this.sim.hooks.addTag.subscribe("BaseEntityIndex", ({ entity, tag }) => {
-      if (this.requiredTags.includes(tag) && this.canBeAdded(entity)) {
-        this.add(entity as RequireComponent<T>);
-      }
-    });
-
-    this.sim.hooks.removeTag.subscribe("BaseEntityIndex", ({ tag, entity }) => {
-      if (this.requiredTags.includes(tag)) {
-        this.remove(entity);
-      }
-    });
-
-    this.sim.hooks.removeEntity.subscribe("BaseEntityIndex", (entity) => {
-      this.remove(entity);
-    });
-  };
-
-  canBeAdded = (entity: Entity) =>
-    (entity.componentsMask & this.requiredComponentsMask) ===
-      this.requiredComponentsMask && entity.hasTags(this.requiredTags);
-
-  collect(): void {
-    if (this.sim === null) {
-      throw new IndexNotAppliedError();
-    }
-
-    for (const entity of filter(this.canBeAdded, this.sim.entities.values())) {
-      this.add(entity as RequireComponent<T>);
-    }
+  get() {
+    return Array.from(this.getIt());
   }
 
-  add = (entity: RequireComponent<T>) => {
-    if (this.sim === null) {
-      throw new IndexNotAppliedError();
-    }
-
-    this.hooks.add.notify(entity);
-  };
-
-  remove = (entity: Entity) => {
-    if (this.sim === null) {
-      throw new IndexNotAppliedError();
-    }
-
-    this.hooks.remove.notify({ id: entity.id, entity });
-  };
-}
-
-export class EntityIndex<
-  T extends keyof CoreComponents
-> extends BaseEntityIndex<T> {
-  cache: boolean;
-  entities: Set<RequireComponent<T>>;
-
-  constructor(
-    requiredComponents: readonly T[],
-    requiredTags: readonly EntityTag[] = [],
-    cache = false
-  ) {
-    super(requiredComponents, requiredTags);
-    this.cache = cache;
-  }
-
-  apply = (sim: Sim): void => {
-    super.apply(sim);
-    this.entities = new Set();
-    if (this.cache) {
-      this.enableCache();
-    }
-  };
-
-  enableCache = () => {
-    this.hooks.add.subscribe("EntityIndex", (entity) => {
-      this.entities.add(entity);
-    });
-    this.hooks.remove.subscribe("EntityIndex", ({ entity }) => {
-      this.entities.delete(entity as RequireComponent<T>);
-    });
-    this.collect();
-  };
-
-  get = (): IndexEntities<T> => {
-    if (this.sim === null) {
-      throw new IndexNotAppliedError();
-    }
-
-    if (this.cache) {
-      return [...this.entities];
-    }
-
-    return this.sim.filter(this.canBeAdded) as IndexEntities<T>;
-  };
-
-  getIt = (): IterableIterator<RequireComponent<T>> => {
-    if (this.sim === null) {
-      throw new IndexNotAppliedError();
-    }
-
-    if (this.cache) {
-      return this.entities.values();
-    }
-
-    return filter(this.canBeAdded, this.sim.entities.values()) as any;
-  };
-
-  clear = (): void => {
-    this.entities.clear();
-  };
-
-  reset = (): void => {
-    this.clear();
-    this.sim = null;
-  };
+  // eslint-disable-next-line class-methods-use-this
+  apply() {}
 }

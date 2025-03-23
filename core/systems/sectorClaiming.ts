@@ -1,19 +1,11 @@
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import type { Sim } from "../sim";
 import { System } from "./system";
 import { defaultIndexer } from "./utils/default";
-import { EntityIndex } from "./utils/entityIndex";
 
 export class SectorClaimingSystem extends System<"exec"> {
-  hubIndex = new EntityIndex(["parent"], ["facilityModuleType:hub"]);
-  hiveIndex = new EntityIndex(
-    ["name", "parent"],
-    ["facilityModuleType:special"]
-  );
-
   apply = (sim: Sim): void => {
     super.apply(sim);
-    this.hubIndex.apply(sim);
-    this.hiveIndex.apply(sim);
 
     this.cooldowns.timers.exec = 2;
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
@@ -21,15 +13,19 @@ export class SectorClaimingSystem extends System<"exec"> {
 
   exec = (): void => {
     this.cooldowns.doEvery("exec", 1, () => {
-      const hubs = this.hubIndex
-        .get()
-        .map((e) =>
-          this.sim
-            .getOrThrow(e.cp.parent.id)
-            .requireComponents(["owner", "position"])
-        );
-      const hives = this.hiveIndex
-        .get()
+      const hubs = [
+        ...entityIndexer.search(["parent"], ["facilityModuleType:hub"]),
+      ].map((e) =>
+        this.sim
+          .getOrThrow(e.cp.parent.id)
+          .requireComponents(["owner", "position"])
+      );
+      const hives = [
+        ...entityIndexer.search(
+          ["name", "parent"],
+          ["facilityModuleType:special"]
+        ),
+      ]
         .filter((e) => e.cp.name.slug === "tauHive")
         .map((e) =>
           this.sim
@@ -46,7 +42,6 @@ export class SectorClaimingSystem extends System<"exec"> {
           );
           if (!hubOrHive) {
             sector.removeComponent("owner");
-            sector.cp.renderGraphics.redraw = true;
             return;
           }
         } else {
@@ -56,7 +51,6 @@ export class SectorClaimingSystem extends System<"exec"> {
 
           if (hubOrHive) {
             sector.addComponent({ name: "owner", id: hubOrHive.cp.owner.id });
-            sector.cp.renderGraphics.redraw = true;
           }
         }
       }

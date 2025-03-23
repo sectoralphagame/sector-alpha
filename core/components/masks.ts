@@ -2,7 +2,7 @@
 import type { CoreComponents } from "./component";
 
 // DO NOT CHANGE THE ORDER OF THIS LIST, EVER
-export const componentMask: Record<keyof CoreComponents, bigint> = [
+export const componentList = [
   "ai",
   "asteroidSpawn",
   "autoOrder",
@@ -32,7 +32,7 @@ export const componentMask: Record<keyof CoreComponents, bigint> = [
   "model",
   "orders",
   "relations",
-  "renderGraphics",
+  "renderGraphics", // @deprecated
   "sectorStats",
   "shipyard",
   "subordinates",
@@ -55,10 +55,12 @@ export const componentMask: Record<keyof CoreComponents, bigint> = [
   "movable",
   "storageTransfer",
   "policies",
-].reduce(
-  (acc, component, index) => ({
-    ...acc,
-    [component]: BigInt(1) << BigInt(index),
-  }),
-  {} as Record<keyof CoreComponents, bigint>
-);
+];
+export const componentMask: Record<keyof CoreComponents, bigint> =
+  componentList.reduce(
+    (acc, component, index) => ({
+      ...acc,
+      [component]: BigInt(1) << BigInt(index),
+    }),
+    {} as Record<keyof CoreComponents, bigint>
+  );

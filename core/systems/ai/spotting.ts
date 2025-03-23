@@ -1,12 +1,11 @@
 import { filter, map, pipe, sort, toArray } from "@fxts/core";
 import type { Faction } from "@core/archetypes/faction";
 import { relationThresholds } from "@core/components/relations";
-import { distance } from "mathjs";
 import type { RequireComponent } from "@core/tsHelpers";
 import { pickRandom } from "@core/utils/generators";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { System } from "../system";
 import type { Sim } from "../../sim";
-import { SectorIndex } from "../utils/sectorIndex";
 
 export const spottingRadius = 7;
 
@@ -16,17 +15,16 @@ export type EnemyArrayCache = Record<
 >;
 
 export class SpottingSystem extends System<"exec"> {
-  index = new SectorIndex(["hitpoints", "owner", "position"]);
-
   apply = (sim: Sim) => {
     super.apply(sim);
-    this.index.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 
   static getEnemies(
-    potentialEnemies: RequireComponent<"hitpoints" | "owner" | "position">[],
+    potentialEnemies: Iterable<
+      RequireComponent<"hitpoints" | "owner" | "position">
+    >,
     cache: EnemyArrayCache,
     entity: RequireComponent<"owner" | "position">
   ) {
@@ -35,7 +33,7 @@ export class SpottingSystem extends System<"exec"> {
     const cacheKey = [
       entity.cp.owner!.id,
       entity.cp.position.sector,
-      entity.cp.orders?.value[0].type === "pillage" ? "pillage" : "default",
+      entity.cp.orders?.value[0]?.type === "pillage" ? "pillage" : "default",
     ].join(":");
     const enemies =
       cache[cacheKey] ??
@@ -45,7 +43,7 @@ export class SpottingSystem extends System<"exec"> {
           const isMiningOnRestrictedArea =
             entityOwner.cp.ai?.restrictions.mining && e.cp.mining?.entityId;
           const isSubjectToPillaging =
-            entity.cp.orders?.value[0].type === "pillage" &&
+            entity.cp.orders?.value[0]?.type === "pillage" &&
             entityOwner.cp.relations.values[e.cp.owner.id]! <= 0 &&
             (e.tags.has("role:transport") || e.tags.has("role:mining")) &&
             (e.cp.dockable?.size === "small" ||
@@ -69,10 +67,7 @@ export class SpottingSystem extends System<"exec"> {
       enemies,
       map((e) => ({
         entity: e,
-        distance: distance(
-          e.cp.position.coord,
-          entity.cp.position.coord
-        ) as number,
+        distance: e.cp.position.coord.distance(entity.cp.position.coord),
       })),
       sort((a, b) => (a.distance > b.distance ? 1 : -1)),
       toArray
@@ -105,7 +100,11 @@ export class SpottingSystem extends System<"exec"> {
 
       const enemy = pickRandom(
         SpottingSystem.getEnemies(
-          this.index.get(entity.cp.position.sector),
+          entityIndexer.searchBySector(entity.cp.position.sector, [
+            "hitpoints",
+            "owner",
+            "position",
+          ]),
           cache,
           entity
         ).slice(0, 3)

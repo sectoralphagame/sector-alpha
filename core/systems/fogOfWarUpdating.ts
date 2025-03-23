@@ -1,66 +1,22 @@
 import type { Sim } from "@core/sim";
-import { Entity } from "@core/entity";
-import { createRenderGraphics } from "@core/components/renderGraphics";
-import type { RequireComponent } from "@core/tsHelpers";
 import { sectorSize } from "@core/archetypes/sector";
-import type { Position2D } from "@core/components/position";
 import { HideReason } from "@core/components/render";
+import { actionLoader } from "@core/actionLoader";
+import type { Vec2 } from "ogl";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { System } from "./system";
-import { EntityIndex } from "./utils/entityIndex";
 
 let sectorMaps: Record<number, Uint8Array> = {};
 const divisions = 2 ** 6;
 
 export class FogOfWarUpdatingSystem extends System<"exec"> {
-  grid: RequireComponent<"renderGraphics"> | null = null;
-  entitiesWithInfluence = new EntityIndex(["position", "owner"]);
-  entitiesToHide = new EntityIndex(["position", "render"]);
   enabled = true;
   intervalHandle: number | null = null;
 
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    this.grid =
-      sim
-        .find(
-          (e) =>
-            e.tags.has("virtual") &&
-            e.cp.renderGraphics?.draw === "fogOfWarGrid"
-        )
-        ?.requireComponents(["renderGraphics"]) ?? null;
-
-    if (!this.grid) {
-      this.initGrid();
-    }
-
-    this.intervalHandle = setInterval(() => {
-      if (this.grid) {
-        this.grid.cp.renderGraphics.redraw = true;
-      }
-    }, 300) as unknown as number;
-
-    sim.actions.register(
-      {
-        category: "drawing",
-        type: "basic",
-        description: "Show fog of war grid",
-        name: "Fog of war grid",
-        slug: "fogOfWarGrid",
-        // eslint-disable-next-line no-shadow
-        fn: (sim) => {
-          if (this.grid) {
-            sim.unregisterEntity(this.grid);
-            this.grid = null;
-          } else {
-            this.initGrid();
-          }
-        },
-      },
-      this.constructor.name
-    );
-
-    sim.actions.register(
+    actionLoader.register(
       {
         category: "core",
         type: "basic",
@@ -79,19 +35,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       this.constructor.name
     );
 
-    this.entitiesToHide.apply(sim);
-    this.entitiesWithInfluence.apply(sim);
-
     sim.hooks.phase.init.subscribe(this.constructor.name, this.updateFog);
-  };
-
-  initGrid = () => {
-    const grid = new Entity(this.sim);
-
-    this.grid = grid
-      .addTag("virtual")
-      .addComponent(createRenderGraphics("fogOfWarGrid"))
-      .requireComponents(["renderGraphics"]);
   };
 
   destroy = (): void => {
@@ -106,7 +50,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
 
       const player = this.sim.index.player.get()[0];
 
-      for (const entity of this.entitiesWithInfluence.getIt()) {
+      for (const entity of entityIndexer.search(["position", "owner"])) {
         const position = entity.cp.position;
         const owner = entity.cp.owner;
         if (owner.id !== player.id) continue;
@@ -128,7 +72,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
         }
       }
 
-      for (const entity of this.entitiesToHide.getIt()) {
+      for (const entity of entityIndexer.search(["position", "render"])) {
         if (entity.cp.dockable?.dockedIn || entity.cp.owner?.id === player.id)
           continue;
 
@@ -155,7 +99,7 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
     });
   };
 
-  static getBox = (pos: Position2D): [number, number] => [
+  static getBox = (pos: Vec2): [number, number] => [
     Math.floor((pos[0] * divisions) / 2 / (sectorSize / 10) + divisions / 2),
     Math.floor((pos[1] * divisions) / 2 / (sectorSize / 10) + divisions / 2),
   ];

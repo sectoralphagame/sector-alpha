@@ -27,7 +27,7 @@ function mine(entity: WithMining, delta: number) {
         field.cp.children.entities = field.cp.children.entities.filter(
           (e) => e !== mined.id
         );
-        mined.unregister();
+        mined.unregister("mined");
         entity.cp.mining.entityId = null;
       }
     }

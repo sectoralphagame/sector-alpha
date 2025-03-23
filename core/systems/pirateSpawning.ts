@@ -11,10 +11,10 @@ import { pickRandom } from "@core/utils/generators";
 import { moveToActions } from "@core/utils/moving";
 import { shipClasses } from "@core/world/ships";
 import { filter, find, map, pipe, toArray } from "@fxts/core";
-import { distance, random, randomInt } from "mathjs";
-import { fromPolar } from "@core/utils/misc";
+import { random, randomInt } from "mathjs";
+import { fromPolar, getSubordinates } from "@core/utils/misc";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { System } from "./system";
-import { EntityIndex } from "./utils/entityIndex";
 
 const flagshipDistanceFromSectorCenter =
   ((1 + Math.random() / 5) * sectorSize) / 15;
@@ -27,8 +27,8 @@ function returnToFlagship(unassigned: Ship[], flagships: Ship[]) {
       const closestFlagship = flagships.reduce((prev, cur) => {
         if (ship.cp.position.sector === cur.cp.position.sector) return cur;
         if (
-          distance(prev.cp.position.coord, ship.cp.position.coord) >
-          distance(cur.cp.position.coord, ship.cp.position.coord)
+          prev.cp.position.coord.squaredDistance(ship.cp.position.coord) >
+          cur.cp.position.coord.squaredDistance(ship.cp.position.coord)
         )
           return cur;
         return prev;
@@ -102,7 +102,7 @@ function spawnSquad(
       createShip(sim, {
         ...shipClasses.find((sc) => sc.slug === "roach")!,
         owner: faction,
-        position: [...flagship.cp.position.coord],
+        position: flagship.cp.position.coord.clone(),
         sector,
       })
     );
@@ -116,7 +116,7 @@ function spawnSquad(
       createShip(sim, {
         ...shipClasses.find((sc) => sc.slug === "stingray")!,
         owner: faction,
-        position: [...flagship.cp.position.coord],
+        position: flagship.cp.position.coord.clone(),
         sector,
       })
     );
@@ -150,7 +150,6 @@ export class PirateSpawningSystem extends System<
   "return" | "spawnFlagship" | "spawnSquad"
 > {
   faction: Faction;
-  index = new EntityIndex(shipComponents, ["role:military"]);
 
   moveFlagship = (flagships: Ship[]) => {
     const shipToMove = pickRandom(
@@ -181,7 +180,7 @@ export class PirateSpawningSystem extends System<
   };
 
   exec = (): void => {
-    const ships = this.index.get();
+    const ships = [...entityIndexer.search(shipComponents, ["role:military"])];
 
     const squads = pipe(
       ships,
@@ -193,9 +192,7 @@ export class PirateSpawningSystem extends System<
       ),
       map((s) => ({
         commander: s,
-        subordinates: s.cp.subordinates.ids.map((id) =>
-          this.sim.getOrThrow<Ship>(id)
-        ),
+        subordinates: getSubordinates(s),
       }))
     );
 
@@ -241,7 +238,6 @@ export class PirateSpawningSystem extends System<
 
   apply = (sim: Sim) => {
     super.apply(sim);
-    this.index.apply(sim);
 
     sim.hooks.phase.start.subscribe(this.constructor.name, () => {
       if (!this.faction) {
