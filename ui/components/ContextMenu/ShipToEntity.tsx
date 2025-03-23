@@ -16,6 +16,7 @@ export const ShipToEntity: React.FC = () => {
   const [sim] = useSim();
   const [[menu]] = useContextMenuStore((store) => [store.state]);
   const [[selected]] = useGameStore((store) => [store.selectedUnits]);
+  const [, setDialog] = useGameDialog();
 
   if (!selected.length) {
     return null;
@@ -24,7 +25,6 @@ export const ShipToEntity: React.FC = () => {
   const canBeOrdered =
     isOwnedByPlayer(selected[0]) &&
     selected[0].hasComponents(["orders", "position"]);
-  const [, setDialog] = useGameDialog();
 
   if (!canBeOrdered) {
     return (
