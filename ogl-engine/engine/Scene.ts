@@ -103,6 +103,27 @@ export class TacticalMapScene extends Scene {
         label: "Bloom Strength",
       }
     );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.vignette.uStrength,
+      "value",
+      {
+        label: "Vignette Strength",
+      }
+    );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.vignette.uSmoothness,
+      "value",
+      {
+        label: "Vignette Smoothness",
+      }
+    );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.vignette.uOffset,
+      "value",
+      {
+        label: "Vignette Offset",
+      }
+    );
   }
 
   destroy() {

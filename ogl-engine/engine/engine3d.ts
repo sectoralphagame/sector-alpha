@@ -5,6 +5,7 @@ import { gameStore } from "@ui/state/game";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
+import vignetteFragment from "../post/vignette.frag.glsl";
 import godraysFragment from "../post/godrays.frag.glsl";
 import compositeFragment from "../post/composite.frag.glsl";
 import type { Light } from "./Light";
@@ -40,6 +41,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         };
         bloom: {
           uBloomStrength: { value: number };
+        };
+        vignette: {
+          uStrength: { value: number };
+          uSmoothness: { value: number };
+          uOffset: { value: number };
         };
       };
     };
@@ -96,6 +102,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
           },
           bloom: {
             uBloomStrength: { value: 1.1 },
+          },
+          vignette: {
+            uStrength: { value: 0.38 },
+            uSmoothness: { value: 0.19 },
+            uOffset: { value: -0.41 },
           },
         },
       },
@@ -171,18 +182,31 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         uResolution: this.uniforms.resolution.base,
       },
     });
+    this.postProcessingLayers.composite.addPass({
+      fragment: vignetteFragment,
+      uniforms: {
+        uResolution: this.uniforms.resolution.base,
+        uStrength: this.uniforms.env.postProcessing.vignette.uStrength,
+        uSmoothness: this.uniforms.env.postProcessing.vignette.uSmoothness,
+        uOffset: this.uniforms.env.postProcessing.vignette.uOffset,
+      },
+    });
   };
 
-  private get fxaaPass() {
+  private get vignettePass() {
     return this.postProcessingLayers.composite.passes.at(-1)!;
   }
 
-  private get godraysPass() {
+  private get fxaaPass() {
     return this.postProcessingLayers.composite.passes.at(-2)!;
   }
 
-  private get compositePass() {
+  private get godraysPass() {
     return this.postProcessingLayers.composite.passes.at(-3)!;
+  }
+
+  private get compositePass() {
+    return this.postProcessingLayers.composite.passes.at(-4)!;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -231,6 +255,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.compositePass.enabled = false;
     this.godraysPass.enabled = false;
     this.fxaaPass.enabled = false;
+    this.vignettePass.enabled = false;
     // `targetOnly` prevents post from rendering to the canvas
     this.postProcessingLayers.composite.targetOnly = true;
     // This renders the scene to postComposite.uniform.value
@@ -254,6 +279,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.compositePass.enabled = true;
     this.godraysPass.enabled = this.godrays;
     this.fxaaPass.enabled = this.fxaa;
+    this.vignettePass.enabled = true;
     // Allow post to render to canvas upon its last pass
     this.postProcessingLayers.composite.targetOnly = false;
 
