@@ -50,7 +50,7 @@ const ShipFreightEditor: React.FC<{ index: number }> = ({ index }) => {
         <TableCell>
           {withDistance((d) => getShipStorageEfficiency(ship, d).toFixed(2))}
         </TableCell>
-        <TableCell>
+        <TableCell className={ship.mining ? "" : styles.dimmed}>
           {withDistance((d) => getShipMiningEfficiency(ship, d).toFixed(2))}
         </TableCell>
       </tr>
