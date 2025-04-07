@@ -23,9 +23,8 @@ export abstract class System<T extends string | never = never> {
     this.sim = sim;
     this.logger.log("Applying system");
 
-    sim.hooks.phase.start.subscribe(
-      this.constructor.name,
-      this.cooldowns.update
+    sim.hooks.phase.start.subscribe(this.constructor.name, (delta) =>
+      this.cooldowns.update(delta)
     );
     sim.hooks.destroy.subscribe(this.constructor.name, this.destroy);
   }
