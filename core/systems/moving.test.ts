@@ -1,4 +1,5 @@
 import { distance, matrix } from "mathjs";
+import { Vec2 } from "ogl";
 import { createFaction } from "../archetypes/faction";
 import { createWaypoint } from "../archetypes/waypoint";
 import type { Sector } from "../archetypes/sector";
@@ -35,7 +36,7 @@ describe("Floating entity", () => {
       .addComponent({
         name: "position",
         angle: 0,
-        coord: [0, 0],
+        coord: new Vec2(0, 0),
         sector: sector.id,
         moved: false,
       })
@@ -75,6 +76,9 @@ describe("Ship", () => {
     navigatingSystem = new NavigatingSystem();
     orderExecutingSystem = new OrderExecutingSystem();
 
+    if (sim) {
+      sim.destroy();
+    }
     sim = new Sim({
       systems: [movingSystem, navigatingSystem, orderExecutingSystem],
     });
@@ -85,7 +89,7 @@ describe("Ship", () => {
     });
     ship = createShip(sim, {
       ...shipClasses.find((s) => s.name === "Courier A")!,
-      position: [1, 0],
+      position: new Vec2(1, 0),
       owner: createFaction("F", sim),
       sector,
     });
@@ -93,12 +97,12 @@ describe("Ship", () => {
   });
 
   it("is able to go to target position", () => {
-    ship.cp.position.coord = [0, 0];
+    ship.cp.position.coord.set(0, 0);
     setTarget(
       ship,
       createWaypoint(sim, {
         sector: sector.id,
-        value: [1, 0],
+        value: new Vec2(1, 0),
         owner: 0,
       }).id
     );
@@ -112,25 +116,22 @@ describe("Ship", () => {
   });
 
   it("is not able to go to target position if travel is too short", () => {
-    setTarget(
-      ship,
-      createWaypoint(sim, {
-        sector: sector.id,
-        value: [1, 10],
-        owner: 0,
-      }).id
-    );
+    const waypoint = createWaypoint(sim, {
+      sector: sector.id,
+      value: new Vec2(1, 10),
+      owner: 0,
+    });
+    setTarget(ship, waypoint.id);
 
     navigatingSystem.exec(1);
     movingSystem.exec(1);
-
     expect(ship.cp.drive.targetReached).toBe(false);
   });
 
   it("is able to make move order", () => {
     const m = createWaypoint(sim, {
       sector: sector.id,
-      value: [1, 1],
+      value: new Vec2(1, 1),
       owner: 0,
     });
     ship.cp.orders.value.push({
