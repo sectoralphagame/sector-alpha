@@ -7,6 +7,7 @@ import { IconButton } from "@kit/IconButton";
 import { Card, CardHeader } from "@kit/Card";
 import { useThrottledFormState } from "@devtools/utils";
 import { ArrowLeftIcon } from "@assets/ui/icons";
+import { formatSI } from "@core/utils/format";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
 import type { FormData } from "./utils";
@@ -45,13 +46,17 @@ const ShipFreightEditor: React.FC<{ index: number }> = ({ index }) => {
           />
         </TableCell>
         <TableCell>
-          {withDistance((d) => getShipTravelSpeed(ship, d).toFixed(2))}
+          {withDistance((d) => formatSI(getShipTravelSpeed(ship, d), "", 2))}
         </TableCell>
         <TableCell>
-          {withDistance((d) => getShipStorageEfficiency(ship, d).toFixed(2))}
+          {withDistance((d) =>
+            formatSI(getShipStorageEfficiency(ship, d), "", 2)
+          )}
         </TableCell>
         <TableCell className={ship.mining ? "" : styles.dimmed}>
-          {withDistance((d) => getShipMiningEfficiency(ship, d).toFixed(2))}
+          {withDistance((d) =>
+            formatSI(getShipMiningEfficiency(ship, d), "", 2)
+          )}
         </TableCell>
       </tr>
       {expanded && (
@@ -139,9 +144,9 @@ export const FreightEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
     <colgroup>
       <col style={{ width: "48px" }} />
       <col style={{ width: "250px" }} />
-      <col style={{ width: "250px" }} />
-      <col style={{ width: "250px" }} />
-      <col style={{ width: "250px" }} />
+      <col style={{ width: "350px" }} />
+      <col style={{ width: "350px" }} />
+      <col style={{ width: "350px" }} />
       <col />
     </colgroup>
     <thead>
@@ -149,8 +154,8 @@ export const FreightEditor: React.FC<{ ships: ShipInput[] }> = ({ ships }) => (
         {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
         <th colSpan={2} />
         <TableHeader>Speed [su/s]</TableHeader>
-        <TableHeader>Storage [Ksu/h]</TableHeader>
-        <TableHeader>Mining [Ksu/h]</TableHeader>
+        <TableHeader>Storage [units/month]</TableHeader>
+        <TableHeader>Mining [units/month]</TableHeader>
       </tr>
     </thead>
     <tbody>

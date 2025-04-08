@@ -2,37 +2,70 @@ import type { Position } from "@core/components/position";
 import { isDev } from "@core/settings";
 import type { RequireComponent } from "@core/tsHelpers";
 import { discriminate } from "@core/utils/maps";
-import shuffle from "lodash/shuffle";
 import { random } from "mathjs";
 import keyBy from "lodash/keyBy";
 import type { Vec2 } from "ogl";
 import { fromPolar } from "@core/utils/misc";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
+import type { AsteroidField } from "@core/archetypes/asteroidField";
+import { asteroidFieldComponents } from "@core/archetypes/asteroidField";
+import {
+  filter,
+  first,
+  fromEntries,
+  map,
+  pipe,
+  sort,
+  sum,
+  toArray,
+} from "@fxts/core";
+import capitalize from "lodash/capitalize";
+import shuffle from "lodash/shuffle";
+import { findModules } from "@core/utils/findInAncestors";
+import { getSectorsInTeleportRange } from "@core/economy/utils";
+import { NotImplementedError } from "@core/errors";
 import type { Facility } from "../../archetypes/facility";
-import { createFacilityName, createFacility } from "../../archetypes/facility";
+import {
+  createFacilityName,
+  createFacility,
+  facilityComponents,
+} from "../../archetypes/facility";
 import { facilityModules } from "../../archetypes/facilityModule";
 import type { Faction } from "../../archetypes/faction";
 import type { Sector } from "../../archetypes/sector";
 import { sectorSize } from "../../archetypes/sector";
 import type { PAC } from "../../components/production";
 import { addStorage } from "../../components/storage";
-import type { Commodity } from "../../economy/commodity";
-import { commoditiesArray, mineableCommodities } from "../../economy/commodity";
+import type { Commodity, MineableCommodity } from "../../economy/commodity";
+import {
+  commoditiesArray,
+  commodityLabel,
+  mineableCommodities,
+  mineableCommoditiesArray,
+} from "../../economy/commodity";
 import type { Sim } from "../../sim";
 import { addFacilityModule } from "../../utils/entityModules";
 import { pickRandom } from "../../utils/generators";
 import { perCommodity } from "../../utils/perCommodity";
-import {
-  getResourceProduction,
-  getResourceUsage,
-  getSectorResources,
-} from "../../utils/resources";
+import { getResourceProduction, getResourceUsage } from "../../utils/resources";
 import { maxFacilityModules } from "../facilityBuilding";
 import { settleStorageQuota } from "../storageQuotaPlanning";
 import { System } from "../system";
 import facilityTemplatesData from "../../world/data/facilityTemplates.json";
+import { MiningSystem } from "../mining";
 
 const facilityTemplates = keyBy(facilityTemplatesData, "slug");
+const safetyMiningOffset = 2;
+const averageSMinerFreightMonth = 200;
 
+interface FacilityPlan {
+  modules: string[];
+  position: Vec2;
+  sector: Sector;
+  name: string;
+}
+
+// FIXME: merge with FacilityPlanningSystem.createFacilityFromPlan
 function createFacilityFromTemplate(
   template: string,
   sim: Sim,
@@ -81,6 +114,52 @@ export function addStartingCommodities(facility: RequireComponent<"storage">) {
       );
     }
   });
+}
+
+export function getRequiredSpots(consumption: number): number {
+  return Math.ceil(consumption / averageSMinerFreightMonth);
+}
+
+export type ResourceUsage = Record<MineableCommodity, number>;
+
+export function addResourceUsage(
+  a: ResourceUsage,
+  b: ResourceUsage
+): ResourceUsage {
+  return pipe(
+    mineableCommoditiesArray,
+    map(
+      (commodity) =>
+        [commodity, a[commodity] + b[commodity]] as [MineableCommodity, number]
+    ),
+    fromEntries
+  );
+}
+export function sumResourceUsage(usage: ResourceUsage): number {
+  return sum(Object.values(usage));
+}
+const emptyResourceUsage: ResourceUsage = pipe(
+  mineableCommoditiesArray,
+  map((commodity) => [commodity, 0] as [MineableCommodity, number]),
+  fromEntries
+);
+
+export function getReservedMiningSpots(
+  facility: RequireComponent<"modules">
+): ResourceUsage {
+  const usage = { ...emptyResourceUsage };
+
+  for (const facilityModule of findModules(facility, "production")) {
+    for (const commodity of mineableCommoditiesArray) {
+      usage[commodity] += facilityModule.cp.production.pac[commodity].consumes;
+    }
+  }
+
+  for (const commodity of mineableCommoditiesArray) {
+    usage[commodity] = getRequiredSpots(usage[commodity]);
+  }
+
+  return usage;
 }
 
 function getSectorPosition(
@@ -150,73 +229,172 @@ export class FacilityPlanningSystem extends System<"plan"> {
     return facility;
   };
 
-  planMiningFacilities = (sector: Sector, faction: Faction): void => {
-    const resources = getSectorResources(sector, 0);
-    const factionBlueprints = Object.values(facilityModules).filter((f) =>
-      faction.cp.blueprints.facilityModules.find((fm) => fm.slug === f.slug)
+  createFacilityFromPlan(plan: FacilityPlan, owner: Faction) {
+    const facility = createFacility(this.sim, {
+      owner,
+      position: plan.position,
+      sector: plan.sector,
+    });
+    facility.cp.name.value = createFacilityName(facility, plan.name);
+
+    for (const m of plan.modules) {
+      addFacilityModule(
+        facility,
+        facilityModules[m].create(this.sim, facility)
+      );
+    }
+
+    this.logger.log(`Planned ${plan.name}`);
+    return facility;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getSectorFieldUsage(sector: Sector, fields: AsteroidField[]) {
+    const availableResources = mineableCommoditiesArray.filter((resource) =>
+      fields.find((f) => f.cp.mineable.resources[resource] > 0)
+    );
+    const miningComplexes = [
+      ...entityIndexer.searchBySector(sector.id, facilityComponents),
+    ].filter((f) =>
+      findModules(f, "production").some((m) =>
+        availableResources.some(
+          (mineable) => m.cp.production.pac[mineable].consumes > 0
+        )
+      )
     );
 
-    perCommodity((commodity) => {
+    const spots = pipe(
+      fields,
+      map(
+        (f) =>
+          [f.id, { max: f.cp.mineable.mountPoints.max, used: 0 }] as [
+            number,
+            { max: number; used: number }
+          ]
+      ),
+      fromEntries
+    );
+    const reserved = miningComplexes
+      .map(getReservedMiningSpots)
+      .reduce(addResourceUsage, { ...emptyResourceUsage });
+
+    while (sumResourceUsage(reserved) > 0) {
+      for (const commodity of mineableCommoditiesArray) {
+        const bestField = pipe(
+          fields,
+          filter(
+            (f) => spots[f.id].used + safetyMiningOffset < spots[f.id].max
+          ),
+          sort(
+            (a, b) =>
+              MiningSystem.getFieldEfficiencyFactor(b, commodity) -
+              MiningSystem.getFieldEfficiencyFactor(a, commodity)
+          ),
+          first
+        );
+        if (!bestField) {
+          throw new NotImplementedError();
+        }
+        const available =
+          spots[bestField.id].max -
+          safetyMiningOffset -
+          spots[bestField.id].used;
+        const allocated = Math.min(available, reserved[commodity]);
+
+        spots[bestField.id].used += allocated;
+        reserved[commodity] -= allocated;
+      }
+    }
+
+    return spots;
+  }
+
+  getFieldsForMining(
+    sector: Sector,
+    faction: RequireComponent<"ai">
+  ): AsteroidField[] {
+    return [
+      ...entityIndexer.searchBySector(sector.id, asteroidFieldComponents),
+      ...(faction.cp.ai!.mining === "expansive"
+        ? pipe(
+            getSectorsInTeleportRange(sector, 1, this.sim),
+            filter((s) => s.cp.owner?.id !== faction.id),
+            map((s) => [
+              ...entityIndexer.searchBySector(s.id, asteroidFieldComponents),
+            ]),
+            toArray
+          )
+        : []
+      ).flat(),
+    ];
+  }
+
+  planMiningFacility(sector: Sector, faction: Faction): FacilityPlan | null {
+    const fields = this.getFieldsForMining(
+      sector,
+      faction.requireComponents(["ai"])
+    );
+    const factionBlueprints = Object.values(facilityModules).filter((f) =>
+      faction.cp.blueprints.facilityModules.some((fm) => fm.slug === f.slug)
+    );
+    const spots = this.getSectorFieldUsage(sector, fields);
+
+    if (Object.keys(spots).length === 0) return null;
+
+    const availableResources = mineableCommoditiesArray.filter((resource) =>
+      fields.some(
+        (f) =>
+          f.cp.mineable.resources[resource] > 0 &&
+          spots[f.id].max > spots[f.id].used + safetyMiningOffset &&
+          factionBlueprints.some(
+            (bp) =>
+              bp.type === "production" && (bp.pac[resource]?.consumes ?? 0) > 0
+          )
+      )
+    );
+
+    for (const resource of availableResources) {
       const facilityModule = factionBlueprints
         .filter(discriminate("type", "production"))
-        .find((fm) => fm.pac?.[commodity]?.consumes);
-      const canBeMined = resources[commodity].max > 0 && !!facilityModule;
+        .find((fm) => fm.pac?.[resource]?.consumes);
+      if (!facilityModule) continue;
 
-      if (!canBeMined) {
-        return;
-      }
+      const candidateField = fields.find(
+        (f) =>
+          spots[f.id].max >
+          safetyMiningOffset +
+            spots[f.id].used +
+            getRequiredSpots(facilityModule.pac[resource]!.consumes)
+      );
+      if (!candidateField) continue;
 
-      const minableField = this.sim.index.asteroidFields
-        .get()
-        .find(
-          (af) =>
-            af.cp.asteroidSpawn.type === commodity &&
-            af.cp.position.sector === sector.id
-        );
-      const facility = createFacility(this.sim, {
-        owner: faction,
-        position: getSectorPosition(
-          sector,
-          10,
-          minableField?.cp.position.coord
-        ),
+      const plan: FacilityPlan = {
+        position: fromPolar(random(0, 2 * Math.PI), random(0, sectorSize / 20)),
+        modules: [
+          "basicHabitat",
+          "basicStorage",
+          "containerLarge",
+          "smallDefense",
+          facilityModule.slug,
+        ],
+        name: `${capitalize(commodityLabel[resource])} Mining Complex`,
         sector,
-      });
-      addFacilityModule(
-        facility,
-        facilityModules.basicHabitat.create(this.sim, facility)
-      );
-      addFacilityModule(
-        facility,
-        facilityModules.basicStorage.create(this.sim, facility)
-      );
-      facility.cp.name.value = createFacilityName(facility, "Mining Complex");
-      facility.cp.render.texture = "fMin";
-      if (facility.hasComponents(["crew"])) {
-        facility.cp.crew.workers.current = facility.cp.crew.workers.max * 0.7;
-      }
+      };
 
-      for (
-        let i = 0;
-        i <
-          resources[commodity].max /
-            ((10000 * facilityModule.pac![commodity]!.consumes) / 3600) &&
-        i < maxFacilityModules / 2 - 2;
-        i++
-      ) {
-        addFacilityModule(
-          facility,
-          facilityModules.containerMedium.create(this.sim, facility)
-        );
-        addFacilityModule(facility, facilityModule.create(this.sim, facility));
-      }
+      return plan;
+    }
 
-      addFacilityModule(
-        facility,
-        facilityModules.smallDefense.create(this.sim, facility)
-      );
+    return null;
+  }
+
+  planMiningFacilities = (sector: Sector, faction: Faction): void => {
+    let plan: FacilityPlan | null;
+    // eslint-disable-next-line no-cond-assign
+    while ((plan = this.planMiningFacility(sector, faction))) {
+      const facility = this.createFacilityFromPlan(plan, faction);
       addStartingCommodities(facility);
-    });
+      plan = this.planMiningFacility(sector, faction);
+    }
   };
 
   planHubs = (faction: Faction): void => {

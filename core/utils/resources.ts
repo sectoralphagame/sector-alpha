@@ -1,9 +1,8 @@
-import { getFieldMax } from "@core/archetypes/asteroidField";
 import { filter, pipe, toArray } from "@fxts/core";
-import groupBy from "lodash/groupBy";
 import { sum } from "mathjs";
+import { defaultIndexer } from "@core/systems/utils/default";
 import type { Sector } from "../archetypes/sector";
-import type { Commodity } from "../economy/commodity";
+import { type Commodity } from "../economy/commodity";
 import { getSectorsInTeleportRange } from "../economy/utils";
 import type { RequireComponent } from "../tsHelpers";
 import { perCommodity } from "./perCommodity";
@@ -19,34 +18,22 @@ export interface SectorResources {
 export function getSectorResources(
   sector: Sector,
   neighbourhood: number
-): Record<Commodity, SectorResources> {
+): Record<Commodity, boolean> {
   const neighbors = pipe(
     getSectorsInTeleportRange(sector, neighbourhood, sector.sim),
     filter((e) => e.cp.owner?.id !== sector.cp.owner?.id),
     toArray
   );
+  const sectorIds = [sector.id, ...neighbors.map((e) => e.id)];
   const fields = pipe(
-    sector.sim.index.asteroidFields.getIt(),
-    filter((field) =>
-      [sector.id, ...neighbors.map((e) => e.id)].includes(
-        field.cp.position.sector
-      )
-    ),
+    defaultIndexer.asteroidFields.getIt(),
+    filter((field) => sectorIds.includes(field.cp.position.sector)),
     toArray
   );
-  const fieldsByType = groupBy(fields, (field) => field.cp.asteroidSpawn.type);
 
-  return perCommodity((commodity) => ({
-    available:
-      fieldsByType[commodity]
-        ?.map((field) => field.cp.asteroidSpawn.amount)
-        .reduce((acc, a) => acc + a, 0) ?? 0,
-    max:
-      fieldsByType[commodity]?.reduce(
-        (max, field) => max + getFieldMax(field.cp.asteroidSpawn),
-        0
-      ) ?? 0,
-  }));
+  return perCommodity((commodity) =>
+    fields.some((f) => f.cp.mineable.resources[commodity] > 0)
+  );
 }
 
 /**

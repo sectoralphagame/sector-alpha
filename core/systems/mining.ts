@@ -1,51 +1,66 @@
 import type { Sim } from "@core/sim";
-import { asteroidField } from "../archetypes/asteroidField";
+// import { gameMonth } from "@core/utils/misc";
+// import settings from "@core/settings";
+import type { MineableCommodity } from "@core/economy/commodity";
 import { addStorage } from "../components/storage";
 import type { RequireComponent } from "../tsHelpers";
 import { System } from "./system";
 
 type WithMining = RequireComponent<"mining" | "storage">;
+// const tickChance = 1 / 240;
 
 function mine(entity: WithMining, delta: number) {
   if (entity.cp.mining.entityId) {
     if (entity.cooldowns.canUse("mine")) {
       entity.cooldowns.use("mine", 5);
-      const mined = entity.sim
-        .get(entity.cp.mining.entityId)!
-        .requireComponents(["minable"]);
       addStorage(
         entity.cp.storage,
-        mined.cp.minable.commodity,
+        entity.cp.mining.resource,
         Math.floor(entity.cp.mining.buffer),
         false
       );
-      mined.cp.minable.resources -= entity.cp.mining.buffer;
       entity.cp.mining.buffer = 0;
-
-      if (mined.cp.minable.resources <= 0) {
-        const field = asteroidField(entity.sim.get(mined.cp.parent!.id)!);
-        field.cp.children.entities = field.cp.children.entities.filter(
-          (e) => e !== mined.id
-        );
-        mined.unregister("mined");
-        entity.cp.mining.entityId = null;
-      }
     }
     entity.cp.mining.buffer += entity.cp.mining.efficiency * delta;
   }
 }
 
-export class MiningSystem extends System {
+export class MiningSystem extends System<"exec"> {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
   exec = (delta: number): void => {
+    // if (!this.cooldowns.canUse("exec")) return;
+
     for (const entity of this.sim.index.mining.getIt()) {
       mine(entity, delta);
     }
+    // this.cooldowns.use("exec", 1);
   };
+
+  static getFieldEfficiencyFactor(
+    field: RequireComponent<"mineable">,
+    commodity: MineableCommodity
+  ): number {
+    return field.cp.mineable.density * field.cp.mineable.resources[commodity];
+  }
+
+  // static getExpectedMonthMiningValue(
+  //   density: number,
+  //   composition: number,
+  //   efficiency: number
+  // ): number {
+  //   return (
+  //     gameMonth *
+  //     settings.global.targetFps *
+  //     density *
+  //     composition *
+  //     efficiency *
+  //     tickChance
+  //   );
+  // }
 }
 
 export const miningSystem = new MiningSystem();

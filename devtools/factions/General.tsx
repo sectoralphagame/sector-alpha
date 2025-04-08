@@ -72,6 +72,18 @@ const FactionGeneralEditor: React.FC<{ index: number }> = ({ index }) => {
       </TableCell>
       <TableCell>
         <Select
+          value={faction.mining ?? "preferOwn"}
+          onChange={(value) => setValue(`factions.${index}.mining`, value)}
+        >
+          <SelectButton>{faction.mining}</SelectButton>
+          <SelectOptions>
+            <SelectOption value="preferOwn">preferOwn</SelectOption>
+            <SelectOption value="expansive">expansive</SelectOption>
+          </SelectOptions>
+        </Select>
+      </TableCell>
+      <TableCell>
+        <Select
           value={faction.home ?? "none"}
           onChange={(value) =>
             setValue(`factions.${index}.home`, value === "none" ? null : value)
@@ -103,6 +115,7 @@ export const GeneralEditor: React.FC<{
       <col style={{ width: "80px" }} />
       <col style={{ width: "200px" }} />
       <col style={{ width: "132px" }} />
+      <col style={{ width: "132px" }} />
       <col style={{ width: "180px" }} />
       <col />
     </colgroup>
@@ -113,6 +126,7 @@ export const GeneralEditor: React.FC<{
         <TableHeader>Slug</TableHeader>
         <TableHeader>Type</TableHeader>
         <TableHeader align="right">Color</TableHeader>
+        <TableHeader>Mining Strategy</TableHeader>
         <TableHeader>Home Sector</TableHeader>
       </tr>
     </thead>

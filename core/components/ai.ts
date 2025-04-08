@@ -1,6 +1,7 @@
 import type { BaseComponent } from "./component";
 
 export type AiType = "territorial" | "travelling";
+export type MiningStrategy = "expansive" | "preferOwn";
 
 export interface Ai extends BaseComponent<"ai"> {
   type: AiType;
@@ -26,4 +27,5 @@ export interface Ai extends BaseComponent<"ai"> {
   };
   // ID of the sector where the faction has its home base
   home: number;
+  mining: MiningStrategy;
 }

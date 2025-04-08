@@ -1,3 +1,4 @@
+import type { MineableCommodity } from "@core/economy/commodity";
 import type { BaseComponent } from "./component";
 
 export interface Mining extends BaseComponent<"mining"> {
@@ -16,6 +17,7 @@ export interface Mining extends BaseComponent<"mining"> {
    * Mined entity ID
    */
   entityId: number | null;
+  resource: MineableCommodity;
 }
 
 export function createMining(efficiency: number): Mining {
@@ -24,5 +26,6 @@ export function createMining(efficiency: number): Mining {
     buffer: 0,
     efficiency,
     entityId: null,
+    resource: "fuelium",
   };
 }

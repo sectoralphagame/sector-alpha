@@ -1,3 +1,5 @@
+import type { MiningStrategy } from "@core/components/ai";
+
 export interface FactionInput {
   name: string;
   slug: string;
@@ -6,6 +8,7 @@ export interface FactionInput {
   color: string;
   type: string;
   home: string | null;
+  mining: MiningStrategy;
 }
 
 export interface RelationInput {

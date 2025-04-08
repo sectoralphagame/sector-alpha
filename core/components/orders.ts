@@ -1,3 +1,4 @@
+import type { MineableCommodity } from "@core/economy/commodity";
 import { NegativeQuantity } from "../errors";
 import type { BaseComponent } from "./component";
 import type { TransactionInput } from "./trade";
@@ -36,8 +37,8 @@ export interface TradeAction {
 
 export interface MineAction {
   type: "mine";
+  resource: MineableCommodity;
   targetFieldId: number;
-  targetRockId: number | null;
 }
 
 export interface HoldPositionAction {

@@ -3,11 +3,11 @@ import type { IChartApi, UTCTimestamp } from "lightweight-charts";
 import { ColorType, createChart } from "lightweight-charts";
 import type { Sector } from "@core/archetypes/sector";
 import { getSectorResources } from "@core/utils/resources";
-import { fieldColors } from "@core/archetypes/asteroid";
 import { Button } from "@kit/Button";
 import { Dialog } from "@kit/Dialog";
 import { Checkbox } from "@kit/Checkbox";
 import { commodityLabel } from "@core/economy/commodity";
+import { fieldColors } from "@core/archetypes/asteroidField";
 import styles from "./SectorStats.scss";
 
 const SectorResources: React.FC<{ entity: Sector }> = ({ entity }) => {

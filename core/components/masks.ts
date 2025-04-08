@@ -4,7 +4,7 @@ import type { CoreComponents } from "./component";
 // DO NOT CHANGE THE ORDER OF THIS LIST, EVER
 export const componentList = [
   "ai",
-  "asteroidSpawn",
+  "mineable",
   "autoOrder",
   "blueprints",
   "budget",
@@ -26,7 +26,7 @@ export const componentList = [
   "hitpoints",
   "inflationStats",
   "journal",
-  "minable",
+  "minable", // @deprecated
   "mining",
   "missions",
   "model",

@@ -1,3 +1,4 @@
+import type { Vec2 } from "ogl";
 import { Euler, Geometry, Mat3, Mat4, Plane, Quat, Transform, Vec3 } from "ogl";
 import type { ModelName } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
@@ -9,6 +10,11 @@ import { BaseMesh } from "./BaseMesh";
 import type { Engine3D } from "./engine3d";
 
 const axis = new Vec3();
+const tempMat4 = new Mat4();
+const tempMat3 = new Mat3();
+const tempTrs = new Mat4();
+const tempQuat = new Quat();
+const tempEuler = new Euler();
 
 export class Asteroids extends Transform {
   name = "Asteroids";
@@ -16,7 +22,12 @@ export class Asteroids extends Transform {
   density: number;
   engine: Engine3D;
 
-  constructor(engine: Engine3D, size: number, density: number, color: string) {
+  constructor(
+    engine: Engine3D,
+    size: number,
+    density: number,
+    fPoints: [Vec2, number][]
+  ) {
     super();
 
     this.engine = engine;
@@ -24,8 +35,9 @@ export class Asteroids extends Transform {
     this.density = density;
 
     this.visible = false;
-    this.createAsteroids();
-    this.createRing(color);
+    for (const [offset, radius] of fPoints) {
+      this.createAsteroids(offset, radius);
+    }
   }
 
   static getScale() {
@@ -36,22 +48,8 @@ export class Asteroids extends Transform {
     return random(20, 50);
   }
 
-  private createRing(color: string) {
-    const ring = new BaseMesh(this.engine, {
-      geometry: new Plane(this.engine.gl),
-    });
-    const material = new AsteroidFieldRingMaterial(this.engine);
-    material.setColor(color);
-    ring.applyMaterial(material);
-
-    ring.position.y = -11 * entityScale;
-    ring.scale.set(this.size * 2);
-    ring.rotation.x = -Math.PI / 2;
-    ring.setParent(this);
-  }
-
-  private async createAsteroids() {
-    const numAsteroids = Math.ceil(this.size ** 2 * this.density * 0.75);
+  private async createAsteroids(offset: Vec2, radius: number) {
+    const numAsteroids = Math.ceil((radius ** 2 * this.density) / 10);
 
     await assetLoader.load(this.engine.gl);
     const asteroidModels: ModelName[] = [
@@ -70,36 +68,41 @@ export class Asteroids extends Transform {
       asteroid.applyMaterial(
         new InstancedPbrMaterial(this.engine, gltf.material)
       );
+      asteroid.position.set(offset.x, 0, offset.y);
+
       const instanceMatrix = new Float32Array(numAsteroids * 16);
       const instanceNormalMatrix = new Float32Array(numAsteroids * 9);
 
       for (let i = 0; i < numAsteroids; i++) {
-        const angle = random(0, Math.PI * 2);
-        const radius = random(0, this.size);
+        let x = 0;
+        let y = 0;
+        do {
+          x = random(-radius, radius);
+          y = random(-radius, radius);
+        } while (x ** 2 + y ** 2 > radius ** 2);
 
-        const t = new Mat4().identity();
-        t[12] = Math.cos(angle) * radius;
-        t[13] =
-          Math.cos(((radius / this.size) * Math.PI) / 2) ** 2 *
-          random(-this.size / 10, this.size / 10);
-        t[14] = Math.sin(angle) * radius;
+        const trs = tempTrs.identity();
+        trs[12] = x;
+        trs[13] = random(-radius / 10, radius / 10);
+        trs[14] = y;
 
-        const r = new Mat4().fromQuaternion(
-          new Quat().fromEuler(
-            new Euler(
+        const rot = tempMat4.fromQuaternion(
+          tempQuat.fromEuler(
+            tempEuler.set(
               random(0, Math.PI * 2),
               random(0, Math.PI * 2),
               random(0, Math.PI * 2)
             )
           )
         );
+        trs.multiply(rot);
 
-        const s = new Mat4()
+        const s = tempMat4
           .identity()
           .multiply(entityScale * Asteroids.getScale());
         s[15] = 1;
+        trs.multiply(s);
 
-        const trs = t.multiply(r).multiply(s);
         trs.toArray(instanceMatrix, i * 16);
 
         const normalMatrix = new Mat3().getNormalMatrix(trs);
@@ -124,17 +127,17 @@ export class Asteroids extends Transform {
 
       asteroid.onBeforeRender(() => {
         for (let i = 0; i < numAsteroids; i++) {
-          const trs = new Mat4().fromArray(
+          const trs = tempMat4.fromArray(
             asteroid.geometry.attributes.instanceMatrix.data!.slice(
               16 * i,
               16 * i + 16
             )
           );
           axis.set(Math.sin(i), Math.cos(i), Math.sin(-i)).normalize();
-          trs.rotate(this.engine.delta * 0.02 * ((i % 6) + 1), axis);
+          trs.rotate(this.engine.delta * 0.02 * ((i % 15) + 1), axis);
           trs.toArray(asteroid.geometry.attributes.instanceMatrix.data, i * 16);
 
-          const normalMatrix = new Mat3().getNormalMatrix(trs);
+          const normalMatrix = tempMat3.getNormalMatrix(trs);
           instanceNormalMatrix.set(normalMatrix, i * 9);
         }
 

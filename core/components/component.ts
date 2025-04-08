@@ -14,7 +14,7 @@ import type { AutoOrder } from "./autoOrder";
 import type { Drive } from "./drive";
 import type { Mining } from "./mining";
 import type { Minable } from "./minable";
-import type { AsteroidSpawn } from "./asteroidSpawn";
+import type { Mineable } from "./mineable";
 import type { Children } from "./children";
 import type { Orders } from "./orders";
 import type { HECSPosition } from "./hecsPosition";
@@ -48,7 +48,7 @@ import type { Policies } from "./policies";
 
 export interface CoreComponents {
   ai: Ai;
-  asteroidSpawn: AsteroidSpawn;
+  mineable: Mineable;
   autoOrder: AutoOrder;
   blueprints: Blueprints;
   budget: Budget;
@@ -73,6 +73,9 @@ export interface CoreComponents {
   hitpoints: HitPoints;
   inflationStats: InflationStats;
   journal: Journal;
+  /**
+   * @deprecated
+   */
   minable: Minable;
   mining: Mining;
   missions: Missions;

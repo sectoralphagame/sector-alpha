@@ -1,4 +1,4 @@
-import { filter, intersection } from "@fxts/core";
+import { each, filter, intersection, pipe } from "@fxts/core";
 import type { RequireComponent } from "@core/tsHelpers";
 import type { CoreComponents } from "@core/components/component";
 import { componentMask } from "@core/components/masks";
@@ -44,12 +44,24 @@ export class EntityIndexer {
     components: readonly (T | "position")[],
     tags: readonly EntityTag[] = []
   ): Iterable<RequireComponent<T | "position">> {
-    if (!this.entityToSector.has(sectorId)) return [];
+    if (!this.entityToSector.has(sectorId)) {
+      this.populate(sectorId);
+    }
 
     return intersection(
       this.entityToSector.get(sectorId)!,
       this.search(components, tags)
     ) as Iterable<RequireComponent<T | "position">>;
+  }
+
+  private populate(sectorId: number): void {
+    const sectorSet = new Set<RequireComponent<"position">>();
+    this.entityToSector.set(sectorId, sectorSet);
+    pipe(
+      this.search(["position"]),
+      filter((e) => e.cp.position.sector === sectorId),
+      each((e) => sectorSet.add(e))
+    );
   }
 
   updateMask(entity: Entity) {
@@ -58,9 +70,7 @@ export class EntityIndexer {
   }
 
   updateSector(entity: RequireComponent<"position">) {
-    for (const sectorId of this.entityToSector.keys()) {
-      this.entityToSector.get(sectorId)!.delete(entity);
-    }
+    this.removeFromSectors(entity);
     if (!this.entityToSector.has(entity.cp.position.sector)) {
       this.entityToSector.set(entity.cp.position.sector, new Set());
     }
@@ -71,7 +81,7 @@ export class EntityIndexer {
     this.trie.insert(entity);
     if (entity.cp.position) {
       if (!this.entityToSector.has(entity.cp.position.sector)) {
-        this.entityToSector.set(entity.cp.position.sector, new Set());
+        this.populate(entity.cp.position.sector);
       }
       this.entityToSector
         .get(entity.cp.position.sector)!
@@ -82,9 +92,15 @@ export class EntityIndexer {
   remove(entity: Entity) {
     this.trie.remove(entity);
     if (entity.hasComponents(["position"])) {
-      for (const sectorId of this.entityToSector.keys()) {
-        this.entityToSector.get(sectorId)?.delete(entity);
-      }
+      this.removeFromSectors(entity);
+    }
+  }
+
+  removeFromSectors(entity: Entity) {
+    for (const sectorId of this.entityToSector.keys()) {
+      this.entityToSector
+        .get(sectorId)!
+        .delete(entity as RequireComponent<"position">);
     }
   }
 

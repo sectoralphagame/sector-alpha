@@ -29,7 +29,7 @@ export const ShipToSpace: React.FC = () => {
           (field) =>
             (norm(
               subtract(field.cp.position.coord, menu.worldPosition)
-            ) as number) < field.cp.asteroidSpawn.size &&
+            ) as number) < field.cp.mineable.size &&
             menu.sector?.id === field.cp.position.sector
         )
     : [];
@@ -60,7 +60,7 @@ export const ShipToSpace: React.FC = () => {
           ...moveToActions(unit, field),
           mineAction({
             targetFieldId: field.id,
-            targetRockId: null,
+            resource: field.cp.mineable.resources[0],
           }),
         ],
       });
@@ -113,7 +113,7 @@ export const ShipToSpace: React.FC = () => {
       {fieldsToMine.length > 0 &&
         fieldsToMine.map((field) => (
           <DropdownOption key={field.id} onClick={() => onMine(field)}>
-            Mine {field.cp.asteroidSpawn.type}
+            Mine {field.cp.mineable.resources[0]}
           </DropdownOption>
         ))}
       {selected.length === 1 &&

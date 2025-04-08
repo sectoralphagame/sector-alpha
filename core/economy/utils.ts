@@ -280,16 +280,6 @@ export function getFacilityWithMostProfit(
   return pickRandom(sortedByProfit).facility;
 }
 
-export function getMineableAsteroid(
-  field: AsteroidField
-): Asteroid | undefined {
-  return pickRandom(
-    field.cp.children.entities
-      .map((e) => asteroid(field.sim.getOrThrow(e)!))
-      .filter((a) => !a.cp.minable.minedById && a.cp.minable.resources > 0)
-  );
-}
-
 /**
  *
  * Minimum required money to fulfill all buy requests, not taking

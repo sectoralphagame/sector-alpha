@@ -5,6 +5,7 @@ import { random } from "mathjs";
 import { filter, flatMap, map, pipe, sum, toArray } from "@fxts/core";
 import { fromPolar, getRandomPositionInBounds } from "@core/utils/misc";
 import { hecsToCartesian } from "@core/components/hecsPosition";
+import { pickRandom } from "@core/utils/generators";
 import { asteroidField } from "../../archetypes/asteroidField";
 import { commanderRange, facility } from "../../archetypes/facility";
 import type { Waypoint } from "../../archetypes/waypoint";
@@ -14,7 +15,7 @@ import { sector as asSector, sectorSize } from "../../archetypes/sector";
 import type { MineOrder, TradeOrder } from "../../components/orders";
 import { mineAction } from "../../components/orders";
 import { dumpCargo, getAvailableSpace } from "../../components/storage";
-import type { Commodity } from "../../economy/commodity";
+import type { Commodity, MineableCommodity } from "../../economy/commodity";
 import { mineableCommodities } from "../../economy/commodity";
 import {
   getSectorsInTeleportRange,
@@ -270,6 +271,12 @@ function autoMine(
       return;
     }
 
+    const resource = pickRandom(
+      Object.entries(field.cp.mineable.resources)
+        .filter(([, composition]) => composition > 0)
+        .map(([c]) => c as MineableCommodity)
+    );
+
     entity.cp.orders.value.push({
       origin: "OrderPlanningSystem:auto",
       type: "mine",
@@ -277,7 +284,7 @@ function autoMine(
         ...moveToActions(entity, field),
         mineAction({
           targetFieldId: field.id,
-          targetRockId: null,
+          resource,
         }),
       ],
     });
@@ -321,7 +328,7 @@ function autoMineForCommander(
     );
     const mineable = needed.find((commodity) =>
       (Object.values(mineableCommodities) as string[]).includes(commodity)
-    );
+    ) as MineableCommodity;
 
     if (mineable) {
       const sectorsInTeleportRange = getSectorsInTeleportRange(
@@ -343,7 +350,7 @@ function autoMineForCommander(
           asteroidFields.filter((f) => f.cp.position!.sector === sector.id)
         ),
         map(asteroidField),
-        filter((e) => e.cp.asteroidSpawn.type === mineable),
+        filter((e) => e.cp.mineable.resources[mineable] > 0),
         toArray
       );
       const field = minBy(eligibleFields, (e) =>
@@ -362,7 +369,7 @@ function autoMineForCommander(
           ...moveToActions(entity, field),
           mineAction({
             targetFieldId: field.id,
-            targetRockId: null,
+            resource: mineable,
           }),
         ],
       });
