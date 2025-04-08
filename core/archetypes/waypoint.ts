@@ -1,4 +1,6 @@
 import type { Vec2 } from "ogl";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
+import { find, pipe } from "@fxts/core";
 import { Entity } from "../entity";
 import { MissingComponentError } from "../errors";
 import type { Sim } from "../sim";
@@ -29,7 +31,19 @@ export interface WaypointInput {
 export function createWaypoint(
   sim: Sim,
   { value, sector, owner }: WaypointInput
-) {
+): Waypoint {
+  const usedWaypoint = pipe(
+    entityIndexer.search(waypointComponents),
+    find((e) => e.hasTags(["virtual"]) && e.cp.disposable?.disposed)
+  );
+  if (usedWaypoint) {
+    usedWaypoint.cp.disposable!.disposed = false;
+    usedWaypoint.cp.disposable!.owner = owner;
+    usedWaypoint.cp.position.coord.set(value);
+    usedWaypoint.cp.position.sector = sector;
+    return usedWaypoint;
+  }
+
   const entity = new Entity(sim);
 
   entity
@@ -40,7 +54,7 @@ export function createWaypoint(
       sector,
       moved: false,
     })
-    .addComponent({ name: "disposable", owner })
+    .addComponent({ name: "disposable", owner, disposed: false })
     .addTag("virtual");
 
   return entity as Waypoint;

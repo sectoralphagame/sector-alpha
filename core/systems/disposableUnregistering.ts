@@ -1,4 +1,5 @@
 import type { Sim } from "@core/sim";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { System } from "./system";
 
 export class DisposableUnregisteringSystem extends System<"exec"> {
@@ -13,7 +14,7 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 120);
 
-      for (const entity of this.sim.index.disposable.getIt()) {
+      for (const entity of entityIndexer.search(["disposable"])) {
         const owner = this.sim.get(entity.cp.disposable.owner);
         if (
           !owner ||
@@ -24,7 +25,7 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
             )
           )
         ) {
-          entity.unregister("disposed");
+          entity.cp.disposable.disposed = true;
         }
       }
     }
