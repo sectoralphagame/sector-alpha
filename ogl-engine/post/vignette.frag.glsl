@@ -1,6 +1,6 @@
 precision highp float;
 
-uniform sampler2D uTexture;
+uniform sampler2D tMap;
 uniform vec2 uResolution;
 uniform float uStrength;
 uniform float uSmoothness;
@@ -18,6 +18,6 @@ void main() {
 
     vignette = mix(1.0, vignette, uStrength);
 
-    vec4 color = texture2D(uTexture, uv);
+    vec4 color = texture2D(tMap, uv);
     gl_FragColor = color * vignette;
 }
