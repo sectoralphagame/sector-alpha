@@ -10,9 +10,10 @@ export class EntityIndicatorMaterial extends Material {
   uniforms: Material["uniforms"] & {
     uSize: { value: number };
     uColor: { value: Vec4 };
-    uState: { value: number };
     uHp: { value: number };
     uShield: { value: number };
+    uHovered: { value: number };
+    uSelected: { value: number };
   };
 
   constructor(engine: Engine3D) {
@@ -27,9 +28,10 @@ export class EntityIndicatorMaterial extends Material {
     });
     this.uniforms.uColor = { value: new Vec4(1) };
     this.uniforms.uSize = { value: 1 };
-    this.uniforms.uState = { value: 0 };
     this.uniforms.uHp = { value: 0 };
     this.uniforms.uShield = { value: 0 };
+    this.uniforms.uHovered = { value: 0 };
+    this.uniforms.uSelected = { value: 0 };
   }
 
   setColor(color: number) {
@@ -46,18 +48,10 @@ export class EntityIndicatorMaterial extends Material {
   }
 
   setSelected(selected: boolean) {
-    if (selected) {
-      this.uniforms.uState.value |= 1 << 0;
-    } else {
-      this.uniforms.uState.value &= ~(1 << 0);
-    }
+    this.uniforms.uSelected.value = selected ? 1 : 0;
   }
 
   setHovered(hovered: boolean) {
-    if (hovered) {
-      this.uniforms.uState.value |= 1 << 1;
-    } else {
-      this.uniforms.uState.value &= ~(1 << 1);
-    }
+    this.uniforms.uHovered.value = hovered ? 1 : 0;
   }
 }
