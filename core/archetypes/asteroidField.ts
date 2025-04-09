@@ -4,7 +4,7 @@ import {
   createMineable,
   type Mineable,
 } from "@core/components/mineable";
-import { random } from "mathjs";
+import { random, randomInt } from "mathjs";
 import { fromPolar } from "@core/utils/misc";
 import type { MineableCommodity } from "@core/economy/commodity";
 import { Entity } from "../entity";
@@ -31,6 +31,16 @@ export type AsteroidField = RequireComponent<AsteroidFieldComponent>;
 
 export function asteroidField(entity: Entity): AsteroidField {
   return entity.requireComponents(asteroidFieldComponents);
+}
+
+export function getRandomPositionInField(field: AsteroidField): Vec2 {
+  const { fPoints } = field.cp.mineable;
+  const randomIndex = randomInt(0, fPoints.length);
+  const [p, r] = fPoints[randomIndex];
+  const angle = random(0, 2 * Math.PI);
+  const distance = random(0, r);
+
+  return fromPolar(angle, distance).add(p);
 }
 
 function getFPoint(last: FPoint[], size: number): FPoint {

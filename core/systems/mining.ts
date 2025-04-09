@@ -10,7 +10,7 @@ type WithMining = RequireComponent<"mining" | "storage">;
 // const tickChance = 1 / 240;
 
 function mine(entity: WithMining, delta: number) {
-  if (entity.cp.mining.entityId) {
+  if (entity.cp.mining.entityId && entity.cp.mining.resource) {
     if (entity.cooldowns.canUse("mine")) {
       entity.cooldowns.use("mine", 5);
       addStorage(

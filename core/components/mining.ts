@@ -17,7 +17,7 @@ export interface Mining extends BaseComponent<"mining"> {
    * Mined entity ID
    */
   entityId: number | null;
-  resource: MineableCommodity;
+  resource: MineableCommodity | null;
 }
 
 export function createMining(efficiency: number): Mining {
@@ -26,6 +26,6 @@ export function createMining(efficiency: number): Mining {
     buffer: 0,
     efficiency,
     entityId: null,
-    resource: "fuelium",
+    resource: null,
   };
 }

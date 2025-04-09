@@ -1,8 +1,15 @@
-import { asteroidField } from "../../archetypes/asteroidField";
+import { createWaypoint } from "@core/archetypes/waypoint";
+import { Vec2 } from "ogl";
+import {
+  asteroidField,
+  getRandomPositionInField,
+} from "../../archetypes/asteroidField";
 import type { MineAction } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
 import type { RequireComponent } from "../../tsHelpers";
-import { stop } from "../../utils/moving";
+import { moveToActions } from "../../utils/moving";
+
+const tempVec2 = new Vec2(0, 0);
 
 export function mineAction(
   entity: RequireComponent<
@@ -11,29 +18,47 @@ export function mineAction(
   order: MineAction
 ): boolean {
   const targetField = asteroidField(entity.sim.getOrThrow(order.targetFieldId));
-  // entity.cp.orders!.value[0].actions.unshift(...moveToActions(entity, rock));
 
-  if (entity.cp.drive.targetReached) {
-    stop(entity);
-    entity.cp.drive.active = true;
-    entity.cp.drive.limit = Math.min(entity.cp.drive.maneuver, 0.05);
+  if (
+    entity.cp.position.sector !== targetField.cp.position.sector ||
+    !targetField.cp.mineable.fPoints.some(([pos, size]) => {
+      const distance = tempVec2
+        .copy(pos)
+        .add(targetField.cp.position.coord)
+        .distance(entity.cp.position.coord);
 
-    entity.cp.mining.entityId = order.targetFieldId;
-    entity.cp.mining.resource = order.resource;
+      return distance <= size;
+    })
+  ) {
+    entity.cp.orders!.value[0].actions.unshift(
+      ...moveToActions(
+        entity,
+        createWaypoint(entity.sim, {
+          owner: entity.id,
+          value: targetField.cp.position.coord.add(
+            getRandomPositionInField(targetField)
+          ),
+          sector: targetField.cp.position.sector,
+        })
+      )
+    );
+  }
 
-    if (!targetField.cp.mineable.mountPoints.used.includes(entity.id)) {
-      targetField.cp.mineable.mountPoints.used.push(entity.id);
-    }
+  entity.cp.mining.entityId = order.targetFieldId;
+  entity.cp.mining.resource = order.resource;
 
-    if (getAvailableSpace(entity.cp.storage) === 0) {
-      entity.cp.mining.entityId = null;
-      targetField.cp.mineable.mountPoints.used =
-        targetField.cp.mineable.mountPoints.used.filter(
-          (id) => id !== entity.id
-        );
+  if (!targetField.cp.mineable.mountPoints.used.includes(entity.id)) {
+    targetField.cp.mineable.mountPoints.used.push(entity.id);
+  }
 
-      return true;
-    }
+  if (getAvailableSpace(entity.cp.storage) === 0) {
+    entity.cp.mining.entityId = null;
+    entity.cp.mining.resource = null;
+
+    targetField.cp.mineable.mountPoints.used =
+      targetField.cp.mineable.mountPoints.used.filter((id) => id !== entity.id);
+
+    return true;
   }
 
   return false;
