@@ -13,7 +13,10 @@ import { useGameStore } from "@ui/state/game";
 import { useContextMenuStore } from "@ui/state/contextMenu";
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { find } from "@fxts/core";
-import type { MineableCommodity } from "@core/economy/commodity";
+import {
+  commodityLabel,
+  type MineableCommodity,
+} from "@core/economy/commodity";
 import { useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 import { Wrapper } from "./Wrapper";
@@ -127,7 +130,7 @@ export const ShipToSpace: React.FC = () => {
                 onMine(fieldToMine, commodity as MineableCommodity)
               }
             >
-              Mine {commodity}
+              Mine {commodityLabel[commodity]}
             </DropdownOption>
           ))}
       {selected.length === 1 &&
