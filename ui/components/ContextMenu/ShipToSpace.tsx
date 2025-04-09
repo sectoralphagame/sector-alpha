@@ -1,6 +1,9 @@
 import { norm, subtract } from "mathjs";
 import React from "react";
-import type { AsteroidField } from "@core/archetypes/asteroidField";
+import {
+  asteroidFieldComponents,
+  type AsteroidField,
+} from "@core/archetypes/asteroidField";
 import { createWaypoint } from "@core/archetypes/waypoint";
 import { mineAction } from "@core/components/orders";
 import { moveToActions } from "@core/utils/moving";
@@ -8,6 +11,9 @@ import { DropdownOption } from "@kit/Dropdown";
 import { isOwnedByPlayer } from "@core/utils/misc";
 import { useGameStore } from "@ui/state/game";
 import { useContextMenuStore } from "@ui/state/contextMenu";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
+import { find } from "@fxts/core";
+import type { MineableCommodity } from "@core/economy/commodity";
 import { useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 import { Wrapper } from "./Wrapper";
@@ -22,17 +28,16 @@ export const ShipToSpace: React.FC = () => {
     isOwnedByPlayer(selected[0]) &&
     selected.every((unit) => unit.hasComponents(["orders", "position"]));
 
-  const fieldsToMine = selected.every((unit) => unit.hasComponents(["mining"]))
-    ? sim.index.asteroidFields
-        .get()
-        .filter(
-          (field) =>
-            (norm(
-              subtract(field.cp.position.coord, menu.worldPosition)
-            ) as number) < field.cp.mineable.size &&
-            menu.sector?.id === field.cp.position.sector
-        )
-    : [];
+  const fieldToMine = selected.every((unit) => unit.hasComponents(["mining"]))
+    ? find(
+        (field) =>
+          (norm(
+            subtract(field.cp.position.coord, menu.worldPosition)
+          ) as number) < field.cp.mineable.size &&
+          menu.sector?.id === field.cp.position.sector,
+        entityIndexer.search(asteroidFieldComponents)
+      )
+    : null;
 
   const onMove = () => {
     for (const unit of selected) {
@@ -51,7 +56,7 @@ export const ShipToSpace: React.FC = () => {
     }
   };
 
-  const onMine = (field: AsteroidField) => {
+  const onMine = (field: AsteroidField, commodity: MineableCommodity) => {
     for (const unit of selected) {
       unit.cp.orders!.value.push({
         origin: "manual",
@@ -60,7 +65,7 @@ export const ShipToSpace: React.FC = () => {
           ...moveToActions(unit, field),
           mineAction({
             targetFieldId: field.id,
-            resource: field.cp.mineable.resources[0],
+            resource: commodity,
           }),
         ],
       });
@@ -91,7 +96,7 @@ export const ShipToSpace: React.FC = () => {
   React.useEffect(() => {
     if (
       canBeOrdered &&
-      fieldsToMine.length === 0 &&
+      !fieldToMine &&
       selected.every((unit) => !unit.cp.deployable)
     ) {
       onMove();
@@ -110,12 +115,21 @@ export const ShipToSpace: React.FC = () => {
   return (
     <Wrapper>
       <DropdownOption onClick={onMove}>Move</DropdownOption>
-      {fieldsToMine.length > 0 &&
-        fieldsToMine.map((field) => (
-          <DropdownOption key={field.id} onClick={() => onMine(field)}>
-            Mine {field.cp.mineable.resources[0]}
-          </DropdownOption>
-        ))}
+      {!!fieldToMine &&
+        Object.keys(fieldToMine.cp.mineable.resources)
+          .filter(
+            (commodity) => fieldToMine.cp.mineable.resources[commodity] > 0
+          )
+          .map((commodity) => (
+            <DropdownOption
+              key={commodity}
+              onClick={() =>
+                onMine(fieldToMine, commodity as MineableCommodity)
+              }
+            >
+              Mine {commodity}
+            </DropdownOption>
+          ))}
       {selected.length === 1 &&
         selected[0].cp.deployable?.type === "facility" && (
           <DropdownOption onClick={onFacilityDeploy}>
