@@ -39,7 +39,7 @@ export class SubLogger {
 
 class Logger {
   logs: string[] = [];
-  print = process.env.NODE_ENV === "development" ? levels.warn : levels.error;
+  print = process.env.NODE_ENV === "development" ? levels.debug : levels.error;
 
   log(message: string, severity: Severity, prefix: string[]): void {
     this.logs.push(

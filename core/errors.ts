@@ -3,7 +3,12 @@ import type { CoreComponents } from "./components/component";
 import type { DockSize } from "./components/dockable";
 import type { Entity } from "./entity";
 
-export const notImplemented = new Error("Not implemented");
+export class NotImplementedError extends Error {
+  constructor() {
+    super("Not implemented");
+  }
+}
+export const notImplemented = new NotImplementedError();
 
 export class InsufficientStorage extends Error {
   wanted: number;
@@ -110,7 +115,7 @@ export class ExceededOfferQuantity extends Error {
 }
 
 export class MissingComponentError extends Error {
-  entity: Entity;
+  entityId: number;
   expectedComponents: Readonly<Array<keyof CoreComponents>>;
 
   constructor(
@@ -123,7 +128,7 @@ export class MissingComponentError extends Error {
         Object.keys(entity.cp)
       ).join(", ")}`
     );
-    this.entity = entity;
+    this.entityId = entity.id;
     this.expectedComponents = expectedComponents;
   }
 }

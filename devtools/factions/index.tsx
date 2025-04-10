@@ -11,6 +11,7 @@ import mapData from "@core/world/data/map.json";
 import { Button } from "@kit/Button";
 import { Tab, TabList } from "@kit/Tabs";
 import { sortBy } from "@fxts/core";
+import type { MiningStrategy } from "@core/components/ai";
 import type { FormData } from "./utils";
 import styles from "./styles.scss";
 import { JSONOutput } from "../components/JSONOutput";
@@ -41,6 +42,7 @@ const Editor: React.FC<{}> = () => {
                 sectors: [],
                 slug: "",
                 type: "territorial",
+                mining: "preferOwn",
               });
               const newFactions = getValues().factions;
               newFactions.slice(0, newFactions.length - 2).forEach((_, index) =>
@@ -83,6 +85,10 @@ export const Factions: React.FC = () => {
   const form = useForm<FormData>({
     defaultValues: {
       ...mapData,
+      factions: mapData.factions.map((faction) => ({
+        ...faction,
+        mining: faction.mining as MiningStrategy,
+      })),
       relations: mapData.factions
         .flatMap((fY, y) =>
           mapData.factions.map((fX, x) => ({

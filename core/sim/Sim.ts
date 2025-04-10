@@ -93,11 +93,23 @@ export class Sim extends BaseSim {
       index.apply();
     }
 
-    this.hooks.addComponent.subscribe("EntityIndexer", ({ entity }) =>
-      entityIndexer.updateMask(entity)
+    this.hooks.addComponent.subscribe(
+      "EntityIndexer",
+      ({ entity, component }) => {
+        entityIndexer.updateMask(entity);
+        if (component === "position") {
+          entityIndexer.updateSector(entity.requireComponents(["position"]));
+        }
+      }
     );
-    this.hooks.removeComponent.subscribe("EntityIndexer", ({ entity }) =>
-      entityIndexer.updateMask(entity)
+    this.hooks.removeComponent.subscribe(
+      "EntityIndexer",
+      ({ entity, component }) => {
+        entityIndexer.updateMask(entity);
+        if (component === "position") {
+          entityIndexer.removeFromSectors(entity);
+        }
+      }
     );
     this.hooks.removeEntity.subscribe("EntityIndexer", ({ entity, reason }) => {
       logger.log(
@@ -303,6 +315,10 @@ export class Sim extends BaseSim {
       ...pick(this, ["entityIdCounter", "timeOffset"]),
       entities: [...this.entities].map(([, e]) => e),
     };
+  }
+
+  toString() {
+    return `Sim #${this.id}`;
   }
 }
 

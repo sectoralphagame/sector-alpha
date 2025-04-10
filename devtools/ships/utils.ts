@@ -1,4 +1,5 @@
 import { limitMax } from "@core/utils/limit";
+import { gameMonth } from "@core/utils/misc";
 import type { ShipInput } from "@core/world/ships";
 
 export type FormData = { ships: ShipInput[] };
@@ -54,7 +55,7 @@ export function getShipStorageEfficiency(
   ship: ShipInput,
   distance: number
 ): number {
-  return (ship.storage / getShipTravelTime(ship, distance)) * 3.6;
+  return (ship.storage / getShipTravelTime(ship, distance)) * gameMonth;
 }
 
 /**
@@ -71,11 +72,11 @@ export function getShipMiningEfficiency(
   return (
     (ship.storage /
       (getShipTravelTime(ship, distance) * 2 + ship.storage / ship.mining)) *
-    3.6
+    gameMonth
   );
 }
 
 // eslint-disable-next-line no-unused-vars
 export function withDistance(cb: (distance: number) => any): string {
-  return [10, 100, 1000, 10000].map(cb).join("/");
+  return [10, 100, 1000, 10000].map(cb).join(" / ");
 }

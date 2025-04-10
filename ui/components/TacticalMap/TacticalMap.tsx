@@ -15,7 +15,6 @@ import { contextMenuStore } from "@ui/state/contextMenu";
 import { storageHook } from "@core/hooks";
 import { MouseButton } from "@ogl-engine/Orbit";
 import { Asteroids } from "@ogl-engine/engine/Asteroids";
-import { fieldColors } from "@core/archetypes/asteroid";
 import type { Destroyable } from "@ogl-engine/types";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
 import { gameStore } from "@ui/state/game";
@@ -488,9 +487,9 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       if (field.cp.position.sector === gameStore.sector.id) {
         const fieldTransform = new Asteroids(
           this.engine,
-          field.cp.asteroidSpawn.size,
-          1,
-          fieldColors[field.cp.asteroidSpawn.type]
+          field.cp.mineable.size,
+          field.cp.mineable.density,
+          field.cp.mineable.fPoints
         );
         fieldTransform.position.set(
           field.cp.position.coord[0] * scale,

@@ -9,10 +9,11 @@ uniform mat4 modelMatrix;
 uniform vec3 cameraPosition;
 uniform vec4 uColor;
 uniform float uSize;
-uniform int uState;
 uniform float uTime;
 uniform float uHp;
 uniform float uShield;
+uniform int uHovered;
+uniform int uSelected;
 
 #define baseLineWidth 0.04f
 #define baseBarLineWidth 0.1f
@@ -51,7 +52,7 @@ void main() {
     float dist = sdRoundedBox(p, vec2(0.2f), 0.1f);
     float alpha = 1.0f - smoothstep(lineWidth - smoothing, lineWidth, abs(dist));
 
-    if(uState == 1 || uState == 3) {
+    if(uSelected > 0) {
         float x = sdCornersOnly(p, vec2(0.26f) + sin(uTime * 3.f) * 0.02f, 0.1f);
         alpha += 1.0f - smoothstep(lineWidth - smoothing, lineWidth, abs(x));
     }
@@ -68,6 +69,10 @@ void main() {
 
     if(sign(shield) < 0.f) {
         color = vec3(0.16f, 0.5f, 0.98f);
+    }
+
+    if(uSelected <= 0 && uHovered <= 0) {
+        alpha *= 0.75f;
     }
 
     if(alpha <= 0.05f) {

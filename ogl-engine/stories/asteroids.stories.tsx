@@ -9,6 +9,9 @@ import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import models from "@assets/models";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
+import { Vec2 } from "ogl";
+import { getFPoints } from "@core/archetypes/asteroidField";
+import { noop } from "@fxts/core";
 import { Story3d, story3dMeta } from "./Story3d";
 import type { Story3dArgs } from "./Story3d";
 
@@ -20,12 +23,12 @@ const AsteroidsStory: React.FC<
   }
 > = ({ postProcessing, skybox, size, density, color }) => {
   const engineRef = React.useRef<Engine3D>();
-  const onInit = React.useCallback(async (engine) => {
+  const onInit = React.useCallback(async (engine: Engine3D) => {
     await assetLoader.generateTextures();
     engineRef.current = engine;
     engine.camera.position.set(1, 1, 1);
 
-    const asteroids = new Asteroids(engine, size, density, color);
+    const asteroids = new Asteroids(engine, size, density, getFPoints(size));
     asteroids.setParent(engine.scene);
 
     const model = await assetLoader.getGltf(
@@ -42,21 +45,25 @@ const AsteroidsStory: React.FC<
   }, []);
 
   React.useEffect(() => {
-    if (!engineRef.current) return;
+    if (!engineRef.current) return noop;
 
     const asteroids = engineRef.current.scene.children.find(
       (c) => c instanceof Asteroids
     );
     asteroids?.setParent(null);
 
-    new Asteroids(engineRef.current, size, density, color).setParent(
-      engineRef.current.scene
-    );
+    const a = new Asteroids(engineRef.current, size, density, getFPoints(size));
+    a.setParent(engineRef.current.scene);
+
+    return () => {
+      a.setParent(null);
+    };
   }, [size, density, color]);
 
   return (
     <Story3d
       postProcessing={postProcessing}
+      control="map"
       onEngineInit={onInit}
       onEngineUpdate={() => {}}
       skybox={skybox}

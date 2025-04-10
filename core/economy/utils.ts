@@ -24,9 +24,6 @@ import type { Sim } from "../sim";
 import type { Commodity } from "./commodity";
 import { commoditiesArray } from "./commodity";
 import type { RequireComponent } from "../tsHelpers";
-import type { AsteroidField } from "../archetypes/asteroidField";
-import type { Asteroid } from "../archetypes/asteroid";
-import { asteroid } from "../archetypes/asteroid";
 import type { Sector } from "../archetypes/sector";
 import { sector as asSector } from "../archetypes/sector";
 import type { Waypoint } from "../archetypes/waypoint";
@@ -278,16 +275,6 @@ export function getFacilityWithMostProfit(
   }
 
   return pickRandom(sortedByProfit).facility;
-}
-
-export function getMineableAsteroid(
-  field: AsteroidField
-): Asteroid | undefined {
-  return pickRandom(
-    field.cp.children.entities
-      .map((e) => asteroid(field.sim.getOrThrow(e)!))
-      .filter((a) => !a.cp.minable.minedById && a.cp.minable.resources > 0)
-  );
 }
 
 /**

@@ -2,17 +2,17 @@ import { createSector, sectorSize } from "@core/archetypes/sector";
 import { random } from "mathjs";
 import type { PositionAxial } from "@core/components/hecsPosition";
 import { axialToCube, hecsToCartesian } from "@core/components/hecsPosition";
-import type { AiType } from "@core/components/ai";
+import type { AiType, MiningStrategy } from "@core/components/ai";
 import { requestShip } from "@core/systems/ai/shipPlanning";
 import { facilityModules } from "@core/archetypes/facilityModule";
 import { changeRelations } from "@core/components/relations";
 import settings from "@core/settings";
-import { find } from "@fxts/core";
+import { find, fromEntries, map, pipe, sum } from "@fxts/core";
 import { Vec2 } from "ogl";
+import type { MineableCommodity } from "@core/economy/commodity";
 import { createFaction } from "../archetypes/faction";
 import { createShip } from "../archetypes/ship";
 import { changeBudgetMoney, createBudget } from "../components/budget";
-import type { MineableCommodity } from "../economy/commodity";
 import type { Sim } from "../sim";
 import { pickRandom } from "../utils/generators";
 import { spawnAsteroidField } from "./asteroids";
@@ -52,18 +52,24 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     }
   });
 
-  mapData.sectors.forEach((sector) =>
-    Object.entries(sector.resources)
-      .filter(([, size]) => size > 0)
-      .forEach(([mineable, size]) => {
-        spawnAsteroidField(
-          sim,
-          mineable as MineableCommodity,
-          size,
-          getSector(sector.id)
-        );
-      })
-  );
+  for (const sector of mapData.sectors) {
+    const size = sum(Object.values(sector.resources));
+    if (size) {
+      spawnAsteroidField(
+        sim,
+        pipe(
+          Object.entries(sector.resources),
+          map(
+            ([commodity, v]) =>
+              [commodity, v / size] as [MineableCommodity, number]
+          ),
+          fromEntries
+        ),
+        size,
+        getSector(sector.id)
+      );
+    }
+  }
 
   mapData.factions.forEach((factionData) => {
     const faction = createFaction(factionData.name, sim);
@@ -71,6 +77,7 @@ export function getFixedWorld(sim: Sim): Promise<void> {
     changeBudgetMoney(faction.cp.budget, 1e10);
     faction.addComponent({
       name: "ai",
+      mining: factionData.mining as MiningStrategy,
       type: factionData.type as AiType,
       stockpiling: random(1.2, 1.6),
       priceModifier: random(0.1, 0.25),

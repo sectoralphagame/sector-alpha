@@ -47,3 +47,17 @@ export function formatGameTime(
   }
   return parts.join(" ");
 }
+
+const SI_PREFIXES = ["", "k", "M", "G", "T", "P", "E"];
+export function formatSI(
+  value: number,
+  unit: string = "",
+  decimals: number = 2
+): string {
+  const tier = Math.max(0, Math.floor(Math.log10(Math.abs(value)) / 3));
+  const scaledValue = value / 10 ** (tier * 3);
+  const formattedValue = scaledValue.toFixed(decimals);
+  const prefix = SI_PREFIXES[tier] || "";
+
+  return `${formattedValue}${prefix}${unit}`;
+}

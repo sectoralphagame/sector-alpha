@@ -1,13 +1,13 @@
-import type { Commodity } from "../economy/commodity";
-import { commodities } from "../economy/commodity";
+import { commodities, type Commodity } from "../economy/commodity";
 
-export function perCommodity<T>(
+export function perCommodity<T, TCommodities extends Commodity[]>(
   // eslint-disable-next-line no-unused-vars
-  cb: (commodity: Commodity) => T
-): Record<Commodity, T> {
-  const ret = {} as Record<Commodity, T>;
+  cb: (commodity: TCommodities[number]) => T,
+  subset?: TCommodities
+): Record<TCommodities[number], T> {
+  const ret = {} as Record<TCommodities[number], T>;
 
-  for (const commodity of commodities) {
+  for (const commodity of subset ?? commodities) {
     ret[commodity] = cb(commodity);
   }
 

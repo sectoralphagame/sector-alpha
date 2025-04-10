@@ -18,6 +18,7 @@ function createTerritorialFaction(index: number, sim: Sim) {
   const faction = createFaction(`Faction ${char}`, sim);
   faction.addComponent({
     name: "ai",
+    mining: "preferOwn",
     type: "territorial",
     stockpiling: random(0.5, 0.8),
     priceModifier: random(0.002, 0.02),
@@ -54,6 +55,7 @@ function createTradingFaction(index: number, sim: Sim) {
   const faction = createFaction(`Traders ${char}`, sim);
   faction.addComponent({
     name: "ai",
+    mining: "preferOwn",
     type: "travelling",
     stockpiling: 1,
     priceModifier: 0.01,

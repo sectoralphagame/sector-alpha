@@ -1,10 +1,15 @@
-import { asteroid } from "../../archetypes/asteroid";
-import { asteroidField, spawn } from "../../archetypes/asteroidField";
+import { createWaypoint } from "@core/archetypes/waypoint";
+import { Vec2 } from "ogl";
+import {
+  asteroidField,
+  getRandomPositionInField,
+} from "../../archetypes/asteroidField";
 import type { MineAction } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
-import { getMineableAsteroid } from "../../economy/utils";
 import type { RequireComponent } from "../../tsHelpers";
-import { moveToActions, stop } from "../../utils/moving";
+import { moveToActions } from "../../utils/moving";
+
+const tempVec2 = new Vec2(0, 0);
 
 export function mineAction(
   entity: RequireComponent<
@@ -13,39 +18,47 @@ export function mineAction(
   order: MineAction
 ): boolean {
   const targetField = asteroidField(entity.sim.getOrThrow(order.targetFieldId));
-  const targetRock = order.targetRockId
-    ? entity.sim.get(order.targetRockId)
-    : null;
 
   if (
-    !targetRock ||
-    (targetRock.cp.minable!.minedById !== null &&
-      targetRock.cp.minable!.minedById !== entity.id)
+    entity.cp.position.sector !== targetField.cp.position.sector ||
+    !targetField.cp.mineable.fPoints.some(([pos, size]) => {
+      const distance = tempVec2
+        .copy(pos)
+        .add(targetField.cp.position.coord)
+        .distance(entity.cp.position.coord);
+
+      return distance <= size;
+    })
   ) {
-    let rock = getMineableAsteroid(targetField);
-    if (!rock) {
-      if (targetField.cp.asteroidSpawn.amount > 0) {
-        rock = spawn(targetField);
-      } else {
-        return true;
-      }
-    }
-    order.targetRockId = rock.id;
-    entity.cp.orders!.value[0].actions.unshift(...moveToActions(entity, rock));
+    entity.cp.orders!.value[0].actions.unshift(
+      ...moveToActions(
+        entity,
+        createWaypoint(entity.sim, {
+          owner: entity.id,
+          value: targetField.cp.position.coord.add(
+            getRandomPositionInField(targetField)
+          ),
+          sector: targetField.cp.position.sector,
+        })
+      )
+    );
   }
 
-  if (entity.cp.drive.targetReached) {
-    const rock = asteroid(entity.sim.getOrThrow(order.targetRockId!));
-    entity.cp.mining.entityId = order.targetRockId;
-    rock.cp.minable.minedById = entity.id;
-    stop(entity);
+  entity.cp.mining.entityId = order.targetFieldId;
+  entity.cp.mining.resource = order.resource;
 
-    if (getAvailableSpace(entity.cp.storage) === 0) {
-      entity.cp.mining.entityId = null;
-      rock.cp.minable.minedById = null;
+  if (!targetField.cp.mineable.mountPoints.used.includes(entity.id)) {
+    targetField.cp.mineable.mountPoints.used.push(entity.id);
+  }
 
-      return true;
-    }
+  if (getAvailableSpace(entity.cp.storage) === 0) {
+    entity.cp.mining.entityId = null;
+    entity.cp.mining.resource = null;
+
+    targetField.cp.mineable.mountPoints.used =
+      targetField.cp.mineable.mountPoints.used.filter((id) => id !== entity.id);
+
+    return true;
   }
 
   return false;

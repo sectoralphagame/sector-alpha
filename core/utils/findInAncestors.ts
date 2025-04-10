@@ -1,3 +1,5 @@
+import { filter, map, pipe, toArray } from "@fxts/core";
+import type { FacilityModule } from "@core/archetypes/facilityModule";
 import type { CoreComponents } from "../components/component";
 import type { Entity } from "../entity";
 import { MissingComponentError } from "../errors";
@@ -24,4 +26,17 @@ export function findInAncestors<T extends keyof CoreComponents>(
   }
 
   throw new MissingComponentError(entity, [component]);
+}
+
+export function findModules<T extends keyof CoreComponents>(
+  entity: RequireComponent<"modules">,
+  component: T
+): RequireComponent<T>[] {
+  return pipe(
+    entity.cp.modules.ids,
+    map(entity.sim.getOrThrow<FacilityModule>),
+    filter((m) => m.hasComponents([component])),
+    map((m) => m.requireComponents([component])),
+    toArray
+  );
 }

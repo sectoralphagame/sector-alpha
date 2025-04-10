@@ -6,7 +6,6 @@ import { shipPlanningSystem } from "@core/systems/ai/shipPlanning";
 import { shipReturningSystem } from "@core/systems/ai/shipReturning";
 import { spottingSystem } from "@core/systems/ai/spotting";
 import { tauHarassingSystem } from "@core/systems/ai/tauHarassing";
-import { asteroidSpawningSystem } from "@core/systems/asteroidSpawning";
 import { attackingSystem } from "@core/systems/attacking";
 import { budgetPlanningSystem } from "@core/systems/budgetPlanning";
 import { collectibleUnregisteringSystem } from "@core/systems/collectibleUnregistering";
@@ -47,7 +46,6 @@ export const bootstrapSystems = [
   movingSystem,
   miningSystem,
   orderExecutingSystem,
-  asteroidSpawningSystem,
   facilityPlanningSystem,
   shipPlanningSystem,
   sectorStatisticGatheringSystem,

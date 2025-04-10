@@ -14,3 +14,4 @@ export const rowExpanderToggled: string;
 export const textureLabel: string;
 export const texturePreview: string;
 export const buildExpanded: string;
+export const dimmed: string;

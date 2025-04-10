@@ -5,7 +5,6 @@ import type {
   Action,
   Order,
 } from "@core/components/orders";
-import { asteroidField } from "@core/archetypes/asteroidField";
 import type { Ship } from "@core/archetypes/ship";
 import type { Sim } from "@core/sim";
 import {
@@ -38,11 +37,7 @@ function getOrderDescription(ship: Ship, order: Action) {
             ship.sim.getOrThrow(order.targetId).cp.name?.value
           }`;
     case "mine":
-      return `Mine ${
-        ship.sim
-          .getOrThrow(order.targetFieldId)
-          .requireComponents(["asteroidSpawn"]).cp.asteroidSpawn.type
-      }`;
+      return `Mine ${order.resource}`;
     case "dock":
       if (order.targetId === ship.cp.commander?.id)
         return "Dock at commanding facility";
@@ -70,12 +65,7 @@ function getOrderGroupDescription(order: Order, sim: Sim) {
       return "Trade";
     case "mine":
       return `Mine ${
-        asteroidField(
-          sim.getOrThrow(
-            (order.actions.find((o) => o.type === "mine") as MineAction)!
-              .targetFieldId
-          )
-        ).cp.asteroidSpawn.type
+        (order.actions.find((o) => o.type === "mine") as MineAction)!.resource
       }`;
     case "dock":
       return `Dock at ${
