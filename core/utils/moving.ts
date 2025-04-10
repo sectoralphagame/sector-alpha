@@ -137,13 +137,11 @@ export function setTarget(entity: Driveable, target: number | null) {
   if (shouldUpdate) {
     entity.cp.drive.state = "maneuver";
     entity.cp.drive.target = target;
-    entity.cp.drive.targetReached = false;
   }
 }
 
 export function clearTarget(entity: Driveable) {
   stop(entity);
   setTarget(entity, null);
-  entity.cp.drive.targetReached = true;
   entity.cp.drive.mode = "goto";
 }

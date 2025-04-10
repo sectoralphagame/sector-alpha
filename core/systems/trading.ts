@@ -9,6 +9,8 @@ import {
 } from "@fxts/core";
 import { randomInt, sum } from "mathjs";
 import { isIncomingAllocation } from "@core/components/storage";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
+import { shipComponents } from "@core/archetypes/ship";
 import type { Sector } from "../archetypes/sector";
 import type { TradeEntry } from "../components/journal";
 import type { PriceBelief } from "../components/trade";
@@ -367,7 +369,7 @@ export class TradingSystem extends System<"adjustPrices" | "createOffers"> {
             : 0
         ),
         max
-      ) || 0;
+      ) ?? 0;
   };
 
   createId = (initiatorId: number, targetId: number): string => {
@@ -377,7 +379,9 @@ export class TradingSystem extends System<"adjustPrices" | "createOffers"> {
 
   apply = (sim: Sim): void => {
     super.apply(sim);
-    this.collect(sim);
+    if ([...entityIndexer.search(shipComponents)].length) {
+      this.collect(sim);
+    }
 
     sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };

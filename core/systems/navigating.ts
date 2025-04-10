@@ -4,6 +4,7 @@ import type { Driveable } from "@core/utils/moving";
 import { clearTarget, startCruise, stopCruise } from "@core/utils/moving";
 import { Vec2 } from "ogl";
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
+import { Observable } from "@core/utils/observer";
 import { defaultDriveLimit } from "../components/drive";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
@@ -12,6 +13,7 @@ import { System } from "./system";
 const tempPosition = new Vec2();
 
 type Navigable = Driveable & RequireComponent<"position">;
+const hook = new Observable<Navigable>("onTargetReached");
 
 function hold(entity: Navigable) {
   clearTarget(entity);
@@ -62,133 +64,49 @@ export function getDeltaAngle(
 
 const cruiseTimer = "cruise";
 
-function setFlybyDrive(entity: Navigable, delta: number) {
-  const drive = entity.cp.drive;
-  const movable = entity.cp.movable;
-  const entityPosition = entity.cp.position;
-  const targetEntity = entity.sim.get(drive.target!)!;
-  const targetPosition = targetEntity.cp.position!;
+export class NavigatingSystem extends System {
+  entities: Navigable[];
 
-  const path = tempPosition
-    .copy(targetPosition.coord)
-    .sub(entityPosition.coord);
-  const dAngle = getAngleDiff(entity, path);
+  private setFlybyDrive(entity: Navigable, delta: number) {
+    const drive = entity.cp.drive;
+    const movable = entity.cp.movable;
+    const entityPosition = entity.cp.position;
+    const targetEntity = this.sim.get(drive.target!)!;
+    const targetPosition = targetEntity.cp.position!;
 
-  const distance = path.len();
-  const angleOffset = Math.abs(dAngle);
-  const isInRange =
-    (targetEntity.cp.damage?.range ?? 0) + 0.2 > distance &&
-    angleOffset < (entity.cp.damage?.angle || 0);
+    const path = tempPosition
+      .copy(targetPosition.coord)
+      .sub(entityPosition.coord);
+    const dAngle = getAngleDiff(entity, path);
 
-  const shieldsUp = entity.cp.hitpoints?.shield
-    ? entity.cp.hitpoints.shield.value / entity.cp.hitpoints.shield.max > 0.5
-    : true;
+    const distance = path.len();
+    const angleOffset = Math.abs(dAngle);
+    const isInRange =
+      (targetEntity.cp.damage?.range ?? 0) + 0.2 > distance &&
+      angleOffset < (entity.cp.damage?.angle || 0);
 
-  if (Math.PI - Math.abs(dAngle) < 0.1) {
-    movable.rotary = drive.rotary * delta * Math.random() > 0.5 ? 1 : -1;
-  } else {
-    movable.rotary =
-      angleOffset > Math.PI * 0.85 &&
-      (isInRange || !shieldsUp || Math.random() > 0.3)
-        ? 0
-        : getDeltaAngle(dAngle, drive.rotary, delta);
-  }
+    const shieldsUp = entity.cp.hitpoints?.shield
+      ? entity.cp.hitpoints.shield.value / entity.cp.hitpoints.shield.max > 0.5
+      : true;
 
-  const canCruise =
-    distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
-    angleOffset < Math.PI / 12 &&
-    drive.limit > drive.maneuver;
-
-  entity.cp.drive.limit = defaultDriveLimit;
-  if (
-    (targetEntity.cp.movable?.velocity ?? 0) > drive.maneuver ||
-    distance > drive.maneuver * drive.ttc
-  ) {
-    if (canCruise && drive.state === "maneuver") {
-      entity.cooldowns.use(cruiseTimer, drive.ttc);
-      startCruise(entity);
+    if (Math.PI - Math.abs(dAngle) < 0.1) {
+      movable.rotary = drive.rotary * delta * Math.random() > 0.5 ? 1 : -1;
+    } else {
+      movable.rotary =
+        angleOffset > Math.PI * 0.85 &&
+        (isInRange || !shieldsUp || Math.random() > 0.3)
+          ? 0
+          : getDeltaAngle(dAngle, drive.rotary, delta);
     }
-  } else if (drive.state !== "maneuver") {
-    stopCruise(entity);
-  }
 
-  const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
-  const maxSpeedLimited = Math.min(drive.limit ?? defaultDriveLimit, maxSpeed);
-  const deltaSpeedMultiplier =
-    angleOffset > Math.PI / 3 ? random(0.55, 0.8) : 1;
-  movable.velocity = Math.max(
-    0,
-    Math.min(
-      movable.velocity +
-        maxSpeed * drive.acceleration * delta * deltaSpeedMultiplier,
-      maxSpeedLimited
-    )
-  );
-}
+    const canCruise =
+      distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
+      angleOffset < Math.PI / 12 &&
+      drive.limit > drive.maneuver;
 
-function setDrive(entity: Navigable, delta: number) {
-  if (!entity.cp.drive.active || delta === 0) return;
-
-  const entityPosition = entity.cp.position;
-  const drive = entity.cp.drive;
-  const movable = entity.cp.movable;
-
-  if (!drive.target) return;
-
-  if (drive.state === "warming" && entity.cooldowns.canUse(cruiseTimer)) {
-    drive.state = "cruise";
-  }
-
-  const targetEntity = entity.sim.get(drive.target);
-  if (!targetEntity) {
-    hold(entity);
-    return;
-  }
-  const targetPosition =
-    entity.cp.commander?.id === targetEntity.id
-      ? getFormationPlace(
-          targetEntity.requireComponents(["subordinates", "position"]),
-          entity
-        )
-      : targetEntity.cp.position!.coord;
-  const isInSector = targetEntity.cp.position!.sector === entityPosition.sector;
-
-  if (!isInSector) {
-    hold(entity);
-    return;
-  }
-
-  if (drive.mode === "flyby") {
-    setFlybyDrive(entity, delta);
-    return;
-  }
-
-  const path = tempPosition.copy(targetPosition).sub(entityPosition.coord);
-
-  const dAngle = getAngleDiff(entity, path);
-
-  const distance = path.len();
-  const angleOffset = Math.abs(dAngle);
-
-  movable.rotary = getDeltaAngle(dAngle, drive.rotary, delta);
-
-  if (distance <= drive.minimalDistance) {
-    movable.velocity = 0;
-    drive.targetReached = true;
-    if (targetEntity.cp.disposable) {
-      targetEntity.unregister("disposed");
-    }
-    return;
-  }
-
-  const canCruise =
-    distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
-    angleOffset < Math.PI / 12 &&
-    drive.limit > drive.maneuver;
-
-  if (drive.mode === "follow" && targetEntity.cp.drive) {
+    entity.cp.drive.limit = defaultDriveLimit;
     if (
-      targetEntity.cp.movable!.velocity > drive.maneuver ||
+      (targetEntity.cp.movable?.velocity ?? 0) > drive.maneuver ||
       distance > drive.maneuver * drive.ttc
     ) {
       if (canCruise && drive.state === "maneuver") {
@@ -199,50 +117,144 @@ function setDrive(entity: Navigable, delta: number) {
       stopCruise(entity);
     }
 
-    if (distance <= 0.5) {
-      entity.cp.drive.limit = targetEntity.cp.movable!.velocity;
-    } else {
-      entity.cp.drive.limit = defaultDriveLimit;
-    }
-  } else {
-    entity.cp.drive.limit = defaultDriveLimit;
-
-    if (
-      canCruise &&
-      drive.state === "maneuver" &&
-      entity.cooldowns.canUse(cruiseTimer)
-    ) {
-      entity.cooldowns.use(cruiseTimer, drive.ttc);
-      startCruise(entity);
-    }
-
-    if (!canCruise && drive.state === "cruise") {
-      stopCruise(entity);
-    }
+    const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
+    const maxSpeedLimited = Math.min(
+      drive.limit ?? defaultDriveLimit,
+      maxSpeed
+    );
+    const deltaSpeedMultiplier =
+      angleOffset > Math.PI / 3 ? random(0.55, 0.8) : 1;
+    movable.velocity = Math.max(
+      0,
+      Math.min(
+        movable.velocity +
+          maxSpeed * drive.acceleration * delta * deltaSpeedMultiplier,
+        maxSpeedLimited
+      )
+    );
   }
 
-  const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
-  const maxSpeedLimited = Math.min(drive.limit ?? defaultDriveLimit, maxSpeed);
-  const speedMultiplier = angleOffset < Math.PI / 8 ? 1 : -1;
+  private setDrive(entity: Navigable, delta: number) {
+    if (!entity.cp.drive.active || delta === 0) return;
 
-  movable.velocity = Math.max(
-    0,
-    Math.min(
-      movable.velocity +
-        speedMultiplier * maxSpeed * drive.acceleration * delta,
-      maxSpeedLimited
-    )
-  );
-}
+    const entityPosition = entity.cp.position;
+    const drive = entity.cp.drive;
+    const movable = entity.cp.movable;
 
-export class NavigatingSystem extends System {
-  entities: Navigable[];
+    if (!drive.target) return;
 
-  apply = (sim: Sim): void => {
+    if (drive.state === "warming" && entity.cooldowns.canUse(cruiseTimer)) {
+      drive.state = "cruise";
+    }
+
+    const targetEntity = this.sim.get(drive.target);
+    if (!targetEntity) {
+      hold(entity);
+      return;
+    }
+    const targetPosition =
+      entity.cp.commander?.id === targetEntity.id
+        ? getFormationPlace(
+            targetEntity.requireComponents(["subordinates", "position"]),
+            entity
+          )
+        : targetEntity.cp.position!.coord;
+    const isInSector =
+      targetEntity.cp.position!.sector === entityPosition.sector;
+
+    if (!isInSector) {
+      hold(entity);
+      return;
+    }
+
+    if (drive.mode === "flyby") {
+      this.setFlybyDrive(entity, delta);
+      return;
+    }
+
+    const path = tempPosition.copy(targetPosition).sub(entityPosition.coord);
+
+    const dAngle = getAngleDiff(entity, path);
+
+    const distance = path.len();
+    const angleOffset = Math.abs(dAngle);
+
+    movable.rotary = getDeltaAngle(dAngle, drive.rotary, delta);
+
+    if (distance <= drive.minimalDistance) {
+      movable.velocity = 0;
+      hook.notify(entity);
+      return;
+    }
+
+    const canCruise =
+      distance > (drive.state === "cruise" ? 3 : drive.ttc) * drive.maneuver &&
+      angleOffset < Math.PI / 12 &&
+      drive.limit > drive.maneuver;
+
+    if (drive.mode === "follow" && targetEntity.cp.drive) {
+      if (
+        targetEntity.cp.movable!.velocity > drive.maneuver ||
+        distance > drive.maneuver * drive.ttc
+      ) {
+        if (canCruise && drive.state === "maneuver") {
+          entity.cooldowns.use(cruiseTimer, drive.ttc);
+          startCruise(entity);
+        }
+      } else if (drive.state !== "maneuver") {
+        stopCruise(entity);
+      }
+
+      if (distance <= 0.5) {
+        entity.cp.drive.limit = targetEntity.cp.movable!.velocity;
+      } else {
+        entity.cp.drive.limit = defaultDriveLimit;
+      }
+    } else {
+      entity.cp.drive.limit = defaultDriveLimit;
+
+      if (
+        canCruise &&
+        drive.state === "maneuver" &&
+        entity.cooldowns.canUse(cruiseTimer)
+      ) {
+        entity.cooldowns.use(cruiseTimer, drive.ttc);
+        startCruise(entity);
+      }
+
+      if (!canCruise && drive.state === "cruise") {
+        stopCruise(entity);
+      }
+    }
+
+    const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
+    const maxSpeedLimited = Math.min(
+      drive.limit ?? defaultDriveLimit,
+      maxSpeed
+    );
+    const speedMultiplier = angleOffset < Math.PI / 8 ? 1 : -1;
+
+    movable.velocity = Math.max(
+      0,
+      Math.min(
+        movable.velocity +
+          speedMultiplier * maxSpeed * drive.acceleration * delta,
+        maxSpeedLimited
+      )
+    );
+  }
+
+  apply(sim: Sim): void {
     super.apply(sim);
 
-    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
-  };
+    sim.hooks.phase.update.subscribe(
+      this.constructor.name,
+      this.exec.bind(this)
+    );
+    sim.hooks.destroy.subscribe(this.constructor.name, () => {
+      hook.observers.clear();
+    });
+  }
 
   // eslint-disable-next-line class-methods-use-this
   exec(delta: number): void {
@@ -251,8 +263,12 @@ export class NavigatingSystem extends System {
       "movable",
       "position",
     ])) {
-      setDrive(entity, delta);
+      this.setDrive(entity, delta);
     }
+  }
+
+  static onTargetReached(origin: string, fn: (_entity: Navigable) => void) {
+    return hook.subscribe(origin, fn);
   }
 }
 

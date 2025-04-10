@@ -1,14 +1,29 @@
 import type { Sim } from "@core/sim";
+import type { RequireComponent } from "@core/tsHelpers";
 import { System } from "./system";
+import { NavigatingSystem } from "./navigating";
 
 export class DisposableUnregisteringSystem extends System<"exec"> {
-  apply = (sim: Sim) => {
+  apply(sim: Sim) {
     super.apply(sim);
 
-    sim.hooks.phase.cleanup.subscribe(this.constructor.name, this.exec);
-  };
+    sim.hooks.phase.cleanup.subscribe(
+      this.constructor.name,
+      this.exec.bind(this)
+    );
+    NavigatingSystem.onTargetReached(this.constructor.name, (entity) => {
+      if (entity.hasComponents(["disposable"])) {
+        this.dispose(entity);
+      }
+    });
+  }
 
-  exec = (delta: number): void => {
+  // eslint-disable-next-line class-methods-use-this
+  dispose(entity: RequireComponent<"disposable">): void {
+    entity.unregister("disposed");
+  }
+
+  exec(delta: number): void {
     this.cooldowns.update(delta);
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 120);
@@ -24,11 +39,11 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
             )
           )
         ) {
-          entity.unregister("disposed");
+          this.dispose(entity);
         }
       }
     }
-  };
+  }
 }
 
 export const disposableUnregisteringSystem =
