@@ -197,13 +197,6 @@ function cleanupChildren(entity: Entity): void {
     removeCommander(entity);
   }
 
-  if (entity.cp.drive?.target) {
-    const target = entity.sim.getOrThrow(entity.cp.drive.target);
-    if (target.hasComponents(["disposable"])) {
-      target.cp.disposable.disposed = true;
-      target.cp.disposable.owner = -1;
-    }
-  }
   if (
     (["asteroid", "virtual"] as EntityTag[]).some((tag) => entity.tags.has(tag))
   )
