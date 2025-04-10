@@ -482,6 +482,9 @@ export class FacilityPlanningSystem extends System<"plan"> {
       const productionModule = factoryModules.find(
         (facilityModule) =>
           facilityModule.pac &&
+          !mineableCommoditiesArray.some(
+            (mc) => facilityModule.pac[mc]?.consumes
+          ) &&
           isAbleToBuild(
             facilityModule.pac,
             resourcesProducedByFacilities,

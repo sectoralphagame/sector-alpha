@@ -5,7 +5,6 @@ import type {
   Action,
   Order,
 } from "@core/components/orders";
-import { asteroidField } from "@core/archetypes/asteroidField";
 import type { Ship } from "@core/archetypes/ship";
 import type { Sim } from "@core/sim";
 import {
