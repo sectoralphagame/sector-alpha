@@ -171,13 +171,12 @@ function setDrive(entity: Navigable, delta: number) {
   const angleOffset = Math.abs(dAngle);
 
   movable.rotary = getDeltaAngle(dAngle, drive.rotary, delta);
+
   if (distance <= drive.minimalDistance) {
     movable.velocity = 0;
     drive.targetReached = true;
-    if (targetEntity.hasComponents(["disposable"])) {
-      targetEntity.cp.disposable.disposed = true;
-      targetEntity.cp.disposable.owner = -1;
-      drive.target = null;
+    if (targetEntity.cp.disposable) {
+      targetEntity.unregister("disposed");
     }
     return;
   }
