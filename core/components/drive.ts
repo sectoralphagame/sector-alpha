@@ -33,8 +33,7 @@ export interface Drive extends BaseComponent<"drive"> {
 
   state: "maneuver" | "warming" | "cruise";
   target: number | null;
-  targetReached: boolean;
-  /** Minimal distance to target to set targetReached to true */
+  /** Minimal distance to target to assume target was reached */
   minimalDistance: number;
   /** Limits maximum speed */
   limit: number;
@@ -50,7 +49,6 @@ export function createDrive(input: ShipDriveProps): Drive {
     rotary: (input.rotary * Math.PI) / 180,
     state: "maneuver",
     target: null,
-    targetReached: false,
     name: "drive",
     minimalDistance: 0.01,
     limit: defaultDriveLimit,

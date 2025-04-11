@@ -78,6 +78,9 @@ function idleMovement(entity: RequireComponent<"position" | "orders">) {
       { onlyManeuver: true }
     ),
     type: "move",
+    meta: {
+      action: "idle",
+    },
   });
 }
 

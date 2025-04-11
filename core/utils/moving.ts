@@ -135,15 +135,13 @@ export function setTarget(entity: Driveable, target: number | null) {
     target === null ? true : target !== entity.cp.drive.target;
 
   if (shouldUpdate) {
-    entity.cp.drive.state = "maneuver";
     entity.cp.drive.target = target;
-    entity.cp.drive.targetReached = false;
+    entity.cp.drive.state = "maneuver";
   }
 }
 
 export function clearTarget(entity: Driveable) {
   stop(entity);
   setTarget(entity, null);
-  entity.cp.drive.targetReached = true;
   entity.cp.drive.mode = "goto";
 }

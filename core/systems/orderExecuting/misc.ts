@@ -18,9 +18,20 @@ export function moveActionCleanup(
 }
 
 export function moveAction(
-  entity: RequireComponent<"drive" | "movable" | "orders">,
+  entity: RequireComponent<"drive" | "movable" | "orders" | "position">,
   order: MoveAction
 ): boolean {
+  const target = waypoint(entity.sim.getOrThrow(order.targetId));
+  const isTargetReached =
+    entity.cp.position.sector === target.cp.position.sector &&
+    entity.cp.position.coord.distance(target.cp.position.coord) <=
+      entity.cp.drive.minimalDistance;
+
+  if (isTargetReached) {
+    moveActionCleanup(entity);
+    return true;
+  }
+
   setTarget(entity, order.targetId);
   entity.cp.drive.limit = order.onlyManeuver
     ? entity.cp.drive.maneuver
@@ -30,18 +41,9 @@ export function moveAction(
     entity.cp.orders.value[0].actions.unshift({
       type: "undock",
     });
-    return false;
   }
 
-  if (order.ignoreReached) return false;
-
-  const reached = entity.cp.drive.targetReached;
-
-  if (reached) {
-    moveActionCleanup(entity);
-  }
-
-  return reached;
+  return false;
 }
 
 export function undockAction(

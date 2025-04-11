@@ -88,6 +88,7 @@ export class Sim extends BaseSim {
       onSpeedChange: new Observable("onSpeedChange", false),
     };
 
+    entityIndexer.clear();
     this.index = defaultIndexer;
     for (const index of Object.values(defaultIndexer)) {
       index.apply();

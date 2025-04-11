@@ -5,7 +5,6 @@ import { Sim } from "@core/sim";
 import { movingSystem } from "@core/systems/moving";
 import { spottingSystem } from "@core/systems/ai/spotting";
 import { hitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating";
-import { navigatingSystem } from "@core/systems/navigating";
 import { cooldownUpdatingSystem } from "@core/systems/cooldowns";
 import { orderPlanningSystem } from "@core/systems/ai/orderPlanning";
 import { orderExecutingSystem } from "@core/systems/orderExecuting/orderExecuting";
@@ -31,6 +30,7 @@ import settings from "@core/settings";
 import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
 import { gameStore } from "@ui/state/game";
 import { Vec2 } from "ogl";
+import { NavigatingSystem } from "@core/systems/navigating";
 
 const Game: React.FC<{ factions: number; fighters: number }> = ({
   factions,
@@ -45,7 +45,7 @@ const Game: React.FC<{ factions: number; fighters: number }> = ({
         movingSystem,
         spottingSystem,
         hitpointsRegeneratingSystem,
-        navigatingSystem,
+        new NavigatingSystem(),
         cooldownUpdatingSystem,
         orderPlanningSystem,
         orderExecutingSystem,

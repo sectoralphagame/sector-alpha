@@ -48,7 +48,11 @@ export function dockOrder(
   }
 
   if (
-    entity.cp.drive.targetReached &&
+    entity.cp.position.sector === target.cp.position.sector &&
+    entity.cp.position.coord.distance(target.cp.position.coord) <=
+      entity.cp.drive.minimalDistance &&
+    entity.cp.dockable.dockedIn === null &&
+    entity.cp.dockable.undocking === false &&
     availableDocks(docks, size, entity.sim) > 0
   ) {
     dockShip(entity, target);

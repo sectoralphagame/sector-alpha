@@ -75,6 +75,7 @@ export interface BaseOrder {
   origin: string;
   actions: Action[];
   interrupt?: boolean;
+  meta?: Record<string, unknown>;
 }
 
 export interface HoldOrder extends BaseOrder {

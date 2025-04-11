@@ -18,7 +18,6 @@ import { hitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating
 import { inflationStatisticGatheringSystem } from "@core/systems/inflationStatisticGathering";
 import { miningSystem } from "@core/systems/mining";
 import { movingSystem } from "@core/systems/moving";
-import { navigatingSystem } from "@core/systems/navigating";
 import { orderExecutingSystem } from "@core/systems/orderExecuting/orderExecuting";
 import { pathPlanningSystem } from "@core/systems/pathPlanning";
 import { pirateSpawningSystem } from "@core/systems/pirateSpawning";
@@ -32,6 +31,7 @@ import { undeployingSystem } from "@core/systems/undeploying";
 import { fogOfWarUpdatingSystem } from "@core/systems/fogOfWarUpdating";
 import { storageTransferringSystem } from "@core/systems/storageTransferring";
 import { sectorClaimingSystem } from "@core/systems/sectorClaiming";
+import { NavigatingSystem } from "@core/systems/navigating";
 import type { SimConfig } from "./Sim";
 
 export const bootstrapSystems = [
@@ -42,7 +42,7 @@ export const bootstrapSystems = [
   tradingSystem,
   budgetPlanningSystem,
   orderPlanningSystem,
-  navigatingSystem,
+  new NavigatingSystem(),
   movingSystem,
   miningSystem,
   orderExecutingSystem,
