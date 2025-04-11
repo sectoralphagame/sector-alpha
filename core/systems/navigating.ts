@@ -13,7 +13,6 @@ import { System } from "./system";
 const tempPosition = new Vec2();
 
 type Navigable = Driveable & RequireComponent<"position">;
-const hook = new Observable<Navigable>("onTargetReached");
 
 function hold(entity: Navigable) {
   clearTarget(entity);
@@ -64,8 +63,16 @@ export function getDeltaAngle(
 
 const cruiseTimer = "cruise";
 
+let navigatingSystem: NavigatingSystem;
 export class NavigatingSystem extends System {
   entities: Navigable[];
+  hook: Observable<Navigable> = new Observable<Navigable>("onTargetReached");
+
+  constructor() {
+    super();
+
+    navigatingSystem = this;
+  }
 
   private setFlybyDrive(entity: Navigable, delta: number) {
     const drive = entity.cp.drive;
@@ -75,7 +82,7 @@ export class NavigatingSystem extends System {
     const targetPosition = targetEntity.cp.position!;
 
     const path = tempPosition
-      .copy(targetPosition.coord)
+      .set(targetPosition.coord)
       .sub(entityPosition.coord);
     const dAngle = getAngleDiff(entity, path);
 
@@ -153,7 +160,8 @@ export class NavigatingSystem extends System {
       return;
     }
     const targetPosition =
-      entity.cp.commander?.id === targetEntity.id
+      entity.cp.commander?.id === targetEntity.id &&
+      targetEntity.hasComponents(["drive"])
         ? getFormationPlace(
             targetEntity.requireComponents(["subordinates", "position"]),
             entity
@@ -183,7 +191,7 @@ export class NavigatingSystem extends System {
 
     if (distance <= drive.minimalDistance) {
       movable.velocity = 0;
-      hook.notify(entity);
+      this.hook.notify(entity);
       return;
     }
 
@@ -252,7 +260,7 @@ export class NavigatingSystem extends System {
       this.exec.bind(this)
     );
     sim.hooks.destroy.subscribe(this.constructor.name, () => {
-      hook.observers.clear();
+      this.hook.observers.clear();
     });
   }
 
@@ -267,9 +275,11 @@ export class NavigatingSystem extends System {
     }
   }
 
+  static getInstance(): NavigatingSystem {
+    return navigatingSystem;
+  }
+
   static onTargetReached(origin: string, fn: (_entity: Navigable) => void) {
-    return hook.subscribe(origin, fn);
+    return NavigatingSystem.getInstance().hook.subscribe(origin, fn);
   }
 }
-
-export const navigatingSystem = new NavigatingSystem();

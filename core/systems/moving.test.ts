@@ -1,4 +1,5 @@
 import { distance, matrix } from "mathjs";
+import { Vec2 } from "ogl";
 import { createFaction } from "../archetypes/faction";
 import { createWaypoint } from "../archetypes/waypoint";
 import type { Sector } from "../archetypes/sector";
@@ -35,7 +36,7 @@ describe("Floating entity", () => {
       .addComponent({
         name: "position",
         angle: 0,
-        coord: [0, 0],
+        coord: new Vec2(0, 0),
         sector: sector.id,
         moved: false,
       })
@@ -85,38 +86,43 @@ describe("Ship", () => {
     });
     ship = createShip(sim, {
       ...shipClasses.find((s) => s.name === "Courier A")!,
-      position: [1, 0],
+      position: new Vec2(1, 0),
       owner: createFaction("F", sim),
       sector,
     });
     ship.cp.drive.maneuver = 1;
+    ship.cp.drive.minimalDistance = 0.01;
   });
 
   it("is able to go to target position", () => {
-    ship.cp.position.coord = [0, 0];
+    const cb = jest.fn();
+    NavigatingSystem.onTargetReached("test", cb);
+    ship.cp.position.coord.set(0, 0);
     setTarget(
       ship,
       createWaypoint(sim, {
         sector: sector.id,
-        value: [1, 0],
+        value: new Vec2(1, 0),
         owner: 0,
       }).id
     );
 
-    for (let index = 0; index < 6; index++) {
+    for (let index = 0; index < 5; index++) {
       navigatingSystem.exec(1);
       movingSystem.exec(1);
     }
 
-    expect(ship.cp.drive.targetReached).toBe(true);
+    expect(cb).toHaveBeenCalledTimes(1);
   });
 
   it("is not able to go to target position if travel is too short", () => {
+    const cb = jest.fn();
+    NavigatingSystem.onTargetReached("test", cb);
     setTarget(
       ship,
       createWaypoint(sim, {
         sector: sector.id,
-        value: [1, 10],
+        value: new Vec2(1, 10),
         owner: 0,
       }).id
     );
@@ -124,13 +130,15 @@ describe("Ship", () => {
     navigatingSystem.exec(1);
     movingSystem.exec(1);
 
-    expect(ship.cp.drive.targetReached).toBe(false);
+    expect(cb).not.toHaveBeenCalled();
   });
 
   it("is able to make move order", () => {
+    const cb = jest.fn();
+    NavigatingSystem.onTargetReached("test", cb);
     const m = createWaypoint(sim, {
       sector: sector.id,
-      value: [1, 1],
+      value: new Vec2(1, 1),
       owner: 0,
     });
     ship.cp.orders.value.push({
@@ -145,12 +153,12 @@ describe("Ship", () => {
     });
 
     orderExecutingSystem.exec();
-    for (let index = 0; index < 12; index++) {
+    for (let index = 0; index < 6; index++) {
       navigatingSystem.exec(1);
       movingSystem.exec(1);
     }
 
     expect(distance(ship.cp.position.coord, [1, 1])).toBeLessThan(0.01);
-    expect(ship.cp.drive.targetReached).toBe(true);
+    expect(cb).toHaveBeenCalledTimes(1);
   });
 });
