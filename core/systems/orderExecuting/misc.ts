@@ -9,6 +9,7 @@ import type {
 } from "../../components/orders";
 import type { RequireComponent } from "../../tsHelpers";
 import { undockShip } from "./dock";
+import { DisposableUnregisteringSystem } from "../disposableUnregistering";
 
 export function moveActionCleanup(
   entity: RequireComponent<"drive" | "movable" | "orders">
@@ -29,6 +30,9 @@ export function moveAction(
 
   if (isTargetReached) {
     moveActionCleanup(entity);
+    if (target.hasTags(["virtual"]) && target.hasComponents(["disposable"])) {
+      DisposableUnregisteringSystem.dispose(target);
+    }
     return true;
   }
 
