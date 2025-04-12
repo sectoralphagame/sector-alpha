@@ -13,14 +13,14 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
     );
     NavigatingSystem.onTargetReached(this.constructor.name, (entity) => {
       if (entity.hasComponents(["disposable"])) {
-        this.dispose(entity);
+        DisposableUnregisteringSystem.dispose(entity);
       }
     });
   }
 
   // eslint-disable-next-line class-methods-use-this
-  dispose(entity: RequireComponent<"disposable">): void {
-    entity.unregister("disposed");
+  static dispose(entity: RequireComponent<"disposable">): void {
+    entity.cp.disposable.disposed = true;
   }
 
   exec(delta: number): void {
@@ -31,6 +31,7 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
       for (const entity of this.sim.index.disposable.getIt()) {
         const owner = this.sim.get(entity.cp.disposable.owner);
         if (
+          entity.cp.disposable.disposed ||
           !owner ||
           !owner.cp.orders?.value.some((order) =>
             order.actions.some(
@@ -39,7 +40,7 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
             )
           )
         ) {
-          this.dispose(entity);
+          DisposableUnregisteringSystem.dispose(entity);
         }
       }
     }

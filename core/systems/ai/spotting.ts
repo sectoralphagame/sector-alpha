@@ -69,7 +69,7 @@ export class SpottingSystem extends System<"exec"> {
         entity: e,
         distance: e.cp.position.coord.distance(entity.cp.position.coord),
       })),
-      sort((a, b) => (a.distance > b.distance ? 1 : -1)),
+      sort((a, b) => a.distance - b.distance),
       toArray
     );
   }
