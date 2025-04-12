@@ -114,7 +114,9 @@ export class Sim extends BaseSim {
     );
     this.hooks.removeEntity.subscribe("EntityIndexer", ({ entity, reason }) => {
       logger.log(
-        `Removing entity ${entity.id} ${entity.cp.name?.value ?? ""} ${reason}`
+        `Removing entity ${entity.id} ${
+          entity.cp.name?.value ?? "[unnamed]"
+        } (${reason})`
       );
       entityIndexer.remove(entity);
     });

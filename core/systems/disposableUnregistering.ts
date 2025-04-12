@@ -3,8 +3,6 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { System } from "./system";
 import { NavigatingSystem } from "./navigating";
 
-const disposablePool = 300;
-
 export class DisposableUnregisteringSystem extends System<"exec"> {
   apply(sim: Sim) {
     super.apply(sim);
@@ -30,9 +28,7 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
     if (this.cooldowns.canUse("exec")) {
       this.cooldowns.use("exec", 120);
 
-      let disposables = 0;
       for (const entity of this.sim.index.disposable.getIt()) {
-        disposables++;
         const owner = this.sim.get(entity.cp.disposable.owner);
         if (
           entity.cp.disposable.disposed ||
@@ -44,12 +40,7 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
             )
           )
         ) {
-          if (disposables > disposablePool) {
-            entity.unregister("disposed");
-            disposables--;
-          } else {
-            DisposableUnregisteringSystem.dispose(entity);
-          }
+          DisposableUnregisteringSystem.dispose(entity);
         }
       }
     }
