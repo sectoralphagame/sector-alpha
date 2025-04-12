@@ -109,7 +109,7 @@ const config = {
         use: ["./build/conversation-loader.ts"],
       },
       {
-        test: /\.(svg|png|jpe?g|wav|glb)$/,
+        test: /\.(svg|png|jpe?g|webp|wav|glb)$/,
         type: "asset/resource",
       },
       {

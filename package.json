@@ -19,6 +19,7 @@
     "gen-save": "tsx ./scripts/createSave.mts",
     "gen-icons": "node -r ts-node/register ./scripts/createIconsModule.ts",
     "gen-commodities-graph": "node -r ts-node/register ./scripts/createCommoditiesGraph.ts",
+    "optimise-images": "tsx ./scripts/optimiseImage.mts",
     "prepare": "husky install",
     "postinstall": "patch-package"
   },
@@ -35,6 +36,7 @@
     "@storybook/react-webpack5": "^8.4.1",
     "@storybook/test": "^8.4.1",
     "@tweakpane/core": "^2.0.5",
+    "@types/columnify": "^1.5.4",
     "@types/graphlib": "^2.1.8",
     "@types/howler": "^2.2.11",
     "@types/jest": "^27.0.2",
@@ -46,12 +48,14 @@
     "@types/react-router": "^5.1.18",
     "@types/react-router-dom": "^5.3.3",
     "@types/webpack": "^5.28.5",
+    "@types/yargs": "^17.0.33",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
     "ajv": "^8.12.0",
     "babel-loader": "^8.3.0",
     "circular-dependency-plugin": "^5.2.2",
     "cli-progress": "^3.12.0",
+    "columnify": "^1.6.0",
     "css-loader": "^6.7.1",
     "dart-sass": "^1.25.0",
     "dts-css-modules-loader": "^2.0.1",
@@ -93,7 +97,8 @@
     "webpack": "^5.58.2",
     "webpack-bugsnag-plugins": "^1.8.0",
     "webpack-cli": "^4.9.0",
-    "webpack-dev-server": "^4.3.1"
+    "webpack-dev-server": "^4.3.1",
+    "yargs": "^17.7.2"
   },
   "dependencies": {
     "@alenaksu/json-viewer": "^1.0.1",

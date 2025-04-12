@@ -1,9 +1,9 @@
-import back from "./back.png";
-import front from "./front.png";
-import bottom from "./bottom.png";
-import top from "./top.png";
-import left from "./left.png";
-import right from "./right.png";
+import back from "./back.webp";
+import front from "./front.webp";
+import bottom from "./bottom.webp";
+import top from "./top.webp";
+import left from "./left.webp";
+import right from "./right.webp";
 
 export const sectoralpha = {
   back,
