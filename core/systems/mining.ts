@@ -1,51 +1,53 @@
 import type { Sim } from "@core/sim";
-// import { gameMonth } from "@core/utils/misc";
-// import settings from "@core/settings";
+import { gameDay, gameMonth } from "@core/utils/misc";
 import type { MineableCommodity } from "@core/economy/commodity";
 import { asteroidField } from "@core/archetypes/asteroidField";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { addStorage } from "../components/storage";
 import type { RequireComponent } from "../tsHelpers";
 import { System } from "./system";
 
 type WithMining = RequireComponent<"mining" | "storage">;
-// const tickChance = 1 / 240;
-const baseMiningefficiency = 1.2;
+const tickChance = 1 / 4;
+const baseMiningefficiency = 10;
+const tickTime = gameDay / 4;
 
 export class MiningSystem extends System<"exec"> {
-  apply = (sim: Sim): void => {
+  apply(sim: Sim): void {
     super.apply(sim);
 
-    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
-  };
-  exec = (delta: number): void => {
-    // if (!this.cooldowns.canUse("exec")) return;
-
-    for (const entity of this.sim.index.mining.getIt()) {
-      this.mine(entity, delta);
-    }
-    // this.cooldowns.use("exec", 1);
-  };
-
-  mine(entity: WithMining, delta: number) {
-    if (entity.cp.mining.entityId && entity.cp.mining.resource) {
-      if (entity.cooldowns.canUse("mine")) {
-        entity.cooldowns.use("mine", 5);
-        addStorage(
-          entity.cp.storage,
-          entity.cp.mining.resource,
-          Math.floor(entity.cp.mining.buffer),
-          false
-        );
-        entity.cp.mining.buffer = 0;
+    sim.hooks.phase.update.subscribe(
+      this.constructor.name,
+      this.exec.bind(this)
+    );
+  }
+  exec(): void {
+    this.cooldowns.doEvery("exec", tickTime, () => {
+      for (const entity of entityIndexer.search(["storage", "mining"])) {
+        this.mine(entity);
       }
-      const field = asteroidField(
-        this.sim.getOrThrow(entity.cp.mining.entityId)
-      );
-      entity.cp.mining.buffer +=
-        entity.cp.mining.efficiency *
-        delta *
-        MiningSystem.getFieldEfficiencyFactor(field, entity.cp.mining.resource);
-    }
+    });
+  }
+
+  mine(entity: WithMining) {
+    if (
+      !(
+        entity.cp.mining.entityId &&
+        entity.cp.mining.resource &&
+        Math.random() < entity.cp.mining.efficiency * tickChance
+      )
+    )
+      return;
+
+    const field = asteroidField(this.sim.getOrThrow(entity.cp.mining.entityId));
+    addStorage(
+      entity.cp.storage,
+      entity.cp.mining.resource,
+      Math.floor(
+        MiningSystem.getFieldEfficiencyFactor(field, entity.cp.mining.resource)
+      ),
+      false
+    );
   }
 
   static getFieldEfficiencyFactor(
@@ -64,20 +66,15 @@ export class MiningSystem extends System<"exec"> {
     );
   }
 
-  // static getExpectedMonthMiningValue(
-  //   density: number,
-  //   composition: number,
-  //   efficiency: number
-  // ): number {
-  //   return (
-  //     gameMonth *
-  //     settings.global.targetFps *
-  //     density *
-  //     composition *
-  //     efficiency *
-  //     tickChance
-  //   );
-  // }
+  static getExpectedMonthMiningValue(
+    density: number,
+    composition: number,
+    efficiency: number
+  ): number {
+    return (
+      (gameMonth / tickTime) * density * composition * efficiency * tickChance
+    );
+  }
 }
 
 export const miningSystem = new MiningSystem();

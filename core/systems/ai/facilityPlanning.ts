@@ -341,19 +341,32 @@ export class FacilityPlanningSystem extends System<"plan"> {
 
     if (Object.keys(spots).length === 0) return null;
 
-    const availableResources = mineableCommoditiesArray.filter((resource) =>
-      fields.some(
-        (f) =>
-          f.cp.mineable.resources[resource] > 0 &&
-          spots[f.id].max > spots[f.id].used + safetyMiningOffset &&
-          factionBlueprints.some(
-            (bp) =>
-              bp.type === "production" && (bp.pac[resource]?.consumes ?? 0) > 0
-          )
+    const resourceUsage = getResourceUsage([
+      ...entityIndexer.searchBySector(sector.id, [
+        "modules",
+        "compoundProduction",
+      ]),
+    ]);
+    const availableResources = mineableCommoditiesArray
+      .filter((resource) =>
+        fields.some(
+          (f) =>
+            f.cp.mineable.resources[resource] > 0 &&
+            spots[f.id].max > spots[f.id].used + safetyMiningOffset &&
+            factionBlueprints.some(
+              (bp) =>
+                bp.type === "production" &&
+                (bp.pac[resource]?.consumes ?? 0) > 0
+            )
+        )
       )
-    );
+      .sort((a, b) => resourceUsage[a] - resourceUsage[b]);
 
     for (const resource of availableResources) {
+      this.logger.log(
+        `Evaluating ${resource} mining facility in ${sector.cp.name.value} for ${faction.cp.name.slug}`,
+        "error"
+      );
       const facilityModule = factionBlueprints
         .filter(discriminate("type", "production"))
         .find((fm) => fm.pac?.[resource]?.consumes);
@@ -380,6 +393,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
         name: `${capitalize(commodityLabel[resource])} Mining Complex`,
         sector,
       };
+      this.logger.log(`Planned ${plan.name}`, "error");
 
       return plan;
     }
