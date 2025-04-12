@@ -1,11 +1,10 @@
 import type { Vec2 } from "ogl";
-import { Euler, Geometry, Mat3, Mat4, Plane, Quat, Transform, Vec3 } from "ogl";
+import { Euler, Geometry, Mat3, Mat4, Quat, Transform, Vec3 } from "ogl";
 import type { ModelName } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { random } from "mathjs";
 import { InstancedPbrMaterial } from "@ogl-engine/materials/instancedPbr/instancedPbr";
-import { AsteroidFieldRingMaterial } from "@ogl-engine/materials/asteroidFieldRing/asteroidFieldRing";
 import { BaseMesh } from "./BaseMesh";
 import type { Engine3D } from "./engine3d";
 
@@ -44,8 +43,9 @@ export class Asteroids extends Transform {
     const t = Math.random();
 
     if (t < 0.8) return random(9, 15);
+    if (t < 0.99) return random(20, 50);
 
-    return random(20, 50);
+    return random(50, 100);
   }
 
   private async createAsteroids(offset: Vec2, radius: number) {

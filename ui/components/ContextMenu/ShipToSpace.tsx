@@ -1,4 +1,3 @@
-import { norm, subtract } from "mathjs";
 import React from "react";
 import {
   asteroidFieldComponents,
@@ -17,9 +16,12 @@ import {
   commodityLabel,
   type MineableCommodity,
 } from "@core/economy/commodity";
+import { Vec2 } from "ogl";
 import { useSim } from "../../atoms";
 import { NoAvailableActions } from "./NoAvailableActions";
 import { Wrapper } from "./Wrapper";
+
+const tempVec2 = new Vec2(0, 0);
 
 export const ShipToSpace: React.FC = () => {
   const [sim] = useSim();
@@ -34,10 +36,14 @@ export const ShipToSpace: React.FC = () => {
   const fieldToMine = selected.every((unit) => unit.hasComponents(["mining"]))
     ? find(
         (field) =>
-          (norm(
-            subtract(field.cp.position.coord, menu.worldPosition)
-          ) as number) < field.cp.mineable.size &&
-          menu.sector?.id === field.cp.position.sector,
+          field.cp.mineable.fPoints.some(
+            ([pos, size]) =>
+              tempVec2
+                .set(field.cp.position.coord)
+                .add(pos)
+                .squaredDistance(menu.worldPosition) <=
+              size ** 2
+          ) && menu.sector?.id === field.cp.position.sector,
         entityIndexer.search(asteroidFieldComponents)
       )
     : null;
