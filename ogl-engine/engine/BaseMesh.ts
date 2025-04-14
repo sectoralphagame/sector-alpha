@@ -13,6 +13,7 @@ export class BaseMesh<TMaterial extends Material = Material>
   engine: Engine3D;
   name = "BaseMesh";
   material: TMaterial;
+  tangents = true;
   onDestroyCallbacks: (() => void)[] = [];
 
   constructor(
@@ -31,7 +32,9 @@ export class BaseMesh<TMaterial extends Material = Material>
       this.name = options.name;
     }
 
-    if (this.geometry && !this.geometry.attributes.tangent) {
+    this.tangents = options.calculateTangents ?? true;
+
+    if (this.geometry && !this.geometry.attributes.tangent && this.tangents) {
       this.calculateTangents();
     }
 
@@ -52,7 +55,7 @@ export class BaseMesh<TMaterial extends Material = Material>
     this.geometry = geometry;
 
     // add tangent attribute if missing
-    if (!this.geometry.attributes.tangent) {
+    if (!this.geometry.attributes.tangent && this.tangents) {
       this.calculateTangents();
     }
   }
