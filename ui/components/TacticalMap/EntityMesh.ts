@@ -3,11 +3,9 @@ import type { ParticleGeneratorInput } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
-import type { EngineParticleGenerator } from "@ogl-engine/particles";
 import { getParticleType, particleGenerator } from "@ogl-engine/particles";
 import { Light } from "@ogl-engine/engine/Light";
 import { Plane } from "ogl";
-import { ship } from "@core/archetypes/ship";
 import { EntityIndicatorMaterial } from "@ogl-engine/materials/entityIndicator/entityIndicator";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { RibbonEmitter } from "@ogl-engine/RibbonEmitter";
@@ -61,6 +59,8 @@ export class EntityMesh extends BaseMesh {
     this.entity = entity;
     this.name = `EntityMesh:${entity.id}`;
 
+    this.updatePosition();
+
     if (gltf.particles) {
       for (const input of gltf.particles) {
         // FIXME: add this as a child after light refactor
@@ -70,29 +70,28 @@ export class EntityMesh extends BaseMesh {
           light.setColor("#fffd8c");
           this.addChild(light);
           this.engine.addLight(light);
-        } else {
-          const emitter = new RibbonEmitter(this, input.position);
-          emitter.mesh.material.setColor(
-            entity.cp.owner
-              ? entity.sim.getOrThrow<Faction>(entity.cp.owner.id).cp.color
-                  .value
-              : "#ffffff"
+        }
+
+        if (input.name.includes("engine")) {
+          const emitter = new RibbonEmitter(
+            this,
+            input.position,
+            input.scale.x * 4,
+            { small: 25, medium: 10, large: 5 }[
+              entity.cp.dockable?.size ?? "large"
+            ]
           );
+          const color = entity.cp.owner
+            ? entity.sim.getOrThrow<Faction>(entity.cp.owner.id).cp.color.value
+            : "#ffffff";
+          emitter.material.setColor(color);
 
           this.onDestroyCallbacks.push(() => {
             emitter.destroy();
           });
         }
-        // if (input.name.includes("engine")) {
-        //   const light = new Light(0.2, false);
-        //   light.setColor("#1ff4ff");
-        //   this.addChild(light);
-        //   this.engine.addLight(light);
-        // }
       }
     }
-
-    this.updatePosition();
 
     if (entity.tags.has("selection")) {
       this.indicator = new EntityIndicator(engine);
@@ -133,17 +132,6 @@ export class EntityMesh extends BaseMesh {
     generator.scale.copy(input.scale).multiply(1 / entityScale);
     generator.setParent(this);
     generator.updateMatrixWorld();
-
-    if (type === "engine") {
-      this.onBeforeRender(() => {
-        const gen = generator as any as EngineParticleGenerator;
-        const shipEntity = ship(this.entity);
-
-        gen.setIntensity(
-          shipEntity.cp.movable.velocity / shipEntity.cp.drive.maneuver
-        );
-      });
-    }
   }
 
   setSelected(selected: boolean) {

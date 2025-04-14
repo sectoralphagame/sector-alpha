@@ -1,8 +1,6 @@
 import type { OGLRenderingContext } from "ogl";
 import { Geometry, Vec3 } from "ogl";
 import { BaseMesh } from "./engine/BaseMesh";
-import type { Engine3D } from "./engine/engine3d";
-import type { Destroyable } from "./types";
 import { EngineTrailMaterial } from "./materials/engineTrail/engineTrail";
 
 const tempVec3 = new Vec3();
@@ -98,30 +96,37 @@ export class RibbonGeometry extends Geometry {
   }
 }
 
-export class RibbonEmitter implements Destroyable {
-  engine: Engine3D;
-  parent: BaseMesh;
+export class RibbonEmitter extends BaseMesh<EngineTrailMaterial> {
+  trackedEntity: BaseMesh;
   segments: Float32Array;
-  readonly maxSegments: number = 25;
   offset: Vec3;
-  mesh: BaseMesh<EngineTrailMaterial>;
+  width = 0.3;
+  maxSegments = 25;
   onDestroyCallbacks: (() => void)[] = [];
+  initialised = false;
 
-  constructor(parent: BaseMesh, offset?: Vec3) {
-    this.parent = parent;
-    this.offset = offset || new Vec3();
-    this.engine = parent.engine;
-    this.mesh = new BaseMesh(this.engine, {
+  constructor(
+    trackedEntity: BaseMesh,
+    offset: Vec3,
+    width: number,
+    maxSegments: number
+  ) {
+    super(trackedEntity.engine, {
       frustumCulled: false,
       name: "RibbonEmitter",
-      geometry: new RibbonGeometry(this.engine.gl, this.maxSegments),
-      material: new EngineTrailMaterial(this.engine, "#ff00ff"),
+      geometry: new RibbonGeometry(trackedEntity.engine.gl, maxSegments),
+      material: new EngineTrailMaterial(trackedEntity.engine, "#ff00ff"),
       calculateTangents: false,
     });
-    this.segments = new Float32Array(this.maxSegments * 4);
+    this.maxSegments = maxSegments;
+    this.width = width;
+    this.trackedEntity = trackedEntity;
+    this.offset = offset || new Vec3();
+    this.engine = trackedEntity.engine;
+    this.segments = new Float32Array(maxSegments * 4);
 
-    this.mesh.setParent(this.engine.scene);
-    this.mesh.onBeforeRender(() => {
+    this.setParent(this.engine.scene);
+    this.onBeforeRender(() => {
       this.update(this.engine.delta);
     });
 
@@ -129,20 +134,17 @@ export class RibbonEmitter implements Destroyable {
     this.engine.hooks.onUpdate.subscribe("RibbonEmitter", updateFn);
     this.onDestroyCallbacks.push(() => {
       this.engine.hooks.onUpdate.unsubscribe(updateFn);
-      this.mesh.destroy();
-      this.mesh.setParent(null);
     });
   }
 
   update(delta: number) {
-    if (delta) {
-      if (this.segments.length > 0) {
+    if (!this.initialised) {
+      for (let i = 0; i < this.maxSegments; i++) {
         this.spawnSegment();
-      } else {
-        for (let i = 0; i < this.maxSegments; i++) {
-          this.spawnSegment();
-        }
       }
+      this.initialised = true;
+    } else if (delta) {
+      this.spawnSegment();
     }
 
     this.updateGeometry();
@@ -152,7 +154,7 @@ export class RibbonEmitter implements Destroyable {
     this.segments.set(this.segments.subarray(0, (this.maxSegments - 1) * 4), 4);
     const position = tempVec3
       .copy(this.offset)
-      .applyMatrix4(this.parent.worldMatrix);
+      .applyMatrix4(this.trackedEntity.worldMatrix);
 
     this.segments.set(
       [position.x, position.y, position.z, this.engine.uniforms.uTime.value],
@@ -165,12 +167,15 @@ export class RibbonEmitter implements Destroyable {
 
     RibbonGeometry.build(
       this.segments,
-      this.mesh.geometry.attributes.position.data! as Float32Array,
-      this.parent.position.clone().sub(this.engine.camera.position).normalize(),
-      0.3 * this.parent.scale.x
+      this.geometry.attributes.position.data! as Float32Array,
+      this.trackedEntity.position
+        .clone()
+        .sub(this.engine.camera.position)
+        .normalize(),
+      this.width * this.trackedEntity.scale.x
     );
 
-    this.mesh.geometry.attributes.position.needsUpdate = true;
+    this.geometry.attributes.position.needsUpdate = true;
   }
 
   destroy() {

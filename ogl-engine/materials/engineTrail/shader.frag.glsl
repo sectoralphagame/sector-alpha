@@ -7,7 +7,7 @@ out vec4 fragData[2];
 
 uniform vec3 uColor;
 
-#define emissive 0.5f
+#define emissive 0.8f
 #define K 0.02
 
 void main() {
@@ -16,6 +16,6 @@ void main() {
     float alphaY = K / (K + alphaFactorY * alphaFactorY) - K;
     float alpha = alphaX * alphaY;
 
-    fragData[0] = vec4(uColor, alpha);
-    fragData[1] = fragData[0] * emissive;
+    fragData[0] = vec4(uColor * (1.f + emissive) * alphaX, alpha);
+    fragData[1].r = emissive;
 }
