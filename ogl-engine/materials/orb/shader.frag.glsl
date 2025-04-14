@@ -1,6 +1,8 @@
 #version 300 es
 precision highp float;
 
+#pragma glslify: luma = require(glsl-luma)
+
 in vec2 vUv;
 in float vT;
 
@@ -19,5 +21,5 @@ void main() {
     if(fragData[0].a < 0.1f) {
         discard;
     }
-    fragData[1] = fragData[0] * fEmissive;
+    fragData[1].r = luma(fragData[0]) * fEmissive;
 }

@@ -3,9 +3,9 @@ import { Plane, Sphere, Transform } from "ogl";
 import type { FolderApi } from "tweakpane";
 import { StarCoronaMaterial } from "@ogl-engine/materials/starCorona/starCorona";
 import { getPane } from "@ui/context/Pane";
-import type { Engine3D } from "./engine3d";
-import { BaseMesh } from "./BaseMesh";
-import type { Engine } from "./engine";
+import type { Engine3D } from "../engine/engine3d";
+import { BaseMesh } from "../engine/BaseMesh";
+import type { Engine } from "../engine/engine";
 
 export class Star extends Transform {
   engine: Engine;

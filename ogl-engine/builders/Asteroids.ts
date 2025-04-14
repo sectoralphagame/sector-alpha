@@ -5,8 +5,8 @@ import { assetLoader } from "@ogl-engine/AssetLoader";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { random } from "mathjs";
 import { InstancedPbrMaterial } from "@ogl-engine/materials/instancedPbr/instancedPbr";
-import { BaseMesh } from "./BaseMesh";
-import type { Engine3D } from "./engine3d";
+import { BaseMesh } from "../engine/BaseMesh";
+import type { Engine3D } from "../engine/engine3d";
 
 const axis = new Vec3();
 const tempMat4 = new Mat4();

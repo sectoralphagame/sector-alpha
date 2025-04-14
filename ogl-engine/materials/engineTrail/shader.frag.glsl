@@ -17,5 +17,5 @@ void main() {
     float alpha = alphaX * alphaY;
 
     fragData[0] = vec4(uColor * (1.f + emissive) * alphaX, alpha);
-    fragData[1].r = emissive;
+    fragData[1] = vec4(emissive, 0.f, 0.f, 1.f);
 }

@@ -13,7 +13,7 @@ import { dummyLight } from "./Light";
 import { Camera } from "./Camera";
 import { Engine } from "./engine";
 import { TacticalMapScene, type Scene } from "./Scene";
-import { Star } from "./Star";
+import { Star } from "../builders/Star";
 
 const bloomSize = 1.2;
 const lightsNum = 16;

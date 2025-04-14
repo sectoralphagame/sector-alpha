@@ -1,9 +1,9 @@
 import { Vec2, Mat4, Plane, Vec3 } from "ogl";
 import { SelectionBoxMaterial } from "@ogl-engine/materials/selectionBox/selectionBox";
 import { filter, pipe, toArray } from "@fxts/core";
-import { BaseMesh } from "./BaseMesh";
-import type { Engine3D } from "./engine3d";
-import type { TacticalMapScene } from "./Scene";
+import { BaseMesh } from "../engine/BaseMesh";
+import type { Engine3D } from "../engine/engine3d";
+import type { TacticalMapScene } from "../engine/Scene";
 
 const tempVec3 = new Vec3();
 

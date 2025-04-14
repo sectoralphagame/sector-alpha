@@ -9,8 +9,8 @@ import Color from "color";
 import type { Faction } from "@core/archetypes/faction";
 import { ColorMaterial2D } from "@ogl-engine/materials/color/color";
 import { strategicMapStore } from "@ui/state/strategicMap";
-import { BaseMesh2D } from "./BaseMesh2D";
-import type { Engine2D } from "./engine2d";
+import { BaseMesh2D } from "../engine/BaseMesh2D";
+import type { Engine2D } from "../engine/engine2d";
 
 class RegularPolygonGeometry extends Geometry {
   constructor(gl: OGLRenderingContext, n = 6) {
