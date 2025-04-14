@@ -84,6 +84,7 @@ export class SpottingSystem extends System<"exec"> {
       const owner = entity.sim.getOrThrow<Faction>(entity.cp.owner.id);
 
       if (
+        !currentOrder ||
         !(
           ["patrol", "pillage", "escort"].includes(currentOrder?.type) ||
           owner.cp.policies.enemySpotted[

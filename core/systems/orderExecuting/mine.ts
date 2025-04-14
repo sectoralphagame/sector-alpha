@@ -35,9 +35,9 @@ export function mineAction(
         entity,
         createWaypoint(entity.sim, {
           owner: entity.id,
-          value: targetField.cp.position.coord.add(
-            getRandomPositionInField(targetField)
-          ),
+          value: tempVec2
+            .copy(targetField.cp.position.coord)
+            .add(getRandomPositionInField(targetField)),
           sector: targetField.cp.position.sector,
         })
       )

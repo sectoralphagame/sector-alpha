@@ -1,4 +1,4 @@
-import type { Vec2 } from "ogl";
+import { Vec2 } from "ogl";
 import { find } from "@fxts/core";
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { Entity } from "../entity";
@@ -49,7 +49,7 @@ export function createWaypoint(
   entity
     .addComponent({
       name: "position",
-      coord: value,
+      coord: new Vec2().copy(value),
       angle: 0,
       sector,
       moved: false,
