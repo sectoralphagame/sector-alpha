@@ -8,9 +8,9 @@ import { gameStore } from "@ui/state/game";
 import { Geometry, Transform, Vec3 } from "ogl";
 
 export type PathColor = "default" | "warning";
-const colors: Record<PathColor, Vec3> = {
-  default: new Vec3(169, 207, 252),
-  warning: new Vec3(255, 0, 0),
+const colors: Record<PathColor, string> = {
+  default: "rgb(169, 207, 252)",
+  warning: "rgb(255, 0, 0)",
 };
 
 export class Path extends Transform {
@@ -97,7 +97,10 @@ export class Path extends Transform {
     });
     const plane = new BaseMesh(this.engine, {
       geometry,
-      material: new ColorMaterial(this.engine, colors.default, false),
+      material: new ColorMaterial(this.engine, {
+        color: colors.default,
+        shaded: false,
+      }),
     });
     plane.rotation.x = Math.PI / 2;
     plane.material.uniforms.fEmissive.value = 0.05;
@@ -128,9 +131,9 @@ export class Path extends Transform {
         waypoints[i][0].x - waypoints[i + 1][0].x,
         waypoints[i][0].z - waypoints[i + 1][0].z
       );
-      (
-        this.children[i] as BaseMesh<ColorMaterial>
-      ).material.uniforms.uColor.value = colors[waypoints[i + 1][1]];
+      (this.children[i] as BaseMesh<ColorMaterial>).material.setColor(
+        colors[waypoints[i + 1][1]]
+      );
     }
   };
 

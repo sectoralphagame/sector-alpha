@@ -29,11 +29,13 @@ import type { GameSettings } from "@core/settings";
 import { defaultGameSttings } from "@core/settings";
 import merge from "lodash/merge";
 import { renderLogger } from "@core/log";
-import mapData from "../../../core/world/data/map.json";
+import { DustCloud } from "@ogl-engine/builders/DustCloud";
 import { EntityMesh } from "./EntityMesh";
 import { createShootHandler } from "./events/shoot";
 import { createExplodeHandler } from "./events/explode";
 import { createDeployFacilityHandler } from "./events/deployFacility";
+import type { Prop } from "../../../core/world/map";
+import mapData from "../../../core/world/map";
 
 // FIXME: This is just an ugly hotfix to keep distance between things larger
 const scale = 2;
@@ -502,7 +504,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     }
   }
 
-  loadProp(data: (typeof mapData)["sectors"][number]["props"][number]) {
+  loadProp(data: Prop) {
     if (data.type === "star") {
       const star = new Star(this.engine, data.color);
       star.body.material.setColor2(data.color2);
@@ -514,8 +516,19 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       star.scale.set(data.scale);
       star.body.material.uniforms.uNoise.value = data.noise;
       star.body.material.uniforms.uNoisePower.value = data.noisePower;
+      star.name = data.name;
 
       return star;
+    }
+
+    if (data.type === "dust") {
+      const dust = new DustCloud(this.engine, data.size, data.density);
+      dust.position.set(data.position[0], data.position[1], data.position[2]);
+      dust.scale.set(scale);
+      dust.material.setColor(data.color);
+      dust.name = data.name;
+
+      return dust;
     }
 
     throw new Error("Unknown prop type");

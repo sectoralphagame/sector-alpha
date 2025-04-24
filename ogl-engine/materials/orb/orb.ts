@@ -23,7 +23,10 @@ export class OrbMaterial extends Material {
     this.uniforms.uEnd = { value: end };
     this.uniforms.fEmissive = { value: 0 };
 
-    this.createProgram(vertex, fragment, defines);
-    this.program.cullFace = false;
+    this.createProgram(vertex, fragment, defines, {
+      cullFace: false,
+      transparent: true,
+      depthWrite: false,
+    });
   }
 }

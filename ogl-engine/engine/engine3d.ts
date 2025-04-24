@@ -26,6 +26,17 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   fxaa = false;
   godrays = false;
   scene: TScene;
+  /**
+   * Capture performance metrics for the next frame
+   */
+  willCapturePerformance = false;
+  capturePerformance = false;
+  performanceReport: Array<{
+    id: number;
+    time: number;
+    label: string;
+    parent: number;
+  }> = [];
 
   uniforms: {
     env: {
@@ -220,6 +231,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   }
 
   render() {
+    if (this.willCapturePerformance) {
+      this.capturePerformance = true;
+      this.willCapturePerformance = false;
+    }
+
     this.prepareLighting();
 
     if (this.postProcessing) {
@@ -227,6 +243,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     } else {
       this.renderSimple();
     }
+
+    this.capturePerformance = false;
   }
 
   private renderSimple = () => {
@@ -342,7 +360,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     return mesh;
   }
 
-  prepareLighting() {
+  private prepareLighting() {
     const lightsToRender: Light[] = [];
     const point: Light[] = [];
 
@@ -379,5 +397,10 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     }
 
     super.setScene(scene);
+  }
+
+  capture() {
+    this.willCapturePerformance = true;
+    this.capturePerformance = false;
   }
 }

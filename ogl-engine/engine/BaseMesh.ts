@@ -1,5 +1,5 @@
 import type { Material } from "@ogl-engine/materials/material";
-import type { Geometry, GLTF, MeshOptions } from "ogl";
+import type { AttributeData, Camera, Geometry, GLTF, MeshOptions } from "ogl";
 import { Mesh, Vec3 } from "ogl";
 import { MissingMaterial } from "@ogl-engine/materials/missing/missing";
 import type { Destroyable } from "@ogl-engine/types";
@@ -75,6 +75,18 @@ export class BaseMesh<TMaterial extends Material = Material>
     const indices = this.geometry.attributes.index.data!;
     const uvs = this.geometry.attributes.uv.data!;
 
+    const tangents = BaseMesh.getTangents(vertices, uvs, indices);
+    this.geometry.addAttribute("tangent", {
+      size: 3,
+      data: tangents,
+    });
+  }
+
+  static getTangents(
+    vertices: AttributeData,
+    uvs: AttributeData,
+    indices: AttributeData
+  ): Float32Array {
     const tangents = new Float32Array(vertices.length);
     let degenerateUVs = 0;
 
@@ -133,10 +145,7 @@ export class BaseMesh<TMaterial extends Material = Material>
       console.warn(`BaseMesh: ${degenerateUVs} faces have degenerate UVs`);
     }
 
-    this.geometry.addAttribute("tangent", {
-      size: 3,
-      data: tangents,
-    });
+    return tangents;
   }
 
   // eslint-disable-next-line no-shadow
@@ -157,6 +166,21 @@ export class BaseMesh<TMaterial extends Material = Material>
   destroy() {
     for (const cb of this.onDestroyCallbacks) {
       cb();
+    }
+  }
+
+  draw(options?: { camera?: Camera | undefined } | undefined): void {
+    const start = performance.now();
+    super.draw(options);
+    const end = performance.now();
+
+    if (this.engine.capturePerformance) {
+      this.engine.performanceReport.push({
+        id: this.id,
+        label: this.name,
+        time: end - start,
+        parent: (this.parent as any)?.id,
+      });
     }
   }
 }

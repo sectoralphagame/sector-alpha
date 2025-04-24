@@ -6,7 +6,6 @@ in vec3 position;
 in vec3 normal;
 
 out vec3 vNormal;
-out vec3 vMPos;
 out vec3 worldPosition;
 
 uniform mat4 modelMatrix;

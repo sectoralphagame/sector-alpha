@@ -64,10 +64,9 @@ export class Asteroids extends Transform {
 
       const asteroid = new BaseMesh(this.engine, {
         geometry: new Geometry(this.engine.gl, { ...gltf.geometry.attributes }),
+        material: new InstancedPbrMaterial(this.engine, gltf.material),
+        frustumCulled: false,
       });
-      asteroid.applyMaterial(
-        new InstancedPbrMaterial(this.engine, gltf.material)
-      );
       asteroid.position.set(offset.x, 0, offset.y);
 
       const instanceMatrix = new Float32Array(numAsteroids * 16);
@@ -113,16 +112,17 @@ export class Asteroids extends Transform {
         instanced: true,
         size: 16,
         data: instanceMatrix,
+        usage: this.engine.gl.DYNAMIC_DRAW,
         needsUpdate: true,
       });
       asteroid.geometry.addAttribute("instanceNormalMatrix", {
         instanced: true,
         size: 9,
         data: instanceNormalMatrix,
+        usage: this.engine.gl.DYNAMIC_DRAW,
         needsUpdate: true,
       });
 
-      asteroid.frustumCulled = false;
       asteroid.setParent(this);
 
       asteroid.onBeforeRender(() => {
