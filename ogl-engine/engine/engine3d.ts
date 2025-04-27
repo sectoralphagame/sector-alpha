@@ -1,3 +1,4 @@
+import type { Transform } from "ogl";
 import { Post, Texture, Vec2, Vec3, RenderTarget } from "ogl";
 import settings from "@core/settings";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
@@ -37,6 +38,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     label: string;
     parent: number;
   }> = [];
+
+  fxOwners: Record<number, Transform[]> = {};
 
   uniforms: {
     env: {
@@ -395,6 +398,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     if (this.scene instanceof TacticalMapScene) {
       this.scene.destroy();
     }
+    this.fxOwners = {};
 
     super.setScene(scene);
   }

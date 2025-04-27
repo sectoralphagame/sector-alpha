@@ -5,6 +5,7 @@ import { MissingMaterial } from "@ogl-engine/materials/missing/missing";
 import type { Destroyable } from "@ogl-engine/types";
 import type { Engine3D } from "./engine3d";
 import { Light } from "./Light";
+import { BoundingBox } from "./BoundingBox";
 
 export class BaseMesh<TMaterial extends Material = Material>
   extends Mesh
@@ -182,5 +183,15 @@ export class BaseMesh<TMaterial extends Material = Material>
         parent: (this.parent as any)?.id,
       });
     }
+  }
+
+  addBoundingBox() {
+    if (this.children.some((child) => child instanceof BoundingBox)) return;
+
+    this.geometry.computeBoundingBox();
+
+    const bbox = new BoundingBox(this.gl, this.geometry.bounds);
+
+    bbox.setParent(this);
   }
 }

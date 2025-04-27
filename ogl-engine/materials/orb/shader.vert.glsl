@@ -8,8 +8,7 @@ precision highp float;
 in vec2 uv;
 in vec3 position;
 in float t;
-in vec3 offset;
-in vec3 scale;
+in mat4 instanceMatrix;
 
 out vec2 vUv;
 out float vT;
@@ -19,15 +18,17 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
 void main() {
+    vUv = uv;
+    vT = t;
+
+    vec3 offset = instanceMatrix[3].xyz;
+    vec3 scale = vec3(length(instanceMatrix[0].xyz), length(instanceMatrix[1].xyz), length(instanceMatrix[2].xyz));
+
     vec4 worldPosition = vec4(billboard(position * scale, viewMatrix) + offset, 1.f);
     #ifdef USE_MODEL_MATRIX
     worldPosition += modelMatrix[3];
     worldPosition.w = 1.f;
     #endif
-    vec4 viewPositionPosition = viewMatrix * worldPosition;
 
-    vUv = uv;
-    vT = t;
-
-    gl_Position = projectionMatrix * viewPositionPosition;
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
 }

@@ -6,6 +6,7 @@ precision highp float;
 
 in vec2 vUv;
 flat in float vInstanceIndex;
+flat in float vT;
 
 out vec4 fragData[2];
 
@@ -21,7 +22,7 @@ uniform vec3 ambient;
 void main() {
     vec3 value = texture(tMap, vUv).rgb;
     float l = max(0.f, luma(value) - 0.1f);
-    float alpha = uAlpha * l * clamp(triangle(uTime * (mod(vInstanceIndex, 9.f) + 0.1f) * animSpeed + vInstanceIndex * 0.01f), 0.15f, 0.9f);
+    float alpha = uAlpha * l * (1.f - triangle(vT));
 
     if(alpha < 1.f / 255.f)
         discard;

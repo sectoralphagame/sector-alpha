@@ -36,6 +36,8 @@ import { createExplodeHandler } from "./events/explode";
 import { createDeployFacilityHandler } from "./events/deployFacility";
 import type { Prop } from "../../../core/world/map";
 import mapData from "../../../core/world/map";
+import { createStartMiningHandler } from "./events/startMining";
+import { createStopMiningHandler } from "./events/stopMining";
 
 // FIXME: This is just an ugly hotfix to keep distance between things larger
 const scale = 2;
@@ -74,6 +76,14 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     transport3D.hooks.deployFacility.subscribe(
       "TacticalMap",
       createDeployFacilityHandler(this.engine, this.meshes)
+    );
+    transport3D.hooks.startMining.subscribe(
+      "TacticalMap",
+      createStartMiningHandler(this.engine, this.meshes)
+    );
+    transport3D.hooks.stopMining.subscribe(
+      "TacticalMap",
+      createStopMiningHandler(this.engine, this.meshes)
     );
     const onSpeedChange = (speed: number) => {
       this.engine.setDeltaMultiplier(speed);

@@ -4,7 +4,7 @@ import { Styles } from "@kit/theming/style";
 import { OglCanvas } from "ogl-engine/OglCanvas";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import arrowDownFat from "@assets/ui/icons/arrow_down_fat.svg";
-import { Orbit, Sphere, Vec3 } from "ogl";
+import { Orbit, Sphere } from "ogl";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { Light } from "@ogl-engine/engine/Light";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
@@ -49,7 +49,9 @@ const LightingStory: React.FC<{
         boxRef.current = new BaseMesh(engine, {
           geometry: new Sphere(engine.gl),
         });
-        boxRef.current.applyMaterial(new ColorMaterial(engine, new Vec3(255)));
+        boxRef.current.applyMaterial(
+          new ColorMaterial(engine, { color: "#ffffff" })
+        );
         boxRef.current.material.uniforms.fEmissive.value = 0.0;
         engine.scene.addChild(boxRef.current);
       };
