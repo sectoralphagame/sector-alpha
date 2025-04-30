@@ -1,7 +1,8 @@
 #pragma glslify: cookTorranceSpec = require(glsl-specular-cook-torrance);
 #pragma glslify: luma = require(glsl-luma);
 
-vec4 pbr(vec3 albedo, vec3 norm, float metallic, float roughness, vec3 emissive, samplerCube tEnvMap, vec3 ambient, vec3 vTangent, vec3 vNormal, vec3 cameraPosition, vec3 worldPosition, Light[16] lights) {
+vec4 pbr(vec3 albedo, vec3 norm, float metallic, float roughness, vec3 emissive, samplerCube tEnvMap, vec3 ambient, vec3 vTangent, vec3 vNormal) {
+    float dist = length(worldPosition - cameraPosition);
     vec3 eyeDirection = normalize(cameraPosition - worldPosition);
     vec3 diffuse = vec3(0.0);
     vec3 specular = vec3(0.0);
@@ -38,8 +39,10 @@ vec4 pbr(vec3 albedo, vec3 norm, float metallic, float roughness, vec3 emissive,
 
     vec3 reflectedDir = reflect(eyeDirection, norm);
     vec3 reflectionColor = texture(tEnvMap, -reflectedDir).rgb;
+    vec3 reflection = reflectionColor * metallic * roughness;
+    vec3 lighting = diffuse * (1. - metallic) + ambient + specular;
 
-    return vec4((diffuse * (1. - metallic) + ambient + specular) * albedo + emissive + reflectionColor * metallic * roughness, 1.0);
+    return vec4(mix(lighting * albedo + emissive + reflection, normalize(ambient) - vec3(0.7), clamp(log2(dist / 60.) - 1., 0., 1.)), 1.0);
 }
 
 #pragma glslify: export(pbr)

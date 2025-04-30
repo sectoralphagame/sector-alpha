@@ -2,9 +2,6 @@
 precision highp float;
 
 #pragma glslify: Light = require("./ogl-engine/shader/light");
-#pragma glslify: normalMap = require("./ogl-engine/shader/normalMap");
-#pragma glslify: pbr = require("./ogl-engine/shader/pbr", Light = Light);
-#pragma glslify: luma = require(glsl-luma);
 
 #pragma defines
 
@@ -36,6 +33,10 @@ uniform sampler2D tEmissive;
 out vec4 fragData[2];
 #define EPSILON 0.001f
 
+#pragma glslify: normalMap = require("./ogl-engine/shader/normalMap");
+#pragma glslify: pbr = require("./ogl-engine/shader/pbr", lights = lights, cameraPosition = cameraPosition, worldPosition = worldPosition);
+#pragma glslify: luma = require(glsl-luma);
+
 void main() {
     vec3 albedo = max(vec3(EPSILON), pow(texture(tDiffuse, vUv).rgb, vec3(1.f / 2.2f)));
     vec3 norm = normalMap(texture(tNormal, vUv).rgb * 2.f - 1.f, vNormal, vTangent);
@@ -56,6 +57,6 @@ void main() {
     float roughness = uRoughness;
     #endif
 
-    fragData[0] = pbr(albedo, norm, metallic, roughness, emissive, tEnvMap, ambient, vTangent, vNormal, cameraPosition, worldPosition, lights);
+    fragData[0] = pbr(albedo, norm, metallic, roughness, emissive, tEnvMap, ambient, vTangent, vNormal);
     fragData[1].r = luma(emissive);
 }
