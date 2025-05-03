@@ -14,26 +14,30 @@ import type { Sim } from "@core/sim";
 import { contextMenuStore } from "@ui/state/contextMenu";
 import { storageHook } from "@core/hooks";
 import { MouseButton } from "@ogl-engine/Orbit";
-import { Asteroids } from "@ogl-engine/engine/Asteroids";
+import { Asteroids } from "@ogl-engine/builders/Asteroids";
 import type { Destroyable } from "@ogl-engine/types";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
 import { gameStore } from "@ui/state/game";
 import { reaction } from "mobx";
-import { Star } from "@ogl-engine/engine/Star";
+import { Star } from "@ogl-engine/builders/Star";
 import { Light } from "@ogl-engine/engine/Light";
 import type { Entity } from "@core/entity";
-import { SelectionBox } from "@ogl-engine/engine/SelectionBox";
+import { SelectionBox } from "@ogl-engine/builders/SelectionBox";
 import sounds from "@assets/ui/sounds";
 import { transport3D } from "@core/systems/transport3d";
 import type { GameSettings } from "@core/settings";
 import { defaultGameSttings } from "@core/settings";
 import merge from "lodash/merge";
 import { renderLogger } from "@core/log";
-import mapData from "../../../core/world/data/map.json";
+import { DustCloud } from "@ogl-engine/builders/DustCloud";
 import { EntityMesh } from "./EntityMesh";
 import { createShootHandler } from "./events/shoot";
 import { createExplodeHandler } from "./events/explode";
 import { createDeployFacilityHandler } from "./events/deployFacility";
+import type { Prop } from "../../../core/world/map";
+import mapData from "../../../core/world/map";
+import { createStartMiningHandler } from "./events/startMining";
+import { createStopMiningHandler } from "./events/stopMining";
 
 // FIXME: This is just an ugly hotfix to keep distance between things larger
 const scale = 2;
@@ -72,6 +76,14 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     transport3D.hooks.deployFacility.subscribe(
       "TacticalMap",
       createDeployFacilityHandler(this.engine, this.meshes)
+    );
+    transport3D.hooks.startMining.subscribe(
+      "TacticalMap",
+      createStartMiningHandler(this.engine, this.meshes)
+    );
+    transport3D.hooks.stopMining.subscribe(
+      "TacticalMap",
+      createStopMiningHandler(this.engine, this.meshes)
     );
     const onSpeedChange = (speed: number) => {
       this.engine.setDeltaMultiplier(speed);
@@ -502,7 +514,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     }
   }
 
-  loadProp(data: (typeof mapData)["sectors"][number]["props"][number]) {
+  loadProp(data: Prop) {
     if (data.type === "star") {
       const star = new Star(this.engine, data.color);
       star.body.material.setColor2(data.color2);
@@ -514,8 +526,19 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       star.scale.set(data.scale);
       star.body.material.uniforms.uNoise.value = data.noise;
       star.body.material.uniforms.uNoisePower.value = data.noisePower;
+      star.name = data.name;
 
       return star;
+    }
+
+    if (data.type === "dust") {
+      const dust = new DustCloud(this.engine, data.size, data.density);
+      dust.position.set(data.position[0], data.position[1], data.position[2]);
+      dust.scale.set(scale);
+      dust.material.setColor(data.color);
+      dust.name = data.name;
+
+      return dust;
     }
 
     throw new Error("Unknown prop type");

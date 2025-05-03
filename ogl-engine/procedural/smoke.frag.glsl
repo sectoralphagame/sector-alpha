@@ -17,9 +17,14 @@ float vignette(vec2 uv, float roundness) {
 }
 
 void main() {
-    float noise = fbm2(vUv * 8.f * clamp(uSeed, 0.5f, 2.f) + uSeed * 100.f, 6);
-    float maskNoise = noise3(vec3(vUv, uSeed));
-    float value = (1.f - vignette(vUv, uSeed * 0.4f)) * noise * maskNoise * 2.f;
+    float x = floor(vUv.x * 4.f);
+    float y = floor(vUv.y * 4.f);
+    float seed = uSeed * (4.f * y + x) * 100.f;
+
+    vec2 uv = vec2(vUv.x * 4.f - x, vUv.y * 4.f - y);
+
+    float noise = fbm2(uv * 1.5f + seed, 6);
+    float value = (1.f - vignette(uv, 0.4f)) * noise;
 
     fragColor = vec4(vec3(value), 1.0f);
 }

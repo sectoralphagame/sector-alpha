@@ -1,3 +1,4 @@
+import type { Transform } from "ogl";
 import { Post, Texture, Vec2, Vec3, RenderTarget } from "ogl";
 import settings from "@core/settings";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
@@ -13,7 +14,7 @@ import { dummyLight } from "./Light";
 import { Camera } from "./Camera";
 import { Engine } from "./engine";
 import { TacticalMapScene, type Scene } from "./Scene";
-import { Star } from "./Star";
+import { Star } from "../builders/Star";
 
 const bloomSize = 1.2;
 const lightsNum = 16;
@@ -26,6 +27,19 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   fxaa = false;
   godrays = false;
   scene: TScene;
+  /**
+   * Capture performance metrics for the next frame
+   */
+  willCapturePerformance = false;
+  capturePerformance = false;
+  performanceReport: Array<{
+    id: number;
+    time: number;
+    label: string;
+    parent: number;
+  }> = [];
+
+  fxOwners: Record<number, Transform[]> = {};
 
   uniforms: {
     env: {
@@ -220,6 +234,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   }
 
   render() {
+    if (this.willCapturePerformance) {
+      this.capturePerformance = true;
+      this.willCapturePerformance = false;
+    }
+
     this.prepareLighting();
 
     if (this.postProcessing) {
@@ -227,6 +246,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     } else {
       this.renderSimple();
     }
+
+    this.capturePerformance = false;
   }
 
   private renderSimple = () => {
@@ -342,7 +363,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     return mesh;
   }
 
-  prepareLighting() {
+  private prepareLighting() {
     const lightsToRender: Light[] = [];
     const point: Light[] = [];
 
@@ -377,7 +398,13 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     if (this.scene instanceof TacticalMapScene) {
       this.scene.destroy();
     }
+    this.fxOwners = {};
 
     super.setScene(scene);
+  }
+
+  capture() {
+    this.willCapturePerformance = true;
+    this.capturePerformance = false;
   }
 }

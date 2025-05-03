@@ -4,7 +4,7 @@ import { Styles } from "@kit/theming/style";
 import { Orbit } from "ogl";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { merge } from "lodash";
-import { Star } from "@ogl-engine/engine/Star";
+import { Star } from "@ogl-engine/builders/Star";
 import type { Story3dArgs } from "./Story3d";
 import { Story3d, story3dMeta } from "./Story3d";
 

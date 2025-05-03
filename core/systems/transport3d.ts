@@ -6,6 +6,8 @@ export class Transport3D {
     shoot: Observable<RequirePureComponent<"position" | "damage">>;
     explode: Observable<RequirePureComponent<"position">>;
     deployFacility: Observable<RequirePureComponent<"position">>;
+    startMining: Observable<RequirePureComponent<"position">>;
+    stopMining: Observable<RequirePureComponent<"position">>;
   };
 
   constructor() {
@@ -13,12 +15,15 @@ export class Transport3D {
       shoot: new Observable("shoot"),
       explode: new Observable("explode"),
       deployFacility: new Observable("deployFacility"),
+      startMining: new Observable("startMining"),
+      stopMining: new Observable("stopMining"),
     };
   }
 
   reset() {
-    this.hooks.shoot.observers.clear();
-    this.hooks.explode.observers.clear();
+    for (const key of Object.keys(this.hooks)) {
+      this.hooks[key].reset();
+    }
   }
 }
 

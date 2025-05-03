@@ -11,7 +11,7 @@ import { OglCanvas } from "@ogl-engine/OglCanvas";
 import type { Transform } from "ogl";
 import { Vec2, Raycast, Vec3, Box } from "ogl";
 import React from "react";
-import { SectorMesh } from "@ogl-engine/engine/Sector";
+import { SectorMesh } from "@ogl-engine/builders/Sector";
 import { STATE, type MouseButton } from "@ogl-engine/Orbit";
 import { strategicMapStore } from "@ui/state/strategicMap";
 import { gameStore } from "@ui/state/game";

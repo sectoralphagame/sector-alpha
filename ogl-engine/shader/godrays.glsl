@@ -25,7 +25,7 @@ vec3 godrays(
         }
 
         textCoo -= deltaTextCoord;
-        vec3 samp = texture2D(occlusionTexture, textCoo).xyz;
+        float samp = texture2D(occlusionTexture, textCoo).g;
         samp *= illuminationDecay * weight;
         fragColor += samp;
         illuminationDecay *= decay;

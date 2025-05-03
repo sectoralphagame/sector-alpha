@@ -44,9 +44,9 @@ void main() {
             }
         }
 
-        fragData[0].rgb = (diffuse + ambient + specular) * uColor / 255.f;
+        fragData[0].rgb = (diffuse + ambient + specular) * uColor;
     } else {
-        fragData[0] = vec4(uColor / 255.f, 1.f);
+        fragData[0] = vec4(uColor, 1.f);
     }
 
     fragData[0].a = 1.0f;

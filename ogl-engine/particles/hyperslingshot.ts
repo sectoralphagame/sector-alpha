@@ -1,5 +1,5 @@
 import { ParticleGenerator } from "@ogl-engine/ParticleGenerator";
-import { Vec3, Vec4 } from "ogl";
+import { Vec4 } from "ogl";
 import { random } from "mathjs";
 import { OrbMaterial } from "@ogl-engine/materials/orb/orb";
 import Color from "color";
@@ -22,8 +22,8 @@ export class HyperSlingshotParticleGenerator extends ParticleGenerator {
           0,
           Math.sin(angle) * radius
         );
-        particle.acceleration = new Vec3(0, random(0.5, 0.8), 0);
-        particle.velocity = new Vec3(0, random(0.3, 0.5), 0);
+        particle.acceleration.set(0, random(0.5, 0.8), 0);
+        particle.velocity.set(0, random(0.3, 0.5), 0);
         particle.life =
           (particleLife *
             random(0.8, 1) *

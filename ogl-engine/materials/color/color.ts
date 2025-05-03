@@ -1,7 +1,7 @@
 import { Vec3, Program } from "ogl";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
-import Color from "color";
 import type { Engine2D } from "@ogl-engine/engine/engine2d";
+import { colorToVec3 } from "@core/utils/maps";
 import fragment from "./shader.frag.glsl";
 import fragment2d from "./shader2d.frag.glsl";
 import vertex from "./shader.vert.glsl";
@@ -15,22 +15,35 @@ export class ColorMaterial extends Material {
     bShaded: { value: boolean };
   };
 
-  constructor(engine: Engine3D, color: Vec3, shaded = true) {
+  constructor(
+    engine: Engine3D,
+    opts: {
+      color?: string;
+      shaded?: boolean;
+    }
+  ) {
     super(engine);
 
-    this.program = new Program(engine.gl, {
+    this.createProgram(
       vertex,
       fragment,
-      uniforms: this.uniforms,
-      cullFace: false,
-    });
-    this.uniforms.uColor = { value: color };
+      {},
+      {
+        cullFace: false,
+      }
+    );
+
+    this.uniforms.uColor = { value: new Vec3() };
     this.uniforms.fEmissive = { value: 0 };
-    this.uniforms.bShaded = { value: shaded };
+    this.uniforms.bShaded = { value: opts.shaded ?? true };
+
+    if (opts.color) {
+      this.setColor(opts.color);
+    }
   }
 
-  setColor(color: Vec3) {
-    this.uniforms.uColor.value = color;
+  setColor(color: string) {
+    colorToVec3(color, this.uniforms.uColor.value);
   }
 
   getColor(): Vec3 {
@@ -58,7 +71,6 @@ export class ColorMaterial2D extends Material2D {
   }
 
   setColor(color: string) {
-    const c = Color(color).rgb().array();
-    this.uniforms.uColor.value.set(c[0], c[1], c[2]).divide(255);
+    colorToVec3(color, this.uniforms.uColor.value);
   }
 }

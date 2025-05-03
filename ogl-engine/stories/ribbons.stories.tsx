@@ -4,7 +4,7 @@ import { Styles } from "@kit/theming/style";
 import { merge } from "lodash";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
-import { Plane, Vec3 } from "ogl";
+import { Plane } from "ogl";
 import { RibbonGeometry } from "@ogl-engine/RibbonEmitter";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
 import { EngineTrailMaterial } from "@ogl-engine/materials/engineTrail/engineTrail";
@@ -40,7 +40,10 @@ const RibbonsStory: React.FC<Story3dArgs & {}> = ({
 
     const plane = new BaseMesh(engine, {
       geometry: new Plane(engine.gl),
-      material: new ColorMaterial(engine, new Vec3(0, 255, 0), false),
+      material: new ColorMaterial(engine, {
+        color: "#00ff00",
+        shaded: false,
+      }),
     });
     plane.scale.set(0.1);
 

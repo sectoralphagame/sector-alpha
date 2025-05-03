@@ -7,7 +7,7 @@ import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 import { Material } from "../material";
 
-export class AsteroidDustMaterial extends Material {
+export class ParticleCloudMaterial extends Material {
   uniforms: Material["uniforms"] & {
     tMap: { value: Texture };
     uColor: { value: Vec3 };

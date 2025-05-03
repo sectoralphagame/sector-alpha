@@ -2,15 +2,16 @@ import type { Entity } from "@core/entity";
 import type { RequireComponent } from "@core/tsHelpers";
 import { findInAncestors } from "@core/utils/findInAncestors";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
+import { CrossGeometry } from "@ogl-engine/engine/CrossGeometry";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
 import { gameStore } from "@ui/state/game";
-import { Geometry, Transform, Vec3 } from "ogl";
+import { Transform, Vec3 } from "ogl";
 
 export type PathColor = "default" | "warning";
-const colors: Record<PathColor, Vec3> = {
-  default: new Vec3(169, 207, 252),
-  warning: new Vec3(255, 0, 0),
+const colors: Record<PathColor, string> = {
+  default: "#a9cffc",
+  warning: "#ff0000",
 };
 
 export class Path extends Transform {
@@ -26,78 +27,13 @@ export class Path extends Transform {
   }
 
   createSegment = (): void => {
-    const geometry = new Geometry(this.engine.gl, {
-      index: {
-        size: 1,
-        data: new Uint16Array([
-          0,
-          2,
-          1,
-          2,
-          3,
-          1, // First plane
-          4,
-          6,
-          5,
-          6,
-          7,
-          5, // Second plane
-        ]),
-      },
-      position: {
-        size: 3,
-        data: new Float32Array([
-          // First Plane (XY)
-          -0.5,
-          0.5,
-          0.0, // 0
-          0.5,
-          0.5,
-          0.0, // 1
-          -0.5,
-          -0.5,
-          0.0, // 2
-          0.5,
-          -0.5,
-          0.0, // 3
-
-          // Second Plane (XZ) - Interlocking
-          0.0,
-          -0.5,
-          -0.5, // 4
-          0.0,
-          0.5,
-          -0.5, // 5
-          0.0,
-          -0.5,
-          0.5, // 6
-          0.0,
-          0.5,
-          0.5, // 7
-        ]),
-      },
-      uv: {
-        size: 2,
-        data: new Float32Array([
-          // First Plane UVs
-          0, 1, 1, 1, 0, 0, 1, 0,
-          // Second Plane UVs
-          0, 1, 1, 1, 0, 0, 1, 0,
-        ]),
-      },
-      normal: {
-        size: 3,
-        data: new Float32Array([
-          // First Plane normals (facing +Z)
-          0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-          // Second Plane normals (facing +X)
-          1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-        ]),
-      },
-    });
+    const geometry = new CrossGeometry(this.engine.gl);
     const plane = new BaseMesh(this.engine, {
       geometry,
-      material: new ColorMaterial(this.engine, colors.default, false),
+      material: new ColorMaterial(this.engine, {
+        color: colors.default,
+        shaded: false,
+      }),
     });
     plane.rotation.x = Math.PI / 2;
     plane.material.uniforms.fEmissive.value = 0.05;
@@ -128,9 +64,10 @@ export class Path extends Transform {
         waypoints[i][0].x - waypoints[i + 1][0].x,
         waypoints[i][0].z - waypoints[i + 1][0].z
       );
-      (
-        this.children[i] as BaseMesh<ColorMaterial>
-      ).material.uniforms.uColor.value = colors[waypoints[i + 1][1]];
+
+      (this.children[i] as BaseMesh<ColorMaterial>).material.setColor(
+        colors[waypoints[i + 1][1]]
+      );
     }
   };
 

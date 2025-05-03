@@ -2,32 +2,32 @@ import React from "react";
 import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { merge } from "lodash";
-import { Asteroids } from "@ogl-engine/builders/Asteroids";
+import { DustCloud } from "@ogl-engine/builders/DustCloud";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import models from "@assets/models";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
-import { getFPoints } from "@core/archetypes/asteroidField";
 import { noop } from "@fxts/core";
 import { Story3d, story3dMeta } from "./Story3d";
 import type { Story3dArgs } from "./Story3d";
 
-const AsteroidsStory: React.FC<
+const DustCloudStory: React.FC<
   Story3dArgs & {
     size: number;
     density: number;
     color: string;
+    alpha: number;
   }
-> = ({ postProcessing, skybox, size, density, color }) => {
+> = ({ postProcessing, skybox, size, density, color, alpha }) => {
   const engineRef = React.useRef<Engine3D>();
   const onInit = React.useCallback(async (engine: Engine3D) => {
     await assetLoader.generateTextures();
     engineRef.current = engine;
     engine.camera.position.set(1, 1, 1);
 
-    const asteroids = new Asteroids(engine, size, density, getFPoints(size));
+    const asteroids = new DustCloud(engine, size, density);
     asteroids.setParent(engine.scene);
 
     const model = await assetLoader.getGltf(
@@ -47,17 +47,19 @@ const AsteroidsStory: React.FC<
     if (!engineRef.current) return noop;
 
     const asteroids = engineRef.current.scene.children.find(
-      (c) => c instanceof Asteroids
+      (c) => c instanceof DustCloud
     );
     asteroids?.setParent(null);
 
-    const a = new Asteroids(engineRef.current, size, density, getFPoints(size));
+    const a = new DustCloud(engineRef.current, size, density);
     a.setParent(engineRef.current.scene);
+    a.material.setColor(color);
+    a.material.uniforms.uAlpha.value = alpha;
 
     return () => {
       a.setParent(null);
     };
-  }, [size, density, color]);
+  }, [size, density, color, alpha]);
 
   return (
     <Story3d
@@ -71,13 +73,14 @@ const AsteroidsStory: React.FC<
 };
 
 export default {
-  title: "OGL / Asteroids",
+  title: "OGL / DustCloud",
   ...merge(
     {
       args: {
         size: 10,
         density: 1,
         color: "#ff0000",
+        alpha: 0.5,
       },
       argTypes: {
         color: {
@@ -97,15 +100,17 @@ const Template: StoryFn = ({
   size,
   density,
   color,
+  alpha,
 }) => (
   <div id="root">
     <Styles>
-      <AsteroidsStory
+      <DustCloudStory
         postProcessing={postProcessing}
         skybox={skybox}
         size={size}
         density={density}
         color={color}
+        alpha={alpha}
       />
     </Styles>
   </div>

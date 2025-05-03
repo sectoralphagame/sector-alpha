@@ -24,7 +24,7 @@ const textures = {
   "particle/fire": fire,
   "font/spaceMono": spaceMonoTexture,
 };
-export type TextureName = keyof typeof textures | `prop/smoke_${number}`;
+export type TextureName = keyof typeof textures | "prop/smoke";
 
 export interface ParticleGeneratorInput {
   name: string;
@@ -90,21 +90,20 @@ class AssetLoader {
     this.logger.log("Generating textures");
     const start = performance.now();
     const textureEngine = new TextureEngine();
-    textureEngine.size = 1024 * 4;
+    textureEngine.size = 4096;
     textureEngine.init(new OffscreenCanvas(512, 512));
     textureEngine.setShader(smokeShader);
     textureEngine.update();
-    for (let i = 0; i < 16; i++) {
-      const name = `prop/smoke_${i + 1}`;
 
-      textureEngine.seed();
-      textureEngine.render();
-      const img = new Image();
-      // eslint-disable-next-line no-await-in-loop
-      await textureEngine.image(img);
-      this.addTexture(name as TextureName, img);
-      this.logger.log(`Generated ${name}`);
-    }
+    const name = "prop/smoke";
+    textureEngine.seed();
+    textureEngine.render();
+    const img = new Image();
+    // eslint-disable-next-line no-await-in-loop
+    await textureEngine.image(img);
+    this.addTexture(name as TextureName, img);
+    this.logger.log(`Generated ${name}`);
+
     this.logger.log(`Textures generated in ${performance.now() - start}ms`);
   }
 

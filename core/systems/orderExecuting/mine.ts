@@ -8,6 +8,7 @@ import type { MineAction } from "../../components/orders";
 import { getAvailableSpace } from "../../components/storage";
 import type { RequireComponent } from "../../tsHelpers";
 import { moveToActions } from "../../utils/moving";
+import { transport3D } from "../transport3d";
 
 const tempVec2 = new Vec2(0, 0);
 
@@ -49,6 +50,7 @@ export function mineAction(
 
   if (!targetField.cp.mineable.mountPoints.used.includes(entity.id)) {
     targetField.cp.mineable.mountPoints.used.push(entity.id);
+    transport3D.hooks.startMining.notify(entity);
   }
 
   if (getAvailableSpace(entity.cp.storage) === 0) {
@@ -57,6 +59,7 @@ export function mineAction(
 
     targetField.cp.mineable.mountPoints.used =
       targetField.cp.mineable.mountPoints.used.filter((id) => id !== entity.id);
+    transport3D.hooks.stopMining.notify(entity);
 
     return true;
   }

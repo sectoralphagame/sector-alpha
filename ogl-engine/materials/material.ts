@@ -5,7 +5,8 @@ import { entries, join, map, pipe } from "@fxts/core";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Light } from "@ogl-engine/engine/Light";
 import Color from "color";
-import { type Vec3, type Mesh, Program, Texture } from "ogl";
+import type { ProgramOptions, Mesh, Vec3 } from "ogl";
+import { Texture, Program } from "ogl";
 import type { FolderApi } from "tweakpane";
 
 export abstract class Material {
@@ -78,7 +79,10 @@ export abstract class Material {
   createProgram(
     vertex: string,
     fragment: string,
-    defines: Record<string, string> = {}
+    defines: Record<string, string> = {},
+    options: Partial<
+      Omit<ProgramOptions, "vertex" | "fragment" | "uniforms">
+    > = {}
   ) {
     this.program = new Program(this.engine.gl, {
       vertex: vertex.replace(
@@ -100,6 +104,7 @@ export abstract class Material {
         )
       ),
       uniforms: this.uniforms,
+      ...options,
     });
   }
 

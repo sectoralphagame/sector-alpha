@@ -5,8 +5,8 @@ import { assetLoader } from "@ogl-engine/AssetLoader";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { random } from "mathjs";
 import { InstancedPbrMaterial } from "@ogl-engine/materials/instancedPbr/instancedPbr";
-import { BaseMesh } from "./BaseMesh";
-import type { Engine3D } from "./engine3d";
+import { BaseMesh } from "../engine/BaseMesh";
+import type { Engine3D } from "../engine/engine3d";
 
 const axis = new Vec3();
 const tempMat4 = new Mat4();
@@ -64,10 +64,9 @@ export class Asteroids extends Transform {
 
       const asteroid = new BaseMesh(this.engine, {
         geometry: new Geometry(this.engine.gl, { ...gltf.geometry.attributes }),
+        material: new InstancedPbrMaterial(this.engine, gltf.material),
+        frustumCulled: false,
       });
-      asteroid.applyMaterial(
-        new InstancedPbrMaterial(this.engine, gltf.material)
-      );
       asteroid.position.set(offset.x, 0, offset.y);
 
       const instanceMatrix = new Float32Array(numAsteroids * 16);
@@ -113,16 +112,17 @@ export class Asteroids extends Transform {
         instanced: true,
         size: 16,
         data: instanceMatrix,
+        usage: this.engine.gl.DYNAMIC_DRAW,
         needsUpdate: true,
       });
       asteroid.geometry.addAttribute("instanceNormalMatrix", {
         instanced: true,
         size: 9,
         data: instanceNormalMatrix,
+        usage: this.engine.gl.DYNAMIC_DRAW,
         needsUpdate: true,
       });
 
-      asteroid.frustumCulled = false;
       asteroid.setParent(this);
 
       asteroid.onBeforeRender(() => {
