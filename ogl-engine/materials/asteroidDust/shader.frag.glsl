@@ -26,8 +26,5 @@ void main() {
     if(alpha < 1.f / 255.f)
         discard;
 
-    vec4 color = vec4(uColor, alpha);
-
-    fragData[0] = color;
-    fragData[1] = vec4(0.f, 0.f, 0.f, 1.0f);
+    fragData[0] = vec4(uColor, alpha);
 }

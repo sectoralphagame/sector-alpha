@@ -50,5 +50,5 @@ void main() {
     }
 
     fragData[0].a = 1.0f;
-    fragData[1] = fragData[0] * fEmissive;
+    fragData[1] = vec4(fragData[0].xyz, fEmissive);
 }

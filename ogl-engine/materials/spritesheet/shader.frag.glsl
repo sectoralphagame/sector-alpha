@@ -17,5 +17,5 @@ void main() {
         discard;
     }
     fragData[0] = vec4(tex.rgb, alpha);
-    fragData[1] = fEmissive * fragData[0];
+    fragData[1] = vec4(fragData[0].rgb, fEmissive);
 }

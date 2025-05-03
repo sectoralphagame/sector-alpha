@@ -58,5 +58,5 @@ void main() {
     #endif
 
     fragData[0] = pbr(albedo, norm, metallic, roughness, emissive, tEnvMap, ambient, vTangent, vNormal);
-    fragData[1].r = luma(emissive);
+    fragData[1] = vec4(fragData[0].rgb, luma(emissive));
 }

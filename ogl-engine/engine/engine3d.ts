@@ -157,7 +157,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       fragment: blurFragment,
       uniforms: {
         uResolution: this.uniforms.resolution.bloom,
-        uDirection: { value: new Vec2(bloomSize * 1.2, 0) },
+        uDirection: { value: new Vec2(bloomSize * 3, 0) },
       },
     });
     const verticalPass = this.postProcessingLayers.bloom.addPass({
@@ -167,7 +167,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         uDirection: { value: new Vec2(0, bloomSize) },
       },
     });
-    for (let i = 0; i < 24; i++) {
+    for (let i = 0; i < 16; i++) {
       this.postProcessingLayers.bloom.passes.push(horizontalPass, verticalPass);
     }
 
@@ -332,7 +332,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
     // Update uniforms
     this.uniforms.resolution.base.value.set(w, h);
-    this.uniforms.resolution.bloom.value.set(w / 5, h / 2);
+    this.uniforms.resolution.bloom.value.set(w, h);
   };
 
   addLight = (light: Light) => {

@@ -43,5 +43,5 @@ void main() {
     vec3 rimLighting = rim(rimPower, vViewDirection, vWorldNormal, mix(white, uColor, 0.9f));
 
     fragData[0] = vec4(color + rimLighting, 1.0f);
-    fragData[1] = vec4(color, 0.4f) * uEmissive;
+    fragData[1] = vec4(color, uEmissive);
 }

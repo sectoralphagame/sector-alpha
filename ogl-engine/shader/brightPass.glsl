@@ -1,5 +1,7 @@
-vec4 brightPass(vec4 color, float threshold) {
-    return color * (step(threshold, length(color.rgb) / 1.73205));
+#pragma glslify: luma = require(glsl-luma);
+
+float brightPass(vec4 color, float threshold) {
+    return step(threshold, luma(color));
 }
 
 #pragma glslify: export(brightPass) 
