@@ -23,10 +23,14 @@ export const DropdownButton: React.FC<
   />
 );
 export const DropdownOptions: React.FC<
-  React.PropsWithChildren<{ static?: boolean; direction?: "up" | "down" }>
-> = ({ direction = "down", ...props }) => (
+  React.PropsWithChildren<{
+    static?: boolean;
+    direction?: "up" | "down";
+    className?: string;
+  }>
+> = ({ direction = "down", className, ...props }) => (
   <Menu.Items
-    className={clsx(styles.dropdown, {
+    className={clsx(styles.dropdown, className, {
       [styles.dropdownUp]: direction === "up",
     })}
     {...props}

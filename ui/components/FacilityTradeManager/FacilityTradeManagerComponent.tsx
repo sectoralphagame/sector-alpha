@@ -87,7 +87,9 @@ export const FacilityTradeManagerComponent: React.FC<
         >
           Reset
         </Button>
-        <Button onClick={() => onChange({ offers, auto })}>Accept</Button>
+        <Button color="primary" onClick={() => onChange({ offers, auto })}>
+          Accept
+        </Button>
       </DialogActions>
     </Dialog>
   );

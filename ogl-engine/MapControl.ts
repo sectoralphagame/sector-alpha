@@ -5,8 +5,6 @@ import type { GameSettings } from "@core/settings";
 import { MouseButton, Orbit, STATE, tempVec3 } from "./Orbit";
 
 const dPos = 360;
-const dScale = 0.2;
-const dRotation = 200;
 const keymap = {
   KeyW: { x: 0, y: dPos },
   ArrowUp: { x: 0, y: dPos },
@@ -16,12 +14,6 @@ const keymap = {
   ArrowLeft: { x: dPos, y: 0 },
   KeyD: { x: -dPos, y: 0 },
   ArrowRight: { x: -dPos, y: 0 },
-  KeyQ: { rotate: Math.PI / dRotation },
-  KeyE: { rotate: -Math.PI / dRotation },
-  KeyX: { scale: -dScale },
-  Equal: { scale: -dScale },
-  KeyZ: { scale: dScale },
-  Minus: { scale: dScale },
 };
 
 export class MapControl extends Orbit {

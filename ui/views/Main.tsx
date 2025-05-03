@@ -9,8 +9,12 @@ export const Main: React.FC = () => {
 
   return (
     <View showBack={false} title="Sector Alpha">
-      <Button className={styles.button} onClick={() => navigate("new")}>
-        New Game
+      <Button
+        color="primary"
+        className={styles.button}
+        onClick={() => navigate("new")}
+      >
+        Start New Game
       </Button>
       <Button className={styles.button} onClick={() => navigate("load")}>
         Load Game

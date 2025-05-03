@@ -116,6 +116,10 @@ const Game: React.FC = () => {
         getPane().hidden = !getPane().hidden;
       }
 
+      if (event.code === "KeyQ") {
+        gameStore.togglePanelExpanded();
+      }
+
       if (
         event.code.startsWith("Digit") &&
         pressedKeys.current.has("ShiftLeft")

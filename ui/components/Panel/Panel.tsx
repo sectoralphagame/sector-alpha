@@ -11,6 +11,7 @@ import { find } from "@fxts/core";
 import { ConfigIcon } from "@assets/ui/icons";
 import { actionLoader } from "@core/actionLoader";
 import type { FacilityModule } from "@core/archetypes/facilityModule";
+import { useGameStore } from "@ui/state/game";
 import ShipPanel from "../ShipPanel";
 import { ConfigDialog } from "../ConfigDialog";
 import EntityName from "../EntityName";
@@ -68,12 +69,12 @@ const JournalWrapper: React.FC<
   );
 
 export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
-  const [isCollapsed, setCollapsed] = React.useState(
-    expanded === undefined ? true : !expanded
-  );
+  const [[isPanelExpanded], gameStore] = useGameStore((store) => [
+    store.isPanelExpanded,
+  ]);
+  const isCollapsed = expanded ?? !isPanelExpanded;
 
   const [dialog, setDialog] = useGameDialog();
-  const toggleCollapse = React.useCallback(() => setCollapsed((c) => !c), []);
   const [showHidden, setShowHidden] = React.useState(false);
 
   const [sim] = useSim();
@@ -95,7 +96,7 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
 
   React.useEffect(() => {
     if (entity && isCollapsed) {
-      toggleCollapse();
+      gameStore.togglePanelExpanded();
     }
   }, [entity]);
 
@@ -138,9 +139,9 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
     <>
       <PanelComponent
         isCollapsed={isCollapsed}
-        onCollapseToggle={toggleCollapse}
+        onCollapseToggle={gameStore.togglePanelExpanded}
         onPlayerAssets={() => {
-          setCollapsed(false);
+          gameStore.setPanelExpanded(true);
         }}
       >
         {!isCollapsed &&

@@ -76,6 +76,7 @@ export const Overlay: React.FC<OverlayProps> = ({
           </Button>
           {overlays.map((slug) => (
             <Text
+              className={styles.overlayButton}
               variant="h3"
               color={active === slug ? "primary" : "default"}
               onClick={() => gameStore.setOverlay(slug)}

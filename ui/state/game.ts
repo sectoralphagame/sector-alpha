@@ -14,6 +14,7 @@ export class GameStore {
   selectedUnits: Selectable[] = [];
   focused = false;
   overlay: GameOverlayType = null;
+  isPanelExpanded = false;
 
   paneFolder: FolderApi | null;
 
@@ -37,6 +38,10 @@ export class GameStore {
 
       selectionBox: observable,
       setSelectionBoxState: action.bound,
+
+      isPanelExpanded: observable,
+      setPanelExpanded: action.bound,
+      togglePanelExpanded: action.bound,
     });
   }
 
@@ -141,9 +146,17 @@ export class GameStore {
   setSelectionBoxState(state: boolean) {
     this.selectionBox = state;
   }
+
+  setPanelExpanded(state: boolean) {
+    this.isPanelExpanded = state;
+  }
+
+  togglePanelExpanded() {
+    this.isPanelExpanded = !this.isPanelExpanded;
+  }
 }
 
 export const gameStore = new GameStore();
-export const useGameStore = <TResult extends Array<any>>(
+export const useGameStore = <TResult extends any[]>(
   selector: (_store: GameStore) => TResult
 ) => useMobx(gameStore, selector);

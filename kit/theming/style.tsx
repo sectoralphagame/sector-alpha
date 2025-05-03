@@ -21,6 +21,7 @@ export interface Theme {
     success: string;
     active: string;
     primary: string;
+    secondary: string;
     blue: string;
     "debug-error": string;
   };
@@ -67,6 +68,7 @@ export function createTheme(): Theme {
       error: "#ff5b45",
       success: "#52fa6e",
       primary: "#f7c14a",
+      secondary: "#328bcf",
       active: "#f7c14a",
       blue: "#328bcf",
       "debug-error": "#ff5b4522",
