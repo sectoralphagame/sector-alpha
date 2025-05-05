@@ -20,6 +20,7 @@ import { Star } from "../builders/Star";
 
 const bloomSize = 1.2;
 const lightsNum = 16;
+const bloomPasses = 8;
 
 const tempVec3 = new Vec3();
 
@@ -197,7 +198,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         },
       }),
     };
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < bloomPasses; i++) {
       this.postProcessingLayers.bloom.post.passes.push(
         this.postProcessingLayers.bloom.passes.horizontalBloom.pass,
         this.postProcessingLayers.bloom.passes.verticalBloom.pass

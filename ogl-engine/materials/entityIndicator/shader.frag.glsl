@@ -71,13 +71,9 @@ void main() {
         color = vec3(0.16f, 0.5f, 0.98f);
     }
 
-    if(uSelected <= 0 && uHovered <= 0) {
-        alpha *= 0.75f;
-    }
-
     if(alpha <= 0.05f) {
         discard;
     }
 
-    fragData[2] = vec4(color, alpha * (0.7f + sign(float(uSelected)) * 0.25f + sign(float(uHovered)) * 0.15f));
+    fragData[2] = vec4(color, alpha * (0.75f + sign(float(uSelected)) * 0.22f + sign(float(uHovered)) * 0.1f));
 }
