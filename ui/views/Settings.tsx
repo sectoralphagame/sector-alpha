@@ -127,7 +127,8 @@ export const Settings: React.FC = () => {
       <div className={styles.settingsRow}>
         <div>Volumetric Light Scattering</div>
         <Select
-          disabled={!settings.graphics?.postProcessing}
+          // FIXME: Godrays need refinement
+          disabled={!settings.graphics?.postProcessing || true}
           onChange={(value) =>
             setSettings((prevSettings) =>
               merge({}, prevSettings, {
@@ -137,7 +138,8 @@ export const Settings: React.FC = () => {
               })
             )
           }
-          value={(settings.graphics?.godrays ?? false).toString()}
+          // value={(settings.graphics?.godrays ?? false).toString()}
+          value="false"
         >
           <SelectButton>
             {settings.graphics?.godrays ? "Enabled" : "Disabled"}
