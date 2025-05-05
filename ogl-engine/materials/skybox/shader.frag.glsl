@@ -5,7 +5,7 @@ uniform samplerCube tMap;
 
 in vec3 vDir;
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 
 void main() {
     fragData[0] = texture(tMap, vDir);

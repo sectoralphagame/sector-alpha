@@ -3,7 +3,7 @@ precision highp float;
 
 in vec2 vUv;
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 
 uniform mat4 modelMatrix;
 uniform vec3 cameraPosition;
@@ -79,5 +79,5 @@ void main() {
         discard;
     }
 
-    fragData[0] = vec4(color, alpha / 2.f);
+    fragData[2] = vec4(color, alpha * (0.7f + sign(float(uSelected)) * 0.25f + sign(float(uHovered)) * 0.15f));
 }

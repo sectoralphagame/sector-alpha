@@ -7,7 +7,7 @@ precision highp float;
 in vec3 worldPosition;
 in vec3 vNormal;
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 
 uniform vec3 uColor;
 uniform bool bShaded;

@@ -7,6 +7,7 @@ import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
 import vignetteFragment from "../post/vignette.frag.glsl";
+import uiFragment from "../post/ui.frag.glsl";
 import godraysFragment from "../post/godrays.frag.glsl";
 import tonemappingFragment from "../post/tonemapping.frag.glsl";
 import compositeFragment from "../post/composite.frag.glsl";
@@ -101,7 +102,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.camera.far = settings.camera.far;
 
     this.renderTarget = new RenderTarget(gl, {
-      color: 2,
+      // Color, bloom and UI
+      color: 3,
       width: gl.canvas.width * this.dpr,
       height: gl.canvas.height * this.dpr,
     });
@@ -156,7 +158,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       },
       bloom: {
         post: new Post(gl, {
-          dpr: this.dpr / 4,
+          dpr: this.dpr / 8,
           targetOnly: true,
           depth: false,
         }),
@@ -255,6 +257,15 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         },
       }),
     };
+    this.postProcessingLayers.composite.passes.ui = {
+      enabled: true,
+      pass: this.postProcessingLayers.composite.post.addPass({
+        fragment: uiFragment,
+        uniforms: {
+          tUi: this.renderTarget.textures[2],
+        },
+      }),
+    };
   };
 
   private get vignettePass() {
@@ -342,6 +353,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         pass.uniforms.tEmissive.value = this.renderTarget.textures[1];
       }
     }
+    this.postProcessingLayers.composite.passes.ui.pass.uniforms.tUi.value =
+      this.renderTarget.textures[2];
     this.postProcessingLayers.bloom.post.render({
       texture: this.renderTarget.textures[0],
     });
@@ -352,6 +365,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.godraysPass.pass.enabled = this.godraysPass.enabled;
     this.fxaaPass.pass.enabled = this.fxaa;
     this.vignettePass.pass.enabled = true;
+    this.postProcessingLayers.composite.passes.ui.pass.enabled =
+      this.postProcessingLayers.composite.passes.ui.enabled;
     // Allow post to render to canvas upon its last pass
     this.postProcessingLayers.composite.post.targetOnly = false;
 

@@ -30,7 +30,7 @@ uniform float uRoughness;
 uniform sampler2D tEmissive;
 #endif
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 #define EPSILON 0.001f
 
 #pragma glslify: normalMap = require("./ogl-engine/shader/normalMap");

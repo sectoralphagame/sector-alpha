@@ -3,7 +3,7 @@ precision highp float;
 
 in vec2 vUv;
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 
 uniform float lineWidthX;
 uniform float lineWidthY;

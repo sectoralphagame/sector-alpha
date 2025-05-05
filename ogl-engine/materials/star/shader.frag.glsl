@@ -15,7 +15,7 @@ in vec3 vWorldNormal;
 in vec3 vViewDirection;
 in float fCameraDistance;
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 
 uniform float uTime;
 uniform vec3 cameraPosition;
