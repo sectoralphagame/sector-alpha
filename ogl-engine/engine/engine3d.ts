@@ -64,6 +64,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
           uSmoothness: { value: number };
           uOffset: { value: number };
         };
+        tonemapping: {
+          uGamma: { value: number };
+          uSaturation: { value: number };
+          uContrast: { value: number };
+        };
       };
     };
     resolution: { base: { value: Vec2 }; bloom: { value: Vec2 } };
@@ -137,6 +142,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
             uStrength: { value: 0.48 },
             uSmoothness: { value: 0.19 },
             uOffset: { value: -0.41 },
+          },
+          tonemapping: {
+            uGamma: { value: 1.08 },
+            uContrast: { value: 1 },
+            uSaturation: { value: 1 },
           },
         },
       },
@@ -235,6 +245,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       enabled: true,
       pass: this.postProcessingLayers.composite.post.addPass({
         fragment: tonemappingFragment,
+        uniforms: this.uniforms.env.postProcessing.tonemapping,
       }),
     };
     this.postProcessingLayers.composite.passes.fxaa = {

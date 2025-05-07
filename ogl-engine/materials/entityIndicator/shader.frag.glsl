@@ -17,9 +17,9 @@ uniform int uSelected;
 
 #define baseLineWidth 0.04f
 #define baseBarLineWidth 0.1f
-#define barWidth 0.025f
-#define hpOffset 0.88f
-#define shieldOffset 0.95f
+#define barHeight 0.034f / log(uSize)
+#define hpOffset (1.0 - barHeight * 3.)
+#define shieldOffset hpOffset - barHeight * 2.0f
 
 float sdCircle(vec2 p, float radius) {
     return length(p) - radius;
@@ -57,14 +57,14 @@ void main() {
         alpha += 1.0f - smoothstep(lineWidth - smoothing, lineWidth, abs(x));
     }
 
-    float hp = box(vUv + vec2(0, -hpOffset), vec2(0.f, 0.0f), vec2(uHp, barWidth));
+    float hp = box(vUv + vec2(0, -hpOffset), vec2(0.f, 0.0f), vec2(uHp, barHeight));
     alpha += 1.0f - sign(hp);
 
     if(sign(hp) < 0.f) {
         color = vec3(0.45f, 0.99f, 0.56f);
     }
 
-    float shield = box(vUv + vec2(0, -shieldOffset), vec2(0.f, 0.0f), vec2(uShield, barWidth));
+    float shield = box(vUv + vec2(0, -shieldOffset), vec2(0.f, 0.0f), vec2(uShield, barHeight));
     alpha += 1.0f - sign(shield);
 
     if(sign(shield) < 0.f) {
