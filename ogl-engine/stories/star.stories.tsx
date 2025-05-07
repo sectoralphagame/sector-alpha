@@ -10,7 +10,7 @@ import { Story3d, story3dMeta } from "./Story3d";
 
 interface StarStoryProps extends Story3dArgs {}
 
-const StarStory: React.FC<StarStoryProps> = ({ postProcessing, skybox }) => {
+const StarStory: React.FC<StarStoryProps> = (props) => {
   const engineRef = React.useRef<Engine3D>();
   const starRef = React.useRef<Star>();
   const controlRef = React.useRef<Orbit>();
@@ -29,14 +29,7 @@ const StarStory: React.FC<StarStoryProps> = ({ postProcessing, skybox }) => {
     controlRef.current!.update();
   }, []);
 
-  return (
-    <Story3d
-      postProcessing={postProcessing}
-      onEngineInit={onInit}
-      onEngineUpdate={onUpdate}
-      skybox={skybox}
-    />
-  );
+  return <Story3d {...props} onEngineInit={onInit} onEngineUpdate={onUpdate} />;
 };
 
 export default {
@@ -44,10 +37,10 @@ export default {
   ...merge({}, story3dMeta),
 } as Meta;
 
-const Template: StoryFn<StarStoryProps> = ({ postProcessing, skybox }) => (
+const Template: StoryFn<StarStoryProps> = (props) => (
   <div id="root">
     <Styles>
-      <StarStory postProcessing={postProcessing} skybox={skybox} />
+      <StarStory {...props} />
     </Styles>
   </div>
 );

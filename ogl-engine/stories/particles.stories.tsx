@@ -11,12 +11,16 @@ import { OneShotParticleGenerator } from "@ogl-engine/ParticleGenerator";
 import type { Story3dArgs } from "./Story3d";
 import { Story3d, story3dMeta } from "./Story3d";
 
-const ParticleGeneratorStory: React.FC<
-  Story3dArgs & {
-    particles: number;
-    type: ParticleGeneratorType;
-  }
-> = ({ postProcessing, skybox, particles, type }) => {
+interface ParticleGeneratorStoryProps extends Story3dArgs {
+  particles: number;
+  type: ParticleGeneratorType;
+}
+
+const ParticleGeneratorStory: React.FC<ParticleGeneratorStoryProps> = ({
+  particles,
+  type,
+  ...props
+}) => {
   const engineRef = React.useRef<Engine3D>();
   const generatorRef = React.useRef<
     SmokeParticleGenerator | FireParticleGenerator
@@ -53,14 +57,7 @@ const ParticleGeneratorStory: React.FC<
     generatorRef.current.setParent(engineRef.current.scene);
   }, [type]);
 
-  return (
-    <Story3d
-      postProcessing={postProcessing}
-      onEngineInit={onInit}
-      onEngineUpdate={onUpdate}
-      skybox={skybox}
-    />
-  );
+  return <Story3d {...props} onEngineInit={onInit} onEngineUpdate={onUpdate} />;
 };
 
 export default {
@@ -84,15 +81,10 @@ export default {
   ),
 } as Meta;
 
-const Template: StoryFn = ({ postProcessing, particles, skybox, type }) => (
+const Template: StoryFn<ParticleGeneratorStoryProps> = (props) => (
   <div id="root">
     <Styles>
-      <ParticleGeneratorStory
-        postProcessing={postProcessing}
-        particles={particles}
-        skybox={skybox}
-        type={type}
-      />
+      <ParticleGeneratorStory {...props} />
     </Styles>
   </div>
 );

@@ -16,14 +16,20 @@ import type { DockSize } from "@core/components/dockable";
 import { Story3d, story3dMeta } from "./Story3d";
 import type { Story3dArgs } from "./Story3d";
 
-const EntityIndicatorStory: React.FC<
-  Story3dArgs & {
-    color: string;
-    hovered: boolean;
-    selected: boolean;
-    size: DockSize;
-  }
-> = ({ postProcessing, skybox, color, hovered, selected, size, pane }) => {
+interface EntityIndicatorStoryProps extends Story3dArgs {
+  color: string;
+  hovered: boolean;
+  selected: boolean;
+  size: DockSize;
+}
+
+const EntityIndicatorStory: React.FC<EntityIndicatorStoryProps> = ({
+  color,
+  hovered,
+  selected,
+  size,
+  ...props
+}) => {
   const engineRef = React.useRef<Engine>();
   const onInit = React.useCallback(async (engine) => {
     engineRef.current = engine;
@@ -66,15 +72,7 @@ const EntityIndicatorStory: React.FC<
     indicator?.material.setSelected(selected);
   }, [color, hovered, selected]);
 
-  return (
-    <Story3d
-      postProcessing={postProcessing}
-      onEngineInit={onInit}
-      onEngineUpdate={() => {}}
-      skybox={skybox}
-      pane={pane}
-    />
-  );
+  return <Story3d {...props} onEngineInit={onInit} onEngineUpdate={() => {}} />;
 };
 
 export default {
@@ -115,26 +113,10 @@ export default {
   ),
 } as Meta;
 
-const Template: StoryFn = ({
-  postProcessing,
-  skybox,
-  color,
-  hovered,
-  selected,
-  size,
-  pane,
-}) => (
+const Template: StoryFn<EntityIndicatorStoryProps> = (props) => (
   <div id="root">
     <Styles>
-      <EntityIndicatorStory
-        postProcessing={postProcessing}
-        skybox={skybox}
-        color={color}
-        hovered={hovered}
-        selected={selected}
-        size={size}
-        pane={pane}
-      />
+      <EntityIndicatorStory {...props} />
     </Styles>
   </div>
 );

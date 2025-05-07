@@ -13,14 +13,20 @@ import { noop } from "@fxts/core";
 import { Story3d, story3dMeta } from "./Story3d";
 import type { Story3dArgs } from "./Story3d";
 
-const DustCloudStory: React.FC<
-  Story3dArgs & {
-    size: number;
-    density: number;
-    color: string;
-    alpha: number;
-  }
-> = ({ postProcessing, skybox, size, density, color, alpha }) => {
+interface DustCloudStoryProps extends Story3dArgs {
+  size: number;
+  density: number;
+  color: string;
+  alpha: number;
+}
+
+const DustCloudStory: React.FC<DustCloudStoryProps> = ({
+  size,
+  density,
+  color,
+  alpha,
+  ...props
+}) => {
   const engineRef = React.useRef<Engine3D>();
   const onInit = React.useCallback(async (engine: Engine3D) => {
     await assetLoader.generateTextures();
@@ -63,11 +69,10 @@ const DustCloudStory: React.FC<
 
   return (
     <Story3d
-      postProcessing={postProcessing}
+      {...props}
       control="map"
       onEngineInit={onInit}
       onEngineUpdate={() => {}}
-      skybox={skybox}
     />
   );
 };
@@ -94,24 +99,10 @@ export default {
   ),
 } as Meta;
 
-const Template: StoryFn = ({
-  postProcessing,
-  skybox,
-  size,
-  density,
-  color,
-  alpha,
-}) => (
+const Template: StoryFn<DustCloudStoryProps> = (props) => (
   <div id="root">
     <Styles>
-      <DustCloudStory
-        postProcessing={postProcessing}
-        skybox={skybox}
-        size={size}
-        density={density}
-        color={color}
-        alpha={alpha}
-      />
+      <DustCloudStory {...props} />
     </Styles>
   </div>
 );

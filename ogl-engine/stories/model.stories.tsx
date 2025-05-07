@@ -20,9 +20,8 @@ interface ModelStoryProps extends Story3dArgs {
 
 const ModelStory: React.FC<ModelStoryProps> = ({
   model: modelName,
-  skybox,
   rotationSpeed,
-  postProcessing,
+  ...props
 }) => {
   const engineRef = React.useRef<Engine3D>();
   const meshRef = React.useRef<BaseMesh>();
@@ -74,14 +73,7 @@ const ModelStory: React.FC<ModelStoryProps> = ({
     rotationSpeedRef.current = rotationSpeed;
   }, [rotationSpeed]);
 
-  return (
-    <Story3d
-      postProcessing={postProcessing}
-      onEngineInit={onInit}
-      onEngineUpdate={onUpdate}
-      skybox={skybox}
-    />
-  );
+  return <Story3d {...props} onEngineInit={onInit} onEngineUpdate={onUpdate} />;
 };
 
 export default {
@@ -110,17 +102,15 @@ export default {
 
 const Template: StoryFn<ModelStoryProps> = ({
   model,
-  skybox,
   rotationSpeed,
-  postProcessing,
+  ...props
 }) => (
   <div id="root">
     <Styles>
       <ModelStory
         model={model.replace(/-/, "/")}
-        skybox={skybox}
         rotationSpeed={rotationSpeed}
-        postProcessing={postProcessing}
+        {...props}
       />
     </Styles>
   </div>
