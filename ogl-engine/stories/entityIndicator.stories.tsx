@@ -12,6 +12,7 @@ import {
 } from "@ui/components/TacticalMap/EntityMesh";
 import models from "@assets/models";
 import Color from "color";
+import type { DockSize } from "@core/components/dockable";
 import { Story3d, story3dMeta } from "./Story3d";
 import type { Story3dArgs } from "./Story3d";
 
@@ -20,8 +21,9 @@ const EntityIndicatorStory: React.FC<
     color: string;
     hovered: boolean;
     selected: boolean;
+    size: DockSize;
   }
-> = ({ postProcessing, skybox, color, hovered, selected }) => {
+> = ({ postProcessing, skybox, color, hovered, selected, size, pane }) => {
   const engineRef = React.useRef<Engine>();
   const onInit = React.useCallback(async (engine) => {
     engineRef.current = engine;
@@ -43,6 +45,9 @@ const EntityIndicatorStory: React.FC<
     indicator.material.setColor(Color(color).rgbNumber());
     // @ts-expect-error
     indicator.setParent(ship);
+    indicator.material.setSize(size);
+    indicator.material.uniforms.uShield.value = 0.5;
+    indicator.material.uniforms.uHp.value = 1;
   }, []);
 
   React.useEffect(() => {
@@ -67,6 +72,7 @@ const EntityIndicatorStory: React.FC<
       onEngineInit={onInit}
       onEngineUpdate={() => {}}
       skybox={skybox}
+      pane={pane}
     />
   );
 };
@@ -77,6 +83,9 @@ export default {
     {
       args: {
         color: "#ff0000",
+        hovered: false,
+        selected: false,
+        size: "medium",
       },
       argTypes: {
         color: {
@@ -94,6 +103,12 @@ export default {
             type: "boolean",
           },
         },
+        size: {
+          control: {
+            type: "select",
+          },
+          options: ["small", "medium", "large"] as DockSize[],
+        },
       },
     },
     story3dMeta
@@ -106,6 +121,8 @@ const Template: StoryFn = ({
   color,
   hovered,
   selected,
+  size,
+  pane,
 }) => (
   <div id="root">
     <Styles>
@@ -115,6 +132,8 @@ const Template: StoryFn = ({
         color={color}
         hovered={hovered}
         selected={selected}
+        size={size}
+        pane={pane}
       />
     </Styles>
   </div>
