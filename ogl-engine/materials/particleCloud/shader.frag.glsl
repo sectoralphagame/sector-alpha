@@ -8,7 +8,7 @@ in vec2 vUv;
 flat in float vInstanceIndex;
 flat in float vT;
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 
 uniform sampler2D tMap;
 uniform vec3 uColor;
@@ -30,5 +30,4 @@ void main() {
     vec4 color = vec4(uColor, alpha);
 
     fragData[0] = color;
-    fragData[1] = vec4(0.f, 0.f, 0.f, 1.0f);
 }

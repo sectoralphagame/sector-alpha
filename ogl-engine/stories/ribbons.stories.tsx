@@ -18,10 +18,9 @@ for (let i = 0; i < n; i++) {
   segments.set([i / n, 0, 0], i * 4);
 }
 
-const RibbonsStory: React.FC<Story3dArgs & {}> = ({
-  postProcessing,
-  skybox,
-}) => {
+interface RibbonsStoryProps extends Story3dArgs {}
+
+const RibbonsStory: React.FC<RibbonsStoryProps> = (props) => {
   const engineRef = React.useRef<Engine3D>();
   const onInit = React.useCallback(async (engine: Engine3D) => {
     engineRef.current = engine;
@@ -52,11 +51,10 @@ const RibbonsStory: React.FC<Story3dArgs & {}> = ({
 
   return (
     <Story3d
-      postProcessing={postProcessing}
+      {...props}
       control="map"
       onEngineInit={onInit}
       onEngineUpdate={() => {}}
-      skybox={skybox}
     />
   );
 };
@@ -72,10 +70,10 @@ export default {
   ),
 } as Meta;
 
-const Template: StoryFn = ({ postProcessing, skybox }) => (
+const Template: StoryFn<RibbonsStoryProps> = (props) => (
   <div id="root">
     <Styles>
-      <RibbonsStory postProcessing={postProcessing} skybox={skybox} />
+      <RibbonsStory {...props} />
     </Styles>
   </div>
 );

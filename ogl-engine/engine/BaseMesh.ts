@@ -1,11 +1,14 @@
 import type { Material } from "@ogl-engine/materials/material";
 import type { AttributeData, Camera, Geometry, GLTF, MeshOptions } from "ogl";
-import { Mesh, Vec3 } from "ogl";
+import { Mat4, Mesh, Vec3 } from "ogl";
 import { MissingMaterial } from "@ogl-engine/materials/missing/missing";
 import type { Destroyable } from "@ogl-engine/types";
 import type { Engine3D } from "./engine3d";
 import { Light } from "./Light";
 import { BoundingBox } from "./BoundingBox";
+
+const tempMat4 = new Mat4();
+const tempWorldMatrix = new Mat4();
 
 export class BaseMesh<TMaterial extends Material = Material>
   extends Mesh
@@ -193,5 +196,30 @@ export class BaseMesh<TMaterial extends Material = Material>
     const bbox = new BoundingBox(this.gl, this.geometry.bounds);
 
     bbox.setParent(this);
+  }
+
+  override lookAt(target: Vec3, invert = false, useWorldMatrix = false) {
+    super.lookAt(target, invert);
+    if (useWorldMatrix) {
+      if (invert) this.matrix.lookAt(this.position, target, this.up);
+      else this.matrix.lookAt(target, this.position, this.up);
+
+      // Extract world-space rotation
+      // @ts-expect-error
+      // eslint-disable-next-line no-underscore-dangle
+      this.matrix.getRotation(this.quaternion._target);
+
+      // Convert world rotation to local using inverse of parent world matrix
+      const invParentWorld = tempWorldMatrix
+        .copy(this.parent!.worldMatrix)
+        .inverse();
+      const worldRotation = tempMat4.fromQuaternion(this.quaternion);
+      worldRotation.multiply(invParentWorld);
+      // @ts-expect-error
+      // eslint-disable-next-line no-underscore-dangle
+      worldRotation.getRotation(this.quaternion._target);
+
+      this.rotation.fromQuaternion(this.quaternion);
+    }
   }
 }

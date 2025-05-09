@@ -19,6 +19,7 @@ export class StarCoronaMaterial extends Material {
       fragment,
       uniforms: this.uniforms,
       transparent: true,
+      cullFace: false,
     });
     this.uniforms.uColor = { value: color };
   }

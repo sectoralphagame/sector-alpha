@@ -3,11 +3,11 @@ precision highp float;
 
 in vec2 vUv;
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 
 uniform vec3 uColor;
 
-#define emissive 0.8f
+#define emissive 0.9f
 #define K 0.02
 
 void main() {
@@ -17,5 +17,5 @@ void main() {
     float alpha = alphaX * alphaY;
 
     fragData[0] = vec4(uColor * (1.f + emissive) * alphaX, alpha);
-    fragData[1] = vec4(emissive, 0.f, 0.f, 1.f);
+    fragData[1] = vec4(fragData[0].rgb, emissive * alpha);
 }

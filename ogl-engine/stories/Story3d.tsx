@@ -4,6 +4,7 @@ import { TacticalMapScene } from "@ogl-engine/engine/Scene";
 import { MapControl } from "@ogl-engine/MapControl";
 import { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
+import { getPane } from "@ui/context/Pane";
 import { Orbit } from "ogl";
 import React from "react";
 
@@ -11,6 +12,7 @@ export interface Story3dArgs {
   postProcessing: boolean;
   skybox: keyof typeof skyboxes;
   control?: "orbit" | "map";
+  pane: boolean;
 }
 
 interface Story3dProps extends Story3dArgs {
@@ -22,21 +24,22 @@ export const Story3d: React.FC<Story3dProps> = ({
   postProcessing,
   skybox,
   control,
+  pane,
   onEngineInit,
   onEngineUpdate,
 }) => {
-  const engine = React.useMemo(() => {
-    const e = new Engine3D<TacticalMapScene>();
-    e.setScene(new TacticalMapScene(e));
-
-    return e;
-  }, []);
+  const engine = React.useMemo(() => new Engine3D<TacticalMapScene>(), []);
   const controlRef = React.useRef<{ update: (_delta?: number) => void }>();
   const skyboxRef = React.useRef<Skybox>();
 
   React.useEffect(() => {
+    getPane().hidden = !pane;
+  }, [pane]);
+
+  React.useEffect(() => {
     engine.hooks.onInit.subscribe("Story3d", async () => {
       onEngineInit(engine);
+      engine.setScene(new TacticalMapScene(engine));
 
       controlRef.current =
         control === "map"
@@ -75,6 +78,7 @@ export const story3dMeta = {
   args: {
     postProcessing: false,
     skybox: Object.keys(skyboxes)[0],
+    pane: false,
   },
   argTypes: {
     postProcessing: {
@@ -85,6 +89,11 @@ export const story3dMeta = {
     skybox: {
       options: Object.keys(skyboxes),
       control: { type: "select" },
+    },
+    pane: {
+      control: {
+        type: "boolean",
+      },
     },
   },
 };

@@ -16,7 +16,9 @@ export const Wrapper: React.FC<React.PropsWithChildren<{}>> = ({
         style={{ top: menu.position[1], left: menu.position[0] }}
       >
         <Dropdown onClick={menuStore.close}>
-          <DropdownOptions static>{children}</DropdownOptions>
+          <DropdownOptions className={styles.dropdown} static>
+            {children}
+          </DropdownOptions>
         </Dropdown>
       </div>
     </ClickAwayListener>

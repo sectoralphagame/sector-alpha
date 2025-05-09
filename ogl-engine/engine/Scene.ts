@@ -124,6 +124,33 @@ export class TacticalMapScene extends Scene {
         label: "Vignette Offset",
       }
     );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.tonemapping.uGamma,
+      "value",
+      {
+        label: "Gamma",
+        min: 0.5,
+        max: 2.2,
+      }
+    );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.tonemapping.uContrast,
+      "value",
+      {
+        label: "Contrast",
+        min: 0.5,
+        max: 2,
+      }
+    );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.tonemapping.uSaturation,
+      "value",
+      {
+        label: "Saturation",
+        min: 0.5,
+        max: 2,
+      }
+    );
   }
 
   destroy() {

@@ -138,6 +138,7 @@ export class RibbonEmitter extends BaseMesh<EngineTrailMaterial> {
   }
 
   update(delta: number) {
+    this.setVisibility(this.trackedEntity.visible);
     if (!this.initialised) {
       for (let i = 0; i < this.maxSegments; i++) {
         this.spawnSegment();

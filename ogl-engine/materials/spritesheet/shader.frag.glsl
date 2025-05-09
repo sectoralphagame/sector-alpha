@@ -4,7 +4,7 @@ precision highp float;
 in vec3 worldPosition;
 in vec2 vUv;
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 
 uniform sampler2D tDiffuse;
 uniform float fAlpha;
@@ -17,5 +17,5 @@ void main() {
         discard;
     }
     fragData[0] = vec4(tex.rgb, alpha);
-    fragData[1] = fEmissive * fragData[0];
+    fragData[1] = vec4(fragData[0].rgb, fEmissive);
 }

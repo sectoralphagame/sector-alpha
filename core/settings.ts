@@ -4,7 +4,7 @@ export const isDev = process.env.NODE_ENV === "development";
 
 export const settings = {
   camera: {
-    near: 1e-2,
+    near: 1e-1,
     far: 5e3,
   },
   bootTime: 3600,
@@ -19,7 +19,6 @@ export interface GameSettings {
   dev: boolean;
   volume: Record<"ui", number>;
   graphics: {
-    postProcessing: boolean;
     fxaa: boolean;
     godrays: boolean;
   };
@@ -37,7 +36,6 @@ export const defaultGameSttings: GameSettings = {
     ui: 1,
   },
   graphics: {
-    postProcessing: false,
     fxaa: false,
     godrays: false,
   },

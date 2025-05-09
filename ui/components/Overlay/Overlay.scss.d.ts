@@ -6,3 +6,4 @@ export const active: string;
 export const fadeIn: string;
 export const fadeOut: string;
 export const bar: string;
+export const overlayButton: string;

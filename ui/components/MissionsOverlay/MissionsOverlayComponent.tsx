@@ -77,6 +77,7 @@ export const MissionsOverlayComponent: React.FC<
               </div>
               {missions[selected].cancellable && (
                 <Button
+                  color="error"
                   onClick={() => {
                     if (selected > 0) {
                       setSelected(selected - 1);

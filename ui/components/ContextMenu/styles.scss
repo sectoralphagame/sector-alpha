@@ -2,3 +2,15 @@
   position: absolute;
   width: usesize(20);
 }
+
+.dropdown {
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 0;
+  width: unset;
+
+  > button {
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+}

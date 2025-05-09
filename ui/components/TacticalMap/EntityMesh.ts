@@ -5,30 +5,87 @@ import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
 import { getParticleType, particleGenerator } from "@ogl-engine/particles";
 import { Light } from "@ogl-engine/engine/Light";
-import { Plane } from "ogl";
+import { Geometry, Plane, Text, Texture, Vec3 } from "ogl";
 import { EntityIndicatorMaterial } from "@ogl-engine/materials/entityIndicator/entityIndicator";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { RibbonEmitter } from "@ogl-engine/RibbonEmitter";
 import type { Faction } from "@core/archetypes/faction";
+import font from "@assets/fonts/FiraSans/FiraSans-Light.json";
+import { EntityNameMaterial } from "@ogl-engine/materials/entityName/entityName";
+import type { DockSize } from "@core/components/dockable";
 
 export const entityScale = 1 / 220;
 // FIXME: Remove after distance rebalancing
 const scale = 2;
 
+const tempVec3 = new Vec3();
+
 export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
   name = "EntityIndicator";
   parent: EntityMesh;
+  nameMesh: BaseMesh<EntityNameMaterial>;
 
   constructor(engine: Engine3D) {
     super(engine, {
       geometry: new Plane(engine.gl),
+      material: new EntityIndicatorMaterial(engine),
+      frustumCulled: false,
     });
-    this.applyMaterial(new EntityIndicatorMaterial(engine));
-    this.frustumCulled = false;
   }
 
   override setParent(parent: EntityMesh) {
     super.setParent(parent);
+    if (parent.entity?.cp.name)
+      this.createNameMesh(parent.entity.cp.name.value);
+  }
+
+  setSize(size: DockSize) {
+    this.material.setSize(size);
+    this.nameMesh.material.setOffset(size);
+  }
+
+  createNameMesh(name: string) {
+    const text = new Text({
+      font,
+      text: name,
+      // width: 13,
+      align: "center",
+      letterSpacing: 0.1,
+      size: 1,
+      lineHeight: 1.1,
+    });
+
+    this.nameMesh = new BaseMesh<EntityNameMaterial>(this.engine, {
+      geometry: new Geometry(this.engine.gl, {
+        position: {
+          size: 3,
+          data: text.buffers.position,
+        },
+        uv: { size: 2, data: text.buffers.uv },
+        id: { size: 1, data: text.buffers.id },
+        index: { data: text.buffers.index },
+      }),
+      frustumCulled: false,
+    });
+    const texture = new Texture(this.engine.gl, {
+      generateMipmaps: false,
+    });
+    assetLoader.loadTexture("font/firaSans").then((img) => {
+      texture.image = img;
+    });
+    this.nameMesh.applyMaterial(new EntityNameMaterial(this.engine, texture));
+    this.onBeforeRender(() => {
+      this.nameMesh.setVisibility(
+        !!(
+          this.material.uniforms.uHovered.value +
+          this.material.uniforms.uSelected.value
+        ) ||
+          this.engine.camera.position.distance(
+            tempVec3.copy(this.position).applyMatrix4(this.worldMatrix)
+          ) < 10
+      );
+    });
+    this.nameMesh.setParent(this);
   }
 }
 
@@ -107,9 +164,10 @@ export class EntityMesh extends BaseMesh {
             this.entity.cp.hitpoints.shield.max;
         }
       });
+
       this.indicator.setParent(this);
       this.indicator.material.setColor(entity.cp.render.color);
-      this.indicator.material.setSize(entity.cp.dockable?.size ?? "large");
+      this.indicator.setSize(entity.cp.dockable?.size ?? "large");
     }
   }
 
@@ -119,7 +177,7 @@ export class EntityMesh extends BaseMesh {
       0,
       this.entity.cp.position.coord[1] * scale
     );
-    this.rotation.y = -this.entity.cp.position.angle;
+    // this.rotation.y = -this.entity.cp.position.angle;
     this.setVisibility(!this.entity.cp.render.hidden);
   }
 

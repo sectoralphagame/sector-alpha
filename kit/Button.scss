@@ -13,9 +13,34 @@
     color: var(--palette-disabled);
     cursor: auto;
   }
+  &.primary,
+  &.secondary,
+  &.error,
+  &.success {
+    border: 1px solid transparent;
+    color: var(--palette-text-5);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--palette-default);
+    }
+  }
+  &.primary {
+    background: var(--palette-primary);
+  }
+  &.secondary {
+    background: var(--palette-secondary);
+  }
+  &.error {
+    background: var(--palette-error);
+  }
+  &.success {
+    background: var(--palette-success);
+  }
   appearance: none;
   background: var(--palette-background);
-  border-radius: usesize(0.4);
+  border-top-left-radius: usesize(1.2);
+  border-bottom-right-radius: usesize(1.2);
   border: usesize(0.1) solid var(--palette-border);
   color: var(--palette-default);
   cursor: pointer;

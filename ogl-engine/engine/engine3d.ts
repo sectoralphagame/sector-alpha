@@ -1,4 +1,4 @@
-import type { Transform } from "ogl";
+import type { Pass, Transform } from "ogl";
 import { Post, Texture, Vec2, Vec3, RenderTarget } from "ogl";
 import settings from "@core/settings";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
@@ -7,7 +7,9 @@ import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
 import vignetteFragment from "../post/vignette.frag.glsl";
+import uiFragment from "../post/ui.frag.glsl";
 import godraysFragment from "../post/godrays.frag.glsl";
+import tonemappingFragment from "../post/tonemapping.frag.glsl";
 import compositeFragment from "../post/composite.frag.glsl";
 import type { Light } from "./Light";
 import { dummyLight } from "./Light";
@@ -18,12 +20,13 @@ import { Star } from "../builders/Star";
 
 const bloomSize = 1.2;
 const lightsNum = 16;
+const bloomPasses = 8;
 
 const tempVec3 = new Vec3();
 
 export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   canvas: HTMLCanvasElement;
-  postProcessing = false;
+  postProcessing = true;
   fxaa = false;
   godrays = false;
   scene: TScene;
@@ -61,6 +64,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
           uSmoothness: { value: number };
           uOffset: { value: number };
         };
+        tonemapping: {
+          uGamma: { value: number };
+          uSaturation: { value: number };
+          uContrast: { value: number };
+        };
       };
     };
     resolution: { base: { value: Vec2 }; bloom: { value: Vec2 } };
@@ -69,7 +77,19 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   };
 
   private lights: Light[] = [];
-  private postProcessingLayers: Record<"composite" | "bloom", Post>;
+  private postProcessingLayers: Record<
+    "composite" | "bloom",
+    {
+      post: Post;
+      passes: Record<
+        string,
+        {
+          pass: Pass;
+          enabled: boolean;
+        }
+      >;
+    }
+  >;
   private renderTarget: RenderTarget;
 
   constructor() {
@@ -88,7 +108,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.camera.far = settings.camera.far;
 
     this.renderTarget = new RenderTarget(gl, {
-      color: 2,
+      // Color, bloom and UI
+      color: 3,
       width: gl.canvas.width * this.dpr,
       height: gl.canvas.height * this.dpr,
     });
@@ -115,12 +136,17 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
             uExposure: { value: 0.9 },
           },
           bloom: {
-            uBloomStrength: { value: 1.1 },
+            uBloomStrength: { value: 0.4 },
           },
           vignette: {
-            uStrength: { value: 0.38 },
+            uStrength: { value: 0.48 },
             uSmoothness: { value: 0.19 },
             uOffset: { value: -0.41 },
+          },
+          tonemapping: {
+            uGamma: { value: 1.08 },
+            uContrast: { value: 1 },
+            uSaturation: { value: 1 },
           },
         },
       },
@@ -137,90 +163,137 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     const gl = this.renderer.gl;
 
     this.postProcessingLayers = {
-      composite: new Post(gl),
-      bloom: new Post(gl, {
-        dpr: this.dpr / 4,
-        targetOnly: true,
-        depth: false,
-      }),
+      composite: {
+        post: new Post(gl),
+        passes: {},
+      },
+      bloom: {
+        post: new Post(gl, {
+          dpr: this.dpr / 8,
+          targetOnly: true,
+          depth: false,
+        }),
+        passes: {},
+      },
     };
 
-    this.postProcessingLayers.bloom.addPass({
-      fragment: brightPassFragment,
-      uniforms: {
-        uThreshold: { value: 0.95 },
-        tEmissive: { value: new Texture(gl) },
-      },
-    });
+    this.postProcessingLayers.bloom.passes.bright = {
+      pass: this.postProcessingLayers.bloom.post.addPass({
+        fragment: brightPassFragment,
+        uniforms: {
+          uThreshold: { value: 0.96 },
+          tEmissive: { value: new Texture(gl) },
+        },
+      }),
+      enabled: true,
+    };
 
-    const horizontalPass = this.postProcessingLayers.bloom.addPass({
-      fragment: blurFragment,
-      uniforms: {
-        uResolution: this.uniforms.resolution.bloom,
-        uDirection: { value: new Vec2(bloomSize * 1.2, 0) },
-      },
-    });
-    const verticalPass = this.postProcessingLayers.bloom.addPass({
-      fragment: blurFragment,
-      uniforms: {
-        uResolution: this.uniforms.resolution.bloom,
-        uDirection: { value: new Vec2(0, bloomSize) },
-      },
-    });
-    for (let i = 0; i < 24; i++) {
-      this.postProcessingLayers.bloom.passes.push(horizontalPass, verticalPass);
+    this.postProcessingLayers.bloom.passes.horizontalBloom = {
+      enabled: true,
+      pass: this.postProcessingLayers.bloom.post.addPass({
+        fragment: blurFragment,
+        uniforms: {
+          uResolution: this.uniforms.resolution.bloom,
+          uDirection: { value: new Vec2(bloomSize * 3, 0) },
+        },
+      }),
+    };
+    this.postProcessingLayers.bloom.passes.verticalBloom = {
+      enabled: true,
+      pass: this.postProcessingLayers.bloom.post.addPass({
+        fragment: blurFragment,
+        uniforms: {
+          uResolution: this.uniforms.resolution.bloom,
+          uDirection: { value: new Vec2(0, bloomSize) },
+        },
+      }),
+    };
+    for (let i = 0; i < bloomPasses; i++) {
+      this.postProcessingLayers.bloom.post.passes.push(
+        this.postProcessingLayers.bloom.passes.horizontalBloom.pass,
+        this.postProcessingLayers.bloom.passes.verticalBloom.pass
+      );
     }
 
-    this.postProcessingLayers.composite.addPass({
-      fragment: compositeFragment,
-      uniforms: {
-        uResolution: this.uniforms.resolution.base,
-        tBloom: this.postProcessingLayers.bloom.uniform,
-        uBloomStrength: this.uniforms.env.postProcessing.bloom.uBloomStrength,
-      },
-    });
-    this.postProcessingLayers.composite.addPass({
-      fragment: godraysFragment,
-      uniforms: {
-        tBloom: this.postProcessingLayers.bloom.uniform,
-        uSunPos: { value: new Vec2() },
-        uDensity: this.uniforms.env.postProcessing.godrays.uDensity,
-        uWeight: this.uniforms.env.postProcessing.godrays.uWeight,
-        uDecay: this.uniforms.env.postProcessing.godrays.uDecay,
-        uExposure: this.uniforms.env.postProcessing.godrays.uExposure,
-      },
-    });
-    this.postProcessingLayers.composite.addPass({
-      fragment: fxaaFragment,
-      uniforms: {
-        uResolution: this.uniforms.resolution.base,
-      },
-    });
-    this.postProcessingLayers.composite.addPass({
-      fragment: vignetteFragment,
-      uniforms: {
-        uResolution: this.uniforms.resolution.base,
-        uStrength: this.uniforms.env.postProcessing.vignette.uStrength,
-        uSmoothness: this.uniforms.env.postProcessing.vignette.uSmoothness,
-        uOffset: this.uniforms.env.postProcessing.vignette.uOffset,
-      },
-    });
+    this.postProcessingLayers.composite.passes.composite = {
+      enabled: true,
+      pass: this.postProcessingLayers.composite.post.addPass({
+        fragment: compositeFragment,
+        uniforms: {
+          uResolution: this.uniforms.resolution.base,
+          tBloom: this.postProcessingLayers.bloom.post.uniform,
+          uBloomStrength: this.uniforms.env.postProcessing.bloom.uBloomStrength,
+        },
+      }),
+    };
+    this.postProcessingLayers.composite.passes.godrays = {
+      // FIXME: Needs refinement
+      enabled: false,
+      pass: this.postProcessingLayers.composite.post.addPass({
+        fragment: godraysFragment,
+        uniforms: {
+          tBloom: this.postProcessingLayers.bloom.passes.uniform,
+          uSunPos: { value: new Vec2() },
+          uDensity: this.uniforms.env.postProcessing.godrays.uDensity,
+          uWeight: this.uniforms.env.postProcessing.godrays.uWeight,
+          uDecay: this.uniforms.env.postProcessing.godrays.uDecay,
+          uExposure: this.uniforms.env.postProcessing.godrays.uExposure,
+        },
+      }),
+    };
+    this.postProcessingLayers.composite.passes.tonemapping = {
+      enabled: true,
+      pass: this.postProcessingLayers.composite.post.addPass({
+        fragment: tonemappingFragment,
+        uniforms: this.uniforms.env.postProcessing.tonemapping,
+      }),
+    };
+    this.postProcessingLayers.composite.passes.fxaa = {
+      enabled: true,
+      pass: this.postProcessingLayers.composite.post.addPass({
+        fragment: fxaaFragment,
+        uniforms: {
+          uResolution: this.uniforms.resolution.base,
+        },
+      }),
+    };
+    this.postProcessingLayers.composite.passes.vignette = {
+      enabled: true,
+      pass: this.postProcessingLayers.composite.post.addPass({
+        fragment: vignetteFragment,
+        uniforms: {
+          uResolution: this.uniforms.resolution.base,
+          uStrength: this.uniforms.env.postProcessing.vignette.uStrength,
+          uSmoothness: this.uniforms.env.postProcessing.vignette.uSmoothness,
+          uOffset: this.uniforms.env.postProcessing.vignette.uOffset,
+        },
+      }),
+    };
+    this.postProcessingLayers.composite.passes.ui = {
+      enabled: true,
+      pass: this.postProcessingLayers.composite.post.addPass({
+        fragment: uiFragment,
+        uniforms: {
+          tUi: this.renderTarget.textures[2],
+        },
+      }),
+    };
   };
 
   private get vignettePass() {
-    return this.postProcessingLayers.composite.passes.at(-1)!;
+    return this.postProcessingLayers.composite.passes.vignette;
   }
 
   private get fxaaPass() {
-    return this.postProcessingLayers.composite.passes.at(-2)!;
+    return this.postProcessingLayers.composite.passes.fxaa;
   }
 
   private get godraysPass() {
-    return this.postProcessingLayers.composite.passes.at(-3)!;
+    return this.postProcessingLayers.composite.passes.godrays;
   }
 
   private get compositePass() {
-    return this.postProcessingLayers.composite.passes.at(-4)!;
+    return this.postProcessingLayers.composite.passes.composite;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -258,14 +331,14 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   };
 
   private renderComposite = () => {
-    this.godraysPass.uniforms.uSunPos.value.set(0.5, 0.5);
+    this.godraysPass.pass.uniforms.uSunPos.value.set(0.5, 0.5);
 
     this.scene.traverse((m) => {
       if (m instanceof Star) {
         const v = m.position
           .clone()
           .applyMatrix4(this.camera.projectionViewMatrix);
-        this.godraysPass.uniforms.uSunPos.value.set(
+        this.godraysPass.pass.uniforms.uSunPos.value.set(
           v.x / 2 + 0.5,
           v.y / 2 + 0.5
         );
@@ -273,14 +346,13 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     });
 
     // Disable compositePass pass, so this post will just render the scene for now
-    this.compositePass.enabled = false;
-    this.godraysPass.enabled = false;
-    this.fxaaPass.enabled = false;
-    this.vignettePass.enabled = false;
+    for (const pass of this.postProcessingLayers.composite.post.passes) {
+      pass.enabled = false;
+    }
     // `targetOnly` prevents post from rendering to the canvas
-    this.postProcessingLayers.composite.targetOnly = true;
+    this.postProcessingLayers.composite.post.targetOnly = true;
     // This renders the scene to postComposite.uniform.value
-    this.postProcessingLayers.composite.render({
+    this.postProcessingLayers.composite.post.render({
       scene: this.scene,
       camera: this.camera,
       target: this.renderTarget,
@@ -288,25 +360,31 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
     // This render the bloom effect's bright and blur passes to postBloom.fbo.read
     // Passing in a `texture` argument avoids the post initially rendering the scene
-    for (const pass of this.postProcessingLayers.bloom.passes) {
+    for (const pass of this.postProcessingLayers.bloom.post.passes) {
       if (pass.uniforms.tEmissive !== undefined) {
         pass.uniforms.tEmissive.value = this.renderTarget.textures[1];
       }
     }
-    this.postProcessingLayers.bloom.render({
+    this.postProcessingLayers.composite.passes.ui.pass.uniforms.tUi.value =
+      this.renderTarget.textures[2];
+    this.postProcessingLayers.bloom.post.render({
       texture: this.renderTarget.textures[0],
     });
     // Re-enable composite pass
-    this.compositePass.enabled = true;
-    this.godraysPass.enabled = this.godrays;
-    this.fxaaPass.enabled = this.fxaa;
-    this.vignettePass.enabled = true;
+    this.compositePass.pass.enabled = true;
+    this.postProcessingLayers.composite.passes.tonemapping.pass.enabled =
+      this.postProcessingLayers.composite.passes.tonemapping.enabled;
+    this.godraysPass.pass.enabled = this.godraysPass.enabled;
+    this.fxaaPass.pass.enabled = this.fxaa;
+    this.vignettePass.pass.enabled = true;
+    this.postProcessingLayers.composite.passes.ui.pass.enabled =
+      this.postProcessingLayers.composite.passes.ui.enabled;
     // Allow post to render to canvas upon its last pass
-    this.postProcessingLayers.composite.targetOnly = false;
+    this.postProcessingLayers.composite.post.targetOnly = false;
 
     // This renders to canvas, compositing the bloom pass on top
     // pass back in its previous render of the scene to avoid re-rendering
-    this.postProcessingLayers.composite.render({
+    this.postProcessingLayers.composite.post.render({
       texture: this.renderTarget.textures[0],
     });
   };
@@ -318,12 +396,12 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     const h = this.canvas!.parentElement!.clientHeight;
 
     // Update post classes
-    this.postProcessingLayers.composite.resize({
+    this.postProcessingLayers.composite.post.resize({
       width: w,
       height: h,
       dpr: this.dpr,
     });
-    this.postProcessingLayers.bloom.resize({
+    this.postProcessingLayers.bloom.post.resize({
       width: w,
       height: h,
       dpr: this.dpr / 4,
@@ -332,7 +410,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
     // Update uniforms
     this.uniforms.resolution.base.value.set(w, h);
-    this.uniforms.resolution.bloom.value.set(w / 5, h / 2);
+    this.uniforms.resolution.bloom.value.set(w, h);
   };
 
   addLight = (light: Light) => {
@@ -392,6 +470,13 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     for (let i = 0; i < lightsNum; i++) {
       this.uniforms.env.lights[i] = lightsToRender[i].uniforms;
     }
+  }
+
+  togglePostProcessingPass(layer: "composite" | "bloom", pass: string) {
+    const l = this.postProcessingLayers[layer];
+    l.passes[pass].enabled = !l.passes[pass].enabled;
+
+    return l.passes[pass].enabled;
   }
 
   override setScene(scene: TScene) {

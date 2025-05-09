@@ -40,7 +40,7 @@ export class Camera extends BaseCamera {
     this.paneFolder?.dispose();
   }
 
-  distanceFromFocus() {
+  focus() {
     const cameraPos = this.engine.camera.position;
     const cameraDir = tempVec3.set(
       -this.engine.camera.viewMatrix[2], // X

@@ -58,6 +58,10 @@
   }
 }
 
+.overlayButton:hover {
+  color: var(--palette-text-3);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

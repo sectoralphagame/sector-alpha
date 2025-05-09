@@ -6,7 +6,10 @@ export const DraggableContainer: React.FC<
   React.PropsWithChildren<{ className?: string }>
 > = ({ children, className }) => {
   const [isDragging, setIsDragging] = React.useState(false);
-  const [position, setPosition] = React.useState({ x: 0, y: 0 });
+  const [position, setPosition] = React.useState({
+    x: window.innerWidth - 400,
+    y: 0,
+  });
   const offsetRef = React.useRef({ x: 0, y: 0 });
 
   const handleMouseDown = (e: React.MouseEvent) => {

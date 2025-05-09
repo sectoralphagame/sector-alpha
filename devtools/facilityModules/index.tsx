@@ -28,6 +28,7 @@ const Editor: React.FC<{}> = () => {
       <HeadlessTab.Group>
         <div className={styles.toolbar}>
           <Button
+            color="primary"
             onClick={() => {
               append({
                 name: "",

@@ -7,7 +7,7 @@ precision highp float;
 in vec3 worldPosition;
 in vec3 vNormal;
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 
 uniform vec3 uColor;
 uniform bool bShaded;
@@ -50,5 +50,5 @@ void main() {
     }
 
     fragData[0].a = 1.0f;
-    fragData[1] = fragData[0] * fEmissive;
+    fragData[1] = vec4(fragData[0].xyz, fEmissive);
 }

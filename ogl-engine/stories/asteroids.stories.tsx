@@ -14,13 +14,18 @@ import { noop } from "@fxts/core";
 import { Story3d, story3dMeta } from "./Story3d";
 import type { Story3dArgs } from "./Story3d";
 
-const AsteroidsStory: React.FC<
-  Story3dArgs & {
-    size: number;
-    density: number;
-    color: string;
-  }
-> = ({ postProcessing, skybox, size, density, color }) => {
+interface AsteroidsStoryProps extends Story3dArgs {
+  size: number;
+  density: number;
+  color: string;
+}
+
+const AsteroidsStory: React.FC<AsteroidsStoryProps> = ({
+  size,
+  density,
+  color,
+  ...props
+}) => {
   const engineRef = React.useRef<Engine3D>();
   const onInit = React.useCallback(async (engine: Engine3D) => {
     await assetLoader.generateTextures();
@@ -61,11 +66,10 @@ const AsteroidsStory: React.FC<
 
   return (
     <Story3d
-      postProcessing={postProcessing}
+      {...props}
       control="map"
       onEngineInit={onInit}
       onEngineUpdate={() => {}}
-      skybox={skybox}
     />
   );
 };
@@ -91,22 +95,10 @@ export default {
   ),
 } as Meta;
 
-const Template: StoryFn = ({
-  postProcessing,
-  skybox,
-  size,
-  density,
-  color,
-}) => (
+const Template: StoryFn<AsteroidsStoryProps> = (props) => (
   <div id="root">
     <Styles>
-      <AsteroidsStory
-        postProcessing={postProcessing}
-        skybox={skybox}
-        size={size}
-        density={density}
-        color={color}
-      />
+      <AsteroidsStory {...props} />
     </Styles>
   </div>
 );

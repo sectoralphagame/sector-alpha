@@ -77,6 +77,7 @@ export const FacilityMoneyManagerComponent: React.FC<
         <Button
           onClick={() => onChange(diff)}
           disabled={diff > availableMoney || money < 0}
+          color="primary"
         >
           Accept
         </Button>

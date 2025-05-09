@@ -30,7 +30,7 @@ uniform float uRoughness;
 uniform sampler2D tEmissive;
 #endif
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 #define EPSILON 0.001f
 
 #pragma glslify: normalMap = require("./ogl-engine/shader/normalMap");
@@ -58,5 +58,5 @@ void main() {
     #endif
 
     fragData[0] = pbr(albedo, norm, metallic, roughness, emissive, tEnvMap, ambient, vTangent, vNormal);
-    fragData[1].r = luma(emissive);
+    fragData[1] = vec4(fragData[0].rgb, luma(emissive));
 }

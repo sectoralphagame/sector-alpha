@@ -12,18 +12,27 @@ import {
 } from "@ui/components/TacticalMap/EntityMesh";
 import models from "@assets/models";
 import Color from "color";
+import type { DockSize } from "@core/components/dockable";
 import { Story3d, story3dMeta } from "./Story3d";
 import type { Story3dArgs } from "./Story3d";
 
-const EntityIndicatorStory: React.FC<
-  Story3dArgs & {
-    color: string;
-    hovered: boolean;
-    selected: boolean;
-  }
-> = ({ postProcessing, skybox, color, hovered, selected }) => {
+interface EntityIndicatorStoryProps extends Story3dArgs {
+  color: string;
+  hovered: boolean;
+  selected: boolean;
+  size: DockSize;
+}
+
+const EntityIndicatorStory: React.FC<EntityIndicatorStoryProps> = ({
+  color,
+  hovered,
+  selected,
+  size,
+  ...props
+}) => {
   const engineRef = React.useRef<Engine>();
   const onInit = React.useCallback(async (engine) => {
+    await assetLoader.readyPromise;
     engineRef.current = engine;
     engine.camera.position.set(1, 1, 1);
 
@@ -40,7 +49,11 @@ const EntityIndicatorStory: React.FC<
     ship.setParent(engine.scene);
 
     const indicator = new EntityIndicator(engine);
+    indicator.createNameMesh("Ship");
     indicator.material.setColor(Color(color).rgbNumber());
+    indicator.material.uniforms.uShield.value = 0.5;
+    indicator.material.uniforms.uHp.value = 1;
+    indicator.setSize(size);
     // @ts-expect-error
     indicator.setParent(ship);
   }, []);
@@ -59,16 +72,10 @@ const EntityIndicatorStory: React.FC<
     indicator?.material.setColor(Color(color).rgbNumber());
     indicator?.material.setHovered(hovered);
     indicator?.material.setSelected(selected);
-  }, [color, hovered, selected]);
+    indicator?.setSize(size);
+  }, [color, hovered, selected, size]);
 
-  return (
-    <Story3d
-      postProcessing={postProcessing}
-      onEngineInit={onInit}
-      onEngineUpdate={() => {}}
-      skybox={skybox}
-    />
-  );
+  return <Story3d {...props} onEngineInit={onInit} onEngineUpdate={() => {}} />;
 };
 
 export default {
@@ -77,6 +84,9 @@ export default {
     {
       args: {
         color: "#ff0000",
+        hovered: false,
+        selected: false,
+        size: "medium",
       },
       argTypes: {
         color: {
@@ -94,28 +104,22 @@ export default {
             type: "boolean",
           },
         },
+        size: {
+          control: {
+            type: "select",
+          },
+          options: ["small", "medium", "large"] as DockSize[],
+        },
       },
     },
     story3dMeta
   ),
 } as Meta;
 
-const Template: StoryFn = ({
-  postProcessing,
-  skybox,
-  color,
-  hovered,
-  selected,
-}) => (
+const Template: StoryFn<EntityIndicatorStoryProps> = (props) => (
   <div id="root">
     <Styles>
-      <EntityIndicatorStory
-        postProcessing={postProcessing}
-        skybox={skybox}
-        color={color}
-        hovered={hovered}
-        selected={selected}
-      />
+      <EntityIndicatorStory {...props} />
     </Styles>
   </div>
 );

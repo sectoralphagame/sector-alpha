@@ -465,7 +465,6 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
     this.engine.fxaa = settings.graphics.fxaa;
     this.engine.godrays = settings.graphics.godrays;
-    this.engine.postProcessing = settings.graphics.postProcessing;
   }
 
   loadSector() {

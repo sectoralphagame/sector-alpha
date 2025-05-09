@@ -3,7 +3,7 @@ precision highp float;
 
 in vec2 vUv;
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 
 uniform mat4 modelMatrix;
 uniform vec3 cameraPosition;
@@ -17,9 +17,9 @@ uniform int uSelected;
 
 #define baseLineWidth 0.04f
 #define baseBarLineWidth 0.1f
-#define barWidth 0.025f
-#define hpOffset 0.88f
-#define shieldOffset 0.95f
+#define barHeight 0.034f / log(uSize)
+#define hpOffset (1.0 - barHeight * 3.)
+#define shieldOffset hpOffset - barHeight * 2.0f
 
 float sdCircle(vec2 p, float radius) {
     return length(p) - radius;
@@ -41,6 +41,16 @@ float box(vec2 p, vec2 from, vec2 to) {
     return min(max(d.x, d.y), 0.0f) + length(max(d, 0.0f));
 }
 
+vec3 getHpColor(float hp) {
+    if(hp > 0.5f) {
+        return vec3(0.45f, 0.99f, 0.56f);
+    } else if(hp > 0.25f) {
+        return vec3(1.f, 1.f, 0.f);
+    } else {
+        return vec3(1.f, 0.f, 0.f);
+    }
+}
+
 void main() {
     vec3 color = uColor.rgb;
 
@@ -57,27 +67,23 @@ void main() {
         alpha += 1.0f - smoothstep(lineWidth - smoothing, lineWidth, abs(x));
     }
 
-    float hp = box(vUv + vec2(0, -hpOffset), vec2(0.f, 0.0f), vec2(uHp, barWidth));
+    float hp = box(vUv + vec2(0, -hpOffset), vec2(0.f, 0.0f), vec2(uHp, barHeight));
     alpha += 1.0f - sign(hp);
 
     if(sign(hp) < 0.f) {
-        color = vec3(0.45f, 0.99f, 0.56f);
+        color = getHpColor(uHp);
     }
 
-    float shield = box(vUv + vec2(0, -shieldOffset), vec2(0.f, 0.0f), vec2(uShield, barWidth));
+    float shield = box(vUv + vec2(0, -shieldOffset), vec2(0.f, 0.0f), vec2(uShield, barHeight));
     alpha += 1.0f - sign(shield);
 
     if(sign(shield) < 0.f) {
         color = vec3(0.16f, 0.5f, 0.98f);
     }
 
-    if(uSelected <= 0 && uHovered <= 0) {
-        alpha *= 0.75f;
-    }
-
     if(alpha <= 0.05f) {
         discard;
     }
 
-    fragData[0] = vec4(color, alpha / 2.f);
+    fragData[2] = vec4(color, alpha * (0.75f + sign(float(uSelected)) * 0.22f + sign(float(uHovered)) * 0.1f));
 }

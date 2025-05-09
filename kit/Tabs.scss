@@ -2,19 +2,17 @@
   border-radius: usesize(0.4);
   border: usesize(0.1) solid var(--palette-border);
   background: var(--palette-background);
+  display: inline-flex !important;
+  width: 100%;
 }
 .tab {
-  &:hover,
-  &:focus {
-    background: rgba(255, 255, 255, 0.15);
-  }
-  &:active {
+  &:hover {
     background: rgba(255, 255, 255, 0.3);
   }
   appearance: none;
   background: transparent;
   border: none;
-  color: var(--palette-text-1);
+  color: var(--palette-default);
   cursor: pointer;
   height: usesize(3);
   padding: usesize(0.8);
@@ -26,14 +24,12 @@
   font-weight: 600;
   transition: 200ms;
   outline: 0;
+  flex: 1;
 }
 .tabActive {
-  &:hover,
-  &:focus {
-    background: rgba(255, 255, 255, 0.6);
-  }
-  &:active {
+  &:hover {
     background: rgba(255, 255, 255, 0.8);
   }
-  background: rgba(255, 255, 255, 0.5);
+  background: rgb(255, 255, 255);
+  color: var(--palette-text-5);
 }

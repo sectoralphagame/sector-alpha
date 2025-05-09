@@ -6,7 +6,7 @@ precision highp float;
 in vec2 vUv;
 in float vT;
 
-out vec4 fragData[2];
+out vec4 fragData[3];
 
 uniform vec4 uStart;
 uniform vec4 uEnd;
@@ -22,7 +22,5 @@ void main() {
     }
 
     fragData[0].a = alpha;
-
-    fragData[1].r = luma(fragData[0]) * fEmissive;
-    fragData[1].a = 1.f;
+    fragData[1] = vec4(fragData[0].rgb, luma(fragData[0]) * fEmissive);
 }
