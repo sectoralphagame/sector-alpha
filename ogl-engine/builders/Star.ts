@@ -37,7 +37,10 @@ export class Star extends Transform {
     this.body.setParent(this);
 
     this.corona = new BaseMesh(engine, {
-      geometry: new Plane(engine.gl),
+      geometry: new Plane(engine.gl, {
+        heightSegments: 16,
+        widthSegments: 16,
+      }),
       material: new StarCoronaMaterial(
         engine,
         this.body.material.uniforms.uColor.value
@@ -45,11 +48,8 @@ export class Star extends Transform {
       frustumCulled: false,
     });
     this.corona.scale.set(2.5);
-    this.corona.onBeforeRender(({ mesh }) => {
-      mesh.lookAt(this.engine.camera.position);
-    });
-    this.corona.renderOrder = 0;
     this.corona.setParent(this);
+    this.corona.lookAt(this.engine.camera.position, false, true);
   }
 
   createPaneFolder() {

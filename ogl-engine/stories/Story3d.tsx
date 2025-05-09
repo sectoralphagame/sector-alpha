@@ -28,12 +28,7 @@ export const Story3d: React.FC<Story3dProps> = ({
   onEngineInit,
   onEngineUpdate,
 }) => {
-  const engine = React.useMemo(() => {
-    const e = new Engine3D<TacticalMapScene>();
-    e.setScene(new TacticalMapScene(e));
-
-    return e;
-  }, []);
+  const engine = React.useMemo(() => new Engine3D<TacticalMapScene>(), []);
   const controlRef = React.useRef<{ update: (_delta?: number) => void }>();
   const skyboxRef = React.useRef<Skybox>();
 
@@ -44,6 +39,7 @@ export const Story3d: React.FC<Story3dProps> = ({
   React.useEffect(() => {
     engine.hooks.onInit.subscribe("Story3d", async () => {
       onEngineInit(engine);
+      engine.setScene(new TacticalMapScene(engine));
 
       controlRef.current =
         control === "map"

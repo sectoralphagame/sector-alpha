@@ -117,8 +117,10 @@ export class SectorMesh extends BaseMesh2D<ColorMaterial2D> {
     sectorNameMesh.rotation.set(-Math.PI / 2, 0, 0);
     sectorNameMesh.scale.set(0.08);
     const texture = new Texture(this.engine.gl, {
-      image: assetLoader.getTexture("font/spaceMono"),
       generateMipmaps: false,
+    });
+    assetLoader.loadTexture("font/spaceMono").then((img) => {
+      texture.image = img;
     });
     sectorNameMesh.applyMaterial(new MSDFMaterial(this.engine, texture));
     sectorNameMesh.setParent(this);

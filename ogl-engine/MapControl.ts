@@ -147,7 +147,17 @@ export class MapControl extends Orbit {
         );
       }
     });
+
+    const near = this.getNear();
+    if (this.camera.near !== near) {
+      this.camera.perspective({ near });
+    }
   };
+
+  getNear() {
+    const distanceToFocus = this.camera.position.distance(this.target);
+    return Math.min(distanceToFocus * 0.1, 0.1);
+  }
 
   onMouseMovePersistent = (e: MouseEvent) => {
     this.cursorMoved = false;

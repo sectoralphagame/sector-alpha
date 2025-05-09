@@ -12,6 +12,7 @@ import { skyboxes } from "@assets/textures/skybox";
 import smoke from "@assets/textures/particle/smoke.png";
 import fire from "@assets/textures/particle/fire.png";
 import spaceMonoTexture from "@assets/fonts/SpaceMono/SpaceMono-Regular.png";
+import firaSansTexture from "@assets/fonts/FiraSans/FiraSans-Light.png";
 import { renderLogger } from "@core/log";
 import { getParticleType } from "./particles";
 import { TextureEngine } from "./engine/engine2d";
@@ -23,6 +24,7 @@ const textures = {
   "particle/smoke": smoke,
   "particle/fire": fire,
   "font/spaceMono": spaceMonoTexture,
+  "font/firaSans": firaSansTexture,
 };
 export type TextureName = keyof typeof textures | "prop/smoke";
 
@@ -75,6 +77,10 @@ class AssetLoader {
         await fetch(path);
         this.logger.log(`Loaded ${path}`);
         resources[path] = true;
+
+        if (path in Object.values(textures)) {
+          await this.loadTexture(path as TextureName);
+        }
       }),
       chunk(3)
     );
@@ -84,6 +90,9 @@ class AssetLoader {
       await Promise.all(jobChunk.map((job) => job()));
       updateProgress();
     }
+
+    this.logger.log("All assets loaded");
+    this.logger.log(`Loaded ${Object.keys(resources).length} assets`);
   }
 
   async generateTextures() {
@@ -160,11 +169,23 @@ class AssetLoader {
     }
   }
 
+  loadTexture(name: TextureName): Promise<HTMLImageElement> {
+    const image = new Image();
+    const promise = new Promise<HTMLImageElement>((resolve) => {
+      image.onload = () => {
+        resolve(image);
+      };
+    });
+    image.src = textures[name];
+    this.addTexture(name, image);
+
+    return promise;
+  }
+
   getTexture(name: TextureName) {
     if (!this.textures[name]) {
-      const image = new Image();
-      image.src = textures[name];
-      this.textures[name] = image;
+      this.logger.log(`Accessing not loaded texture ${name}, loading`, "warn");
+      this.loadTexture(name);
     }
     return this.textures[name];
   }

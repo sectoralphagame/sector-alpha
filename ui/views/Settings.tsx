@@ -78,32 +78,8 @@ export const Settings: React.FC = () => {
       </div>
       <hr />
       <div className={styles.settingsRow}>
-        <div>Post Processing</div>
-        <Select
-          onChange={(value) =>
-            setSettings((prevSettings) =>
-              merge({}, prevSettings, {
-                graphics: {
-                  postProcessing: value === "true",
-                },
-              })
-            )
-          }
-          value={(settings.graphics?.postProcessing ?? false).toString()}
-        >
-          <SelectButton>
-            {settings.graphics?.postProcessing ? "Enabled" : "Disabled"}
-          </SelectButton>
-          <SelectOptions>
-            <SelectOption value="true">Enabled</SelectOption>
-            <SelectOption value="false">Disabled</SelectOption>
-          </SelectOptions>
-        </Select>
-      </div>
-      <div className={styles.settingsRow}>
         <div>Antialiasing</div>
         <Select
-          disabled={!settings.graphics?.postProcessing}
           onChange={(value) =>
             setSettings((prevSettings) =>
               merge({}, prevSettings, {
@@ -128,7 +104,7 @@ export const Settings: React.FC = () => {
         <div>Volumetric Light Scattering</div>
         <Select
           // FIXME: Godrays need refinement
-          disabled={!settings.graphics?.postProcessing || true}
+          disabled
           onChange={(value) =>
             setSettings((prevSettings) =>
               merge({}, prevSettings, {

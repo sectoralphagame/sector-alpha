@@ -82,7 +82,7 @@ export class Skybox extends Mesh implements Destroyable {
 
     this.loadTexture(name);
     this.engine = engine;
-    this.scale.set(1e3);
+    this.scale.set(5e2);
     this.light = new Light(0.5, true);
     this.light.position.set(0, -1, -0.4);
     this.light.setParent(this);

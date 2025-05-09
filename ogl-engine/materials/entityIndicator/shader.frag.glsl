@@ -41,6 +41,16 @@ float box(vec2 p, vec2 from, vec2 to) {
     return min(max(d.x, d.y), 0.0f) + length(max(d, 0.0f));
 }
 
+vec3 getHpColor(float hp) {
+    if(hp > 0.5f) {
+        return vec3(0.45f, 0.99f, 0.56f);
+    } else if(hp > 0.25f) {
+        return vec3(1.f, 1.f, 0.f);
+    } else {
+        return vec3(1.f, 0.f, 0.f);
+    }
+}
+
 void main() {
     vec3 color = uColor.rgb;
 
@@ -61,7 +71,7 @@ void main() {
     alpha += 1.0f - sign(hp);
 
     if(sign(hp) < 0.f) {
-        color = vec3(0.45f, 0.99f, 0.56f);
+        color = getHpColor(uHp);
     }
 
     float shield = box(vUv + vec2(0, -shieldOffset), vec2(0.f, 0.0f), vec2(uShield, barHeight));

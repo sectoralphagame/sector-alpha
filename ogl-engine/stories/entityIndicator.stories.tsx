@@ -32,6 +32,7 @@ const EntityIndicatorStory: React.FC<EntityIndicatorStoryProps> = ({
 }) => {
   const engineRef = React.useRef<Engine>();
   const onInit = React.useCallback(async (engine) => {
+    await assetLoader.readyPromise;
     engineRef.current = engine;
     engine.camera.position.set(1, 1, 1);
 
@@ -48,12 +49,13 @@ const EntityIndicatorStory: React.FC<EntityIndicatorStoryProps> = ({
     ship.setParent(engine.scene);
 
     const indicator = new EntityIndicator(engine);
+    indicator.createNameMesh("Ship");
     indicator.material.setColor(Color(color).rgbNumber());
-    // @ts-expect-error
-    indicator.setParent(ship);
-    indicator.material.setSize(size);
     indicator.material.uniforms.uShield.value = 0.5;
     indicator.material.uniforms.uHp.value = 1;
+    indicator.setSize(size);
+    // @ts-expect-error
+    indicator.setParent(ship);
   }, []);
 
   React.useEffect(() => {
@@ -70,7 +72,8 @@ const EntityIndicatorStory: React.FC<EntityIndicatorStoryProps> = ({
     indicator?.material.setColor(Color(color).rgbNumber());
     indicator?.material.setHovered(hovered);
     indicator?.material.setSelected(selected);
-  }, [color, hovered, selected]);
+    indicator?.setSize(size);
+  }, [color, hovered, selected, size]);
 
   return <Story3d {...props} onEngineInit={onInit} onEngineUpdate={() => {}} />;
 };

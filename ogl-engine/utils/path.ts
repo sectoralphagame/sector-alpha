@@ -52,7 +52,7 @@ export class Path extends Transform {
 
     for (let i = 0; i < waypoints.length - 1; i++) {
       const distance = waypoints[i][0].distance(waypoints[i + 1][0]);
-      const focusPoint = this.engine.camera.distanceFromFocus();
+      const focusPoint = this.engine.camera.focus();
       const scale = focusPoint.distance(this.engine.camera.position) * 0.001;
 
       this.children[i].scale.set(scale, distance, scale);
