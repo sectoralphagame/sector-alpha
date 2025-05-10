@@ -141,7 +141,7 @@ export function setTarget(entity: Driveable, target: number | null) {
 }
 
 export function clearTarget(entity: Driveable) {
-  stop(entity);
+  entity.cp.drive.targetVelocity = 0;
   setTarget(entity, null);
   entity.cp.drive.mode = "goto";
 }

@@ -3,11 +3,11 @@ import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import { System } from "./system";
 
+const maxSpeed = 2000;
+
 type Movable = RequireComponent<"movable" | "position">;
 
 function move(entity: Movable, delta: number) {
-  if (entity.cp.movable.velocity === 0 && entity.cp.movable.rotary === 0)
-    return;
   const entityPosition = entity.cp.position;
 
   const dAngle = entity.cp.movable.rotary;
@@ -32,6 +32,12 @@ function move(entity: Movable, delta: number) {
     dockedPosition.angle += (entityPosition.angle + dAngle) % (2 * Math.PI);
     dockedPosition.moved = true;
   });
+
+  const dVec = entity.cp.movable.acceleration * delta;
+  entity.cp.movable.velocity = Math.min(
+    entity.cp.movable.velocity + dVec,
+    maxSpeed
+  );
 }
 
 export class MovingSystem extends System {

@@ -177,7 +177,7 @@ export class EntityMesh extends BaseMesh {
       0,
       this.entity.cp.position.coord[1] * scale
     );
-    // this.rotation.y = -this.entity.cp.position.angle;
+    this.rotation.y = -this.entity.cp.position.angle;
     this.setVisibility(!this.entity.cp.render.hidden);
   }
 

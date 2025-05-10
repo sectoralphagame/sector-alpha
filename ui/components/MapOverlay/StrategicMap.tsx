@@ -1,13 +1,9 @@
-// import type { Sector } from "@core/archetypes/sector";
 import { hecsToCartesian } from "@core/components/hecsPosition";
 import type { Sim } from "@core/sim";
 import { defaultIndexer } from "@core/systems/utils/default";
 import { StrategicMapEngine } from "@ogl-engine/engine/engine2d";
 import { MapControl } from "@ogl-engine/MapControl";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
-// import type { MouseButton } from "@ogl-engine/Orbit";
-// import { contextMenuObservable } from "@ui/state/contextMenu";
-// import { sectorObservable } from "@ui/state/sector";
 import type { Transform } from "ogl";
 import { Vec2, Raycast, Vec3, Box } from "ogl";
 import React from "react";
@@ -154,23 +150,6 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
   onClick(_mousePosition: Vec2, button: MouseButton, isTarget: boolean) {
     if (!isTarget) return;
 
-    // if (button === 2) {
-    //   const worldPos = this.raycast.intersectPlane({
-    //     origin: new Vec3(0),
-    //     normal: new Vec3(0, 1, 0),
-    //   });
-    //   console.log(this.raycast.origin);
-    //   const worldPosition = [worldPos.x / scale, worldPos.z / scale];
-
-    //   const data = {
-    //     active: true,
-    //     position: mousePosition.clone(),
-    //     worldPosition,
-    //     // sector: sectorObservable.value,
-    //   };
-    //   contextMenuObservable.notify(data);
-    // }
-
     if (button === 0) {
       const now = performance.now();
       const isDoubleClick = now - this.lastClick < 300;
@@ -272,13 +251,6 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     );
     this.raycast.castMouse(this.engine.camera, normalisedMousePos);
   }
-
-  // changeSector(sector: Sector) {
-  //   sectorObservable.notify(sector);
-
-  //   // eslint-disable-next-line react/destructuring-assignment
-  //   this.props.close();
-  // }
 
   updateRenderables() {
     for (const renderable of entityIndexer.search(["render", "position"])) {

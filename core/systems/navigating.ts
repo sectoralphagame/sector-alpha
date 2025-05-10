@@ -125,20 +125,9 @@ export class NavigatingSystem extends System {
     }
 
     const maxSpeed = drive.state === "cruise" ? drive.cruise : drive.maneuver;
-    const maxSpeedLimited = Math.min(
-      drive.limit ?? defaultDriveLimit,
-      maxSpeed
-    );
-    const deltaSpeedMultiplier =
-      angleOffset > Math.PI / 3 ? random(0.55, 0.8) : 1;
-    movable.velocity = Math.max(
-      0,
-      Math.min(
-        movable.velocity +
-          maxSpeed * drive.acceleration * delta * deltaSpeedMultiplier,
-        maxSpeedLimited
-      )
-    );
+    const maxSpeedLimited = Math.min(drive.limit, defaultDriveLimit, maxSpeed);
+    const speedMultiplier = angleOffset > Math.PI / 3 ? random(0.55, 0.8) : 1;
+    drive.targetVelocity = maxSpeedLimited * speedMultiplier;
   }
 
   private setDrive(entity: Navigable, delta: number) {
@@ -147,6 +136,9 @@ export class NavigatingSystem extends System {
     const entityPosition = entity.cp.position;
     const drive = entity.cp.drive;
     const movable = entity.cp.movable;
+
+    movable.acceleration =
+      drive.acceleration * Math.sign(drive.targetVelocity - movable.velocity);
 
     if (!drive.target) return;
 
@@ -190,7 +182,8 @@ export class NavigatingSystem extends System {
     movable.rotary = getDeltaAngle(dAngle, drive.rotary, delta);
 
     if (distance <= drive.minimalDistance) {
-      movable.velocity = 0;
+      drive.targetVelocity = 0;
+      movable.acceleration = -drive.acceleration * 3;
       this.hook.notify(entity);
       return;
     }
@@ -242,14 +235,7 @@ export class NavigatingSystem extends System {
     );
     const speedMultiplier = angleOffset < Math.PI / 8 ? 1 : -1;
 
-    movable.velocity = Math.max(
-      0,
-      Math.min(
-        movable.velocity +
-          speedMultiplier * maxSpeed * drive.acceleration * delta,
-        maxSpeedLimited
-      )
-    );
+    drive.targetVelocity = maxSpeedLimited * speedMultiplier;
   }
 
   apply(sim: Sim): void {

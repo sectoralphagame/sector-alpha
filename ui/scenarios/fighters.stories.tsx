@@ -92,6 +92,9 @@ const Game: React.FC<{ factions: number; fighters: number }> = ({
           owner: faction,
           sector,
         });
+        const t = random(0.75, 1);
+        fighter.cp.drive.cruise *= t;
+        fighter.cp.drive.maneuver /= t;
         fighter.cp.orders.value = [
           {
             type: "move",
