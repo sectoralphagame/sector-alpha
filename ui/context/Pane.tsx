@@ -1,12 +1,91 @@
 import { storageHook } from "@core/hooks";
 import { defaultLogger } from "@core/log";
 import type { GameSettings } from "@core/settings";
+import {
+  SingleLogController,
+  createPlugin,
+  formatString,
+} from "@tweakpane/core";
 import { DraggableContainer } from "@ui/components/DraggableContainer/DraggableContainer";
+import { Vec2, Vec3 } from "ogl";
 import React from "react";
-import type { FolderApi, FolderParams } from "tweakpane";
+import type {
+  FolderApi,
+  FolderParams,
+  TpPlugin,
+  TpPluginBundle,
+} from "tweakpane";
 import { Pane as BasePane } from "tweakpane";
 
 const logger = defaultLogger.sub("pane");
+
+export function formatVec2(v: Vec2): string {
+  return `(${v.x.toFixed(3)}, ${v.y.toFixed(3)})`;
+}
+
+export function formatVec3(v: Vec3): string {
+  return `(${v.x.toFixed(3)}, ${v.y.toFixed(3)}, ${v.z.toFixed(3)})`;
+}
+const vec2Plugin: TpPlugin = createPlugin({
+  accept: (v: unknown, params: Record<string, unknown>) => {
+    if (v instanceof Vec2) {
+      return {
+        initialValue: params?.format
+          ? (params.format as Function)(v)
+          : formatVec2(v),
+        params,
+      };
+    }
+
+    return null;
+  },
+  // @ts-expect-error
+  binding: {
+    reader: (args) => (v: Vec2) =>
+      args.params.format ? (args.params.format as Function)(v) : formatVec2(v),
+  },
+  controller: (args) =>
+    new SingleLogController(args.document, {
+      formatter: formatString,
+      value: args.value,
+      viewProps: args.viewProps,
+    }),
+  type: "monitor",
+  id: "vec2",
+});
+
+const vec3Plugin: TpPlugin = createPlugin({
+  accept: (v: unknown, params: Record<string, unknown>) => {
+    if (v instanceof Vec3) {
+      return {
+        initialValue: params?.format
+          ? (params.format as Function)(v)
+          : formatVec3(v),
+        params,
+      };
+    }
+
+    return null;
+  },
+  // @ts-expect-error
+  binding: {
+    reader: (args) => (v: Vec3) =>
+      args.params.format ? (args.params.format as Function)(v) : formatVec3(v),
+  },
+  controller: (args) =>
+    new SingleLogController(args.document, {
+      formatter: formatString,
+      value: args.value,
+      viewProps: args.viewProps,
+    }),
+  type: "monitor",
+  id: "vec2",
+});
+
+const OglPlugin: TpPluginBundle = {
+  id: "ogl",
+  plugins: [vec2Plugin, vec3Plugin],
+};
 
 export class Pane extends BasePane {
   constructor({ container }: { container?: HTMLDivElement } = {}) {
@@ -28,7 +107,10 @@ export class Pane extends BasePane {
       existing.dispose();
     }
 
-    return super.addFolder(props);
+    return super.addFolder({
+      expanded: false,
+      ...props,
+    });
   }
 
   dispose() {
@@ -38,6 +120,7 @@ export class Pane extends BasePane {
 }
 
 let pane = new Pane();
+pane.registerPlugin(OglPlugin);
 pane.hidden = !process.env.STORYBOOK;
 
 storageHook.subscribe("Pane", (key) => {
@@ -64,6 +147,7 @@ export const DraggablePane: React.FC = () => {
   React.useEffect(() => {
     if (container !== null) {
       pane = new Pane({ container });
+      pane.registerPlugin(OglPlugin);
       pane.hidden = !process.env.STORYBOOK;
     }
 

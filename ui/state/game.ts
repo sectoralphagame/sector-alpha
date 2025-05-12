@@ -3,10 +3,12 @@ import type { RequireComponent } from "@core/tsHelpers";
 import { getPane } from "@ui/context/Pane";
 import { useMobx } from "@ui/hooks/useMobx";
 import { action, makeObservable, observable } from "mobx";
+import type { Vec2 } from "ogl";
 import type { FolderApi } from "tweakpane";
 
 export type GameOverlayType = "fleet" | "missions" | "map" | "dev" | null;
 export type Selectable = RequireComponent<"position">;
+const updateInterval = 100;
 
 export class GameStore {
   selectionBox: boolean = false;
@@ -88,8 +90,46 @@ export class GameStore {
       }
 
       if (unit.hasComponents(["position"])) {
+        this.paneFolder.addBinding(unit.cp.position, "coord", {
+          interval: updateInterval,
+          readonly: true,
+        });
         this.paneFolder.addBinding(unit.cp.position, "angle", {
-          interval: 200,
+          interval: updateInterval,
+          readonly: true,
+        });
+      }
+
+      if (unit.hasComponents(["movable", "position"])) {
+        this.paneFolder.addBinding(unit.cp.movable, "velocity", {
+          interval: updateInterval,
+          readonly: true,
+        });
+        this.paneFolder.addBinding(unit.cp.movable, "velocity", {
+          interval: updateInterval,
+          readonly: true,
+          format: (v: Vec2) => v.len().toFixed(3),
+          label: "speed",
+        });
+        this.paneFolder.addBinding(unit.cp.movable, "acceleration", {
+          interval: updateInterval,
+          readonly: true,
+        });
+        this.paneFolder.addBinding(unit.cp.movable, "drag", {
+          interval: updateInterval,
+          readonly: true,
+          format: (v) => v.toFixed(3),
+        });
+      }
+
+      if (unit.hasComponents(["drive"])) {
+        this.paneFolder.addBinding(unit.cp.drive, "state", {
+          interval: updateInterval,
+          readonly: true,
+        });
+        this.paneFolder.addBinding(unit.cp.drive, "mode", {
+          interval: updateInterval,
+          readonly: true,
         });
       }
     }

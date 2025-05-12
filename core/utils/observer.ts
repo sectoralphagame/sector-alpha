@@ -44,4 +44,9 @@ export class Observable<T> {
       }
     });
   };
+
+  reset() {
+    this.observers.clear();
+    this.value = undefined as unknown as T;
+  }
 }

@@ -387,6 +387,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
       if (!this.meshes.has(entity)) {
         const mesh = new EntityMesh(this.engine, entity);
+        mesh.scale.multiply(entity.cp.render.defaultScale);
         this.engine.scene.entities.addChild(mesh);
         this.meshes.set(entity, mesh);
       }

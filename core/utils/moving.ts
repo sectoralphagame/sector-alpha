@@ -118,16 +118,18 @@ export function startCruise(entity: Driveable) {
 }
 
 export function stopCruise(entity: Driveable) {
-  entity.cp.movable.velocity = Math.min(
-    entity.cp.movable.velocity,
-    entity.cp.drive.maneuver
-  );
+  const currentSpeed = entity.cp.movable.velocity.len();
+  const targetSpeed = Math.min(currentSpeed, entity.cp.drive.maneuver);
+
+  entity.cp.drive.targetVelocity = targetSpeed;
   entity.cp.drive.state = "maneuver";
 }
 
 export function stop(entity: Driveable) {
   entity.cp.movable.rotary = 0;
-  entity.cp.movable.velocity = 0;
+  entity.cp.movable.acceleration.set(
+    entity.cp.movable.velocity.clone().negate()
+  );
 }
 
 export function setTarget(entity: Driveable, target: number | null) {
@@ -142,6 +144,7 @@ export function setTarget(entity: Driveable, target: number | null) {
 
 export function clearTarget(entity: Driveable) {
   entity.cp.drive.targetVelocity = 0;
+  entity.cp.movable.rotary = 0;
   setTarget(entity, null);
   entity.cp.drive.mode = "goto";
 }

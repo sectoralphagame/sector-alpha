@@ -2,7 +2,7 @@ import Color from "color";
 import pick from "lodash/pick";
 import type { DockSize } from "@core/components/dockable";
 import { createDocks } from "@core/components/dockable";
-import type { Vec2 } from "ogl";
+import { Vec2 } from "ogl";
 import { createDrive } from "../components/drive";
 import { Entity } from "../entity";
 import { createMining } from "../components/mining";
@@ -82,9 +82,10 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
     )
     .addComponent({
       name: "movable",
-      acceleration: 0,
+      acceleration: new Vec2(0),
+      velocity: new Vec2(0),
       rotary: 0,
-      velocity: 0,
+      drag: 0,
     })
     .addComponent({
       name: "orders",

@@ -66,7 +66,9 @@ export function undockAction(
   if (entity.cp.render) {
     entity.cp.render.hidden &= ~HideReason.Docked;
   }
-  entity.cp.movable.velocity = entity.cp.drive.maneuver;
+  entity.cp.movable.velocity
+    .set(Math.cos(entity.cp.position.angle), Math.sin(entity.cp.position.angle))
+    .multiply(entity.cp.drive.maneuver);
   const facility = entity.sim
     .getOrThrow(entity.cp.dockable!.dockedIn!)
     .requireComponents(["position"]);
