@@ -31,6 +31,7 @@ export const Story3d: React.FC<Story3dProps> = ({
   const engine = React.useMemo(() => {
     const e = new Engine3D<TacticalMapScene>();
     e.setScene(new TacticalMapScene(e));
+    e.scene.addGrid();
 
     return e;
   }, []);
@@ -65,6 +66,9 @@ export const Story3d: React.FC<Story3dProps> = ({
 
   React.useEffect(() => {
     if (engine.initialized) {
+      if (skyboxRef.current?.light) {
+        engine.removeLight(skyboxRef.current.light);
+      }
       skyboxRef.current?.destroy();
       skyboxRef.current?.setParent(null);
       skyboxRef.current = new Skybox(engine, skybox);
