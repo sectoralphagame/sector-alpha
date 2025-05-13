@@ -3,12 +3,10 @@ import { Vec2 } from "ogl";
 import clamp from "lodash/clamp";
 import type { Navigable } from "./types";
 import type { Thrust } from "./thrust";
-import { lateralForce } from "./thrust";
+import { createThrust, lateralForce } from "./thrust";
 import { brake, getBrakingDistance } from "./utils";
 
 const tempVelocity = new Vec2();
-const tempForwardThrust = new Vec2();
-const tempLateralThrust = new Vec2();
 const tempForward = new Vec2();
 const tempVec2 = new Vec2();
 
@@ -24,16 +22,8 @@ export function goToPosition(entity: Navigable, target: Vec2): Thrust {
     Math.cos(entity.cp.position.angle),
     Math.sin(entity.cp.position.angle)
   );
-  const thrust: Thrust = {
-    forward: tempForwardThrust
-      .copy(target)
-      .sub(entity.cp.position.coord)
-      .normalize(),
-    lateral: tempLateralThrust.set(0),
-    throttle: 1,
-    drag: 0,
-    angular: 1,
-  };
+  const thrust = createThrust();
+  thrust.forward.copy(target).sub(entity.cp.position.coord).normalize();
 
   const alignmentToTarget = forward.dot(thrust.forward);
   const alignmentToVelocity =
@@ -42,8 +32,9 @@ export function goToPosition(entity: Navigable, target: Vec2): Thrust {
       : 1;
   const forwardMag = forward.dot(entity.cp.movable.velocity);
 
-  thrust.angular =
-    (Math.min(1, 1 - speedPercent + 0.5) * (alignmentToTarget + 1)) / 2;
+  const speedCoeff = Math.min(1, 1 - speedPercent + 0.5);
+  const alignCoeff = (1 - (alignmentToTarget + 1) / 2) ** 2 + 0.2;
+  thrust.angular = speedCoeff * alignCoeff;
   thrust.drag = Math.min(0.7, (1 - alignmentToTarget) ** 2);
   if (speed > 0) {
     thrust.lateral

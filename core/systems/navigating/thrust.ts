@@ -13,7 +13,19 @@ export interface Thrust {
   angular: number;
 }
 
+const tempForwardThrust = new Vec2();
+const tempLateralThrust = new Vec2();
 const tempForward = new Vec2();
+
+export function createThrust(): Thrust {
+  return {
+    forward: tempForwardThrust.set(0),
+    lateral: tempLateralThrust.set(0),
+    throttle: 1,
+    drag: 0,
+    angular: 1,
+  };
+}
 
 export function applyThrust(entity: Navigable, thrust: Thrust, delta: number) {
   const forward = tempForward.set(

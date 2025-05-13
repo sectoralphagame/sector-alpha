@@ -3,12 +3,11 @@ import { Vec2 } from "ogl";
 import clamp from "lodash/clamp";
 import type { RequireComponent } from "@core/tsHelpers";
 import type { Navigable } from "./types";
-import type { Thrust } from "./thrust";
+import { createThrust, type Thrust } from "./thrust";
 import { brake } from "./utils";
+import { isInRange } from "../attacking";
 
 const tempVelocity = new Vec2();
-const tempForwardThrust = new Vec2();
-const tempLateralThrust = new Vec2();
 const tempForward = new Vec2();
 const tempVec2 = new Vec2();
 const tempTargetDirection = new Vec2();
@@ -33,16 +32,8 @@ export function flyBy(
     Math.cos(target.cp.position.angle),
     Math.sin(target.cp.position.angle)
   );
-  const thrust: Thrust = {
-    forward: tempForwardThrust
-      .copy(targetPosition)
-      .sub(entity.cp.position.coord)
-      .normalize(),
-    lateral: tempLateralThrust.set(0),
-    throttle: 1,
-    drag: 0,
-    angular: 1,
-  };
+  const thrust = createThrust();
+  thrust.forward.copy(targetPosition).sub(entity.cp.position.coord).normalize();
 
   const alignmentToTarget = forward.dot(thrust.forward);
   const alignmentToVelocity =
@@ -93,7 +84,13 @@ export function flyBy(
       thrust.throttle = 1;
     } else if (alignmentToTarget < 0.4 && alignmentToTargetForward > 0.5) {
       brake(entity, 0, thrust);
-    } else if (alignmentToTarget > 0.9 && alignmentToTargetForward > 0.7) {
+    } else if (
+      alignmentToTarget > 0.9 &&
+      alignmentToTargetForward > 0.7 &&
+      entity.hasComponents(["damage"])
+        ? isInRange(entity, target)
+        : true
+    ) {
       brake(
         entity,
         Math.min(

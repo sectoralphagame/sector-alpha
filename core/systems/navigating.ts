@@ -11,8 +11,9 @@ import type { RequireComponent } from "../tsHelpers";
 import { System } from "./system";
 import { goToPosition } from "./navigating/goto";
 import type { Thrust } from "./navigating/thrust";
-import { applyThrust } from "./navigating/thrust";
+import { applyThrust, createThrust } from "./navigating/thrust";
 import { flyBy } from "./navigating/flyby";
+import { brake } from "./navigating/utils";
 
 const tempPosition = new Vec2();
 const tempTarget = new Vec2();
@@ -47,7 +48,7 @@ function getFormationPlace(
   const distance = 0.1;
 
   const x = distance;
-  const y = (subordinateIndex - (subordinatesCount - 1) / 2) * 0.3;
+  const y = (subordinateIndex - (subordinatesCount - 1) / 2) * 0.12;
 
   return v.set(
     x * Math.cos(angle) - y * Math.sin(angle) + commander.cp.position.coord.x,
@@ -142,46 +143,45 @@ export class NavigatingSystem extends System {
 
   setDrive(entity: Navigable, delta: number) {
     if (!entity.cp.drive.active || delta === 0) return;
-
-    if (!entity.cp.drive.target) {
-      entity.cp.movable.acceleration.set(0, 0);
-      return;
-    }
-
-    const targetEntity = this.sim.get(entity.cp.drive.target);
-    if (!targetEntity || !targetEntity.hasComponents(["position"])) {
-      hold(entity);
-      return;
-    }
-
-    if (
-      entity.cp.drive.state === "warming" &&
-      entity.cooldowns.canUse(cruiseTimer)
-    ) {
-      entity.cp.drive.state = "cruise";
-    }
-
-    const targetPosition = tempTarget;
-
-    if (targetEntity.hasComponents(["drive"])) {
-      getFormationPlace(
-        targetEntity.requireComponents(["subordinates", "position"]),
-        entity,
-        targetPosition
-      );
-    } else {
-      targetPosition.copy(targetEntity.cp.position.coord);
-    }
-
     let thrust: Thrust;
 
-    switch (entity.cp.drive.mode) {
-      case "flyby":
-        thrust = flyBy(entity, targetEntity);
-        break;
-      default:
-        thrust = goToPosition(entity, targetPosition);
-        break;
+    if (!entity.cp.drive.target) {
+      thrust = createThrust();
+      brake(entity, 0, thrust);
+    } else {
+      const targetEntity = this.sim.get(entity.cp.drive.target);
+      if (!targetEntity || !targetEntity.hasComponents(["position"])) {
+        hold(entity);
+        return;
+      }
+
+      if (
+        entity.cp.drive.state === "warming" &&
+        entity.cooldowns.canUse(cruiseTimer)
+      ) {
+        entity.cp.drive.state = "cruise";
+      }
+
+      const targetPosition = tempTarget;
+
+      if (targetEntity.hasComponents(["drive"])) {
+        getFormationPlace(
+          targetEntity.requireComponents(["subordinates", "position"]),
+          entity,
+          targetPosition
+        );
+      } else {
+        targetPosition.copy(targetEntity.cp.position.coord);
+      }
+
+      switch (entity.cp.drive.mode) {
+        case "flyby":
+          thrust = flyBy(entity, targetEntity);
+          break;
+        default:
+          thrust = goToPosition(entity, targetPosition);
+          break;
+      }
     }
 
     applyThrust(entity, thrust, delta);
