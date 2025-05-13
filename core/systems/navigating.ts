@@ -10,7 +10,9 @@ import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import { System } from "./system";
 import { goToPosition } from "./navigating/goto";
+import type { Thrust } from "./navigating/thrust";
 import { applyThrust } from "./navigating/thrust";
+import { flyBy } from "./navigating/flyby";
 
 const tempPosition = new Vec2();
 const tempTarget = new Vec2();
@@ -171,7 +173,18 @@ export class NavigatingSystem extends System {
       targetPosition.copy(targetEntity.cp.position.coord);
     }
 
-    applyThrust(entity, goToPosition(entity, targetPosition), delta);
+    let thrust: Thrust;
+
+    switch (entity.cp.drive.mode) {
+      case "flyby":
+        thrust = flyBy(entity, targetEntity);
+        break;
+      default:
+        thrust = goToPosition(entity, targetPosition);
+        break;
+    }
+
+    applyThrust(entity, thrust, delta);
   }
 
   apply(sim: Sim): void {
