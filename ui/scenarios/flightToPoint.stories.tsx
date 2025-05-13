@@ -13,7 +13,6 @@ import { createFaction } from "@core/archetypes/faction";
 import Color from "color";
 import { createShip } from "@core/archetypes/ship";
 import { shipClasses } from "@core/world/ships";
-import { random } from "mathjs";
 import { pickRandom } from "@core/utils/generators";
 import { moveToActions } from "@core/utils/moving";
 import { createWaypoint } from "@core/archetypes/waypoint";
@@ -66,7 +65,7 @@ const Game: React.FC<{ factions: number; fighters: number }> = ({
 
     const fighter = createShip(xSim, {
       ...pickRandom(shipClasses.filter(({ slug }) => slug === "dart")),
-      angle: random(-Math.PI, Math.PI),
+      angle: 0,
       position: new Vec2(),
       owner: faction,
       sector,

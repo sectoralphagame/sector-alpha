@@ -134,7 +134,7 @@ export class EntityMesh extends BaseMesh {
             this,
             input.position,
             input.scale.x * 4,
-            { small: 25, medium: 10, large: 5 }[
+            { small: 50, medium: 15, large: 10 }[
               entity.cp.dockable?.size ?? "large"
             ]
           );
