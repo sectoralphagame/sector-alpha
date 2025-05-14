@@ -426,6 +426,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.lights.splice(index, 1);
   };
 
+  clearLights() {
+    this.lights = [];
+    this.uniforms.env.lights = [];
+  }
+
   getByEntityId(id: number): EntityMesh | null {
     let mesh: EntityMesh | null = null;
 

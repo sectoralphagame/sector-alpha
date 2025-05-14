@@ -23,7 +23,7 @@ const tempVec3 = new Vec3();
 export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
   name = "EntityIndicator";
   parent: EntityMesh;
-  nameMesh: BaseMesh<EntityNameMaterial>;
+  nameMesh: BaseMesh<EntityNameMaterial> | null = null;
 
   constructor(engine: Engine3D) {
     super(engine, {
@@ -41,7 +41,7 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
 
   setSize(size: DockSize) {
     this.material.setSize(size);
-    this.nameMesh.material.setOffset(size);
+    this.nameMesh?.material.setOffset(size);
   }
 
   createNameMesh(name: string) {
@@ -75,7 +75,7 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
     });
     this.nameMesh.applyMaterial(new EntityNameMaterial(this.engine, texture));
     this.onBeforeRender(() => {
-      this.nameMesh.setVisibility(
+      this.nameMesh?.setVisibility(
         !!(
           this.material.uniforms.uHovered.value +
           this.material.uniforms.uSelected.value

@@ -288,6 +288,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
   onSectorChange() {
     this.engine.scene.destroy();
+    this.engine.scene.setParent(null);
     this.engine.setScene(new TacticalMapScene(this.engine));
     this.loadSector();
   }

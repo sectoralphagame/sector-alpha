@@ -8,7 +8,6 @@ import { GridMaterial } from "@ogl-engine/materials/Grid/Grid";
 import type { Engine } from "./engine";
 import type { BaseMesh2D } from "./BaseMesh2D";
 import type { Engine3D } from "./engine3d";
-import { Light } from "./Light";
 import { BaseMesh } from "./BaseMesh";
 
 function isDestroyable(mesh: Transform): mesh is Transform & Destroyable {
@@ -173,12 +172,12 @@ export class TacticalMapScene extends Scene {
 
   destroy() {
     this.pane.dispose();
+    this.engine.clearLights();
     this.traverse((mesh) => {
+      if (mesh === this) return;
+
       if (isDestroyable(mesh)) {
         mesh.destroy();
-      }
-      if (mesh instanceof Light) {
-        this.engine.removeLight(mesh);
       }
     });
   }
