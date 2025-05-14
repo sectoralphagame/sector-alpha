@@ -451,7 +451,7 @@
     "role": "military",
     "cruise": 3.8,
     "maneuver": 0.6,
-    "rotary": 142,
+    "rotary": 210,
     "ttc": 0.8,
     "name": "Dart",
     "size": "small",
