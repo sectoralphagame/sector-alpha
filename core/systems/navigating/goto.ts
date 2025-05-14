@@ -1,6 +1,7 @@
 import { startCruise, stopCruise } from "@core/utils/moving";
 import { Vec2 } from "ogl";
 import clamp from "lodash/clamp";
+import type { DockSize } from "@core/components/dockable";
 import type { Navigable } from "./types";
 import type { Thrust } from "./thrust";
 import { createThrust, lateralForce } from "./thrust";
@@ -9,6 +10,12 @@ import { brake, getBrakingDistance } from "./utils";
 const tempVelocity = new Vec2();
 const tempForward = new Vec2();
 const tempVec2 = new Vec2();
+
+const brakeAlignment: Record<DockSize, number> = {
+  large: 0.95,
+  medium: 0.8,
+  small: 0.4,
+};
 
 export function goToPosition(entity: Navigable, target: Vec2): Thrust {
   const distanceToTarget = target.distance(entity.cp.position.coord);
@@ -65,14 +72,15 @@ export function goToPosition(entity: Navigable, target: Vec2): Thrust {
 
   if (speed > 0) {
     if (
-      (distanceToTarget < getBrakingDistance(entity) / lateralForce &&
-        entity.cp.drive.mode !== "flyby") ||
+      distanceToTarget < getBrakingDistance(entity) / lateralForce ||
       distanceToTarget < entity.cp.drive.minimalDistance
     ) {
       brake(entity, 0, thrust);
     } else if (alignmentToVelocity > 0.2 && alignmentToTarget < 0.2) {
       brake(entity, (1 + alignmentToTarget) / 10, thrust);
-    } else if (alignmentToTarget < 0.4) {
+    } else if (
+      alignmentToTarget < brakeAlignment[entity.cp.dockable?.size ?? "large"]
+    ) {
       brake(entity, 0, thrust);
     }
   }
