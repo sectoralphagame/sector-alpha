@@ -134,7 +134,10 @@ export class AttackingSystem extends System {
         !target.cp.movable ||
         !target.cp.dockable ||
         Math.random() >
-          getEvasionChance(target.cp.movable.velocity, target.cp.dockable.size)
+          getEvasionChance(
+            target.cp.movable.velocity.len(),
+            target.cp.dockable.size
+          )
       ) {
         transport3D.hooks.shoot.notify(
           entity.requireComponents(["position", "damage"])

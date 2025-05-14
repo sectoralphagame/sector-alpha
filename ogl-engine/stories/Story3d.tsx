@@ -28,7 +28,13 @@ export const Story3d: React.FC<Story3dProps> = ({
   onEngineInit,
   onEngineUpdate,
 }) => {
-  const engine = React.useMemo(() => new Engine3D<TacticalMapScene>(), []);
+  const engine = React.useMemo(() => {
+    const e = new Engine3D<TacticalMapScene>();
+    e.setScene(new TacticalMapScene(e));
+    e.scene.addGrid();
+
+    return e;
+  }, []);
   const controlRef = React.useRef<{ update: (_delta?: number) => void }>();
   const skyboxRef = React.useRef<Skybox>();
 
@@ -37,9 +43,8 @@ export const Story3d: React.FC<Story3dProps> = ({
   }, [pane]);
 
   React.useEffect(() => {
-    engine.hooks.onInit.subscribe("Story3d", async () => {
+    engine.hooks.onInit.subscribe("Story3d", () => {
       onEngineInit(engine);
-      engine.setScene(new TacticalMapScene(engine));
 
       controlRef.current =
         control === "map"
@@ -50,7 +55,7 @@ export const Story3d: React.FC<Story3dProps> = ({
     });
 
     engine.hooks.onUpdate.subscribe("Story3d", (time) => {
-      controlRef.current!.update(engine.originalDelta);
+      controlRef.current?.update(engine.originalDelta);
       onEngineUpdate(engine, time);
     });
   }, [engine]);
@@ -61,6 +66,9 @@ export const Story3d: React.FC<Story3dProps> = ({
 
   React.useEffect(() => {
     if (engine.initialized) {
+      if (skyboxRef.current?.light) {
+        engine.removeLight(skyboxRef.current.light);
+      }
       skyboxRef.current?.destroy();
       skyboxRef.current?.setParent(null);
       skyboxRef.current = new Skybox(engine, skybox);

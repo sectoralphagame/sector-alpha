@@ -1,5 +1,4 @@
 import React from "react";
-import type { Transform } from "ogl";
 import { Raycast, Vec2, Vec3 } from "ogl";
 import { defaultIndexer } from "@core/systems/utils/default";
 import { find, map, pipe, reduce, toArray } from "@fxts/core";
@@ -15,12 +14,10 @@ import { contextMenuStore } from "@ui/state/contextMenu";
 import { storageHook } from "@core/hooks";
 import { MouseButton } from "@ogl-engine/Orbit";
 import { Asteroids } from "@ogl-engine/builders/Asteroids";
-import type { Destroyable } from "@ogl-engine/types";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
 import { gameStore } from "@ui/state/game";
 import { reaction } from "mobx";
 import { Star } from "@ogl-engine/builders/Star";
-import { Light } from "@ogl-engine/engine/Light";
 import type { Entity } from "@core/entity";
 import { SelectionBox } from "@ogl-engine/builders/SelectionBox";
 import sounds from "@assets/ui/sounds";
@@ -41,10 +38,6 @@ import { createStopMiningHandler } from "./events/stopMining";
 
 // FIXME: This is just an ugly hotfix to keep distance between things larger
 const scale = 2;
-
-function isDestroyable(mesh: Transform): mesh is Transform & Destroyable {
-  return !!(mesh as any).destroy;
-}
 
 export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   engine: Engine3D<TacticalMapScene>;
@@ -247,6 +240,10 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
     this.updateEngineSettings();
     this.loadSector();
+
+    if (process.env.STORYBOOK) {
+      this.engine.scene.addGrid();
+    }
   }
 
   onPointerUp(position: Vec2, button: MouseButton, isTarget: boolean) {
@@ -290,15 +287,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   }
 
   onSectorChange() {
-    this.engine.scene.traverse((mesh) => {
-      if (isDestroyable(mesh)) {
-        mesh.destroy();
-      }
-      if (mesh instanceof Light) {
-        this.engine.removeLight(mesh);
-      }
-    });
-
+    this.engine.scene.destroy();
+    this.engine.scene.setParent(null);
     this.engine.setScene(new TacticalMapScene(this.engine));
     this.loadSector();
   }
@@ -398,6 +388,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
       if (!this.meshes.has(entity)) {
         const mesh = new EntityMesh(this.engine, entity);
+        mesh.scale.multiply(entity.cp.render.defaultScale);
         this.engine.scene.entities.addChild(mesh);
         this.meshes.set(entity, mesh);
       }

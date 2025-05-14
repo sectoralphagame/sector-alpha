@@ -2,7 +2,10 @@
 to: ogl-engine/materials/<%= name %>/<%= name %>.ts
 ---
 
-import { Program } from "ogl";
+interface <%= h.capitalize(name) %>MaterialArgs {
+  
+}
+
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
@@ -13,14 +16,15 @@ export class <%= h.capitalize(name) %>Material extends Material {
     
   };
 
-  constructor(engine: Engine3D) {
+  constructor(engine: Engine3D, args: <%= h.capitalize(name) %>MaterialArgs) {
     super(engine);
 
-    this.program = new Program(engine.gl, {
+    this.createProgram(
       vertex,
       fragment,
-      uniforms: this.uniforms,
-    });
+      {},
+      {},
+    );
 
     this.uniforms.
   }

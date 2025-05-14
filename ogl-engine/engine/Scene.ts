@@ -1,11 +1,18 @@
-import { Transform } from "ogl";
+import { Plane, Transform } from "ogl";
 import type { Skybox } from "@ogl-engine/materials/skybox/skybox";
 import type { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
 import type { FolderApi } from "tweakpane";
 import { getPane } from "@ui/context/Pane";
+import type { Destroyable } from "@ogl-engine/types";
+import { GridMaterial } from "@ogl-engine/materials/Grid/Grid";
 import type { Engine } from "./engine";
 import type { BaseMesh2D } from "./BaseMesh2D";
 import type { Engine3D } from "./engine3d";
+import { BaseMesh } from "./BaseMesh";
+
+function isDestroyable(mesh: Transform): mesh is Transform & Destroyable {
+  return !!(mesh as any).destroy;
+}
 
 export class Scene extends Transform {
   engine: Engine<any>;
@@ -60,6 +67,16 @@ export class TacticalMapScene extends Scene {
   addSkybox(skybox: Skybox) {
     this.skybox = skybox;
     this.skybox.setParent(this);
+  }
+
+  addGrid() {
+    const grid = new BaseMesh(this.engine, {
+      geometry: new Plane(this.engine.gl),
+      material: new GridMaterial(this.engine),
+    });
+    grid.scale.set(1000);
+    grid.rotation.x = -Math.PI / 2;
+    this.ui.addChild(grid);
   }
 
   initPane() {
@@ -155,6 +172,14 @@ export class TacticalMapScene extends Scene {
 
   destroy() {
     this.pane.dispose();
+    this.engine.clearLights();
+    this.traverse((mesh) => {
+      if (mesh === this) return;
+
+      if (isDestroyable(mesh)) {
+        mesh.destroy();
+      }
+    });
   }
 }
 

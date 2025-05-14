@@ -73,7 +73,7 @@ export function attackAction(
   ) {
     const potentialTarget = pipe(
       defaultIndexer.sectorShips.getIt(entity.cp.position.sector),
-      filter((s) => isInRange(entity, s)),
+      filter((s) => isInRange(entity, s) && s.id !== entity.id),
       sort(
         (a, b) =>
           entity.cp.position.coord.squaredDistance(a.cp.position.coord) -

@@ -54,7 +54,7 @@ const settings: Partial<
 };
 
 export class Skybox extends Mesh implements Destroyable {
-  private light: Light;
+  light: Light;
   name = "Skybox";
   engine: Engine3D;
 

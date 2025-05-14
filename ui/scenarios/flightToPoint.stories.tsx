@@ -3,29 +3,20 @@ import type { StoryFn, Meta } from "@storybook/react";
 import { Styles } from "@kit/theming/style";
 import { Sim } from "@core/sim";
 import { movingSystem } from "@core/systems/moving";
-import { spottingSystem } from "@core/systems/ai/spotting";
-import { hitpointsRegeneratingSystem } from "@core/systems/hitpointsRegenerating";
 import { cooldownUpdatingSystem } from "@core/systems/cooldowns";
 import { orderPlanningSystem } from "@core/systems/ai/orderPlanning";
 import { orderExecutingSystem } from "@core/systems/orderExecuting/orderExecuting";
-import { attackingSystem } from "@core/systems/attacking";
 import { deadUnregisteringSystem } from "@core/systems/deadUnregistering";
 import { pathPlanningSystem } from "@core/systems/pathPlanning";
 import { createSector } from "@core/archetypes/sector";
-import type { Faction } from "@core/archetypes/faction";
 import { createFaction } from "@core/archetypes/faction";
 import Color from "color";
 import { createShip } from "@core/archetypes/ship";
 import { shipClasses } from "@core/world/ships";
-import { random } from "mathjs";
 import { pickRandom } from "@core/utils/generators";
 import { moveToActions } from "@core/utils/moving";
 import { createWaypoint } from "@core/archetypes/waypoint";
 import { fromPolar } from "@core/utils/misc";
-import {
-  changeRelations,
-  relationThresholds,
-} from "@core/components/relations";
 import settings from "@core/settings";
 import { TacticalMap } from "@ui/components/TacticalMap/TacticalMap";
 import { gameStore } from "@ui/state/game";
@@ -43,13 +34,10 @@ const Game: React.FC<{ factions: number; fighters: number }> = ({
       systems: [
         pathPlanningSystem,
         movingSystem,
-        spottingSystem,
-        hitpointsRegeneratingSystem,
         new NavigatingSystem(),
         cooldownUpdatingSystem,
         orderPlanningSystem,
         orderExecutingSystem,
-        attackingSystem,
         deadUnregisteringSystem,
       ],
     });
@@ -72,51 +60,48 @@ const Game: React.FC<{ factions: number; fighters: number }> = ({
     });
     gameStore.setSector(sector);
 
-    const generatedFactions: Faction[] = [];
-    for (let i = 0; i < factions; i++) {
-      const faction = createFaction(`Faction #${i + 1}`, xSim);
-      faction.cp.color.value = Color.hsv((i / factions) * 360, 100, 100)
-        .rgb()
-        .string();
-      faction.cp.policies.enemySpotted.military = "attack";
-      generatedFactions.push(faction);
+    const faction = createFaction("Faction", xSim);
+    faction.cp.color.value = Color.hsv(50, 100, 100).rgb().string();
 
-      for (let j = 0; j < fighters; j++) {
-        const fighter = createShip(xSim, {
-          ...pickRandom(shipClasses.filter(({ slug }) => slug === "dart")),
-          angle: random(-Math.PI, Math.PI),
-          position: fromPolar(
-            (2 * Math.PI * (i * fighters + j)) / (factions * fighters),
-            random(4, 6)
-          ),
-          owner: faction,
-          sector,
-        });
-        const t = random(0.75, 1);
-        fighter.cp.drive.cruise *= t;
-        fighter.cp.drive.maneuver /= t;
-        fighter.cp.orders.value = [
-          {
-            type: "move",
-            actions: moveToActions(
-              fighter,
-              createWaypoint(xSim, {
-                value: new Vec2(0, 0),
-                sector: sector.id,
-                owner: faction.id,
-              }),
-              {}
-            ),
-            origin: "manual",
-          },
-        ];
-      }
+    const fighter = createShip(xSim, {
+      ...pickRandom(shipClasses.filter(({ slug }) => slug === "dart")),
+      angle: 0,
+      position: new Vec2(),
+      owner: faction,
+      sector,
+    });
+
+    const n = 4;
+    const checkpoints: number[] = [];
+    for (let i = 0; i < 2 * n; i++) {
+      const waypoint = createWaypoint(xSim, {
+        value: fromPolar((i * Math.PI) / n, 1),
+        owner: fighter.id,
+        sector: sector.id,
+      });
+      waypoint.addComponent({
+        name: "render",
+        color: 0,
+        defaultScale: 20,
+        hidden: 0,
+        interactive: false,
+        layer: "ship",
+        model: "world/asteroid1",
+        static: true,
+        texture: "asteroid",
+      });
+      checkpoints.push(waypoint.id);
     }
-    for (const factionA of generatedFactions) {
-      for (const factionB of generatedFactions) {
-        if (factionA === factionB) continue;
-        changeRelations(factionA, factionB, relationThresholds.attack - 1);
-      }
+
+    for (let i = 0; i < 2 * n; i++) {
+      fighter.cp.orders.value.push({
+        type: "move",
+        actions: moveToActions(
+          fighter,
+          xSim.getOrThrow(checkpoints[(i + (i % 2 ? 0 : n)) % (2 * n)])
+        ),
+        origin: "story",
+      });
     }
 
     xSim.start();
@@ -147,7 +132,7 @@ Default.args = {
 };
 
 export default {
-  title: "Scenarios / Fighters",
+  title: "Scenarios / Flight through checkpoints",
   parameters: {
     layout: "fullscreen",
   },

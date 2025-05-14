@@ -38,6 +38,8 @@ export interface Drive extends BaseComponent<"drive"> {
   /** Limits maximum speed */
   limit: number;
   mode: "goto" | "follow" | "flyby";
+
+  targetVelocity: number;
 }
 
 export const defaultDriveLimit = 2000;
@@ -53,5 +55,6 @@ export function createDrive(input: ShipDriveProps): Drive {
     minimalDistance: 0.01,
     limit: defaultDriveLimit,
     mode: "goto",
+    targetVelocity: 0,
   };
 }
