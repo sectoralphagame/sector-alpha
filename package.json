@@ -47,6 +47,7 @@
     "@types/react-modal": "^3.13.1",
     "@types/react-router": "^5.1.18",
     "@types/react-router-dom": "^5.3.3",
+    "@types/serviceworker": "^0.0.135",
     "@types/webpack": "^5.28.5",
     "@types/yargs": "^17.0.33",
     "@typescript-eslint/eslint-plugin": "^7.4.0",

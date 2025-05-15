@@ -28,6 +28,10 @@ if (process.env.BUGSNAG_API_KEY) {
   ErrorBoundary = Bugsnag.getPlugin("react")!.createErrorBoundary(React);
 }
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register(new URL("../sw.ts", import.meta.url));
+}
+
 const root = createRoot(document.querySelector("#root")!);
 const DevTools = isDev ? React.lazy(() => import("../devtools")) : () => null;
 

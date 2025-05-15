@@ -49,7 +49,9 @@ if (
 }
 
 const config = {
-  entry: ["./gateway/index.tsx"],
+  entry: {
+    bundle: "./gateway/index.tsx",
+  },
   module: {
     rules: [
       {
@@ -121,7 +123,7 @@ const config = {
   output: {
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
-    filename: "bundle.[hash].js",
+    filename: "[name].[hash].js",
     assetModuleFilename: devMode
       ? "[path][name][ext][query]"
       : "assets/[hash][ext][query]",

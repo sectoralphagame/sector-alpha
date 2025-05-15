@@ -9,6 +9,7 @@
     "resolveJsonModule": true,
     "jsx": "react",
     "strictNullChecks": true,
+    "lib": [],
     "paths": {
       "@assets/*": ["assets/*"],
       "@core/*": ["core/*"],
