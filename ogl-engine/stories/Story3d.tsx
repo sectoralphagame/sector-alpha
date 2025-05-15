@@ -78,7 +78,7 @@ export const Story3d: React.FC<Story3dProps> = ({
   }, [engine, skybox]);
 
   React.useEffect(() => {
-    if (grid) {
+    if (grid && engine.initialized) {
       engine.scene.addGrid();
     } else {
       engine.scene.ui.children
@@ -95,7 +95,7 @@ export const story3dMeta = {
     layout: "fullscreen",
   },
   args: {
-    postProcessing: false,
+    postProcessing: true,
     skybox: Object.keys(skyboxes)[0],
     pane: false,
     grid: false,

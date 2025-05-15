@@ -1,7 +1,7 @@
 import React from "react";
 import { Raycast, Vec2, Vec3 } from "ogl";
 import { defaultIndexer } from "@core/systems/utils/default";
-import { find, map, pipe, reduce, toArray } from "@fxts/core";
+import { each, find, map, pipe } from "@fxts/core";
 import { OglCanvas } from "@ogl-engine/OglCanvas";
 import { MapControl } from "@ogl-engine/MapControl";
 import { assetLoader } from "@ogl-engine/AssetLoader";
@@ -39,6 +39,8 @@ import { createStopMiningHandler } from "./events/stopMining";
 // FIXME: This is just an ugly hotfix to keep distance between things larger
 const scale = 2;
 
+const tempCameraFocus = new Vec3();
+
 export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   engine: Engine3D<TacticalMapScene>;
   sim: Sim;
@@ -60,7 +62,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     this.engine.setScene(new TacticalMapScene(this.engine));
     transport3D.hooks.shoot.subscribe(
       "TacticalMap",
-      createShootHandler(this.engine)
+      createShootHandler(this.engine, this.sim)
     );
     transport3D.hooks.explode.subscribe(
       "TacticalMap",
@@ -400,10 +402,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       (c) => c instanceof Path
     ) as Path[]) {
       path.update(
-        Path.getPath(
-          path.owner.requireComponents(["position", "orders"]),
-          scale
-        )
+        path.getPath(path.owner.requireComponents(["position", "orders"]))
       );
     }
   }
@@ -427,20 +426,15 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         );
       }
 
-      const centerPoint = pipe(
+      tempCameraFocus.set(0);
+      pipe(
         gameStore.selectedUnits,
-        map((e) => e.requireComponents(["position"]).cp.position.coord),
-        reduce((acc, val) => [acc[0] + val[0], acc[1] + val[1]]),
-        (acc) => [
-          acc[0] / gameStore.selectedUnits.length,
-          acc[1] / gameStore.selectedUnits.length,
-        ],
-        toArray
+        map((e) => this.engine.getByEntityId(e.id)!.position),
+        each((val) => tempCameraFocus.add(val))
       );
+      tempCameraFocus.scale(1 / gameStore.selectedUnits.length);
 
-      this.control!.lookAt(
-        new Vec3(centerPoint[0] * scale, 0, centerPoint[1] * scale)
-      );
+      this.control!.lookAt(tempCameraFocus);
     }
   }
 

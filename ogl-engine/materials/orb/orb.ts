@@ -29,4 +29,14 @@ export class OrbMaterial extends Material {
       depthWrite: false,
     });
   }
+
+  setEmissive(value: number) {
+    this.uniforms.fEmissive.value = value;
+    this.program.setBlendFunc(
+      this.engine.gl.SRC_ALPHA,
+      this.engine.gl.ONE,
+      this.engine.gl.SRC_ALPHA,
+      this.engine.gl.DST_ALPHA
+    );
+  }
 }

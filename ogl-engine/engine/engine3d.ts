@@ -3,6 +3,7 @@ import { Post, Texture, Vec2, Vec3, RenderTarget } from "ogl";
 import settings from "@core/settings";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
 import { gameStore } from "@ui/state/game";
+import { sortBy } from "@fxts/core";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
@@ -28,7 +29,7 @@ const tempVec3 = new Vec3();
 export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   canvas: HTMLCanvasElement;
   postProcessing = true;
-  fxaa = false;
+  fxaa = true;
   godrays = false;
   scene: TScene;
   /**
@@ -315,7 +316,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     }
 
     this.prepareLighting();
-    this.executeOnBeforeRenderTasks();
 
     if (this.postProcessing) {
       this.renderComposite();
@@ -324,6 +324,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     }
 
     this.capturePerformance = false;
+    this.executeOnBeforeRenderTasks();
   }
 
   private renderSimple = () => {
@@ -501,20 +502,21 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.capturePerformance = false;
   }
 
-  addOnBeforeRenderTask(task: () => void) {
-    const t = new OnBeforeRenderTask(task);
+  addOnBeforeRenderTask(task: () => void, priority?: number) {
+    const t = new OnBeforeRenderTask(task, priority);
     this.onBeforeRenderTasks.push(t);
     return t;
   }
 
   executeOnBeforeRenderTasks() {
-    for (const task of this.onBeforeRenderTasks) {
+    this.onBeforeRenderTasks = this.onBeforeRenderTasks.filter((task) =>
+      task.isValid()
+    );
+
+    for (const task of sortBy((t) => t.priority, this.onBeforeRenderTasks)) {
       if (task.isValid()) {
         task.run();
       }
     }
-    this.onBeforeRenderTasks = this.onBeforeRenderTasks.filter((task) =>
-      task.isValid()
-    );
   }
 }

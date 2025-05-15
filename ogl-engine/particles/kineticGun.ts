@@ -1,43 +1,44 @@
 import { OneShotParticleGenerator } from "@ogl-engine/ParticleGenerator";
-import { Vec4 } from "ogl";
 import { random } from "mathjs";
-import { OrbMaterial } from "@ogl-engine/materials/orb/orb";
-import Color from "color";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
+import { KineticGunMaterial } from "@ogl-engine/materials/kineticGun/kineticGun";
+import { RosetteGeometry } from "./rosette";
 
-const particleSize = 0.6;
+const particleSize = 1.4;
 const particleLife = 6;
 const spread = 0.025;
 
 export class KineticGunParticleGenerator extends OneShotParticleGenerator {
+  scaleForces = false;
+
   constructor(engine: Engine3D) {
     super(
       engine,
       (particle) => {
-        particle.acceleration.set(0);
+        particle.acceleration.set(0, 0, -0.1);
         particle.velocity.set(
-          random(700, 750),
           random(-spread, spread),
-          random(-spread, spread)
+          random(-spread, spread),
+          random(2.5, 2.9)
         );
         particle.life = particleLife;
+        this.worldMatrix.getRotation(particle.rotation);
+        particle.rotation.rotateX(Math.PI / 2);
       },
-      5
+      (e) => new RosetteGeometry(e.gl),
+      9
     );
 
-    this.spawnRate = 40;
+    this.spawnRate = 8;
 
     this.onParticleUpdate = (particle) => {
       particle.t = particle.life / particleLife;
-      particle.scale.set(particleSize);
+      particle.scale.set(particleSize, particleSize * 9, particleSize);
     };
 
-    const material = new OrbMaterial(
-      engine,
-      new Vec4(...Color("#ff250b").alpha(0.3).array()),
-      new Vec4(...Color("#fffd8c").alpha(1).array())
-    );
-    material.uniforms.fEmissive.value = 1;
+    const material = new KineticGunMaterial(engine, {
+      color: "rgb(255, 57, 57)",
+    });
     this.mesh.applyMaterial(material);
   }
 }

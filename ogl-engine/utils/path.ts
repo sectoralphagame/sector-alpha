@@ -6,7 +6,9 @@ import { CrossGeometry } from "@ogl-engine/engine/CrossGeometry";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
 import { gameStore } from "@ui/state/game";
-import { Transform, Vec3 } from "ogl";
+import { Vec3, Transform } from "ogl";
+
+const tempZero = new Vec3(0, 0, 0);
 
 export type PathColor = "default" | "warning";
 const colors: Record<PathColor, string> = {
@@ -71,20 +73,15 @@ export class Path extends Transform {
     }
   };
 
-  static getPath = (
-    entity: RequireComponent<"position" | "orders">,
-    scale: number
-  ): [Vec3, PathColor][] => {
+  getPath(
+    entity: RequireComponent<"position" | "orders">
+  ): [Vec3, PathColor][] {
     const origin = findInAncestors(entity, "position");
     const waypoints: [Vec3, PathColor][] =
       origin.cp.position.sector === gameStore.sector.id
         ? [
             [
-              new Vec3(
-                origin.cp.position.coord[0] * scale,
-                0,
-                origin.cp.position.coord[1] * scale
-              ),
+              this.engine.getByEntityId(origin.id)?.position ?? tempZero,
               "default" as PathColor,
             ],
           ]
@@ -109,16 +106,13 @@ export class Path extends Transform {
         const targetWithPosition = findInAncestors(target!, "position");
 
         waypoints.push([
-          new Vec3(
-            targetWithPosition.cp.position.coord[0] * scale,
-            0,
-            targetWithPosition.cp.position.coord[1] * scale
-          ),
+          this.engine.getByEntityId(targetWithPosition.id)?.position ??
+            tempZero,
           action.type === "attack" ? "warning" : "default",
         ]);
       }
     }
 
     return waypoints;
-  };
+  }
 }

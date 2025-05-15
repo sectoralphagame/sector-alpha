@@ -13,7 +13,7 @@ import type { Faction } from "@core/archetypes/faction";
 import font from "@assets/fonts/FiraSans/FiraSans-Light.json";
 import { EntityNameMaterial } from "@ogl-engine/materials/entityName/entityName";
 import type { DockSize } from "@core/components/dockable";
-import type { OnBeforeRenderTask } from "@ogl-engine/engine/task";
+import { taskPriority, type OnBeforeRenderTask } from "@ogl-engine/engine/task";
 
 export const entityScale = 1 / 220;
 // FIXME: Remove after distance rebalancing
@@ -125,7 +125,10 @@ export class EntityMesh extends BaseMesh {
     this.name = `EntityMesh:${entity.id}`;
 
     this.tasks.push(
-      this.engine.addOnBeforeRenderTask(this.updatePosition.bind(this))
+      this.engine.addOnBeforeRenderTask(
+        this.updatePosition.bind(this),
+        taskPriority.high
+      )
     );
 
     if (gltf.particles) {
@@ -155,6 +158,7 @@ export class EntityMesh extends BaseMesh {
 
           this.onDestroyCallbacks.push(() => {
             emitter.destroy();
+            emitter.setParent(null);
           });
         }
       }

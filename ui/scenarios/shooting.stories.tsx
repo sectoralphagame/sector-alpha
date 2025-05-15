@@ -7,6 +7,7 @@ import { attackingSystem } from "@core/systems/attacking";
 import { createSector } from "@core/archetypes/sector";
 import { createFaction } from "@core/archetypes/faction";
 import Color from "color";
+import type { Ship } from "@core/archetypes/ship";
 import { createShip } from "@core/archetypes/ship";
 import { shipClasses } from "@core/world/ships";
 import { fromPolar } from "@core/utils/misc";
@@ -27,21 +28,20 @@ class MovingSystem extends System {
       for (let i = 0; i < shipsNum; i++) {
         const ship = defaultIndexer.ships.get()[i];
 
-        const angle = sim.getTime() * 1 + (i * Math.PI * 2) / shipsNum;
+        const angle = sim.getTime() + (i * Math.PI * 2) / shipsNum;
         const r = 0.1;
 
-        const euclidean = fromPolar(angle, r);
-        ship.cp.position.coord[0] = euclidean[0];
-        ship.cp.position.coord[1] = euclidean[1];
-        ship.cp.position.angle =
-          ((angle + (2 * Math.PI) / shipsNum + Math.PI / 2) % (Math.PI * 2)) +
-          Math.PI / 12;
+        ship.cp.position.coord.copy(fromPolar(angle, r));
+        const nextAngle = sim.getTime() + ((i + 1) * Math.PI * 2) / shipsNum;
+        const nextPos = fromPolar(nextAngle, r);
+        const vec = nextPos.sub(ship.cp.position.coord);
+        ship.cp.position.angle = Math.atan2(vec.y, vec.x);
       }
     });
   }
 }
 
-const Game: React.FC<{ fighters: number }> = ({ fighters }) => {
+const Game: React.FC<{ fighters: number }> = ({ fighters: fightersNumber }) => {
   const [sim, setSim] = React.useState<Sim | null>(null);
   React.useEffect(() => {
     settings.bootTime = 0;
@@ -57,21 +57,26 @@ const Game: React.FC<{ fighters: number }> = ({ fighters }) => {
     });
     gameStore.setSector(sector);
 
-    for (let i = 0; i < fighters; i++) {
+    const fighters: Ship[] = [];
+    for (let i = 0; i < fightersNumber; i++) {
       const faction = createFaction(`Faction #${i + 1}`, xSim);
-      faction.cp.color.value = Color.hsv((i / fighters) * 360, 100, 100)
+      faction.cp.color.value = Color.hsv((i / fightersNumber) * 360, 100, 100)
         .rgb()
         .string();
 
-      const fighter = createShip(xSim, {
-        ...shipClasses.find(({ slug }) => slug === "dart")!,
-        angle: 0,
-        position: new Vec2(0, 0),
-        owner: faction,
-        sector,
-      });
-      fighter.cp.damage!.targetId =
-        i === 0 ? fighter.id + fighters * 2 - 2 : fighter.id - 2;
+      fighters.push(
+        createShip(xSim, {
+          ...shipClasses.find(({ slug }) => slug === "dart")!,
+          angle: 0,
+          position: new Vec2(0, 0),
+          owner: faction,
+          sector,
+        })
+      );
+    }
+
+    for (let i = 0; i < fighters.length; i++) {
+      fighters[i].cp.damage!.targetId = fighters[(i + 1) % fighters.length].id;
     }
 
     xSim.start();
@@ -87,7 +92,7 @@ const Game: React.FC<{ fighters: number }> = ({ fighters }) => {
     return () => {
       xSim.destroy();
     };
-  }, [fighters]);
+  }, [fightersNumber]);
 
   if (!sim) return null;
 

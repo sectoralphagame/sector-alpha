@@ -25,6 +25,7 @@ export class EngineParticleGenerator extends ParticleGenerator {
         particle.life = this.life;
         particle.scale.set(1);
       },
+      undefined,
       500
     );
 

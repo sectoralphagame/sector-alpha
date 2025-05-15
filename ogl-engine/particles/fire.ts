@@ -23,6 +23,7 @@ export class FireParticleGenerator extends ParticleGenerator {
         particle.life = particleLife;
         particle.scale.set(1);
       },
+      undefined,
       300
     );
 
@@ -40,7 +41,7 @@ export class FireParticleGenerator extends ParticleGenerator {
       new Vec4(...Color("#ff250b").alpha(0.3).array()),
       new Vec4(...Color("#fffd8c").alpha(1).array())
     );
-    material.uniforms.fEmissive.value = 1;
+    material.setEmissive(1);
     this.mesh.applyMaterial(material);
   }
 }

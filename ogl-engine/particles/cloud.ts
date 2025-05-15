@@ -20,6 +20,7 @@ export class CloudParticleGenerator extends ParticleGenerator {
         particle.life = particleLife;
         particle.scale.set(random(0.5, 5));
       },
+      undefined,
       100
     );
 

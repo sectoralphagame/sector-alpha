@@ -23,6 +23,7 @@ export class SmokeParticleGenerator extends ParticleGenerator {
         particle.life = particleLife;
         particle.scale.set(1);
       },
+      undefined,
       300
     );
 

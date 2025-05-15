@@ -37,6 +37,7 @@ export class ExplosionParticleGenerator extends OneShotParticleGenerator {
         particle.life = particleLife;
         particle.scale.set(1);
       },
+      undefined,
       3000
     );
 
