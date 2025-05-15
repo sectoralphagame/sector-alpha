@@ -2,6 +2,7 @@ import { Vec3, Transform, Plane, Quat, Mat4 } from "ogl";
 import { BaseMesh } from "./engine/BaseMesh";
 import type { Destroyable } from "./types";
 import type { Engine3D } from "./engine/engine3d";
+import type { OnBeforeRenderTask } from "./engine/task";
 
 const scale = new Vec3();
 const emptyQuat = new Quat();
@@ -45,6 +46,7 @@ export class ParticleGenerator extends Transform implements Destroyable {
     null;
 
   protected generate: GenerateParticleFn;
+  private task: OnBeforeRenderTask;
 
   constructor(engine: Engine3D, generate: GenerateParticleFn, max = 1000) {
     super();
@@ -107,7 +109,9 @@ export class ParticleGenerator extends Transform implements Destroyable {
     mesh.setParent(this);
     mesh.geometry.setInstancedCount(this.max);
 
-    mesh.onBeforeRender(() => this.update(this.engine.delta));
+    this.task = this.engine.addOnBeforeRenderTask(() => {
+      this.update(this.engine.delta);
+    });
 
     return mesh;
   }
@@ -207,6 +211,7 @@ export class ParticleGenerator extends Transform implements Destroyable {
 
   // eslint-disable-next-line class-methods-use-this
   destroy() {
+    this.task.cancel();
     this.mesh.setParent(null);
   }
 }
@@ -224,12 +229,7 @@ export abstract class OneShotParticleGenerator extends ParticleGenerator {
   override update(time: number) {
     super.update(time);
     if (this.count > 0 && this.particles.every((p) => p.life <= 0)) {
-      this.destroy();
-      this.setParent(null);
+      this.markForDestruction();
     }
-  }
-
-  override destroy() {
-    this.setParent(null);
   }
 }

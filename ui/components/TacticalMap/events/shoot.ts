@@ -22,7 +22,12 @@ export function createShootHandler(
     const lookAtMatrix = new Mat4();
     const lookAtQuaternion = new Quat();
 
-    generator.mesh.onBeforeRender(() => {
+    const task = engine.addOnBeforeRenderTask(() => {
+      if (generator.scheduledToDestroy) {
+        task.cancel();
+        return;
+      }
+
       generator.worldMatrix.getTranslation(position);
       lookAtMatrix.lookAt(position, target.position, new Vec3(0, 1, 0));
 

@@ -13,6 +13,7 @@ import type { Faction } from "@core/archetypes/faction";
 import font from "@assets/fonts/FiraSans/FiraSans-Light.json";
 import { EntityNameMaterial } from "@ogl-engine/materials/entityName/entityName";
 import type { DockSize } from "@core/components/dockable";
+import type { OnBeforeRenderTask } from "@ogl-engine/engine/task";
 
 export const entityScale = 1 / 220;
 // FIXME: Remove after distance rebalancing
@@ -24,6 +25,7 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
   name = "EntityIndicator";
   parent: EntityMesh;
   nameMesh: BaseMesh<EntityNameMaterial> | null = null;
+  private task: OnBeforeRenderTask;
 
   constructor(engine: Engine3D) {
     super(engine, {
@@ -74,7 +76,7 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
       texture.image = img;
     });
     this.nameMesh.applyMaterial(new EntityNameMaterial(this.engine, texture));
-    this.onBeforeRender(() => {
+    this.task = this.engine.addOnBeforeRenderTask(() => {
       this.nameMesh?.setVisibility(
         !!(
           this.material.uniforms.uHovered.value +
@@ -87,6 +89,11 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
     });
     this.nameMesh.setParent(this);
   }
+
+  destroy(): void {
+    super.destroy();
+    this.task.cancel();
+  }
 }
 
 export class EntityMesh extends BaseMesh {
@@ -97,6 +104,7 @@ export class EntityMesh extends BaseMesh {
   selected = false;
   hovered = false;
   indicator: EntityIndicator;
+  tasks: OnBeforeRenderTask[] = [];
 
   constructor(
     engine: Engine3D,
@@ -116,7 +124,9 @@ export class EntityMesh extends BaseMesh {
     this.entity = entity;
     this.name = `EntityMesh:${entity.id}`;
 
-    this.updatePosition();
+    this.tasks.push(
+      this.engine.addOnBeforeRenderTask(this.updatePosition.bind(this))
+    );
 
     if (gltf.particles) {
       for (const input of gltf.particles) {
@@ -152,18 +162,20 @@ export class EntityMesh extends BaseMesh {
 
     if (entity.tags.has("selection")) {
       this.indicator = new EntityIndicator(engine);
-      this.indicator.onBeforeRender(() => {
-        if (!this.entity.cp.hitpoints) return;
+      this.tasks.push(
+        this.engine.addOnBeforeRenderTask(() => {
+          if (!this.entity.cp.hitpoints) return;
 
-        this.indicator.material.uniforms.uHp.value =
-          this.entity.cp.hitpoints.hp.value / this.entity.cp.hitpoints.hp.max;
+          this.indicator.material.uniforms.uHp.value =
+            this.entity.cp.hitpoints.hp.value / this.entity.cp.hitpoints.hp.max;
 
-        if (this.entity.cp.hitpoints.shield) {
-          this.indicator.material.uniforms.uShield.value =
-            this.entity.cp.hitpoints.shield.value /
-            this.entity.cp.hitpoints.shield.max;
-        }
-      });
+          if (this.entity.cp.hitpoints.shield) {
+            this.indicator.material.uniforms.uShield.value =
+              this.entity.cp.hitpoints.shield.value /
+              this.entity.cp.hitpoints.shield.max;
+          }
+        })
+      );
 
       this.indicator.setParent(this);
       this.indicator.material.setColor(entity.cp.render.color);
@@ -179,6 +191,7 @@ export class EntityMesh extends BaseMesh {
     );
     this.rotation.y = -this.entity.cp.position.angle;
     this.setVisibility(!this.entity.cp.render.hidden);
+    this.updateMatrixWorld();
   }
 
   addParticleGenerator(input: ParticleGeneratorInput) {
@@ -200,5 +213,12 @@ export class EntityMesh extends BaseMesh {
   setHovered(hovered: boolean) {
     this.hovered = hovered;
     this.indicator?.material.setHovered(hovered);
+  }
+
+  destroy(): void {
+    super.destroy();
+    for (const task of this.tasks) {
+      task.cancel();
+    }
   }
 }

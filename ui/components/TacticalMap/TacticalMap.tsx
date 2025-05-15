@@ -392,9 +392,6 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         this.engine.scene.entities.addChild(mesh);
         this.meshes.set(entity, mesh);
       }
-
-      const mesh = this.meshes.get(entity)!;
-      mesh.updatePosition();
     }
   }
 

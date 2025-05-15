@@ -74,6 +74,7 @@ export class TacticalMapScene extends Scene {
       geometry: new Plane(this.engine.gl),
       material: new GridMaterial(this.engine),
     });
+    grid.name = "Grid";
     grid.scale.set(1000);
     grid.rotation.x = -Math.PI / 2;
     this.ui.addChild(grid);

@@ -17,6 +17,7 @@ import { Camera } from "./Camera";
 import { Engine } from "./engine";
 import { TacticalMapScene, type Scene } from "./Scene";
 import { Star } from "../builders/Star";
+import { OnBeforeRenderTask } from "./task";
 
 const bloomSize = 1.2;
 const lightsNum = 16;
@@ -91,6 +92,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     }
   >;
   private renderTarget: RenderTarget;
+  private onBeforeRenderTasks: OnBeforeRenderTask[] = [];
 
   constructor() {
     super();
@@ -313,6 +315,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     }
 
     this.prepareLighting();
+    this.executeOnBeforeRenderTasks();
 
     if (this.postProcessing) {
       this.renderComposite();
@@ -496,5 +499,22 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   capture() {
     this.willCapturePerformance = true;
     this.capturePerformance = false;
+  }
+
+  addOnBeforeRenderTask(task: () => void) {
+    const t = new OnBeforeRenderTask(task);
+    this.onBeforeRenderTasks.push(t);
+    return t;
+  }
+
+  executeOnBeforeRenderTasks() {
+    for (const task of this.onBeforeRenderTasks) {
+      if (task.isValid()) {
+        task.run();
+      }
+    }
+    this.onBeforeRenderTasks = this.onBeforeRenderTasks.filter((task) =>
+      task.isValid()
+    );
   }
 }
