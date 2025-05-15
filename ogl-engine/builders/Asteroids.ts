@@ -5,6 +5,7 @@ import { assetLoader } from "@ogl-engine/AssetLoader";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { random } from "mathjs";
 import { InstancedPbrMaterial } from "@ogl-engine/materials/instancedPbr/instancedPbr";
+import type { OnBeforeRenderTask } from "@ogl-engine/engine/task";
 import { BaseMesh } from "../engine/BaseMesh";
 import type { Engine3D } from "../engine/engine3d";
 
@@ -20,6 +21,7 @@ export class Asteroids extends Transform {
   size: number;
   density: number;
   engine: Engine3D;
+  tasks: OnBeforeRenderTask[] = [];
 
   constructor(
     engine: Engine3D,
@@ -125,27 +127,36 @@ export class Asteroids extends Transform {
 
       asteroid.setParent(this);
 
-      asteroid.onBeforeRender(() => {
-        for (let i = 0; i < numAsteroids; i++) {
-          const trs = tempMat4.fromArray(
-            asteroid.geometry.attributes.instanceMatrix.data!.slice(
-              16 * i,
-              16 * i + 16
-            )
-          );
-          axis.set(Math.sin(i), Math.cos(i), Math.sin(-i)).normalize();
-          trs.rotate(this.engine.delta * 0.02 * ((i % 15) + 1), axis);
-          trs.toArray(asteroid.geometry.attributes.instanceMatrix.data, i * 16);
+      this.tasks.push(
+        this.engine.addOnBeforeRenderTask(() => {
+          for (let i = 0; i < numAsteroids; i++) {
+            const trs = tempMat4.fromArray(
+              asteroid.geometry.attributes.instanceMatrix.data!.slice(
+                16 * i,
+                16 * i + 16
+              )
+            );
+            axis.set(Math.sin(i), Math.cos(i), Math.sin(-i)).normalize();
+            trs.rotate(this.engine.delta * 0.02 * ((i % 15) + 1), axis);
+            trs.toArray(
+              asteroid.geometry.attributes.instanceMatrix.data,
+              i * 16
+            );
 
-          const normalMatrix = tempMat3.getNormalMatrix(trs);
-          instanceNormalMatrix.set(normalMatrix, i * 9);
-        }
+            const normalMatrix = tempMat3.getNormalMatrix(trs);
+            instanceNormalMatrix.set(normalMatrix, i * 9);
+          }
 
-        asteroid.geometry.attributes.instanceMatrix.needsUpdate = true;
-        asteroid.geometry.attributes.instanceNormalMatrix.needsUpdate = true;
-      });
+          asteroid.geometry.attributes.instanceMatrix.needsUpdate = true;
+          asteroid.geometry.attributes.instanceNormalMatrix.needsUpdate = true;
+        })
+      );
     }
 
     this.visible = true;
+  }
+
+  destroy() {
+    this.tasks.forEach((task) => task.cancel());
   }
 }

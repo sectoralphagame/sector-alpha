@@ -1,13 +1,17 @@
+import type { Geometry } from "ogl";
 import { Vec3, Transform, Plane, Quat, Mat4 } from "ogl";
 import { BaseMesh } from "./engine/BaseMesh";
 import type { Destroyable } from "./types";
 import type { Engine3D } from "./engine/engine3d";
+import type { OnBeforeRenderTask } from "./engine/task";
+import { ColorMaterial } from "./materials/color/color";
 
 const scale = new Vec3();
-const emptyQuat = new Quat();
 const trs = new Mat4();
 const tempVec3 = new Vec3();
 const tempWorldScale = new Vec3();
+const tempMat4 = new Mat4();
+const tempWorldMatrix = new Mat4();
 
 interface Particle {
   angularVelocity: number;
@@ -16,10 +20,12 @@ interface Particle {
   life: number;
   position: Vec3;
   scale: Vec3;
+  rotation: Quat;
   t: number;
 }
 
 type GenerateParticleFn = (_particle: Particle) => void;
+type GeometryFn = (_engine: Engine3D) => Geometry;
 
 export class ParticleGenerator extends Transform implements Destroyable {
   engine: Engine3D;
@@ -31,29 +37,46 @@ export class ParticleGenerator extends Transform implements Destroyable {
   scheduledToDestroy = false;
 
   mesh: BaseMesh;
-  /**
-   * If true, particles will be spawned in world space, meaning they will not be
-   * affected by future generator movements.
-   */
-  global = true;
+  testMesh: BaseMesh;
 
   currentWindow: number;
   currentWindowSpawned = 0;
   lastKilled: number | null = 0;
+  scaleForces = true;
 
   onParticleUpdate: ((_particle: Particle, _time: number) => void) | null =
     null;
 
   protected generate: GenerateParticleFn;
+  private task: OnBeforeRenderTask;
 
-  constructor(engine: Engine3D, generate: GenerateParticleFn, max = 1000) {
+  constructor(
+    engine: Engine3D,
+    generate: GenerateParticleFn,
+    geometry?: GeometryFn,
+    max = 1000
+  ) {
     super();
     this.engine = engine;
     this.max = max;
     this.particles = [];
     this.generate = generate;
     this.currentWindow = 0;
-    this.mesh = this.createParticleMesh();
+    this.mesh = this.createParticleMesh(geometry);
+    this.testMesh = new BaseMesh(engine, {
+      geometry: new Plane(engine.gl, {
+        width: 10,
+        height: 10,
+      }),
+      material: new ColorMaterial(engine, {
+        color: "rgb(93, 134, 176)",
+        shaded: false,
+      }),
+    });
+    this.testMesh.worldMatrix = this.worldMatrix;
+    this.testMesh.setParent(this);
+    this.testMesh.visible = false;
+
     this.generateParticles();
   }
 
@@ -76,15 +99,17 @@ export class ParticleGenerator extends Transform implements Destroyable {
     particle.acceleration.set(0);
     particle.velocity.set(0);
     particle.position.set(0);
+    particle.rotation.identity();
+    particle.scale.set(0);
     particle.angularVelocity = 0;
     particle.t = 0;
 
     return particle;
   }
 
-  createParticleMesh(): BaseMesh {
+  createParticleMesh(geometry?: GeometryFn): BaseMesh {
     const mesh = new BaseMesh(this.engine, {
-      geometry: new Plane(this.engine.gl),
+      geometry: geometry?.(this.engine) ?? new Plane(this.engine.gl),
     });
 
     mesh.geometry.addAttribute("instanceMatrix", {
@@ -107,7 +132,9 @@ export class ParticleGenerator extends Transform implements Destroyable {
     mesh.setParent(this);
     mesh.geometry.setInstancedCount(this.max);
 
-    mesh.onBeforeRender(() => this.update(this.engine.delta));
+    this.task = this.engine.addOnBeforeRenderTask(() => {
+      this.update(this.engine.delta);
+    });
 
     return mesh;
   }
@@ -120,6 +147,7 @@ export class ParticleGenerator extends Transform implements Destroyable {
       velocity: new Vec3(0),
       position: new Vec3(0),
       scale: new Vec3(0),
+      rotation: new Quat(),
       t: 0,
     };
     this.particles.push(particle);
@@ -131,11 +159,14 @@ export class ParticleGenerator extends Transform implements Destroyable {
 
     this.generate(particle);
 
-    if (this.global) {
-      particle.position.applyMatrix4(this.worldMatrix);
-    }
+    particle.position.applyMatrix4(this.worldMatrix);
     particle.acceleration.scaleRotateMatrix4(this.worldMatrix);
     particle.velocity.scaleRotateMatrix4(this.worldMatrix);
+    if (!this.scaleForces) {
+      this.worldMatrix.getScaling(tempWorldScale);
+      particle.acceleration.divide(tempWorldScale);
+      particle.velocity.divide(tempWorldScale);
+    }
   }
 
   update(time: number) {
@@ -169,24 +200,23 @@ export class ParticleGenerator extends Transform implements Destroyable {
 
       this.onParticleUpdate?.(particle, time);
 
-      particle.position.add(tempVec3.copy(particle.velocity).multiply(time));
       particle.velocity.add(
         tempVec3.copy(particle.acceleration).multiply(time)
       );
+      particle.position.add(tempVec3.copy(particle.velocity).multiply(time));
       scale.set(particle.scale).multiply(tempWorldScale);
-      //   particle.mesh.rotation.y += particle.angularVelocity * time;
       particle.life -= time;
 
       if (particle.life <= 0) {
         scale.set([0, 0, 0], i * 3);
-        if (!this.lastKilled) {
+        if (this.lastKilled) {
           this.lastKilled = i;
         }
         continue;
       }
 
       trs
-        .compose(emptyQuat, particle.position, scale)
+        .compose(particle.rotation, particle.position, scale)
         .toArray(this.mesh.geometry.attributes.instanceMatrix.data!, i * 16);
 
       this.mesh.geometry.attributes.t.data!.set([particle.t], i);
@@ -201,12 +231,41 @@ export class ParticleGenerator extends Transform implements Destroyable {
     }
   }
 
+  override lookAt(target: Vec3, invert = false, useWorldMatrix = true) {
+    if (useWorldMatrix) {
+      if (invert) this.matrix.lookAt(this.position, target, this.up);
+      else this.matrix.lookAt(target, this.position, this.up);
+
+      // Extract world-space rotation
+      // @ts-expect-error
+      // eslint-disable-next-line no-underscore-dangle
+      this.matrix.getRotation(this.quaternion._target);
+      this.rotation.fromQuaternion(this.quaternion);
+
+      // Convert world rotation to local using inverse of parent world matrix
+      const invParentWorld = tempWorldMatrix
+        .copy(this.parent!.worldMatrix)
+        .inverse();
+      const worldRotation = tempMat4.fromQuaternion(this.quaternion);
+      worldRotation.multiply(invParentWorld);
+      // @ts-expect-error
+      // eslint-disable-next-line no-underscore-dangle
+      worldRotation.getRotation(this.quaternion._target);
+      // this.rotation.fromQuaternion(this.quaternion);
+
+      this.updateMatrixWorld();
+    } else {
+      super.lookAt(target, invert);
+    }
+  }
+
   markForDestruction() {
     this.scheduledToDestroy = true;
   }
 
   // eslint-disable-next-line class-methods-use-this
   destroy() {
+    this.task.cancel();
     this.mesh.setParent(null);
   }
 }
@@ -224,12 +283,7 @@ export abstract class OneShotParticleGenerator extends ParticleGenerator {
   override update(time: number) {
     super.update(time);
     if (this.count > 0 && this.particles.every((p) => p.life <= 0)) {
-      this.destroy();
-      this.setParent(null);
+      this.markForDestruction();
     }
-  }
-
-  override destroy() {
-    this.setParent(null);
   }
 }

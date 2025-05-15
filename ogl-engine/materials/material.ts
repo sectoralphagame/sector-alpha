@@ -5,7 +5,7 @@ import { entries, join, map, pipe } from "@fxts/core";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Light } from "@ogl-engine/engine/Light";
 import Color from "color";
-import type { ProgramOptions, Mesh, Vec3 } from "ogl";
+import type { ProgramOptions, Mesh, Vec3, Vec4 } from "ogl";
 import { Texture, Program } from "ogl";
 import type { FolderApi } from "tweakpane";
 
@@ -111,6 +111,16 @@ export abstract class Material {
   static colorToVec3(color: string, uniform: { value: Vec3 }) {
     const c = Color(color).rgb().array();
     uniform.value.set(c[0], c[1], c[2]).divide(255);
+  }
+
+  static colorToVec4(color: string, uniform: { value: Vec4 }) {
+    const c = Color(color).rgb();
+    uniform.value.set(
+      c.red() / 255,
+      c.green() / 255,
+      c.blue() / 255,
+      c.alpha()
+    );
   }
 }
 

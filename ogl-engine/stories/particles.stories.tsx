@@ -33,7 +33,7 @@ const ParticleGeneratorStory: React.FC<ParticleGeneratorStoryProps> = ({
     if (!(generatorRef.current instanceof OneShotParticleGenerator)) {
       generatorRef.current.spawnRate = particles;
     }
-    engine.scene.addChild(generatorRef.current);
+    engineRef.current!.scene.addChild(generatorRef.current);
   }, []);
   const onUpdate = React.useCallback((_, _delta) => {}, []);
 

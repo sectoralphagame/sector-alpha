@@ -13,6 +13,7 @@ export interface Story3dArgs {
   skybox: keyof typeof skyboxes;
   control?: "orbit" | "map";
   pane: boolean;
+  grid: boolean;
 }
 
 interface Story3dProps extends Story3dArgs {
@@ -25,13 +26,13 @@ export const Story3d: React.FC<Story3dProps> = ({
   skybox,
   control,
   pane,
+  grid,
   onEngineInit,
   onEngineUpdate,
 }) => {
   const engine = React.useMemo(() => {
     const e = new Engine3D<TacticalMapScene>();
     e.setScene(new TacticalMapScene(e));
-    e.scene.addGrid();
 
     return e;
   }, []);
@@ -76,6 +77,16 @@ export const Story3d: React.FC<Story3dProps> = ({
     }
   }, [engine, skybox]);
 
+  React.useEffect(() => {
+    if (grid && engine.initialized) {
+      engine.scene.addGrid();
+    } else {
+      engine.scene.ui.children
+        .find((child) => child.name === "Grid")
+        ?.setParent(null);
+    }
+  }, [grid]);
+
   return <OglCanvas engine={engine} />;
 };
 
@@ -84,9 +95,10 @@ export const story3dMeta = {
     layout: "fullscreen",
   },
   args: {
-    postProcessing: false,
+    postProcessing: true,
     skybox: Object.keys(skyboxes)[0],
     pane: false,
+    grid: false,
   },
   argTypes: {
     postProcessing: {
@@ -99,6 +111,11 @@ export const story3dMeta = {
       control: { type: "select" },
     },
     pane: {
+      control: {
+        type: "boolean",
+      },
+    },
+    grid: {
       control: {
         type: "boolean",
       },

@@ -139,6 +139,7 @@ export class Sim extends BaseSim {
   };
 
   next = (delta: number) => {
+    this.speed = this.nextSpeed;
     this.delta = delta;
 
     if (delta === 0) {

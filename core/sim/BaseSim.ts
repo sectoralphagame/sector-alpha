@@ -14,6 +14,7 @@ export class BaseSim {
   timeOffset: number;
   speed = 1;
   prevSpeed = 1;
+  nextSpeed = 1;
 
   constructor() {
     this.id = counter;
@@ -23,7 +24,7 @@ export class BaseSim {
 
   setSpeed(value: number) {
     this.prevSpeed = this.speed;
-    this.speed = value;
+    this.nextSpeed = value;
   }
 
   start() {

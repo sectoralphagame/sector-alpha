@@ -15,7 +15,7 @@ const n = 50;
 const segments = new Float32Array(n * 4);
 
 for (let i = 0; i < n; i++) {
-  segments.set([i / n, 0, 0], i * 4);
+  segments.set([i / n, 0, Math.sin(i) / n], i * 4);
 }
 
 interface RibbonsStoryProps extends Story3dArgs {}

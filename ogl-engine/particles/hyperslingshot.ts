@@ -5,10 +5,13 @@ import { OrbMaterial } from "@ogl-engine/materials/orb/orb";
 import Color from "color";
 import { loopToZero } from "@ogl-engine/easing";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
+import clamp from "lodash/clamp";
+import { RosetteGeometry } from "./rosette";
 
 const particleSize = 0.4;
 const particleLife = 1.5;
 const maxRadius = 0.8;
+const spawnRate = 800;
 
 export class HyperSlingshotParticleGenerator extends ParticleGenerator {
   constructor(engine: Engine3D) {
@@ -22,28 +25,32 @@ export class HyperSlingshotParticleGenerator extends ParticleGenerator {
           0,
           Math.sin(angle) * radius
         );
+        this.worldMatrix.getRotation(particle.rotation);
         particle.acceleration.set(0, random(0.5, 0.8), 0);
         particle.velocity.set(0, random(0.3, 0.5), 0);
-        particle.life =
+        particle.life = clamp(
           (particleLife *
             random(0.8, 1) *
-            Math.abs(
+            Math.max(
+              0.5,
               Math.cos(((maxRadius - radius) / maxRadius) * 2 * Math.PI)
             ) *
             (maxRadius - radius)) /
-          maxRadius;
+            maxRadius,
+          0,
+          1
+        );
       },
-      1000
+      (e) => new RosetteGeometry(e.gl),
+      spawnRate * particleLife
     );
 
-    this.spawnRate = 500;
+    this.spawnRate = spawnRate;
 
     this.onParticleUpdate = (particle) => {
       particle.t = particle.life / particleLife;
       const size = loopToZero(1 - particle.life / particleLife) * particleSize;
-      particle.scale
-        .set(size / 20, size, size / 20)
-        .scaleRotateMatrix4(this.worldMatrix);
+      particle.scale.set(size / 20, size, size / 20);
     };
 
     const material = new OrbMaterial(
@@ -51,7 +58,7 @@ export class HyperSlingshotParticleGenerator extends ParticleGenerator {
       new Vec4(...Color("#ff1f7c").alpha(0.3).array()),
       new Vec4(...Color("#ffa71d").alpha(1).array())
     );
-    material.uniforms.fEmissive.value = 1;
+    material.setEmissive(1);
     this.mesh.applyMaterial(material);
   }
 }
