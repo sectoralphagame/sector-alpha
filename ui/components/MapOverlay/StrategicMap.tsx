@@ -119,13 +119,8 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     // eslint-disable-next-line react/destructuring-assignment
     this.props.engineRef.current = this.engine;
     this.control = new MapControl(this.engine.camera, this.engine.canvas);
-    this.control.isFocused = () => {
-      const overlay = document.querySelector("#overlay");
-      return (
-        overlay?.getAttribute("data-open") === "true" &&
-        overlay?.getAttribute("data-active") === "map"
-      );
-    };
+    this.control.isFocused = () => gameStore.overlay === "map";
+
     this.engine.camera.position.y = 20;
     this.control.minDistance = 1;
     this.control.maxDistance = 20;
