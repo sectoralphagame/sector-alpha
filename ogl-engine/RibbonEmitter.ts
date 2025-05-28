@@ -123,7 +123,6 @@ export class RibbonEmitter extends BaseMesh<EngineTrailMaterial> {
     this.engine = trackedEntity.engine;
     this.segments = new Float32Array(maxSegments * 4);
 
-    this.setParent(this.engine.scene);
     this.task = this.engine.addOnBeforeRenderTask(() => {
       this.update(this.engine.delta);
     });

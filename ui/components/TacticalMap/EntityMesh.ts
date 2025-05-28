@@ -155,6 +155,7 @@ export class EntityMesh extends BaseMesh {
             ? entity.sim.getOrThrow<Faction>(entity.cp.owner.id).cp.color.value
             : "#ffffff";
           emitter.material.setColor(color);
+          emitter.setParent(this);
 
           this.onDestroyCallbacks.push(() => {
             emitter.destroy();
