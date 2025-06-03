@@ -434,7 +434,23 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       );
       tempCameraFocus.scale(1 / gameStore.selectedUnits.length);
 
-      this.control!.lookAt(tempCameraFocus);
+      if (
+        !this.control.transition.active &&
+        gameStore.focusType === "transition"
+      ) {
+        this.control!.transitionTo(
+          {
+            position: tempCameraFocus,
+            rotation: this.engine.camera.rotation,
+          },
+          0.15,
+          () => {
+            gameStore.focusType = "lookAt";
+          }
+        );
+      } else if (gameStore.focusType === "lookAt") {
+        this.control!.lookAt(tempCameraFocus);
+      }
     }
   }
 
