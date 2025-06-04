@@ -1,9 +1,10 @@
-import type { Camera, Mat4, Vec3 } from "ogl";
-import { Vec2 } from "ogl";
+import type { Camera, Mat4 } from "ogl";
+import { Euler, Vec3, Vec2 } from "ogl";
 import { storageHook } from "@core/hooks";
 import type { GameSettings } from "@core/settings";
-import { MouseButton, Orbit, STATE, tempVec3 } from "./Orbit";
+import { MouseButton, Orbit, STATE } from "./Orbit";
 
+const tempVec3 = new Vec3();
 const dPos = 360;
 const keymap = {
   KeyW: { x: 0, y: dPos },
@@ -15,6 +16,20 @@ const keymap = {
   KeyD: { x: -dPos, y: 0 },
   ArrowRight: { x: -dPos, y: 0 },
 };
+
+interface TransitionPoint {
+  position: Vec3;
+  rotation: Euler;
+}
+
+interface CameraTransition {
+  from: TransitionPoint;
+  to: TransitionPoint;
+  duration: number;
+  elapsed: number;
+  active: boolean;
+  onEnd?: () => void;
+}
 
 export class MapControl extends Orbit {
   camera: Camera;
@@ -39,6 +54,19 @@ export class MapControl extends Orbit {
   onRightClick: ((_event: MouseEvent) => void) | null = null;
   // eslint-disable-next-line class-methods-use-this
   isFocused: () => boolean = () => true;
+  transition: CameraTransition = {
+    from: {
+      position: new Vec3(),
+      rotation: new Euler(),
+    },
+    to: {
+      position: new Vec3(),
+      rotation: new Euler(),
+    },
+    duration: 0,
+    elapsed: 0,
+    active: false,
+  };
 
   constructor(camera: Camera, element: HTMLElement) {
     super(camera, element);
@@ -89,11 +117,24 @@ export class MapControl extends Orbit {
     }
   }
 
-  lookAt = (position: Vec3) => {
-    tempVec3.copy(this.camera.position).sub(position);
+  lookAt(position: Vec3) {
     this.target.copy(position);
-    this.camera.position.copy(position).add(tempVec3);
-  };
+  }
+
+  transitionTo(
+    target: TransitionPoint,
+    duration: number,
+    onTransitionEnd?: () => void
+  ) {
+    this.transition.from.position.copy(this.target);
+    this.transition.from.rotation.copy(this.camera.rotation);
+    this.transition.to.position.copy(target.position);
+    this.transition.to.rotation.copy(target.rotation);
+    this.transition.duration = duration;
+    this.transition.elapsed = 0;
+    this.transition.active = true;
+    this.transition.onEnd = onTransitionEnd;
+  }
 
   override panUp = (distance: number, m: Mat4) => {
     const i = 0;
@@ -129,10 +170,35 @@ export class MapControl extends Orbit {
     super.onMouseUp(e);
   }
 
+  updateTransition(delta: number) {
+    this.transition.elapsed += delta;
+
+    const t = Math.min(this.transition.elapsed / this.transition.duration, 1);
+
+    this.target
+      .copy(this.transition.from.position)
+      .lerp(this.transition.to.position, t);
+
+    if (t >= 1) {
+      this.transition.active = false;
+      this.transition.onEnd?.();
+    }
+  }
+
   override update = (delta: number) => {
     super.update(delta);
 
+    const near = this.getNear();
+    if (this.camera.near !== near) {
+      this.camera.perspective({ near });
+    }
+
     if (!this.isFocused()) {
+      return;
+    }
+
+    if (this.transition.active) {
+      this.updateTransition(delta);
       return;
     }
 
@@ -147,11 +213,6 @@ export class MapControl extends Orbit {
         );
       }
     });
-
-    const near = this.getNear();
-    if (this.camera.near !== near) {
-      this.camera.perspective({ near });
-    }
   };
 
   getNear() {

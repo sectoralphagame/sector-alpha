@@ -184,8 +184,12 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
 
   onKeyDown(event: KeyboardEvent) {
     if (event.code === "KeyR") {
-      this.control.lookAt(
-        this.engine.scene.getSector(gameStore.sector.id)!.position
+      this.control.transitionTo(
+        {
+          position: this.engine.scene.getSector(gameStore.sector.id)!.position,
+          rotation: this.engine.camera.rotation,
+        },
+        0.2
       );
     }
   }

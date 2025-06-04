@@ -15,6 +15,7 @@ export class GameStore {
   sector: Sector = undefined!;
   selectedUnits: Selectable[] = [];
   focused = false;
+  focusType: "lookAt" | "transition" = "lookAt";
   overlay: GameOverlayType = null;
   isPanelExpanded = false;
 
@@ -164,6 +165,7 @@ export class GameStore {
     if (!inTheSameSector) return;
 
     this.focused = true;
+    this.focusType = "transition";
     this.setSector(
       this.selectedUnits[0].sim.getOrThrow(
         this.selectedUnits[0].cp.position!.sector
