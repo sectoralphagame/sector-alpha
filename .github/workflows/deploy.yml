@@ -24,6 +24,9 @@ jobs:
       - name: Build
         run: |
           npm run build
+        env:
+          BUGSNAG_API_KEY: ${{ secrets.BUGSNAG_API_KEY }}
+          BUILD_ENV: ${{ vars.BUILD_ENV }}
 
       - name: Deploy to production
         run: |
