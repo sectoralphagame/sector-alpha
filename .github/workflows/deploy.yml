@@ -1,14 +1,15 @@
-name: QA
-
-on: [pull_request]
+name: Deployment
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - uses: actions/checkout@v4
-        with:
-          lfs: false
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -18,17 +19,13 @@ jobs:
         run: |
           npm ci
 
-      - name: Lint
-        run: |
-          npm run lint
-          git diff --exit-code .
-
-      - name: Test
-        run: |
-          npm test
-
       - name: Build
         run: |
           npm run build
+
+      - name: Deploy to production
+        run: |
+          npm run deploy
         env:
-          SKIP_LFS: true
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

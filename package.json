@@ -11,6 +11,7 @@
     "lint": "eslint \"@(core|ui|kit|devtools)/**/*.@(tsx|ts|jsx|js)\" --fix && prettier --check \"@(core|ui|kit|devtools)/**/*.@(tsx|ts|jsx|js)\" --write",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "deploy": "node -r ts-node/register ./scripts/deploy.ts",
     "deploy-storybook": "node -r ts-node/register ./scripts/deployStorybook.ts",
     "gen-archetype": "hygen archetype new",
     "gen-mission": "hygen mission new",

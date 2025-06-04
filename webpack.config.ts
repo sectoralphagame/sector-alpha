@@ -2,7 +2,7 @@ import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin";
-import { EnvironmentPlugin } from "webpack";
+import { EnvironmentPlugin, NormalModuleReplacementPlugin } from "webpack";
 import { BugsnagSourceMapUploaderPlugin } from "webpack-bugsnag-plugins";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CircularDependencyPlugin from "circular-dependency-plugin";
@@ -45,6 +45,15 @@ if (
       releaseStage: process.env.BUILD_ENV,
       overwrite: true,
     })
+  );
+}
+
+if (process.env.SKIP_LFS) {
+  plugins.push(
+    new NormalModuleReplacementPlugin(
+      /core\/world\/data\/base\.json/,
+      "core/world/data/base.mock.json"
+    )
   );
 }
 
