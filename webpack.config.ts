@@ -50,7 +50,10 @@ if (
 
 if (process.env.SKIP_LFS) {
   plugins.push(
-    new NormalModuleReplacementPlugin(/core\/world\/data\/base\.json/, "{}")
+    new NormalModuleReplacementPlugin(
+      /core\/world\/data\/base\.json/,
+      "core/world/data/base.mock.json"
+    )
   );
 }
 
