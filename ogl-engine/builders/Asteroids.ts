@@ -78,8 +78,8 @@ export class Asteroids extends Transform {
         instanced: true,
       });
       material.uniforms.uMask.value = lerp(
-        0.02,
-        0.07,
+        0.14,
+        0.34,
         lerp(0.5, 2, this.density)
       );
       const asteroid = new BaseMesh(this.engine, {

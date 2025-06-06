@@ -29,7 +29,7 @@ out vec4 fragData[3];
 #pragma glslify: luma = require(glsl-luma);
 
 void main() {
-    vec4 grungeMap = texture(tGrunge, fract(vUv * 4.f));
+    vec3 grungeMap = pow(texture(tGrunge, fract(vUv * 4.f)).rgb, vec3(1.f / 2.2f));
     float color = grungeMap.g;
     float grunge = grungeMap.r;
     float resMask = step(1.f - uMask, 1.f - grunge);
