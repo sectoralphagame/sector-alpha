@@ -4,10 +4,14 @@ import type { ModelName } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { random } from "mathjs";
-import { InstancedPbrMaterial } from "@ogl-engine/materials/instancedPbr/instancedPbr";
 import type { OnBeforeRenderTask } from "@ogl-engine/engine/task";
-import { BaseMesh } from "../engine/BaseMesh";
+import { AsteroidNewMaterial } from "@ogl-engine/materials/AsteroidNew/AsteroidNew";
+import { lerp } from "@core/utils/misc";
+import { pickRandom } from "@core/utils/generators";
+import { fieldColors } from "@core/archetypes/asteroidField";
+import type { MineableCommodity } from "@core/economy/commodity";
 import type { Engine3D } from "../engine/engine3d";
+import { BaseMesh } from "../engine/BaseMesh";
 
 const axis = new Vec3();
 const tempMat4 = new Mat4();
@@ -22,18 +26,21 @@ export class Asteroids extends Transform {
   density: number;
   engine: Engine3D;
   tasks: OnBeforeRenderTask[] = [];
+  resources: MineableCommodity[];
 
   constructor(
     engine: Engine3D,
     size: number,
     density: number,
-    fPoints: [Vec2, number][]
+    fPoints: [Vec2, number][],
+    resources: MineableCommodity[]
   ) {
     super();
 
     this.engine = engine;
     this.size = size;
     this.density = density;
+    this.resources = resources;
 
     this.visible = false;
     for (const [offset, radius] of fPoints) {
@@ -59,14 +66,25 @@ export class Asteroids extends Transform {
       "world/asteroid2",
       "world/asteroid3",
       "world/asteroid4",
+      "world/asteroid5",
+      "world/asteroid6",
     ];
 
     for (const model of asteroidModels) {
       const gltf = assetLoader.model(model);
 
+      const material = new AsteroidNewMaterial(this.engine, {
+        color: fieldColors[pickRandom(this.resources)],
+        instanced: true,
+      });
+      material.uniforms.uMask.value = lerp(
+        0.02,
+        0.07,
+        lerp(0.5, 2, this.density)
+      );
       const asteroid = new BaseMesh(this.engine, {
         geometry: new Geometry(this.engine.gl, { ...gltf.geometry.attributes }),
-        material: new InstancedPbrMaterial(this.engine, gltf.material),
+        material,
         frustumCulled: false,
       });
       asteroid.position.set(offset.x, 0, offset.y);

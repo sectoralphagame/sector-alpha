@@ -11,6 +11,8 @@ import { chunk, fromEntries, keys, map, pipe, values } from "@fxts/core";
 import { skyboxes } from "@assets/textures/skybox";
 import smoke from "@assets/textures/particle/smoke.png";
 import fire from "@assets/textures/particle/fire.png";
+import asteroidGrunge from "@assets/textures/world/asteroidGrunge.png";
+import asteroidNormal from "@assets/textures/world/asteroidNormal.png";
 import spaceMonoTexture from "@assets/fonts/SpaceMono/SpaceMono-Regular.png";
 import firaSansTexture from "@assets/fonts/FiraSans/FiraSans-Light.png";
 import { renderLogger } from "@core/log";
@@ -25,6 +27,8 @@ const textures = {
   "particle/fire": fire,
   "font/spaceMono": spaceMonoTexture,
   "font/firaSans": firaSansTexture,
+  "world/asteroidGrunge": asteroidGrunge,
+  "world/asteroidNormal": asteroidNormal,
 };
 export type TextureName = keyof typeof textures | "prop/smoke";
 
@@ -118,8 +122,8 @@ class AssetLoader {
 
   load(gl: OGLRenderingContext) {
     this.readyPromise = Promise.all(
-      Object.entries(models).map(([modelName, modelPath]) =>
-        this.getGltf(gl, modelName, modelPath)
+      Object.entries(models).map(([modelName, modelInfo]) =>
+        this.getGltf(gl, modelName, modelInfo)
       )
     ).then(() => {
       this.ready = true;
@@ -128,9 +132,15 @@ class AssetLoader {
     return this.readyPromise;
   }
 
-  async getGltf(gl: OGLRenderingContext, modelName: string, modelPath: string) {
-    const model = await GLTFLoader.load(gl, modelPath);
-
+  async getGltf(
+    gl: OGLRenderingContext,
+    modelName: string,
+    modelInfo: string | { model: string; material: string }
+  ) {
+    const model = await GLTFLoader.load(
+      gl,
+      typeof modelInfo === "string" ? modelInfo : modelInfo.model
+    );
     this.models[modelName] = {
       geometry: model.meshes[0].primitives[0].geometry,
       material: model.materials?.[0],

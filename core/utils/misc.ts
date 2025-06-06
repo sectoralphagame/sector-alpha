@@ -60,3 +60,7 @@ export function getGameDate(timeOffset: number): string {
 export function isVec2(v: object): v is { value: number[] } {
   return (v as any).isVec2 === true;
 }
+
+export function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}

@@ -5,16 +5,16 @@ import { GLTFLoader, Orbit } from "ogl";
 import models from "@assets/models";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
-import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { skyboxes } from "@assets/textures/skybox";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { merge } from "lodash";
 import { getPane } from "@ui/context/Pane";
+import { AsteroidNewMaterial } from "@ogl-engine/materials/AsteroidNew/AsteroidNew";
 import type { Story3dArgs } from "./Story3d";
 import { Story3d, story3dMeta } from "./Story3d";
 
 interface ModelStoryProps extends Story3dArgs {
-  model: string;
+  model: keyof typeof models;
   rotationSpeed: number;
 }
 
@@ -28,14 +28,22 @@ const ModelStory: React.FC<ModelStoryProps> = ({
   const controlRef = React.useRef<Orbit>();
   const rotationSpeedRef = React.useRef(rotationSpeed);
   const load = useCallback((m: keyof typeof models, engine: Engine3D) => {
-    GLTFLoader.load(engine.gl, m).then((model) => {
-      meshRef.current = BaseMesh.fromGltf(engine, model, {
-        material: model.materials?.[0]
-          ? new PbrMaterial(engine, model.materials[0])
-          : undefined,
-      });
+    const modelInfo = models[m];
+    GLTFLoader.load(
+      engine.gl,
+      typeof modelInfo === "string" ? modelInfo : modelInfo.model
+    ).then((model) => {
+      if (typeof modelInfo === "string") {
+        meshRef.current = BaseMesh.fromGltf(engine, model, {
+          material: new PbrMaterial(engine, model.materials[0]),
+        });
+      } else {
+        meshRef.current = BaseMesh.fromGltf(engine, model, {
+          material: new AsteroidNewMaterial(engine, { color: "#ff00ff" }),
+        });
+      }
+
       meshRef.current.setParent(engine.scene);
-      meshRef.current.scale.set(entityScale);
 
       const materialFolder = getPane().addOrReplaceFolder({
         title: "Material",
@@ -52,7 +60,7 @@ const ModelStory: React.FC<ModelStoryProps> = ({
       inertia: 0.8,
     });
 
-    load(models[modelName], engine);
+    load(modelName, engine);
   }, []);
 
   const onUpdate = useCallback(() => {
@@ -65,7 +73,7 @@ const ModelStory: React.FC<ModelStoryProps> = ({
   React.useEffect(() => {
     if (engineRef.current?.initialized) {
       meshRef.current?.parent?.removeChild(meshRef.current);
-      load(models[modelName], engineRef.current);
+      load(modelName, engineRef.current);
     }
   }, [modelName]);
 
@@ -100,7 +108,7 @@ export default {
   ),
 } as Meta;
 
-const Template: StoryFn<ModelStoryProps> = ({
+const Template: StoryFn<ModelStoryProps & { model: string }> = ({
   model,
   rotationSpeed,
   ...props
@@ -108,7 +116,7 @@ const Template: StoryFn<ModelStoryProps> = ({
   <div id="root">
     <Styles>
       <ModelStory
-        model={model.replace(/-/, "/")}
+        model={model.replace(/-/, "/") as keyof typeof models}
         rotationSpeed={rotationSpeed}
         {...props}
       />
@@ -119,4 +127,4 @@ const Template: StoryFn<ModelStoryProps> = ({
 export const Default = Template.bind({});
 Default.args = {
   model: "ship-lMil",
-} as ModelStoryProps;
+} as ModelStoryProps & { model: string };

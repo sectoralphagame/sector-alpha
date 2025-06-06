@@ -14,6 +14,16 @@ import font from "@assets/fonts/FiraSans/FiraSans-Light.json";
 import { EntityNameMaterial } from "@ogl-engine/materials/entityName/entityName";
 import type { DockSize } from "@core/components/dockable";
 import { taskPriority, type OnBeforeRenderTask } from "@ogl-engine/engine/task";
+import models from "@assets/models";
+import type { Material } from "@ogl-engine/materials/material";
+import { AsteroidNewMaterial } from "@ogl-engine/materials/AsteroidNew/AsteroidNew";
+import { ColorMaterial } from "@ogl-engine/materials/color/color";
+
+const materials = {
+  pbr: PbrMaterial,
+  default: ColorMaterial,
+  asteroidNew: AsteroidNewMaterial,
+};
 
 export const entityScale = 1 / 220;
 // FIXME: Remove after distance rebalancing
@@ -115,7 +125,16 @@ export class EntityMesh extends BaseMesh {
     super(engine, {
       geometry: gltf.geometry,
     });
-    this.applyMaterial(new PbrMaterial(engine, gltf.material));
+    let material: Material;
+    const modelInfo = models[entity.cp.render.model];
+    if (typeof modelInfo === "string") {
+      material = new PbrMaterial(engine, gltf.material);
+    } else {
+      material = new (materials[modelInfo.material] ?? materials.default)(
+        engine
+      );
+    }
+    this.applyMaterial(material);
 
     this.engine = engine;
     this.scale.set(entityScale);

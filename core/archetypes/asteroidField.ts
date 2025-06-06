@@ -13,11 +13,11 @@ import type { RequireComponent } from "../tsHelpers";
 import type { Sector } from "./sector";
 
 export const fieldColors = {
-  fuelium: "#ffab6b",
+  fuelium: "#873dff",
   goldOre: "#ffe46b",
-  ice: "#e8ffff",
+  ice: "#58f1ff",
   ore: "#ff5c7a",
-  silica: "#8f8f8f",
+  silica: "#ededed",
 } as Record<MineableCommodity, string>;
 
 export const asteroidFieldComponents = [
