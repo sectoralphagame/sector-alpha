@@ -1,6 +1,10 @@
 #version 300 es
 precision highp float;
 
+#pragma defines
+
+#pragma glslify: getTBN = require("./ogl-engine/shader/tbn");
+
 in vec3 position;
 in vec2 uv;
 in vec3 normal;
@@ -13,6 +17,7 @@ out vec3 worldPosition;
 out vec2 vUv;
 out vec3 vNormal;
 out vec3 vTangent;
+out mat3 tbn;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
@@ -25,7 +30,7 @@ void main() {
 
     vNormal = normalize(instanceNormalMatrix * normal);
     vTangent = normalize(instanceNormalMatrix * tangent);
-
+    tbn = getTBN(vNormal, vTangent);
     vUv = uv;
 
     gl_Position = projectionMatrix * viewMatrix * mPosition;
