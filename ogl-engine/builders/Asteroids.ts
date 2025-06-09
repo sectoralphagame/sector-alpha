@@ -137,7 +137,6 @@ export class Asteroids extends Transform {
     const pos = new Vec3();
     const scale = new Vec3();
 
-    let counter = 0;
     for (let i = 0; i < numObjects; i++) {
       const [x, z] = this.prng.sample();
       pos.set(
@@ -154,14 +153,9 @@ export class Asteroids extends Transform {
         (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1)
       );
 
-      tempTrs
-        .compose(emptyQuat, pos, scale)
-        .toArray(dust.geometry.attributes.instanceMatrix.data!, counter * 16);
-
-      counter++;
+      const trs = tempTrs.compose(emptyQuat, pos, scale);
+      dust.updateInstanceTrs(trs, i);
     }
-
-    dust.geometry.attributes.instanceMatrix.needsUpdate = true;
 
     dust.setParent(this);
   }
@@ -229,13 +223,10 @@ export class Asteroids extends Transform {
           );
           trs.multiply(rot);
           trs.scale(entityScale * random(1.5, 3.5));
-          trs.toArray(asteroid.geometry.attributes.instanceMatrix.data, i * 16);
+          asteroid.updateInstanceTrs(trs, i);
 
           i++;
         }
-
-        asteroid.calculateNormals();
-        asteroid.geometry.attributes.instanceMatrix.needsUpdate = true;
       }
 
       asteroid.setParent(this);
@@ -305,10 +296,8 @@ export class Asteroids extends Transform {
         );
         trs.multiply(rot);
         trs.scale(entityScale * Asteroids.getScale());
-        trs.toArray(asteroid.geometry.attributes.instanceMatrix.data, i * 16);
+        asteroid.updateInstanceTrs(trs, i);
       }
-
-      asteroid.calculateNormals();
 
       this.tasks.push(
         this.engine.addOnBeforeRenderTask(() => {
@@ -321,18 +310,10 @@ export class Asteroids extends Transform {
             );
             axis.set(Math.sin(i), Math.cos(i), Math.sin(-i)).normalize();
             trs.rotate(this.engine.delta * 0.02 * ((i % 15) + 1), axis);
-            trs.toArray(
-              asteroid.geometry.attributes.instanceMatrix.data,
-              i * 16
-            );
+            asteroid.updateInstanceTrs(trs, i);
           }
-
-          asteroid.calculateNormals();
-          asteroid.geometry.attributes.instanceMatrix.needsUpdate = true;
         })
       );
-
-      asteroid.geometry.attributes.instanceMatrix.needsUpdate = true;
 
       asteroid.setParent(this);
     }

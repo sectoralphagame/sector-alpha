@@ -98,25 +98,39 @@ export class BaseInstancedMesh<TMaterial extends Material = Material>
     });
   }
 
+  updateInstanceTrs(trs: Mat4, index: number): void {
+    trs.toArray(this.geometry.attributes.instanceMatrix.data!, index * 16);
+    this.geometry.attributes.instanceMatrix.needsUpdate = true;
+
+    if (this.geometry.attributes.instanceNormalMatrix) {
+      this.calculateInstanceNormals(index, trs);
+    }
+  }
+
+  calculateInstanceNormals(index: number, calculatedTrs?: Mat4): void {
+    const trs =
+      calculatedTrs ??
+      tempTrs.fromArray(
+        this.geometry.attributes.instanceMatrix.data!,
+        index * 16
+      );
+
+    const normalMatrix = tempMat3.getNormalMatrix(trs);
+    this.geometry.attributes.instanceNormalMatrix.data!.set(
+      normalMatrix,
+      index * 9
+    );
+    this.geometry.attributes.instanceNormalMatrix.needsUpdate = true;
+  }
+
   calculateNormals(): void {
     for (
       let i = 0;
       i < this.geometry.attributes.instanceMatrix.data!.length / 16;
       i++
     ) {
-      const trs = tempTrs.fromArray(
-        this.geometry.attributes.instanceMatrix.data!,
-        i * 16
-      );
-
-      const normalMatrix = tempMat3.getNormalMatrix(trs);
-      this.geometry.attributes.instanceNormalMatrix.data!.set(
-        normalMatrix,
-        i * 9
-      );
+      this.calculateInstanceNormals(i);
     }
-
-    this.geometry.attributes.instanceNormalMatrix.needsUpdate = true;
   }
 
   destroy() {
