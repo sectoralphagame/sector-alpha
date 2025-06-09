@@ -1,10 +1,13 @@
 import type { Material } from "@ogl-engine/materials/material";
 import type { MeshOptions } from "ogl";
-import { InstancedMesh } from "ogl";
+import { InstancedMesh, Mat3, Mat4 } from "ogl";
 import { MissingMaterial } from "@ogl-engine/materials/missing/missing";
 import type { Destroyable } from "@ogl-engine/types";
 import type { Engine3D } from "./engine3d";
 import { BaseMesh } from "./BaseMesh";
+
+const tempTrs = new Mat4();
+const tempMat3 = new Mat3();
 
 export class BaseInstancedMesh<TMaterial extends Material = Material>
   extends InstancedMesh
@@ -24,6 +27,7 @@ export class BaseInstancedMesh<TMaterial extends Material = Material>
         name: string;
         calculateTangents: boolean;
         instances: number;
+        normalMatrix: boolean;
       }
     >
   ) {
@@ -44,6 +48,19 @@ export class BaseInstancedMesh<TMaterial extends Material = Material>
 
     if (options.instances) {
       this.setInstancesCount(options.instances);
+    }
+
+    if (options.normalMatrix) {
+      if (!options.instances) {
+        throw new Error("normalMatrix requires instances to be set");
+      }
+
+      this.geometry.addAttribute("instanceNormalMatrix", {
+        instanced: true,
+        size: 9,
+        data: new Float32Array(options.instances * 9),
+        needsUpdate: true,
+      });
     }
   }
 
@@ -79,6 +96,27 @@ export class BaseInstancedMesh<TMaterial extends Material = Material>
       size: 3,
       data: tangents,
     });
+  }
+
+  calculateNormals(): void {
+    for (
+      let i = 0;
+      i < this.geometry.attributes.instanceMatrix.data!.length / 16;
+      i++
+    ) {
+      const trs = tempTrs.fromArray(
+        this.geometry.attributes.instanceMatrix.data!,
+        i * 16
+      );
+
+      const normalMatrix = tempMat3.getNormalMatrix(trs);
+      this.geometry.attributes.instanceNormalMatrix.data!.set(
+        normalMatrix,
+        i * 9
+      );
+    }
+
+    this.geometry.attributes.instanceNormalMatrix.needsUpdate = true;
   }
 
   destroy() {

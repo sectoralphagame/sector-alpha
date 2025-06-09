@@ -1,5 +1,5 @@
 import type { Vec2 } from "ogl";
-import { Euler, Geometry, Mat3, Mat4, Plane, Quat, Transform, Vec3 } from "ogl";
+import { Euler, Geometry, Mat4, Plane, Quat, Transform, Vec3 } from "ogl";
 import type { ModelName } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
@@ -22,7 +22,6 @@ import type { Engine3D } from "../engine/engine3d";
 
 const axis = new Vec3();
 const tempMat4 = new Mat4();
-const tempMat3 = new Mat3();
 const tempTrs = new Mat4();
 const tempQuat = new Quat();
 const tempEuler = new Euler();
@@ -198,9 +197,8 @@ export class Asteroids extends Transform {
         material,
         frustumCulled: false,
         instances: numObjects,
+        normalMatrix: true,
       });
-
-      const instanceNormalMatrix = new Float32Array(numObjects * 9);
 
       let i = 0;
       for (const [offset, radius] of fPoints) {
@@ -233,19 +231,11 @@ export class Asteroids extends Transform {
           trs.scale(entityScale * random(1.5, 3.5));
           trs.toArray(asteroid.geometry.attributes.instanceMatrix.data, i * 16);
 
-          const normalMatrix = new Mat3().getNormalMatrix(trs);
-          instanceNormalMatrix.set(normalMatrix, i * 9);
-
           i++;
         }
 
+        asteroid.calculateNormals();
         asteroid.geometry.attributes.instanceMatrix.needsUpdate = true;
-        asteroid.geometry.addAttribute("instanceNormalMatrix", {
-          instanced: true,
-          size: 9,
-          data: instanceNormalMatrix,
-          needsUpdate: true,
-        });
       }
 
       asteroid.setParent(this);
@@ -291,9 +281,8 @@ export class Asteroids extends Transform {
         material,
         frustumCulled: false,
         instances: numObjects,
+        normalMatrix: true,
       });
-
-      const instanceNormalMatrix = new Float32Array(numObjects * 9);
 
       for (let i = 0; i < numObjects; i++) {
         let [x, z] = this.prng.sample();
@@ -317,10 +306,9 @@ export class Asteroids extends Transform {
         trs.multiply(rot);
         trs.scale(entityScale * Asteroids.getScale());
         trs.toArray(asteroid.geometry.attributes.instanceMatrix.data, i * 16);
-
-        const normalMatrix = new Mat3().getNormalMatrix(trs);
-        instanceNormalMatrix.set(normalMatrix, i * 9);
       }
+
+      asteroid.calculateNormals();
 
       this.tasks.push(
         this.engine.addOnBeforeRenderTask(() => {
@@ -337,24 +325,14 @@ export class Asteroids extends Transform {
               asteroid.geometry.attributes.instanceMatrix.data,
               i * 16
             );
-
-            const normalMatrix = tempMat3.getNormalMatrix(trs);
-            instanceNormalMatrix.set(normalMatrix, i * 9);
           }
 
+          asteroid.calculateNormals();
           asteroid.geometry.attributes.instanceMatrix.needsUpdate = true;
-          asteroid.geometry.attributes.instanceNormalMatrix.needsUpdate = true;
         })
       );
 
       asteroid.geometry.attributes.instanceMatrix.needsUpdate = true;
-      asteroid.geometry.addAttribute("instanceNormalMatrix", {
-        instanced: true,
-        size: 9,
-        data: instanceNormalMatrix,
-        usage: this.engine.gl.DYNAMIC_DRAW,
-        needsUpdate: true,
-      });
 
       asteroid.setParent(this);
     }
