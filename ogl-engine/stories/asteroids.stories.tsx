@@ -11,19 +11,20 @@ import models from "@assets/models";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { getFPoints } from "@core/archetypes/asteroidField";
 import { noop } from "@fxts/core";
+import type { MineableCommodity } from "@core/economy/commodity";
 import { Story3d, story3dMeta } from "./Story3d";
 import type { Story3dArgs } from "./Story3d";
 
 interface AsteroidsStoryProps extends Story3dArgs {
   size: number;
   density: number;
-  color: string;
 }
+
+const resources: MineableCommodity[] = ["fuelium", "goldOre", "ore"];
 
 const AsteroidsStory: React.FC<AsteroidsStoryProps> = ({
   size,
   density,
-  color,
   ...props
 }) => {
   const engineRef = React.useRef<Engine3D>();
@@ -32,7 +33,13 @@ const AsteroidsStory: React.FC<AsteroidsStoryProps> = ({
     engineRef.current = engine;
     engine.camera.position.set(1, 1, 1);
 
-    const asteroids = new Asteroids(engine, size, density, getFPoints(size));
+    const asteroids = new Asteroids(
+      engine,
+      size,
+      density,
+      getFPoints(size),
+      resources
+    );
     asteroids.setParent(engine.scene);
 
     const model = await assetLoader.getGltf(
@@ -56,13 +63,19 @@ const AsteroidsStory: React.FC<AsteroidsStoryProps> = ({
     );
     asteroids?.setParent(null);
 
-    const a = new Asteroids(engineRef.current, size, density, getFPoints(size));
+    const a = new Asteroids(
+      engineRef.current,
+      size,
+      density,
+      getFPoints(size),
+      resources
+    );
     a.setParent(engineRef.current.scene);
 
     return () => {
       a.setParent(null);
     };
-  }, [size, density, color]);
+  }, [size, density]);
 
   return (
     <Story3d
@@ -81,7 +94,6 @@ export default {
       args: {
         size: 10,
         density: 1,
-        color: "#ff0000",
       },
       argTypes: {
         color: {

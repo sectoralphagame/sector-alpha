@@ -15,7 +15,7 @@ uniform float fEmissive;
 void main() {
     float dist = distance(vUv, vec2(0.5f, 0.5f));
     fragData[0] = mix(uStart / 255.f, uEnd / 255.f, vT);
-    fragData[0].a *= sign((1.0f - 2.0f * dist));
+    fragData[0].a *= mix(1.f, 0.f, dist * 2.f);
 
     if(fragData[0].a < 0.01f) {
         discard;

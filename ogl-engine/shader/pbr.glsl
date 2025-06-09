@@ -3,7 +3,7 @@
 
 const float maxLodLevel = 8.0;
 
-vec4 pbr(vec3 albedo, vec3 norm, float metallic, float roughness, vec3 emissive, samplerCube tEnvMap, vec3 ambient, vec3 vTangent, vec3 vNormal) {
+vec4 pbr(vec3 albedo, vec3 norm, float metallic, float roughness, vec3 emissive, samplerCube tEnvMap, vec3 ambient) {
     float dist = length(worldPosition - cameraPosition);
     vec3 eyeDirection = normalize(cameraPosition - worldPosition);
     vec3 diffuse = vec3(0.0);

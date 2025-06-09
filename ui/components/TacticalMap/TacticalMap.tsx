@@ -27,6 +27,9 @@ import { defaultGameSttings } from "@core/settings";
 import merge from "lodash/merge";
 import { renderLogger } from "@core/log";
 import { DustCloud } from "@ogl-engine/builders/DustCloud";
+import { mineableCommoditiesArray } from "@core/economy/commodity";
+import { entityIndexer } from "@core/entityIndexer/entityIndexer";
+import { asteroidFieldComponents } from "@core/archetypes/asteroidField";
 import { EntityMesh } from "./EntityMesh";
 import { createShootHandler } from "./events/shoot";
 import { createExplodeHandler } from "./events/explode";
@@ -491,23 +494,27 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
   }
 
   loadAsteroidFields() {
-    const fields = this.sim.index.asteroidFields.getIt();
+    const fields = entityIndexer.searchBySector(
+      gameStore.sector.id,
+      asteroidFieldComponents
+    );
     for (const field of fields) {
-      if (field.cp.position.sector === gameStore.sector.id) {
-        const fieldTransform = new Asteroids(
-          this.engine,
-          field.cp.mineable.size,
-          field.cp.mineable.density,
-          field.cp.mineable.fPoints
-        );
-        fieldTransform.position.set(
-          field.cp.position.coord[0] * scale,
-          0,
-          field.cp.position.coord[1] * scale
-        );
-        fieldTransform.scale.set(scale);
-        this.engine.scene.addChild(fieldTransform);
-      }
+      const fieldTransform = new Asteroids(
+        this.engine,
+        field.cp.mineable.size,
+        field.cp.mineable.density,
+        field.cp.mineable.fPoints,
+        mineableCommoditiesArray.filter(
+          (m) => field.cp.mineable.resources[m] > 0
+        )
+      );
+      fieldTransform.position.set(
+        field.cp.position.coord[0] * scale,
+        0,
+        field.cp.position.coord[1] * scale
+      );
+      fieldTransform.scale.set(scale);
+      this.engine.scene.addChild(fieldTransform);
     }
   }
 

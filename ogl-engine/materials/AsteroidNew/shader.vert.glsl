@@ -10,6 +10,11 @@ in vec3 position;
 in vec3 normal;
 in vec3 tangent;
 
+#ifdef USE_INSTANCING
+in mat4 instanceMatrix;
+in mat3 instanceNormalMatrix;
+#endif
+
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
@@ -23,13 +28,24 @@ out vec3 worldPosition;
 out mat3 tbn;
 
 void main() {
-    vec4 mPosition = modelMatrix * vec4(position, 1.0f);
-    worldPosition = mPosition.xyz;
+    #ifdef USE_INSTANCING
+    vec4 mPosition = modelMatrix * instanceMatrix * vec4(position, 1.0f);
 
-    vUv = uv;
-    vNormal = normalize(mat3(modelMatrix) * normal);
-    vTangent = normalize(mat3(modelMatrix) * tangent);
+    vNormal = instanceNormalMatrix * normal;
+    vTangent = instanceNormalMatrix * tangent;
+    #else
+    vec4 mPosition = modelMatrix * vec4(position, 1.0f);
+
+    vNormal = mat3(modelMatrix) * normal;
+    vTangent = mat3(modelMatrix) * tangent;
+    #endif
+
+    vNormal = normalize(vNormal);
+    vTangent = normalize(vTangent);
+
     tbn = getTBN(vNormal, vTangent);
+    vUv = uv;
+    worldPosition = mPosition.xyz;
 
     gl_Position = projectionMatrix * viewMatrix * mPosition;
 }
