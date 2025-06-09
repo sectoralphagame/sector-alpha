@@ -23,6 +23,7 @@ export class BaseInstancedMesh<TMaterial extends Material = Material>
         material: TMaterial;
         name: string;
         calculateTangents: boolean;
+        instances: number;
       }
     >
   ) {
@@ -40,6 +41,10 @@ export class BaseInstancedMesh<TMaterial extends Material = Material>
     if (this.geometry && !this.geometry.attributes.tangent && this.tangents) {
       this.calculateTangents();
     }
+
+    if (options.instances) {
+      this.setInstancesCount(options.instances);
+    }
   }
 
   applyMaterial(material: TMaterial): BaseInstancedMesh<TMaterial> {
@@ -47,6 +52,21 @@ export class BaseInstancedMesh<TMaterial extends Material = Material>
     this.material.apply(this);
 
     return this;
+  }
+
+  setInstancesCount(count: number): void {
+    this.geometry.setInstancedCount(count);
+    this.geometry.addAttribute("instanceIndex", {
+      instanced: true,
+      size: 1,
+      data: new Uint16Array(count).map((_, i) => i),
+    });
+    this.geometry.addAttribute("instanceMatrix", {
+      instanced: true,
+      size: 16,
+      data: new Float32Array(count * 16),
+      needsUpdate: true,
+    });
   }
 
   private calculateTangents(): void {

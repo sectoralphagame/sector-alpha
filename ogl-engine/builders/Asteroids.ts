@@ -1,5 +1,5 @@
 import type { Vec2 } from "ogl";
-import { Euler, Geometry, Mat3, Mat4, Quat, Transform, Vec3 } from "ogl";
+import { Euler, Geometry, Mat3, Mat4, Plane, Quat, Transform, Vec3 } from "ogl";
 import type { ModelName } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
@@ -12,8 +12,9 @@ import { fieldColors } from "@core/archetypes/asteroidField";
 import type { MineableCommodity } from "@core/economy/commodity";
 import { map, pipe, sum } from "@fxts/core";
 import { AsteroidRockMaterial } from "@ogl-engine/materials/AsteroidRock/AsteroidRock";
+import { AsteroidDustMaterial } from "@ogl-engine/materials/asteroidDust/asteroidDust";
+import { BaseInstancedMesh } from "@ogl-engine/engine/BaseInstancedMesh";
 import type { Engine3D } from "../engine/engine3d";
-import { BaseMesh } from "../engine/BaseMesh";
 
 const axis = new Vec3();
 const tempMat4 = new Mat4();
@@ -22,6 +23,7 @@ const tempTrs = new Mat4();
 const tempQuat = new Quat();
 const tempEuler = new Euler();
 const tempTranslate = new Vec3();
+const emptyQuat = new Quat();
 
 export class Asteroids extends Transform {
   name = "Asteroids";
@@ -49,6 +51,7 @@ export class Asteroids extends Transform {
 
     this.createAsteroids(fPoints);
     this.createDebris(fPoints);
+    this.createDust(fPoints);
   }
 
   static getScale() {
@@ -58,6 +61,65 @@ export class Asteroids extends Transform {
     if (t < 0.99) return random(45, 90);
 
     return random(100, 200);
+  }
+
+  private async createDust(fPoints: [Vec2, number][]) {
+    await assetLoader.load(this.engine.gl);
+
+    const getDustNumber = (radius: number) =>
+      Math.ceil(radius ** 2 * this.density * 15);
+
+    const numObjects = pipe(
+      fPoints,
+      map(([, radius]) => getDustNumber(radius)),
+      sum
+    );
+
+    const material = new AsteroidDustMaterial(this.engine, "prop/smoke", {
+      alpha: 0.3,
+      color: "#b5b5b5",
+      emissive: 0,
+    });
+
+    const dust = new BaseInstancedMesh(this.engine, {
+      geometry: new Plane(this.engine.gl),
+      material,
+      frustumCulled: false,
+      instances: numObjects,
+    });
+
+    const pos = new Vec3();
+    const scale = new Vec3();
+
+    let counter = 0;
+    for (const [offset, radius] of fPoints) {
+      const r = radius * 1.2;
+      for (let i = 0; i < getDustNumber(radius); i++) {
+        do {
+          pos.set(random(-r, r), random(-1, 1), random(-r, r));
+        } while (pos.x ** 2 + pos.z ** 2 > r ** 2);
+
+        pos.x += offset.x;
+        pos.z += offset.y;
+
+        const factor = Math.random() > 0.7 ? 1.2 : 0.5;
+        scale.set(
+          (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1),
+          (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1),
+          (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1)
+        );
+
+        tempTrs
+          .compose(emptyQuat, pos, scale)
+          .toArray(dust.geometry.attributes.instanceMatrix.data!, counter * 16);
+
+        counter++;
+      }
+    }
+
+    dust.geometry.attributes.instanceMatrix.needsUpdate = true;
+
+    dust.setParent(this);
   }
 
   private async createDebris(fPoints: [Vec2, number][]) {
@@ -86,13 +148,13 @@ export class Asteroids extends Transform {
         instanced: true,
       });
 
-      const asteroid = new BaseMesh(this.engine, {
+      const asteroid = new BaseInstancedMesh(this.engine, {
         geometry: new Geometry(this.engine.gl, { ...gltf.geometry.attributes }),
         material,
         frustumCulled: false,
+        instances: numObjects,
       });
 
-      const instanceMatrix = new Float32Array(numObjects * 16);
       const instanceNormalMatrix = new Float32Array(numObjects * 9);
 
       let i = 0;
@@ -124,7 +186,7 @@ export class Asteroids extends Transform {
           );
           trs.multiply(rot);
           trs.scale(entityScale * random(1.5, 3.5));
-          trs.toArray(instanceMatrix, i * 16);
+          trs.toArray(asteroid.geometry.attributes.instanceMatrix.data, i * 16);
 
           const normalMatrix = new Mat3().getNormalMatrix(trs);
           instanceNormalMatrix.set(normalMatrix, i * 9);
@@ -132,12 +194,7 @@ export class Asteroids extends Transform {
           i++;
         }
 
-        asteroid.geometry.addAttribute("instanceMatrix", {
-          instanced: true,
-          size: 16,
-          data: instanceMatrix,
-          needsUpdate: true,
-        });
+        asteroid.geometry.attributes.instanceMatrix.needsUpdate = true;
         asteroid.geometry.addAttribute("instanceNormalMatrix", {
           instanced: true,
           size: 9,
@@ -184,13 +241,13 @@ export class Asteroids extends Transform {
         0.11,
         lerp(0.5, 2, this.density)
       );
-      const asteroid = new BaseMesh(this.engine, {
+      const asteroid = new BaseInstancedMesh(this.engine, {
         geometry: new Geometry(this.engine.gl, { ...gltf.geometry.attributes }),
         material,
         frustumCulled: false,
+        instances: numObjects,
       });
 
-      const instanceMatrix = new Float32Array(numObjects * 16);
       const instanceNormalMatrix = new Float32Array(numObjects * 9);
 
       let counter = 0;
@@ -222,7 +279,10 @@ export class Asteroids extends Transform {
           );
           trs.multiply(rot);
           trs.scale(entityScale * Asteroids.getScale());
-          trs.toArray(instanceMatrix, counter * 16);
+          trs.toArray(
+            asteroid.geometry.attributes.instanceMatrix.data,
+            counter * 16
+          );
 
           const normalMatrix = new Mat3().getNormalMatrix(trs);
           instanceNormalMatrix.set(normalMatrix, counter * 9);
@@ -256,13 +316,7 @@ export class Asteroids extends Transform {
         })
       );
 
-      asteroid.geometry.addAttribute("instanceMatrix", {
-        instanced: true,
-        size: 16,
-        data: instanceMatrix,
-        usage: this.engine.gl.DYNAMIC_DRAW,
-        needsUpdate: true,
-      });
+      asteroid.geometry.attributes.instanceMatrix.needsUpdate = true;
       asteroid.geometry.addAttribute("instanceNormalMatrix", {
         instanced: true,
         size: 9,
