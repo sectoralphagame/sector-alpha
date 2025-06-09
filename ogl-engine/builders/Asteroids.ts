@@ -10,10 +10,14 @@ import { lerp } from "@core/utils/misc";
 import { pickRandom } from "@core/utils/generators";
 import { fieldColors } from "@core/archetypes/asteroidField";
 import type { MineableCommodity } from "@core/economy/commodity";
-import { map, pipe, sum } from "@fxts/core";
+import { map, pipe, range, sum } from "@fxts/core";
 import { AsteroidRockMaterial } from "@ogl-engine/materials/AsteroidRock/AsteroidRock";
 import { AsteroidDustMaterial } from "@ogl-engine/materials/asteroidDust/asteroidDust";
 import { BaseInstancedMesh } from "@ogl-engine/engine/BaseInstancedMesh";
+import { Probability2D } from "@core/utils/rng";
+import { createNoise2D } from "simplex-noise";
+import Alea from "alea";
+import { toArray } from "lodash";
 import type { Engine3D } from "../engine/engine3d";
 
 const axis = new Vec3();
@@ -25,6 +29,10 @@ const tempEuler = new Euler();
 const tempTranslate = new Vec3();
 const emptyQuat = new Quat();
 
+const noiseRes = 1;
+const noiseScale = 10;
+const noiseThreshold = 0.55;
+
 export class Asteroids extends Transform {
   name = "Asteroids";
   size: number;
@@ -32,6 +40,8 @@ export class Asteroids extends Transform {
   engine: Engine3D;
   tasks: OnBeforeRenderTask[] = [];
   resources: MineableCommodity[];
+  prng: Probability2D;
+  noiseRng: (_x: number, _y: number) => number;
 
   constructor(
     engine: Engine3D,
@@ -48,6 +58,43 @@ export class Asteroids extends Transform {
     this.resources = resources;
 
     this.visible = false;
+
+    const noise = createNoise2D(
+      Alea(
+        fPoints
+          .map(([v, r]) => [v.x.toFixed(0), v.y.toFixed(0), r].join(","))
+          .join(":")
+      )
+    );
+    this.noiseRng = (x, y) => noise(x / noiseScale, y / noiseScale) * 0.5 + 0.5;
+    const startX = Math.min(...fPoints.map(([v, r]) => v.x - r));
+    const endX = Math.max(...fPoints.map(([v, r]) => v.x + r));
+    const startY = Math.min(...fPoints.map(([v, r]) => v.y - r));
+    const endY = Math.max(...fPoints.map(([v, r]) => v.y + r));
+    this.prng = new Probability2D(
+      pipe(
+        range(startY, endY, noiseRes),
+        map((y) =>
+          pipe(
+            range(startX, endX, noiseRes),
+            map((x) => {
+              const v = this.noiseRng(x, y);
+              const inFPoint = fPoints.some(
+                ([offset, r]) =>
+                  (x - offset.x) ** 2 + (y - offset.y) ** 2 <= r ** 2
+              )
+                ? 1
+                : 0;
+
+              return v * inFPoint < noiseThreshold ? 0 : v;
+            }),
+            toArray
+          )
+        ),
+        toArray
+      ),
+      [startX, startY]
+    );
 
     this.createAsteroids(fPoints);
     this.createDebris(fPoints);
@@ -67,7 +114,7 @@ export class Asteroids extends Transform {
     await assetLoader.load(this.engine.gl);
 
     const getDustNumber = (radius: number) =>
-      Math.ceil(radius ** 2 * this.density * 15);
+      Math.ceil(radius ** 2 * this.density * 5);
 
     const numObjects = pipe(
       fPoints,
@@ -76,8 +123,8 @@ export class Asteroids extends Transform {
     );
 
     const material = new AsteroidDustMaterial(this.engine, "prop/smoke", {
-      alpha: 0.3,
-      color: "#b5b5b5",
+      alpha: 0.25,
+      color: "#ffffff",
       emissive: 0,
     });
 
@@ -92,29 +139,27 @@ export class Asteroids extends Transform {
     const scale = new Vec3();
 
     let counter = 0;
-    for (const [offset, radius] of fPoints) {
-      const r = radius * 1.2;
-      for (let i = 0; i < getDustNumber(radius); i++) {
-        do {
-          pos.set(random(-r, r), random(-1, 1), random(-r, r));
-        } while (pos.x ** 2 + pos.z ** 2 > r ** 2);
+    for (let i = 0; i < numObjects; i++) {
+      const [x, z] = this.prng.sample();
+      pos.set(
+        x + random(-noiseRes / 2, noiseRes / 2),
+        random(-1, 1),
+        z + random(-noiseRes / 2, noiseRes / 2)
+      );
+      pos.scale(noiseRes);
 
-        pos.x += offset.x;
-        pos.z += offset.y;
+      const factor = Math.random() > 0.7 ? 1.7 : 0.5;
+      scale.set(
+        (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1),
+        (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1),
+        (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1)
+      );
 
-        const factor = Math.random() > 0.7 ? 1.2 : 0.5;
-        scale.set(
-          (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1),
-          (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1),
-          (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1)
-        );
+      tempTrs
+        .compose(emptyQuat, pos, scale)
+        .toArray(dust.geometry.attributes.instanceMatrix.data!, counter * 16);
 
-        tempTrs
-          .compose(emptyQuat, pos, scale)
-          .toArray(dust.geometry.attributes.instanceMatrix.data!, counter * 16);
-
-        counter++;
-      }
+      counter++;
     }
 
     dust.geometry.attributes.instanceMatrix.needsUpdate = true;
@@ -220,7 +265,7 @@ export class Asteroids extends Transform {
     ];
 
     const getAsteroidsNumber = (radius: number) =>
-      Math.ceil((radius ** 2 * this.density) / 20);
+      Math.ceil((radius ** 2 * this.density) / 100);
 
     const numObjects =
       pipe(
@@ -250,45 +295,31 @@ export class Asteroids extends Transform {
 
       const instanceNormalMatrix = new Float32Array(numObjects * 9);
 
-      let counter = 0;
-      for (const [offset, radius] of fPoints) {
-        for (let j = 0; j < getAsteroidsNumber(radius); j++) {
-          let x = 0;
-          let y = 0;
-          do {
-            x = random(-radius, radius);
-            y = random(-radius, radius);
-          } while (x ** 2 + y ** 2 > radius ** 2);
+      for (let i = 0; i < numObjects; i++) {
+        let [x, z] = this.prng.sample();
+        x += random(-noiseRes / 2, noiseRes / 2);
+        z += random(-noiseRes / 2, noiseRes / 2);
 
-          const trs = tempTrs.identity();
-          const translate = tempTranslate.set(
-            x + offset.x,
-            random(-radius / 10, radius / 10),
-            y + offset.y
-          );
-          trs.translate(translate);
+        const trs = tempTrs.identity();
+        const h = this.noiseRng(x, z) ** 2 * 2;
+        const translate = tempTranslate.set(x, random(-h, h), z);
+        trs.translate(translate);
 
-          const rot = tempMat4.fromQuaternion(
-            tempQuat.fromEuler(
-              tempEuler.set(
-                random(0, Math.PI * 2),
-                random(0, Math.PI * 2),
-                random(0, Math.PI * 2)
-              )
+        const rot = tempMat4.fromQuaternion(
+          tempQuat.fromEuler(
+            tempEuler.set(
+              random(0, Math.PI * 2),
+              random(0, Math.PI * 2),
+              random(0, Math.PI * 2)
             )
-          );
-          trs.multiply(rot);
-          trs.scale(entityScale * Asteroids.getScale());
-          trs.toArray(
-            asteroid.geometry.attributes.instanceMatrix.data,
-            counter * 16
-          );
+          )
+        );
+        trs.multiply(rot);
+        trs.scale(entityScale * Asteroids.getScale());
+        trs.toArray(asteroid.geometry.attributes.instanceMatrix.data, i * 16);
 
-          const normalMatrix = new Mat3().getNormalMatrix(trs);
-          instanceNormalMatrix.set(normalMatrix, counter * 9);
-
-          counter++;
-        }
+        const normalMatrix = new Mat3().getNormalMatrix(trs);
+        instanceNormalMatrix.set(normalMatrix, i * 9);
       }
 
       this.tasks.push(

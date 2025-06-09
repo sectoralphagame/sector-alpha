@@ -33,7 +33,6 @@ export class AsteroidDustMaterial extends Material {
       transparent: true,
       depthWrite: false,
       cullFace: false,
-      depthTest: false,
     });
 
     const tMap = new Texture(engine.gl, {
