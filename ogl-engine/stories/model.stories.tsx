@@ -10,6 +10,7 @@ import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { merge } from "lodash";
 import { getPane } from "@ui/context/Pane";
 import { AsteroidNewMaterial } from "@ogl-engine/materials/AsteroidNew/AsteroidNew";
+import { materials } from "@ogl-engine/materials";
 import type { Story3dArgs } from "./Story3d";
 import { Story3d, story3dMeta } from "./Story3d";
 
@@ -36,6 +37,10 @@ const ModelStory: React.FC<ModelStoryProps> = ({
       if (typeof modelInfo === "string") {
         meshRef.current = BaseMesh.fromGltf(engine, model, {
           material: new PbrMaterial(engine, model.materials[0]),
+        });
+      } else if (modelInfo.material in materials) {
+        meshRef.current = BaseMesh.fromGltf(engine, model, {
+          material: new materials[modelInfo.material](engine),
         });
       } else {
         meshRef.current = BaseMesh.fromGltf(engine, model, {

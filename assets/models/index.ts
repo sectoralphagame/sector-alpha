@@ -13,6 +13,10 @@ import asteroid3 from "@assets/models/world/asteroid_3.glb";
 import asteroid4 from "@assets/models/world/asteroid_4.glb";
 import asteroid5 from "@assets/models/world/asteroid_5.glb";
 import asteroid6 from "@assets/models/world/asteroid_6.glb";
+import asteroidSmall1 from "@assets/models/world/asteroid_small_1.glb";
+import asteroidSmall2 from "@assets/models/world/asteroid_small_2.glb";
+import asteroidSmall3 from "@assets/models/world/asteroid_small_3.glb";
+import asteroidSmall4 from "@assets/models/world/asteroid_small_4.glb";
 
 export default {
   "ship/sCiv": sCiv,
@@ -48,5 +52,20 @@ export default {
     model: asteroid6,
     material: "asteroidNew",
   },
-  // "world/asteroidIce1": asteroidIce1,
+  "world/asteroidSmall1": {
+    model: asteroidSmall1,
+    material: "asteroidRock",
+  },
+  "world/asteroidSmall2": {
+    model: asteroidSmall2,
+    material: "asteroidRock",
+  },
+  "world/asteroidSmall3": {
+    model: asteroidSmall3,
+    material: "asteroidRock",
+  },
+  "world/asteroidSmall4": {
+    model: asteroidSmall4,
+    material: "asteroidRock",
+  },
 };

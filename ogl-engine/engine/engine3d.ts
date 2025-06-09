@@ -17,19 +17,19 @@ import { dummyLight } from "./Light";
 import { Camera } from "./Camera";
 import { Engine } from "./engine";
 import { TacticalMapScene, type Scene } from "./Scene";
-import { Star } from "../builders/Star";
 import { OnBeforeRenderTask } from "./task";
 
 const bloomSize = 1.2;
 const lightsNum = 16;
 const bloomPasses = 8;
+const bloomDpr = 4; // 1/4 of the canvas size
 
 const tempVec3 = new Vec3();
 
 export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   canvas: HTMLCanvasElement;
   postProcessing = true;
-  fxaa = true;
+  fxaa = false;
   godrays = false;
   scene: TScene;
   /**
@@ -113,8 +113,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.renderTarget = new RenderTarget(gl, {
       // Color, bloom and UI
       color: 3,
-      width: gl.canvas.width * this.dpr,
-      height: gl.canvas.height * this.dpr,
     });
 
     this.uniforms.env.tEnvMap.value = new Texture(this.renderer.gl);
@@ -167,12 +165,14 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
     this.postProcessingLayers = {
       composite: {
-        post: new Post(gl),
+        post: new Post(gl, {
+          dpr: this.dpr,
+        }),
         passes: {},
       },
       bloom: {
         post: new Post(gl, {
-          dpr: this.dpr / 8,
+          dpr: this.dpr / bloomDpr,
           targetOnly: true,
           depth: false,
         }),
@@ -184,7 +184,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       pass: this.postProcessingLayers.bloom.post.addPass({
         fragment: brightPassFragment,
         uniforms: {
-          uThreshold: { value: 0.96 },
+          uThreshold: { value: 0.995 },
           tEmissive: { value: new Texture(gl) },
         },
       }),
@@ -334,21 +334,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     });
   };
 
-  private renderComposite = () => {
-    this.godraysPass.pass.uniforms.uSunPos.value.set(0.5, 0.5);
-
-    this.scene.traverse((m) => {
-      if (m instanceof Star) {
-        const v = m.position
-          .clone()
-          .applyMatrix4(this.camera.projectionViewMatrix);
-        this.godraysPass.pass.uniforms.uSunPos.value.set(
-          v.x / 2 + 0.5,
-          v.y / 2 + 0.5
-        );
-      }
-    });
-
+  private renderComposite() {
     // Disable compositePass pass, so this post will just render the scene for now
     for (const pass of this.postProcessingLayers.composite.post.passes) {
       pass.enabled = false;
@@ -380,7 +366,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       this.postProcessingLayers.composite.passes.tonemapping.enabled;
     this.godraysPass.pass.enabled = this.godraysPass.enabled;
     this.fxaaPass.pass.enabled = this.fxaa;
-    this.vignettePass.pass.enabled = true;
+    this.vignettePass.pass.enabled =
+      this.postProcessingLayers.composite.passes.vignette.enabled;
     this.postProcessingLayers.composite.passes.ui.pass.enabled =
       this.postProcessingLayers.composite.passes.ui.enabled;
     // Allow post to render to canvas upon its last pass
@@ -391,7 +378,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.postProcessingLayers.composite.post.render({
       texture: this.renderTarget.textures[0],
     });
-  };
+  }
 
   resize = () => {
     super.resize();
@@ -400,16 +387,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     const h = this.canvas!.parentElement!.clientHeight;
 
     // Update post classes
-    this.postProcessingLayers.composite.post.resize({
-      width: w,
-      height: h,
-      dpr: this.dpr,
-    });
-    this.postProcessingLayers.bloom.post.resize({
-      width: w,
-      height: h,
-      dpr: this.dpr / 4,
-    });
+    this.postProcessingLayers.composite.post.resize();
+    this.postProcessingLayers.bloom.post.resize();
     this.renderTarget.setSize(w * this.dpr, h * this.dpr);
 
     // Update uniforms

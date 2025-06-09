@@ -16,14 +16,7 @@ import type { DockSize } from "@core/components/dockable";
 import { taskPriority, type OnBeforeRenderTask } from "@ogl-engine/engine/task";
 import models from "@assets/models";
 import type { Material } from "@ogl-engine/materials/material";
-import { AsteroidNewMaterial } from "@ogl-engine/materials/AsteroidNew/AsteroidNew";
-import { ColorMaterial } from "@ogl-engine/materials/color/color";
-
-const materials = {
-  pbr: PbrMaterial,
-  default: ColorMaterial,
-  asteroidNew: AsteroidNewMaterial,
-};
+import { materials } from "@ogl-engine/materials";
 
 export const entityScale = 1 / 220;
 // FIXME: Remove after distance rebalancing
