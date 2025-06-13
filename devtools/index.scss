@@ -30,6 +30,33 @@
 }
 
 .root {
-  overflow-y: scroll;
-  height: 100vh;
+  padding-bottom: usesize(1.6);
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: var(--palette-background);
+  padding: usesize(0.8);
+  border-bottom: 1px solid var(--palette-border);
+  display: flex;
+  gap: usesize(1.6);
+  align-items: center;
+  z-index: 1;
+
+  .headerText {
+    margin-bottom: 0;
+  }
+}
+
+.main {
+  margin-top: usesize(6);
+}
+
+html,
+body,
+:global(#root) {
+  height: unset !important;
+  overflow: unset !important;
 }

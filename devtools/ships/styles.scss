@@ -16,7 +16,6 @@
 .root {
   display: grid;
   grid-template-columns: 1fr usesize(12);
-  height: 100vh;
 }
 .rootExpanded {
   grid-template-columns: 1fr usesize(35);
