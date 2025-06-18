@@ -10,6 +10,7 @@ import { Factions } from "./factions";
 import { Sectors } from "./Sectors";
 import { Charts } from "./charts";
 import FacilityBuilder from "./facilityBuilder";
+import { Layout } from "./layout";
 
 const DevToolsCard: React.FC<{
   link: string;
@@ -68,16 +69,18 @@ const DevToolsIndex: React.FC = () => (
 
 export const DevTools: React.FC = () => (
   <div className={styles.root}>
-    <Routes>
-      <Route path="ships" element={<Ships />} />
-      <Route path="map" element={<UniverseMap />} />
-      <Route path="facility-modules" element={<FacilityModules />} />
-      <Route path="factions" element={<Factions />} />
-      <Route path="sectors" element={<Sectors />} />
-      <Route path="charts/*" element={<Charts />} />
-      <Route path="facility-builder" element={<FacilityBuilder />} />
-      <Route path="/" element={<DevToolsIndex />} />
-    </Routes>
+    <Layout>
+      <Routes>
+        <Route path="ships" element={<Ships />} />
+        <Route path="map" element={<UniverseMap />} />
+        <Route path="facility-modules" element={<FacilityModules />} />
+        <Route path="factions" element={<Factions />} />
+        <Route path="sectors" element={<Sectors />} />
+        <Route path="charts/*" element={<Charts />} />
+        <Route path="facility-builder" element={<FacilityBuilder />} />
+        <Route path="/" element={<DevToolsIndex />} />
+      </Routes>
+    </Layout>
   </div>
 );
 
