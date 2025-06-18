@@ -6,6 +6,7 @@ precision highp float;
 
 in vec3 worldPosition;
 in vec3 vNormal;
+in float vFragDepth;
 
 out vec4 fragData[3];
 
@@ -15,6 +16,7 @@ uniform vec3 cameraPosition;
 uniform float fEmissive;
 uniform vec3 ambient;
 uniform Light lights[16];
+uniform float uCameraScale;
 
 #define shininess 64.0f
 
@@ -51,4 +53,5 @@ void main() {
 
     fragData[0].a = 1.0f;
     fragData[1] = vec4(fragData[0].xyz, fEmissive);
+    gl_FragDepth = log2(vFragDepth) / uCameraScale;
 }

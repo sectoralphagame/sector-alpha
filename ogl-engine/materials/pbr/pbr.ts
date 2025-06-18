@@ -14,10 +14,18 @@ export class PbrMaterial extends Material {
     uMetallic: { value: number };
   };
 
-  constructor(engine: Engine3D, gltfMaterial: GLTFMaterial) {
+  constructor(
+    engine: Engine3D,
+    gltfMaterial: GLTFMaterial,
+    args: { instanced?: boolean } = {}
+  ) {
     super(engine);
 
     const defines: Record<string, string> = {};
+
+    if (args.instanced) {
+      defines.USE_INSTANCING = "1";
+    }
 
     this.uniforms.tDiffuse = { value: gltfMaterial.baseColorTexture.texture };
     this.uniforms.tNormal = { value: gltfMaterial.normalTexture.texture };

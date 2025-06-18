@@ -16,9 +16,8 @@ export abstract class Material {
     ambient: { value: Vec3 };
     lights: Light["uniforms"][];
     uTime: { value: number };
-    fCameraNear: { value: number };
-    fCameraFar: { value: number };
     tEnvMap: { value: Texture };
+    uCameraScale: { value: number };
   };
 
   constructor(engine: Engine3D) {
@@ -27,9 +26,8 @@ export abstract class Material {
       ambient: engine.uniforms.env.ambient,
       lights: engine.uniforms.env.lights,
       uTime: engine.uniforms.uTime,
-      fCameraNear: { value: settings.camera.near },
-      fCameraFar: { value: settings.camera.far },
       tEnvMap: engine.uniforms.env.tEnvMap,
+      uCameraScale: { value: Math.log2(engine.camera.far) },
     };
   }
 
@@ -44,8 +42,7 @@ export abstract class Material {
           "ambient",
           "lights",
           "uTime",
-          "fCameraNear",
-          "fCameraFar",
+          "uCameraScale",
           "modelMatrix",
           "viewMatrix",
           "modelViewMatrix",

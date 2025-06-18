@@ -3,7 +3,7 @@ import { TextureLoader, type Texture } from "ogl";
 import asteroidGrunge from "@assets/textures/world/asteroidGrunge.png";
 import asteroidNormal from "@assets/textures/world/asteroidNormal.png";
 import fragment from "./shader.frag.glsl";
-import vertex from "./shader.vert.glsl";
+import vertex from "../pbr/shader.vert.glsl";
 import { Material } from "../material";
 
 interface AsteroidRockMaterialArgs {

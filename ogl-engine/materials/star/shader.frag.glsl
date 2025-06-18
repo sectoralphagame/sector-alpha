@@ -13,6 +13,7 @@ in vec2 vUv;
 in vec3 vPosition;
 in vec3 vWorldNormal;
 in vec3 vViewDirection;
+in float vFragDepth;
 in float fCameraDistance;
 
 out vec4 fragData[3];
@@ -24,6 +25,7 @@ uniform vec3 uColor2;
 uniform float uNoise;
 uniform float uNoisePower;
 uniform float uEmissive;
+uniform float uCameraScale;
 
 #define black vec3(0., 0., 0.)
 #define white vec3(1., 1., 1.)
@@ -44,4 +46,5 @@ void main() {
 
     fragData[0] = vec4(color + rimLighting, 1.0f);
     fragData[1] = vec4(color, uEmissive);
+    gl_FragDepth = log2(vFragDepth) / uCameraScale;
 }

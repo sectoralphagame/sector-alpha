@@ -7,6 +7,7 @@ in vec3 normal;
 
 out vec3 vNormal;
 out vec3 worldPosition;
+out float vFragDepth;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
@@ -19,4 +20,5 @@ void main() {
     vNormal = mat3(modelMatrix) * normal;
 
     gl_Position = projectionMatrix * viewMatrix * mPosition;
+    vFragDepth = 1.f + gl_Position.w;
 }
