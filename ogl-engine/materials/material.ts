@@ -1,4 +1,3 @@
-import settings from "@core/settings";
 import type { Engine } from "@ogl-engine/engine/engine";
 import type { Engine2D } from "@ogl-engine/engine/engine2d";
 import { entries, join, map, pipe } from "@fxts/core";
@@ -124,17 +123,10 @@ export abstract class Material {
 export abstract class Material2D {
   engine: Engine2D;
   protected program: Program;
-  protected uniforms: {
-    fCameraNear: { value: number };
-    fCameraFar: { value: number };
-  };
+  protected uniforms: {};
 
   constructor(engine: Engine2D) {
     this.engine = engine;
-    this.uniforms = {
-      fCameraNear: { value: settings.camera.near },
-      fCameraFar: { value: settings.camera.far },
-    };
   }
 
   apply(mesh: Mesh) {
