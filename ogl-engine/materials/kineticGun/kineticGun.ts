@@ -1,7 +1,7 @@
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { Vec4 } from "ogl";
 import fragment from "./shader.frag.glsl";
-import vertex from "./shader.vert.glsl";
+import vertex from "../orb/shader.vert.glsl";
 import { Material } from "../material";
 
 interface KineticGunMaterialArgs {

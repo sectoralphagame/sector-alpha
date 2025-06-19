@@ -14,7 +14,7 @@ export function createStartMiningHandler(
     const mesh = engine.getByEntityId(entity.id);
     if (mesh && !mesh?.children.some((child) => child.name === cloudName)) {
       const cloud = new CloudParticleGenerator(engine);
-      cloud.scale.set(0.2);
+      cloud.scale.set(20);
       cloud.name = cloudName;
       cloud.position.set(mesh!.position);
       cloud.setParent(engine.scene);

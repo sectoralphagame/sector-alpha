@@ -10,6 +10,7 @@ in vec2 vUv;
 in vec3 vTangent;
 in vec3 vNormal;
 in mat3 tbn;
+in float vFragDepth;
 
 uniform mat4 viewMatrix;
 uniform sampler2D tDiffuse;
@@ -18,6 +19,7 @@ uniform vec3 cameraPosition;
 uniform vec3 ambient;
 uniform Light lights[16];
 uniform samplerCube tEnvMap;
+uniform float uCameraScale;
 
 uniform float uMetallic;
 
@@ -59,4 +61,5 @@ void main() {
 
     fragData[0] = pbr(albedo, norm, metallic, roughness, emissive, tEnvMap, ambient);
     fragData[1] = vec4(fragData[0].rgb, luma(emissive));
+    gl_FragDepth = log2(vFragDepth) / uCameraScale;
 }

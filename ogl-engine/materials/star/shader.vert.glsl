@@ -12,6 +12,7 @@ out vec3 vWorldNormal;
 out vec3 vViewDirection;
 out vec2 vUv;
 out float fCameraDistance;
+out float vFragDepth;
 
 uniform float uTime;
 uniform mat4 modelMatrix;
@@ -38,4 +39,5 @@ void main() {
 
     // Standard position transformation for vertex shader
     gl_Position = projectionMatrix * viewMatrix * trs * vec4(position, 1.0f) + vec4(displacement, 1.0f);
+    vFragDepth = 1.0f + gl_Position.w;
 }

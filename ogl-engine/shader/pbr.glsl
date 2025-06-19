@@ -2,6 +2,7 @@
 #pragma glslify: luma = require(glsl-luma);
 
 const float maxLodLevel = 8.0;
+const float far = 10000.0;
 
 vec4 pbr(vec3 albedo, vec3 norm, float metallic, float roughness, vec3 emissive, samplerCube tEnvMap, vec3 ambient) {
     float dist = length(worldPosition - cameraPosition);
@@ -47,7 +48,7 @@ vec4 pbr(vec3 albedo, vec3 norm, float metallic, float roughness, vec3 emissive,
     vec3 reflection = reflectionColor * F;
     vec3 lighting = diffuse * (1. - metallic) + ambient + specular;
     vec3 ambientFade = normalize(ambient) - vec3(0.7);
-    float ambientFadeMix = clamp(log2(dist / 60.) - 1., 0., 1.);
+    float ambientFadeMix = clamp(log2(dist / far) - 1., 0., 1.);
 
     return vec4(mix(lighting * albedo + emissive + reflection, ambientFade, ambientFadeMix), 1.0);
 }

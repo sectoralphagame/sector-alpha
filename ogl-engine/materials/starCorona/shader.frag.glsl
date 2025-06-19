@@ -5,11 +5,13 @@ precision highp float;
 #pragma glslify: snoise3 = require(glsl-noise/simplex/3d)
 
 in vec2 vUv;
+in float vFragDepth;
 
 out vec4 fragData[3];
 
 uniform vec3 uColor;
 uniform float uTime;
+uniform float uCameraScale;
 
 #define endColor vec4(1.f, 1.f, 1.f, 0.f)
 #define noiseScale 5.
@@ -40,4 +42,6 @@ void main() {
     if(fragData[0].a < 0.01f) {
         discard;
     }
+
+    gl_FragDepth = log2(vFragDepth) / uCameraScale;
 }

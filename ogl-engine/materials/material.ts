@@ -1,4 +1,3 @@
-import settings from "@core/settings";
 import type { Engine } from "@ogl-engine/engine/engine";
 import type { Engine2D } from "@ogl-engine/engine/engine2d";
 import { entries, join, map, pipe } from "@fxts/core";
@@ -16,9 +15,8 @@ export abstract class Material {
     ambient: { value: Vec3 };
     lights: Light["uniforms"][];
     uTime: { value: number };
-    fCameraNear: { value: number };
-    fCameraFar: { value: number };
     tEnvMap: { value: Texture };
+    uCameraScale: { value: number };
   };
 
   constructor(engine: Engine3D) {
@@ -27,9 +25,8 @@ export abstract class Material {
       ambient: engine.uniforms.env.ambient,
       lights: engine.uniforms.env.lights,
       uTime: engine.uniforms.uTime,
-      fCameraNear: { value: settings.camera.near },
-      fCameraFar: { value: settings.camera.far },
       tEnvMap: engine.uniforms.env.tEnvMap,
+      uCameraScale: { value: Math.log2(engine.camera.far) },
     };
   }
 
@@ -44,8 +41,7 @@ export abstract class Material {
           "ambient",
           "lights",
           "uTime",
-          "fCameraNear",
-          "fCameraFar",
+          "uCameraScale",
           "modelMatrix",
           "viewMatrix",
           "modelViewMatrix",
@@ -127,17 +123,10 @@ export abstract class Material {
 export abstract class Material2D {
   engine: Engine2D;
   protected program: Program;
-  protected uniforms: {
-    fCameraNear: { value: number };
-    fCameraFar: { value: number };
-  };
+  protected uniforms: {};
 
   constructor(engine: Engine2D) {
     this.engine = engine;
-    this.uniforms = {
-      fCameraNear: { value: settings.camera.near },
-      fCameraFar: { value: settings.camera.far },
-    };
   }
 
   apply(mesh: Mesh) {

@@ -11,6 +11,7 @@ in float instanceIndex;
 
 out vec2 vUv;
 flat out float vInstanceIndex;
+out float vFragDepth;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
@@ -24,4 +25,5 @@ void main() {
     vec3 scale = vec3(length(instanceMatrix[0].xyz), length(instanceMatrix[1].xyz), length(instanceMatrix[2].xyz));
 
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(billboard(position * scale, viewMatrix) + offset, 1.f);
+    vFragDepth = 1.f + gl_Position.w;
 }

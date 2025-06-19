@@ -5,6 +5,7 @@ import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { CrossGeometry } from "@ogl-engine/engine/CrossGeometry";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
+import { distanceScale } from "@ui/components/TacticalMap/EntityMesh";
 import { gameStore } from "@ui/state/game";
 import { Vec3, Transform } from "ogl";
 
@@ -107,7 +108,11 @@ export class Path extends Transform {
 
         waypoints.push([
           this.engine.getByEntityId(targetWithPosition.id)?.position ??
-            tempZero,
+            new Vec3(
+              targetWithPosition.cp.position.coord.x,
+              0,
+              targetWithPosition.cp.position.coord.y
+            ).multiply(distanceScale),
           action.type === "attack" ? "warning" : "default",
         ]);
       }

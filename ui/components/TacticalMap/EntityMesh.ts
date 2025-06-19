@@ -18,11 +18,8 @@ import models from "@assets/models";
 import type { Material } from "@ogl-engine/materials/material";
 import { materials } from "@ogl-engine/materials";
 
-export const entityScale = 1 / 220;
-// FIXME: Remove after distance rebalancing
-const scale = 2;
-
 const tempVec3 = new Vec3();
+export const distanceScale = 250;
 
 export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
   name = "EntityIndicator";
@@ -130,7 +127,6 @@ export class EntityMesh extends BaseMesh {
     this.applyMaterial(material);
 
     this.engine = engine;
-    this.scale.set(entityScale);
     this.position.y = Math.random() * 5;
     this.entityId = entity.id;
     this.entity = entity;
@@ -202,9 +198,9 @@ export class EntityMesh extends BaseMesh {
 
   updatePosition() {
     this.position.set(
-      this.entity.cp.position.coord[0] * scale,
+      this.entity.cp.position.coord[0] * distanceScale,
       0,
-      this.entity.cp.position.coord[1] * scale
+      this.entity.cp.position.coord[1] * distanceScale
     );
     this.rotation.y = -this.entity.cp.position.angle;
     this.setVisibility(!this.entity.cp.render.hidden);
@@ -217,7 +213,7 @@ export class EntityMesh extends BaseMesh {
     const generator = new PGen(this.engine);
     generator.position.copy(input.position);
     generator.rotation.copy(input.rotation);
-    generator.scale.copy(input.scale).multiply(1 / entityScale);
+    generator.scale.copy(input.scale);
     generator.setParent(this);
     generator.updateMatrixWorld();
   }

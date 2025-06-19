@@ -6,7 +6,6 @@ import { DustCloud } from "@ogl-engine/builders/DustCloud";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
-import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import models from "@assets/models";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { noop } from "@fxts/core";
@@ -45,7 +44,6 @@ const DustCloudStory: React.FC<DustCloudStoryProps> = ({
       geometry: model.geometry,
     });
     ship.applyMaterial(new PbrMaterial(engine, model.material));
-    ship.scale.set(entityScale);
     ship.setParent(engine.scene);
   }, []);
 

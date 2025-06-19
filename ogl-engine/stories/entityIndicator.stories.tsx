@@ -6,10 +6,7 @@ import type { Engine } from "@ogl-engine/engine/engine";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
-import {
-  EntityIndicator,
-  entityScale,
-} from "@ui/components/TacticalMap/EntityMesh";
+import { EntityIndicator } from "@ui/components/TacticalMap/EntityMesh";
 import models from "@assets/models";
 import Color from "color";
 import type { DockSize } from "@core/components/dockable";
@@ -45,7 +42,6 @@ const EntityIndicatorStory: React.FC<EntityIndicatorStoryProps> = ({
       geometry: model.geometry,
     });
     ship.applyMaterial(new PbrMaterial(engine, model.material));
-    ship.scale.set(entityScale);
     ship.setParent(engine.scene);
 
     const indicator = new EntityIndicator(engine);

@@ -48,6 +48,9 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
   uniforms: {
     env: {
+      camera: {
+        scale: { value: number };
+      };
       ambient: { value: Vec3 };
       lights: Light["uniforms"][];
       tEnvMap: { value: Texture };
@@ -127,6 +130,9 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.uniforms = {
       env: {
         ambient: { value: new Vec3(0) },
+        camera: {
+          scale: { value: 1 },
+        },
         lights: [],
         tEnvMap: { value: null! },
         postProcessing: {

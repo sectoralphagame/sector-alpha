@@ -11,6 +11,7 @@ in float instanceIndex;
 in float t;
 
 out vec2 vUv;
+out float vFragDepth;
 flat out float vInstanceIndex;
 flat out float vT;
 
@@ -29,4 +30,5 @@ void main() {
     vec4 worldPosition = vec4(billboard(position * scale, viewMatrix) + offset, 1.f);
 
     gl_Position = projectionMatrix * viewMatrix * worldPosition;
+    vFragDepth = 1.f + gl_Position.w;
 }

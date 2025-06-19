@@ -5,6 +5,7 @@ precision highp float;
 #pragma glslify: triangle = require(./ogl-engine/shader/triangle);
 
 in vec2 vUv;
+in float vFragDepth;
 flat in float vInstanceIndex;
 
 out vec4 fragData[3];
@@ -14,6 +15,7 @@ uniform vec3 uColor;
 uniform float uEmissive;
 uniform float uAlpha;
 uniform float uTime;
+uniform float uCameraScale;
 uniform vec3 ambient;
 
 #define animSpeed 0.02f
@@ -27,4 +29,5 @@ void main() {
         discard;
 
     fragData[0] = vec4(uColor, alpha);
+    gl_FragDepth = log2(vFragDepth) / uCameraScale;
 }

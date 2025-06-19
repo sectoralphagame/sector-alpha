@@ -72,8 +72,7 @@ export class Skybox extends Mesh implements Destroyable {
               target: engine.gl.TEXTURE_CUBE_MAP,
             }),
           },
-          fCameraNear: { value: engine.camera.near },
-          fCameraFar: { value: engine.camera.far },
+          uCameraScale: { value: Math.log2(engine.camera.far) },
         },
         cullFace: null,
       }),
@@ -82,7 +81,7 @@ export class Skybox extends Mesh implements Destroyable {
 
     this.loadTexture(name);
     this.engine = engine;
-    this.scale.set(5e2);
+    this.scale.set(5e6);
     this.light = new Light(0.5, true);
     this.light.position.set(0, -1, -0.4);
     this.light.setParent(this);

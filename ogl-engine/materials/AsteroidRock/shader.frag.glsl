@@ -10,6 +10,7 @@ in vec2 vUv;
 in vec3 vTangent;
 in vec3 vNormal;
 in mat3 tbn;
+in float vFragDepth;
 
 uniform mat4 viewMatrix;
 uniform sampler2D tGrunge;
@@ -18,6 +19,7 @@ uniform vec3 cameraPosition;
 uniform vec3 ambient;
 uniform Light lights[16];
 uniform samplerCube tEnvMap;
+uniform float uCameraScale;
 
 out vec4 fragData[3];
 #define EPSILON 0.001f
@@ -40,4 +42,5 @@ void main() {
     float roughness = grungeMap.r;
 
     fragData[0] = pbr(albedo, norm, metallic, roughness, vec3(0.f), tEnvMap, ambient);
+    gl_FragDepth = log2(vFragDepth) / uCameraScale;
 }
