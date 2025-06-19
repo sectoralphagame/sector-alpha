@@ -30,8 +30,8 @@ export abstract class BackgroundProp extends Transform {
 
     this.paneFolder
       .addBinding(params, "distance", {
-        min: 5000,
-        max: 100000,
+        min: 50000,
+        max: 10000000,
       })
       .on("change", ({ value }) =>
         this.updatePositionFromSphericalCoords(
@@ -67,7 +67,7 @@ export abstract class BackgroundProp extends Transform {
     this.paneFolder
       .addBinding(params, "scale", {
         min: 200,
-        max: 10000,
+        max: 1e7,
       })
       .on("change", ({ value }) => {
         this.scale.set(Number(value));

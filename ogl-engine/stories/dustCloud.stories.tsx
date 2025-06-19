@@ -43,7 +43,7 @@ const DustCloudStory: React.FC<DustCloudStoryProps> = ({
     const ship = new BaseMesh(engine, {
       geometry: model.geometry,
     });
-    ship.applyMaterial(new PbrMaterial(engine, model.material));
+    ship.applyMaterial(PbrMaterial.fromGltfMaterial(engine, model.material));
     ship.setParent(engine.scene);
   }, []);
 

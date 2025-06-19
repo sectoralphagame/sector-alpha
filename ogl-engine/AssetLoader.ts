@@ -4,15 +4,18 @@ import type {
   GLTFMaterial,
   ImageRepresentation,
   OGLRenderingContext,
+  Texture,
   Vec3,
 } from "ogl";
-import { Euler, GLTFLoader } from "ogl";
+import { Euler, GLTFLoader, TextureLoader } from "ogl";
 import { chunk, fromEntries, keys, map, pipe, values } from "@fxts/core";
 import { skyboxes } from "@assets/textures/skybox";
 import smoke from "@assets/textures/particle/smoke.png";
 import fire from "@assets/textures/particle/fire.png";
 import asteroidGrunge from "@assets/textures/world/asteroidGrunge.png";
 import asteroidNormal from "@assets/textures/world/asteroidNormal.png";
+import ansuraDiffuse from "@assets/textures/world/ansura_diffuse.webp";
+import ansuraNormal from "@assets/textures/world/ansura_normal.webp";
 import spaceMonoTexture from "@assets/fonts/SpaceMono/SpaceMono-Regular.png";
 import firaSansTexture from "@assets/fonts/FiraSans/FiraSans-Light.png";
 import { renderLogger } from "@core/log";
@@ -29,6 +32,8 @@ const textures = {
   "font/firaSans": firaSansTexture,
   "world/asteroidGrunge": asteroidGrunge,
   "world/asteroidNormal": asteroidNormal,
+  "world/ansuraDiffuse": ansuraDiffuse,
+  "world/ansuraNormal": ansuraNormal,
 };
 export type TextureName = keyof typeof textures | "prop/smoke";
 
@@ -198,6 +203,13 @@ class AssetLoader {
       this.loadTexture(name);
     }
     return this.textures[name];
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  tx(gl: OGLRenderingContext, name: TextureName): Texture {
+    return TextureLoader.load(gl, {
+      src: textures[name],
+    });
   }
 }
 

@@ -326,7 +326,15 @@
         "silica": 8
       },
       "skybox": "example",
-      "props": []
+      "props": [
+        {
+          "type": "planet",
+          "position": [10000000.0, 1.4117958834, -0.1819434604],
+          "scale": 3116645.82,
+          "textureSet": "ansura",
+          "name": "Ansura"
+        }
+      ]
     },
     {
       "name": "GJ 1002 I",

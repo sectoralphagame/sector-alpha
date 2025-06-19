@@ -118,7 +118,7 @@ export class EntityMesh extends BaseMesh {
     let material: Material;
     const modelInfo = models[entity.cp.render.model];
     if (typeof modelInfo === "string") {
-      material = new PbrMaterial(engine, gltf.material);
+      material = PbrMaterial.fromGltfMaterial(engine, gltf.material);
     } else {
       material = new (materials[modelInfo.material] ?? materials.default)(
         engine

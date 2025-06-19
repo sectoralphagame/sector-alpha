@@ -16,8 +16,15 @@ export class PbrMaterial extends Material {
 
   constructor(
     engine: Engine3D,
-    gltfMaterial: GLTFMaterial,
-    args: { instanced?: boolean } = {}
+    args: {
+      instanced?: boolean;
+      diffuse: Texture;
+      normal: Texture;
+      roughness?: Texture;
+      roughnessFactor: number;
+      emissive?: Texture;
+      metallic: number;
+    }
   ) {
     super(engine);
 
@@ -27,26 +34,42 @@ export class PbrMaterial extends Material {
       defines.USE_INSTANCING = "1";
     }
 
-    this.uniforms.tDiffuse = { value: gltfMaterial.baseColorTexture.texture };
-    this.uniforms.tNormal = { value: gltfMaterial.normalTexture.texture };
-    this.uniforms.uMetallic = { value: gltfMaterial.metallicFactor };
+    this.uniforms.tDiffuse = { value: args.diffuse };
+    this.uniforms.tNormal = { value: args.normal };
+    this.uniforms.uMetallic = { value: args.metallic };
 
-    if (gltfMaterial.metallicRoughnessTexture) {
+    if (args.roughness) {
       this.uniforms.tRoughness = {
-        value: gltfMaterial.metallicRoughnessTexture.texture,
+        value: args.roughness,
       };
       defines.USE_ROUGHNESS = "1";
     } else {
-      this.uniforms.uRoughness = { value: gltfMaterial.roughnessFactor };
+      this.uniforms.uRoughness = { value: args.roughnessFactor };
     }
 
-    if (gltfMaterial.emissiveTexture) {
+    if (args.emissive) {
       this.uniforms.tEmissive = {
-        value: gltfMaterial.emissiveTexture.texture,
+        value: args.emissive,
       };
       defines.USE_EMISSIVE = "1";
     }
 
     this.createProgram(vertex, fragment, defines);
+  }
+
+  static fromGltfMaterial(
+    engine: Engine3D,
+    gltfMaterial: GLTFMaterial,
+    instanced = false
+  ): PbrMaterial {
+    return new PbrMaterial(engine, {
+      instanced,
+      diffuse: gltfMaterial.baseColorTexture.texture,
+      normal: gltfMaterial.normalTexture.texture,
+      roughness: gltfMaterial.metallicRoughnessTexture?.texture,
+      roughnessFactor: gltfMaterial.roughnessFactor,
+      emissive: gltfMaterial.emissiveTexture?.texture,
+      metallic: gltfMaterial.metallicFactor,
+    });
   }
 }

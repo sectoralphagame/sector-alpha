@@ -11,7 +11,6 @@ out vec3 vPosition;
 out vec3 vWorldNormal;
 out vec3 vViewDirection;
 out vec2 vUv;
-out float fCameraDistance;
 out float vFragDepth;
 
 uniform float uTime;
@@ -26,7 +25,6 @@ void main() {
     vWorldNormal = normalize(modelMatrix * vec4(normal, 0.0f)).xyz;
     vViewDirection = normalize(cameraPosition - worldPosition.xyz);
     vUv = uv;
-    fCameraDistance = distance(cameraPosition, worldPosition.xyz);
 
     float noise = snoise4(vec4(vPosition, uTime * 0.2f));
 

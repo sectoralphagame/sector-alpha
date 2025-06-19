@@ -27,7 +27,9 @@ const ModelStory: React.FC = () => {
 
       const gltf = await GLTFLoader.load(engine.gl, sCiv);
       const mesh = BaseMesh.fromGltf(engine, gltf);
-      mesh.applyMaterial(new PbrMaterial(engine, gltf.materials[0]));
+      mesh.applyMaterial(
+        PbrMaterial.fromGltfMaterial(engine, gltf.materials[0])
+      );
       engine.scene.addChild(mesh);
     });
 

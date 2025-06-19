@@ -41,7 +41,7 @@ const EntityIndicatorStory: React.FC<EntityIndicatorStoryProps> = ({
     const ship = new BaseMesh(engine, {
       geometry: model.geometry,
     });
-    ship.applyMaterial(new PbrMaterial(engine, model.material));
+    ship.applyMaterial(PbrMaterial.fromGltfMaterial(engine, model.material));
     ship.setParent(engine.scene);
 
     const indicator = new EntityIndicator(engine);
