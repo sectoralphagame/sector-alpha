@@ -69,8 +69,8 @@ export class Star extends Transform {
 
     this.paneFolder
       .addBinding(params, "distance", {
-        min: 50,
-        max: 10000,
+        min: 5000,
+        max: 100000,
       })
       .on("change", ({ value }) =>
         this.updatePositionFromSphericalCoords(
@@ -105,7 +105,7 @@ export class Star extends Transform {
       );
     this.paneFolder
       .addBinding(params, "scale", {
-        min: 500,
+        min: 200,
         max: 10000,
       })
       .on("change", ({ value }) => {

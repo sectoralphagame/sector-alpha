@@ -2,7 +2,6 @@ import type { Vec2 } from "ogl";
 import { Euler, Geometry, Mat4, Plane, Quat, Transform, Vec3 } from "ogl";
 import type { ModelName } from "@ogl-engine/AssetLoader";
 import { assetLoader } from "@ogl-engine/AssetLoader";
-import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import { random } from "mathjs";
 import type { OnBeforeRenderTask } from "@ogl-engine/engine/task";
 import { AsteroidNewMaterial } from "@ogl-engine/materials/AsteroidNew/AsteroidNew";
@@ -18,6 +17,7 @@ import { Probability2D } from "@core/utils/rng";
 import { createNoise2D } from "simplex-noise";
 import Alea from "alea";
 import { toArray } from "lodash";
+import { distanceScale } from "@ui/components/TacticalMap/EntityMesh";
 import type { Engine3D } from "../engine/engine3d";
 
 const axis = new Vec3();
@@ -144,7 +144,7 @@ export class Asteroids extends Transform {
         random(-1, 1),
         z + random(-noiseRes / 2, noiseRes / 2)
       );
-      pos.scale(noiseRes);
+      pos.scale(noiseRes * distanceScale);
 
       const factor = Math.random() > 0.7 ? 1.7 : 0.5;
       scale.set(
@@ -205,11 +205,9 @@ export class Asteroids extends Transform {
           } while (x ** 2 + y ** 2 > (radius * 1.4) ** 2);
 
           const trs = tempTrs.identity();
-          const translate = tempTranslate.set(
-            x + offset.x,
-            random(-1, 1),
-            y + offset.y
-          );
+          const translate = tempTranslate
+            .set(x + offset.x, random(-1, 1), y + offset.y)
+            .scale(distanceScale);
           trs.translate(translate);
 
           const rot = tempMat4.fromQuaternion(
@@ -222,7 +220,7 @@ export class Asteroids extends Transform {
             )
           );
           trs.multiply(rot);
-          trs.scale(entityScale * random(1.5, 3.5));
+          trs.scale(random(1.5, 3.5));
           asteroid.updateInstanceTrs(trs, i);
 
           i++;
@@ -282,7 +280,9 @@ export class Asteroids extends Transform {
 
         const trs = tempTrs.identity();
         const h = this.noiseRng(x, z) ** 2 * 2;
-        const translate = tempTranslate.set(x, random(-h, h), z);
+        const translate = tempTranslate
+          .set(x, random(-h, h), z)
+          .scale(distanceScale);
         trs.translate(translate);
 
         const rot = tempMat4.fromQuaternion(
@@ -295,7 +295,7 @@ export class Asteroids extends Transform {
           )
         );
         trs.multiply(rot);
-        trs.scale(entityScale * Asteroids.getScale());
+        trs.scale(Asteroids.getScale());
         asteroid.updateInstanceTrs(trs, i);
       }
 

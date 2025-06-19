@@ -30,7 +30,7 @@ import { DustCloud } from "@ogl-engine/builders/DustCloud";
 import { mineableCommoditiesArray } from "@core/economy/commodity";
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { asteroidFieldComponents } from "@core/archetypes/asteroidField";
-import { EntityMesh } from "./EntityMesh";
+import { EntityMesh, distanceScale } from "./EntityMesh";
 import { createShootHandler } from "./events/shoot";
 import { createExplodeHandler } from "./events/explode";
 import { createDeployFacilityHandler } from "./events/deployFacility";
@@ -38,9 +38,6 @@ import type { Prop } from "../../../core/world/map";
 import mapData from "../../../core/world/map";
 import { createStartMiningHandler } from "./events/startMining";
 import { createStopMiningHandler } from "./events/stopMining";
-
-// FIXME: This is just an ugly hotfix to keep distance between things larger
-const scale = 2;
 
 const tempCameraFocus = new Vec3();
 
@@ -220,7 +217,10 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       origin: new Vec3(0),
       normal: new Vec3(0, 1, 0),
     });
-    const worldPosition = new Vec2(worldPos.x / scale, worldPos.z / scale);
+    const worldPosition = new Vec2(
+      worldPos.x / distanceScale,
+      worldPos.z / distanceScale
+    );
 
     contextMenuStore.open({
       position: this.control.mouse.clone(),
@@ -509,11 +509,11 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         )
       );
       fieldTransform.position.set(
-        field.cp.position.coord[0] * scale,
+        field.cp.position.coord[0] * distanceScale,
         0,
-        field.cp.position.coord[1] * scale
+        field.cp.position.coord[1] * distanceScale
       );
-      fieldTransform.scale.set(scale);
+      fieldTransform.scale.set(1);
       this.engine.scene.addChild(fieldTransform);
     }
   }
@@ -538,7 +538,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
     if (data.type === "dust") {
       const dust = new DustCloud(this.engine, data.size, data.density);
       dust.position.set(data.position[0], data.position[1], data.position[2]);
-      dust.scale.set(scale);
+      dust.scale.set(distanceScale);
       dust.material.setColor(data.color);
       dust.name = data.name;
 

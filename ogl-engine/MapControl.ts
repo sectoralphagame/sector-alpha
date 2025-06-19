@@ -71,8 +71,8 @@ export class MapControl extends Orbit {
   constructor(camera: Camera, element: HTMLElement) {
     super(camera, element);
 
-    this.minDistance = 0.1;
-    this.maxDistance = 80;
+    this.minDistance = 1;
+    this.maxDistance = 10000;
 
     this.updateSettings();
     storageHook.subscribe("MapControl", (key) => {
@@ -188,11 +188,6 @@ export class MapControl extends Orbit {
   override update = (delta: number) => {
     super.update(delta);
 
-    const near = this.getNear();
-    if (this.camera.near !== near) {
-      this.camera.perspective({ near });
-    }
-
     if (!this.isFocused()) {
       return;
     }
@@ -214,11 +209,6 @@ export class MapControl extends Orbit {
       }
     });
   };
-
-  getNear() {
-    const distanceToFocus = this.camera.position.distance(this.target);
-    return Math.min(distanceToFocus * 0.1, 0.1);
-  }
 
   onMouseMovePersistent = (e: MouseEvent) => {
     this.cursorMoved = false;

@@ -6,7 +6,6 @@ import { Asteroids } from "@ogl-engine/builders/Asteroids";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
-import { entityScale } from "@ui/components/TacticalMap/EntityMesh";
 import models from "@assets/models";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { getFPoints } from "@core/archetypes/asteroidField";
@@ -51,7 +50,6 @@ const AsteroidsStory: React.FC<AsteroidsStoryProps> = ({
       geometry: model.geometry,
     });
     ship.applyMaterial(new PbrMaterial(engine, model.material));
-    ship.scale.set(entityScale);
     ship.setParent(engine.scene);
   }, []);
 
