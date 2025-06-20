@@ -34,6 +34,7 @@ interface PlanetProp {
   position: [number, number, number];
   scale: number;
   textureSet: "ansura";
+  atmosphere: [number, number];
 }
 
 interface Sector {
@@ -118,8 +119,21 @@ const propSchema: JSONSchemaType<Prop> = {
         scale: { type: "number" },
         name: { type: "string" },
         textureSet: { type: "string", enum: ["ansura"] },
+        atmosphere: {
+          type: "array",
+          items: { type: "number" },
+          minItems: 2,
+          maxItems: 2,
+        },
       },
-      required: ["type", "position", "scale", "name", "textureSet"],
+      required: [
+        "type",
+        "position",
+        "scale",
+        "name",
+        "textureSet",
+        "atmosphere",
+      ],
       additionalProperties: false,
     },
     {

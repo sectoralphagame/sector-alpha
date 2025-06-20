@@ -543,6 +543,8 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         data.position[2]
       );
       planet.scale.set(data.scale);
+      planet.atmosphere.material.uniforms.uX.value = data.atmosphere[0];
+      planet.atmosphere.material.uniforms.uY.value = data.atmosphere[1];
 
       return planet;
     }

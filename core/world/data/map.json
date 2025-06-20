@@ -329,10 +329,11 @@
       "props": [
         {
           "type": "planet",
-          "position": [10000000.0, 1.4117958834, -0.1819434604],
+          "position": [10000000.0, 3.2557741801, -0.1136479679],
           "scale": 3116645.82,
           "textureSet": "ansura",
-          "name": "Ansura"
+          "name": "Ansura",
+          "atmosphere": [-1.99, -8.28]
         }
       ]
     },
