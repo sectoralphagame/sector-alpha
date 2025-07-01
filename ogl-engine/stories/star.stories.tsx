@@ -19,6 +19,7 @@ const StarStory: React.FC<StarStoryProps> = (props) => {
     engineRef.current = engine;
     starRef.current = new Star(engine, "#f2a0ae");
     starRef.current.setParent(engine.scene);
+    starRef.current.updatePositionFromSphericalCoords(1, 0, 0);
     starRef.current.createPaneFolder();
     controlRef.current = new Orbit(engine.camera, {
       inertia: 0.8,
@@ -26,7 +27,7 @@ const StarStory: React.FC<StarStoryProps> = (props) => {
   }, []);
 
   const onUpdate = React.useCallback(() => {
-    controlRef.current!.update();
+    controlRef.current?.update();
   }, []);
 
   return <Story3d {...props} onEngineInit={onInit} onEngineUpdate={onUpdate} />;

@@ -139,7 +139,7 @@ export class RibbonEmitter extends BaseMesh<EngineTrailMaterial> {
       this.spawnSegment();
     }
 
-    this.updateGeometry();
+    if (this.trackedEntity.visible) this.updateGeometry();
   }
 
   spawnSegment() {

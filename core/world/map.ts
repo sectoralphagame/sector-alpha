@@ -15,6 +15,7 @@ interface StarProp {
   noise: number;
   noisePower: number;
   emissive: number;
+  corona?: [number, number];
   name: string;
 }
 
@@ -28,11 +29,20 @@ interface DustProp {
   name: string;
 }
 
+interface PlanetProp {
+  name: string;
+  type: "planet";
+  position: [number, number, number];
+  scale: number;
+  textureSet: "ansura" | "gaia";
+  atmosphere: [number, number];
+}
+
 interface Sector {
   id: string;
   name: string;
   position: number[];
-  props: Array<StarProp | DustProp>;
+  props: Array<StarProp | DustProp | PlanetProp>;
   resources: Record<string, number>;
   skybox: string;
 }
@@ -61,7 +71,7 @@ interface Faction {
   mining: MiningStrategy;
 }
 
-export type Prop = StarProp | DustProp;
+export type Prop = StarProp | DustProp | PlanetProp;
 const propSchema: JSONSchemaType<Prop> = {
   type: "object",
   required: [],
@@ -82,6 +92,12 @@ const propSchema: JSONSchemaType<Prop> = {
         noise: { type: "number" },
         noisePower: { type: "number" },
         emissive: { type: "number" },
+        corona: {
+          type: "array",
+          items: { type: "number" },
+          minItems: 2,
+          maxItems: 2,
+        },
         name: { type: "string" },
       },
       required: [
@@ -94,6 +110,36 @@ const propSchema: JSONSchemaType<Prop> = {
         "noisePower",
         "emissive",
         "name",
+      ],
+      additionalProperties: false,
+    },
+    {
+      type: "object",
+      properties: {
+        type: { type: "string", enum: ["planet"] },
+        position: {
+          type: "array",
+          items: { type: "number" },
+          minItems: 3,
+          maxItems: 3,
+        },
+        scale: { type: "number" },
+        name: { type: "string" },
+        textureSet: { type: "string", enum: ["ansura", "gaia", "none"] },
+        atmosphere: {
+          type: "array",
+          items: { type: "number" },
+          minItems: 2,
+          maxItems: 2,
+        },
+      },
+      required: [
+        "type",
+        "position",
+        "scale",
+        "name",
+        "textureSet",
+        "atmosphere",
       ],
       additionalProperties: false,
     },

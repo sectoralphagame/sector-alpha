@@ -30,6 +30,7 @@ import { DustCloud } from "@ogl-engine/builders/DustCloud";
 import { mineableCommoditiesArray } from "@core/economy/commodity";
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { asteroidFieldComponents } from "@core/archetypes/asteroidField";
+import { Planet } from "@ogl-engine/builders/Planet";
 import { EntityMesh, distanceScale } from "./EntityMesh";
 import { createShootHandler } from "./events/shoot";
 import { createExplodeHandler } from "./events/explode";
@@ -530,9 +531,27 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       star.scale.set(data.scale);
       star.body.material.uniforms.uNoise.value = data.noise;
       star.body.material.uniforms.uNoisePower.value = data.noisePower;
-      star.name = data.name;
+
+      if (data.corona) {
+        star.corona.material.uniforms.uX.value = data.corona[0];
+        star.corona.material.uniforms.uY.value = data.corona[1];
+      }
 
       return star;
+    }
+
+    if (data.type === "planet") {
+      const planet = new Planet(this.engine, data.textureSet);
+      planet.updatePositionFromSphericalCoords(
+        data.position[0],
+        data.position[1],
+        data.position[2]
+      );
+      planet.scale.set(data.scale);
+      planet.atmosphere.material.uniforms.uX.value = data.atmosphere[0];
+      planet.atmosphere.material.uniforms.uY.value = data.atmosphere[1];
+
+      return planet;
     }
 
     if (data.type === "dust") {
@@ -540,7 +559,6 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       dust.position.set(data.position[0], data.position[1], data.position[2]);
       dust.scale.set(distanceScale);
       dust.material.setColor(data.color);
-      dust.name = data.name;
 
       return dust;
     }

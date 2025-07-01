@@ -123,7 +123,7 @@ export abstract class Material {
 export abstract class Material2D {
   engine: Engine2D;
   protected program: Program;
-  protected uniforms: {};
+  protected uniforms: {} = {};
 
   constructor(engine: Engine2D) {
     this.engine = engine;

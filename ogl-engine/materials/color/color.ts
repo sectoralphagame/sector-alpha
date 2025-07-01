@@ -20,7 +20,7 @@ export class ColorMaterial extends Material {
     opts: {
       color?: string;
       shaded?: boolean;
-    }
+    } = {}
   ) {
     super(engine);
 

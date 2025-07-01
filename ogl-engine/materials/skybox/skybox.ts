@@ -34,10 +34,10 @@ const settings: Partial<
     direction: [4.2, -1, 2.9],
   },
   example: {
-    ambient: 0.19,
+    ambient: 0.021699,
     color: "#d0bdff",
-    intensity: 2.4,
-    direction: [2.04, -3.04, 0.28],
+    intensity: 0.97,
+    direction: [2.04, -3.04, -0.21],
   },
   earth: {
     ambient: 0.19,
@@ -46,10 +46,10 @@ const settings: Partial<
     direction: [0, -1, -0.4],
   },
   gaia: {
-    ambient: 0.05,
-    color: "#ebad7f",
-    intensity: 0.39,
-    direction: [0, -1, -0.4],
+    ambient: 0.01,
+    color: "#fff9f5",
+    intensity: 0.83,
+    direction: [-0.96, -0.891, -0.4],
   },
 };
 
@@ -81,7 +81,7 @@ export class Skybox extends Mesh implements Destroyable {
 
     this.loadTexture(name);
     this.engine = engine;
-    this.scale.set(5e6);
+    this.scale.set(5e7);
     this.light = new Light(0.5, true);
     this.light.position.set(0, -1, -0.4);
     this.light.setParent(this);

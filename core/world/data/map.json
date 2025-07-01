@@ -94,7 +94,16 @@
         "silica": 0
       },
       "skybox": "gaia",
-      "props": []
+      "props": [
+        {
+          "type": "planet",
+          "position": [10000000.0, 1.89, 0.15],
+          "scale": 1594937,
+          "textureSet": "gaia",
+          "name": "Gaia",
+          "atmosphere": [-2.01, -8.31]
+        }
+      ]
     },
     {
       "name": "Arges",
@@ -136,7 +145,24 @@
         "silica": 0
       },
       "skybox": "sectoralpha",
-      "props": []
+      "props": [
+        {
+          "type": "planet",
+          "position": [10000000.0, 3.3, 0.15],
+          "scale": 8007852,
+          "textureSet": "none",
+          "name": "Scylla",
+          "atmosphere": [-2.01, -8.31]
+        },
+        {
+          "type": "planet",
+          "position": [10000000.0, 0.16, 0.15],
+          "scale": 8007852,
+          "textureSet": "none",
+          "name": "Charybdis",
+          "atmosphere": [-2.01, -8.31]
+        }
+      ]
     },
     {
       "name": "Eris",
@@ -257,6 +283,18 @@
           "size": 6,
           "scale": 1,
           "name": "exampleDust1"
+        },
+        {
+          "type": "star",
+          "position": [10000000.0, 1.3659098494, 0.24],
+          "scale": 42909.74,
+          "color": "#9c5757",
+          "color2": "#fbc8a2",
+          "noise": -1.61,
+          "noisePower": 0.39,
+          "emissive": 0.3,
+          "corona": [-1.77, -4.86],
+          "name": "Teegarden's Star"
         }
       ]
     },
@@ -275,14 +313,15 @@
       "props": [
         {
           "type": "star",
-          "position": [10000, 1.3659098494, 0.24],
-          "scale": 381,
-          "color": "#b84545",
-          "color2": "#ffb986",
-          "noise": 2.5,
-          "noisePower": 0.5,
-          "emissive": 0.8,
-          "name": "Star"
+          "position": [10000000.0, 1.3659098494, 0.24],
+          "scale": 429029.74,
+          "color": "#9c5757",
+          "color2": "#fbc8a2",
+          "noise": -1.61,
+          "noisePower": 0.39,
+          "emissive": 0.3,
+          "corona": [-1.77, -4.86],
+          "name": "Teegarden's Star"
         }
       ]
     },
@@ -326,7 +365,16 @@
         "silica": 8
       },
       "skybox": "example",
-      "props": []
+      "props": [
+        {
+          "type": "planet",
+          "position": [10000000.0, 3.2557741801, -0.1136479679],
+          "scale": 3116645.82,
+          "textureSet": "ansura",
+          "name": "Ansura",
+          "atmosphere": [-1.99, -8.28]
+        }
+      ]
     },
     {
       "name": "GJ 1002 I",

@@ -1,7 +1,6 @@
 #version 300 es
 precision highp float;
 
-#pragma glslify: luma = require(glsl-luma);
 #pragma glslify: triangle = require(./ogl-engine/shader/triangle);
 
 in vec2 vUv;
@@ -21,8 +20,8 @@ uniform vec3 ambient;
 #define animSpeed 0.02f
 
 void main() {
-    vec3 value = texture(tMap, vUv).rgb;
-    float l = max(0.f, luma(value) - 0.1f);
+    float value = texture(tMap, vUv).r;
+    float l = max(0.f, value - 0.1f);
     float alpha = uAlpha * l * clamp(triangle(uTime * (mod(vInstanceIndex, 9.f) + 0.1f) * animSpeed + vInstanceIndex * 0.01f), 0.15f, 0.9f);
 
     if(alpha < 1.f / 255.f)

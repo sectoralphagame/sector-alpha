@@ -36,7 +36,7 @@ const ModelStory: React.FC<ModelStoryProps> = ({
     ).then((model) => {
       if (typeof modelInfo === "string") {
         meshRef.current = BaseMesh.fromGltf(engine, model, {
-          material: new PbrMaterial(engine, model.materials[0]),
+          material: PbrMaterial.fromGltfMaterial(engine, model.materials[0]),
         });
       } else if (modelInfo.material in materials) {
         meshRef.current = BaseMesh.fromGltf(engine, model, {

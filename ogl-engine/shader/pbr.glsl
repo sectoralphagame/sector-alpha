@@ -47,10 +47,8 @@ vec4 pbr(vec3 albedo, vec3 norm, float metallic, float roughness, vec3 emissive,
     vec3 F = F0 + (1.0 - F0) * pow(1.0 - NdotV, 5.0);
     vec3 reflection = reflectionColor * F;
     vec3 lighting = diffuse * (1. - metallic) + ambient + specular;
-    vec3 ambientFade = normalize(ambient) - vec3(0.7);
-    float ambientFadeMix = clamp(log2(dist / far) - 1., 0., 1.);
 
-    return vec4(mix(lighting * albedo + emissive + reflection, ambientFade, ambientFadeMix), 1.0);
+    return vec4(lighting * albedo + emissive + reflection, 1.0);
 }
 
 #pragma glslify: export(pbr)

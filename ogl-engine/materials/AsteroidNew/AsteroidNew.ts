@@ -1,7 +1,6 @@
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
-import { TextureLoader, Vec3, type Texture } from "ogl";
-import asteroidGrunge from "@assets/textures/world/asteroidGrunge.png";
-import asteroidNormal from "@assets/textures/world/asteroidNormal.png";
+import { Vec3, type Texture } from "ogl";
+import { assetLoader } from "@ogl-engine/AssetLoader";
 import fragment from "./shader.frag.glsl";
 import vertex from "../pbr/shader.vert.glsl";
 import { Material } from "../material";
@@ -30,14 +29,10 @@ export class AsteroidNewMaterial extends Material {
     }
 
     this.uniforms.tGrunge = {
-      value: TextureLoader.load(this.engine.gl, {
-        src: asteroidGrunge,
-      }),
+      value: assetLoader.tx(this.engine.gl, "world/asteroidGrunge"),
     };
     this.uniforms.tNormal = {
-      value: TextureLoader.load(this.engine.gl, {
-        src: asteroidNormal,
-      }),
+      value: assetLoader.tx(this.engine.gl, "world/asteroidNormal"),
     };
     this.uniforms.uMask = { value: 0.02 };
     this.uniforms.uColor = { value: new Vec3() };

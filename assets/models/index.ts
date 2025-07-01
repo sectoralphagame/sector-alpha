@@ -17,6 +17,7 @@ import asteroidSmall1 from "@assets/models/world/asteroid_small_1.glb";
 import asteroidSmall2 from "@assets/models/world/asteroid_small_2.glb";
 import asteroidSmall3 from "@assets/models/world/asteroid_small_3.glb";
 import asteroidSmall4 from "@assets/models/world/asteroid_small_4.glb";
+import planet from "@assets/models/world/planet.glb";
 
 export default {
   "ship/sCiv": sCiv,
@@ -68,4 +69,5 @@ export default {
     model: asteroidSmall4,
     material: "asteroidRock",
   },
+  "world/planet": planet,
 };
