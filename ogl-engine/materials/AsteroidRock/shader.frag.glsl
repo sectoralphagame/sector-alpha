@@ -28,7 +28,7 @@ out vec4 fragData[3];
 #pragma glslify: luma = require(glsl-luma);
 
 void main() {
-    if(distance(worldPosition, cameraPosition) > 100.f) {
+    if(distance(worldPosition, cameraPosition) > 10000.f) {
         discard;
     }
 

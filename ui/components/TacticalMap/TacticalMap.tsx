@@ -532,6 +532,11 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
       star.body.material.uniforms.uNoise.value = data.noise;
       star.body.material.uniforms.uNoisePower.value = data.noisePower;
 
+      if (data.corona) {
+        star.corona.material.uniforms.uX.value = data.corona[0];
+        star.corona.material.uniforms.uY.value = data.corona[1];
+      }
+
       return star;
     }
 

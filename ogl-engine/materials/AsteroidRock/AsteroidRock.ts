@@ -1,7 +1,6 @@
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
-import { TextureLoader, type Texture } from "ogl";
-import asteroidGrunge from "@assets/textures/world/asteroidGrunge.png";
-import asteroidNormal from "@assets/textures/world/asteroidNormal.png";
+import { type Texture } from "ogl";
+import { assetLoader } from "@ogl-engine/AssetLoader";
 import fragment from "./shader.frag.glsl";
 import vertex from "../pbr/shader.vert.glsl";
 import { Material } from "../material";
@@ -12,7 +11,7 @@ interface AsteroidRockMaterialArgs {
 
 export class AsteroidRockMaterial extends Material {
   uniforms: Material["uniforms"] & {
-    tDiffuse: { value: Texture };
+    tGrunge: { value: Texture };
     tNormal: { value: Texture };
   };
 
@@ -25,15 +24,11 @@ export class AsteroidRockMaterial extends Material {
       defines.USE_INSTANCING = "1";
     }
 
-    this.uniforms.tDiffuse = {
-      value: TextureLoader.load(this.engine.gl, {
-        src: asteroidGrunge,
-      }),
+    this.uniforms.tGrunge = {
+      value: assetLoader.tx(this.engine.gl, "world/asteroidGrunge"),
     };
     this.uniforms.tNormal = {
-      value: TextureLoader.load(this.engine.gl, {
-        src: asteroidNormal,
-      }),
+      value: assetLoader.tx(this.engine.gl, "world/asteroidNormal"),
     };
 
     this.createProgram(vertex, fragment, defines);

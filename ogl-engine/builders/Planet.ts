@@ -2,19 +2,20 @@ import { assetLoader } from "@ogl-engine/AssetLoader";
 import { PbrMaterial } from "@ogl-engine/materials/pbr/pbr";
 import { AtmosphereMaterial } from "@ogl-engine/materials/atmosphere/atmosphere";
 import { Sphere } from "ogl";
+import type { OnBeforeRenderTask } from "@ogl-engine/engine/task";
 import type { Engine3D } from "../engine/engine3d";
 import { BaseMesh } from "../engine/BaseMesh";
-import type { Engine } from "../engine/engine";
 import { BackgroundProp } from "./templates/BackgroundProp";
 
 export class Planet extends BackgroundProp {
-  engine: Engine;
+  engine: Engine3D;
   name = "Planet";
 
   atmosphere: BaseMesh<AtmosphereMaterial>;
   body: BaseMesh<PbrMaterial>;
+  task: OnBeforeRenderTask;
 
-  constructor(engine: Engine3D, textureSet: "ansura") {
+  constructor(engine: Engine3D, textureSet: "ansura" | "gaia") {
     super(engine);
 
     this.body = new BaseMesh(engine, {
@@ -41,6 +42,10 @@ export class Planet extends BackgroundProp {
     });
     this.atmosphere.scale.set(2.3);
     this.atmosphere.setParent(this);
+
+    this.task = this.engine.addOnBeforeRenderTask(() => {
+      this.rotation.y += this.engine.delta * 0.007;
+    }, 0);
   }
 
   createPaneFolder() {

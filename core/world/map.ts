@@ -15,6 +15,7 @@ interface StarProp {
   noise: number;
   noisePower: number;
   emissive: number;
+  corona?: [number, number];
   name: string;
 }
 
@@ -33,7 +34,7 @@ interface PlanetProp {
   type: "planet";
   position: [number, number, number];
   scale: number;
-  textureSet: "ansura";
+  textureSet: "ansura" | "gaia";
   atmosphere: [number, number];
 }
 
@@ -91,6 +92,12 @@ const propSchema: JSONSchemaType<Prop> = {
         noise: { type: "number" },
         noisePower: { type: "number" },
         emissive: { type: "number" },
+        corona: {
+          type: "array",
+          items: { type: "number" },
+          minItems: 2,
+          maxItems: 2,
+        },
         name: { type: "string" },
       },
       required: [
@@ -118,7 +125,7 @@ const propSchema: JSONSchemaType<Prop> = {
         },
         scale: { type: "number" },
         name: { type: "string" },
-        textureSet: { type: "string", enum: ["ansura"] },
+        textureSet: { type: "string", enum: ["ansura", "gaia", "none"] },
         atmosphere: {
           type: "array",
           items: { type: "number" },

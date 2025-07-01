@@ -124,7 +124,7 @@ export class Asteroids extends Transform {
     const material = new AsteroidDustMaterial(this.engine, "prop/smoke", {
       alpha: 0.25,
       color: "#ffffff",
-      emissive: 0,
+      emissive: 0.0,
     });
 
     const dust = new BaseInstancedMesh(this.engine, {
@@ -144,14 +144,16 @@ export class Asteroids extends Transform {
         random(-1, 1),
         z + random(-noiseRes / 2, noiseRes / 2)
       );
-      pos.scale(noiseRes * distanceScale);
+      pos.scale(noiseRes).scale(distanceScale);
 
       const factor = Math.random() > 0.7 ? 1.7 : 0.5;
-      scale.set(
-        (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1),
-        (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1),
-        (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1)
-      );
+      scale
+        .set(
+          (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1),
+          (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1),
+          (Math.random() * 0.5 + 0.5) * factor * (Math.random() > 0.5 ? 1 : -1)
+        )
+        .scale(distanceScale);
 
       const trs = tempTrs.compose(emptyQuat, pos, scale);
       dust.updateInstanceTrs(trs, i);
@@ -171,7 +173,7 @@ export class Asteroids extends Transform {
     ];
 
     const getDebrisNumber = (radius: number) =>
-      Math.ceil(radius ** 2 * this.density);
+      Math.ceil(radius ** 2 * this.density * 2);
 
     const numObjects =
       pipe(

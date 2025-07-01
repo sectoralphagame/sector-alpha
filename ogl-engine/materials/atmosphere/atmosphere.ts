@@ -6,6 +6,8 @@ import { Material } from "../material";
 
 interface AtmosphereMaterialArgs {
   color: string;
+  uX?: number;
+  uY?: number;
 }
 
 export class AtmosphereMaterial extends Material {
@@ -39,10 +41,10 @@ export class AtmosphereMaterial extends Material {
       value: new Vec3(),
     };
     this.uniforms.uX = {
-      value: -1.96,
+      value: args.uX ?? -1.96,
     };
     this.uniforms.uY = {
-      value: -8.15,
+      value: args.uY ?? -8.15,
     };
 
     this.setColor(args.color);

@@ -16,6 +16,8 @@ import asteroidGrunge from "@assets/textures/world/asteroidGrunge.png";
 import asteroidNormal from "@assets/textures/world/asteroidNormal.png";
 import ansuraDiffuse from "@assets/textures/world/ansura_diffuse.webp";
 import ansuraNormal from "@assets/textures/world/ansura_normal.webp";
+import gaiaDiffuse from "@assets/textures/world/gaia_diffuse.webp";
+import gaiaNormal from "@assets/textures/world/gaia_normal.webp";
 import spaceMonoTexture from "@assets/fonts/SpaceMono/SpaceMono-Regular.png";
 import firaSansTexture from "@assets/fonts/FiraSans/FiraSans-Light.png";
 import { renderLogger } from "@core/log";
@@ -34,6 +36,8 @@ const textures = {
   "world/asteroidNormal": asteroidNormal,
   "world/ansuraDiffuse": ansuraDiffuse,
   "world/ansuraNormal": ansuraNormal,
+  "world/gaiaDiffuse": gaiaDiffuse,
+  "world/gaiaNormal": gaiaNormal,
 };
 export type TextureName = keyof typeof textures | "prop/smoke";
 
