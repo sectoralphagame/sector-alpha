@@ -73,6 +73,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
           uGamma: { value: number };
           uSaturation: { value: number };
           uContrast: { value: number };
+          uAces: { value: number };
         };
       };
     };
@@ -154,6 +155,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
             uGamma: { value: 1.08 },
             uContrast: { value: 1 },
             uSaturation: { value: 1 },
+            uAces: { value: 1 },
           },
         },
       },

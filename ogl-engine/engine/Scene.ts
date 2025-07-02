@@ -169,6 +169,15 @@ export class TacticalMapScene extends Scene {
         max: 2,
       }
     );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.tonemapping.uAces,
+      "value",
+      {
+        label: "ACES Enabled",
+        min: 0,
+        max: 1,
+      }
+    );
   }
 
   destroy() {
