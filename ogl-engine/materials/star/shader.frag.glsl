@@ -37,9 +37,9 @@ void main() {
     vec3 scaledPosition = vec3(vPosition.x * noiseScaleZ, vPosition.y, vPosition.z * noiseScaleZ);
     float baseNoise = snoise4(vec4(scaledPosition * uNoise, uTime * 0.06f));
     float noise = clamp(snoise2(vec2(baseNoise * uNoisePower, uTime * 0.001f)), 0.0f, 0.3f);
-    vec3 smokeColor = vec3(fbm3(scaledPosition, 7)) + 0.1f;
+    float smokeColor = fbm3(scaledPosition, 7) + 0.1f;
 
-    vec3 color = mix(uColor, uColor2, smokeColor + noise);
+    vec3 color = pow(mix(uColor, uColor2, smokeColor + noise), vec3(4.f)) * 10000.f;
 
     vec3 rimLighting = rim(rimPower, vViewDirection, vWorldNormal, mix(white, uColor, 0.9f));
 

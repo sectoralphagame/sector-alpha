@@ -73,7 +73,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
           uGamma: { value: number };
           uSaturation: { value: number };
           uContrast: { value: number };
-          uAces: { value: number };
+          uExposure: { value: number };
+          uMap: { value: number };
         };
       };
     };
@@ -107,6 +108,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   init = (canvas: HTMLCanvasElement) => {
     super.init(canvas);
 
+    this.gl.getExtension("EXT_color_buffer_float");
+    this.gl.getExtension("WEBGL_color_buffer_float");
+    this.gl.getExtension("OES_texture_half_float");
+    this.gl.getExtension("OES_texture_half_float_linear");
+
     const gl = this.renderer.gl;
     this.camera = new Camera(this);
     this.camera.position.set(50, 50, 50);
@@ -117,6 +123,9 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.renderTarget = new RenderTarget(gl, {
       // Color, bloom and UI
       color: 3,
+      type: gl.HALF_FLOAT,
+      format: gl.RGBA,
+      internalFormat: gl.RGBA16F,
     });
 
     this.uniforms.env.tEnvMap.value = new Texture(this.renderer.gl);
@@ -155,7 +164,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
             uGamma: { value: 1.08 },
             uContrast: { value: 1 },
             uSaturation: { value: 1 },
-            uAces: { value: 1 },
+            uExposure: { value: 1.03 },
+            uMap: { value: 1 },
           },
         },
       },

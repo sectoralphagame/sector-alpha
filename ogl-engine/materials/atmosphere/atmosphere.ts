@@ -41,10 +41,10 @@ export class AtmosphereMaterial extends Material {
       value: new Vec3(),
     };
     this.uniforms.uX = {
-      value: args.uX ?? -1.96,
+      value: args.uX ?? -0.3,
     };
     this.uniforms.uY = {
-      value: args.uY ?? -8.15,
+      value: args.uY ?? -0.75,
     };
 
     this.setColor(args.color);

@@ -14,30 +14,27 @@ vec4 pbr(vec3 albedo, vec3 norm, float metallic, float roughness, vec3 emissive,
     F0 = mix(F0, albedo, metallic);
 
     for(int i = 0; i < lights.length(); i++) {
-        if(lights[i].visible) {
-            vec3 lightDir = vec3(0.0);
-            float intensity = lights[i].intensity;
-            if(lights[i].position.w == 0.0) {
-                lightDir = normalize(-lights[i].position.xyz);
-            } else {
-                vec3 d = lights[i].position.xyz - worldPosition;
-                lightDir = normalize(d);
-                float dist = length(d);
-                intensity /= 1.0 + dist + pow(dist, 2.0);
-                if(intensity < 0.01) {
-                    continue;
-                }
-            }
-            float diff = max(dot(norm, lightDir), 0.0);
-            vec3 color = lights[i].color * intensity;
-            diffuse += diff * color;
-            specular += cookTorranceSpec(lightDir, eyeDirection, norm, roughness, luma(F0)) * color;
+        if(!lights[i].visible) {
+            continue;
         }
-    }
 
-    float specularPower = luma(specular);
-    if(specularPower < 0.9) {
-        specularPower = 0.;
+        vec3 lightDir = vec3(0.0);
+        float intensity = lights[i].intensity;
+        if(lights[i].position.w == 0.0) {
+            lightDir = normalize(-lights[i].position.xyz);
+        } else {
+            vec3 d = lights[i].position.xyz - worldPosition;
+            lightDir = normalize(d);
+            float dist = length(d);
+            intensity /= 1.0 + dist + pow(dist, 2.0);
+            if(intensity < 0.01) {
+                continue;
+            }
+        }
+        float diff = max(dot(norm, lightDir), 0.0);
+        vec3 color = lights[i].color * intensity;
+        diffuse += diff * color;
+        specular += cookTorranceSpec(lightDir, eyeDirection, norm, roughness, luma(F0)) * color;
     }
 
     vec3 reflectedDir = reflect(-eyeDirection, norm);

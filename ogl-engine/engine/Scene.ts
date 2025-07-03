@@ -170,10 +170,19 @@ export class TacticalMapScene extends Scene {
       }
     );
     this.pane.addBinding(
-      this.engine.uniforms.env.postProcessing.tonemapping.uAces,
+      this.engine.uniforms.env.postProcessing.tonemapping.uExposure,
       "value",
       {
-        label: "ACES Enabled",
+        label: "Exposure",
+        min: 0.5,
+        max: 2.5,
+      }
+    );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.tonemapping.uMap,
+      "value",
+      {
+        label: "Tonemapping Enabled",
         min: 0,
         max: 1,
       }
