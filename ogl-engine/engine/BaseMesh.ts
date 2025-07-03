@@ -1,5 +1,5 @@
 import type { Material } from "@ogl-engine/materials/material";
-import type { AttributeData, Camera, Geometry, GLTF, MeshOptions } from "ogl";
+import type { AttributeData, Geometry, GLTF, MeshOptions } from "ogl";
 import { Mat4, Mesh, Vec3 } from "ogl";
 import { MissingMaterial } from "@ogl-engine/materials/missing/missing";
 import type { Destroyable } from "@ogl-engine/types";
@@ -170,21 +170,6 @@ export class BaseMesh<TMaterial extends Material = Material>
   destroy() {
     for (const cb of this.onDestroyCallbacks) {
       cb();
-    }
-  }
-
-  draw(options?: { camera?: Camera | undefined } | undefined): void {
-    const start = performance.now();
-    super.draw(options);
-    const end = performance.now();
-
-    if (this.engine.capturePerformance) {
-      this.engine.performanceReport.push({
-        id: this.id,
-        label: this.name,
-        time: end - start,
-        parent: (this.parent as any)?.id,
-      });
     }
   }
 

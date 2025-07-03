@@ -304,6 +304,6 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
   }
 
   render() {
-    return <OglCanvas engine={this.engine} fpsCounter={false} />;
+    return <OglCanvas engine={this.engine} />;
   }
 }
