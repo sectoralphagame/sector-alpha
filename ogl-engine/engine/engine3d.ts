@@ -123,8 +123,10 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.renderTarget = new RenderTarget(gl, {
       // Color, bloom and UI
       color: 3,
+      // @ts-expect-error type resolution fails for some reason
       type: gl.HALF_FLOAT,
       format: gl.RGBA,
+      // @ts-expect-error type resolution fails for some reason
       internalFormat: gl.RGBA16F,
     });
 
