@@ -40,7 +40,7 @@ export class Planet extends BackgroundProp {
       }),
       frustumCulled: false,
     });
-    this.atmosphere.scale.set(2.3);
+    this.atmosphere.scale.set(2.15);
     this.atmosphere.setParent(this);
 
     this.task = this.engine.addOnBeforeRenderTask(() => {

@@ -27,18 +27,14 @@ void main() {
 
     float intensity = 0.0f;
     for(int i = 0; i < lights.length(); i++) {
-        if(lights[i].visible) {
+        if(lights[i].visible && lights[i].position.w == 0.0) {
             vec3 lightDir = vec3(0.0);
-            if(lights[i].position.w == 0.0) {
-                lightDir = normalize(-lights[i].position.xyz);
-            } else {
-                continue;
-            }
+            lightDir = normalize(-lights[i].position.xyz);
             float diff = max(dot(norm, lightDir), 0.0);
             intensity += lights[i].intensity * diff;
         }
     }
-    intensity = clamp(intensity, 0.1f, 1.0f);
+    intensity = clamp(intensity, 0.1f, 10.0f);
 
     fragData[0] = vec4(uColor * density, density * intensity);
     fragData[1] = fragData[0] * fEmissive;

@@ -4,6 +4,7 @@ import settings from "@core/settings";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
 import { gameStore } from "@ui/state/game";
 import { sortBy } from "@fxts/core";
+import { getPane } from "@ui/context/Pane";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
@@ -18,6 +19,7 @@ import { Camera } from "./Camera";
 import { Engine } from "./engine";
 import { TacticalMapScene, type Scene } from "./Scene";
 import { OnBeforeRenderTask } from "./task";
+import { RenderingPerformance } from "./performance";
 
 const bloomSize = 1.2;
 const lightsNum = 16;
@@ -32,17 +34,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   fxaa = false;
   godrays = false;
   scene: TScene;
-  /**
-   * Capture performance metrics for the next frame
-   */
-  willCapturePerformance = false;
-  capturePerformance = false;
-  performanceReport: Array<{
-    id: number;
-    time: number;
-    label: string;
-    parent: number;
-  }> = [];
+  performance = new RenderingPerformance();
 
   fxOwners: Record<number, Transform[]> = {};
 
@@ -73,6 +65,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
           uGamma: { value: number };
           uSaturation: { value: number };
           uContrast: { value: number };
+          uExposure: { value: number };
+          uMap: { value: number };
         };
       };
     };
@@ -100,11 +94,41 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
   constructor() {
     super();
+
+    const folder = getPane().addOrReplaceFolder({
+      title: "Renderer",
+      expanded: true,
+    });
+    folder.addBinding(this.performance, "fps", {
+      readonly: true,
+      interval: 500,
+      label: "FPS",
+    });
+    folder.addBinding(this.performance, "fps", {
+      view: "graph",
+      label: "FPS Graph",
+      interval: 500,
+      readonly: true,
+    });
+    folder.addBinding(this.performance, "averageFrameTime", {
+      view: "graph",
+      label: "Avg Frame Time [ms]",
+      interval: 500,
+      readonly: true,
+      min: 0,
+      max: 4,
+    });
+
     this.initUniforms();
   }
 
   init = (canvas: HTMLCanvasElement) => {
     super.init(canvas);
+
+    this.gl.getExtension("EXT_color_buffer_float");
+    this.gl.getExtension("WEBGL_color_buffer_float");
+    this.gl.getExtension("OES_texture_half_float");
+    this.gl.getExtension("OES_texture_half_float_linear");
 
     const gl = this.renderer.gl;
     this.camera = new Camera(this);
@@ -116,6 +140,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.renderTarget = new RenderTarget(gl, {
       // Color, bloom and UI
       color: 3,
+      // @ts-expect-error type resolution fails for some reason
+      type: gl.HALF_FLOAT,
+      format: gl.RGBA,
+      // @ts-expect-error type resolution fails for some reason
+      internalFormat: gl.RGBA16F,
     });
 
     this.uniforms.env.tEnvMap.value = new Texture(this.renderer.gl);
@@ -154,6 +183,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
             uGamma: { value: 1.08 },
             uContrast: { value: 1 },
             uSaturation: { value: 1 },
+            uExposure: { value: 1.03 },
+            uMap: { value: 1 },
           },
         },
       },
@@ -316,11 +347,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   }
 
   render() {
-    if (this.willCapturePerformance) {
-      this.capturePerformance = true;
-      this.willCapturePerformance = false;
-    }
-
+    this.performance.updateTimeToNextFrame();
+    const startTime = performance.now();
     this.prepareLighting();
 
     if (this.postProcessing) {
@@ -328,8 +356,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     } else {
       this.renderSimple();
     }
+    this.performance.updateFrameTime(performance.now() - startTime);
 
-    this.capturePerformance = false;
     this.executeOnBeforeRenderTasks();
   }
 
@@ -480,11 +508,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.fxOwners = {};
 
     super.setScene(scene);
-  }
-
-  capture() {
-    this.willCapturePerformance = true;
-    this.capturePerformance = false;
   }
 
   addOnBeforeRenderTask(task: () => void, priority?: number) {

@@ -169,6 +169,24 @@ export class TacticalMapScene extends Scene {
         max: 2,
       }
     );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.tonemapping.uExposure,
+      "value",
+      {
+        label: "Exposure",
+        min: 0.5,
+        max: 2.5,
+      }
+    );
+    this.pane.addBinding(
+      this.engine.uniforms.env.postProcessing.tonemapping.uMap,
+      "value",
+      {
+        label: "Tonemapping Enabled",
+        min: 0,
+        max: 1,
+      }
+    );
   }
 
   destroy() {

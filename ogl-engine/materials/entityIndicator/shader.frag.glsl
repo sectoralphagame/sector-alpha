@@ -85,5 +85,5 @@ void main() {
         discard;
     }
 
-    fragData[2] = vec4(color, alpha * (0.75f + sign(float(uSelected)) * 0.22f + sign(float(uHovered)) * 0.1f));
+    fragData[2] = vec4(color, clamp(alpha, 0.f, 1.f) * (0.75f + sign(float(uSelected)) * 0.22f + sign(float(uHovered)) * 0.1f));
 }

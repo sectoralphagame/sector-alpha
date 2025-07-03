@@ -101,7 +101,7 @@
           "scale": 1594937,
           "textureSet": "gaia",
           "name": "Gaia",
-          "atmosphere": [-2.01, -8.31]
+          "atmosphere": [-0.21, -0.48]
         }
       ]
     },
@@ -372,7 +372,7 @@
           "scale": 3116645.82,
           "textureSet": "ansura",
           "name": "Ansura",
-          "atmosphere": [-1.99, -8.28]
+          "atmosphere": [-0.3, -0.75]
         }
       ]
     },
