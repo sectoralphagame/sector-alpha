@@ -45,6 +45,8 @@ import type { CrewRequirement } from "./crewRequirement";
 import type { Movable } from "./movable";
 import type { StorageTransfer } from "./storageTransfer";
 import type { Policies } from "./policies";
+import type { Experience } from "./experience";
+import type { Modifiers } from "./modifiers";
 
 export interface CoreComponents {
   ai: Ai;
@@ -67,6 +69,7 @@ export interface CoreComponents {
   dockable: Dockable;
   docks: Docks;
   drive: Drive;
+  experience: Experience;
   facilityModuleBonus: FacilityModuleBonus;
   facilityModuleQueue: FacilityModuleQueue;
   hecsPosition: HECSPosition;
@@ -81,6 +84,7 @@ export interface CoreComponents {
   missions: Missions;
   model: Model;
   modules: Modules;
+  modifiers: Modifiers;
   movable: Movable;
   name: Name;
   orders: Orders;

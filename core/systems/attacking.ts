@@ -1,4 +1,4 @@
-import { changeHp } from "@core/components/hitpoints";
+import { dealDamageToEntity } from "@core/components/hitpoints";
 import settings from "@core/settings";
 import type { Sim } from "@core/sim";
 import type { RequireComponent } from "@core/tsHelpers";
@@ -142,7 +142,7 @@ export class AttackingSystem extends System {
         transport3D.hooks.shoot.notify(
           entity.requireComponents(["position", "damage"])
         );
-        changeHp(target, entity.cp.damage.value);
+        dealDamageToEntity(target, -entity.cp.damage.value, entity.id);
         const parentEntity = entityOrParent;
 
         if (target.hasComponents(["drive", "movable"])) {

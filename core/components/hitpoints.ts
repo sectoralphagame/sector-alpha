@@ -12,10 +12,10 @@ export interface HitPoints extends BaseComponent<"hitpoints"> {
     value: number;
     regen: number;
   };
-  hit?: boolean;
+  hitBy: Record<number, number>; // entityId: timestamp
 }
 
-export function changeHp(
+export function subtractHp(
   entity: RequireComponent<"hitpoints">,
   value: number
 ): void {
@@ -25,9 +25,17 @@ export function changeHp(
       0,
       entity.cp.hitpoints.shield.value - delta
     );
-    delta -= Math.min(entity.cp.hitpoints.shield.value, value);
+    delta += Math.min(entity.cp.hitpoints.shield.value, value);
   }
 
   entity.cp.hitpoints.hp.value -= delta;
-  entity.cp.hitpoints.hit = true;
+}
+
+export function dealDamageToEntity(
+  entity: RequireComponent<"hitpoints">,
+  value: number,
+  attackerId: number
+): void {
+  subtractHp(entity, -value);
+  entity.cp.hitpoints.hitBy[attackerId] = entity.sim.getTime();
 }

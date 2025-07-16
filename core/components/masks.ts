@@ -55,6 +55,8 @@ export const componentList = [
   "movable",
   "storageTransfer",
   "policies",
+  "experience",
+  "modifiers",
 ];
 export const componentMask: Record<keyof CoreComponents, bigint> =
   componentList.reduce(

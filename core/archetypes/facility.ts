@@ -88,6 +88,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     .addComponent({
       name: "hitpoints",
       hp: { max: 100000, regen: 0, value: 100000 },
+      hitBy: {},
     })
     .addComponent({
       name: "name",
