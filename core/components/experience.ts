@@ -6,10 +6,10 @@ export interface Experience extends BaseComponent<"experience"> {
   rank: number;
 }
 
-const ranks = [200, 600, 1400, 3000, 6200];
+const ranks = [200, 600, 1400, 3000, 6200, Infinity];
 
 function getRank(exp: number): number {
-  return ranks.findIndex((threshold) => exp < threshold) + 1;
+  return ranks.findIndex((threshold) => exp < threshold);
 }
 
 export function addExperience(
@@ -22,11 +22,10 @@ export function addExperience(
     entity.cp.experience.rank = newRank;
 
     if (entity.hasComponents(["damage"])) {
-      entity.cp.damage.modifiers.rank = 0.1 * (entity.cp.experience.rank - 1);
+      entity.cp.damage.modifiers.rank = 0.1 * entity.cp.experience.rank;
     }
     if (entity.hasComponents(["hitpoints"])) {
-      entity.cp.hitpoints.hp.modifiers.rank =
-        0.1 * (entity.cp.experience.rank - 1);
+      entity.cp.hitpoints.hp.modifiers.rank = 0.1 * entity.cp.experience.rank;
     }
     entity.addTag("recalculate:modifiers");
   }
