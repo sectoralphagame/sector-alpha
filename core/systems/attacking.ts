@@ -142,7 +142,7 @@ export class AttackingSystem extends System {
         transport3D.hooks.shoot.notify(
           entity.requireComponents(["position", "damage"])
         );
-        dealDamageToEntity(target, -entity.cp.damage.value, entity.id);
+        dealDamageToEntity(target, -entity.cp.damage.output.current, entity.id);
         const parentEntity = entityOrParent;
 
         if (target.hasComponents(["drive", "movable"])) {

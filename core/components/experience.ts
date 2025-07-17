@@ -17,5 +17,17 @@ export function addExperience(
   value: number
 ): void {
   entity.cp.experience.amount += value;
-  entity.cp.experience.rank = getRank(entity.cp.experience.amount);
+  const newRank = getRank(entity.cp.experience.amount);
+  if (newRank > entity.cp.experience.rank) {
+    entity.cp.experience.rank = newRank;
+
+    if (entity.hasComponents(["damage"])) {
+      entity.cp.damage.modifiers.rank = 0.1 * (entity.cp.experience.rank - 1);
+    }
+    if (entity.hasComponents(["hitpoints"])) {
+      entity.cp.hitpoints.hp.modifiers.rank =
+        0.1 * (entity.cp.experience.rank - 1);
+    }
+    entity.addTag("recalculate:modifiers");
+  }
 }

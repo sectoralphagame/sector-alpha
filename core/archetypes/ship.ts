@@ -119,9 +119,11 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
     .addComponent({
       name: "hitpoints",
       hp: {
+        base: initial.hitpoints.hp.value,
         max: initial.hitpoints.hp.value,
         regen: initial.hitpoints.hp.regen,
         value: initial.hitpoints.hp.value,
+        modifiers: {},
       },
       shield: {
         max: initial.hitpoints.shield.value,
@@ -134,6 +136,11 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       ...initial.damage,
       name: "damage",
       targetId: null,
+      output: {
+        base: initial.damage.value,
+        current: initial.damage.value,
+      },
+      modifiers: {},
     })
     .addComponent({
       name: "model",

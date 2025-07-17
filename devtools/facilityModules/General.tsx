@@ -71,10 +71,10 @@ const FacilityModuleGeneralEditor: React.FC<{ index: number }> = ({
       <TableCell>
         {facilityModule.type === "military" && (
           <input
-            {...register(`facilityModules.${index}.damage.value`, {
+            {...register(`facilityModules.${index}.damage.output.current`, {
               valueAsNumber: true,
             })}
-            defaultValue={facilityModule.damage?.value}
+            defaultValue={facilityModule.damage?.output?.current}
           />
         )}
       </TableCell>

@@ -46,7 +46,6 @@ import type { Movable } from "./movable";
 import type { StorageTransfer } from "./storageTransfer";
 import type { Policies } from "./policies";
 import type { Experience } from "./experience";
-import type { Modifiers } from "./modifiers";
 
 export interface CoreComponents {
   ai: Ai;
@@ -84,7 +83,6 @@ export interface CoreComponents {
   missions: Missions;
   model: Model;
   modules: Modules;
-  modifiers: Modifiers;
   movable: Movable;
   name: Name;
   orders: Orders;

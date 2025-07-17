@@ -87,7 +87,7 @@ export function createFacility(sim: Sim, initial: InitialFacilityInput) {
     .addComponent({ name: "journal", entries: [] })
     .addComponent({
       name: "hitpoints",
-      hp: { max: 100000, regen: 0, value: 100000 },
+      hp: { base: 100000, max: 100000, regen: 0, value: 100000, modifiers: {} },
       hitBy: {},
     })
     .addComponent({
