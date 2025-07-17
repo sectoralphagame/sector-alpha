@@ -31,12 +31,9 @@ export const HitPointsInfo: React.FC<HitPointsProps> = ({ hp }) => {
   );
 
   return (
-    <>
-      <div className={styles.root}>
-        {!!hp.shield && <Tooltip anchor={ShieldTooltip}>Shield</Tooltip>}
-        <Tooltip anchor={HealthTooltip}>Health</Tooltip>
-      </div>
-      <hr />
-    </>
+    <div className={styles.root}>
+      {!!hp.shield && <Tooltip anchor={ShieldTooltip}>Shield</Tooltip>}
+      <Tooltip anchor={HealthTooltip}>Health</Tooltip>
+    </div>
   );
 };

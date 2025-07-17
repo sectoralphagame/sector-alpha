@@ -6,9 +6,9 @@ export interface Experience extends BaseComponent<"experience"> {
   rank: number;
 }
 
-const ranks = [200, 600, 1400, 3000, 6200, Infinity];
+export const ranks = [200, 600, 1400, 3000, 6200, Infinity];
 
-function getRank(exp: number): number {
+export function getRank(exp: number): number {
   return ranks.findIndex((threshold) => exp < threshold);
 }
 
