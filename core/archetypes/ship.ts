@@ -28,6 +28,7 @@ export const shipComponents = [
   "journal",
   "model",
   "subordinates",
+  "experience",
 ] as const;
 
 export type ShipComponent = (typeof shipComponents)[number];
@@ -118,20 +119,28 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
     .addComponent({
       name: "hitpoints",
       hp: {
+        base: initial.hitpoints.hp.value,
         max: initial.hitpoints.hp.value,
         regen: initial.hitpoints.hp.regen,
         value: initial.hitpoints.hp.value,
+        modifiers: {},
       },
       shield: {
         max: initial.hitpoints.shield.value,
         regen: initial.hitpoints.shield.regen,
         value: initial.hitpoints.shield.value,
       },
+      hitBy: {},
     })
     .addComponent({
       ...initial.damage,
       name: "damage",
       targetId: null,
+      output: {
+        base: initial.damage.value,
+        current: initial.damage.value,
+      },
+      modifiers: {},
     })
     .addComponent({
       name: "model",
@@ -143,6 +152,11 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       value: createShipName(entity.requireComponents(["model"])),
     })
     .addComponent({ name: "subordinates", ids: [] })
+    .addComponent({
+      name: "experience",
+      rank: 1,
+      amount: 0,
+    })
     .addTag("selection")
     .addTag("ship")
     .addTag(`role:${initial.role}`);

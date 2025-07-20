@@ -52,3 +52,12 @@
 .turbo {
   color: var(--palette-error);
 }
+
+.hpBar {
+  display: flex;
+  align-items: center;
+  gap: usesize(0.8);
+  padding-bottom: usesize(0.8);
+  margin-bottom: usesize(0.8);
+  border-bottom: usesize(0.1) solid var(--palette-border);
+}

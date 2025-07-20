@@ -20,7 +20,7 @@ const tags = [
   "ai:attack-force",
   "ai:spare",
   "ai:mission",
-  "ui:arrow",
+  "recalculate:modifiers",
   ...shipRoles.map<`role:${ShipRole}`>((role) => `role:${role}`),
   ...modules.map<`facilityModuleType:${FacilityModuleType}`>(
     ({ type: facilityModuleType }) =>

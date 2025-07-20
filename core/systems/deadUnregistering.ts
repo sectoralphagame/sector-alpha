@@ -2,8 +2,17 @@ import type { Sim } from "@core/sim";
 import { dumpCargo } from "@core/components/storage";
 import type { Faction } from "@core/archetypes/faction";
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
+import type { DockSize } from "@core/components/dockable";
+import { addExperience } from "@core/components/experience";
 import { System } from "./system";
 import { transport3D } from "./transport3d";
+
+const expValues: Record<DockSize, number> = {
+  large: 200,
+  medium: 50,
+  small: 20,
+};
+const timestampThreshold = 120; // 2 minutes
 
 export class DeadUnregisteringSystem extends System {
   apply = (sim: Sim) => {
@@ -27,8 +36,29 @@ export class DeadUnregisteringSystem extends System {
             time: this.sim.getTime(),
           });
         }
+
         if (entity.hasComponents(["position"]))
           transport3D.hooks.explode.notify(entity);
+
+        const attackers: number[] = [];
+
+        for (const [attackerId, timestamp] of Object.entries(
+          entity.cp.hitpoints.hitBy
+        )) {
+          if (timestamp + timestampThreshold > this.sim.getTime()) {
+            attackers.push(Number(attackerId));
+          }
+        }
+
+        const exp =
+          expValues[entity.cp.dockable?.size || "small"] / attackers.length;
+        for (const attackerId of attackers) {
+          const attacker = this.sim.get(attackerId);
+          if (attacker?.hasComponents(["experience"])) {
+            addExperience(attacker, exp);
+          }
+        }
+
         entity.unregister("dead");
       }
     }

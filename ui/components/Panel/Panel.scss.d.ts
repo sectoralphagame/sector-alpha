@@ -11,3 +11,4 @@ export const spacer: string;
 export const tab: string;
 export const manage: string;
 export const turbo: string;
+export const hpBar: string;

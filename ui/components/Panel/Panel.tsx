@@ -42,6 +42,7 @@ import { Docks } from "../Docks";
 import ShipBuildingQueue from "../ShipBuildingQueue";
 import { Production } from "../Production";
 import { Teleport } from "../Teleport/Teleport";
+import { ExperienceBar } from "../ExperienceBar/ExperienceBar";
 
 export interface PanelProps {
   expanded?: boolean;
@@ -196,7 +197,12 @@ export const Panel: React.FC<PanelProps> = ({ entity, expanded }) => {
                   </>
                 )}
                 {entity.hasComponents(["hitpoints"]) && (
-                  <HitPointsInfo hp={entity.cp.hitpoints} />
+                  <div className={styles.hpBar}>
+                    <HitPointsInfo hp={entity.cp.hitpoints} />
+                    {entity.hasComponents(["experience"]) && showSensitive && (
+                      <ExperienceBar amount={entity.cp.experience.amount} />
+                    )}
+                  </div>
                 )}
                 {entity.hasComponents(shipComponents) && (
                   <ShipPanel entity={entity} showSensitive={showSensitive} />

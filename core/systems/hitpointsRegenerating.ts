@@ -29,8 +29,6 @@ export class HitpointsRegeneratingSystem extends System<"exec"> {
           entity.cp.hitpoints.shield.max
         );
       }
-
-      entity.cp.hitpoints.hit = true;
     }
   };
 }

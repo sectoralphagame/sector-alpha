@@ -1,0 +1,32 @@
+.root {
+  --height: usesize(1.8);
+  --percent: 0%;
+
+  height: var(--height);
+  border: usesize(0.1) solid var(--palette-border);
+  border-radius: usesize(0.2);
+  position: relative;
+  flex: 1;
+
+  &::before {
+    content: "";
+    display: block;
+    height: 100%;
+    width: var(--percent);
+    background-color: var(--palette-primary);
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: usesize(0.2);
+  }
+}
+
+.label {
+  position: absolute;
+  display: inline-block;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+  font-size: var(--typography-label);
+}
