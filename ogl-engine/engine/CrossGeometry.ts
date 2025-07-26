@@ -57,7 +57,7 @@ export class CrossGeometry extends Geometry {
         size: 2,
         data: new Float32Array([
           // First Plane UVs
-          0, 1, 1, 1, 0, 0, 1, 0,
+          1, 1, 1, 0, 0, 1, 0, 0,
           // Second Plane UVs
           0, 1, 1, 1, 0, 0, 1, 0,
         ]),

@@ -11,7 +11,6 @@ out vec3 worldPosition;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
-uniform float uTime;
 
 void main() {
     vec4 mPosition = modelMatrix * vec4(position, 1.0f);

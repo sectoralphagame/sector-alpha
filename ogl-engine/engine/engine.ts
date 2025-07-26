@@ -20,7 +20,7 @@ export abstract class Engine<TScene extends Scene = Scene> {
   protected lastFrameTime: number;
 
   public originalDelta = 0;
-  private deltaMultiplier = 1;
+  protected deltaMultiplier = 1;
 
   constructor() {
     this.hooks = {

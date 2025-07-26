@@ -4,9 +4,17 @@ import { entries, join, map, pipe } from "@fxts/core";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Light } from "@ogl-engine/engine/Light";
 import Color from "color";
-import type { ProgramOptions, Mesh, Vec3, Vec4 } from "ogl";
+import type { ProgramOptions, Mesh, Vec3, Vec4, Vec2 } from "ogl";
 import { Texture, Program } from "ogl";
-import type { FolderApi } from "tweakpane";
+import type { BindingParams, FolderApi } from "tweakpane";
+import { getPane } from "@ui/context/Pane";
+
+export interface Uniform<T extends Vec2 | Vec3 | Vec4 | Texture | number> {
+  value: T;
+  meta?: {
+    pane?: BindingParams;
+  };
+}
 
 export abstract class Material {
   engine: Engine3D;
@@ -34,7 +42,11 @@ export abstract class Material {
     mesh.program = this.program;
   }
 
-  createPaneSettings(folder: FolderApi) {
+  createPaneSettings(folder?: FolderApi) {
+    if (!folder) {
+      folder = getPane().addOrReplaceFolder({ title: "Material" });
+    }
+
     for (const uniform of Object.keys(this.uniforms)) {
       if (
         [
@@ -66,7 +78,7 @@ export abstract class Material {
       } else {
         folder.addBinding(this.uniforms[uniform], "value", {
           label: uniform,
-          view: uniform.match(/[cC]olor/) ? "color" : undefined,
+          ...(this.uniforms[uniform].meta?.pane ?? {}),
         });
       }
     }

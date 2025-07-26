@@ -118,6 +118,13 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       min: 0,
       max: 4,
     });
+    folder
+      .addButton({
+        title: "Toggle Ticker",
+      })
+      .on("click", () => {
+        this.setDeltaMultiplier(this.deltaMultiplier === 1 ? 0 : 1);
+      });
 
     this.initUniforms();
   }
@@ -358,7 +365,9 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     }
     this.performance.updateFrameTime(performance.now() - startTime);
 
-    this.executeOnBeforeRenderTasks();
+    if (this.deltaMultiplier > 0) {
+      this.executeOnBeforeRenderTasks();
+    }
   }
 
   private renderSimple = () => {
