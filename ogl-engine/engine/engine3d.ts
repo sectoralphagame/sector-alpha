@@ -94,6 +94,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
   constructor() {
     super();
+    this.initUniforms();
 
     const folder = getPane().addOrReplaceFolder({
       title: "Renderer",
@@ -118,6 +119,9 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       min: 0,
       max: 4,
     });
+    folder.addBinding(this.uniforms.uTime, "value", {
+      readonly: true,
+    });
     folder
       .addButton({
         title: "Toggle Ticker",
@@ -125,8 +129,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       .on("click", () => {
         this.setDeltaMultiplier(this.deltaMultiplier === 1 ? 0 : 1);
       });
-
-    this.initUniforms();
   }
 
   init = (canvas: HTMLCanvasElement) => {

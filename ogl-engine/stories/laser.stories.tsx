@@ -23,11 +23,11 @@ const LaserStory: React.FC<LaserStoryProps> = ({ motion, ...props }) => {
 
     const laser = new LaserWeaponEffect(engine, {
       color: "rgb(54, 54, 255)",
-      width: 0.01,
+      width: 0.1,
     });
     laser.beam.material.createPaneSettings();
     laser.setParent(engine.scene);
-    laser.setTarget(new Vec3(1, 0, 0));
+    laser.setTarget(new Vec3(10, 0, 0));
 
     const axes = new AxesHelper(engine, {
       symmetric: false,
