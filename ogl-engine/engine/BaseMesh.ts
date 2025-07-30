@@ -173,6 +173,10 @@ export class BaseMesh<TMaterial extends Material = Material>
     }
   }
 
+  isMounted(): boolean {
+    return !!this.parent;
+  }
+
   addBoundingBox() {
     if (this.children.some((child) => child instanceof BoundingBox)) return;
 

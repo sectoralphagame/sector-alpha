@@ -17,6 +17,7 @@ import { taskPriority, type OnBeforeRenderTask } from "@ogl-engine/engine/task";
 import models from "@assets/models";
 import type { Material } from "@ogl-engine/materials/material";
 import { materials } from "@ogl-engine/materials";
+import { LaserWeaponEffect } from "@ogl-engine/builders/LaserWeapon";
 
 const tempVec3 = new Vec3();
 export const distanceScale = 250;
@@ -172,6 +173,14 @@ export class EntityMesh extends BaseMesh {
         }
       }
     }
+
+    const laserWeapon = new LaserWeaponEffect(engine, {
+      color: entity.cp.owner
+        ? entity.sim.getOrThrow<Faction>(entity.cp.owner.id).cp.color.value
+        : "rgb(54, 54, 255)",
+      width: 0.55,
+    });
+    laserWeapon.setParent(this);
 
     if (entity.tags.has("selection")) {
       this.indicator = new EntityIndicator(engine);

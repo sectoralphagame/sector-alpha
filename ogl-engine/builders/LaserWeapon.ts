@@ -9,7 +9,7 @@ import { createTimeline } from "@ogl-engine/utils/timeline";
 import { Mat4, Sphere, Transform, Vec3 } from "ogl";
 
 const tempMat4 = new Mat4();
-const tempWorldMatrix = new Mat4();
+const tempScale = new Vec3();
 
 interface LaserWeaponOpts {
   color: string;
@@ -38,7 +38,7 @@ class Beam extends BaseMesh<LaserMaterial> {
     });
     this.material.uniforms.uIntensity.value = 0;
     this.position.z += 0.5;
-    this.rotation.x -= Math.PI / 2;
+    this.rotation.x = Math.PI / 2;
   }
 }
 
@@ -71,8 +71,8 @@ class Exhaust extends BaseMesh<LaserImpactMaterial> {
 
 export class LaserWeaponEffect extends Transform implements Destroyable {
   startedAt: number;
-  task: OnBeforeRenderTask;
-  duration = 2.5; // seconds
+  task: OnBeforeRenderTask | null = null;
+  duration = 0.9; // seconds
   width: number;
   beam: Beam;
   exhaust: Exhaust;
@@ -89,20 +89,29 @@ export class LaserWeaponEffect extends Transform implements Destroyable {
     this.beam.setParent(this);
     this.exhaust = new Exhaust(engine, opts);
     this.exhaust.setParent(this);
+  }
 
-    this.task = engine.addOnBeforeRenderTask(() => {
-      const t = (engine.uniforms.uTime.value - this.startedAt) / this.duration;
+  fire() {
+    if (this.task) return;
+
+    this.startedAt = this.engine.uniforms.uTime.value;
+
+    this.task = this.engine.addOnBeforeRenderTask(() => {
+      const t =
+        (this.engine.uniforms.uTime.value - this.startedAt) / this.duration;
       const p = timeline(t);
       this.beam.material.uniforms.uIntensity.value = p;
       this.exhaust.material.uniforms.uIntensity.value = p;
 
       this.lookAt(this.target, false, true);
       const worldPosition = tempVec3;
+      const scale = tempScale;
       this.worldMatrix.getTranslation(worldPosition);
+      this.parent!.worldMatrix.getScaling(scale);
       this.scale.set(
         this.width,
         this.width,
-        worldPosition.distance(this.target)
+        (worldPosition.distance(this.target) * 1) / scale.z
       );
       this.beam.material.uniforms.uAspectRatio.value =
         this.scale.z / this.width;
@@ -110,17 +119,18 @@ export class LaserWeaponEffect extends Transform implements Destroyable {
       const exhaustSize =
         4 *
         this.width *
-        (1 + Math.sin(engine.uniforms.uTime.value * 80) * 0.025 * p);
+        (1 + Math.sin(this.engine.uniforms.uTime.value * 80) * 0.025 * p);
       this.exhaust.scale.set(
         exhaustSize,
         exhaustSize,
         (this.width / worldPosition.distance(this.target)) * exhaustSize * 1.2
       );
-    });
-  }
 
-  restart() {
-    this.startedAt = this.engine.uniforms.uTime.value;
+      if (t >= 1) {
+        this.task!.cancel();
+        this.task = null;
+      }
+    });
   }
 
   setTarget(target: Vec3) {
@@ -128,31 +138,17 @@ export class LaserWeaponEffect extends Transform implements Destroyable {
   }
 
   destroy(): void {
-    this.task.cancel();
+    this.task?.cancel();
   }
 
   override lookAt(target: Vec3, invert = false, useWorldMatrix = false) {
-    super.lookAt(target, invert);
     if (useWorldMatrix) {
-      if (invert) this.matrix.lookAt(this.position, target, this.up);
-      else this.matrix.lookAt(target, this.position, this.up);
+      const invWorldMatrix = tempMat4.copy(this.parent!.worldMatrix).inverse();
+      const locaTarget = tempVec3.copy(target).applyMatrix4(invWorldMatrix);
 
-      // Extract world-space rotation
-      // @ts-expect-error
-      // eslint-disable-next-line no-underscore-dangle
-      this.matrix.getRotation(this.quaternion._target);
-
-      // Convert world rotation to local using inverse of parent world matrix
-      const invParentWorld = tempWorldMatrix
-        .copy(this.parent!.worldMatrix)
-        .inverse();
-      const worldRotation = tempMat4.fromQuaternion(this.quaternion);
-      worldRotation.multiply(invParentWorld);
-      // @ts-expect-error
-      // eslint-disable-next-line no-underscore-dangle
-      worldRotation.getRotation(this.quaternion._target);
-
-      this.rotation.fromQuaternion(this.quaternion);
+      super.lookAt(locaTarget, invert);
+    } else {
+      super.lookAt(target, invert);
     }
   }
 }

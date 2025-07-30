@@ -5,10 +5,12 @@ precision highp float;
 
 in vec2 vUv;
 in float vT;
+in float vFragDepth;
 
 out vec4 fragData[3];
 
 uniform vec4 uColor;
+uniform float uCameraScale;
 
 void main() {
     float a = 1.f - 2.f * distance(vUv, vec2(0.5f, 0.5f));
@@ -19,5 +21,6 @@ void main() {
         discard;
     }
 
-    fragData[1] = vec4(fragData[0].rgb, luma(fragData[0]));
+    fragData[1] = vec4(fragData[0].rgb, a * a * 5.f);
+    gl_FragDepth = log2(vFragDepth) / uCameraScale;
 }
