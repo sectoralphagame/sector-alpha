@@ -223,6 +223,9 @@ export class EntityMesh extends BaseMesh {
     generator.position.copy(input.position);
     generator.rotation.copy(input.rotation);
     generator.scale.copy(input.scale);
+    if (type === "hyperslingshot") {
+      generator.scale.multiply(200);
+    }
     generator.setParent(this);
     generator.updateMatrixWorld();
   }
