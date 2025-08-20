@@ -20,11 +20,7 @@ export const fieldColors = {
   silica: "#ededed",
 } as Record<MineableCommodity, string>;
 
-export const asteroidFieldComponents = [
-  "mineable",
-  "children",
-  "position",
-] as const;
+export const asteroidFieldComponents = ["mineable", "position"] as const;
 
 export type AsteroidFieldComponent = (typeof asteroidFieldComponents)[number];
 export type AsteroidField = RequireComponent<AsteroidFieldComponent>;
@@ -111,7 +107,6 @@ export function createAsteroidField(
         getFPoints(data.size)
       )
     )
-    .addComponent({ name: "children", entities: [] })
     .addComponent({
       name: "position",
       coord: position,
