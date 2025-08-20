@@ -95,40 +95,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   constructor() {
     super();
     this.initUniforms();
-
-    const folder = getPane().addOrReplaceFolder({
-      title: "Renderer",
-      expanded: true,
-    });
-    folder.addBinding(this.performance, "fps", {
-      readonly: true,
-      interval: 500,
-      label: "FPS",
-    });
-    folder.addBinding(this.performance, "fps", {
-      view: "graph",
-      label: "FPS Graph",
-      interval: 500,
-      readonly: true,
-    });
-    folder.addBinding(this.performance, "averageFrameTime", {
-      view: "graph",
-      label: "Avg Frame Time [ms]",
-      interval: 500,
-      readonly: true,
-      min: 0,
-      max: 4,
-    });
-    folder.addBinding(this.uniforms.uTime, "value", {
-      readonly: true,
-    });
-    folder
-      .addButton({
-        title: "Toggle Ticker",
-      })
-      .on("click", () => {
-        this.setDeltaMultiplier(this.deltaMultiplier === 1 ? 0 : 1);
-      });
+    this.initPane();
   }
 
   init = (canvas: HTMLCanvasElement) => {
@@ -163,6 +130,43 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.hooks.onInit.notify();
     this.initialized = true;
   };
+
+  initPane() {
+    console.log("Initializing pane");
+    const folder = getPane().addOrReplaceFolder({
+      title: "Renderer",
+      expanded: true,
+    });
+    folder.addBinding(this.performance, "fps", {
+      readonly: true,
+      interval: 500,
+      label: "FPS",
+    });
+    folder.addBinding(this.performance, "fps", {
+      view: "graph",
+      label: "FPS Graph",
+      interval: 500,
+      readonly: true,
+    });
+    folder.addBinding(this.performance, "averageFrameTime", {
+      view: "graph",
+      label: "Avg Frame Time [ms]",
+      interval: 500,
+      readonly: true,
+      min: 0,
+      max: 4,
+    });
+    folder.addBinding(this.uniforms.uTime, "value", {
+      readonly: true,
+    });
+    folder
+      .addButton({
+        title: "Toggle Ticker",
+      })
+      .on("click", () => {
+        this.setDeltaMultiplier(this.deltaMultiplier === 1 ? 0 : 1);
+      });
+  }
 
   private initUniforms() {
     this.uniforms = {
