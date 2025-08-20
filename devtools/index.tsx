@@ -11,6 +11,8 @@ import { Sectors } from "./Sectors";
 import { Charts } from "./charts";
 import FacilityBuilder from "./facilityBuilder";
 import { Layout } from "./layout";
+import { Turrets } from "./turrets";
+import { Scenarios } from "./scenarios";
 
 const DevToolsCard: React.FC<{
   link: string;
@@ -32,6 +34,11 @@ const DevToolsIndex: React.FC = () => (
         name="Ship Editor"
         description="Manage ships blueprints, their costs and other properties"
         link="/dev/ships"
+      />
+      <DevToolsCard
+        name="Turret Editor"
+        description="Manage turret types"
+        link="/dev/turrets"
       />
       <DevToolsCard
         name="Map"
@@ -63,6 +70,11 @@ const DevToolsIndex: React.FC = () => (
         description="Build prototypes of facilities and see their stats"
         link="/dev/facility-builder"
       />
+      <DevToolsCard
+        name="Scenarios"
+        description="Test prepared game scenarios"
+        link="/dev/scenarios"
+      />
     </div>
   </div>
 );
@@ -78,6 +90,8 @@ export const DevTools: React.FC = () => (
         <Route path="sectors" element={<Sectors />} />
         <Route path="charts/*" element={<Charts />} />
         <Route path="facility-builder" element={<FacilityBuilder />} />
+        <Route path="turrets" element={<Turrets />} />
+        <Route path="scenarios/*" element={<Scenarios />} />
         <Route path="/" element={<DevToolsIndex />} />
       </Routes>
     </Layout>

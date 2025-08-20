@@ -1,0 +1,38 @@
+.editorContainer {
+  overflow-y: scroll;
+  padding: usesize(0.8);
+}
+.root {
+  display: grid;
+  grid-template-columns: 1fr usesize(12);
+}
+.rootExpanded {
+  grid-template-columns: 1fr usesize(35);
+}
+.toolbar {
+  display: flex;
+  gap: usesize(0.8);
+  margin-bottom: usesize(0.8);
+}
+.hr {
+  margin-bottom: usesize(0.8);
+}
+.swatch {
+  border-radius: usesize(0.2);
+  display: inline-block;
+  width: usesize(3.2);
+  height: usesize(3.2);
+}
+.color {
+  appearance: none;
+  background: none;
+  color: var(--palette-text-1);
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: usesize(0.8);
+  padding: 0;
+}
+.colorPicker {
+  position: absolute;
+}

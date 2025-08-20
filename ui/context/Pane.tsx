@@ -180,10 +180,22 @@ export const DraggablePane: React.FC = () => {
     if (container !== null) {
       pane = new Pane({ container });
       pane.registerPlugin(OglPlugin);
-      pane.hidden = !process.env.STORYBOOK;
+      pane.hidden = !(
+        process.env.STORYBOOK ||
+        window.location.pathname.startsWith("/dev/scenarios/")
+      );
     }
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code === "KeyK" && (event.metaKey || event.ctrlKey)) {
+        getPane().hidden = !getPane().hidden;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
     return () => {
+      window.removeEventListener("keydown", handleKeyDown);
       pane.dispose();
     };
   }, [container]);

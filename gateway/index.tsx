@@ -7,6 +7,7 @@ import { isDev } from "@core/settings";
 import Bugsnag from "@bugsnag/js";
 import BugsnagPluginReact from "@bugsnag/plugin-react";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
+import { DraggablePane } from "@ui/context/Pane";
 import packageJson from "../package.json";
 
 let ErrorBoundary: React.FC<
@@ -56,6 +57,7 @@ root.render(
   >
     <Styles>
       <BrowserRouter>
+        <DraggablePane />
         <Routes>
           {isDev && <Route path="dev/*" element={<DevTools />} />}
           <Route path="*" element={<Root />} />

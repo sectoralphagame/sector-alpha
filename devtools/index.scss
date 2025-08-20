@@ -30,7 +30,9 @@
 }
 
 .root {
-  padding-bottom: usesize(1.6);
+  --header-height: usesize(6);
+  --body-bottom-padding: usesize(1.6);
+  padding-bottom: var(--body-bottom-padding);
 }
 
 .header {
@@ -44,6 +46,7 @@
   gap: usesize(1.6);
   align-items: center;
   z-index: 1;
+  height: var(--header-height);
 
   .headerText {
     margin-bottom: 0;

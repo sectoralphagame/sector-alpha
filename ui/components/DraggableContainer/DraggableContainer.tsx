@@ -7,8 +7,8 @@ export const DraggableContainer: React.FC<
 > = ({ children, className }) => {
   const [isDragging, setIsDragging] = React.useState(false);
   const [position, setPosition] = React.useState({
-    x: window.innerWidth - 400,
-    y: 0,
+    x: window.innerWidth - 300,
+    y: 100,
   });
   const offsetRef = React.useRef({ x: 0, y: 0 });
 
