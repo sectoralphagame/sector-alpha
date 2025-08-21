@@ -38,7 +38,10 @@ export class DeadUnregisteringSystem extends System {
         }
 
         if (entity.hasComponents(["position"]))
-          transport3D.hooks.explode.notify(entity);
+          transport3D.publish({
+            type: "explode",
+            entity,
+          });
 
         const attackers: number[] = [];
 

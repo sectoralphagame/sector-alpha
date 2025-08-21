@@ -23,11 +23,13 @@ export function subtractHp(
 ): void {
   let delta = value;
   if (entity.cp.hitpoints.shield?.value) {
-    entity.cp.hitpoints.shield.value = Math.max(
-      0,
-      entity.cp.hitpoints.shield.value - delta
-    );
-    delta += Math.min(entity.cp.hitpoints.shield.value, value);
+    entity.cp.hitpoints.shield.value -= delta;
+    if (entity.cp.hitpoints.shield.value < 0) {
+      delta = -entity.cp.hitpoints.shield.value;
+      entity.cp.hitpoints.shield.value = 0;
+    } else {
+      return; // shield absorbed all damage
+    }
   }
 
   entity.cp.hitpoints.hp.value -= delta;

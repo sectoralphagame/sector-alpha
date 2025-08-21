@@ -135,6 +135,10 @@ export class Entity {
   }
 }
 
+/**
+ * Mock entity for testing purposes.
+ * It does not register itself in the sim and does not have a unique ID.
+ */
 let pureEntityCounter = 0;
 export class PureEntity {
   components = new EntityComponents() as Partial<CoreComponents>;

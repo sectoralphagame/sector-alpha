@@ -1,4 +1,3 @@
-import type { RequireComponent } from "@core/tsHelpers";
 import type { Facility } from "@core/archetypes/facility";
 import { facilityComponents } from "@core/archetypes/facility";
 import { pickRandom } from "@core/utils/generators";
@@ -17,11 +16,6 @@ export class MilitaryModuleSpottingSystem extends System<"exec"> {
 
   exec = (): void => {
     if (!this.cooldowns.canUse("exec")) return;
-
-    const cache: Record<
-      string,
-      Array<RequireComponent<"hitpoints" | "owner" | "position">>
-    > = {};
 
     for (const entity of entityIndexer.search(
       ["parent", "damage"],
@@ -43,7 +37,6 @@ export class MilitaryModuleSpottingSystem extends System<"exec"> {
             "owner",
             "position",
           ]),
-          cache,
           facility.requireComponents([...facilityComponents, "owner"])
         ).slice(0, 3)
       );

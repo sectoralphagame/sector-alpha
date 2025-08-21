@@ -16,6 +16,7 @@ export function brake(entity: Navigable, targetSpeed: number, thrust: Thrust) {
   if (speed > targetSpeed) {
     thrust.lateral.copy(entity.cp.movable.velocity).normalize();
     thrust.throttle = 0;
+    thrust.drag += 0.1;
   }
 
   return thrust;

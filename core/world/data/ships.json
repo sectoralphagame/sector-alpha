@@ -36,7 +36,9 @@
         "value": 30,
         "regen": 2
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "name": "Courier B",
@@ -75,7 +77,9 @@
         "value": 30,
         "regen": 2
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "name": "Freighter A",
@@ -114,7 +118,9 @@
         "value": 90,
         "regen": 4
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "name": "Freighter B",
@@ -153,7 +159,9 @@
         "value": 90,
         "regen": 4
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "name": "Large Freighter A",
@@ -192,7 +200,9 @@
         "value": 300,
         "regen": 8
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "name": "Large Freighter B",
@@ -231,7 +241,9 @@
         "value": 300,
         "regen": 8
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "name": "Marble",
@@ -270,7 +282,9 @@
         "value": 90,
         "regen": 2
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "name": "Miner B",
@@ -309,7 +323,9 @@
         "value": 90,
         "regen": 2
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "acceleration": 0.13,
@@ -346,7 +362,9 @@
         "value": 90,
         "regen": 2
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "acceleration": 0.05,
@@ -386,7 +404,9 @@
         "value": 300,
         "regen": 10
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "acceleration": 0.06,
@@ -426,7 +446,9 @@
         "value": 300,
         "regen": 10
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "acceleration": 0.2,
@@ -467,7 +489,29 @@
         "value": 35,
         "regen": 3
       }
-    }
+    },
+    "slots": [
+      {
+        "slug": "turret1",
+        "angle": 0
+      },
+      {
+        "slug": "turret2",
+        "angle": 0
+      }
+    ],
+    "turrets": [
+      {
+        "angle": 0.314,
+        "class": "rapidKinetic",
+        "slot": "turret1"
+      },
+      {
+        "angle": 0.314,
+        "class": "rapidKinetic",
+        "slot": "turret2"
+      }
+    ]
   },
   {
     "acceleration": 0.15,
@@ -508,7 +552,9 @@
         "value": 120,
         "regen": 6
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "acceleration": 0.27,
@@ -547,10 +593,12 @@
         "value": 45,
         "regen": 3.5
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
-    "acceleration": 0.18,
+    "acceleration": 0.03,
     "build": {
       "time": 180,
       "cost": {
@@ -570,7 +618,7 @@
     "role": "military",
     "cruise": 1.4,
     "maneuver": 0.22,
-    "rotary": 87,
+    "rotary": 35,
     "ttc": 2.3,
     "name": "Hornet",
     "size": "medium",
@@ -586,7 +634,65 @@
         "value": 155,
         "regen": 8
       }
-    }
+    },
+    "turrets": [
+      {
+        "angle": 3.14,
+        "class": "smallFlak",
+        "slot": "turret1"
+      },
+      {
+        "angle": 3.14,
+        "class": "smallFlak",
+        "slot": "turret2"
+      },
+      {
+        "angle": 3.14,
+        "class": "pulsar",
+        "slot": "turret3"
+      },
+      {
+        "angle": 3.14,
+        "class": "pulsar",
+        "slot": "turret4"
+      },
+      {
+        "angle": 0.31,
+        "class": "kinetic",
+        "slot": "turret5"
+      },
+      {
+        "angle": 0.31,
+        "class": "kinetic",
+        "slot": "turret6"
+      }
+    ],
+    "slots": [
+      {
+        "slug": "turret1",
+        "angle": -1.57
+      },
+      {
+        "slug": "turret2",
+        "angle": 1.57
+      },
+      {
+        "slug": "turret3",
+        "angle": -1.57
+      },
+      {
+        "slug": "turret4",
+        "angle": 1.57
+      },
+      {
+        "slug": "turret5",
+        "angle": 0
+      },
+      {
+        "slug": "turret6",
+        "angle": 0
+      }
+    ]
   },
   {
     "acceleration": 0.09,
@@ -625,7 +731,9 @@
         "value": 310,
         "regen": 6.5
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "acceleration": 0.1,
@@ -662,7 +770,9 @@
         "value": 35,
         "regen": 2.5
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "acceleration": 0.15,
@@ -700,7 +810,9 @@
         "value": 45,
         "regen": 5
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "acceleration": 0.23,
@@ -734,7 +846,9 @@
         "value": 13,
         "regen": 2.5
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "acceleration": 0.16,
@@ -773,7 +887,9 @@
       "small": 6,
       "medium": 2,
       "large": 0
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "acceleration": 0.18,
@@ -807,7 +923,9 @@
         "value": 90,
         "regen": 5
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   },
   {
     "acceleration": 0.09,
@@ -846,6 +964,8 @@
         "value": 30,
         "regen": 1.9
       }
-    }
+    },
+    "turrets": [],
+    "slots": []
   }
 ]

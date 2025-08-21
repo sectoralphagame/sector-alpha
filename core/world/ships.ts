@@ -37,6 +37,8 @@ export interface ShipInput extends ShipDriveProps {
   texture: keyof Textures;
   size: DockSize;
   role: ShipRole;
+  turrets: Array<{ slot: string; class: string; angle: number }>;
+  slots: Array<{ slug: string; angle: number }>;
 }
 
 export const shipClasses = shipClassesData.map((s) => ({

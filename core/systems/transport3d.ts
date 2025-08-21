@@ -1,30 +1,33 @@
 import type { RequirePureComponent } from "@core/tsHelpers";
-import { Observable } from "@core/utils/observer";
+import { PubSub } from "@core/utils/pubsub";
 
-export class Transport3D {
-  hooks: {
-    shoot: Observable<RequirePureComponent<"position" | "damage">>;
-    explode: Observable<RequirePureComponent<"position">>;
-    deployFacility: Observable<RequirePureComponent<"position">>;
-    startMining: Observable<RequirePureComponent<"position">>;
-    stopMining: Observable<RequirePureComponent<"position">>;
-  };
+export type ShootEvent = {
+  type: "shoot";
+  entity: RequirePureComponent<"damage" | "transform">;
+};
 
-  constructor() {
-    this.hooks = {
-      shoot: new Observable("shoot"),
-      explode: new Observable("explode"),
-      deployFacility: new Observable("deployFacility"),
-      startMining: new Observable("startMining"),
-      stopMining: new Observable("stopMining"),
-    };
-  }
+export type ExplodeEvent = {
+  type: "explode";
+  entity: RequirePureComponent<"position">;
+};
+export type StartMiningEvent = {
+  type: "startMining";
+  entity: RequirePureComponent<"position">;
+};
+export type StopMiningEvent = {
+  type: "stopMining";
+  entity: RequirePureComponent<"position">;
+};
+export type DeployFacilityEvent = {
+  type: "deployFacility";
+  entity: RequirePureComponent<"position">;
+};
 
-  reset() {
-    for (const key of Object.keys(this.hooks)) {
-      this.hooks[key].reset();
-    }
-  }
-}
+export type Event3D =
+  | ShootEvent
+  | ExplodeEvent
+  | StartMiningEvent
+  | StopMiningEvent
+  | DeployFacilityEvent;
 
-export const transport3D = new Transport3D();
+export const transport3D = new PubSub<Event3D>();

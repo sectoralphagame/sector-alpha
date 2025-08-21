@@ -11,7 +11,10 @@ import { addFacilityModule } from "@core/utils/entityModules";
 import { transport3D } from "../transport3d";
 
 export function deployFacilityAction(entity: Ship): boolean {
-  transport3D.hooks.deployFacility.notify(entity);
+  transport3D.publish({
+    type: "deployFacility",
+    entity,
+  });
 
   const render = createRender({
     ...entity.cp.render,

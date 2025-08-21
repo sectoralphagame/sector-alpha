@@ -4,15 +4,15 @@ import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { KineticGunMaterial } from "@ogl-engine/materials/kineticGun/kineticGun";
 import { RosetteGeometry } from "./rosette";
 
-const spread = 0.025;
+const spread = 0.25;
 
 export class KineticGunParticleGenerator extends OneShotParticleGenerator {
   scaleForces = false;
-  speed = 25;
-  size = 0.14;
-  life = 6;
+  speed = 3;
+  size = 0.3;
+  life = 2;
 
-  constructor(engine: Engine3D) {
+  constructor(engine: Engine3D, color: string) {
     super(
       engine,
       (particle) => {
@@ -20,7 +20,7 @@ export class KineticGunParticleGenerator extends OneShotParticleGenerator {
         particle.velocity.set(
           random(-spread, spread),
           random(-spread, spread),
-          random(this.speed, this.speed * 1.1)
+          random(this.speed, this.speed * 1.2)
         );
         particle.life = this.life;
         this.worldMatrix.getRotation(particle.rotation);
@@ -38,7 +38,7 @@ export class KineticGunParticleGenerator extends OneShotParticleGenerator {
     };
 
     const material = new KineticGunMaterial(engine, {
-      color: "rgb(255, 57, 57)",
+      color,
     });
     this.mesh.applyMaterial(material);
   }

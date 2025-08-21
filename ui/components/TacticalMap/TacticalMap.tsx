@@ -42,7 +42,12 @@ import { createStopMiningHandler } from "./events/stopMining";
 
 const tempCameraFocus = new Vec3();
 
-export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
+interface TacticalMapProps {
+  sim: Sim;
+  engine?: Engine3D<TacticalMapScene>;
+}
+
+export class TacticalMap extends React.PureComponent<TacticalMapProps> {
   engine: Engine3D<TacticalMapScene>;
   sim: Sim;
   raycast = new Raycast();
@@ -56,29 +61,23 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
 
   onUnmountCallbacks: (() => void)[] = [];
 
-  constructor(props) {
+  constructor(props: TacticalMapProps) {
     super(props);
     this.sim = props.sim;
-    this.engine = new Engine3D<TacticalMapScene>();
+    this.engine = props.engine ?? new Engine3D<TacticalMapScene>();
     this.engine.setScene(new TacticalMapScene(this.engine));
-    transport3D.hooks.shoot.subscribe(
-      "TacticalMap",
-      createShootHandler(this.engine, this.sim)
-    );
-    transport3D.hooks.explode.subscribe(
-      "TacticalMap",
-      createExplodeHandler(this.engine)
-    );
-    transport3D.hooks.deployFacility.subscribe(
-      "TacticalMap",
+    transport3D.subscribe("shoot", createShootHandler(this.engine, this.sim));
+    transport3D.subscribe("explode", createExplodeHandler(this.engine));
+    transport3D.subscribe(
+      "deployFacility",
       createDeployFacilityHandler(this.engine, this.meshes)
     );
-    transport3D.hooks.startMining.subscribe(
-      "TacticalMap",
+    transport3D.subscribe(
+      "startMining",
       createStartMiningHandler(this.engine, this.meshes)
     );
-    transport3D.hooks.stopMining.subscribe(
-      "TacticalMap",
+    transport3D.subscribe(
+      "stopMining",
       createStopMiningHandler(this.engine, this.meshes)
     );
     const onSpeedChange = (speed: number) => {
@@ -158,7 +157,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         .requireComponents(["position"]);
       if (
         multiple &&
-        entity.cp.owner?.id === this.sim.index.player.get()[0].id
+        entity.cp.owner?.id === this.sim.index.player.get()[0]?.id
       ) {
         if (gameStore.selectedUnits.includes(entity)) {
           gameStore.unselectUnit(entity);
@@ -488,7 +487,7 @@ export class TacticalMap extends React.PureComponent<{ sim: Sim }> {
         new Skybox(
           this.engine,
           (mapData.sectors.find((s) => s.id === gameStore.sector.cp.name.slug)
-            ?.skybox as SkyboxTexture) ?? "example"
+            ?.skybox as SkyboxTexture) ?? "deepspace1"
         )
       );
     }

@@ -1,27 +1,48 @@
 import type { Sim } from "@core/sim";
-import type { RequirePureComponent } from "@core/tsHelpers";
-import type { ObserverFn } from "@core/utils/observer";
+import type { ShootEvent } from "@core/systems/transport3d";
+import type { RequireComponent } from "@core/tsHelpers";
+import type { EventHandler } from "@core/utils/pubsub";
 import { LaserWeaponEffect } from "@ogl-engine/builders/LaserWeapon";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { taskPriority } from "@ogl-engine/engine/task";
 import { KineticGunParticleGenerator } from "@ogl-engine/particles/kineticGun";
+import { Vec3 } from "ogl";
+import { distanceScale } from "../EntityMesh";
+
+const tempVec3 = new Vec3();
 
 export function createShootHandler(
   engine: Engine3D,
   sim: Sim
-): ObserverFn<RequirePureComponent<"position" | "damage">> {
-  return (entity) => {
+): EventHandler<ShootEvent> {
+  return ({ entity: turret }) => {
+    const entity = sim.getOrThrow<RequireComponent<"position">>(
+      turret.cp.parent!.id
+    );
     const shooter = engine.getByEntityId(entity.id);
-    const target = engine.getByEntityId(entity.cp.damage.targetId!);
-    const targetEntity = sim.get(entity.cp.damage.targetId!);
+    const target = engine.getByEntityId(turret.cp.damage.targetId!);
+    const targetEntity = sim.get(turret.cp.damage.targetId!);
 
     if (!(shooter && target && targetEntity)) return;
 
-    if (entity.cp.dockable?.size === "small") {
-      const generator = new KineticGunParticleGenerator(engine);
+    if (turret.cp.damage.type === "kinetic") {
+      const generator = new KineticGunParticleGenerator(
+        engine,
+        turret.cp.color?.value ?? "#ffffff"
+      );
       generator.setParent(shooter);
-      generator.lookAt(target.position);
-      generator.speed = 200;
+      generator.position.set(
+        turret.cp.transform.coord.x * distanceScale,
+        0,
+        turret.cp.transform.coord.y * distanceScale
+      );
+
+      tempVec3.copy(target.position);
+      tempVec3.x += targetEntity.cp.movable?.velocity.x || 0;
+      tempVec3.z += targetEntity.cp.movable?.velocity.y || 0;
+      generator.lookAt(tempVec3.scale(distanceScale));
+
+      generator.speed = distanceScale * 0.95;
 
       const task = engine.addOnBeforeRenderTask(() => {
         if (
@@ -38,7 +59,7 @@ export function createShootHandler(
       }, taskPriority.low);
     } else {
       const weapon = shooter.children.find(
-        (c) => c instanceof LaserWeaponEffect
+        (c) => c instanceof LaserWeaponEffect && c.id === turret.id
       ) as LaserWeaponEffect | undefined;
       if (weapon) {
         weapon.setTarget(target.position);

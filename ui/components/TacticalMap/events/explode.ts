@@ -1,12 +1,12 @@
-import type { RequirePureComponent } from "@core/tsHelpers";
-import type { ObserverFn } from "@core/utils/observer";
+import type { ExplodeEvent } from "@core/systems/transport3d";
+import type { EventHandler } from "@core/utils/pubsub";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { ExplosionParticleGenerator } from "@ogl-engine/particles/explosion";
 
 export function createExplodeHandler(
   engine: Engine3D
-): ObserverFn<RequirePureComponent<"position">> {
-  return (entity) => {
+): EventHandler<ExplodeEvent> {
+  return ({ entity }) => {
     const mesh = engine.getByEntityId(entity.id);
     if (mesh) {
       const explosion = new ExplosionParticleGenerator(engine!);

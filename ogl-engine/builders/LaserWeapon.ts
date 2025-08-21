@@ -70,9 +70,10 @@ class Exhaust extends BaseMesh<LaserImpactMaterial> {
 }
 
 export class LaserWeaponEffect extends Transform implements Destroyable {
+  id: number;
   startedAt: number;
   task: OnBeforeRenderTask | null = null;
-  duration = 0.9; // seconds
+  duration = 0.5; // seconds
   width: number;
   beam: Beam;
   exhaust: Exhaust;
@@ -80,9 +81,10 @@ export class LaserWeaponEffect extends Transform implements Destroyable {
   name = "LaserWeaponEffect";
   target = defaultTarget;
 
-  constructor(engine: Engine3D, opts: LaserWeaponOpts) {
+  constructor(engine: Engine3D, opts: LaserWeaponOpts & { id: number }) {
     super();
     this.engine = engine;
+    this.id = opts.id;
     this.startedAt = engine.uniforms.uTime.value;
     this.width = opts.width;
     this.beam = new Beam(engine, opts);
@@ -111,19 +113,19 @@ export class LaserWeaponEffect extends Transform implements Destroyable {
       this.scale.set(
         this.width,
         this.width,
-        (worldPosition.distance(this.target) * 1) / scale.z
+        worldPosition.distance(this.target) / scale.z
       );
       this.beam.material.uniforms.uAspectRatio.value =
         this.scale.z / this.width;
 
       const exhaustSize =
-        4 *
-        this.width *
-        (1 + Math.sin(this.engine.uniforms.uTime.value * 80) * 0.025 * p);
+        (this.width *
+          (1 + Math.sin(this.engine.uniforms.uTime.value * 80) * 0.025 * p)) /
+        4;
       this.exhaust.scale.set(
         exhaustSize,
         exhaustSize,
-        (this.width / worldPosition.distance(this.target)) * exhaustSize * 1.2
+        (exhaustSize / this.scale.z) * this.width
       );
 
       if (t >= 1) {

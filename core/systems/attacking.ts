@@ -8,9 +8,15 @@ import type { Entity } from "@core/entity";
 import { stopCruise } from "@core/utils/moving";
 import { Vec2 } from "ogl";
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
+import type { TransformData } from "@core/components/transform";
+import { filter, map, pipe, some } from "@fxts/core";
+import type { Turret } from "@core/archetypes/turret";
+import type { AttackOrder } from "@core/components/orders";
 import { regenCooldown } from "./hitpointsRegenerating";
 import { System } from "./system";
 import { transport3D } from "./transport3d";
+
+const tempVec2 = new Vec2();
 
 const sizeMultipliers: Record<DockSize, [number, number, number]> = {
   large: [0.1, -5, 10],
@@ -22,79 +28,45 @@ export function getEvasionChance(speed: number, size: DockSize): number {
   return Math.max(0, ((b / speed) * 10 * a + c) / 100);
 }
 
-function getAngleDiff(
-  origin: RequireComponent<"position">,
-  target: RequireComponent<"position">
-): number {
-  const targetVector = new Vec2()
-    .copy(target.cp.position.coord)
-    .sub(origin.cp.position.coord);
+/**
+ *
+ * @param angle Angle in radians
+ * @returns Normalized angle in the range of -π to π
+ */
+function normalizeAngle(angle: number): number {
+  let out = angle;
 
-  const angle =
-    Math.atan2(targetVector[1], targetVector[0]) - origin.cp.position.angle;
-
-  return angle > Math.PI
-    ? angle - 2 * Math.PI
-    : angle < -Math.PI
-    ? angle + 2 * Math.PI
-    : angle;
-}
-
-export function isInDistance(
-  entity: RequireComponent<"damage">,
-  target: RequireComponent<"position">,
-  r: number = entity.cp.damage.range
-): boolean {
-  return (
-    findInAncestors(entity, "position").cp.position.coord.distance(
-      target.cp.position.coord
-    ) <= r
-  );
-}
-
-export function isInRange(
-  entity: RequireComponent<"damage">,
-  target: RequireComponent<"position">
-) {
-  const inDistance = isInDistance(entity, target);
-  if (!inDistance) return false;
-
-  const parentWithPosition = findInAncestors(entity, "position");
-  const angleDiff = getAngleDiff(parentWithPosition, target);
-
-  return Math.abs(angleDiff) <= entity.cp.damage.angle / 2;
-}
-
-function shouldAttackBack(
-  attacker: RequireComponent<"damage">,
-  target: RequireComponent<"position">
-): boolean {
-  const attackerOrParent = findInAncestors(attacker, "position");
-
-  return (
-    !!target.cp.damage &&
-    target.tags.has("role:military") &&
-    (target.cp.orders?.value[0]?.type !== "attack" ||
-      (target.cp.orders.value[0].targetId !== attackerOrParent.id &&
-        !attacker.sim
-          .getOrThrow(target.cp.orders.value[0].targetId)
-          .tags.has("role:military") &&
-        isInDistance(target.requireComponents(["damage"]), attackerOrParent)))
-  );
+  while (out > Math.PI) {
+    out -= 2 * Math.PI;
+  }
+  while (out < -Math.PI) {
+    out += 2 * Math.PI;
+  }
+  return out;
 }
 
 function attack(attacker: RequireComponent<"orders">, target: Entity) {
-  if (attacker.cp.orders.value[0]) {
-    attacker.cp.orders.value[0].interrupt = true;
-  }
-  attacker.cp.orders.value.splice(1, 0, {
+  const order: AttackOrder = {
     type: "attack",
     actions: [],
     followOutsideSector: false,
     ordersForSector: 0,
     origin: "auto",
     targetId: findInAncestors(target, "position").id,
-  });
+  };
+
+  if (attacker.cp.orders.value[0]) {
+    if (
+      attacker.cp.orders.value[0]?.origin === "auto" &&
+      attacker.cp.orders.value[0].type === "attack"
+    ) {
+      attacker.cp.orders.value[0] = order;
+      return;
+    }
+
+    attacker.cp.orders.value[0].interrupt = true;
+  }
+  attacker.cp.orders.value.splice(1, 0, order);
 }
 
 const cdKey = "attack";
@@ -125,9 +97,20 @@ export class AttackingSystem extends System {
       const target = this.sim
         .getOrThrow(entity.cp.damage.targetId)
         .requireComponents(["position", "hitpoints"]);
-      const entityOrParent = findInAncestors(entity, "position");
+      const parentEntity = findInAncestors(entity, "position");
+      const entityTransform: TransformData = (entity.cp.transform?.world ??
+        entity.cp.position)!;
 
-      if (!isInRange(entity, target)) continue;
+      if (
+        !AttackingSystem.isInShootingRange(
+          entityTransform.coord,
+          entityTransform.angle,
+          target.cp.position.coord,
+          entity.cp.damage.range,
+          entity.cp.damage.angle
+        )
+      )
+        continue;
 
       entity.cooldowns.use(cdKey, entity.cp.damage.cooldown);
       if (
@@ -139,30 +122,42 @@ export class AttackingSystem extends System {
             target.cp.dockable.size
           )
       ) {
-        transport3D.hooks.shoot.notify(
-          entity.requireComponents(["position", "damage"])
-        );
         dealDamageToEntity(target, entity.cp.damage.output.current, entity.id);
-        const parentEntity = entityOrParent;
+        if (entity.hasComponents(["transform"])) {
+          transport3D.publish({
+            type: "shoot",
+            entity,
+          });
+        }
 
         if (target.hasComponents(["drive", "movable"])) {
           stopCruise(target);
         }
-        if (shouldAttackBack(entity, target)) {
-          if (target.cp.orders) {
-            attack(target.requireComponents(["orders"]), entity);
-          }
-        } else if (
-          target.cp.damage &&
-          !target.tags.has("role:military") &&
-          (!target.cp.damage.targetId ||
-            (this.sim.get(target.cp.damage.targetId) &&
-              !isInDistance(
-                target.requireComponents(["damage"]),
-                this.sim.get(target.cp.damage.targetId)!
-              )))
+        if (
+          AttackingSystem.shouldPursueAttacker(parentEntity, target) &&
+          target.cp.orders
         ) {
-          target.cp.damage.targetId = parentEntity.id;
+          attack(target.requireComponents(["orders"]), parentEntity);
+        } else if (
+          target.hasComponents(["children"]) &&
+          AttackingSystem.shouldAttackAttacker(parentEntity, target)
+        ) {
+          for (const child of target.cp.children.entities) {
+            if (child.role !== "turret") continue;
+
+            const turret = this.sim.getOrThrow<Turret>(child.id);
+            if (
+              AttackingSystem.isInShootingRange(
+                turret.cp.transform.world.coord,
+                turret.cp.transform.world.angle,
+                entityTransform.coord,
+                turret.cp.damage.range,
+                turret.cp.damage.angle
+              )
+            ) {
+              turret.cp.damage.targetId = parentEntity.id;
+            }
+          }
         }
         target.cp.subordinates?.ids.forEach((subordinateId) => {
           const subordinate = this.sim
@@ -178,6 +173,63 @@ export class AttackingSystem extends System {
       target.cooldowns.use(regenCooldown, 2);
     }
   };
+
+  static isInShootingRange(
+    originPosition: Vec2,
+    originAngle: number,
+    targetPosition: Vec2,
+    range: number,
+    arc: number
+  ): boolean {
+    const targetVector = tempVec2.copy(targetPosition).sub(originPosition);
+    const angle = normalizeAngle(
+      Math.atan2(targetVector[1], targetVector[0]) - originAngle
+    );
+
+    return targetVector.len() <= range && Math.abs(angle) <= arc / 2;
+  }
+
+  static isInTurretShootingRange(
+    entity: RequireComponent<"position" | "children">,
+    targetPosition: Vec2
+  ): boolean {
+    return pipe(
+      entity.cp.children.entities ?? [],
+      filter((c) => c.role === "turret"),
+      map((c) => entity.sim.getOrThrow<Turret>(c.id)),
+      some((t) =>
+        AttackingSystem.isInShootingRange(
+          t.cp.transform.world.coord,
+          t.cp.transform.world.angle,
+          targetPosition,
+          t.cp.damage.range,
+          t.cp.damage.angle
+        )
+      )
+    );
+  }
+
+  static shouldPursueAttacker(
+    attacker: Entity,
+    target: RequireComponent<"position">
+  ): boolean {
+    return (
+      target.tags.has("role:military") &&
+      target.cp.orders?.value[0]?.type !== "attack" &&
+      (!(
+        attacker.cp.dockable?.size === "small" &&
+        target.cp.dockable?.size !== "small"
+      ) ||
+        attacker.cp.dockable?.size !== "small")
+    );
+  }
+
+  static shouldAttackAttacker(
+    _attacker: Entity,
+    _target: RequireComponent<"position">
+  ): boolean {
+    return true;
+  }
 }
 
 export const attackingSystem = new AttackingSystem();

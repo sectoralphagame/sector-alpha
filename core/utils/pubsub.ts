@@ -1,5 +1,7 @@
+export type EventHandler<T extends { type: string }> = (_data: T) => void;
+
 export class PubSub<T extends { type: string }> {
-  private subscribers: Map<string, Set<(_data: T) => void>> = new Map();
+  private subscribers: Map<string, Set<EventHandler<T>>> = new Map();
 
   subscribe<TType extends T["type"]>(
     event: TType,
@@ -14,11 +16,13 @@ export class PubSub<T extends { type: string }> {
     };
   }
 
-  unsubscribe(event: string, callback: (_data: T) => void): void {
+  unsubscribe(event: string, callback: EventHandler<T>): void {
     this.subscribers.get(event)?.delete(callback);
   }
 
-  publish(data: T): void {
+  publish<TType extends T["type"]>(
+    data: T extends { type: TType } ? T : never
+  ): void {
     this.subscribers.get(data.type)?.forEach((callback) => callback(data));
   }
 

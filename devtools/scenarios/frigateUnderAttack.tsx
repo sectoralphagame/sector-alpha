@@ -10,15 +10,12 @@ import { attackingSystem } from "@core/systems/attacking";
 import { deadUnregisteringSystem } from "@core/systems/deadUnregistering";
 import { pathPlanningSystem } from "@core/systems/pathPlanning";
 import { createSector } from "@core/archetypes/sector";
-import type { Faction } from "@core/archetypes/faction";
 import { createFaction } from "@core/archetypes/faction";
 import Color from "color";
 import { createShip } from "@core/archetypes/ship";
 import { shipClasses } from "@core/world/ships";
 import { random } from "mathjs";
 import { pickRandom } from "@core/utils/generators";
-import { moveToActions } from "@core/utils/moving";
-import { createWaypoint } from "@core/archetypes/waypoint";
 import { fromPolar } from "@core/utils/misc";
 import {
   changeRelations,
@@ -34,12 +31,12 @@ import { Asteroids } from "@ogl-engine/builders/Asteroids";
 import { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { TacticalMapScene } from "@ogl-engine/engine/Scene";
 
-export const Dogfight = () => {
+export const FrigateUnderAttack = () => {
   const [params] = useSearchParams();
   const [sim, setSim] = React.useState<Sim | null>(null);
   const engine = React.useMemo(() => {
     const e = new Engine3D<TacticalMapScene>();
-    e.hooks.onInit.subscribe("Dogfight", () => {
+    e.hooks.onInit.subscribe("FrigateUnderAttack", () => {
       const asteroids = new Asteroids(
         window.renderer,
         10,
@@ -52,8 +49,7 @@ export const Dogfight = () => {
     return e;
   }, []);
 
-  const factions = Number(params.get("factions") ?? 4);
-  const fighters = Number(params.get("fighters") ?? 2);
+  const fighters = Number(params.get("fighters") ?? 5);
 
   React.useEffect(() => {
     settings.bootTime = 0;
@@ -90,51 +86,42 @@ export const Dogfight = () => {
     });
     gameStore.setSector(sector);
 
-    const generatedFactions: Faction[] = [];
-    for (let i = 0; i < factions; i++) {
-      const faction = createFaction(`Faction #${i + 1}`, xSim);
-      faction.cp.color.value = Color.hsv((i / factions) * 360, 100, 100)
-        .rgb()
-        .string();
-      faction.cp.policies.enemySpotted.military = "attack";
-      generatedFactions.push(faction);
+    const frigateFaction = createFaction("Frigate Faction", xSim);
+    const fightersFaction = createFaction("Fighters Faction", xSim);
+    frigateFaction.cp.color.value = Color.hsv(0, 100, 100).rgb().string();
+    fightersFaction.cp.color.value = Color.hsv(120, 100, 100).rgb().string();
+    changeRelations(
+      frigateFaction,
+      fightersFaction,
+      relationThresholds.attack - 1
+    );
 
-      for (let j = 0; j < fighters; j++) {
-        const fighter = createShip(xSim, {
-          ...pickRandom(shipClasses.filter(({ slug }) => slug === "dart")),
-          angle: random(-Math.PI, Math.PI),
-          position: fromPolar(
-            (2 * Math.PI * (i * fighters + j)) / (factions * fighters),
-            random(4, 6)
-          ),
-          owner: faction,
-          sector,
-        });
-        const t = random(0.75, 1);
-        fighter.cp.drive.cruise *= t;
-        fighter.cp.drive.maneuver /= t;
-        fighter.cp.orders.value = [
-          {
-            type: "move",
-            actions: moveToActions(
-              fighter,
-              createWaypoint(xSim, {
-                value: new Vec2(0, 0),
-                sector: sector.id,
-                owner: faction.id,
-              }),
-              {}
-            ),
-            origin: "manual",
-          },
-        ];
-      }
-    }
-    for (const factionA of generatedFactions) {
-      for (const factionB of generatedFactions) {
-        if (factionA === factionB) continue;
-        changeRelations(factionA, factionB, relationThresholds.attack - 1);
-      }
+    const frigate = createShip(xSim, {
+      ...shipClasses.find(({ slug }) => slug === "tauFrigate")!,
+      angle: 0,
+      position: new Vec2(0, 0),
+      owner: frigateFaction,
+      sector,
+    });
+
+    for (let j = 0; j < fighters; j++) {
+      const fighter = createShip(xSim, {
+        ...pickRandom(shipClasses.filter(({ slug }) => slug === "dart")),
+        angle: random(-Math.PI, Math.PI),
+        position: fromPolar((2 * Math.PI * j) / fighters, random(1, 2)),
+        owner: fightersFaction,
+        sector,
+      });
+      fighter.cp.orders.value = [
+        {
+          type: "attack",
+          actions: [],
+          origin: "manual",
+          followOutsideSector: false,
+          ordersForSector: sector.id,
+          targetId: frigate.id,
+        },
+      ];
     }
 
     xSim.start();
@@ -143,7 +130,7 @@ export const Dogfight = () => {
     return () => {
       xSim.destroy();
     };
-  }, [factions, fighters]);
+  }, [fighters]);
 
   if (!sim) return null;
 

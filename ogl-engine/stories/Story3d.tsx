@@ -96,7 +96,7 @@ export const story3dMeta = {
   },
   args: {
     postProcessing: true,
-    skybox: Object.keys(skyboxes)[0],
+    skybox: skyboxes.deepspace1,
     pane: false,
     grid: false,
   },

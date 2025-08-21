@@ -14,7 +14,7 @@ uniform float uCameraScale;
 
 void main() {
     float a = 1.f - 2.f * distance(vUv, vec2(0.5f, 0.5f));
-    fragData[0].rgb = mix(uColor.rgb, vec3(1.f), a * a);
+    fragData[0].rgb = mix(uColor.rgb, vec3(2.f), a * a * a);
     fragData[0].a = a * uColor.a;
 
     if(fragData[0].a < 1.f / 255.f) {

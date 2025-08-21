@@ -17,6 +17,8 @@ import { gameStore } from "@ui/state/game";
 import { System } from "@core/systems/system";
 import { defaultIndexer } from "@core/systems/utils/default";
 import { Vec2 } from "ogl";
+import type { Turret } from "@core/archetypes/turret";
+import { applyPositionToChildren } from "@core/systems/moving";
 
 class MovingSystem extends System {
   apply(sim: Sim) {
@@ -37,6 +39,7 @@ class MovingSystem extends System {
         const nextPos = fromPolar(nextAngle, r);
         const vec = nextPos.sub(ship.cp.position.coord);
         ship.cp.position.angle = Math.atan2(vec.y, vec.x);
+        applyPositionToChildren(ship);
       }
     });
   }
@@ -77,7 +80,12 @@ const Game: React.FC<{ fighters: number }> = ({ fighters: fightersNumber }) => {
     }
 
     for (let i = 0; i < fighters.length; i++) {
-      fighters[i].cp.damage!.targetId = fighters[(i + 1) % fighters.length].id;
+      for (const { id, role } of fighters[i].cp.children?.entities ?? []) {
+        if (role !== "turret") continue;
+
+        const turret = xSim.getOrThrow<Turret>(id);
+        turret.cp.damage.targetId = fighters[(i + 1) % fighters.length].id;
+      }
     }
 
     xSim.start();
