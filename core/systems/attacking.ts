@@ -9,7 +9,7 @@ import { stopCruise } from "@core/utils/moving";
 import { Vec2 } from "ogl";
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import type { TransformData } from "@core/components/transform";
-import { filter, map, pipe, some } from "@fxts/core";
+import { filter, flatMap, map, pipe, some } from "@fxts/core";
 import type { Turret } from "@core/archetypes/turret";
 import type { AttackOrder } from "@core/components/orders";
 import { regenCooldown } from "./hitpointsRegenerating";
@@ -138,26 +138,8 @@ export class AttackingSystem extends System {
           target.cp.orders
         ) {
           attack(target.requireComponents(["orders"]), parentEntity);
-        } else if (
-          target.hasComponents(["children"]) &&
-          AttackingSystem.shouldAttackAttacker(parentEntity, target)
-        ) {
-          for (const child of target.cp.children.entities) {
-            if (child.role !== "turret") continue;
-
-            const turret = this.sim.getOrThrow<Turret>(child.id);
-            if (
-              AttackingSystem.isInShootingRange(
-                turret.cp.transform.world.coord,
-                turret.cp.transform.world.angle,
-                entityTransform.coord,
-                turret.cp.damage.range,
-                turret.cp.damage.angle
-              )
-            ) {
-              turret.cp.damage.targetId = parentEntity.id;
-            }
-          }
+        } else if (AttackingSystem.shouldRetribute(parentEntity, target)) {
+          this.retribute(target, entityTransform.coord, parentEntity.id);
         }
         target.cp.subordinates?.ids.forEach((subordinateId) => {
           const subordinate = this.sim
@@ -173,6 +155,48 @@ export class AttackingSystem extends System {
       target.cooldowns.use(regenCooldown, 2);
     }
   };
+
+  retribute(
+    target: RequireComponent<"hitpoints" | "position">,
+    attackerPosition: Vec2,
+    attackerId: number
+  ) {
+    let iterator: Iterable<number>;
+
+    if (target.hasComponents(["children"])) {
+      iterator = pipe(
+        target.cp.children.entities,
+        filter((c) => c.role === "turret"),
+        map((c) => c.id)
+      );
+    } else if (target.hasComponents(["modules"])) {
+      iterator = pipe(
+        target.cp.modules.ids,
+        map((m) => this.sim.getOrThrow(m)),
+        filter((m) => m.hasComponents(["children"])),
+        flatMap((m) => m.cp.children.entities),
+        filter((c) => c.role === "turret"),
+        map((c) => c.id)
+      );
+    } else {
+      throw new Error("This entity has no components to support turrets");
+    }
+
+    for (const turretId of iterator) {
+      const turret = this.sim.getOrThrow<Turret>(turretId);
+      if (
+        AttackingSystem.isInShootingRange(
+          turret.cp.transform.world.coord,
+          turret.cp.transform.world.angle,
+          attackerPosition,
+          turret.cp.damage.range,
+          turret.cp.damage.angle
+        )
+      ) {
+        turret.cp.damage.targetId = attackerId;
+      }
+    }
+  }
 
   static isInShootingRange(
     originPosition: Vec2,
@@ -224,11 +248,13 @@ export class AttackingSystem extends System {
     );
   }
 
-  static shouldAttackAttacker(
+  static shouldRetribute(
     _attacker: Entity,
-    _target: RequireComponent<"position">
+    target: RequireComponent<"position">
   ): boolean {
-    return true;
+    return (
+      target.hasComponents(["children"]) || target.hasComponents(["modules"])
+    );
   }
 }
 

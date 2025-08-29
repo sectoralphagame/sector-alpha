@@ -3,13 +3,14 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import type { ShipInput } from "@core/world/ships";
 import { useThrottledFormState } from "@devtools/utils";
 import { fromPolar } from "@core/utils/misc";
-import type { Vec2 } from "ogl";
+import { Vec2 } from "ogl";
 import { IconButton } from "@kit/IconButton";
 import { ArrowLeftIcon, CloseIcon } from "@assets/ui/icons";
 import clsx from "clsx";
 import { getTurretBySlug, listTurrets } from "@core/world/turrets";
 import { Select, SelectButton, SelectOption, SelectOptions } from "@kit/Select";
 import { Button } from "@kit/Button";
+import { AttackingSystem } from "@core/systems/attacking";
 import type { FormData } from "./utils";
 import { Table, TableCell, TableHeader } from "../components/Table";
 import styles from "./styles.scss";
@@ -17,9 +18,17 @@ import styles from "./styles.scss";
 function getDps(ship: ShipInput, direction: Vec2): number {
   let dps = 0;
   for (const turret of ship.turrets) {
-    // Replace with actual turret direction check
-    if (true) {
-      const turretInfo = getTurretBySlug(turret.class);
+    const turretInfo = getTurretBySlug(turret.class);
+    const slot = ship.slots.find((s) => s.slug === turret.slot)!;
+    if (
+      AttackingSystem.isInShootingRange(
+        new Vec2(0, 0),
+        slot.angle,
+        direction,
+        turretInfo.range,
+        turret.angle
+      )
+    ) {
       dps += turretInfo.damage / turretInfo.cooldown;
     }
   }

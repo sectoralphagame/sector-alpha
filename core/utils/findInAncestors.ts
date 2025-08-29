@@ -8,8 +8,9 @@ import type { RequireComponent } from "../tsHelpers";
 export function findInAncestors<T extends keyof CoreComponents>(
   entity: Entity,
   component: T,
-  visited: number[] = []
+  v?: number[]
 ): RequireComponent<T> {
+  const visited = v ?? [];
   if (visited.includes(entity.id)) {
     throw new Error("Cyclic ancestry detected");
   }
@@ -18,10 +19,11 @@ export function findInAncestors<T extends keyof CoreComponents>(
   }
 
   if (entity.hasComponents(["parent"])) {
+    visited.push(entity.id);
     return findInAncestors(
       entity.sim.getOrThrow(entity.requireComponents(["parent"]).cp.parent.id),
       component,
-      [...visited, entity.id]
+      visited
     );
   }
 

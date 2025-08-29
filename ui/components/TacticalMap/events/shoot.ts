@@ -1,12 +1,12 @@
 import type { Sim } from "@core/sim";
 import type { ShootEvent } from "@core/systems/transport3d";
-import type { RequireComponent } from "@core/tsHelpers";
 import type { EventHandler } from "@core/utils/pubsub";
 import { LaserWeaponEffect } from "@ogl-engine/builders/LaserWeapon";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { taskPriority } from "@ogl-engine/engine/task";
 import { KineticGunParticleGenerator } from "@ogl-engine/particles/kineticGun";
 import { Vec3 } from "ogl";
+import { findInAncestors } from "@core/utils/findInAncestors";
 import { distanceScale } from "../EntityMesh";
 
 const tempVec3 = new Vec3();
@@ -16,9 +16,7 @@ export function createShootHandler(
   sim: Sim
 ): EventHandler<ShootEvent> {
   return ({ entity: turret }) => {
-    const entity = sim.getOrThrow<RequireComponent<"position">>(
-      turret.cp.parent!.id
-    );
+    const entity = findInAncestors(turret, "position");
     const shooter = engine.getByEntityId(entity.id);
     const target = engine.getByEntityId(turret.cp.damage.targetId!);
     const targetEntity = sim.get(turret.cp.damage.targetId!);
@@ -30,6 +28,7 @@ export function createShootHandler(
         engine,
         turret.cp.color?.value ?? "#ffffff"
       );
+      generator.targetId = turret.cp.damage.targetId;
       generator.setParent(shooter);
       generator.position.set(
         turret.cp.transform.coord.x * distanceScale,

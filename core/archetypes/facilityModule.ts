@@ -1,12 +1,15 @@
 import type { Commodity } from "@core/economy/commodity";
 import { fromEntries, pipe, map } from "@fxts/core";
 import type { Damage } from "@core/components/damage";
+import { fromPolar } from "@core/utils/misc";
+import { findInAncestors } from "@core/utils/findInAncestors";
 import { Entity } from "../entity";
 import type { PAC } from "../components/production";
 import { createProduction } from "../components/production";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import modules from "../world/data/facilityModules.json";
+import { createTurret } from "./turret";
 
 export interface FacilityModuleCommonInput {
   name: string;
@@ -104,10 +107,43 @@ export function createFacilityModule(
     });
   } else if (input.type === "military") {
     entity.addComponent({
-      ...input.damage,
-      name: "damage",
-      targetId: null,
+      name: "children",
+      entities: [],
+      slots: Array(4)
+        .fill(0)
+        .map((_, i) => ({
+          angle: (i * Math.PI) / 2,
+          slug: `turret-${i}`,
+        })),
     });
+    const turrets = Array(4)
+      .fill(0)
+      .map((_, i) =>
+        createTurret(sim, {
+          slug: "rapidKinetic",
+          angle: (i * Math.PI) / 2,
+          damage: {
+            angle: Math.PI / 2,
+          },
+          slot: `turret-${i}`,
+          parentId: entity.id,
+          transform: {
+            coord: fromPolar((i * Math.PI) / 2, 0.01),
+            angle: (i * Math.PI) / 2,
+            world: {
+              coord: findInAncestors(input.parent, "position")
+                .cp.position.coord.clone()
+                .add(fromPolar((i * Math.PI) / 2, 0.01)),
+              angle: (i * Math.PI) / 2,
+            },
+          },
+        })
+      );
+    entity.cp.children!.entities = turrets.map((turret, turretIndex) => ({
+      id: turret.id,
+      role: "turret",
+      slot: `turret-${turretIndex}`,
+    }));
   }
   if (input.crew.cost > 0) {
     entity.addComponent({

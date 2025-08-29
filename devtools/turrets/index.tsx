@@ -111,7 +111,9 @@ const TurretGeneralEditor: React.FC<{ index: number }> = ({ index }) => {
           </Popover.Panel>
         </Popover>
       </TableCell>
-      <TableCell>{turret.damage / turret.cooldown} DPS</TableCell>
+      <TableCell align="right">
+        {(turret.damage / turret.cooldown).toFixed(4)} DPS
+      </TableCell>
     </tr>
   );
 };
@@ -167,7 +169,7 @@ const Editor: React.FC<{}> = () => {
             <TableHeader>Cooldown</TableHeader>
             <TableHeader>Type</TableHeader>
             <TableHeader>Color</TableHeader>
-            <TableHeader>DPS</TableHeader>
+            <TableHeader align="right">DPS</TableHeader>
           </tr>
         </thead>
         <tbody>

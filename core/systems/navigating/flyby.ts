@@ -2,7 +2,6 @@ import { startCruise, stopCruise } from "@core/utils/moving";
 import { Vec2 } from "ogl";
 import clamp from "lodash/clamp";
 import type { RequireComponent } from "@core/tsHelpers";
-import { getPane } from "@ui/context/Pane";
 import type { Navigable } from "./types";
 import { createThrust, type Thrust } from "./thrust";
 import { brake } from "./utils";
@@ -79,20 +78,13 @@ export function flyBy(
         (entity.cp.hitpoints?.shield?.max ?? 1) <=
         0.5
     ) {
-      if (window.selected === entity)
-        getPane().updateDebugValue({ name: "thrust", data: "fallback" });
       thrust.forward.negate();
       thrust.throttle = 1;
     } else if (alignmentToTarget < 0.4 && alignmentToTargetForward > 0.5) {
-      if (window.selected === entity)
-        getPane().updateDebugValue({ name: "thrust", data: "braking" });
       brake(entity, 0, thrust);
     } else if (alignmentToVelocity < 0) {
-      if (window.selected === entity)
-        getPane().updateDebugValue({ name: "thrust", data: "misaligned" });
       brake(entity, 0, thrust);
-    } else if (window.selected === entity)
-      getPane().updateDebugValue({ name: "thrust", data: "forward" });
+    }
   }
 
   return thrust;

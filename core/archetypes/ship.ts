@@ -4,7 +4,6 @@ import type { DockSize } from "@core/components/dockable";
 import { createDocks } from "@core/components/dockable";
 import { Vec2 } from "ogl";
 import { random } from "mathjs";
-import { getTurretBySlug } from "@core/world/turrets";
 import { applyParentTransform } from "@core/systems/moving";
 import { createDrive } from "../components/drive";
 import { Entity } from "../entity";
@@ -166,16 +165,12 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       ({ slug }) => slug === turretInput.slot
     );
     const slotPosition = new Vec2(random(-4e-2, 4e-2), random(-4e-2, 4e-2));
-    const turretData = getTurretBySlug(turretInput.class);
 
     const turret = createTurret(sim, {
+      slug: turretInput.class,
       angle: slot!.angle,
       damage: {
         angle: turretInput.angle,
-        cooldown: turretData.cooldown,
-        range: turretData.range,
-        value: turretData.damage,
-        type: turretData.type,
       },
       slot: turretInput.slot,
       parentId: entity.id,
@@ -187,7 +182,6 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
           angle: slot!.angle,
         },
       },
-      color: turretData.color,
     });
     applyParentTransform(turret, entity.cp.position);
   }

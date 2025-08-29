@@ -364,8 +364,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
 
     for (const resource of availableResources) {
       this.logger.log(
-        `Evaluating ${resource} mining facility in ${sector.cp.name.value} for ${faction.cp.name.slug}`,
-        "error"
+        `Evaluating ${resource} mining facility in ${sector.cp.name.value} for ${faction.cp.name.slug}`
       );
       const facilityModule = factionBlueprints
         .filter(discriminate("type", "production"))
@@ -393,7 +392,7 @@ export class FacilityPlanningSystem extends System<"plan"> {
         name: `${capitalize(commodityLabel[resource])} Mining Complex`,
         sector,
       };
-      this.logger.log(`Planned ${plan.name}`, "error");
+      this.logger.log(`Planned ${plan.name}`);
 
       return plan;
     }

@@ -74,7 +74,7 @@ export class MovingSystem extends System {
   exec(delta: number): void {
     if (delta > 0) {
       for (const entity of entityIndexer.search(["movable", "position"])) {
-        if (!entity.cp.dockable?.dockedIn) {
+        if (!entity.cp.dockable?.dockedIn || entity.cp.dockable?.undocking) {
           this.move(entity, delta);
         }
       }

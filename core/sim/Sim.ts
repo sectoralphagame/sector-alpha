@@ -115,7 +115,14 @@ export class Sim extends BaseSim {
     this.hooks.removeEntity.subscribe("EntityIndexer", ({ entity, reason }) => {
       logger.log(
         `Removing entity ${entity.id} ${
-          entity.cp.name?.value ?? "[unnamed]"
+          entity.cp.name?.value ??
+          (entity.cp.parent
+            ? `[unnamed ${
+                this.getOrThrow(entity.cp.parent.id).cp.children!.entities.find(
+                  (c) => c.id === entity.id
+                )!.role
+              }]`
+            : "[unnamed]")
         } (${reason})`
       );
       entityIndexer.remove(entity);
