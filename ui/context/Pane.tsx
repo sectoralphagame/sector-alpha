@@ -201,7 +201,7 @@ export const DraggablePane: React.FC = () => {
   }, [container]);
 
   return (
-    <DraggableContainer>
+    <DraggableContainer style={{ zIndex: 1 }}>
       <div ref={setContainer} />
     </DraggableContainer>
   );
