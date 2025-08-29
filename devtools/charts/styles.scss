@@ -1,3 +1,25 @@
 .root {
   position: relative;
+  max-width: usesize(100);
+  margin: usesize(10) auto;
+
+  ul {
+    display: flex;
+    gap: usesize(1);
+  }
+
+  li {
+    &::marker {
+      color: transparent;
+    }
+
+    border: 1px solid var(--palette-border);
+    border-radius: usesize(0.2);
+    display: block;
+    padding: usesize(1);
+
+    a:any-link {
+      color: var(--palette-text-1) !important;
+    }
+  }
 }
