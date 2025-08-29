@@ -272,8 +272,6 @@ export class OrderExecutingSystem extends System {
     for (const entity of this.sim.index.orderable.getIt()) {
       if (entity.hasTags(["busy"])) continue;
 
-      // if (window.selected === entity) debugger;
-
       if (entity.cp.orders.value.length) {
         const order = entity.cp.orders.value[0];
         const { exec, isCompleted, onCompleted } = orderFns[order.type] ?? {
