@@ -80,39 +80,39 @@ const Game: React.FC = () => {
 
   React.useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.code === "Escape") {
-        if (overlay) {
-          gameStore.setOverlay(null);
-        } else {
-          setDialog(dialog ? null : { type: "config" });
-        }
-      }
-
-      if (event.target instanceof HTMLInputElement) return;
-
-      if (
-        event.code in overlayKeyCodes &&
-        (overlayKeyCodes[event.code] !== "dev" || gameSettings.dev)
-      ) {
-        if (gameStore.overlay === overlayKeyCodes[event.code]) {
-          gameStore.closeOverlay();
-        } else {
-          gameStore.setOverlay(overlayKeyCodes[event.code]);
-        }
-      }
-      if (event.code === "Space") {
-        if (sim.speed === 0) sim.unpause();
-        else sim.pause();
-      }
-
-      if (event.code === "KeyQ") {
-        gameStore.togglePanelExpanded();
-      }
-
-      if (event.code.startsWith("Digit") && event.shiftKey) {
+      if (event.shiftKey) {
         if (event.code === "Digit1") sim.setSpeed(1);
         if (event.code === "Digit2") sim.setSpeed(5);
         if (event.code === "Digit3" && gameSettings.dev) sim.setSpeed(50);
+      } else if (!(event.metaKey || event.ctrlKey)) {
+        if (event.code === "Escape") {
+          if (overlay) {
+            gameStore.setOverlay(null);
+          } else {
+            setDialog(dialog ? null : { type: "config" });
+          }
+        }
+
+        if (event.target instanceof HTMLInputElement) return;
+
+        if (
+          event.code in overlayKeyCodes &&
+          (overlayKeyCodes[event.code] !== "dev" || gameSettings.dev)
+        ) {
+          if (gameStore.overlay === overlayKeyCodes[event.code]) {
+            gameStore.closeOverlay();
+          } else {
+            gameStore.setOverlay(overlayKeyCodes[event.code]);
+          }
+        }
+        if (event.code === "Space") {
+          if (sim.speed === 0) sim.unpause();
+          else sim.pause();
+        }
+
+        if (event.code === "KeyQ") {
+          gameStore.togglePanelExpanded();
+        }
       }
     };
 
