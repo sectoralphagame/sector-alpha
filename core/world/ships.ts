@@ -48,3 +48,7 @@ export const shipClasses = shipClassesData.map((s) => ({
     angle: s.damage.angle,
   },
 })) as ShipInput[];
+
+export function getShipClass(slug: string) {
+  return shipClasses.find((s) => s.slug === slug);
+}
