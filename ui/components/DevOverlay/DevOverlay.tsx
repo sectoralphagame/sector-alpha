@@ -11,7 +11,7 @@ const DevOverlay: React.FC = () => {
   React.useEffect(() => {
     actionLoader.link(sim);
 
-    return actionLoader.reset;
+    return actionLoader.reset.bind(actionLoader);
   }, []);
   const [actions, setActions] = React.useState<DevAction[]>(actionLoader.all());
   const [[overlay, selectedUnits], gameStore] = useGameStore((store) => [
