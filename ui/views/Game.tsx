@@ -23,7 +23,6 @@ import type { Faction } from "@core/archetypes/faction";
 import { MapOverlay } from "@ui/components/MapOverlay/MapOverlay";
 import type { GameOverlayType } from "@ui/state/game";
 import { useGameStore } from "@ui/state/game";
-import { getPane } from "@ui/context/Pane";
 import styles from "./Game.scss";
 
 import { Panel } from "../components/Panel";
@@ -44,7 +43,6 @@ const Game: React.FC = () => {
   const [dialog, setDialog] = useGameDialog();
   const { addNotification } = useNotifications();
   const [gameSettings] = useGameSettings();
-  const pressedKeys = React.useRef(new Set<string>());
 
   const player = sim.index.player.get()[0]!;
   const [[currentSector, overlay, selectedUnits, selectionBox], gameStore] =
@@ -82,8 +80,6 @@ const Game: React.FC = () => {
 
   React.useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      pressedKeys.current.add(event.code);
-
       if (event.code === "Escape") {
         if (overlay) {
           gameStore.setOverlay(null);
@@ -108,33 +104,19 @@ const Game: React.FC = () => {
         if (sim.speed === 0) sim.unpause();
         else sim.pause();
       }
-      if (
-        event.code === "KeyK" &&
-        pressedKeys.current.has("MetaLeft") &&
-        gameSettings.dev
-      ) {
-        getPane().hidden = !getPane().hidden;
-      }
 
       if (event.code === "KeyQ") {
         gameStore.togglePanelExpanded();
       }
 
-      if (
-        event.code.startsWith("Digit") &&
-        pressedKeys.current.has("ShiftLeft")
-      ) {
+      if (event.code.startsWith("Digit") && event.shiftKey) {
         if (event.code === "Digit1") sim.setSpeed(1);
         if (event.code === "Digit2") sim.setSpeed(5);
         if (event.code === "Digit3" && gameSettings.dev) sim.setSpeed(50);
       }
     };
-    const onKeyUp = (event: KeyboardEvent) => {
-      pressedKeys.current.delete(event.code);
-    };
 
     document.addEventListener("keydown", onKeyDown);
-    document.addEventListener("keyup", onKeyUp);
 
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [setDialog, overlay, gameSettings.dev]);
