@@ -4,6 +4,7 @@ import type { Faction } from "@core/archetypes/faction";
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import type { DockSize } from "@core/components/dockable";
 import { addExperience } from "@core/components/experience";
+import { findInAncestors } from "@core/utils/findInAncestors";
 import { System } from "./system";
 import { transport3D } from "./transport3d";
 
@@ -57,8 +58,11 @@ export class DeadUnregisteringSystem extends System {
           expValues[entity.cp.dockable?.size || "small"] / attackers.length;
         for (const attackerId of attackers) {
           const attacker = this.sim.get(attackerId);
-          if (attacker?.hasComponents(["experience"])) {
-            addExperience(attacker, exp);
+          if (!attacker) continue;
+
+          const parentWithExperience = findInAncestors(attacker, "experience");
+          if (parentWithExperience) {
+            addExperience(parentWithExperience, exp);
           }
         }
 
