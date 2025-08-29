@@ -46,6 +46,9 @@ export class GameStore {
       setPanelExpanded: action.bound,
       togglePanelExpanded: action.bound,
     });
+
+    window.select = (ids: number[]) =>
+      this.setSelectedUnits(ids.map((id) => window.sim.getOrThrow(id)));
   }
 
   setSector(sector: Sector) {
