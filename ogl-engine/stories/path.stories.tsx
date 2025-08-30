@@ -25,7 +25,7 @@ const PathStory: React.FC = () => {
   const pathRef = React.useRef<Path>();
 
   React.useEffect(() => {
-    engine.hooks.onInit.subscribe("MapControlStory", async () => {
+    engine.hooks.subscribe("init", async () => {
       engine.setScene(new Scene(engine));
       controlRef.current = new MapControl(engine.camera, engine.canvas);
       skyboxRef.current = new Skybox(engine, "example");
@@ -36,7 +36,7 @@ const PathStory: React.FC = () => {
       engine.scene.addChild(pathRef.current);
     });
 
-    engine.hooks.onUpdate.subscribe("MapControlStory", () => {
+    engine.hooks.subscribe("update", () => {
       pathRef.current?.update(waypoints);
       controlRef.current!.update(engine.originalDelta);
     });

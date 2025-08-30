@@ -103,12 +103,10 @@ export class TacticalMap extends React.PureComponent<TacticalMapProps> {
       ) ?? this.sim.index.sectors.get()[0]
     );
 
-    this.engine.hooks.onInit.subscribe("TacticalMap", () => {
+    this.engine.hooks.subscribe("init", () => {
       this.onEngineInit();
     });
-    this.engine.hooks.onUpdate.subscribe("TacticalMap", () =>
-      this.onEngineUpdate()
-    );
+    this.engine.hooks.subscribe("update", () => this.onEngineUpdate());
     this.onUnmountCallbacks.push(
       reaction(
         () => gameStore.sector,

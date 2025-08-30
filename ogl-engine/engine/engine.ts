@@ -1,14 +1,15 @@
-import { Observable } from "@core/utils/observer";
 import { Renderer } from "ogl";
+import { PubSub } from "@core/utils/pubsub";
 import type { Scene } from "./Scene";
 import type { Camera } from "./Camera";
 
+type InitEvent = { type: "init" };
+type UpdateEvent = { type: "update"; delta: number };
+type ErrorEvent = { type: "error"; error: Error };
+type EngineEvent = InitEvent | UpdateEvent | ErrorEvent;
+
 export abstract class Engine<TScene extends Scene = Scene> {
-  public hooks: {
-    onInit: Observable<void>;
-    onUpdate: Observable<number>;
-    onError: Observable<Error>;
-  };
+  public hooks: PubSub<EngineEvent>;
 
   public camera: Camera;
   protected canvas: HTMLCanvasElement | OffscreenCanvas;
@@ -23,11 +24,7 @@ export abstract class Engine<TScene extends Scene = Scene> {
   protected deltaMultiplier = 1;
 
   constructor() {
-    this.hooks = {
-      onInit: new Observable("onInit"),
-      onUpdate: new Observable("onUpdate"),
-      onError: new Observable("onError"),
-    };
+    this.hooks = new PubSub();
     this.lastFrameTime = performance.now();
   }
 
@@ -62,17 +59,16 @@ export abstract class Engine<TScene extends Scene = Scene> {
     if (!this.initialized) {
       throw new Error("Engine not initialized");
     }
-
     const now = performance.now();
     this.originalDelta = (now - this.lastFrameTime) / 1000;
-    this.hooks.onUpdate.notify(this.delta);
+    this.hooks.publish({ type: "update", delta: this.delta });
 
     try {
       if (this.isFocused()) {
         this.render();
       }
     } catch (err) {
-      this.hooks.onError.notify(err);
+      this.hooks.publish({ type: "error", error: err });
       throw err;
     }
 

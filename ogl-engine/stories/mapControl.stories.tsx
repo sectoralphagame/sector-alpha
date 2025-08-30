@@ -17,7 +17,7 @@ const ModelStory: React.FC = () => {
   const skyboxRef = React.useRef<Skybox>();
 
   React.useEffect(() => {
-    engine.hooks.onInit.subscribe("MapControlStory", async () => {
+    engine.hooks.subscribe("init", async () => {
       engine.setScene(new TacticalMapScene(engine));
       controlRef.current = new MapControl(engine.camera, engine.canvas);
       const helper = new AxesHelper(engine.gl, {});
@@ -33,7 +33,7 @@ const ModelStory: React.FC = () => {
       engine.scene.addChild(mesh);
     });
 
-    engine.hooks.onUpdate.subscribe("MapControlStory", () => {
+    engine.hooks.subscribe("update", () => {
       controlRef.current!.update(engine.originalDelta);
     });
   }, [engine]);

@@ -3,8 +3,8 @@ import type { Driveable } from "@core/utils/moving";
 import { clearTarget, startCruise, stopCruise } from "@core/utils/moving";
 import { Vec2 } from "ogl";
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
-import { Observable } from "@core/utils/observer";
 import { random } from "mathjs";
+import { PubSubHook } from "@core/utils/pubsub";
 import { defaultDriveLimit } from "../components/drive";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
@@ -69,7 +69,7 @@ const cruiseTimer = "cruise";
 let navigatingSystem: NavigatingSystem;
 export class NavigatingSystem extends System {
   entities: Navigable[];
-  hook: Observable<Navigable> = new Observable<Navigable>("onTargetReached");
+  hook = new PubSubHook<Navigable>();
 
   constructor() {
     super();
@@ -194,7 +194,7 @@ export class NavigatingSystem extends System {
       if (phase === "update") this.exec(delta);
     });
     sim.hooks.subscribe("destroy", () => {
-      this.hook.observers.clear();
+      this.hook.reset();
     });
   }
 
@@ -213,7 +213,7 @@ export class NavigatingSystem extends System {
     return navigatingSystem;
   }
 
-  static onTargetReached(origin: string, fn: (_entity: Navigable) => void) {
-    return NavigatingSystem.getInstance().hook.subscribe(origin, fn);
+  static onTargetReached(fn: (_entity: Navigable) => void) {
+    return NavigatingSystem.getInstance().hook.subscribe(fn);
   }
 }

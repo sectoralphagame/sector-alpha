@@ -19,10 +19,10 @@ export const OglCanvas: React.FC<OglCanvasProps> = React.memo(({ engine }) => {
     };
     if (!canvas) return cleanup;
 
-    engine.hooks.onUpdate.subscribe("OglCanvas", () => {
+    engine.hooks.subscribe("update", () => {
       frameIdRef.current = requestAnimationFrame(engine.update.bind(engine));
     });
-    engine.hooks.onError.subscribe("OglCanvas", () => {
+    engine.hooks.subscribe("error", () => {
       setErrorCount((count) => count + 1);
     });
 

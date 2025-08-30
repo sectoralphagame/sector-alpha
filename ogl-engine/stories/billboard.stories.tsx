@@ -19,7 +19,7 @@ const BillboardStory: React.FC<{
   const billboardRef = React.useRef<Billboard<TintedTextureMaterial>>();
 
   React.useEffect(() => {
-    engine.hooks.onInit.subscribe("BillboardStory", async () => {
+    engine.hooks.subscribe("init", async () => {
       controlRef.current = new Orbit(engine.camera);
       skyboxRef.current = new Skybox(engine, "example");
 
@@ -39,7 +39,7 @@ const BillboardStory: React.FC<{
       img.src = arrowDownFat;
     });
 
-    engine.hooks.onUpdate.subscribe("BillboardStory", () => {
+    engine.hooks.subscribe("update", () => {
       controlRef.current!.update();
     });
   }, [engine]);

@@ -12,7 +12,7 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
         this.exec(delta);
       }
     });
-    NavigatingSystem.onTargetReached(this.constructor.name, (entity) => {
+    NavigatingSystem.onTargetReached((entity) => {
       if (entity.hasComponents(["disposable"])) {
         DisposableUnregisteringSystem.dispose(entity);
       }

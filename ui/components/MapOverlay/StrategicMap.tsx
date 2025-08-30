@@ -23,7 +23,6 @@ function isDestroyable(mesh: Transform): mesh is Transform & Destroyable {
 }
 
 const tempVec2 = new Vec2();
-// const tempVec3 = new Vec3();
 
 function sign(p1: Vec2, p2: Vec2, p3: Vec2) {
   return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
@@ -77,7 +76,6 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
   mouseWorldPos = new Vec2();
   lastClick: number;
   sectorSizes: Record<string, number> = {};
-  // raycastHits: BaseMesh2D[];
 
   onUnmountCallbacks: (() => void)[] = [];
 
@@ -85,15 +83,16 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     super(props);
     this.engine = new StrategicMapEngine();
     this.sim = props.sim;
-    // this.raycastHits = [];
   }
 
   componentDidMount(): void {
     const onInit = this.onInit.bind(this);
     const onUpdate = this.onUpdate.bind(this);
 
-    this.engine.hooks.onInit.subscribe("StrategicMap", onInit);
-    this.engine.hooks.onUpdate.subscribe("StrategicMap", onUpdate);
+    this.onUnmountCallbacks.push(
+      this.engine.hooks.subscribe("init", onInit),
+      this.engine.hooks.subscribe("update", onUpdate)
+    );
 
     this.updateSectorSizes();
     const sectorSizeInterval = setInterval(
@@ -101,12 +100,7 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
       1000
     );
 
-    this.onUnmountCallbacks.push(() => {
-      this.engine.hooks.onInit.unsubscribe(onInit);
-      this.engine.hooks.onUpdate.unsubscribe(onUpdate);
-
-      clearInterval(sectorSizeInterval);
-    });
+    this.onUnmountCallbacks.push(() => clearInterval(sectorSizeInterval));
   }
 
   componentWillUnmount(): void {

@@ -127,7 +127,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
     this.initPostProcessing();
     window.renderer = this;
-    this.hooks.onInit.notify();
+    this.hooks.publish({ type: "init" });
     this.initialized = true;
   };
 

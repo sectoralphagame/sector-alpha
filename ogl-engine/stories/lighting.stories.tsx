@@ -28,7 +28,7 @@ const LightingStory: React.FC<{
   const radiusRef = React.useRef(radius);
 
   React.useEffect(() => {
-    engine.hooks.onInit.subscribe("LightingStory", async () => {
+    engine.hooks.subscribe("init", async () => {
       engine.setScene(new Scene(engine));
       engine.camera.position.set(2);
       controlRef.current = new Orbit(engine.camera);
@@ -58,7 +58,7 @@ const LightingStory: React.FC<{
       img.src = arrowDownFat;
     });
 
-    engine.hooks.onUpdate.subscribe("LightingStory", () => {
+    engine.hooks.subscribe("update", () => {
       for (let i = 0; i < lightsRef.current.length; i++) {
         lightsRef.current[i].position.x =
           Math.sin(engine.uniforms.uTime.value + i * Math.PI) *
