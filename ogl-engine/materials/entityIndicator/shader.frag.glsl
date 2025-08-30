@@ -2,6 +2,7 @@
 precision highp float;
 
 in vec2 vUv;
+in float vDist;
 
 out vec4 fragData[3];
 
@@ -85,5 +86,19 @@ void main() {
         discard;
     }
 
-    fragData[2] = vec4(color, clamp(alpha, 0.f, 1.f) * (0.75f + sign(float(uSelected)) * 0.22f + sign(float(uHovered)) * 0.1f));
+    float distanceModifier = clamp(2.f - log(vDist) / 8.f, 0.25f, 1.f);
+    if(shield <= 0.f || hp <= 0.f) {
+        distanceModifier = min(1.f, 2.f - log(vDist) / 4.f);
+    }
+    alpha *= 0.65f * distanceModifier;
+
+    if(uHovered > 0) {
+        alpha += 0.2f;
+    }
+
+    if(uSelected > 0) {
+        alpha = 1.f;
+    }
+
+    fragData[2] = vec4(color, clamp(alpha, 0.f, 1.f));
 }

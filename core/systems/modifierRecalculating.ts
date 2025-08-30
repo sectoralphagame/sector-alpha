@@ -6,10 +6,11 @@ import { System } from "./system";
 
 export class ModifierRecalculatingSystem extends System {
   apply(sim: Sim) {
-    sim.hooks.phase.start.subscribe(
-      this.constructor.name,
-      this.recalculateModifiers.bind(this)
-    );
+    sim.hooks.subscribe("phase", ({ phase }) => {
+      if (phase === "start") {
+        this.recalculateModifiers();
+      }
+    });
   }
 
   // eslint-disable-next-line class-methods-use-this

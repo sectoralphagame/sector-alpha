@@ -26,7 +26,11 @@ export class CrewGrowingSystem extends System<"exec"> {
     const offset =
       Math.floor(sim.getTime() / gameDay) + 1 - sim.getTime() / gameDay;
     this.cooldowns.use("exec", offset);
-    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
+    sim.hooks.subscribe("phase", ({ phase }) => {
+      if (phase === "update") {
+        this.exec();
+      }
+    });
   };
 
   exec = (): void => {

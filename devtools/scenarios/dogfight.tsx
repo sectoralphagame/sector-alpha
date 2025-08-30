@@ -39,7 +39,7 @@ export const Dogfight = () => {
   const [sim, setSim] = React.useState<Sim | null>(null);
   const engine = React.useMemo(() => {
     const e = new Engine3D<TacticalMapScene>();
-    e.hooks.onInit.subscribe("Dogfight", () => {
+    e.hooks.subscribe("init", () => {
       const asteroids = new Asteroids(
         window.renderer,
         10,

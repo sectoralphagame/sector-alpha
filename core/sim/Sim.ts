@@ -12,12 +12,12 @@ import type { CoreComponents } from "@core/components/component";
 import type { EntityTag } from "@core/tags";
 import { componentMask } from "@core/components/masks";
 import LZString from "lz-string";
-import { Observable } from "@core/utils/observer";
 import { defaultIndexer } from "@core/systems/utils/default";
 import { Vec2 } from "ogl";
 import { isVec2 } from "@core/utils/misc";
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { defaultLogger } from "@core/log";
+import { PubSub } from "@core/utils/pubsub";
 import { Entity, EntityComponents } from "../entity";
 import { BaseSim } from "./BaseSim";
 import type { System } from "../systems/system";
@@ -25,6 +25,40 @@ import { MissingEntityError } from "../errors";
 import { openDb } from "../db";
 
 const logger = defaultLogger.sub("sim");
+
+export type ComponentAddEvent = {
+  type: "addComponent";
+  entity: Entity;
+  component: keyof CoreComponents;
+};
+export type ComponentRemoveEvent = {
+  type: "removeComponent";
+  entity: Entity;
+  component: keyof CoreComponents;
+};
+export type TagAddEvent = { type: "addTag"; entity: Entity; tag: EntityTag };
+export type TagRemoveEvent = {
+  type: "removeTag";
+  entity: Entity;
+  tag: EntityTag;
+};
+export type EntityRemoveEvent = {
+  type: "removeEntity";
+  entity: Entity;
+  reason: string;
+};
+export type DestroySimEvent = {
+  type: "destroy";
+};
+export type PhaseEvent = {
+  type: "phase";
+  delta: number;
+  phase: "start" | "init" | "update" | "render" | "cleanup" | "end";
+};
+export type SpeedChangeEvent = {
+  type: "speedChange";
+  newSpeed: number;
+};
 
 export interface SimConfig {
   systems: System[];
@@ -36,26 +70,16 @@ export class Sim extends BaseSim {
 
   @Expose()
   entityIdCounter: number = 1;
-  hooks: {
-    addComponent: Observable<{
-      entity: Entity;
-      component: keyof CoreComponents;
-    }>;
-    removeComponent: Observable<{
-      entity: Entity;
-      component: keyof CoreComponents;
-    }>;
-    addTag: Observable<{ entity: Entity; tag: EntityTag }>;
-    removeTag: Observable<{ entity: Entity; tag: EntityTag }>;
-    removeEntity: Observable<{ entity: Entity; reason: string }>;
-    destroy: Observable<void>;
-
-    phase: Record<
-      "start" | "init" | "update" | "render" | "cleanup" | "end",
-      Observable<number>
-    >;
-    onSpeedChange: Observable<number>;
-  };
+  hooks: PubSub<
+    | ComponentAddEvent
+    | ComponentRemoveEvent
+    | TagAddEvent
+    | TagRemoveEvent
+    | EntityRemoveEvent
+    | DestroySimEvent
+    | PhaseEvent
+    | SpeedChangeEvent
+  >;
 
   @Expose()
   @Type(() => Entity)
@@ -70,23 +94,7 @@ export class Sim extends BaseSim {
     super();
 
     this.entities = new Map();
-    this.hooks = {
-      addComponent: new Observable("addComponent"),
-      removeComponent: new Observable("removeComponent"),
-      addTag: new Observable("addTag"),
-      removeTag: new Observable("removeTag"),
-      removeEntity: new Observable("removeEntity"),
-      destroy: new Observable("destroy"),
-      phase: {
-        start: new Observable("phase.start", false),
-        init: new Observable("phase.init", false),
-        update: new Observable("phase.update", false),
-        render: new Observable("phase.render", false),
-        cleanup: new Observable("phase.cleanup", false),
-        end: new Observable("phase.end", false),
-      },
-      onSpeedChange: new Observable("onSpeedChange", false),
-    };
+    this.hooks = new PubSub();
 
     entityIndexer.clear();
     this.index = defaultIndexer;
@@ -94,25 +102,19 @@ export class Sim extends BaseSim {
       index.apply();
     }
 
-    this.hooks.addComponent.subscribe(
-      "EntityIndexer",
-      ({ entity, component }) => {
-        entityIndexer.updateMask(entity);
-        if (component === "position") {
-          entityIndexer.updateSector(entity.requireComponents(["position"]));
-        }
+    this.hooks.subscribe("addComponent", ({ entity, component }) => {
+      entityIndexer.updateMask(entity);
+      if (component === "position") {
+        entityIndexer.updateSector(entity.requireComponents(["position"]));
       }
-    );
-    this.hooks.removeComponent.subscribe(
-      "EntityIndexer",
-      ({ entity, component }) => {
-        entityIndexer.updateMask(entity);
-        if (component === "position") {
-          entityIndexer.removeFromSectors(entity);
-        }
+    });
+    this.hooks.subscribe("removeComponent", ({ entity, component }) => {
+      entityIndexer.updateMask(entity);
+      if (component === "position") {
+        entityIndexer.removeFromSectors(entity);
       }
-    );
-    this.hooks.removeEntity.subscribe("EntityIndexer", ({ entity, reason }) => {
+    });
+    this.hooks.subscribe("removeEntity", ({ entity, reason }) => {
       logger.log(
         `Removing entity ${entity.id} ${
           entity.cp.name?.value ??
@@ -127,7 +129,7 @@ export class Sim extends BaseSim {
       );
       entityIndexer.remove(entity);
     });
-    this.hooks.destroy.subscribe("EntityIndexer", () => {
+    this.hooks.subscribe("destroy", () => {
       entityIndexer.clear();
     });
 
@@ -141,7 +143,7 @@ export class Sim extends BaseSim {
   };
 
   unregisterEntity = (entity: Entity, reason: string) => {
-    this.hooks.removeEntity.notify({ entity, reason });
+    this.hooks.publish({ type: "removeEntity", entity, reason });
     this.entities.delete(entity.id);
   };
 
@@ -154,19 +156,19 @@ export class Sim extends BaseSim {
       return;
     }
 
-    this.hooks.phase.start.notify(delta);
-    this.hooks.phase.init.notify(delta);
-    this.hooks.phase.update.notify(delta);
-    this.hooks.phase.render.notify(delta);
-    this.hooks.phase.cleanup.notify(delta);
-    this.hooks.phase.end.notify(delta);
+    this.hooks.publish({ type: "phase", delta, phase: "start" });
+    this.hooks.publish({ type: "phase", delta, phase: "init" });
+    this.hooks.publish({ type: "phase", delta, phase: "update" });
+    this.hooks.publish({ type: "phase", delta, phase: "render" });
+    this.hooks.publish({ type: "phase", delta, phase: "cleanup" });
+    this.hooks.publish({ type: "phase", delta, phase: "end" });
 
     this.updateTimer(delta);
   };
 
   override setSpeed(value: number) {
     super.setSpeed(value);
-    this.hooks.onSpeedChange.notify(value);
+    this.hooks.publish({ type: "speedChange", newSpeed: value });
   }
 
   init = () => {
@@ -225,7 +227,7 @@ export class Sim extends BaseSim {
 
   destroy = () => {
     this.stop();
-    this.hooks.destroy.notify();
+    this.hooks.publish({ type: "destroy" });
     if (!isHeadless) {
       window.sim = undefined!;
       window.selected = undefined!;

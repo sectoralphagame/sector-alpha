@@ -26,7 +26,7 @@ export class Engine2D extends Engine {
     this.camera.near = settings.camera.near;
     this.camera.far = settings.camera.far;
 
-    this.hooks.onInit.notify();
+    this.hooks.publish({ type: "init" });
     this.initialized = true;
   }
 

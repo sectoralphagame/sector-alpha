@@ -63,15 +63,11 @@ const Game: React.FC = () => {
       setSim(undefined!);
     };
 
-    sim.hooks.removeEntity.subscribe("Game", ({ entity }) => {
-      if (
-        entity.hasComponents(["position"]) &&
-        selectedUnits.includes(entity)
-      ) {
+    sim.hooks.subscribe("removeEntity", ({ entity }) => {
+      if (entity.hasComponents(["position"]) && selectedUnits.includes(entity))
         gameStore.unselectUnit(entity);
-      }
     });
-    sim.hooks.destroy.subscribe("Game", unmount);
+    sim.hooks.subscribe("destroy", unmount);
 
     window.sim = sim;
 

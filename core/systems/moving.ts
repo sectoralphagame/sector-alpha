@@ -64,10 +64,9 @@ export class MovingSystem extends System {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    sim.hooks.phase.update.subscribe(
-      this.constructor.name,
-      this.exec.bind(this)
-    );
+    sim.hooks.subscribe("phase", ({ phase, delta }) => {
+      if (phase === "update") this.exec(delta);
+    });
   };
 
   // eslint-disable-next-line class-methods-use-this

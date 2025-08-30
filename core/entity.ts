@@ -83,7 +83,8 @@ export class Entity {
     };
     this.componentsMask |= componentMask[componentName];
     if (!exists) {
-      this.sim.hooks.addComponent.notify({
+      this.sim.hooks.publish({
+        type: "addComponent",
         entity: this,
         component: component.name,
       });
@@ -95,7 +96,11 @@ export class Entity {
   removeComponent(name: keyof CoreComponents): Entity {
     this.componentsMask &= ~componentMask[name];
     delete this.components[name];
-    this.sim.hooks.removeComponent.notify({ entity: this, component: name });
+    this.sim.hooks.publish({
+      type: "removeComponent",
+      entity: this,
+      component: name,
+    });
 
     return this;
   }
@@ -105,7 +110,7 @@ export class Entity {
 
     if (!hasTag) {
       this.tags.add(tag);
-      this.sim.hooks.addTag.notify({ tag, entity: this });
+      this.sim.hooks.publish({ type: "addTag", tag, entity: this });
     }
 
     return this;
@@ -113,7 +118,7 @@ export class Entity {
 
   removeTag(tag: EntityTag): Entity {
     this.tags.delete(tag);
-    this.sim.hooks.removeTag.notify({ tag, entity: this });
+    this.sim.hooks.publish({ type: "removeTag", tag, entity: this });
 
     return this;
   }

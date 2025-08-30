@@ -8,7 +8,9 @@ export class SectorClaimingSystem extends System<"exec"> {
     super.apply(sim);
 
     this.cooldowns.timers.exec = 2;
-    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
+    sim.hooks.subscribe("phase", (event) => {
+      if (event.phase === "update") this.exec();
+    });
   };
 
   exec = (): void => {

@@ -20,6 +20,7 @@ void main() {
     vec4 viewPosition = viewMatrix * vec4(worldPosition, 1.0f);
 
     vUv = uv;
+    vDist = distance(cameraPosition, modelMatrix[3].xyz);
 
     gl_Position = projectionMatrix * viewPosition;
 }

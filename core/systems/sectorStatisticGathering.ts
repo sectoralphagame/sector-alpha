@@ -9,7 +9,9 @@ export class SectorStatisticGatheringSystem extends System {
   apply(sim: Sim): void {
     super.apply(sim);
 
-    sim.hooks.phase.end.subscribe(this.constructor.name, this.exec);
+    sim.hooks.subscribe("phase", (event) => {
+      if (event.phase === "end") this.exec();
+    });
   }
 
   exec = (): void => {

@@ -190,7 +190,11 @@ export class FacilityPlanningSystem extends System<"plan"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
+    sim.hooks.subscribe("phase", ({ phase }) => {
+      if (phase === "update") {
+        this.exec();
+      }
+    });
   };
 
   createNewFactory = (faction: Faction): Facility => {

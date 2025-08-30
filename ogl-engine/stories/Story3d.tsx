@@ -44,7 +44,7 @@ export const Story3d: React.FC<Story3dProps> = ({
   }, [pane]);
 
   React.useEffect(() => {
-    engine.hooks.onInit.subscribe("Story3d", () => {
+    engine.hooks.subscribe("init", () => {
       onEngineInit(engine);
 
       controlRef.current =
@@ -55,9 +55,9 @@ export const Story3d: React.FC<Story3dProps> = ({
       skyboxRef.current.setParent(engine.scene);
     });
 
-    engine.hooks.onUpdate.subscribe("Story3d", (time) => {
+    engine.hooks.subscribe("update", ({ delta }) => {
       controlRef.current?.update(engine.originalDelta);
-      onEngineUpdate(engine, time);
+      onEngineUpdate(engine, delta);
     });
   }, [engine]);
 

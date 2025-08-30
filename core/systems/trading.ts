@@ -383,7 +383,11 @@ export class TradingSystem extends System<"adjustPrices" | "createOffers"> {
       this.collect(sim);
     }
 
-    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
+    sim.hooks.subscribe("phase", ({ phase }) => {
+      if (phase === "update") {
+        this.exec();
+      }
+    });
   };
 
   destroy = (): void => {

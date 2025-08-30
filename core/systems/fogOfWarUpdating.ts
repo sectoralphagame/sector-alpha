@@ -35,7 +35,11 @@ export class FogOfWarUpdatingSystem extends System<"exec"> {
       this.constructor.name
     );
 
-    sim.hooks.phase.init.subscribe(this.constructor.name, this.updateFog);
+    sim.hooks.subscribe("phase", ({ phase }) => {
+      if (phase === "init") {
+        this.updateFog();
+      }
+    });
   };
 
   destroy = (): void => {
