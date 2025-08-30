@@ -32,6 +32,7 @@ const LaserStory: React.FC<LaserStoryProps> = ({ motion, ...props }) => {
     const laser = new LaserWeaponEffect(engine, {
       color: "rgb(54, 54, 255)",
       width: 0.1,
+      id: 1,
     });
     laser.beam.material.createPaneSettings();
     laser.setParent(transform);

@@ -3,6 +3,7 @@ import { random } from "mathjs";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { KineticGunMaterial } from "@ogl-engine/materials/kineticGun/kineticGun";
 import { Vec3 } from "ogl";
+import { Material } from "@ogl-engine/materials/material";
 import { RosetteGeometry } from "./rosette";
 
 const spread = 0.25;
@@ -18,7 +19,7 @@ export class KineticGunParticleGenerator extends OneShotParticleGenerator {
   targetId: number | null = null;
   cached = 0;
 
-  constructor(engine: Engine3D, color: string) {
+  constructor(engine: Engine3D) {
     super(
       engine,
       (particle) => {
@@ -73,8 +74,15 @@ export class KineticGunParticleGenerator extends OneShotParticleGenerator {
     };
 
     const material = new KineticGunMaterial(engine, {
-      color,
+      color: "#ffffff",
     });
     this.mesh.applyMaterial(material);
+  }
+
+  setColor(color: string) {
+    Material.colorToVec4(
+      color,
+      (this.mesh.material as KineticGunMaterial).uniforms.uColor
+    );
   }
 }

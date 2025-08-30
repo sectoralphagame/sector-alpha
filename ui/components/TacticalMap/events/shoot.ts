@@ -24,10 +24,8 @@ export function createShootHandler(
     if (!(shooter && target && targetEntity)) return;
 
     if (turret.cp.damage.type === "kinetic") {
-      const generator = new KineticGunParticleGenerator(
-        engine,
-        turret.cp.color?.value ?? "#ffffff"
-      );
+      const generator = new KineticGunParticleGenerator(engine);
+      generator.setColor(turret.cp.color?.value ?? "#ffffff");
       generator.targetId = turret.cp.damage.targetId;
       generator.setParent(shooter);
       generator.position.set(
