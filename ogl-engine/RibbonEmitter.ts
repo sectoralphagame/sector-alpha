@@ -6,8 +6,12 @@ import type { OnBeforeRenderTask } from "./engine/task";
 
 const tempVec3 = new Vec3();
 const tempVec32 = new Vec3();
+const tempVec33 = new Vec3();
+const tempVec34 = new Vec3();
 const tempDir = new Vec3();
-const tempNormal = new Vec3();
+const tempNormalForward = new Vec3();
+const tempNormalBackward = new Vec3();
+const up = new Vec3(0, 1, 0);
 
 export class RibbonGeometry extends Geometry {
   readonly maxSegments: number;
@@ -18,23 +22,22 @@ export class RibbonGeometry extends Geometry {
     segments?: Float32Array,
     width = 0.3
   ) {
-    const position = new Float32Array((maxSegments - 1) * 4 * 3);
-    const uv = new Float32Array((maxSegments - 1) * 4 * 2);
-    const index = new Uint16Array((maxSegments - 1) * 6);
+    const position = new Float32Array(maxSegments * 2 * 3);
+    const uv = new Float32Array(maxSegments * 2 * 2);
+    const index = new Uint16Array(position.length / 3);
 
     if (segments) {
-      RibbonGeometry.build(segments, position, new Vec3(0, 1, 0), width);
+      RibbonGeometry.build(segments, position, width);
     }
 
-    for (let i = 0; i < maxSegments - 1; i++) {
-      index.set(
-        [i * 4, i * 4 + 2, i * 4 + 1, i * 4 + 2, i * 4 + 3, i * 4 + 1],
-        i * 6
-      );
+    for (let i = 0; i < index.length; i++) {
+      index[i] = i;
+    }
 
-      const uvOffset = i * 2 * 4;
-      const xStart = i / (maxSegments - 1);
-      const xEnd = (i + 1) / (maxSegments - 1);
+    for (let i = 0; i < maxSegments; i++) {
+      const uvOffset = i * 2 * 2;
+      const xStart = i / maxSegments;
+      const xEnd = (i + 1) / maxSegments;
 
       uv[uvOffset] = xStart;
       uv[uvOffset + 1] = 0;
@@ -65,31 +68,38 @@ export class RibbonGeometry extends Geometry {
     this.maxSegments = maxSegments;
   }
 
-  static build(
-    segments: Float32Array,
-    position: Float32Array,
-    cameraDirection: Vec3,
-    width: number
-  ) {
+  static build(segments: Float32Array, position: Float32Array, width: number) {
     const length = segments.length / 4;
-    for (let i = 0; i < length - 1; i++) {
-      const segment = segments.subarray(i * 4, i * 4 + 4);
-      const nextSegment = segments.subarray((i + 1) * 4, (i + 1) * 4 + 4);
 
-      const dir = tempDir
-        .fromArray(nextSegment)
-        .sub(tempVec32.set(segment[0], segment[1], segment[2]))
+    for (let i = 0; i < length; i++) {
+      const segment = tempVec32.fromArray(
+        segments.subarray(i * 4, (i + 1) * 4)
+      );
+      const prevSegment = tempVec33.fromArray(
+        segments.subarray((i - 1) * 4, i * 4)
+      );
+      const nextSegment = tempVec34.fromArray(
+        segments.subarray((i + 1) * 4, (i + 2) * 4)
+      );
+
+      const dir = tempDir.copy(nextSegment).sub(segment).normalize();
+      const normalForward = tempNormalForward.cross(dir, up).normalize();
+      const dirBackward = tempDir.copy(segment).sub(prevSegment).normalize();
+      const normalBackward = tempNormalBackward
+        .cross(dirBackward, up)
         .normalize();
-      const normal = tempNormal
-        .cross(dir, cameraDirection)
-        .normalize()
-        .multiply(width);
 
-      const vertOffset = i * 3 * 4;
-      position.set(tempVec3.set(tempVec32).add(normal), vertOffset);
-      position.set(tempVec3.set(tempVec32).sub(normal), vertOffset + 3);
-      position.set(tempVec3.fromArray(nextSegment).add(normal), vertOffset + 6);
-      position.set(tempVec3.fromArray(nextSegment).sub(normal), vertOffset + 9);
+      let normal = normalForward;
+      if (i === length - 1) {
+        normal = normalBackward;
+      } else if (i > 0) {
+        normal = normalForward.add(normalBackward).scale(0.5).normalize();
+      }
+      normal.multiply(width);
+
+      const vertOffset = i * 3 * 2;
+      position.set(tempVec3.copy(segment).add(normal), vertOffset);
+      position.set(tempVec3.copy(segment).sub(normal), vertOffset + 3);
     }
   }
 }
@@ -115,6 +125,7 @@ export class RibbonEmitter extends BaseMesh<EngineTrailMaterial> {
       geometry: new RibbonGeometry(trackedEntity.engine.gl, maxSegments),
       material: new EngineTrailMaterial(trackedEntity.engine, "#ff00ff"),
       calculateTangents: false,
+      mode: trackedEntity.engine.gl.TRIANGLE_STRIP,
     });
     this.maxSegments = maxSegments;
     this.width = width;
@@ -160,10 +171,6 @@ export class RibbonEmitter extends BaseMesh<EngineTrailMaterial> {
     RibbonGeometry.build(
       this.segments,
       this.geometry.attributes.position.data! as Float32Array,
-      tempVec3
-        .copy(this.trackedEntity.position)
-        .sub(this.engine.camera.position)
-        .normalize(),
       this.width * this.trackedEntity.scale.x
     );
 
