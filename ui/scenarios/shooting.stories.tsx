@@ -24,22 +24,24 @@ class MovingSystem extends System {
   apply(sim: Sim) {
     this.sim = sim;
 
-    sim.hooks.phase.update.subscribe(this.constructor.name, () => {
-      const shipsNum = defaultIndexer.ships.get().length;
+    sim.hooks.subscribe("phase", ({ phase }) => {
+      if (phase === "update") {
+        const shipsNum = defaultIndexer.ships.get().length;
 
-      for (let i = 0; i < shipsNum; i++) {
-        const ship = defaultIndexer.ships.get()[i];
-        const t = sim.getTime() / 10;
+        for (let i = 0; i < shipsNum; i++) {
+          const ship = defaultIndexer.ships.get()[i];
+          const t = sim.getTime() / 10;
 
-        const angle = t + (i * Math.PI * 2) / shipsNum;
-        const r = 0.1;
+          const angle = t + (i * Math.PI * 2) / shipsNum;
+          const r = 0.1;
 
-        ship.cp.position.coord.copy(fromPolar(angle, r));
-        const nextAngle = t + ((i + 1) * Math.PI * 2) / shipsNum;
-        const nextPos = fromPolar(nextAngle, r);
-        const vec = nextPos.sub(ship.cp.position.coord);
-        ship.cp.position.angle = Math.atan2(vec.y, vec.x);
-        applyPositionToChildren(ship);
+          ship.cp.position.coord.copy(fromPolar(angle, r));
+          const nextAngle = t + ((i + 1) * Math.PI * 2) / shipsNum;
+          const nextPos = fromPolar(nextAngle, r);
+          const vec = nextPos.sub(ship.cp.position.coord);
+          ship.cp.position.angle = Math.atan2(vec.y, vec.x);
+          applyPositionToChildren(ship);
+        }
       }
     });
   }

@@ -133,12 +133,12 @@ export class StrategicMap extends React.PureComponent<StrategicMapProps> {
     this.control.onPointerUp = this.onClick.bind(this);
     this.control.onKeyDown = this.onKeyDown.bind(this);
 
-    this.sim.hooks.removeEntity.subscribe("TacticalMap", ({ entity }) => {
+    this.sim.hooks.subscribe("removeEntity", ({ entity }) => {
       const mesh = this.engine.scene.getEntity(entity.id);
-      if (mesh) {
-        if (isDestroyable(mesh)) mesh.destroy();
-        this.engine.scene.removeEntity(entity.id);
+      if (mesh && isDestroyable(mesh)) {
+        mesh.destroy();
       }
+      if (mesh) this.engine.scene.removeEntity(entity.id);
     });
   }
 

@@ -32,26 +32,30 @@ export class AvgFrameReportingSystem extends System {
       this.constructor.name
     );
 
-    sim.hooks.phase.start.subscribe(this.constructor.name, () => {
-      this.start = performance.now();
+    sim.hooks.subscribe("phase", ({ phase }) => {
+      if (phase === "start") {
+        this.start = performance.now();
+      }
     });
 
-    sim.hooks.phase.end.subscribe(this.constructor.name, (delta) => {
-      if (!this.reporting || delta === 0) return;
+    sim.hooks.subscribe("phase", ({ phase, delta }) => {
+      if (phase === "end") {
+        if (!this.reporting || delta === 0) return;
 
-      this.accumulator += performance.now() - this.start;
-      this.iterations++;
+        this.accumulator += performance.now() - this.start;
+        this.iterations++;
 
-      if (this.iterations === 60) {
-        // eslint-disable-next-line no-console
-        const newData = frameData.value.slice();
-        newData.unshift(this.accumulator / 60);
-        if (newData.length > 31) {
-          newData.pop();
+        if (this.iterations === 60) {
+          // eslint-disable-next-line no-console
+          const newData = frameData.value.slice();
+          newData.unshift(this.accumulator / 60);
+          if (newData.length > 31) {
+            newData.pop();
+          }
+          frameData.notify(newData);
+          this.iterations = 0;
+          this.accumulator = 0;
         }
-        frameData.notify(newData);
-        this.iterations = 0;
-        this.accumulator = 0;
       }
     });
   }

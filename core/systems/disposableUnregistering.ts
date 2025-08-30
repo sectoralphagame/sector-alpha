@@ -7,10 +7,11 @@ export class DisposableUnregisteringSystem extends System<"exec"> {
   apply(sim: Sim) {
     super.apply(sim);
 
-    sim.hooks.phase.cleanup.subscribe(
-      this.constructor.name,
-      this.exec.bind(this)
-    );
+    sim.hooks.subscribe("phase", ({ phase, delta }) => {
+      if (phase === "cleanup") {
+        this.exec(delta);
+      }
+    });
     NavigatingSystem.onTargetReached(this.constructor.name, (entity) => {
       if (entity.hasComponents(["disposable"])) {
         DisposableUnregisteringSystem.dispose(entity);

@@ -5,7 +5,11 @@ export class CollectibleUnregisteringSystem extends System {
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    sim.hooks.phase.cleanup.subscribe(this.constructor.name, this.exec);
+    sim.hooks.subscribe("phase", ({ phase }) => {
+      if (phase === "cleanup") {
+        this.exec();
+      }
+    });
   };
 
   exec = (): void => {

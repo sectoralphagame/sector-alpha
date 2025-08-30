@@ -1,4 +1,3 @@
-import { matrix } from "mathjs";
 import { Vec2 } from "ogl";
 import type { Facility } from "../archetypes/facility";
 import { facilityComponents } from "../archetypes/facility";
@@ -39,16 +38,16 @@ describe("Trading module", () => {
       systems: [new PathPlanningSystem(), new OrderExecutingSystem()],
     });
     // Run path planning
-    sim.hooks.phase.init.notify(0);
+    sim.hooks.publish("phase", { phase: "init", delta: 0 });
 
     sector = createSector(sim, {
       name: "",
       slug: "",
-      position: matrix([0, 0, 0]),
+      position: new Vec2(0, 0),
     });
     facility = createFarm(
       {
-        position: matrix([0, 0]),
+        position: new Vec2(0, 0),
         owner: createFaction("F", sim),
         sector,
       },
@@ -90,7 +89,7 @@ describe("Trading module", () => {
     const ship = createShip(sim, {
       ...shipClasses[0],
       owner: shipFaction,
-      position: matrix([0, 0, 0]),
+      position: new Vec2(0, 0),
       sector,
     });
     ship.cp.storage.max = 1000;
@@ -139,7 +138,7 @@ describe("Trading module", () => {
     const ship = createShip(sim, {
       ...shipClasses[0],
       owner: shipFaction,
-      position: matrix([0, 0, 0]),
+      position: new Vec2(0, 0),
       sector,
     });
     ship.cp.storage.max = 1000;
@@ -194,7 +193,7 @@ describe("Trading module", () => {
     const ship = createShip(sim, {
       ...shipClasses[0],
       owner: shipFaction,
-      position: matrix([0, 0, 0]),
+      position: new Vec2(0, 0),
       sector,
     });
     ship.cp.storage.max = 1000;
@@ -250,7 +249,7 @@ describe("Trading module", () => {
     createOffers(facility);
 
     const waterFacility = createWaterFacility(
-      { owner: createFaction("F2", sim), position: matrix([0, 0]), sector },
+      { owner: createFaction("F2", sim), position: new Vec2(0, 0), sector },
       sim
     ).requireComponents([...facilityComponents, "compoundProduction", "owner"]);
     settleStorageQuota(waterFacility);
@@ -271,7 +270,7 @@ describe("Trading module", () => {
     const ship = createShip(sim, {
       ...shipClasses[0],
       owner: shipFaction,
-      position: matrix([0, 0, 0]),
+      position: new Vec2(0, 0),
       sector,
     });
 
@@ -358,7 +357,7 @@ describe("Trade flow", () => {
     sim = new Sim({
       systems: [new PathPlanningSystem(), new OrderExecutingSystem()],
     });
-    sim.hooks.phase.init.notify(0);
+    sim.hooks.publish("phase", { phase: "init", delta: 0 });
 
     createFaction("Player", sim)
       .addComponent({
@@ -373,11 +372,11 @@ describe("Trade flow", () => {
     sector = createSector(sim, {
       name: "",
       slug: "",
-      position: matrix([0, 0, 0]),
+      position: new Vec2(0, 0),
     });
     farm = createFarm(
       {
-        position: matrix([0, 0]),
+        position: new Vec2(0, 0),
         owner: createFaction("F", sim),
         sector,
       },
@@ -390,7 +389,7 @@ describe("Trade flow", () => {
     farm.cp.trade.offers.water.price = 110;
 
     waterFacility = createWaterFacility(
-      { owner: createFaction("F2", sim), position: matrix([0, 0]), sector },
+      { owner: createFaction("F2", sim), position: new Vec2(0, 0), sector },
       sim
     ).requireComponents([...facilityComponents, "compoundProduction", "owner"]);
     waterFacility.cp.name.value = "Water facility";
@@ -402,7 +401,7 @@ describe("Trade flow", () => {
     ship = createShip(sim, {
       ...shipClasses[0],
       owner: shipFaction,
-      position: matrix([0, 0, 0]),
+      position: new Vec2(0, 0),
       sector,
     });
   });

@@ -190,11 +190,10 @@ export class NavigatingSystem extends System {
   apply(sim: Sim): void {
     super.apply(sim);
 
-    sim.hooks.phase.update.subscribe(
-      this.constructor.name,
-      this.exec.bind(this)
-    );
-    sim.hooks.destroy.subscribe(this.constructor.name, () => {
+    sim.hooks.subscribe("phase", ({ phase, delta }) => {
+      if (phase === "update") this.exec(delta);
+    });
+    sim.hooks.subscribe("destroy", () => {
       this.hook.observers.clear();
     });
   }

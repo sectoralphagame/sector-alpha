@@ -83,10 +83,16 @@ export class TacticalMap extends React.PureComponent<TacticalMapProps> {
     const onSpeedChange = (speed: number) => {
       this.engine.setDeltaMultiplier(speed);
     };
-    this.sim.hooks.onSpeedChange.subscribe("TacticalMap", onSpeedChange);
-    this.onUnmountCallbacks.push(transport3D.reset.bind(transport3D), () => {
-      this.sim.hooks.onSpeedChange.unsubscribe(onSpeedChange);
-    });
+    const unsubscribe = this.sim.hooks.subscribe(
+      "speedChange",
+      ({ newSpeed }) => {
+        onSpeedChange(newSpeed);
+      }
+    );
+    this.onUnmountCallbacks.push(
+      transport3D.reset.bind(transport3D),
+      unsubscribe
+    );
   }
 
   componentDidMount(): void {
@@ -120,7 +126,7 @@ export class TacticalMap extends React.PureComponent<TacticalMapProps> {
       if (key !== "gameSettings") return;
       this.updateEngineSettings();
     });
-    this.sim.hooks.removeEntity.subscribe("TacticalMap", ({ entity }) => {
+    this.sim.hooks.subscribe("removeEntity", ({ entity }) => {
       if (this.meshes.has(entity)) {
         const mesh = this.meshes.get(entity)!;
         mesh.destroy();

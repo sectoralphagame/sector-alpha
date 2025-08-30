@@ -239,15 +239,13 @@ export class PirateSpawningSystem extends System<
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    sim.hooks.phase.start.subscribe(this.constructor.name, () => {
-      if (!this.faction) {
+    sim.hooks.subscribe("phase", ({ phase }) => {
+      if (phase === "start" && !this.faction) {
         this.faction = sim.index.ai
           .get()
           .find((f) => f.cp.name.slug === "PIR")!;
-      }
+      } else if (phase === "update") this.exec();
     });
-
-    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
   };
 }
 

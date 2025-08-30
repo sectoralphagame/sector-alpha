@@ -17,7 +17,9 @@ export class FacilityBuildingSystem extends System<"build" | "offers"> {
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
+    sim.hooks.subscribe("phase", ({ phase, delta }) => {
+      if (phase === "update") this.exec(delta);
+    });
   };
 
   createOffers = (): void => {

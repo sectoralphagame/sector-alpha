@@ -249,23 +249,17 @@ export class OrderExecutingSystem extends System {
   apply = (sim: Sim) => {
     super.apply(sim);
 
-    sim.hooks.removeEntity.subscribe(
-      "OrderExecutingSystem-allocations",
-      ({ entity }) => cleanupAllocations(entity)
+    sim.hooks.subscribe("removeEntity", ({ entity }) =>
+      cleanupAllocations(entity)
     );
-    sim.hooks.removeEntity.subscribe(
-      "OrderExecutingSystem-orders",
-      ({ entity }) => cleanupOrders(entity)
+    sim.hooks.subscribe("removeEntity", ({ entity }) => cleanupOrders(entity));
+    sim.hooks.subscribe("removeEntity", ({ entity }) =>
+      cleanupChildren(entity)
     );
-    sim.hooks.removeEntity.subscribe(
-      "OrderExecutingSystem-children",
-      ({ entity }) => cleanupChildren(entity)
-    );
-    sim.hooks.removeEntity.subscribe(
-      "OrderExecutingSystem-docks",
-      ({ entity }) => cleanupDocks(entity)
-    );
-    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
+    sim.hooks.subscribe("removeEntity", ({ entity }) => cleanupDocks(entity));
+    sim.hooks.subscribe("phase", ({ phase }) => {
+      if (phase === "update") this.exec();
+    });
   };
 
   exec = () => {
