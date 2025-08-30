@@ -168,7 +168,7 @@ export class Sim extends BaseSim {
 
   override setSpeed(value: number) {
     super.setSpeed(value);
-    this.hooks.publish({ type: "speedChange", newSpeed: this.speed });
+    this.hooks.publish({ type: "speedChange", newSpeed: value });
   }
 
   init = () => {
