@@ -1,6 +1,5 @@
 import { isDev } from "@core/settings";
 import { facilityPlanningSystem } from "@core/systems/ai/facilityPlanning";
-import { militaryModuleSpottingSystem } from "@core/systems/ai/militaryModuleSpotting";
 import { orderPlanningSystem } from "@core/systems/ai/orderPlanning";
 import { shipPlanningSystem } from "@core/systems/ai/shipPlanning";
 import { shipReturningSystem } from "@core/systems/ai/shipReturning";
@@ -68,7 +67,6 @@ export const createBaseConfig = async (): Promise<SimConfig> => {
       undeployingSystem,
       attackingSystem,
       spottingSystem,
-      militaryModuleSpottingSystem,
       hitpointsRegeneratingSystem,
       tauHarassingSystem,
       deadUnregisteringSystem,

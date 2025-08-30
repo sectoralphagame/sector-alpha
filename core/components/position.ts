@@ -1,9 +1,7 @@
-import type { Vec2 } from "ogl";
 import type { BaseComponent } from "./component";
+import type { TransformData } from "./transform";
 
-export interface Position extends BaseComponent<"position"> {
-  angle: number;
-  readonly coord: Vec2;
+export interface Position extends BaseComponent<"position">, TransformData {
   sector: number;
   moved: boolean;
 }

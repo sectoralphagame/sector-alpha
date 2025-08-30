@@ -1,0 +1,56 @@
+[
+  {
+    "name": "Small Flak",
+    "slug": "smallFlak",
+    "damage": 5,
+    "range": 1,
+    "cooldown": 1,
+    "type": "kinetic",
+    "color": "#e6c297"
+  },
+  {
+    "name": "Rapid Kinetic",
+    "slug": "rapidKinetic",
+    "damage": 4.5,
+    "range": 1,
+    "cooldown": 0.7,
+    "type": "kinetic",
+    "color": "#ff2e2e"
+  },
+  {
+    "name": "Kinetic",
+    "slug": "kinetic",
+    "damage": 10,
+    "range": 2,
+    "cooldown": 1,
+    "type": "kinetic",
+    "color": "#ff7220"
+  },
+  {
+    "name": "Pulsar",
+    "slug": "pulsar",
+    "damage": 25,
+    "range": 0.7,
+    "cooldown": 2,
+    "type": "laser",
+    "color": "#53dfff"
+  },
+  {
+    "name": "Laser",
+    "slug": "laser",
+    "damage": 65,
+    "range": 2.5,
+    "cooldown": 7,
+    "type": "laser",
+    "color": "#f78a75"
+  },
+  {
+    "name": "Ion",
+    "slug": "ion",
+    "damage": 125,
+    "range": 2.7,
+    "cooldown": 8,
+    "type": "laser",
+    "color": "#ccff7a"
+  }
+]

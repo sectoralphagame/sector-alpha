@@ -18,7 +18,7 @@ void main() {
     float alphaY = K / (K + alphaFactorY * alphaFactorY) - K;
     float alpha = alphaX * alphaY;
 
-    fragData[0] = vec4(uColor * (1.f + emissive) * alphaX, alpha);
+    fragData[0] = vec4(mix(uColor, vec3(1.f), pow(alphaY, 2.f) - 0.4f), alpha);
     fragData[1] = vec4(fragData[0].rgb, emissive * alpha);
     gl_FragDepth = log2(vFragDepth) / uCameraScale;
 }

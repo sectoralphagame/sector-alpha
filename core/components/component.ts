@@ -46,6 +46,7 @@ import type { Movable } from "./movable";
 import type { StorageTransfer } from "./storageTransfer";
 import type { Policies } from "./policies";
 import type { Experience } from "./experience";
+import type { Transform } from "./transform";
 
 export interface CoreComponents {
   ai: Ai;
@@ -102,6 +103,7 @@ export interface CoreComponents {
   systemManager: SystemManager;
   teleport: Teleport;
   trade: Trade;
+  transform: Transform;
 }
 
 /**

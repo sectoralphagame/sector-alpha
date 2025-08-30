@@ -13,6 +13,10 @@ const titles = {
   "/dev/sectors": "Sectors",
   "/dev/charts": "Charts",
   "/dev/facility-builder": "Facility Builder",
+  "/dev/turrets": "Turret Editor",
+  "/dev/scenarios": "Scenarios",
+  "/dev/scenarios/frigate": "Scenario: Frigate Under Attack",
+  "/dev/scenarios/dogfight": "Scenario: Dogfight",
 };
 
 export const Layout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {

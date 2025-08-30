@@ -1,5 +1,6 @@
 import type { BaseComponent } from "./component";
 
+export type DamageType = "kinetic" | "laser"; // Cosmetic for now
 export interface Damage extends BaseComponent<"damage"> {
   cooldown: number;
   targetId: number | null;
@@ -10,6 +11,7 @@ export interface Damage extends BaseComponent<"damage"> {
     base: number;
     current: number;
   };
+  type: DamageType;
 }
 
 export function recalculate(cp: Damage): void {

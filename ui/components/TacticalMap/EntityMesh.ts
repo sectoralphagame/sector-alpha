@@ -17,6 +17,8 @@ import { taskPriority, type OnBeforeRenderTask } from "@ogl-engine/engine/task";
 import models from "@assets/models";
 import type { Material } from "@ogl-engine/materials/material";
 import { materials } from "@ogl-engine/materials";
+import { LaserWeaponEffect } from "@ogl-engine/builders/LaserWeapon";
+import type { Turret } from "@core/archetypes/turret";
 
 const tempVec3 = new Vec3();
 export const distanceScale = 250;
@@ -173,6 +175,20 @@ export class EntityMesh extends BaseMesh {
       }
     }
 
+    for (const { id, role } of entity.cp.children?.entities ?? []) {
+      if (role !== "turret") continue;
+
+      const turret = this.entity.sim.getOrThrow<Turret>(id);
+      if (turret.cp.damage.type === "laser") {
+        const laserWeapon = new LaserWeaponEffect(engine, {
+          id,
+          color: turret.cp.color.value,
+          width: 1.55,
+        });
+        laserWeapon.setParent(this);
+      }
+    }
+
     if (entity.tags.has("selection")) {
       this.indicator = new EntityIndicator(engine);
       this.tasks.push(
@@ -214,6 +230,9 @@ export class EntityMesh extends BaseMesh {
     generator.position.copy(input.position);
     generator.rotation.copy(input.rotation);
     generator.scale.copy(input.scale);
+    if (type === "hyperslingshot") {
+      generator.scale.multiply(200);
+    }
     generator.setParent(this);
     generator.updateMatrixWorld();
   }

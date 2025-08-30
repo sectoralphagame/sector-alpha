@@ -1,7 +1,8 @@
-import type { RequireComponent } from "@core/tsHelpers";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Entity } from "@core/entity";
 import { CloudParticleGenerator } from "@ogl-engine/particles/cloud";
+import type { StopMiningEvent } from "@core/systems/transport3d";
+import type { EventHandler } from "@core/utils/pubsub";
 import type { EntityMesh } from "../EntityMesh";
 
 const cloudName = "miningCloud";
@@ -9,8 +10,8 @@ const cloudName = "miningCloud";
 export function createStopMiningHandler(
   engine: Engine3D,
   _meshes: WeakMap<Entity, EntityMesh>
-) {
-  return (entity: RequireComponent<"position">) => {
+): EventHandler<StopMiningEvent> {
+  return ({ entity }) => {
     const mesh = engine.getByEntityId(entity.id);
     if (!mesh) return;
 

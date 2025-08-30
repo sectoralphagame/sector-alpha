@@ -3,6 +3,8 @@ import pick from "lodash/pick";
 import type { DockSize } from "@core/components/dockable";
 import { createDocks } from "@core/components/dockable";
 import { Vec2 } from "ogl";
+import { random } from "mathjs";
+import { applyParentTransform } from "@core/systems/moving";
 import { createDrive } from "../components/drive";
 import { Entity } from "../entity";
 import { createMining } from "../components/mining";
@@ -13,6 +15,7 @@ import type { RequireComponent } from "../tsHelpers";
 import type { Sector } from "./sector";
 import type { Faction } from "./faction";
 import type { ShipInput } from "../world/ships";
+import { createTurret } from "./turret";
 
 export const shipComponents = [
   "autoOrder",
@@ -29,6 +32,7 @@ export const shipComponents = [
   "model",
   "subordinates",
   "experience",
+  "children",
 ] as const;
 
 export type ShipComponent = (typeof shipComponents)[number];
@@ -66,7 +70,7 @@ export function createShipName(
 }
 
 export function createShip(sim: Sim, initial: InitialShipInput): Ship {
-  const entity = new Entity(sim);
+  const entity = new Entity(sim) as Ship;
 
   entity
     .addComponent({
@@ -133,16 +137,6 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       hitBy: {},
     })
     .addComponent({
-      ...initial.damage,
-      name: "damage",
-      targetId: null,
-      output: {
-        base: initial.damage.value,
-        current: initial.damage.value,
-      },
-      modifiers: {},
-    })
-    .addComponent({
       name: "model",
       slug: initial.slug,
       value: initial.name,
@@ -157,9 +151,40 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       rank: 1,
       amount: 0,
     })
+    .addComponent({
+      name: "children",
+      entities: [],
+      slots: initial.slots,
+    })
     .addTag("selection")
     .addTag("ship")
     .addTag(`role:${initial.role}`);
+
+  for (const turretInput of initial.turrets) {
+    const slot = entity.cp.children.slots.find(
+      ({ slug }) => slug === turretInput.slot
+    );
+    const slotPosition = new Vec2(random(-4e-2, 4e-2), random(-4e-2, 4e-2));
+
+    const turret = createTurret(sim, {
+      slug: turretInput.class,
+      angle: slot!.angle,
+      damage: {
+        angle: turretInput.angle,
+      },
+      slot: turretInput.slot,
+      parentId: entity.id,
+      transform: {
+        coord: slotPosition.clone(),
+        angle: slot!.angle,
+        world: {
+          coord: new Vec2(),
+          angle: slot!.angle,
+        },
+      },
+    });
+    applyParentTransform(turret, entity.cp.position);
+  }
 
   if (initial.mining) {
     entity.addComponent(createMining(initial.mining));
@@ -182,6 +207,20 @@ export function createShip(sim: Sim, initial: InitialShipInput): Ship {
       cancel: false,
     });
   }
+
+  // if (initial.damage) {
+  //   entity.addComponent({
+  //     ...initial.damage,
+  //     name: "damage",
+  //     targetId: null,
+  //     output: {
+  //       base: initial.damage.value,
+  //       current: initial.damage.value,
+  //     },
+  //     modifiers: {},
+  //     type: "kinetic",
+  //   });
+  // }
 
   if (initial.docks) {
     entity.addComponent(createDocks(initial.docks));

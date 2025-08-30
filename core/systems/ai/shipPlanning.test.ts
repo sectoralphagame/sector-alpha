@@ -1,9 +1,9 @@
-import { matrix } from "mathjs";
+import { Vec2 } from "ogl";
 import { createFacility } from "../../archetypes/facility";
 import { createFaction } from "../../archetypes/faction";
 import { createSector } from "../../archetypes/sector";
 import { Sim } from "../../sim/Sim";
-import { shipClasses } from "../../world/ships";
+import { getShipClass } from "../../world/ships";
 import { ShipPlanningSystem } from "./shipPlanning";
 
 describe("ShipPlanningSystem", () => {
@@ -27,16 +27,22 @@ describe("ShipPlanningSystem", () => {
       type: "territorial",
       home: 0,
       restrictions: { mining: false },
+      mining: "preferOwn",
     });
-    faction.cp.blueprints.ships = shipClasses;
+    faction.cp.blueprints.ships = [
+      getShipClass("dart")!,
+      getShipClass("gunboat")!,
+      getShipClass("freighterA")!,
+    ];
     const sector = createSector(sim, {
-      position: matrix([0, 0, 0]),
+      position: [0, 0, 0],
       name: "Test Sector",
+      slug: "test",
     });
     sector.addComponent({ name: "owner", id: faction.id });
     const shipyard = createFacility(sim, {
       owner: faction,
-      position: matrix([0, 0]),
+      position: new Vec2(0, 0),
       sector,
     });
     shipyard.addComponent({ name: "shipyard", building: null, queue: [] });
@@ -50,7 +56,7 @@ describe("ShipPlanningSystem", () => {
     // 3 Freighters for shipyard
     // 2 Frigates
     // 4 Fighters
-    expect(sim.entities.size).toBe(12);
+    expect(sim.entities.size).toBe(20);
     expect(system.getPatrolRequests(faction)[0].patrols).toBe(-2);
     expect(system.getPatrolRequests(faction)[0].fighters).toBe(-4);
 
@@ -58,7 +64,7 @@ describe("ShipPlanningSystem", () => {
     system.cooldowns.update(100);
     system.exec();
     expect(shipyard.cp.shipyard!.queue).toHaveLength(0);
-    expect(sim.entities.size).toBe(12);
+    expect(sim.entities.size).toBe(20);
     expect(system.getPatrolRequests(faction)[0].patrols).toBe(0);
     expect(system.getPatrolRequests(faction)[0].fighters).toBe(0);
   });

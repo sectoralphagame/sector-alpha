@@ -11,7 +11,6 @@ const trs = new Mat4();
 const tempVec3 = new Vec3();
 const tempWorldScale = new Vec3();
 const tempMat4 = new Mat4();
-const tempWorldMatrix = new Mat4();
 
 interface Particle {
   angularVelocity: number;
@@ -212,7 +211,6 @@ export class ParticleGenerator extends Transform implements Destroyable {
         if (this.lastKilled) {
           this.lastKilled = i;
         }
-        continue;
       }
 
       trs
@@ -231,29 +229,14 @@ export class ParticleGenerator extends Transform implements Destroyable {
     }
   }
 
-  override lookAt(target: Vec3, invert = false, useWorldMatrix = true) {
-    if (useWorldMatrix) {
-      if (invert) this.matrix.lookAt(this.position, target, this.up);
-      else this.matrix.lookAt(target, this.position, this.up);
-
-      // Extract world-space rotation
-      // @ts-expect-error
-      // eslint-disable-next-line no-underscore-dangle
-      this.matrix.getRotation(this.quaternion._target);
-      this.rotation.fromQuaternion(this.quaternion);
-
-      // Convert world rotation to local using inverse of parent world matrix
-      const invParentWorld = tempWorldMatrix
-        .copy(this.parent!.worldMatrix)
+  override lookAt(target: Vec3, invert = false, useWorldTransform = true) {
+    if (useWorldTransform) {
+      const invWorldMatrix = tempMat4
+        .copy(this.parent?.worldMatrix ?? this.worldMatrix)
         .inverse();
-      const worldRotation = tempMat4.fromQuaternion(this.quaternion);
-      worldRotation.multiply(invParentWorld);
-      // @ts-expect-error
-      // eslint-disable-next-line no-underscore-dangle
-      worldRotation.getRotation(this.quaternion._target);
-      // this.rotation.fromQuaternion(this.quaternion);
+      const locaTarget = tempVec3.copy(target).applyMatrix4(invWorldMatrix);
 
-      this.updateMatrixWorld();
+      super.lookAt(locaTarget, invert);
     } else {
       super.lookAt(target, invert);
     }

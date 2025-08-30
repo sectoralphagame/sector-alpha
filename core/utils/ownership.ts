@@ -22,8 +22,8 @@ export function transferOwnership(
   }
 
   if (entity.cp.children) {
-    for (const childId of entity.cp.children.entities) {
-      const child = entity.sim.getOrThrow(childId);
+    for (const { id } of entity.cp.children.entities) {
+      const child = entity.sim.getOrThrow(id);
 
       if (child.cp.owner) {
         transferOwnership(child.requireComponents(["owner"]), newOwnerId);

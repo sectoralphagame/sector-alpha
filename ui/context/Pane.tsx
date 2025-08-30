@@ -1,3 +1,4 @@
+import { eventHook } from "@core/events/pubsub";
 import { storageHook } from "@core/hooks";
 import { defaultLogger } from "@core/log";
 import type { GameSettings } from "@core/settings";
@@ -88,6 +89,12 @@ const OglPlugin: TpPluginBundle = {
 };
 
 export class Pane extends BasePane {
+  debug: {
+    folder: FolderApi;
+    values: Record<string, string | number>;
+    unsubscribe: () => void;
+  };
+
   constructor({ container }: { container?: HTMLDivElement } = {}) {
     logger.log("Creating Pane");
     super({ container });
@@ -95,6 +102,17 @@ export class Pane extends BasePane {
     this.element.addEventListener("mousedown", (e) => {
       e.stopPropagation();
     });
+
+    this.debug = {
+      folder: this.addFolder({
+        title: "Debug",
+      }),
+      values: {},
+      unsubscribe: eventHook.subscribe(
+        "update-debug",
+        this.updateDebugValue.bind(this)
+      ),
+    };
   }
 
   addOrReplaceFolder(props: FolderParams) {
@@ -113,8 +131,22 @@ export class Pane extends BasePane {
     });
   }
 
+  updateDebugValue(event: { data: string | number; name: string }) {
+    if (this.debug.values[event.name] === undefined) {
+      this.debug.values[event.name] = event.data;
+      this.debug.folder.addBinding(this.debug.values, event.name, {
+        readonly: true,
+        interval: 200,
+        label: event.name,
+      });
+    } else {
+      this.debug.values[event.name] = event.data;
+    }
+  }
+
   dispose() {
     logger.log("Disposing Pane");
+    this.debug.unsubscribe();
     super.dispose();
   }
 }
@@ -148,16 +180,28 @@ export const DraggablePane: React.FC = () => {
     if (container !== null) {
       pane = new Pane({ container });
       pane.registerPlugin(OglPlugin);
-      pane.hidden = !process.env.STORYBOOK;
+      pane.hidden = !(
+        process.env.STORYBOOK ||
+        window.location.pathname.startsWith("/dev/scenarios/")
+      );
     }
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code === "KeyK" && (event.metaKey || event.ctrlKey)) {
+        getPane().hidden = !getPane().hidden;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
     return () => {
+      window.removeEventListener("keydown", handleKeyDown);
       pane.dispose();
     };
   }, [container]);
 
   return (
-    <DraggableContainer>
+    <DraggableContainer style={{ zIndex: 1 }}>
       <div ref={setContainer} />
     </DraggableContainer>
   );

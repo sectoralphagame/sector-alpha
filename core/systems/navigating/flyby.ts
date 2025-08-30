@@ -5,7 +5,6 @@ import type { RequireComponent } from "@core/tsHelpers";
 import type { Navigable } from "./types";
 import { createThrust, type Thrust } from "./thrust";
 import { brake } from "./utils";
-import { isInRange } from "../attacking";
 
 const tempVelocity = new Vec2();
 const tempForward = new Vec2();
@@ -46,12 +45,6 @@ export function flyBy(
   thrust.angular =
     (Math.min(1, 1 - speedPercent + 0.5) * (alignmentToTarget + 1)) / 2;
   thrust.drag = Math.min(0.7, (1 - alignmentToTarget) ** 2);
-  if (speed > 0) {
-    thrust.lateral
-      .copy(entity.cp.movable.velocity)
-      .sub(tempVec2.copy(forward).multiply(forwardMag))
-      .normalize();
-  }
 
   if (alignmentToTarget < 0.8) {
     thrust.throttle = clamp(
@@ -74,6 +67,11 @@ export function flyBy(
   }
 
   if (speed > 0) {
+    thrust.lateral
+      .copy(entity.cp.movable.velocity)
+      .sub(tempVec2.copy(forward).multiply(forwardMag))
+      .normalize();
+
     if (
       alignmentToVelocity > 0.2 &&
       (entity.cp.hitpoints?.shield?.value ?? 1) /
@@ -84,21 +82,6 @@ export function flyBy(
       thrust.throttle = 1;
     } else if (alignmentToTarget < 0.4 && alignmentToTargetForward > 0.5) {
       brake(entity, 0, thrust);
-    } else if (
-      alignmentToTarget > 0.9 &&
-      alignmentToTargetForward > 0.7 &&
-      entity.hasComponents(["damage"])
-        ? isInRange(entity, target)
-        : true
-    ) {
-      brake(
-        entity,
-        Math.min(
-          entity.cp.drive.maneuver,
-          target.cp.movable?.velocity.len() ?? 0
-        ),
-        thrust
-      );
     } else if (alignmentToVelocity < 0) {
       brake(entity, 0, thrust);
     }

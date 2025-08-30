@@ -1,5 +1,6 @@
 import { entityIndexer } from "@core/entityIndexer/entityIndexer";
 import { Vec2 } from "ogl";
+import type { TransformData } from "@core/components/transform";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import { System } from "./system";
@@ -24,42 +25,38 @@ function applyToDocked(entity: RequireComponent<"position" | "movable">) {
   }
 }
 
+export function applyParentTransform(
+  entity: RequireComponent<"transform">,
+  transform: TransformData
+): void {
+  entity.cp.transform.world.coord
+    .copy(transform.coord)
+    .add(entity.cp.transform.coord);
+  entity.cp.transform.world.angle = transform.angle + entity.cp.transform.angle;
+}
+
+export function applyPositionToChildren(
+  entity:
+    | RequireComponent<"children" | "position">
+    | RequireComponent<"children" | "transform">
+): void {
+  const worldTransform = (entity.cp.position ?? entity.cp.transform?.world)!;
+  for (const { id } of entity.cp.children.entities) {
+    const child = entity.sim.getOrThrow(id);
+    if (child.hasComponents(["transform"])) {
+      applyParentTransform(child, worldTransform);
+
+      if (child.hasComponents(["children"])) {
+        applyPositionToChildren(child);
+      }
+    }
+  }
+}
+
 const tempDrag = new Vec2();
 const tempAcceleration = new Vec2();
 const tempVelocity = new Vec2();
 export const dragCoeff = 0.01;
-
-function move(entity: Movable, delta: number) {
-  const position = entity.cp.position.coord;
-  const velocity = entity.cp.movable.velocity;
-  const acceleration = entity.cp.movable.acceleration;
-
-  const dPos = tempVelocity
-    .copy(velocity)
-    .multiply(delta)
-    .add(tempAcceleration.copy(acceleration).multiply(delta ** 2 / 2));
-  position.add(dPos);
-  const dVel = tempAcceleration
-    .copy(acceleration)
-    .sub(tempDrag.copy(velocity).multiply(dragCoeff + entity.cp.movable.drag))
-    .multiply(delta);
-  velocity.add(dVel);
-
-  const speed = velocity.len();
-  const maxSpeed = entity.hasComponents(["drive"])
-    ? entity.cp.drive.state === "cruise"
-      ? entity.cp.drive.cruise
-      : entity.cp.drive.maneuver
-    : baseMaxSpeed;
-  if (speed > 0) {
-    entity.cp.movable.velocity.scale(Math.min(speed, maxSpeed) / speed);
-  }
-
-  entity.cp.position.angle =
-    (entity.cp.position.angle + entity.cp.movable.rotary) % (2 * Math.PI);
-
-  applyToDocked(entity);
-}
 
 export class MovingSystem extends System {
   entities: Movable[];
@@ -67,18 +64,64 @@ export class MovingSystem extends System {
   apply = (sim: Sim): void => {
     super.apply(sim);
 
-    sim.hooks.phase.update.subscribe(this.constructor.name, this.exec);
+    sim.hooks.phase.update.subscribe(
+      this.constructor.name,
+      this.exec.bind(this)
+    );
   };
 
   // eslint-disable-next-line class-methods-use-this
   exec(delta: number): void {
     if (delta > 0) {
       for (const entity of entityIndexer.search(["movable", "position"])) {
-        if (!entity.cp.dockable?.dockedIn) {
-          move(entity, delta);
+        if (!entity.cp.dockable?.dockedIn || entity.cp.dockable?.undocking) {
+          this.move(entity, delta);
         }
       }
     }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  move(entity: Movable, delta: number) {
+    const velocity = entity.cp.movable.velocity;
+    const acceleration = entity.cp.movable.acceleration;
+
+    const dPos = tempVelocity
+      .copy(velocity)
+      .multiply(delta)
+      .add(tempAcceleration.copy(acceleration).multiply(delta ** 2 / 2));
+    const dAngle = entity.cp.movable.rotary;
+    MovingSystem.changeEntityPosition(entity, dPos, dAngle);
+    const dVel = tempAcceleration
+      .copy(acceleration)
+      .sub(tempDrag.copy(velocity).multiply(dragCoeff + entity.cp.movable.drag))
+      .multiply(delta);
+    velocity.add(dVel);
+
+    const speed = velocity.len();
+    const maxSpeed = entity.hasComponents(["drive"])
+      ? entity.cp.drive.state === "cruise"
+        ? entity.cp.drive.cruise
+        : entity.cp.drive.maneuver
+      : baseMaxSpeed;
+    if (speed > 0) {
+      entity.cp.movable.velocity.scale(Math.min(speed, maxSpeed) / speed);
+    }
+  }
+
+  static changeEntityPosition(
+    entity: RequireComponent<"position" | "movable">,
+    dPos: Vec2,
+    dAngle: number
+  ) {
+    entity.cp.position.coord.add(dPos);
+    entity.cp.position.angle =
+      (entity.cp.position.angle + dAngle) % (2 * Math.PI);
+
+    if (entity.hasComponents(["children"])) {
+      applyPositionToChildren(entity);
+    }
+    applyToDocked(entity);
   }
 }
 

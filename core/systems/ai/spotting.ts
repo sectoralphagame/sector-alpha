@@ -8,11 +8,10 @@ import { System } from "../system";
 import type { Sim } from "../../sim";
 
 export const spottingRadius = 7;
-
-export type EnemyArrayCache = Record<
+const cache = new Map<
   string,
   Array<RequireComponent<"hitpoints" | "owner" | "position">>
->;
+>();
 
 export class SpottingSystem extends System<"exec"> {
   apply = (sim: Sim) => {
@@ -25,7 +24,6 @@ export class SpottingSystem extends System<"exec"> {
     potentialEnemies: Iterable<
       RequireComponent<"hitpoints" | "owner" | "position">
     >,
-    cache: EnemyArrayCache,
     entity: RequireComponent<"owner" | "position">
   ) {
     const entityOwner = entity.sim.getOrThrow<Faction>(entity.cp.owner.id);
@@ -36,7 +34,7 @@ export class SpottingSystem extends System<"exec"> {
       entity.cp.orders?.value[0]?.type === "pillage" ? "pillage" : "default",
     ].join(":");
     const enemies =
-      cache[cacheKey] ??
+      cache.get(cacheKey) ??
       pipe(
         potentialEnemies,
         filter((e) => {
@@ -59,15 +57,15 @@ export class SpottingSystem extends System<"exec"> {
         }),
         toArray
       );
-    if (!cache[cacheKey]) {
-      cache[cacheKey] = enemies;
+    if (!cache.get(cacheKey)) {
+      cache.set(cacheKey, enemies);
     }
 
     return pipe(
       enemies,
       map((e) => ({
         entity: e,
-        distance: e.cp.position.coord.distance(entity.cp.position.coord),
+        distance: e.cp.position.coord.squaredDistance(entity.cp.position.coord),
       })),
       sort((a, b) => a.distance - b.distance),
       toArray
@@ -75,9 +73,8 @@ export class SpottingSystem extends System<"exec"> {
   }
 
   exec = (): void => {
+    cache.clear();
     if (!this.cooldowns.canUse("exec")) return;
-
-    const cache: EnemyArrayCache = {};
 
     for (const entity of this.sim.index.orderable.getIt()) {
       const currentOrder = entity.cp.orders.value[0];
@@ -106,7 +103,6 @@ export class SpottingSystem extends System<"exec"> {
             "owner",
             "position",
           ]),
-          cache,
           entity
         ).slice(0, 3)
       );

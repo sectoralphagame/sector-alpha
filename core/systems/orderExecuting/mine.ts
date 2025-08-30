@@ -50,7 +50,10 @@ export function mineAction(
 
   if (!targetField.cp.mineable.mountPoints.used.includes(entity.id)) {
     targetField.cp.mineable.mountPoints.used.push(entity.id);
-    transport3D.hooks.startMining.notify(entity);
+    transport3D.publish({
+      type: "startMining",
+      entity,
+    });
   }
 
   if (getAvailableSpace(entity.cp.storage) === 0) {
@@ -59,7 +62,10 @@ export function mineAction(
 
     targetField.cp.mineable.mountPoints.used =
       targetField.cp.mineable.mountPoints.used.filter((id) => id !== entity.id);
-    transport3D.hooks.stopMining.notify(entity);
+    transport3D.publish({
+      type: "stopMining",
+      entity,
+    });
 
     return true;
   }

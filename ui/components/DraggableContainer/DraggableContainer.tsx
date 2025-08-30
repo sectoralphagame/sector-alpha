@@ -3,12 +3,12 @@ import clsx from "clsx";
 import styles from "./DraggableContainer.scss";
 
 export const DraggableContainer: React.FC<
-  React.PropsWithChildren<{ className?: string }>
-> = ({ children, className }) => {
+  React.PropsWithChildren<{ className?: string; style?: React.CSSProperties }>
+> = ({ children, className, style }) => {
   const [isDragging, setIsDragging] = React.useState(false);
   const [position, setPosition] = React.useState({
-    x: window.innerWidth - 400,
-    y: 0,
+    x: window.innerWidth - 300,
+    y: 100,
   });
   const offsetRef = React.useRef({ x: 0, y: 0 });
 
@@ -52,6 +52,7 @@ export const DraggableContainer: React.FC<
         position: "fixed",
         left: Math.max(50, Math.min(window.innerWidth - 50, position.x)),
         top: Math.max(50, Math.min(window.innerHeight - 50, position.y)),
+        ...style,
       }}
     >
       {/* eslint-disable-next-line jsx-a11y/control-has-associated-label, react/button-has-type */}

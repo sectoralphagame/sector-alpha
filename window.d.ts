@@ -16,6 +16,7 @@ interface Window {
     getOrThrow: (id: number) => any;
   } & Record<string, any>;
   renderer: any;
+  select: (_ids: number[]) => void;
   selected: {
     id: number;
   } | null;

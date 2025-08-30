@@ -183,7 +183,7 @@ export class TauHarassingSystem extends System<"exec"> {
     if (isDev) {
       // eslint-disable-next-line no-console
       console.log(
-        `${faction.cp.name.slug} are launching an attack on ${invadedSector.cp.name.value}`
+        `${faction.cp.name.slug} are launching an attack on ${invadedSector.cp.name.value}, #${commander.id} as commander`
       );
     }
   };

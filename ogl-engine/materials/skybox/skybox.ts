@@ -51,6 +51,12 @@ const settings: Partial<
     intensity: 0.83,
     direction: [-0.96, -0.891, -0.4],
   },
+  deepspace1: {
+    ambient: 0.02,
+    color: "#c9d5f6",
+    intensity: 0.27,
+    direction: [2.04, -3.04, -0.21],
+  },
 };
 
 export class Skybox extends Mesh implements Destroyable {

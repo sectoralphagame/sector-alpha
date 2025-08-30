@@ -10,6 +10,7 @@ import clsx from "clsx";
 import { shipClasses } from "@core/world/ships";
 import { Button } from "@kit/Button";
 import { Tab, TabList } from "@kit/Tabs";
+import { useQs } from "@devtools/utils";
 import type { FormData } from "./utils";
 import styles from "./styles.scss";
 import { GeneralEditor } from "./General";
@@ -22,10 +23,16 @@ const Editor: React.FC<{}> = () => {
   const { getValues, control } = useFormContext<FormData>();
   const { append } = useFieldArray({ control, name: "ships" });
   const [ships, setShips] = React.useState(getValues().ships);
+  const qs = useQs();
 
   return (
     <div className={styles.editorContainer}>
-      <HeadlessTab.Group>
+      <HeadlessTab.Group
+        selectedIndex={Number(qs.params.get("tab"))}
+        onChange={(index) =>
+          qs.set(new URLSearchParams({ tab: index.toString() }))
+        }
+      >
         <div className={styles.toolbar}>
           <Button
             color="primary"
@@ -49,6 +56,8 @@ const Editor: React.FC<{}> = () => {
                   shield: { regen: 0, value: 0 },
                 },
                 slug: "",
+                slots: [],
+                turrets: [],
               });
               setShips(getValues().ships);
             }}
