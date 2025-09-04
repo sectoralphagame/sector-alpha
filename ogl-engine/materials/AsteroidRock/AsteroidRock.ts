@@ -3,6 +3,7 @@ import { type Texture } from "ogl";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import fragment from "./shader.frag.glsl";
 import vertex from "../pbr/shader.vert.glsl";
+import type { Uniform } from "../material";
 import { Material } from "../material";
 
 interface AsteroidRockMaterialArgs {
@@ -11,8 +12,8 @@ interface AsteroidRockMaterialArgs {
 
 export class AsteroidRockMaterial extends Material {
   uniforms: Material["uniforms"] & {
-    tGrunge: { value: Texture };
-    tNormal: { value: Texture };
+    tGrunge: Uniform<Texture>;
+    tNormal: Uniform<Texture>;
   };
 
   constructor(engine: Engine3D, args: AsteroidRockMaterialArgs = {}) {

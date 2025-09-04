@@ -4,12 +4,13 @@ import type { Engine } from "@ogl-engine/engine/engine";
 import Color from "color";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
+import type { Uniform } from "../material";
 import { MaterialAny } from "../material";
 
 export class MSDFMaterial extends MaterialAny {
   uniforms: MaterialAny["uniforms"] & {
-    tMap: { value: Texture };
-    uColor: { value: Vec3 };
+    tMap: Uniform<Texture>;
+    uColor: Uniform<Vec3>;
   };
 
   constructor(engine: Engine, texture: Texture) {

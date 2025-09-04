@@ -2,13 +2,14 @@ import type { Vec4 } from "ogl";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
+import type { Uniform } from "../material";
 import { Material } from "../material";
 
 export class OrbMaterial extends Material {
   uniforms: Material["uniforms"] & {
-    uStart: { value: Vec4 };
-    uEnd: { value: Vec4 };
-    fEmissive: { value: number };
+    uStart: Uniform<Vec4>;
+    uEnd: Uniform<Vec4>;
+    fEmissive: Uniform<number>;
   };
 
   constructor(engine: Engine3D, start: Vec4, end: Vec4, global = true) {

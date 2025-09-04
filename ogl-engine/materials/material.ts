@@ -20,11 +20,11 @@ export abstract class Material {
   engine: Engine3D;
   protected program: Program;
   protected uniforms: {
-    ambient: { value: Vec3 };
+    ambient: Uniform<Vec3>;
     lights: Light["uniforms"][];
-    uTime: { value: number };
-    tEnvMap: { value: Texture };
-    uCameraScale: { value: number };
+    uTime: Uniform<number>;
+    tEnvMap: Uniform<Texture>;
+    uCameraScale: Uniform<number>;
   };
 
   constructor(engine: Engine3D) {
@@ -116,12 +116,12 @@ export abstract class Material {
     });
   }
 
-  static colorToVec3(color: string, uniform: { value: Vec3 }) {
+  static colorToVec3(color: string, uniform: Uniform<Vec3>) {
     const c = Color(color).rgb().array();
     uniform.value.set(c[0], c[1], c[2]).divide(255);
   }
 
-  static colorToVec4(color: string, uniform: { value: Vec4 }) {
+  static colorToVec4(color: string, uniform: Uniform<Vec4>) {
     const c = Color(color).rgb();
     uniform.value.set(
       c.red() / 255,

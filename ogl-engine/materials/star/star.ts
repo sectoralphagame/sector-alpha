@@ -4,16 +4,17 @@ import smoke from "@assets/textures/smoke.jpg";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
+import type { Uniform } from "../material";
 import { Material } from "../material";
 
 export class StarMaterial extends Material {
   uniforms: Material["uniforms"] & {
-    uColor: { value: Vec3 };
-    uColor2: { value: Vec3 };
-    tSmoke: { value: Texture };
-    uNoise: { value: number };
-    uNoisePower: { value: number };
-    uEmissive: { value: number };
+    uColor: Uniform<Vec3>;
+    uColor2: Uniform<Vec3>;
+    tSmoke: Uniform<Texture>;
+    uNoise: Uniform<number>;
+    uNoisePower: Uniform<number>;
+    uEmissive: Uniform<number>;
   };
 
   constructor(engine: Engine3D) {

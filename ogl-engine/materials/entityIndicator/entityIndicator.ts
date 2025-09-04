@@ -4,16 +4,17 @@ import type { DockSize } from "@core/components/dockable";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
+import type { Uniform } from "../material";
 import { Material } from "../material";
 
 export class EntityIndicatorMaterial extends Material {
   uniforms: Material["uniforms"] & {
-    uSize: { value: number };
-    uColor: { value: Vec4 };
-    uHp: { value: number };
-    uShield: { value: number };
-    uHovered: { value: number };
-    uSelected: { value: number };
+    uSize: Uniform<number>;
+    uColor: Uniform<Vec4>;
+    uHp: Uniform<number>;
+    uShield: Uniform<number>;
+    uHovered: Uniform<number>;
+    uSelected: Uniform<number>;
   };
 
   constructor(engine: Engine3D) {

@@ -1,13 +1,14 @@
 import { Program } from "ogl";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
+import type { Uniform } from "../material";
 import { Material } from "../material";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 
 export class SelectionBoxMaterial extends Material {
   uniforms: Material["uniforms"] & {
-    lineWidthX: { value: number };
-    lineWidthY: { value: number };
+    lineWidthX: Uniform<number>;
+    lineWidthY: Uniform<number>;
   };
 
   constructor(engine: Engine3D) {

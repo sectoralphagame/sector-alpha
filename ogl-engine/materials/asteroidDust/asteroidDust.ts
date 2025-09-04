@@ -5,14 +5,15 @@ import { assetLoader } from "@ogl-engine/AssetLoader";
 import { colorToVec3 } from "@core/utils/maps";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
+import type { Uniform } from "../material";
 import { Material } from "../material";
 
 export class AsteroidDustMaterial extends Material {
   uniforms: Material["uniforms"] & {
-    tMap: { value: Texture };
-    uColor: { value: Vec3 };
-    uEmissive: { value: number };
-    uAlpha: { value: number };
+    tMap: Uniform<Texture>;
+    uColor: Uniform<Vec3>;
+    uEmissive: Uniform<number>;
+    uAlpha: Uniform<number>;
   };
 
   constructor(

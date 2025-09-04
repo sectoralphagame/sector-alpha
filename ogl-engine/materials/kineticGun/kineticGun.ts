@@ -2,6 +2,7 @@ import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { Vec4 } from "ogl";
 import fragment from "./shader.frag.glsl";
 import vertex from "../orb/shader.vert.glsl";
+import type { Uniform } from "../material";
 import { Material } from "../material";
 
 interface KineticGunMaterialArgs {
@@ -10,7 +11,7 @@ interface KineticGunMaterialArgs {
 
 export class KineticGunMaterial extends Material {
   uniforms: Material["uniforms"] & {
-    uColor: { value: Vec4 };
+    uColor: Uniform<Vec4>;
   };
 
   constructor(engine: Engine3D, args: KineticGunMaterialArgs) {

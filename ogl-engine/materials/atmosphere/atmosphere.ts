@@ -2,6 +2,7 @@ import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import { Vec3 } from "ogl";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
+import type { Uniform } from "../material";
 import { Material } from "../material";
 
 interface AtmosphereMaterialArgs {
@@ -12,9 +13,9 @@ interface AtmosphereMaterialArgs {
 
 export class AtmosphereMaterial extends Material {
   uniforms: Material["uniforms"] & {
-    uColor: { value: Vec3 };
-    uX: { value: number };
-    uY: { value: number };
+    uColor: Uniform<Vec3>;
+    uX: Uniform<number>;
+    uY: Uniform<number>;
   };
 
   constructor(engine: Engine3D, args: AtmosphereMaterialArgs) {
