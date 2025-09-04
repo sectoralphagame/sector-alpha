@@ -12,6 +12,7 @@ uniform mat4 projectionMatrix;
 
 void main() {
     vUv = uv;
+
     gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.0f);
     vFragDepth = 1.0f + gl_Position.w;
 }

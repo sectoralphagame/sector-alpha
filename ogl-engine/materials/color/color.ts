@@ -1,3 +1,4 @@
+import type { ProgramOptions } from "ogl";
 import { Vec3, Program } from "ogl";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Engine2D } from "@ogl-engine/engine/engine2d";
@@ -22,18 +23,20 @@ export class ColorMaterial extends Material {
     opts: {
       color?: string;
       shaded?: boolean;
-    } = {}
+      layer?: string;
+    } & Partial<Omit<ProgramOptions, "vertex" | "fragment" | "uniforms">> = {}
   ) {
     super(engine);
 
-    this.createProgram(
-      vertex,
-      fragment,
-      {},
-      {
-        cullFace: false,
-      }
-    );
+    const defines: Record<string, string> = {};
+    if (opts.layer) {
+      defines.LAYER = opts.layer;
+    }
+
+    this.createProgram(vertex, fragment, defines, {
+      cullFace: false,
+      ...opts,
+    });
 
     this.uniforms.uColor = { value: new Vec3() };
     this.uniforms.fEmissive = { value: 0 };

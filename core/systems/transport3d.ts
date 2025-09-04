@@ -22,12 +22,16 @@ export type DeployFacilityEvent = {
   type: "deployFacility";
   entity: RequireComponent<"position">;
 };
+export type MovingSystemFinishedEvent = {
+  type: "movingSystemFinished";
+};
 
 export type Event3D =
   | ShootEvent
   | ExplodeEvent
   | StartMiningEvent
   | StopMiningEvent
-  | DeployFacilityEvent;
+  | DeployFacilityEvent
+  | MovingSystemFinishedEvent;
 
 export const transport3D = new PubSub<Event3D>();

@@ -4,6 +4,7 @@ import type { TransformData } from "@core/components/transform";
 import type { Sim } from "../sim";
 import type { RequireComponent } from "../tsHelpers";
 import { System } from "./system";
+import { transport3D } from "./transport3d";
 
 const baseMaxSpeed = 8;
 
@@ -77,6 +78,7 @@ export class MovingSystem extends System {
           this.move(entity, delta);
         }
       }
+      transport3D.publish({ type: "movingSystemFinished" });
     }
   }
 

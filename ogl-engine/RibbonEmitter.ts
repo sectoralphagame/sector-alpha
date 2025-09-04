@@ -2,7 +2,6 @@ import type { OGLRenderingContext } from "ogl";
 import { Geometry, Vec3 } from "ogl";
 import { BaseMesh } from "./engine/BaseMesh";
 import { EngineTrailMaterial } from "./materials/engineTrail/engineTrail";
-import type { OnBeforeRenderTask } from "./engine/task";
 
 const tempVec3 = new Vec3();
 const tempVec32 = new Vec3();
@@ -68,10 +67,13 @@ export class RibbonGeometry extends Geometry {
     this.maxSegments = maxSegments;
   }
 
-  static build(segments: Float32Array, position: Float32Array, width: number) {
-    const length = segments.length / 4;
-
-    for (let i = 0; i < length; i++) {
+  static build(
+    segments: Float32Array,
+    position: Float32Array,
+    width: number,
+    lengthOverride?: number
+  ) {
+    for (let i = 0; i < (lengthOverride ?? segments.length / 4); i++) {
       const segment = tempVec32.fromArray(
         segments.subarray(i * 4, (i + 1) * 4)
       );
@@ -90,7 +92,7 @@ export class RibbonGeometry extends Geometry {
         .normalize();
 
       let normal = normalForward;
-      if (i === length - 1) {
+      if (i === segments.length / 4 - 1) {
         normal = normalBackward;
       } else if (i > 0) {
         normal = normalForward.add(normalBackward).scale(0.5).normalize();
@@ -102,6 +104,15 @@ export class RibbonGeometry extends Geometry {
       position.set(tempVec3.copy(segment).sub(normal), vertOffset + 3);
     }
   }
+
+  static addSegment(
+    segments: Float32Array,
+    position: Float32Array,
+    width: number
+  ) {
+    position.set(position.subarray(0, position.length - 3 * 4), 3 * 4);
+    RibbonGeometry.build(segments, position, width, 3);
+  }
 }
 
 export class RibbonEmitter extends BaseMesh<EngineTrailMaterial> {
@@ -111,7 +122,6 @@ export class RibbonEmitter extends BaseMesh<EngineTrailMaterial> {
   width = 0.3;
   maxSegments = 25;
   initialised = false;
-  task: OnBeforeRenderTask;
 
   constructor(
     trackedEntity: BaseMesh,
@@ -133,10 +143,6 @@ export class RibbonEmitter extends BaseMesh<EngineTrailMaterial> {
     this.offset = offset || new Vec3();
     this.engine = trackedEntity.engine;
     this.segments = new Float32Array(maxSegments * 4);
-
-    this.task = this.engine.addOnBeforeRenderTask(() => {
-      this.update(this.engine.delta);
-    });
   }
 
   update(delta: number) {
@@ -168,16 +174,12 @@ export class RibbonEmitter extends BaseMesh<EngineTrailMaterial> {
   updateGeometry() {
     if (this.segments.length < 2) return;
 
-    RibbonGeometry.build(
+    RibbonGeometry.addSegment(
       this.segments,
       this.geometry.attributes.position.data! as Float32Array,
       this.width * this.trackedEntity.scale.x
     );
 
     this.geometry.attributes.position.needsUpdate = true;
-  }
-
-  destroy() {
-    this.task.cancel();
   }
 }

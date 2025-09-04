@@ -36,6 +36,9 @@ export class Path extends Transform {
       material: new ColorMaterial(this.engine, {
         color: colors.default,
         shaded: false,
+        layer: "2",
+        depthWrite: false,
+        depthTest: false,
       }),
     });
     plane.rotation.x = Math.PI / 2;
