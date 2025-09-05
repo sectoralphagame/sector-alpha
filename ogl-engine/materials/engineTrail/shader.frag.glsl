@@ -16,7 +16,7 @@ void main() {
     float alphaX = pow(1.f - vUv.x, 3.f);
     float alphaFactorY = (vUv.y - 0.5f) * 2.0f;
     float alphaY = K / (K + alphaFactorY * alphaFactorY) - K;
-    float alpha = clamp(alphaX * alphaY - 0.005f, 0.f, 1.f);
+    float alpha = clamp(alphaX * alphaY - 0.005f, 0.f, 0.85f);
 
     fragData[0] = vec4(mix(uColor, vec3(1.f), pow(alphaY, 2.f) - 0.1f), alpha);
     fragData[1] = vec4(fragData[0].rgb, emissive * alpha);

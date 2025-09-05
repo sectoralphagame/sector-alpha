@@ -1,5 +1,6 @@
 import type { OGLRenderingContext } from "ogl";
 import { Geometry, Vec3 } from "ogl";
+import { triangle } from "@core/utils/misc";
 import { BaseMesh } from "./engine/BaseMesh";
 import { EngineTrailMaterial } from "./materials/engineTrail/engineTrail";
 
@@ -21,8 +22,8 @@ export class RibbonGeometry extends Geometry {
     segments?: Float32Array,
     width = 0.3
   ) {
-    const position = new Float32Array(maxSegments * 2 * 3);
-    const uv = new Float32Array(maxSegments * 2 * 2);
+    const position = new Float32Array(maxSegments * 2 * 3 * 2);
+    const uv = new Float32Array(maxSegments * 2 * 2 * 2);
     const index = new Uint16Array(position.length / 3);
 
     if (segments) {
@@ -33,10 +34,10 @@ export class RibbonGeometry extends Geometry {
       index[i] = i;
     }
 
-    for (let i = 0; i < maxSegments; i++) {
+    for (let i = 0; i < maxSegments * 2; i++) {
       const uvOffset = i * 2 * 2;
-      const xStart = i / maxSegments;
-      const xEnd = (i + 1) / maxSegments;
+      const xStart = triangle(i / maxSegments);
+      const xEnd = triangle((i + 1) / maxSegments);
 
       uv[uvOffset] = xStart;
       uv[uvOffset + 1] = 0;
@@ -102,6 +103,17 @@ export class RibbonGeometry extends Geometry {
       const vertOffset = i * 3 * 2;
       position.set(tempVec3.copy(segment).add(normal), vertOffset);
       position.set(tempVec3.copy(segment).sub(normal), vertOffset + 3);
+
+      normal.copy(up).scale(width);
+
+      position.set(
+        tempVec3.copy(segment).add(normal),
+        position.length - 3 - vertOffset
+      );
+      position.set(
+        tempVec3.copy(segment).sub(normal),
+        position.length - 3 - (vertOffset + 3)
+      );
     }
   }
 
@@ -110,7 +122,11 @@ export class RibbonGeometry extends Geometry {
     position: Float32Array,
     width: number
   ) {
-    position.set(position.subarray(0, position.length - 3 * 4), 3 * 4);
+    position.set(position.subarray(0, position.length / 2 - 3 * 4), 3 * 4);
+    position.set(
+      position.subarray(position.length / 2 + 3 * 4),
+      position.length / 2
+    );
     RibbonGeometry.build(segments, position, width, 3);
   }
 }
