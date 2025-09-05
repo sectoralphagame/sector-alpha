@@ -1,5 +1,5 @@
 import type { FolderApi } from "tweakpane";
-import { Camera as BaseCamera, Vec3 } from "ogl";
+import { Camera as BaseCamera, Mat4, Vec3 } from "ogl";
 import { getPane } from "@ui/context/Pane";
 import type { Engine } from "./engine";
 
@@ -8,6 +8,10 @@ const tempVec3 = new Vec3();
 export class Camera extends BaseCamera {
   name = "Camera";
   engine: Engine;
+
+  invProjectionMatrix = new Mat4();
+  invViewMatrix = new Mat4();
+  invViewProjectionMatrix = new Mat4();
 
   private paneFolder: FolderApi;
 
@@ -55,5 +59,17 @@ export class Camera extends BaseCamera {
       0,
       cameraPos.z + t * cameraDir.z
     );
+  }
+
+  updateMatrixWorld() {
+    super.updateMatrixWorld();
+
+    this.invProjectionMatrix.inverse(this.projectionMatrix);
+    this.invViewMatrix.inverse(this.viewMatrix);
+    this.invViewProjectionMatrix
+      .copy(this.invProjectionMatrix)
+      .multiply(this.invViewMatrix);
+
+    return this;
   }
 }

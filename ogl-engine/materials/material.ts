@@ -4,27 +4,35 @@ import { entries, join, map, pipe } from "@fxts/core";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Light } from "@ogl-engine/engine/Light";
 import Color from "color";
-import type { ProgramOptions, Mesh, Vec3, Vec4, Vec2 } from "ogl";
+import type { ProgramOptions, Mesh, Vec3, Vec4, Mat4 } from "ogl";
 import { Texture, Program } from "ogl";
 import type { BindingParams, FolderApi } from "tweakpane";
 import { getPane } from "@ui/context/Pane";
 
-export interface Uniform<T extends Vec2 | Vec3 | Vec4 | Texture | number> {
+export interface Uniform<T> {
   value: T;
   meta?: {
     pane?: BindingParams;
   };
 }
 
+export type Uniforms<T extends Record<string, any>> = {
+  [K in keyof T]: Uniform<T[K]>;
+};
+
 export abstract class Material {
   engine: Engine3D;
   protected program: Program;
-  protected uniforms: {
-    ambient: { value: Vec3 };
+  protected uniforms: Uniforms<{
+    ambient: Vec3;
+    uTime: number;
+    tEnvMap: Texture;
+    uCameraScale: number;
+    invProjectionMatrix: Mat4;
+    invViewMatrix: Mat4;
+    invViewProjectionMatrix: Mat4;
+  }> & {
     lights: Light["uniforms"][];
-    uTime: { value: number };
-    tEnvMap: { value: Texture };
-    uCameraScale: { value: number };
   };
 
   constructor(engine: Engine3D) {
@@ -35,6 +43,9 @@ export abstract class Material {
       uTime: engine.uniforms.uTime,
       tEnvMap: engine.uniforms.env.tEnvMap,
       uCameraScale: { value: Math.log2(engine.camera.far) },
+      invProjectionMatrix: { value: engine.camera.invProjectionMatrix },
+      invViewMatrix: { value: engine.camera.invViewMatrix },
+      invViewProjectionMatrix: { value: engine.camera.invViewProjectionMatrix },
     };
   }
 
@@ -116,12 +127,12 @@ export abstract class Material {
     });
   }
 
-  static colorToVec3(color: string, uniform: { value: Vec3 }) {
+  static colorToVec3(color: string, uniform: Uniform<Vec3>) {
     const c = Color(color).rgb().array();
     uniform.value.set(c[0], c[1], c[2]).divide(255);
   }
 
-  static colorToVec4(color: string, uniform: { value: Vec4 }) {
+  static colorToVec4(color: string, uniform: Uniform<Vec4>) {
     const c = Color(color).rgb();
     uniform.value.set(
       c.red() / 255,

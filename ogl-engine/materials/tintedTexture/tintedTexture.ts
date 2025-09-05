@@ -4,14 +4,16 @@ import Color from "color";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
+import type { Uniforms } from "../material";
 import { Material } from "../material";
 
 export class TintedTextureMaterial extends Material {
-  uniforms: Material["uniforms"] & {
-    tMap: { value: Texture };
-    uColor: { value: Vec3 };
-    fEmissive: { value: number };
-  };
+  uniforms: Material["uniforms"] &
+    Uniforms<{
+      tMap: Texture;
+      uColor: Vec3;
+      fEmissive: number;
+    }>;
 
   constructor(engine: Engine3D, texture: Texture, color?: string) {
     super(engine);

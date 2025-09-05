@@ -5,14 +5,16 @@ import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { DockSize } from "@core/components/dockable";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
+import type { Uniforms } from "../material";
 import { Material } from "../material";
 
 export class EntityNameMaterial extends Material {
-  uniforms: Material["uniforms"] & {
-    tMap: { value: Texture };
-    uOffset: { value: number };
-    uColor: { value: Vec3 };
-  };
+  uniforms: Material["uniforms"] &
+    Uniforms<{
+      tMap: Texture;
+      uOffset: number;
+      uColor: Vec3;
+    }>;
 
   constructor(engine: Engine3D, texture: Texture) {
     super(engine);
