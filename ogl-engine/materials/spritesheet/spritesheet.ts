@@ -1,18 +1,19 @@
 import type { Texture } from "ogl";
 import { Program, Vec4 } from "ogl";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
-import type { Uniform } from "../material";
+import type { Uniforms } from "../material";
 import { Material } from "../material";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
 
 export class SpritesheetMaterial extends Material {
-  uniforms: Material["uniforms"] & {
-    tDiffuse: Uniform<Texture>;
-    sprite: Uniform<Vec4>;
-    fAlpha: Uniform<number>;
-    fEmissive: Uniform<number>;
-  };
+  uniforms: Material["uniforms"] &
+    Uniforms<{
+      tDiffuse: Texture;
+      sprite: Vec4;
+      fAlpha: number;
+      fEmissive: number;
+    }>;
   index: number;
 
   constructor(

@@ -3,7 +3,7 @@ import { Vec3, type Texture } from "ogl";
 import { assetLoader } from "@ogl-engine/AssetLoader";
 import fragment from "./shader.frag.glsl";
 import vertex from "../pbr/shader.vert.glsl";
-import type { Uniform } from "../material";
+import type { Uniforms } from "../material";
 import { Material } from "../material";
 
 interface AsteroidNewMaterialArgs {
@@ -12,13 +12,14 @@ interface AsteroidNewMaterialArgs {
 }
 
 export class AsteroidNewMaterial extends Material {
-  uniforms: Material["uniforms"] & {
-    tGrunge: Uniform<Texture>;
-    tNormal: Uniform<Texture>;
-    uMask: Uniform<number>;
-    uColor: Uniform<Vec3>;
-    uEmissive: Uniform<number>;
-  };
+  uniforms: Material["uniforms"] &
+    Uniforms<{
+      tGrunge: Texture;
+      tNormal: Texture;
+      uMask: number;
+      uColor: Vec3;
+      uEmissive: number;
+    }>;
 
   constructor(engine: Engine3D, args: AsteroidNewMaterialArgs = {}) {
     super(engine);

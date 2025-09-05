@@ -6,15 +6,16 @@ import fragment from "./shader.frag.glsl";
 import fragment2d from "./shader2d.frag.glsl";
 import vertex from "./shader.vert.glsl";
 import vertex2d from "./shader2d.vert.glsl";
-import type { Uniform } from "../material";
+import type { Uniforms } from "../material";
 import { Material, Material2D } from "../material";
 
 export class ColorMaterial extends Material {
-  uniforms: Material["uniforms"] & {
-    uColor: Uniform<Vec3>;
-    fEmissive: Uniform<number>;
-    bShaded: { value: boolean };
-  };
+  uniforms: Material["uniforms"] &
+    Uniforms<{
+      uColor: Vec3;
+      fEmissive: number;
+      bShaded: boolean;
+    }>;
 
   constructor(
     engine: Engine3D,
@@ -53,9 +54,10 @@ export class ColorMaterial extends Material {
 }
 
 export class ColorMaterial2D extends Material2D {
-  uniforms: Material["uniforms"] & {
-    uColor: Uniform<Vec3>;
-  };
+  uniforms: Material["uniforms"] &
+    Uniforms<{
+      uColor: Vec3;
+    }>;
 
   constructor(engine: Engine2D, color: string) {
     super(engine);

@@ -4,13 +4,14 @@ import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import Color from "color";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
-import type { Uniform } from "../material";
+import type { Uniforms } from "../material";
 import { Material } from "../material";
 
 export class StarCoronaMaterial extends Material {
-  uniforms: Material["uniforms"] & {
-    uColor: Uniform<Vec3>;
-  };
+  uniforms: Material["uniforms"] &
+    Uniforms<{
+      uColor: Vec3;
+    }>;
 
   constructor(engine: Engine3D, color: Vec3) {
     super(engine);

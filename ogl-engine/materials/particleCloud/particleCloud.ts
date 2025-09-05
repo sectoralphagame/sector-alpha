@@ -5,16 +5,17 @@ import { assetLoader } from "@ogl-engine/AssetLoader";
 import { colorToVec3 } from "@core/utils/maps";
 import fragment from "./shader.frag.glsl";
 import vertex from "./shader.vert.glsl";
-import type { Uniform } from "../material";
+import type { Uniforms } from "../material";
 import { Material } from "../material";
 
 export class ParticleCloudMaterial extends Material {
-  uniforms: Material["uniforms"] & {
-    tMap: Uniform<Texture>;
-    uColor: Uniform<Vec3>;
-    uEmissive: Uniform<number>;
-    uAlpha: Uniform<number>;
-  };
+  uniforms: Material["uniforms"] &
+    Uniforms<{
+      tMap: Texture;
+      uColor: Vec3;
+      uEmissive: number;
+      uAlpha: number;
+    }>;
 
   constructor(
     engine: Engine3D,
