@@ -4,12 +4,14 @@ import { entries, join, map, pipe } from "@fxts/core";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Light } from "@ogl-engine/engine/Light";
 import Color from "color";
-import type { ProgramOptions, Mesh, Vec3, Vec4, Vec2 } from "ogl";
+import type { ProgramOptions, Mesh, Vec3, Vec4, Vec2, Mat4, Mat3 } from "ogl";
 import { Texture, Program } from "ogl";
 import type { BindingParams, FolderApi } from "tweakpane";
 import { getPane } from "@ui/context/Pane";
 
-export interface Uniform<T extends Vec2 | Vec3 | Vec4 | Texture | number> {
+export interface Uniform<
+  T extends Vec2 | Vec3 | Vec4 | Texture | Mat3 | Mat4 | number
+> {
   value: T;
   meta?: {
     pane?: BindingParams;
@@ -25,6 +27,9 @@ export abstract class Material {
     uTime: Uniform<number>;
     tEnvMap: Uniform<Texture>;
     uCameraScale: Uniform<number>;
+    invProjectionMatrix: Uniform<Mat4>;
+    invViewMatrix: Uniform<Mat4>;
+    invViewProjectionMatrix: Uniform<Mat4>;
   };
 
   constructor(engine: Engine3D) {
@@ -35,6 +40,9 @@ export abstract class Material {
       uTime: engine.uniforms.uTime,
       tEnvMap: engine.uniforms.env.tEnvMap,
       uCameraScale: { value: Math.log2(engine.camera.far) },
+      invProjectionMatrix: { value: engine.camera.invProjectionMatrix },
+      invViewMatrix: { value: engine.camera.invViewMatrix },
+      invViewProjectionMatrix: { value: engine.camera.invViewProjectionMatrix },
     };
   }
 
