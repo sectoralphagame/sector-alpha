@@ -4,7 +4,7 @@ import { entries, join, map, pipe } from "@fxts/core";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
 import type { Light } from "@ogl-engine/engine/Light";
 import Color from "color";
-import type { ProgramOptions, Mesh, Vec3, Vec4, Mat4 } from "ogl";
+import type { ProgramOptions, Mesh, Vec3, Vec4, Mat4, Vec2 } from "ogl";
 import { Texture, Program } from "ogl";
 import type { BindingParams, FolderApi } from "tweakpane";
 import { getPane } from "@ui/context/Pane";
@@ -28,6 +28,7 @@ export abstract class Material {
     uTime: number;
     tEnvMap: Texture;
     uCameraScale: number;
+    uResolution: Vec2;
     invProjectionMatrix: Mat4;
     invViewMatrix: Mat4;
     invViewProjectionMatrix: Mat4;
@@ -43,6 +44,7 @@ export abstract class Material {
       uTime: engine.uniforms.uTime,
       tEnvMap: engine.uniforms.env.tEnvMap,
       uCameraScale: { value: Math.log2(engine.camera.far) },
+      uResolution: engine.uniforms.resolution.base,
       invProjectionMatrix: { value: engine.camera.invProjectionMatrix },
       invViewMatrix: { value: engine.camera.invViewMatrix },
       invViewProjectionMatrix: { value: engine.camera.invViewProjectionMatrix },

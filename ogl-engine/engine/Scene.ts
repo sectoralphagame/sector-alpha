@@ -187,6 +187,13 @@ export class TacticalMapScene extends Scene {
         max: 1,
       }
     );
+    this.pane
+      .addButton({
+        title: "Toggle UI",
+      })
+      .on("click", () =>
+        this.engine.togglePostProcessingPass("composite", "ui")
+      );
   }
 
   destroy() {

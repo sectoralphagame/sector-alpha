@@ -1,6 +1,11 @@
 #version 300 es
 precision highp float;
 
+#pragma defines
+#ifndef LAYER
+#define LAYER 0
+#endif
+
 #pragma glslify: blinnPhongSpec = require(glsl-specular-blinn-phong)
 #pragma glslify: Light = require("./ogl-engine/shader/light");
 
@@ -46,12 +51,13 @@ void main() {
             }
         }
 
-        fragData[0].rgb = (diffuse + ambient + specular) * uColor;
+        fragData[LAYER].rgb = (diffuse + ambient + specular) * uColor;
     } else {
-        fragData[0] = vec4(uColor, 1.f);
+        fragData[LAYER] = vec4(uColor, 1.f);
     }
 
-    fragData[0].a = 1.0f;
-    fragData[1] = vec4(fragData[0].xyz, fEmissive);
+    fragData[LAYER].a = 1.0f;
+    fragData[1] = vec4(fragData[LAYER].xyz, fEmissive);
+
     gl_FragDepth = log2(vFragDepth) / uCameraScale;
 }

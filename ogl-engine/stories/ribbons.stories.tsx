@@ -4,7 +4,7 @@ import { Styles } from "@kit/theming/style";
 import { merge } from "lodash";
 import { BaseMesh } from "@ogl-engine/engine/BaseMesh";
 import type { Engine3D } from "@ogl-engine/engine/engine3d";
-import { Plane } from "ogl";
+import { Plane, Sphere } from "ogl";
 import { RibbonGeometry } from "@ogl-engine/RibbonEmitter";
 import { ColorMaterial } from "@ogl-engine/materials/color/color";
 import { EngineTrailMaterial } from "@ogl-engine/materials/engineTrail/engineTrail";
@@ -15,7 +15,7 @@ const n = 50;
 const segments = new Float32Array(n * 4);
 
 for (let i = 0; i < n; i++) {
-  segments.set([i / n, 0, Math.sin(i) / n], i * 4);
+  segments.set([i / n, 0, Math.sin(i) / n, i], i * 4);
 }
 
 interface RibbonsStoryProps extends Story3dArgs {}
@@ -27,13 +27,10 @@ const RibbonsStory: React.FC<RibbonsStoryProps> = (props) => {
     engine.camera.position.set(1, 1, 1);
 
     const ribbon = new BaseMesh(engine, {
-      geometry: new RibbonGeometry(
-        engine.gl,
-        segments.length / 4,
-        segments,
-        0.05
-      ),
+      geometry: new RibbonGeometry(engine.gl, n, segments, 0.05),
       material: new EngineTrailMaterial(engine, "#ff00ff"),
+      mode: engine.gl.TRIANGLE_STRIP,
+      calculateTangents: false,
     });
     ribbon.setParent(engine.scene);
 
@@ -45,6 +42,20 @@ const RibbonsStory: React.FC<RibbonsStoryProps> = (props) => {
       }),
     });
     plane.scale.set(0.1);
+
+    for (let i = 0; i < n; i++) {
+      const segment = segments.subarray(i * 4, (i + 1) * 4);
+      const sphere = new BaseMesh(engine, {
+        geometry: new Sphere(engine.gl),
+        material: new ColorMaterial(engine, {
+          color: "#ffffff",
+          shaded: false,
+        }),
+      });
+      sphere.scale.set(0.004);
+      sphere.position.set(segment[0], segment[1], segment[2]);
+      engine.scene.addChild(sphere);
+    }
 
     engine.scene.addChild(plane);
   }, []);

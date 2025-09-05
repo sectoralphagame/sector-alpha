@@ -64,3 +64,7 @@ export function isVec2(v: object): v is { value: number[] } {
 export function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
+
+export function triangle(a: number): number {
+  return 1 - Math.abs(((a / 2) % 1) * 2 - 1);
+}

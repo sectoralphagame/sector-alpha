@@ -13,12 +13,13 @@ import type { Faction } from "@core/archetypes/faction";
 import font from "@assets/fonts/FiraSans/FiraSans-Light.json";
 import { EntityNameMaterial } from "@ogl-engine/materials/entityName/entityName";
 import type { DockSize } from "@core/components/dockable";
-import { taskPriority, type OnBeforeRenderTask } from "@ogl-engine/engine/task";
+import { type OnBeforeRenderTask } from "@ogl-engine/engine/task";
 import models from "@assets/models";
 import type { Material } from "@ogl-engine/materials/material";
 import { materials } from "@ogl-engine/materials";
 import { LaserWeaponEffect } from "@ogl-engine/builders/LaserWeapon";
 import type { Turret } from "@core/archetypes/turret";
+import { transport3D } from "@core/systems/transport3d";
 
 const tempVec3 = new Vec3();
 export const distanceScale = 250;
@@ -134,10 +135,10 @@ export class EntityMesh extends BaseMesh {
     this.entity = entity;
     this.name = `EntityMesh:${entity.id}`;
 
-    this.tasks.push(
-      this.engine.addOnBeforeRenderTask(
-        this.updatePosition.bind(this),
-        taskPriority.high
+    this.onDestroyCallbacks.push(
+      transport3D.subscribe(
+        "movingSystemFinished",
+        this.updatePosition.bind(this)
       )
     );
 
@@ -157,9 +158,9 @@ export class EntityMesh extends BaseMesh {
             this,
             input.position,
             input.scale.x * 4,
-            { small: 50, medium: 15, large: 10 }[
+            { small: 15, medium: 8, large: 12 }[
               entity.cp.dockable?.size ?? "large"
-            ]
+            ] * 10
           );
           const color = entity.cp.owner
             ? entity.sim.getOrThrow<Faction>(entity.cp.owner.id).cp.color.value
@@ -221,6 +222,12 @@ export class EntityMesh extends BaseMesh {
     this.rotation.y = -this.entity.cp.position.angle;
     this.setVisibility(!this.entity.cp.render.hidden);
     this.updateMatrixWorld();
+
+    for (const child of this.children) {
+      if (child instanceof RibbonEmitter) {
+        child.update(this.entity.sim.delta);
+      }
+    }
   }
 
   addParticleGenerator(input: ParticleGeneratorInput) {
