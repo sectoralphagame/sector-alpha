@@ -34,7 +34,6 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
     super(engine, {
       geometry: new Plane(engine.gl),
       material: new EntityIndicatorMaterial(engine),
-      frustumCulled: false,
     });
   }
 
@@ -70,7 +69,6 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
         id: { size: 1, data: text.buffers.id },
         index: { data: text.buffers.index },
       }),
-      frustumCulled: false,
     });
     const texture = new Texture(this.engine.gl, {
       generateMipmaps: false,
