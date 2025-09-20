@@ -186,7 +186,7 @@ export class TacticalMap extends React.PureComponent<TacticalMapProps> {
   }
 
   async onEngineUpdate() {
-    if (!(assetLoader.ready && this.engine.isFocused())) return;
+    if (!(assetLoader.ready && this.engine.isFocused() && this.control)) return;
 
     if (this.dragStart) {
       const normalisedDragStart = new Vec2(
