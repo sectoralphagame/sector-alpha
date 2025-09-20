@@ -451,7 +451,7 @@
     "slots": []
   },
   {
-    "acceleration": 0.2,
+    "acceleration": 0.15,
     "build": {
       "time": 70,
       "cost": {
@@ -471,10 +471,10 @@
     "range": 2,
     "mining": 0,
     "role": "military",
-    "cruise": 3.8,
-    "maneuver": 0.6,
-    "rotary": 210,
-    "ttc": 0.8,
+    "cruise": 0.9,
+    "maneuver": 0.2,
+    "rotary": 190,
+    "ttc": 1.5,
     "name": "Dart",
     "size": "small",
     "storage": 10,

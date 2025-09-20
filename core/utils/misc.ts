@@ -17,6 +17,23 @@ export function getSubordinates(entity: RequireComponent<"subordinates">) {
   );
 }
 
+/**
+ *
+ * @param angle Angle in radians
+ * @returns Normalized angle in the range of -π to π
+ */
+export function normalizeAngle(angle: number): number {
+  let out = angle;
+
+  while (out > Math.PI) {
+    out -= 2 * Math.PI;
+  }
+  while (out < -Math.PI) {
+    out += 2 * Math.PI;
+  }
+  return out;
+}
+
 export function getAngleDiff(
   origin: RequireComponent<"position">,
   path: Vec2

@@ -12,6 +12,7 @@ import type { TransformData } from "@core/components/transform";
 import { filter, flatMap, map, pipe, some } from "@fxts/core";
 import type { Turret } from "@core/archetypes/turret";
 import type { AttackOrder } from "@core/components/orders";
+import { normalizeAngle } from "@core/utils/misc";
 import { regenCooldown } from "./hitpointsRegenerating";
 import { System } from "./system";
 import { transport3D } from "./transport3d";
@@ -26,23 +27,6 @@ const sizeMultipliers: Record<DockSize, [number, number, number]> = {
 export function getEvasionChance(speed: number, size: DockSize): number {
   const [a, b, c] = sizeMultipliers[size];
   return Math.max(0, ((b / speed) * 10 * a + c) / 100);
-}
-
-/**
- *
- * @param angle Angle in radians
- * @returns Normalized angle in the range of -π to π
- */
-function normalizeAngle(angle: number): number {
-  let out = angle;
-
-  while (out > Math.PI) {
-    out -= 2 * Math.PI;
-  }
-  while (out < -Math.PI) {
-    out += 2 * Math.PI;
-  }
-  return out;
 }
 
 function attack(attacker: RequireComponent<"orders">, target: Entity) {

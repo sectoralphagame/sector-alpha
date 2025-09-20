@@ -12,9 +12,9 @@ const tempForward = new Vec2();
 const tempVec2 = new Vec2();
 
 const brakeAlignment: Record<DockSize, number> = {
-  large: 0.98,
-  medium: 0.92,
-  small: 0.5,
+  large: 0.99,
+  medium: 0.97,
+  small: 0.6,
 };
 
 export function goToPosition(entity: Navigable, target: Vec2): Thrust {
@@ -40,7 +40,8 @@ export function goToPosition(entity: Navigable, target: Vec2): Thrust {
   const forwardMag = forward.dot(entity.cp.movable.velocity);
 
   const speedCoeff = Math.min(1, 1 - speedPercent + 0.5);
-  const alignCoeff = (1 - (alignmentToTarget + 1) / 2) ** 2 + 0.2;
+  const alignCoeff =
+    1 - (alignmentToTarget + 1) / 2 + (alignmentToTarget > 0.999 ? 0 : 0.1);
   thrust.angular = speedCoeff * alignCoeff;
   thrust.drag = Math.min(0.7, (1 - alignmentToTarget) ** 2);
   if (speed > 0) {
