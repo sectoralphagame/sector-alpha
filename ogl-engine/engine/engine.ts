@@ -40,6 +40,7 @@ export abstract class Engine<TScene extends Scene = Scene> {
       canvas: canvas as any, // Works for both HTMLCanvasElement and OffscreenCanvas
       dpr: this.dpr,
       antialias: true,
+      webgl: 2,
     });
   }
 

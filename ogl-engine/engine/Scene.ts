@@ -114,8 +114,19 @@ export class TacticalMapScene extends Scene {
         label: "God Rays Exposure",
       }
     );
+    this.pane.addBinding(this.engine.kawase, "iterations", {
+      label: "Bloom Iterations",
+      min: 2,
+      max: 5,
+      step: 1,
+    });
+    this.pane.addBinding(this.engine.kawase, "samplePosMult", {
+      label: "Bloom Spread",
+      min: 0,
+      max: 5,
+    });
     this.pane.addBinding(
-      this.engine.uniforms.env.postProcessing.bloom.uBloomStrength,
+      this.engine.uniforms.env.postProcessing.bloom.uGain,
       "value",
       {
         label: "Bloom Strength",
