@@ -40,6 +40,7 @@ export const OglCanvas: React.FC<OglCanvasProps> = React.memo(({ engine }) => {
 
   React.useEffect(() => {
     if (errorCount > 10) {
+      // eslint-disable-next-line no-console
       console.error("Too many errors, stopping rendering");
       cancelAnimationFrame(frameIdRef.current);
     }

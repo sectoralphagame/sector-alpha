@@ -8,7 +8,6 @@ import { getPane } from "@ui/context/Pane";
 import brightPassFragment from "../post/brightPass.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
 import vignetteFragment from "../post/vignette.frag.glsl";
-import uiFragment from "../post/ui.frag.glsl";
 import godraysFragment from "../post/godrays.frag.glsl";
 import tonemappingFragment from "../post/tonemapping.frag.glsl";
 import compositeFragment from "../post/composite.frag.glsl";
@@ -22,6 +21,7 @@ import { OnBeforeRenderTask } from "./task";
 import { RenderingPerformance } from "./performance";
 import { createEngine3DUniforms, type Engine3DUniforms } from "./uniforms3d";
 import { DualKawasePost } from "./post/dualKawase";
+import { RenderLayer } from "./Renderer";
 
 const lightsNum = 16;
 
@@ -91,7 +91,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.camera.near = settings.camera.near;
     this.camera.far = settings.camera.far;
 
-    this.renderTarget = createHiDefRenderTarget(this.gl, { color: 3 });
+    this.renderTarget = createHiDefRenderTarget(this.gl, { color: 2 });
 
     this.uniforms.env.tEnvMap.value = new Texture(this.renderer.gl);
 
@@ -243,15 +243,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         },
       }),
     };
-    this.postProcessingLayers.composite.passes.ui = {
-      enabled: true,
-      pass: this.postProcessingLayers.composite.post.addPass({
-        fragment: uiFragment,
-        uniforms: {
-          tUi: this.renderTarget.textures[2],
-        },
-      }),
-    };
   };
 
   private get vignettePass() {
@@ -298,6 +289,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   }
 
   private renderSimple = () => {
+    this.renderer.setRenderLayer(RenderLayer.default);
     this.renderer.render({
       scene: this.scene,
       camera: this.camera,
@@ -305,6 +297,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   };
 
   private renderComposite() {
+    this.renderer.setRenderLayer(RenderLayer.default);
+
     // Disable compositePass pass, so this post will just render the scene for now
     for (const pass of this.postProcessingLayers.composite.post.passes) {
       pass.enabled = false;
@@ -325,8 +319,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         pass.uniforms.tEmissive.value = this.renderTarget.textures[1];
       }
     }
-    this.postProcessingLayers.composite.passes.ui.pass.uniforms.tUi.value =
-      this.renderTarget.textures[2];
     this.postProcessingLayers.bloom.post.render({
       texture: this.renderTarget.textures[0],
     });
@@ -340,8 +332,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.fxaaPass.pass.enabled = this.fxaa;
     this.vignettePass.pass.enabled =
       this.postProcessingLayers.composite.passes.vignette.enabled;
-    this.postProcessingLayers.composite.passes.ui.pass.enabled =
-      this.postProcessingLayers.composite.passes.ui.enabled;
     // Allow post to render to canvas upon its last pass
     this.postProcessingLayers.composite.post.targetOnly = false;
 
@@ -349,6 +339,13 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     // pass back in its previous render of the scene to avoid re-rendering
     this.postProcessingLayers.composite.post.render({
       texture: this.renderTarget.textures[0],
+    });
+
+    this.renderer.setRenderLayer(RenderLayer.ui);
+    this.renderer.render({
+      scene: this.scene,
+      camera: this.camera,
+      clear: false,
     });
   }
 

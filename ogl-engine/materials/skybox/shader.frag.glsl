@@ -7,7 +7,7 @@ uniform float uCameraScale;
 in vec3 vDir;
 in float vFragDepth;
 
-out vec4 fragData[3];
+out vec4 fragData[2];
 
 void main() {
     fragData[0] = texture(tMap, vDir);

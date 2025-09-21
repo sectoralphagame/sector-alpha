@@ -7,7 +7,7 @@ in vec2 vUv;
 in float vFragDepth;
 flat in float vInstanceIndex;
 
-out vec4 fragData[3];
+out vec4 fragData[2];
 
 uniform sampler2D tMap;
 uniform vec3 uColor;

@@ -1,7 +1,7 @@
-import { Renderer } from "ogl";
 import { PubSub } from "@core/utils/pubsub";
 import type { Scene } from "./Scene";
 import type { Camera } from "./Camera";
+import { Renderer } from "./Renderer";
 
 type InitEvent = { type: "init" };
 type UpdateEvent = { type: "update"; delta: number };

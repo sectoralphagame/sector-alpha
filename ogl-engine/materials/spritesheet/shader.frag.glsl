@@ -4,7 +4,7 @@ precision highp float;
 in vec3 worldPosition;
 in vec2 vUv;
 
-out vec4 fragData[3];
+out vec4 fragData[2];
 
 uniform sampler2D tDiffuse;
 uniform float fAlpha;
