@@ -9,7 +9,7 @@ in vec3 vWorldNormal;
 in vec3 worldPosition;
 in float vFragDepth;
 
-out vec4 fragData[3];
+out vec4 fragData[2];
 
 uniform vec3 cameraPosition;
 uniform float uCameraScale;

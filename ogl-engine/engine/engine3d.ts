@@ -1,4 +1,4 @@
-import type { Pass, Transform } from "ogl";
+import type { Pass, RenderTargetOptions, Transform } from "ogl";
 import { Post, Texture, Vec2, Vec3, RenderTarget } from "ogl";
 import settings from "@core/settings";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
@@ -6,27 +6,40 @@ import { gameStore } from "@ui/state/game";
 import { sortBy } from "@fxts/core";
 import { getPane } from "@ui/context/Pane";
 import brightPassFragment from "../post/brightPass.frag.glsl";
-import blurFragment from "../post/blur.frag.glsl";
 import fxaaFragment from "../post/fxaa.frag.glsl";
 import vignetteFragment from "../post/vignette.frag.glsl";
-import uiFragment from "../post/ui.frag.glsl";
 import godraysFragment from "../post/godrays.frag.glsl";
 import tonemappingFragment from "../post/tonemapping.frag.glsl";
 import compositeFragment from "../post/composite.frag.glsl";
 import type { Light } from "./Light";
 import { dummyLight } from "./Light";
 import { Camera } from "./Camera";
+import type { RenderingContext } from "./engine";
 import { Engine } from "./engine";
 import { TacticalMapScene, type Scene } from "./Scene";
 import { OnBeforeRenderTask } from "./task";
 import { RenderingPerformance } from "./performance";
+import { createEngine3DUniforms, type Engine3DUniforms } from "./uniforms3d";
+import { DualKawasePost } from "./post/dualKawase";
+import { RenderLayer } from "./Renderer";
 
-const bloomSize = 1.2;
 const lightsNum = 16;
-const bloomPasses = 8;
-const bloomDpr = 4; // 1/4 of the canvas size
 
 const tempVec3 = new Vec3();
+
+function createHiDefRenderTarget(
+  gl: RenderingContext,
+  opts: Partial<RenderTargetOptions> = {}
+) {
+  return new RenderTarget(gl, {
+    type: gl.HALF_FLOAT,
+    format: gl.RGBA,
+    internalFormat: gl.RGBA16F,
+    minFilter: gl.LINEAR,
+    magFilter: gl.LINEAR,
+    ...opts,
+  });
+}
 
 export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   canvas: HTMLCanvasElement;
@@ -38,42 +51,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
   fxOwners: Record<number, Transform[]> = {};
 
-  uniforms: {
-    env: {
-      camera: {
-        scale: { value: number };
-      };
-      ambient: { value: Vec3 };
-      lights: Light["uniforms"][];
-      tEnvMap: { value: Texture };
-      postProcessing: {
-        godrays: {
-          uDensity: { value: number };
-          uWeight: { value: number };
-          uDecay: { value: number };
-          uExposure: { value: number };
-        };
-        bloom: {
-          uBloomStrength: { value: number };
-        };
-        vignette: {
-          uStrength: { value: number };
-          uSmoothness: { value: number };
-          uOffset: { value: number };
-        };
-        tonemapping: {
-          uGamma: { value: number };
-          uSaturation: { value: number };
-          uContrast: { value: number };
-          uExposure: { value: number };
-          uMap: { value: number };
-        };
-      };
-    };
-    resolution: { base: { value: Vec2 }; bloom: { value: Vec2 } };
-    uTime: { value: number };
-    uSeed: { value: number };
-  };
+  uniforms: Engine3DUniforms;
+  kawase = new DualKawasePost();
 
   private lights: Light[] = [];
   private postProcessingLayers: Record<
@@ -94,7 +73,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
 
   constructor() {
     super();
-    this.initUniforms();
+    this.uniforms = createEngine3DUniforms();
     this.initPane();
   }
 
@@ -106,22 +85,13 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.gl.getExtension("OES_texture_half_float");
     this.gl.getExtension("OES_texture_half_float_linear");
 
-    const gl = this.renderer.gl;
     this.camera = new Camera(this);
     this.camera.position.set(50, 50, 50);
     this.camera.lookAt([0, 0, 0]);
     this.camera.near = settings.camera.near;
     this.camera.far = settings.camera.far;
 
-    this.renderTarget = new RenderTarget(gl, {
-      // Color, bloom and UI
-      color: 3,
-      // @ts-expect-error type resolution fails for some reason
-      type: gl.HALF_FLOAT,
-      format: gl.RGBA,
-      // @ts-expect-error type resolution fails for some reason
-      internalFormat: gl.RGBA16F,
-    });
+    this.renderTarget = createHiDefRenderTarget(this.gl, { color: 2 });
 
     this.uniforms.env.tEnvMap.value = new Texture(this.renderer.gl);
 
@@ -132,7 +102,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   };
 
   initPane() {
-    console.log("Initializing pane");
     const folder = getPane().addOrReplaceFolder({
       title: "Renderer",
       expanded: true,
@@ -168,61 +137,17 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       });
   }
 
-  private initUniforms() {
-    this.uniforms = {
-      env: {
-        ambient: { value: new Vec3(0) },
-        camera: {
-          scale: { value: 1 },
-        },
-        lights: [],
-        tEnvMap: { value: null! },
-        postProcessing: {
-          godrays: {
-            uDensity: { value: 0.8 },
-            uWeight: { value: 1 },
-            uDecay: { value: 0.86 },
-            uExposure: { value: 0.9 },
-          },
-          bloom: {
-            uBloomStrength: { value: 0.4 },
-          },
-          vignette: {
-            uStrength: { value: 0.48 },
-            uSmoothness: { value: 0.19 },
-            uOffset: { value: -0.41 },
-          },
-          tonemapping: {
-            uGamma: { value: 1.08 },
-            uContrast: { value: 1 },
-            uSaturation: { value: 1 },
-            uExposure: { value: 1.03 },
-            uMap: { value: 1 },
-          },
-        },
-      },
-      resolution: {
-        base: { value: new Vec2() },
-        bloom: { value: new Vec2() },
-      },
-      uTime: { value: 0 },
-      uSeed: { value: Math.random() },
-    };
-  }
-
   private initPostProcessing = () => {
-    const gl = this.renderer.gl;
-
     this.postProcessingLayers = {
       composite: {
-        post: new Post(gl, {
+        post: new Post(this.gl, {
           dpr: this.dpr,
         }),
         passes: {},
       },
       bloom: {
-        post: new Post(gl, {
-          dpr: this.dpr / bloomDpr,
+        post: new Post(this.gl, {
+          dpr: this.dpr,
           targetOnly: true,
           depth: false,
         }),
@@ -230,52 +155,45 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       },
     };
 
+    this.kawase.init(this.postProcessingLayers.bloom.post);
+
+    this.postProcessingLayers.composite.post.fbo.read = createHiDefRenderTarget(
+      this.gl,
+      { depth: false }
+    );
+    this.postProcessingLayers.composite.post.fbo.write =
+      createHiDefRenderTarget(this.gl, { depth: false });
+
+    this.postProcessingLayers.bloom.post.fbo.read = createHiDefRenderTarget(
+      this.gl,
+      { depth: false }
+    );
+    this.postProcessingLayers.bloom.post.fbo.write = createHiDefRenderTarget(
+      this.gl,
+      { depth: false }
+    );
+
+    this.postProcessingLayers.composite.post.resize();
+    this.postProcessingLayers.bloom.post.resize();
+
     this.postProcessingLayers.bloom.passes.bright = {
       pass: this.postProcessingLayers.bloom.post.addPass({
         fragment: brightPassFragment,
         uniforms: {
           uThreshold: { value: 0.995 },
-          tEmissive: { value: new Texture(gl) },
+          tEmissive: { value: null },
         },
       }),
       enabled: true,
     };
-
-    this.postProcessingLayers.bloom.passes.horizontalBloom = {
-      enabled: true,
-      pass: this.postProcessingLayers.bloom.post.addPass({
-        fragment: blurFragment,
-        uniforms: {
-          uResolution: this.uniforms.resolution.bloom,
-          uDirection: { value: new Vec2(bloomSize * 3, 0) },
-        },
-      }),
-    };
-    this.postProcessingLayers.bloom.passes.verticalBloom = {
-      enabled: true,
-      pass: this.postProcessingLayers.bloom.post.addPass({
-        fragment: blurFragment,
-        uniforms: {
-          uResolution: this.uniforms.resolution.bloom,
-          uDirection: { value: new Vec2(0, bloomSize) },
-        },
-      }),
-    };
-    for (let i = 0; i < bloomPasses; i++) {
-      this.postProcessingLayers.bloom.post.passes.push(
-        this.postProcessingLayers.bloom.passes.horizontalBloom.pass,
-        this.postProcessingLayers.bloom.passes.verticalBloom.pass
-      );
-    }
 
     this.postProcessingLayers.composite.passes.composite = {
       enabled: true,
       pass: this.postProcessingLayers.composite.post.addPass({
         fragment: compositeFragment,
         uniforms: {
-          uResolution: this.uniforms.resolution.base,
           tBloom: this.postProcessingLayers.bloom.post.uniform,
-          uBloomStrength: this.uniforms.env.postProcessing.bloom.uBloomStrength,
+          uBloomStrength: this.uniforms.env.postProcessing.bloom.uGain,
         },
       }),
     };
@@ -298,7 +216,10 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       enabled: true,
       pass: this.postProcessingLayers.composite.post.addPass({
         fragment: tonemappingFragment,
-        uniforms: this.uniforms.env.postProcessing.tonemapping,
+        uniforms: {
+          ...this.uniforms.env.postProcessing.tonemapping,
+          uTime: this.uniforms.uTime,
+        },
       }),
     };
     this.postProcessingLayers.composite.passes.fxaa = {
@@ -319,15 +240,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
           uStrength: this.uniforms.env.postProcessing.vignette.uStrength,
           uSmoothness: this.uniforms.env.postProcessing.vignette.uSmoothness,
           uOffset: this.uniforms.env.postProcessing.vignette.uOffset,
-        },
-      }),
-    };
-    this.postProcessingLayers.composite.passes.ui = {
-      enabled: true,
-      pass: this.postProcessingLayers.composite.post.addPass({
-        fragment: uiFragment,
-        uniforms: {
-          tUi: this.renderTarget.textures[2],
         },
       }),
     };
@@ -377,6 +289,7 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   }
 
   private renderSimple = () => {
+    this.renderer.setRenderLayer(RenderLayer.default);
     this.renderer.render({
       scene: this.scene,
       camera: this.camera,
@@ -384,6 +297,8 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   };
 
   private renderComposite() {
+    this.renderer.setRenderLayer(RenderLayer.default);
+
     // Disable compositePass pass, so this post will just render the scene for now
     for (const pass of this.postProcessingLayers.composite.post.passes) {
       pass.enabled = false;
@@ -404,11 +319,11 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
         pass.uniforms.tEmissive.value = this.renderTarget.textures[1];
       }
     }
-    this.postProcessingLayers.composite.passes.ui.pass.uniforms.tUi.value =
-      this.renderTarget.textures[2];
     this.postProcessingLayers.bloom.post.render({
       texture: this.renderTarget.textures[0],
     });
+    this.kawase.render(this.postProcessingLayers.bloom.post);
+
     // Re-enable composite pass
     this.compositePass.pass.enabled = true;
     this.postProcessingLayers.composite.passes.tonemapping.pass.enabled =
@@ -417,8 +332,6 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.fxaaPass.pass.enabled = this.fxaa;
     this.vignettePass.pass.enabled =
       this.postProcessingLayers.composite.passes.vignette.enabled;
-    this.postProcessingLayers.composite.passes.ui.pass.enabled =
-      this.postProcessingLayers.composite.passes.ui.enabled;
     // Allow post to render to canvas upon its last pass
     this.postProcessingLayers.composite.post.targetOnly = false;
 
@@ -426,6 +339,13 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     // pass back in its previous render of the scene to avoid re-rendering
     this.postProcessingLayers.composite.post.render({
       texture: this.renderTarget.textures[0],
+    });
+
+    this.renderer.setRenderLayer(RenderLayer.ui);
+    this.renderer.render({
+      scene: this.scene,
+      camera: this.camera,
+      clear: false,
     });
   }
 

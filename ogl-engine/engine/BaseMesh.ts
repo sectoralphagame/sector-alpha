@@ -6,6 +6,7 @@ import type { Destroyable } from "@ogl-engine/types";
 import type { Engine3D } from "./engine3d";
 import { Light } from "./Light";
 import { BoundingBox } from "./BoundingBox";
+import { RenderLayer } from "./Renderer";
 
 const tempMat4 = new Mat4();
 const tempWorldMatrix = new Mat4();
@@ -19,6 +20,7 @@ export class BaseMesh<TMaterial extends Material = Material>
   material: TMaterial;
   tangents = true;
   onDestroyCallbacks: (() => void)[] = [];
+  layer: RenderLayer = RenderLayer.default;
 
   constructor(
     engine: Engine3D,

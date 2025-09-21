@@ -20,6 +20,7 @@ import { materials } from "@ogl-engine/materials";
 import { LaserWeaponEffect } from "@ogl-engine/builders/LaserWeapon";
 import type { Turret } from "@core/archetypes/turret";
 import { transport3D } from "@core/systems/transport3d";
+import { RenderLayer } from "@ogl-engine/engine/Renderer";
 
 const tempVec3 = new Vec3();
 export const distanceScale = 250;
@@ -28,13 +29,13 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
   name = "EntityIndicator";
   parent: EntityMesh;
   nameMesh: BaseMesh<EntityNameMaterial> | null = null;
+  layer = RenderLayer.ui;
   private task: OnBeforeRenderTask;
 
   constructor(engine: Engine3D) {
     super(engine, {
       geometry: new Plane(engine.gl),
       material: new EntityIndicatorMaterial(engine),
-      frustumCulled: false,
     });
   }
 
@@ -70,7 +71,6 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
         id: { size: 1, data: text.buffers.id },
         index: { data: text.buffers.index },
       }),
-      frustumCulled: false,
     });
     const texture = new Texture(this.engine.gl, {
       generateMipmaps: false,
@@ -90,6 +90,7 @@ export class EntityIndicator extends BaseMesh<EntityIndicatorMaterial> {
           ) < 10
       );
     });
+    this.nameMesh.layer = RenderLayer.ui;
     this.nameMesh.setParent(this);
   }
 

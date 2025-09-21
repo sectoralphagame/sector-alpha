@@ -76,6 +76,7 @@ export class Skybox extends Mesh implements Destroyable {
           tMap: {
             value: new Texture(engine.gl, {
               target: engine.gl.TEXTURE_CUBE_MAP,
+              internalFormat: engine.gl.SRGB8_ALPHA8,
             }),
           },
           uCameraScale: { value: Math.log2(engine.camera.far) },

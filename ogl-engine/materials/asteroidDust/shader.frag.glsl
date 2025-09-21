@@ -7,7 +7,7 @@ in vec2 vUv;
 in float vFragDepth;
 flat in float vInstanceIndex;
 
-out vec4 fragData[3];
+out vec4 fragData[2];
 
 uniform sampler2D tMap;
 uniform vec3 uColor;
@@ -24,7 +24,7 @@ void main() {
     float l = max(0.f, value - 0.1f);
     float alpha = uAlpha * l * clamp(triangle(uTime * (mod(vInstanceIndex, 9.f) + 0.1f) * animSpeed + vInstanceIndex * 0.01f), 0.15f, 0.9f);
 
-    if(alpha < 1.f / 255.f)
+    if(alpha < 0.1f / 255.f)
         discard;
 
     fragData[0] = vec4(uColor, alpha);

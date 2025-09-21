@@ -29,7 +29,7 @@ precision highp float;
 in vec3 vColor;
 in float vFragDepth;
 
-out vec4 fragData[3];
+out vec4 fragData[2];
 
 uniform float uCameraScale;
 

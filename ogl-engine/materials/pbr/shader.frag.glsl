@@ -33,7 +33,7 @@ uniform float uRoughness;
 uniform sampler2D tEmissive;
 #endif
 
-out vec4 fragData[3];
+out vec4 fragData[2];
 #define EPSILON 0.001f
 
 #pragma glslify: pbr = require("./ogl-engine/shader/pbr", lights = lights, cameraPosition = cameraPosition, worldPosition = worldPosition);

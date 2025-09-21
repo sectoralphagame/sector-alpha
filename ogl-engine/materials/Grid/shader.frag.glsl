@@ -4,7 +4,7 @@ precision highp float;
 in vec2 vUv;
 in vec3 vPosition;
 
-out vec4 fragData[3];
+out vec4 fragData[2];
 
 uniform vec3 cameraPosition;
 uniform mat4 viewMatrix;

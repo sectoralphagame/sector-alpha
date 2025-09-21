@@ -1,9 +1,10 @@
-import { Mesh, Plane, Program, Renderer } from "ogl";
+import { Mesh, Plane, Program } from "ogl";
 import settings from "@core/settings";
 import { gameStore } from "@ui/state/game";
 import { Scene, StrategicMapScene } from "./Scene";
 import { Camera } from "./Camera";
 import { Engine } from "./engine";
+import { Renderer } from "./Renderer";
 
 // It's not really 2D, but it's going to be used as 2D
 export class Engine2D extends Engine {

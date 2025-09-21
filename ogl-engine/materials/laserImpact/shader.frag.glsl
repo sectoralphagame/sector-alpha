@@ -6,7 +6,7 @@ in float vFragDepth;
 in vec3 vNormal;
 in vec3 vViewDirection;
 
-out vec4 fragData[3];
+out vec4 fragData[2];
 
 uniform vec3 uColor;
 uniform float uCameraScale;

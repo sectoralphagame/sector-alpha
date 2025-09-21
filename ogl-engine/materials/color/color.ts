@@ -29,9 +29,6 @@ export class ColorMaterial extends Material {
     super(engine);
 
     const defines: Record<string, string> = {};
-    if (opts.layer) {
-      defines.LAYER = opts.layer;
-    }
 
     this.createProgram(vertex, fragment, defines, {
       cullFace: false,
