@@ -122,7 +122,7 @@ export class Asteroids extends Transform {
     );
 
     const material = new AsteroidDustMaterial(this.engine, "prop/smoke", {
-      alpha: 0.25,
+      alpha: 0.14,
       color: "#ffffff",
       emissive: 0.0,
     });
