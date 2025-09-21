@@ -1,6 +1,7 @@
 import type { Post, Texture } from "ogl";
 import { Vec2, RenderTarget, Mesh, Program } from "ogl";
 import type { Uniforms } from "@ogl-engine/materials/material";
+import type { RenderingContext } from "@ogl-engine/engine/engine";
 import vertex from "./shader.vert.glsl";
 import downsampleFragment from "./downsample.frag.glsl";
 import upsampleFragment from "./upsample.frag.glsl";
@@ -25,38 +26,38 @@ export class DualKawasePost {
   height = 0;
 
   init(post: Post) {
+    const gl = post.gl as RenderingContext;
+
     const uniforms: BloomUniforms = {
       tMap: { value: null as any },
       uTexel: { value: new Vec2() },
       uOffset: { value: this.samplePosMult },
     };
 
-    this.downsample = new Program(post.gl, {
+    this.downsample = new Program(gl, {
       vertex,
       fragment: downsampleFragment,
       uniforms,
     });
-    this.upsample = new Program(post.gl, {
+    this.upsample = new Program(gl, {
       vertex,
       fragment: upsampleFragment,
       uniforms,
     });
 
-    this.mesh = new Mesh(post.gl, {
+    this.mesh = new Mesh(gl, {
       geometry: post.geometry,
     });
 
     for (let i = 0; i < maxIterations; i++) {
       const opts = {
-        // @ts-expect-error type resolution fails for some reason
-        type: post.gl.HALF_FLOAT,
-        format: post.gl.RGBA,
-        // @ts-expect-error type resolution fails for some reason
-        internalFormat: post.gl.RGBA16F,
+        type: gl.HALF_FLOAT,
+        format: gl.RGBA,
+        internalFormat: gl.RGBA16F,
         depth: false,
       };
-      this.levels.push(new RenderTarget(post.gl, opts));
-      this.temps.push(new RenderTarget(post.gl, opts));
+      this.levels.push(new RenderTarget(gl, opts));
+      this.temps.push(new RenderTarget(gl, opts));
     }
   }
 

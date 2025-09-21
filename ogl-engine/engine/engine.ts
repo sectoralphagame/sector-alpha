@@ -8,6 +8,11 @@ type UpdateEvent = { type: "update"; delta: number };
 type ErrorEvent = { type: "error"; error: Error };
 type EngineEvent = InitEvent | UpdateEvent | ErrorEvent;
 
+export type RenderingContext = WebGL2RenderingContext & {
+  renderer: Renderer;
+  canvas: HTMLCanvasElement;
+};
+
 export abstract class Engine<TScene extends Scene = Scene> {
   public hooks: PubSub<EngineEvent>;
 
@@ -87,7 +92,7 @@ export abstract class Engine<TScene extends Scene = Scene> {
   }
 
   get gl() {
-    return this.renderer.gl;
+    return this.renderer.gl as RenderingContext;
   }
 
   get delta() {

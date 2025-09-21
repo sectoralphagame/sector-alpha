@@ -1,9 +1,4 @@
-import type {
-  OGLRenderingContext,
-  Pass,
-  RenderTargetOptions,
-  Transform,
-} from "ogl";
+import type { Pass, RenderTargetOptions, Transform } from "ogl";
 import { Post, Texture, Vec2, Vec3, RenderTarget } from "ogl";
 import settings from "@core/settings";
 import { EntityMesh } from "@ui/components/TacticalMap/EntityMesh";
@@ -20,6 +15,7 @@ import compositeFragment from "../post/composite.frag.glsl";
 import type { Light } from "./Light";
 import { dummyLight } from "./Light";
 import { Camera } from "./Camera";
+import type { RenderingContext } from "./engine";
 import { Engine } from "./engine";
 import { TacticalMapScene, type Scene } from "./Scene";
 import { OnBeforeRenderTask } from "./task";
@@ -32,14 +28,12 @@ const lightsNum = 16;
 const tempVec3 = new Vec3();
 
 function createHiDefRenderTarget(
-  gl: OGLRenderingContext,
+  gl: RenderingContext,
   opts: Partial<RenderTargetOptions> = {}
 ) {
   return new RenderTarget(gl, {
-    // @ts-expect-error type resolution fails for some reason
     type: gl.HALF_FLOAT,
     format: gl.RGBA,
-    // @ts-expect-error type resolution fails for some reason
     internalFormat: gl.RGBA16F,
     minFilter: gl.LINEAR,
     magFilter: gl.LINEAR,
@@ -91,14 +85,13 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.gl.getExtension("OES_texture_half_float");
     this.gl.getExtension("OES_texture_half_float_linear");
 
-    const gl = this.renderer.gl;
     this.camera = new Camera(this);
     this.camera.position.set(50, 50, 50);
     this.camera.lookAt([0, 0, 0]);
     this.camera.near = settings.camera.near;
     this.camera.far = settings.camera.far;
 
-    this.renderTarget = createHiDefRenderTarget(gl, { color: 3 });
+    this.renderTarget = createHiDefRenderTarget(this.gl, { color: 3 });
 
     this.uniforms.env.tEnvMap.value = new Texture(this.renderer.gl);
 
@@ -145,17 +138,15 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
   }
 
   private initPostProcessing = () => {
-    const gl = this.renderer.gl;
-
     this.postProcessingLayers = {
       composite: {
-        post: new Post(gl, {
+        post: new Post(this.gl, {
           dpr: this.dpr,
         }),
         passes: {},
       },
       bloom: {
-        post: new Post(gl, {
+        post: new Post(this.gl, {
           dpr: this.dpr,
           targetOnly: true,
           depth: false,
@@ -167,18 +158,18 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
     this.kawase.init(this.postProcessingLayers.bloom.post);
 
     this.postProcessingLayers.composite.post.fbo.read = createHiDefRenderTarget(
-      gl,
+      this.gl,
       { depth: false }
     );
     this.postProcessingLayers.composite.post.fbo.write =
-      createHiDefRenderTarget(gl, { depth: false });
+      createHiDefRenderTarget(this.gl, { depth: false });
 
     this.postProcessingLayers.bloom.post.fbo.read = createHiDefRenderTarget(
-      gl,
+      this.gl,
       { depth: false }
     );
     this.postProcessingLayers.bloom.post.fbo.write = createHiDefRenderTarget(
-      gl,
+      this.gl,
       { depth: false }
     );
 
