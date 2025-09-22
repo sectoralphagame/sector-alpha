@@ -8,19 +8,19 @@ interface IconButtonProps extends BaseButtonProps {
   variant?: "outlined" | "naked" | "opaque";
 }
 
-export const IconButton: React.FC<IconButtonProps> = ({
-  variant = "outlined",
-  ...props
-}) => (
-  <BaseButton
-    type="button"
-    {...props}
-    // eslint-disable-next-line react/destructuring-assignment
-    className={clsx(styles.root, props?.className, {
-      [styles.outlined]: variant === "outlined",
-      [styles.naked]: variant === "naked",
-      [styles.opaque]: variant === "opaque",
-    })}
-  />
+export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({ variant = "outlined", ...props }, ref) => (
+    <BaseButton
+      type="button"
+      ref={ref}
+      {...props}
+      // eslint-disable-next-line react/destructuring-assignment
+      className={clsx(styles.root, props?.className, {
+        [styles.outlined]: variant === "outlined",
+        [styles.naked]: variant === "naked",
+        [styles.opaque]: variant === "opaque",
+      })}
+    />
+  )
 );
 IconButton.displayName = "IconButton";

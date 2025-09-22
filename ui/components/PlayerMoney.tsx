@@ -2,8 +2,16 @@ import { IconButton } from "@kit/IconButton";
 import React from "react";
 import Stack from "@kit/Stack";
 import { useGameSettings } from "@ui/hooks/useGameSettings";
-import { ConfigIcon, FleetIcon, JournalIcon, LockIcon } from "@assets/ui/icons";
+import {
+  ConfigIcon,
+  FleetIcon,
+  FullscreenIcon,
+  JournalIcon,
+  LockIcon,
+} from "@assets/ui/icons";
 import { gameStore } from "@ui/state/game";
+import useFullscreen from "@ui/hooks/useFullscreen";
+import { Tooltip } from "@kit/Tooltip";
 import { useGameDialog, useSim } from "../atoms";
 import styles from "./PlayerMoney.scss";
 
@@ -12,6 +20,7 @@ export const PlayerMoney: React.FC = () => {
   const [player, setPlayer] = React.useState(sim.index.player.get()[0]);
   const [gameSettings] = useGameSettings();
   const [, setDialog] = useGameDialog();
+  const { fullscreenEnabled, toggle } = useFullscreen();
 
   React.useEffect(() => {
     const handle = setInterval(
@@ -48,6 +57,18 @@ export const PlayerMoney: React.FC = () => {
       <IconButton onClick={() => setDialog({ type: "config" })} variant="naked">
         <ConfigIcon />
       </IconButton>
+      {!fullscreenEnabled && (
+        <Tooltip
+          // eslint-disable-next-line react/no-unstable-nested-components
+          anchor={(ref) => (
+            <IconButton ref={ref} onClick={toggle} variant="naked">
+              <FullscreenIcon />
+            </IconButton>
+          )}
+        >
+          Go fullscreen
+        </Tooltip>
+      )}
     </Stack>
   );
 };

@@ -18,6 +18,7 @@ import config from "@assets/ui/icons/config.svg";
 import exclamation from "@assets/ui/icons/exclamation.svg";
 import ff from "@assets/ui/icons/ff.svg";
 import fleet from "@assets/ui/icons/fleet.svg";
+import fullscreen from "@assets/ui/icons/fullscreen.svg";
 import heart from "@assets/ui/icons/heart.svg";
 import journal from "@assets/ui/icons/journal.svg";
 import location from "@assets/ui/icons/location.svg";
@@ -70,6 +71,9 @@ export const FFIcon: React.FC<Omit<Props, "src">> = (props) => (
 );
 export const FleetIcon: React.FC<Omit<Props, "src">> = (props) => (
   <SVG {...props} src={fleet} />
+);
+export const FullscreenIcon: React.FC<Omit<Props, "src">> = (props) => (
+  <SVG {...props} src={fullscreen} />
 );
 export const HeartIcon: React.FC<Omit<Props, "src">> = (props) => (
   <SVG {...props} src={heart} />
