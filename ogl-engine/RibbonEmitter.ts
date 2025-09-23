@@ -146,7 +146,6 @@ export class RibbonEmitter extends BaseMesh<EngineTrailMaterial> {
     maxSegments: number
   ) {
     super(trackedEntity.engine, {
-      frustumCulled: false,
       name: "RibbonEmitter",
       geometry: new RibbonGeometry(trackedEntity.engine.gl, maxSegments),
       material: new EngineTrailMaterial(trackedEntity.engine, "#ff00ff"),
