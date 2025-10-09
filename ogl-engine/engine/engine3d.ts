@@ -135,6 +135,13 @@ export class Engine3D<TScene extends Scene = Scene> extends Engine<TScene> {
       .on("click", () => {
         this.setDeltaMultiplier(this.deltaMultiplier === 1 ? 0 : 1);
       });
+    folder
+      .addButton({
+        title: "Toggle Postprocessing",
+      })
+      .on("click", () => {
+        this.postProcessing = !this.postProcessing;
+      });
   }
 
   private initPostProcessing = () => {
